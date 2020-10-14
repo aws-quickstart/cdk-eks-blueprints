@@ -21,9 +21,20 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-sns": "1.67.0",
-    "@aws-cdk/aws-sns-subscriptions": "1.67.0",
-    "@aws-cdk/aws-sqs": "1.67.0",
-    "@aws-cdk/core": "1.67.0"
+    "@aws-cdk/core": "1.67.0",
+    "@aws-cdk/aws-autoscaling": "^1.67.0",
+    "@aws-cdk/aws-codebuild": "^1.67.0",
+    "@aws-cdk/aws-codecommit": "^1.67.0",
+    "@aws-cdk/aws-codepipeline": "^1.67.0",
+    "@aws-cdk/aws-codepipeline-actions": "^1.67.0",
+    "@aws-cdk/aws-dynamodb": "^1.67.0",
+    "@aws-cdk/aws-ec2": "^1.67.0",
+    "@aws-cdk/aws-ecr": "^1.67.0",
+    "@aws-cdk/aws-eks": "^1.67.0",
+    "@aws-cdk/aws-elasticsearch": "^1.67.0",
+    "@aws-cdk/aws-iam": "^1.67.0",
+    "@aws-cdk/aws-logs": "^1.67.0",
+    "@aws-cdk/aws-secretsmanager": "^1.67.0",
+    "js-yaml": "^3.13.1"
   }
 }
