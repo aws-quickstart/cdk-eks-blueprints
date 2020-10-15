@@ -24,3 +24,13 @@ export function readYamlFromDir(dir: string, cluster: eks.Cluster) {
         
       })
 }
+
+export function readYamlDocument(path: string) : string {
+  try {
+    const doc = fs.readFileSync(path, 'utf8');
+    return doc;
+  } catch (e) {
+    console.log(e + ' for path: ' + path);
+    throw e;
+  }
+}

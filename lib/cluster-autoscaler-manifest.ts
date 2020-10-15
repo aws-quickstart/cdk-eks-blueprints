@@ -3,7 +3,7 @@ import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import * as cdk from '@aws-cdk/core';
 
-export function enableAutoscaling(scope: Construct, cluster: eks.Cluster, ng: eks.Nodegroup, version: string = "v1.17.3") {
+export function enableAutoscaling(stack: cdk.Stack, cluster: eks.Cluster, ng: eks.Nodegroup, version: string = "v1.17.3") {
     const autoscalerStmt = new iam.PolicyStatement();
     autoscalerStmt.addResources("*");
     autoscalerStmt.addActions(
@@ -15,19 +15,19 @@ export function enableAutoscaling(scope: Construct, cluster: eks.Cluster, ng: ek
       "autoscaling:TerminateInstanceInAutoScalingGroup",
       "ec2:DescribeLaunchTemplateVersions"
     );
-    const autoscalerPolicy = new iam.Policy(this, "cluster-autoscaler-policy", {
+    const autoscalerPolicy = new iam.Policy(stack, "cluster-autoscaler-policy", {
       policyName: "ClusterAutoscalerPolicy",
       statements: [autoscalerStmt],
     });
     autoscalerPolicy.attachToRole(ng.role);
 
-    const clusterName = new CfnJson(this, "clusterName", {
+    const clusterName = new CfnJson(stack, "clusterName", {
       value: cluster.clusterName,
     });
-    Tags.of(ng).add(ng, `k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
+    Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
     Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
 
-    new eks.KubernetesManifest(scope, "cluster-autoscaler", {
+    new eks.KubernetesManifest(stack, "cluster-autoscaler", {
       cluster,
       manifest: [
         {
