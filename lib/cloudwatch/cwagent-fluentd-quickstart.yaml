@@ -171,7 +171,7 @@ spec:
 ---
 
 # create configmap for cluster name and aws region for CloudWatch Logs
-# need to replace the placeholders {{cluster_name}} and {{region_name}}
+# need to replace the placeholders cluster_name and region_name
 apiVersion: v1
 data:
   cluster.name: {{cluster_name}}

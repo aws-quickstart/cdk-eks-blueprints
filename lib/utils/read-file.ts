@@ -36,6 +36,11 @@ export function readYamlDocument(path: string): string {
     }
 }
 
-export function loadYamlDocument(document: string): any {
-    return yaml.safeLoadAll(document);
+
+export function loadYaml(document: string): any {
+    return yaml.safeLoad(document);
+}
+
+export function serializeYaml(document: any): string {
+  return yaml.safeDump(document);
 }
