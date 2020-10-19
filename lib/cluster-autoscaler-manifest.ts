@@ -3,7 +3,7 @@ import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import * as cdk from '@aws-cdk/core';
 
-export function enableAutoscaling(stack: cdk.Stack, cluster: eks.Cluster, ng: eks.Nodegroup, version: string = "v1.17.3") {
+export function clusterAutoScaling(stack: cdk.Stack, cluster: eks.Cluster, ng: eks.Nodegroup, version: string = "v1.17.3") {
     const autoscalerStmt = new iam.PolicyStatement();
     autoscalerStmt.addResources("*");
     autoscalerStmt.addActions(
