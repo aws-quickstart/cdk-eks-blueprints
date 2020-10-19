@@ -7,15 +7,21 @@ import { clusterAutoScaling } from "./cluster-autoscaler-manifest"
 import { Cluster, Nodegroup } from '@aws-cdk/aws-eks';
 import { Stack } from '@aws-cdk/core';
 import { TeamTroySetup } from './team-troy/setup';
+import { TeamRikerSetup } from './team-riker/setup';
+import { TeamBurnhamSetup } from './team-burnham/setup';
 import { ManagedPolicy } from '@aws-cdk/aws-iam';
 import { readYamlDocument, loadYaml, serializeYaml } from './utils/read-file';
+import { setPriority } from 'os';
 
 export class CdkEksBlueprintStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, "eks-blueprint");
 
         const clusterName = "dev1";
-
+        
+        // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
+        // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
+        // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
         const vpc = new ec2.Vpc(this, clusterName + "-vpc");
 
         const cluster = new eks.Cluster(this, clusterName, {
@@ -39,7 +45,13 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         this.cloudWatchContainerInsights(ng, cluster, this.region);
         this.nginxIngressController(cluster);
         this.argoCD(cluster);
-        const troy = new TeamTroySetup().setup(cluster, this);
+
+        const teams: Array<TeamSetup> = [
+          new TeamTroySetup(), 
+          new TeamRikerSetup(), 
+          new TeamBurnhamSetup()
+        ];
+        teams.forEach(setup => setup.setup(cluster, this));
     }
 
     //cni(cluster: Cluster) {

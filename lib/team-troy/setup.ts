@@ -1,7 +1,5 @@
 import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as iam from "@aws-cdk/aws-iam";
 import * as s3 from "@aws-cdk/aws-s3";
 import { TeamSetup } from '../cdk-eks-blueprint-stack';
 
@@ -20,5 +18,4 @@ export class TeamTroySetup implements TeamSetup {
     bucket.grantReadWrite(sa);
     new cdk.CfnOutput(stack, 'ServiceAccountIamRole', { value: sa.role.roleArn })
   } 
-
 }
