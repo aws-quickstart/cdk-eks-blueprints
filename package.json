@@ -2,7 +2,7 @@
   "name": "cdk-eks-blueprint",
   "version": "0.1.0",
   "bin": {
-    "cdk-eks-blueprint": "bin/cdk-eks-blueprint.js"
+    "main": "bin/main.js"
   },
   "scripts": {
     "build": "tsc",

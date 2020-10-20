@@ -12,7 +12,7 @@ export class TeamTroySetup implements TeamSetup {
       metadata: { name: 'team-troy' }
     });
 
-    const sa = cluster.addServiceAccount('djl-backend-account', {namespace: 'team-troy'});
+    const sa = cluster.addServiceAccount('inf-backend', {name: 'inf-backend', namespace: 'team-troy'});
     sa.node.addDependency(namespace);
     const bucket = new s3.Bucket(stack, 'djl-demo');
     bucket.grantReadWrite(sa);

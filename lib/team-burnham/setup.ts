@@ -9,7 +9,7 @@ export class TeamBurnhamSetup implements TeamSetup {
     const namespace = cluster.addManifest('team-burnham', {
       apiVersion: 'v1',
       kind: 'Namespace',
-      metadata: { name: 'team-troy' }
+      metadata: { name: 'team-burnham' }
     });
   } 
 }
