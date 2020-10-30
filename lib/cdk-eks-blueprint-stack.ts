@@ -6,12 +6,12 @@ import * as iam from "@aws-cdk/aws-iam";
 import { clusterAutoScaling } from "./cluster-autoscaler-manifest"
 import { Cluster, Nodegroup } from '@aws-cdk/aws-eks';
 import { Stack, StackProps } from '@aws-cdk/core';
-import { TeamTroySetup } from './team-troy/setup';
+import { TeamTroiSetup } from './team-troi/setup';
 import { TeamRikerSetup } from './team-riker/setup';
 import { TeamBurnhamSetup } from './team-burnham/setup';
 import { ManagedPolicy } from '@aws-cdk/aws-iam';
 import { readYamlDocument, loadYaml, serializeYaml } from './utils/read-file';
-import { setPriority } from 'os';
+
 
 export class CdkEksBlueprintStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, clusterName: string, props?: StackProps) {
@@ -45,7 +45,7 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         this.argoCD(cluster);
 
         const teams: Array<TeamSetup> = [
-          new TeamTroySetup(), 
+          new TeamTroiSetup(), 
           new TeamRikerSetup(), 
           new TeamBurnhamSetup()
         ];

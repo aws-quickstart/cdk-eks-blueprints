@@ -4,8 +4,8 @@ import * as s3 from "@aws-cdk/aws-s3";
 import { TeamSetup } from '../cdk-eks-blueprint-stack';
 
 
-export class TeamTroySetup implements TeamSetup {
-  readonly teamName: string = 'team-troy';
+export class TeamTroiSetup implements TeamSetup {
+  readonly teamName: string = 'team-troi';
 
   setup(cluster: eks.Cluster, stack: cdk.Stack) {
     const namespace = cluster.addManifest(this.teamName, {
@@ -21,7 +21,7 @@ export class TeamTroySetup implements TeamSetup {
 
     const sa = cluster.addServiceAccount('inf-backend', { name: 'inf-backend', namespace: this.teamName });
     sa.node.addDependency(namespace);
-    const bucket = new s3.Bucket(stack, 'djl-demo');
+    const bucket = new s3.Bucket(stack, 'inf-backend-bucket');
     bucket.grantReadWrite(sa);
     new cdk.CfnOutput(stack, this.teamName + 'sa-iam-role', { value: sa.role.roleArn })
   }
