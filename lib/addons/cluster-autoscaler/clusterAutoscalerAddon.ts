@@ -1,9 +1,17 @@
 import * as eks from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
-import * as cdk from '@aws-cdk/core';
+import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
 
-export function clusterAutoScaling(stack: cdk.Stack, cluster: eks.Cluster, ng: eks.Nodegroup, version: string = "v1.17.3") {
+export class ClusterAutoScaler implements ClusterAddOn {
+  /**
+   * Version of the autoscaler, controls the image tag
+   */
+  version = "v1.17.3";
+  
+  deploy (stack: CdkEksBlueprintStack) {
+    const cluster = stack.cluster;
+    const ng = stack.nodeGroup;
     const autoscalerStmt = new iam.PolicyStatement();
     autoscalerStmt.addResources("*");
     autoscalerStmt.addActions(
@@ -22,7 +30,7 @@ export function clusterAutoScaling(stack: cdk.Stack, cluster: eks.Cluster, ng: e
     autoscalerPolicy.attachToRole(ng.role);
 
     const clusterName = new CfnJson(stack, "clusterName", {
-      value: cluster.clusterName,
+      value: stack.cluster.clusterName,
     });
     Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
     Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
@@ -248,7 +256,7 @@ export function clusterAutoScaling(stack: cdk.Stack, cluster: eks.Cluster, ng: e
                 serviceAccountName: "cluster-autoscaler",
                 containers: [
                   {
-                    image: "k8s.gcr.io/autoscaling/cluster-autoscaler:" + version,
+                    image: "k8s.gcr.io/autoscaling/cluster-autoscaler:" + this.version,
                     name: "cluster-autoscaler",
                     resources: {
                       limits: {
@@ -297,3 +305,4 @@ export function clusterAutoScaling(stack: cdk.Stack, cluster: eks.Cluster, ng: e
       ],
     });
   }
+}
