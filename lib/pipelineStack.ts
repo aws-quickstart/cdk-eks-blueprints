@@ -5,55 +5,55 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
 
 export class FactoryApplication extends Stage {
-  constructor(scope: Construct, id: string, props?: StageProps) {
-    super(scope, id, props);
-    const eksBlueprintStack = new CdkEksBlueprintStack(this, id);
-  }
+    constructor(scope: Construct, id: string, props?: StageProps) {
+        super(scope, id, props);
+        const eksBlueprintStack = new CdkEksBlueprintStack(this, id);
+    }
 }
 
 export class PipelineStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+    constructor(scope: Construct, id: string, props?: StackProps) {
+        super(scope, id, props);
 
-    const sourceArtifact = new codepipeline.Artifact();
-    const cloudAssemblyArtifact = new codepipeline.Artifact();
+        const sourceArtifact = new codepipeline.Artifact();
+        const cloudAssemblyArtifact = new codepipeline.Artifact();
 
-    const pipeline = new CdkPipeline(this, 'FactoryPipeline', {
-      pipelineName: 'FactoryPipeline',
-      cloudAssemblyArtifact,
+        const pipeline = new CdkPipeline(this, 'FactoryPipeline', {
+            pipelineName: 'FactoryPipeline',
+            cloudAssemblyArtifact,
 
-      sourceAction: new actions.GitHubSourceAction({
-        actionName: 'GitHub',
-        output: sourceArtifact,
-        oauthToken: SecretValue.secretsManager('github-token'),
-        // Replace these with your actual GitHub project name
-        owner: 'shapirov103',
-        repo: 'cdk-eks-blueprint',
-        branch: 'main', // default: 'master'
-      }),
+            sourceAction: new actions.GitHubSourceAction({
+                actionName: 'GitHub',
+                output: sourceArtifact,
+                oauthToken: SecretValue.secretsManager('github-token'),
+                // Replace these with your actual GitHub project name
+                owner: 'shapirov103',
+                repo: 'cdk-eks-blueprint',
+                branch: 'main', // default: 'master'
+            }),
 
-      synthAction: SimpleSynthAction.standardNpmSynth({
-        sourceArtifact,
-        cloudAssemblyArtifact,
-        // Use this if you need a build step (if you're not using ts-node
-        // or if you have TypeScript Lambdas that need to be compiled).
-        buildCommand: 'npm run build',
-      }),
-    });
+            synthAction: SimpleSynthAction.standardNpmSynth({
+                sourceArtifact,
+                cloudAssemblyArtifact,
+                // Use this if you need a build step (if you're not using ts-node
+                // or if you have TypeScript Lambdas that need to be compiled).
+                buildCommand: 'npm run build',
+            }),
+        });
 
-    // Do this as many times as necessary with any account and region
-    // Account and region may different from the pipeline's.
-    pipeline.addApplicationStage(new FactoryApplication(this,  'dev', {
-      env: {
-        region: 'us-east-1',
-      }
-    }));
-    // Do this as many times as necessary with any account and region
-    // Account and region may different from the pipeline's.
-    pipeline.addApplicationStage(new FactoryApplication(this, 'staging', {
-      env: {
-        region: 'us-east-1',
-      }
-    }));
-  }
+        // Do this as many times as necessary with any account and region
+        // Account and region may different from the pipeline's.
+        pipeline.addApplicationStage(new FactoryApplication(this, 'dev', {
+            env: {
+                region: 'us-east-1'
+            }
+        }));
+        // Do this as many times as necessary with any account and region
+        // Account and region may different from the pipeline's.
+        pipeline.addApplicationStage(new FactoryApplication(this, 'staging', {
+            env: {
+                region: 'us-east-1'
+            }
+        }));
+    }
 }

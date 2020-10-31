@@ -31,6 +31,7 @@ const allTeams: Array<TeamSetup> = [
 
 new PipelineStack(app, "factory-pipeline", {
     env: {
+        account: "929819487611",
         region: 'us-east-2'
     },
 });
