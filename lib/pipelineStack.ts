@@ -45,14 +45,14 @@ export class PipelineStack extends Stack {
         // Account and region may different from the pipeline's.
         pipeline.addApplicationStage(new FactoryApplication(this, 'dev', {
             env: {
-                region: 'us-east-1'
+                region: 'us-east-2'
             }
         }));
         // Do this as many times as necessary with any account and region
         // Account and region may different from the pipeline's.
         pipeline.addApplicationStage(new FactoryApplication(this, 'staging', {
             env: {
-                region: 'us-east-1'
+                region: 'us-east-2'
             }
         }));
     }
