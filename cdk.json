@@ -4,6 +4,11 @@
     "@aws-cdk/core:newStyleStackSynthesis": true,
     "@aws-cdk/core:enableStackNameDuplicates": "true",
     "aws-cdk:enableDiffNoFail": "true",
-    "@aws-cdk/core:stackRelativeExports": "true"
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "instanceType": "t3.medium",
+    "vpc": null,
+    "minSize": 1,
+    "maxSize": 1,
+    "vpcList": null
   }
 }
