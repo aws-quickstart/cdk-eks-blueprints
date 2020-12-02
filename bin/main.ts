@@ -47,3 +47,10 @@ new CdkEksBlueprintStack(app, 'west-dev', addOns, allTeams, {
         region: 'us-west-2'
     },
 });
+
+new CdkEksBlueprintStack(app, 'east-test', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn], [], {
+    env: {
+        account: '929819487611',
+        region: 'us-east-2',
+    },
+});

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as eks from '@aws-cdk/aws-eks';
+import request from 'sync-request';
 
 
 export function readYamlFromDir(dir: string, cluster: eks.Cluster) {
@@ -39,6 +40,10 @@ export function readYamlDocument(path: string): string {
 
 export function loadYaml(document: string): any {
     return yaml.safeLoad(document);
+}
+
+export function loadExternalYaml(url: string): any {
+    return yaml.safeLoadAll(request('GET', url).getBody().toString());
 }
 
 export function serializeYaml(document: any): string {

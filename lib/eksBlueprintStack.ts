@@ -22,17 +22,7 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         const maxClusterSize = this.node.tryGetContext("maxSize") ?? 3;
         const vpcSubnets = this.node.tryGetContext("vpcSubnets");
 
-
-        // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
-        // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
-        // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
-        if(vpcId != null) {
-            this.vpc = ec2.Vpc.fromLookup(this, id + "-vpc", { vpcId: vpcId });
-        }
-
-        if(this.vpc == null) {
-            this.vpc = new ec2.Vpc(this, id + "-vpc");
-        }
+        this.initializeVpc(vpcId);
 
         this.cluster = new eks.Cluster(this, id, {
             vpc: this.vpc,
@@ -61,9 +51,24 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         }
     }
 
-    defineParameters() {
+    initializeVpc( vpcId: string) {
+        const id = this.node.id;
+        if (vpcId != null) {
+            if (vpcId === "default") {
+                console.log(`looking up completely default VPC`);
+                this.vpc = ec2.Vpc.fromLookup(this, id + "-vpc", { isDefault: true });
+            } else {
+                console.log(`looking up non-default ${vpcId} VPC`);
+                this.vpc = ec2.Vpc.fromLookup(this, id + "-vpc", { vpcId: vpcId });
+            }
+        }
 
-
+        if (this.vpc == null) {
+            // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
+            // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
+            // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
+            this.vpc = new ec2.Vpc(this, id + "-vpc");
+        }
     }
 
 }

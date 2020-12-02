@@ -8,7 +8,7 @@
     "instanceType": "t3.medium",
     "vpc": null,
     "minSize": 1,
-    "maxSize": 1,
+    "maxSize": 2,
     "vpcList": null
   }
 }
