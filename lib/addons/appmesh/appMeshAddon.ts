@@ -19,8 +19,9 @@ export class AppMeshAddon implements ClusterAddOn {
         sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AWSAppMeshFullAccess"));
 
 
-        const chart = stack.cluster.addHelmChart("app-mesh", {
-            chart: "eks/appmesh-controller",
+        const chart = stack.cluster.addHelmChart("appmesh-controller", {
+            chart: "appmesh-controller",
+            release: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
             namespace: "appmesh-system", 
             values: {
