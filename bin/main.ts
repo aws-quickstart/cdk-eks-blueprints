@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
+import { AppMeshAddon } from '../lib/addons/appmesh/appMeshAddon';
 import { ArgoCDAddOn } from '../lib/addons/argocd/argoCDAddon';
 import { CalicoNetworkPolicyAddon } from '../lib/addons/calico/calicoAddon';
 import { ContainerInsightsAddOn } from '../lib/addons/cloudwatch/containerInsightsAddon';
@@ -48,7 +49,7 @@ new CdkEksBlueprintStack(app, 'west-dev', addOns, allTeams, {
     },
 });
 
-new CdkEksBlueprintStack(app, 'east-test', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn], [], {
+new CdkEksBlueprintStack(app, 'east-test', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon], [], {
     env: {
         account: '929819487611',
         region: 'us-east-2',
