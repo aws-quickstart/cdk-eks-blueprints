@@ -30,7 +30,7 @@ export class AppMeshAddon implements ClusterAddOn {
                 "serviceAccount.name": "appmesh-controller"
             }
         });
-
+        
         chart.node.addDependency(appmeshNs);
     }
 }

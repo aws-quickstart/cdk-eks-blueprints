@@ -7,7 +7,7 @@ export class CalicoNetworkPolicyAddon implements ClusterAddOn {
   deploy(stack: CdkEksBlueprintStack): void {
     const cluster = stack.cluster;
 
-    let doc = readYamlDocument('./lib/addons/calico/calico-1.7.1.yaml');
+    let doc = readYamlDocument(__dirname + '/calico-1.7.1.yaml');
     let docArray = doc.split("---").map(e => loadYaml(e));
     let manifest = new KubernetesManifest(stack, "calico-network-policy", {
       cluster,

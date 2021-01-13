@@ -45,6 +45,7 @@ export class PipelineStack extends Stack {
         // Account and region may different from the pipeline's.
         pipeline.addApplicationStage(new FactoryApplication(this, 'dev', {
             env: {
+                account: this.node.tryGetContext(""),
                 region: 'us-east-2'
             }
         }));
@@ -52,6 +53,7 @@ export class PipelineStack extends Stack {
         // Account and region may different from the pipeline's.
         pipeline.addApplicationStage(new FactoryApplication(this, 'staging', {
             env: {
+                account: "929819487611",
                 region: 'us-east-2'
             }
         }));

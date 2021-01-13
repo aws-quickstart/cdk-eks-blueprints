@@ -12,7 +12,7 @@ export class ArgoCDAddOn implements ClusterAddOn {
       kind: 'Namespace',
       metadata: { name: 'argocd' }
     });
-    let doc = readYamlDocument('./lib/addons/argocd/install.yaml');
+    let doc = readYamlDocument(__dirname + '/install.yaml');
     let docArray = doc.split("---").map(e => loadYaml(e));
     docArray.forEach(e => e['metadata']['namespace'] = "argocd");
     let manifest = new KubernetesManifest(stack, "argocd", {
