@@ -6,7 +6,7 @@ At present the implementation contains the following functionality:
 
 * Provision one or many EKS clusters with a pre-defined configuration. 
 * Configure your EKS cluster (or multiple clusters) with add-ons (not to confuse with EKS Managed Addons announced at re:Invent 2020). Select from a list of available addons or add your own by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). Supported addons:  
-  * AppMesh Addon: adds AppMesh controller and CRDs (pending validation on latest version of CDK)
+  * AppMesh Addon: adds AppMesh controller and CRDs (pending validation on the latest version of CDK)
   * ArgoCD Addon: adds ArgoCD controller 
   * Calico Addon: Calico 1.7.1 CNI/Network policy engine
   * CloudWatch: Container Insights support integrating monitoring with CloudWatch 
@@ -14,6 +14,8 @@ At present the implementation contains the following functionality:
   * MetricsServerAddon: adds metrics server (pre-req for HPA and other monitoring tools)
   * NginxAddon: installs NGINX ingress controller 
 * Onboard one or many teams into designated clusters. Examples are provided under `lib/teams`, however due to uniqueness of every team, clients are expected to supply implementation of the `TeamSetup` interface.
+
+Note: currently tested version of CDK with the blueprint is 1.76 (affects bootstrapping as well, see below). It will be migrated shortly to 1.84 (or later). 
 ## Bootstrapping
 Each combination of target account and region must be bootstrapped prior to deploying stacks.
 Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.

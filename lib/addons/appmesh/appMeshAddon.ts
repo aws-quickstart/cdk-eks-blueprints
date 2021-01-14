@@ -21,12 +21,12 @@ export class AppMeshAddon implements ClusterAddOn {
 
         const chart = stack.cluster.addHelmChart("appmesh-controller", {
             chart: "appmesh-controller",
-            release: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
+            release: "appm-release",
             namespace: "appmesh-system", 
             values: {
                 "region": stack.region,
-                "serviceAccount.create": "false",
+                "serviceAccount.create": false,
                 "serviceAccount.name": "appmesh-controller"
             }
         });
