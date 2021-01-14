@@ -6,7 +6,7 @@ At present the implementation contains the following functionality:
 
 * Provision one or many EKS clusters with a pre-defined configuration. 
 * Configure your EKS cluster (or multiple clusters) with add-ons (not to confuse with EKS Managed Addons announced at re:Invent 2020). Select from a list of available addons or add your own by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). Supported addons:  
-  * AppMesh Addon: adds AppMesh controller and CRDs
+  * AppMesh Addon: adds AppMesh controller and CRDs (pending validation on latest version of CDK)
   * ArgoCD Addon: adds ArgoCD controller 
   * Calico Addon: Calico 1.7.1 CNI/Network policy engine
   * CloudWatch: Container Insights support integrating monitoring with CloudWatch 
@@ -59,7 +59,7 @@ const addOns: Array<ClusterAddOn> = [
 
 
 const app = new cdk.App();
-new CdkEksBlueprintStack(app, 'east-test-1', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon], [], {
+new CdkEksBlueprintStack(app, 'east-test-1', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn], [], {
   env: {
       account: YOUR_ACCOUNT,
       region: YOUR_TARGET_REGION,

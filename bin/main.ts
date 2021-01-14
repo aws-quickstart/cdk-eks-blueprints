@@ -49,9 +49,9 @@ new CdkEksBlueprintStack(app, 'west-dev', addOns, allTeams, {
     },
 });
 
-new CdkEksBlueprintStack(app, 'east-test', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon], [], {
+new CdkEksBlueprintStack(app, 'east-test-main', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon], [], {
     env: {
         account: '929819487611',
-        region: 'us-east-2',
+        region: 'us-east-1',
     },
 });

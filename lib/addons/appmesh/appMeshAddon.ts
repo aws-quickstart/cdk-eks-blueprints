@@ -31,6 +31,6 @@ export class AppMeshAddon implements ClusterAddOn {
             }
         });
         
-        chart.node.addDependency(appmeshNs);
+        chart.node.addDependency(sa);
     }
 }
