@@ -37,7 +37,8 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         this.nodeGroup = this.cluster.addNodegroupCapacity(id + "-ng", {
             instanceType: new ec2.InstanceType(instanceType),
             minSize: minClusterSize,
-            maxSize: maxClusterSize
+            maxSize: maxClusterSize,
+            
         });
 
         if (addOns) {

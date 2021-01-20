@@ -22,7 +22,7 @@ Bootstrapping is an process of creating IAM roles and lambda functions that can 
 
 Example: 
 ```   
-  cdk bootstrap aws://929819487611/us-east-1
+  cdk bootstrap aws://<AWS_ACCOUNT_ID>/us-east-1
 ```
 In addition to the regular [environment bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) pipeline bootstrapping for pipelines requires a new style of bootstrapping. Execute (with account admin privileges) the command in bootstrap-pipeline.sh.  
 
@@ -39,7 +39,7 @@ Supports context variables (specify in cdk.json, cdk.context.json or pass with -
 
 Create a new CDK project and add the following to the dependency section of the package.json file:
 ```
-    "@shapirov/cdk-eks-blueprint": "0.1.1"
+    "@shapirov/cdk-eks-blueprint": "0.1.4"
 ```
 Note: the module name will be migrated to aws in the near future. 
 
