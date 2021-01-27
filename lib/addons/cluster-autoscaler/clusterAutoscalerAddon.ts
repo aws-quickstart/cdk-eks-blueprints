@@ -11,7 +11,8 @@ export class ClusterAutoScaler implements ClusterAddOn {
   
   deploy (stack: CdkEksBlueprintStack) {
     const cluster = stack.cluster;
-    const ng = stack.nodeGroup;
+    console.assert(stack.nodeGroup, "Cluster autoscaler is supported with EKS EC2 only");
+    const ng = stack.nodeGroup!;
     const autoscalerStmt = new iam.PolicyStatement();
     autoscalerStmt.addResources("*");
     autoscalerStmt.addActions(

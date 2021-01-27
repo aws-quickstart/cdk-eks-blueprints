@@ -7,7 +7,7 @@ import * as actions from '@aws-cdk/aws-codepipeline-actions';
 export class FactoryApplication extends Stage {
     constructor(scope: Construct, id: string, props?: StageProps) {
         super(scope, id, props);
-        const eksBlueprintStack = new CdkEksBlueprintStack(this, id);
+        const eksBlueprintStack = new CdkEksBlueprintStack(this, {id: 'eks'});
     }
 }
 
@@ -45,7 +45,7 @@ export class PipelineStack extends Stack {
         // Account and region may different from the pipeline's.
         pipeline.addApplicationStage(new FactoryApplication(this, 'dev', {
             env: {
-                account: this.node.tryGetContext(""),
+                account: "929819487611",
                 region: 'us-east-2'
             }
         }));

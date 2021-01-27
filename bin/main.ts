@@ -8,6 +8,7 @@ import { ClusterAutoScaler } from '../lib/addons/cluster-autoscaler/clusterAutos
 import { MetricsServerAddon } from '../lib/addons/metrics-server/metricsServerAddon';
 import { NginxAddon } from '../lib/addons/nginx/nginxAddon';
 import { CdkEksBlueprintStack, ClusterAddOn, TeamSetup } from '../lib/eksBlueprintStack';
+import { FargateClusterProvider } from '../lib/fargate-cluster-provider';
 import { PipelineStack } from '../lib/pipelineStack';
 import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
 import { TeamRikerSetup } from '../lib/teams/team-riker/setup';
@@ -37,21 +38,27 @@ new PipelineStack(app, "factory-pipeline", {
     },
 });
 
-new CdkEksBlueprintStack(app, 'east-dev', addOns, allTeams, {
+new CdkEksBlueprintStack(app, {id: 'east-dev', addOns: addOns, teams: allTeams}, {
     env: {
         region: 'us-east-2'
     },
 });
 
-new CdkEksBlueprintStack(app, 'west-dev', addOns, allTeams, {
+new CdkEksBlueprintStack(app, {id: 'west-dev', addOns: addOns, teams: allTeams }, {
     env: {
         region: 'us-west-2'
     },
 });
 
-new CdkEksBlueprintStack(app, 'east-test-main', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon], [], {
+new CdkEksBlueprintStack(app, {id: 'east-test-main', addOns: [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon]}, {
     env: {
         account: '929819487611',
         region: 'us-east-1',
     },
 });
+
+new CdkEksBlueprintStack(app, {id: 'east-fargate-test', clusterProvider : new FargateClusterProvider}, {
+    env: {
+        region: 'us-east-1'
+    }
+})

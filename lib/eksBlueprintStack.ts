@@ -3,56 +3,67 @@ import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
+import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
+import { Cluster, Nodegroup } from '@aws-cdk/aws-eks';
+import { EC2ClusterProvider } from './ec2-cluster-provider';
+import {FargateClusterProvider} from './fargate-cluster-provider'
+
+export class EksBlueprintProps {
+
+    readonly id: string;
+
+    /**
+     * Defaults to id if not provided
+     */
+    readonly name?: string;
+
+    /**
+     * Add-ons if any.
+     */
+    readonly addOns?: Array<ClusterAddOn> = [];
+
+    /**
+     * Teams if any
+     */
+    readonly teams?: Array<TeamSetup> = [];
+    /**
+     * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
+     * will work
+     */
+    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider;
+
+}
 
 export class CdkEksBlueprintStack extends cdk.Stack {
 
     cluster: eks.Cluster;
     vpc: ec2.IVpc;
-    nodeGroup: eks.Nodegroup;
+    nodeGroup: eks.Nodegroup | undefined;
 
 
-    constructor(scope: cdk.Construct, id: string, addOns?: Array<ClusterAddOn>, teams?: Array<TeamSetup>, props?: StackProps) {
-        super(scope, id, props);
+    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+        super(scope, blueprintProps.id, props);
         /*
          * Supported parameters
         */
-        const instanceType = this.node.tryGetContext("instanceType") ?? 't3.medium';
         const vpcId = this.node.tryGetContext("vpc");
-        const minClusterSize = this.node.tryGetContext("minSize") ?? 1;
-        const maxClusterSize = this.node.tryGetContext("maxSize") ?? 3;
-        const vpcSubnets = this.node.tryGetContext("vpcSubnets");
-
         this.initializeVpc(vpcId);
 
-        this.cluster = new eks.Cluster(this, id, {
-            vpc: this.vpc,
-            clusterName: id,
-            outputClusterName: true,
-            defaultCapacity: 0, // we want to manage capacity ourselves
-            version: eks.KubernetesVersion.V1_18,
-            vpcSubnets: undefined
-        });
+        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
 
+        const clusterInfo = clusterProvider.createCluster(this, this.vpc);
+        this.cluster = clusterInfo.cluster;
+        this.nodeGroup = clusterInfo.nodeGroup;
 
-        this.nodeGroup = this.cluster.addNodegroupCapacity(id + "-ng", {
-            instanceType: new ec2.InstanceType(instanceType),
-            minSize: minClusterSize,
-            maxSize: maxClusterSize,
-            
-        });
-
-        if (addOns) {
-            for (let addOn of addOns) { // must iterate in the strict order
-                addOn.deploy(this);
-            }
+        for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
+            addOn.deploy(this);
         }
-
-        if (teams) {
-            teams.forEach(team => team.setup(this));
+        if(blueprintProps.teams != null) {
+            blueprintProps.teams.forEach(team => team.setup(this));
         }
     }
 
-    initializeVpc( vpcId: string) {
+    initializeVpc(vpcId: string) {
         const id = this.node.id;
         if (vpcId != null) {
             if (vpcId === "default") {
@@ -71,7 +82,10 @@ export class CdkEksBlueprintStack extends cdk.Stack {
             this.vpc = new ec2.Vpc(this, id + "-vpc");
         }
     }
+}
 
+export interface ClusterProvider {
+    createCluster(scope: cdk.Construct, vpc: IVpc): ClusterInfo;
 }
 
 export interface ClusterAddOn {
@@ -80,4 +94,9 @@ export interface ClusterAddOn {
 
 export interface TeamSetup {
     setup(stack: CdkEksBlueprintStack): void;
+}
+
+export interface ClusterInfo {
+    readonly cluster: Cluster;
+    readonly nodeGroup?: eks.Nodegroup;
 }
