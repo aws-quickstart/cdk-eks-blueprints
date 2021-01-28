@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { FargateProfileOptions } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import { AppMeshAddon } from '../lib/addons/appmesh/appMeshAddon';
 import { ArgoCDAddOn } from '../lib/addons/argocd/argoCDAddon';
@@ -57,7 +58,11 @@ new CdkEksBlueprintStack(app, {id: 'east-test-main', addOns: [new MetricsServerA
     },
 });
 
-new CdkEksBlueprintStack(app, {id: 'east-fargate-test', clusterProvider : new FargateClusterProvider}, {
+const fargateProfiles: Map<string, FargateProfileOptions> = new Map([ 
+    ["dynatrace", { selectors: [ { namespace: "dynatrace" }]}]
+]);
+
+new CdkEksBlueprintStack(app, {id: 'east-fargate-test', clusterProvider : new FargateClusterProvider(fargateProfiles)}, {
     env: {
         region: 'us-east-1'
     }
