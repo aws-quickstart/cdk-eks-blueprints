@@ -1,4 +1,4 @@
-import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
+import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 import { loadExternalYaml } from "../../utils/yamlUtils";
 
 export class MetricsServerAddon implements ClusterAddOn {
@@ -9,9 +9,9 @@ export class MetricsServerAddon implements ClusterAddOn {
     this.version = version ?? "v0.4.1";
   }
 
-  deploy(stack: CdkEksBlueprintStack): void {
+  deploy(clusterInfo :ClusterInfo): void {
     const manifestUrl = `https://github.com/kubernetes-sigs/metrics-server/releases/download/${this.version}/components.yaml`;
     const manifest = loadExternalYaml(manifestUrl);
-    stack.cluster.addManifest('my-resource', ...manifest);
+    clusterInfo.cluster.addManifest('my-resource', ...manifest);
   }
 }

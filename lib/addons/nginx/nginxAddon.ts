@@ -1,9 +1,9 @@
-import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
+import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 
 export class NginxAddon implements ClusterAddOn {
 
-  deploy(stack: CdkEksBlueprintStack): void {
-       stack.cluster.addHelmChart("ngninx-ingress", {
+  deploy(clusterInfo: ClusterInfo): void {
+       clusterInfo.cluster.addHelmChart("ngninx-ingress", {
             chart: "nginx-ingress",
             repository: "https://helm.nginx.com/stable",
             namespace: "kube-system"

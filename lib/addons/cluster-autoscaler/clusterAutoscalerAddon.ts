@@ -1,18 +1,29 @@
 import * as eks from "@aws-cdk/aws-eks";
+import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
-import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
+import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 
 export class ClusterAutoScaler implements ClusterAddOn {
   /**
    * Version of the autoscaler, controls the image tag
    */
-  version = "v1.17.3";
-  
-  deploy (stack: CdkEksBlueprintStack) {
-    const cluster = stack.cluster;
-    console.assert(stack.nodeGroup, "Cluster autoscaler is supported with EKS EC2 only");
-    const ng = stack.nodeGroup!;
+  readonly versionMap = new Map([
+    [KubernetesVersion.V1_19, "1.19.1"],
+    [KubernetesVersion.V1_18, "1.18.3"],
+    [KubernetesVersion.V1_17, "1.17.4"]
+  ]);
+
+  deploy(clusterInfo: ClusterInfo) {
+
+    const version = this.versionMap.get(clusterInfo.version);
+    const cluster = clusterInfo.cluster;
+    
+    console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "Cluster autoscaler is supported with EKS EC2 only");
+    
+    const ng = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup!;
+
+
     const autoscalerStmt = new iam.PolicyStatement();
     autoscalerStmt.addResources("*");
     autoscalerStmt.addActions(
@@ -24,19 +35,19 @@ export class ClusterAutoScaler implements ClusterAddOn {
       "autoscaling:TerminateInstanceInAutoScalingGroup",
       "ec2:DescribeLaunchTemplateVersions"
     );
-    const autoscalerPolicy = new iam.Policy(stack, "cluster-autoscaler-policy", {
+    const autoscalerPolicy = new iam.Policy(cluster.stack, "cluster-autoscaler-policy", {
       policyName: "ClusterAutoscalerPolicy",
       statements: [autoscalerStmt],
     });
     autoscalerPolicy.attachToRole(ng.role);
 
-    const clusterName = new CfnJson(stack, "clusterName", {
-      value: stack.cluster.clusterName,
+    const clusterName = new CfnJson(cluster.stack, "clusterName", {
+      value: cluster.clusterName,
     });
     Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
     Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
 
-    new eks.KubernetesManifest(stack, "cluster-autoscaler", {
+    new eks.KubernetesManifest(cluster.stack, "cluster-autoscaler", {
       cluster,
       manifest: [
         {
@@ -257,7 +268,7 @@ export class ClusterAutoScaler implements ClusterAddOn {
                 serviceAccountName: "cluster-autoscaler",
                 containers: [
                   {
-                    image: "k8s.gcr.io/autoscaling/cluster-autoscaler:" + this.version,
+                    image: "k8s.gcr.io/autoscaling/cluster-autoscaler:" + version,
                     name: "cluster-autoscaler",
                     resources: {
                       limits: {
@@ -277,7 +288,7 @@ export class ClusterAutoScaler implements ClusterAddOn {
                       "--skip-nodes-with-local-storage=false",
                       "--expander=least-waste",
                       "--node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/" +
-                        cluster.clusterName,
+                      cluster.clusterName,
                       "--balance-similar-node-groups",
                       "--skip-nodes-with-system-pods=false",
                     ],

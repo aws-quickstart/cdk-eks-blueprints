@@ -1,11 +1,11 @@
-import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
+import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 import {ManagedPolicy} from "@aws-cdk/aws-iam";
 
 export class AppMeshAddon implements ClusterAddOn {
 
-    deploy(stack: CdkEksBlueprintStack): void {
+    deploy(clusterInfo: ClusterInfo): void {
 
-        const cluster = stack.cluster;
+        const cluster = clusterInfo.cluster;
 
         const appmeshNs = cluster.addManifest('appmesh-ns', {
             apiVersion: 'v1',
@@ -19,13 +19,13 @@ export class AppMeshAddon implements ClusterAddOn {
         sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("AWSAppMeshFullAccess"));
 
 
-        const chart = stack.cluster.addHelmChart("appmesh-controller", {
+        const chart = cluster.addHelmChart("appmesh-controller", {
             chart: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
             release: "appm-release",
             namespace: "appmesh-system", 
             values: {
-                "region": stack.region,
+                "region": cluster.stack.region,
                 "serviceAccount.create": false,
                 "serviceAccount.name": "appmesh-controller"
             }

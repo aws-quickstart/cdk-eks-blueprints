@@ -1,11 +1,11 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { CdkEksBlueprintStack, ClusterAddOn } from "../../eksBlueprintStack";
+import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 import { loadYaml, readYamlDocument } from "../../utils/yamlUtils";
 
 export class ArgoCDAddOn implements ClusterAddOn {
 
-  deploy(stack: CdkEksBlueprintStack): void {
-    const cluster = stack.cluster;
+  deploy(clusterInfo: ClusterInfo): void {
+    const cluster = clusterInfo.cluster;
 
     const argons = cluster.addManifest('argocd', {
       apiVersion: 'v1',
@@ -15,7 +15,7 @@ export class ArgoCDAddOn implements ClusterAddOn {
     let doc = readYamlDocument(__dirname + '/install.yaml');
     let docArray = doc.split("---").map(e => loadYaml(e));
     docArray.forEach(e => e['metadata']['namespace'] = "argocd");
-    let manifest = new KubernetesManifest(stack, "argocd", {
+    let manifest = new KubernetesManifest(cluster.stack, "argocd", {
       cluster,
       manifest: docArray
     });

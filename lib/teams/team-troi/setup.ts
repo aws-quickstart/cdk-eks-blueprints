@@ -1,14 +1,15 @@
 import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
 import * as s3 from "@aws-cdk/aws-s3";
-import { CdkEksBlueprintStack, TeamSetup } from '../../eksBlueprintStack';
+import { ClusterInfo, TeamSetup } from '../../eksBlueprintStack';
 
 
 export class TeamTroiSetup implements TeamSetup {
   readonly teamName: string = 'team-troi';
 
-  setup(stack: CdkEksBlueprintStack) {
-    const cluster = stack.cluster;
+  setup(clusterInfo: ClusterInfo) {
+    const cluster = clusterInfo.cluster;
+    const stack = cluster.stack;
     const namespace = cluster.addManifest(this.teamName, {
       apiVersion: 'v1',
       kind: 'Namespace',

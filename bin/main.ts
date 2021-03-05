@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { FargateProfileOptions } from '@aws-cdk/aws-eks';
+import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
+import { Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import { AppMeshAddon } from '../lib/addons/appmesh/appMeshAddon';
 import { ArgoCDAddOn } from '../lib/addons/argocd/argoCDAddon';
@@ -8,7 +9,8 @@ import { ContainerInsightsAddOn } from '../lib/addons/cloudwatch/containerInsigh
 import { ClusterAutoScaler } from '../lib/addons/cluster-autoscaler/clusterAutoscalerAddon';
 import { MetricsServerAddon } from '../lib/addons/metrics-server/metricsServerAddon';
 import { NginxAddon } from '../lib/addons/nginx/nginxAddon';
-import { CdkEksBlueprintStack, ClusterAddOn, TeamSetup } from '../lib/eksBlueprintStack';
+import { EC2ClusterProvider, EC2ProviderClusterProps } from '../lib/ec2-cluster-provider';
+import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo, ClusterProvider, TeamSetup } from '../lib/eksBlueprintStack';
 import { FargateClusterProvider } from '../lib/fargate-cluster-provider';
 import { PipelineStack } from '../lib/pipelineStack';
 import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
@@ -67,3 +69,43 @@ new CdkEksBlueprintStack(app, {id: 'east-fargate-test', clusterProvider : new Fa
         region: 'us-east-1'
     }
 })
+
+class BottlerocketClusterProvider implements ClusterProvider {
+    createCluster(scope: cdk.Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
+
+        const cluster = new Cluster(scope, scope.node.id, {
+            vpc: vpc,
+            clusterName: scope.node.id,
+            outputClusterName: true,
+            defaultCapacity: 0, // we want to manage capacity ourselves
+            version: version,
+          })
+        ;
+        const nodeGroup = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
+            instanceType: new InstanceType('t3.small'),
+            minCapacity:  2,
+            machineImageType: MachineImageType.BOTTLEROCKET
+          });
+        
+        return {cluster: cluster, autoscalingGroup: nodeGroup, version}
+
+    }
+
+}
+
+new CdkEksBlueprintStack(app, {id: 'east-br-test', clusterProvider : new BottlerocketClusterProvider}, {
+    env: {
+        region: 'us-east-1'
+    }
+})
+
+    const props : EC2ProviderClusterProps = {
+        version:KubernetesVersion.V1_19,
+        instanceType:new ec2.InstanceType('t3.large'),
+        amiType: NodegroupAmiType.AL2_X86_64,
+        securityGroup: SG
+    }
+
+    const myClusterProvider = new EC2ClusterProvider(props);
+
+    new CdkEksBlueprintStack(app, {id: "test-cluster", clusterProvider: myClusterProvider});

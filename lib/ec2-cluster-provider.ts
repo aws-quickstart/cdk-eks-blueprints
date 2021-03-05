@@ -1,16 +1,30 @@
-import { InstanceType, IVpc, Vpc } from "@aws-cdk/aws-ec2";
-import { Cluster, ClusterProps, KubernetesVersion } from "@aws-cdk/aws-eks";
+import { InstanceType, IVpc, SubnetSelection, Vpc } from "@aws-cdk/aws-ec2";
+import { Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
 import { Construct } from "@aws-cdk/core";
-import { CdkEksBlueprintStack, ClusterInfo, ClusterProvider } from "./eksBlueprintStack";
+import { ClusterInfo, ClusterProvider } from "./eksBlueprintStack";
+
+
+export interface EC2ProviderClusterProps extends CommonClusterOptions {
+  instanceType?: InstanceType; // m5.large
+
+  minSize? : number;
+  
+  maxSize? : number;
+  
+  amiType?: NodegroupAmiType.AL2_X86_64;
+
+  vpcSubnets?: SubnetSelection[];
+}
 
 export class EC2ClusterProvider implements ClusterProvider {
-  createCluster(scope: Construct, vpc: IVpc): ClusterInfo {
 
-    // TODO: fix configuration so that it does not always come from context but could be injected
-    const instanceType = scope.node.tryGetContext("instanceType") ?? 't3.medium';
-    const minClusterSize = scope.node.tryGetContext("minSize") ?? 1;
-    const maxClusterSize = scope.node.tryGetContext("maxSize") ?? 3;
-    const vpcSubnets = scope.node.tryGetContext("vpcSubnets");
+  readonly providerOptions: EC2ProviderClusterProps;
+
+  constructor(options? : EC2ProviderClusterProps) {
+    this.providerOptions = options ?? {version: KubernetesVersion.V1_18};
+  }
+
+  createCluster(scope: Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
 
     const id = scope.node.id;
 
@@ -19,17 +33,18 @@ export class EC2ClusterProvider implements ClusterProvider {
       clusterName: id,
       outputClusterName: true,
       defaultCapacity: 0, // we want to manage capacity ourselves
-      version: KubernetesVersion.V1_18,
-      vpcSubnets: vpcSubnets,
+      version: this.providerOptions.version,
+      vpcSubnets: this.providerOptions.vpcSubnets,
     });
 
     const nodeGroup = cluster.addNodegroupCapacity(id + "-ng", {
-      instanceType: new InstanceType(instanceType),
-      minSize: minClusterSize,
-      maxSize: maxClusterSize,
+      instanceType: this.providerOptions.instanceType,
+      amiType: this.providerOptions.amiType,
+      minSize: this.providerOptions.minSize,
+      maxSize: this.providerOptions.maxSize,
     });
 
-    return { cluster: cluster, nodeGroup: nodeGroup };
+    return { cluster: cluster, nodeGroup: nodeGroup, version: version };
   }
 
 }
