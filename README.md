@@ -1,22 +1,145 @@
 # EKS Blueprint
 
-The repository contains implementation of the CDK based EKS blueprint that can be viewed as a component of a shared services platform implementation.
+The repository contains the source code and configuration for the EKS Shared Services Platform reference architecture. 
 
-At present the implementation contains the following functionality:
+## Getting Started 
 
-* Provision one or many EKS clusters with a pre-defined configuration. 
-* Configure your EKS cluster (or multiple clusters) with add-ons (not to confuse with EKS Managed Addons announced at re:Invent 2020). Select from a list of available addons or add your own by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). Supported addons:  
-  * AppMesh Addon: adds AppMesh controller and CRDs (pending validation on the latest version of CDK)
-  * ArgoCD Addon: adds ArgoCD controller 
-  * Calico Addon: Calico 1.7.1 CNI/Network policy engine
-  * CloudWatch: Container Insights support integrating monitoring with CloudWatch 
-  * ClusterAutoscaler: addon install standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)
-  * MetricsServerAddon: adds metrics server (pre-req for HPA and other monitoring tools)
-  * NginxAddon: installs NGINX ingress controller 
-* Onboard one or many teams into designated clusters. Examples are provided under `lib/teams`, however due to uniqueness of every team, clients are expected to supply implementation of the `TeamSetup` interface.
+### Install CDK 
 
-Note: currently tested version of CDK with the blueprint is 1.76 (affects bootstrapping as well, see below). It will be migrated shortly to 1.84 (or later). 
+This reference architecture leverages [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). Install CDK via the following.
+
+```bash
+npm install -g aws-cdk
+```
+
+Verify the installation.
+
+```bash
+cdk --version
+```
+
+### Project setup
+
+Create a new CDK project. 
+
+```bash
+cdk init app --language typescript
+```
+
+Bootstrap your environment. For more information see Boostrapping below.  
+
+```bash
+cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
+```
+
+### Usage
+
+Add this project as a dependency to your CDK project. 
+
+```json
+"dependencies": {
+  "@shapirov/cdk-eks-blueprint": "0.1.4"
+}
+```
+
+Replace the contents of `bin/main.ts` with the following.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from '@aws-cdk/core';
+import {
+    CdkEksBlueprintStack, 
+    ArgoCDAddOn
+    MetricsServerAddon, 
+    ClusterAutoScaler, 
+    ContainerInsightsAddOn, 
+    NginxAddon, 
+    CalicoNetworkPolicyAddon, 
+}  from '@shapirov/cdk-eks-blueprint';
+
+const addOns: Array<ClusterAddOn> = [
+  new ArgoCDAddOn
+  new MetricsServerAddon,
+  new ClusterAutoScaler,
+  new ContainerInsightsAddOn,
+  new NginxAddon, 
+  new CalicoNetworkPolicyAddon,
+];
+
+const app = new cdk.App();
+new CdkEksBlueprintStack(app, 'east-test-1', addOns, [], {
+  env: {
+      account: <AWS_ACCOUNT_ID>,
+      region: <AWS_REGION>,
+  },
+});
+```
+
+Deploy the stack 
+
+```
+cdk deploy
+```
+
+### Configuration
+
+Supports context variables (specify in cdk.json, cdk.context.json or pass with -c command line option):
+
+- `instanceType`: (defaulted to "t3.medium") Type of instance for the EKS cluster, must be a valid instance type like t3.medium
+- `vpc`: Specifies whether to use an existing VPC (if specified) or create a new one if not specified.
+- `minSize`: Min cluster size, must be positive integer greater than 0 (default 1).
+- `maxSize`: Max cluster size, must be greater than minSize.
+- `vpcSubnets`: List of VPC subnets for cluster provisioning (unsupported yet)
+
+## Solution Details
+
+### Goals
+
+The goal of this project is to provide a reference implementation of a Shared Services Platform built on top of EKS. At present the implementation provides the following functionality:
+
+  * Provision one or many EKS clusters across one or many regions.
+  * A modular approach to configuring the clusters with suite of add-ons or plugins that are needed to run workloads in a Kubernetes environment. 
+  * Add your own add-ons by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). 
+  * Seamless onboarding of tenants/workloads onto specific clusters via CDK configuration and Gitops.
+
+### Supported Addons
+
+| AddOn             | Description                                                                       |
+|-------------------|-----------------------------------------------------------------------------------|
+| AppMesh           | Adds an AppMesh controller and CRDs (pending validation on the latest version of CDK) |
+| ArgoCD            | Adds an ArgoCD controller |
+| Calico            | Adds the Calico 1.7.1 CNI/Network policy engine |
+| CloudWatch        | Adds Container Insights support integrating monitoring with CloudWatch |
+| ClusterAutoscaler | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
+| MetricsServerAddon| Adds metrics server (pre-req for HPA and other monitoring tools)|
+| NginxAddon        | Adds NGINX ingress controller |
+
+### EKS Cluster Management 
+
+// Todo - Add
+
+### Configuring Addons 
+
+// Todo - Add
+
+### Creating an Addon
+
+// Todo - Add
+
+### Onboarding Tenants
+
+Examples are provided under `lib/teams`, however due to uniqueness of every team, clients are expected to supply implementation of the `TeamSetup` interface.
+
+### CI/CD
+
+## IaC Pipeline
+
+(work in progress)
+
+Example of IaC self-mutating pipeline based on CodePipeline can be found in the `lib/pipelineStack.ts`.
+
 ## Bootstrapping
+
 Each combination of target account and region must be bootstrapped prior to deploying stacks.
 Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
 
@@ -25,61 +148,3 @@ Example:
   cdk bootstrap aws://<AWS_ACCOUNT_ID>/us-east-1
 ```
 In addition to the regular [environment bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) pipeline bootstrapping for pipelines requires a new style of bootstrapping. Execute (with account admin privileges) the command in bootstrap-pipeline.sh.  
-
-## cdk-eks-blueprint
-Supports context variables (specify in cdk.json, cdk.context.json or pass with -c command line option):
-
-- instanceType: (defaulted to "t3.medium") Type of instance for the EKS cluster, must be a valid instance type like t3.medium
-- vpc: Specifies whether to use an existing VPC (if specified) or create a new one if not specified.
-- minSize: Min cluster size, must be positive integer greater than 0 (default 1).
-- maxSize: Max cluster size, must be greater than minSize.
-- vpcSubnets ="List of VPC subnets for cluster provisioning (unsupported yet)
-
-## Usage
-
-Create a new CDK project and add the following to the dependency section of the package.json file:
-```
-    "@shapirov/cdk-eks-blueprint": "0.1.4"
-```
-Note: the module name will be migrated to aws in the near future. 
-
-In the main file (or anywhere in your classes) import CDK EKS blueprint and configure it with various modules:
-
-```ts
-import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
-import {CdkEksBlueprintStack, AppMeshAddon, ClusterAddOn, CalicoNetworkPolicyAddon, MetricsServerAddon, ClusterAutoScaler, ContainerInsightsAddOn, NginxAddon, ArgoCDAddOn}  from '@shapirov/cdk-eks-blueprint';
-
-const addOns: Array<ClusterAddOn> = [
-  new CalicoNetworkPolicyAddon,
-  new MetricsServerAddon,
-  new ClusterAutoScaler,
-  new ContainerInsightsAddOn,
-  new NginxAddon, 
-  new ArgoCDAddOn
-];
-
-
-const app = new cdk.App();
-new CdkEksBlueprintStack(app, 'east-test-1', [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn], [], {
-  env: {
-      account: YOUR_ACCOUNT,
-      region: YOUR_TARGET_REGION,
-  },
-});
-```
-Please create issues to request additional addons from the AWS portfolio. Otherwise, addons could be created outside of this repository, however a PR to the README maybe helpful to reference and advertise. 
-
-## IaC Pipeline
-(work in progress)
-Example of IaC self-mutating pipeline based on CodePipeline can be found in the `lib/pipelineStack.ts`.
-## Useful commands (internal)
-
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
-
-
