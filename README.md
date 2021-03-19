@@ -1,6 +1,6 @@
 # EKS Blueprint
 
-The repository contains the source code and configuration for the EKS Shared Services Platform reference architecture. 
+The repository contains the source code and configuration for the `EKS Shared Services Platform` reference architecture. 
 
 ## Getting Started 
 
@@ -20,7 +20,7 @@ cdk --version
 
 ### Project setup
 
-Create a new CDK project. 
+Create a new CDK project. We use `typescript` for this example. 
 
 ```bash
 cdk init app --language typescript
@@ -34,7 +34,7 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Add this project as a dependency to your CDK project. 
+Add the `cdk-eks-blueprint` library as as a dependency to your CDK project. 
 
 ```json
 "dependencies": {
@@ -81,7 +81,7 @@ Deploy the stack
 cdk deploy
 ```
 
-### Configuration
+### Stack Configuration
 
 Supports context variables (specify in cdk.json, cdk.context.json or pass with -c command line option):
 
@@ -91,28 +91,40 @@ Supports context variables (specify in cdk.json, cdk.context.json or pass with -
 - `maxSize`: Max cluster size, must be greater than minSize.
 - `vpcSubnets`: List of VPC subnets for cluster provisioning (unsupported yet)
 
+### Updating Clusters
+
+// Todo - Add
+
+### Upgrading Clusters
+
+// Todo - Add
+
 ## Solution Details
 
-### Goals
+### Shared Services Platform
 
-The goal of this project is to provide a reference implementation of a Shared Services Platform built on top of EKS. At present the implementation provides the following functionality:
+A Shared Services Platform (SSP) is an interenal development platform that abstracts the complexities of cloud infrastrucuture from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams via a simplified interface, typically a CLI, GUI, Git, or, manifest file. 
 
-  * Provision one or many EKS clusters across one or many regions.
-  * A modular approach to configuring the clusters with suite of add-ons or plugins that are needed to run workloads in a Kubernetes environment. 
-  * Add your own add-ons by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). 
-  * Seamless onboarding of tenants/workloads onto specific clusters via CDK configuration and Gitops.
+### Reference Architecture goals.
+
+The goal of this project is to provide a reference implementation of a Shared Services Platform (SSP) built on top of EKS. At present the implementation provides the following functionality:
+
+  * **Cluster Management** - Provision one or many EKS clusters across one or many regions.
+  * **Add-ons** A modular approach to configuring the clusters with suite of add-ons or plugins that are needed to run workloads in a Kubernetes environment. 
+    * **Custom Add-ons** Add your own add-ons by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). 
+  * **Tenant Onboarding** Seamless onboarding of tenants/workloads onto specific clusters via CDK configuration and Gitops.
 
 ### Supported Addons
 
 | AddOn             | Description                                                                       |
 |-------------------|-----------------------------------------------------------------------------------|
-| AppMesh           | Adds an AppMesh controller and CRDs (pending validation on the latest version of CDK) |
-| ArgoCD            | Adds an ArgoCD controller |
-| Calico            | Adds the Calico 1.7.1 CNI/Network policy engine |
-| CloudWatch        | Adds Container Insights support integrating monitoring with CloudWatch |
-| ClusterAutoscaler | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
-| MetricsServerAddon| Adds metrics server (pre-req for HPA and other monitoring tools)|
-| NginxAddon        | Adds NGINX ingress controller |
+| `AppMeshAddon`           | Adds an AppMesh controller and CRDs (pending validation on the latest version of CDK) |
+| `ArgoCDAddon`            | Adds an ArgoCD controller |
+| `CalicoAddon`            | Adds the Calico 1.7.1 CNI/Network policy engine |
+| `CloudWatchAddon`        | Adds Container Insights support integrating monitoring with CloudWatch |
+| `ClusterAutoscalerAddon` | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
+| `MetricsServerAddon`| Adds metrics server (pre-req for HPA and other monitoring tools)|
+| `NginxAddon`        | Adds NGINX ingress controller |
 
 ### EKS Cluster Management 
 
