@@ -26,7 +26,7 @@ Create a new CDK project. We use `typescript` for this example.
 cdk init app --language typescript
 ```
 
-Bootstrap your environment. For more information see Boostrapping below.  
+Bootstrap your environment. For more information see Bootstrapping below.  
 
 ```bash
 cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>

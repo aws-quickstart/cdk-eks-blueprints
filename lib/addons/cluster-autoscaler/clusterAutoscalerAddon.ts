@@ -9,9 +9,9 @@ export class ClusterAutoScaler implements ClusterAddOn {
    * Version of the autoscaler, controls the image tag
    */
   readonly versionMap = new Map([
-    [KubernetesVersion.V1_19, "1.19.1"],
-    [KubernetesVersion.V1_18, "1.18.3"],
-    [KubernetesVersion.V1_17, "1.17.4"]
+    [KubernetesVersion.V1_19, "v1.19.1"],
+    [KubernetesVersion.V1_18, "v1.18.3"],
+    [KubernetesVersion.V1_17, "v1.17.4"]
   ]);
 
   deploy(clusterInfo: ClusterInfo) {
@@ -176,30 +176,6 @@ export class ClusterAutoScaler implements ClusterAddOn {
           roleRef: {
             apiGroup: "rbac.authorization.k8s.io",
             kind: "ClusterRole",
-            name: "cluster-autoscaler",
-          },
-          subjects: [
-            {
-              kind: "ServiceAccount",
-              name: "cluster-autoscaler",
-              namespace: "kube-system",
-            },
-          ],
-        },
-        {
-          apiVersion: "rbac.authorization.k8s.io/v1",
-          kind: "RoleBinding",
-          metadata: {
-            name: "cluster-autoscaler",
-            namespace: "kube-system",
-            labels: {
-              "k8s-addon": "cluster-autoscaler.addons.k8s.io",
-              "k8s-app": "cluster-autoscaler",
-            },
-          },
-          roleRef: {
-            apiGroup: "rbac.authorization.k8s.io",
-            kind: "Role",
             name: "cluster-autoscaler",
           },
           subjects: [

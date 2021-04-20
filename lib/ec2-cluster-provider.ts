@@ -21,7 +21,7 @@ export class EC2ClusterProvider implements ClusterProvider {
   readonly providerOptions: EC2ProviderClusterProps;
 
   constructor(options? : EC2ProviderClusterProps) {
-    this.providerOptions = options ?? {version: KubernetesVersion.V1_18};
+    this.providerOptions = options ?? {version: KubernetesVersion.V1_19};
   }
 
   createCluster(scope: Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
@@ -41,7 +41,7 @@ export class EC2ClusterProvider implements ClusterProvider {
       instanceType: this.providerOptions.instanceType,
       amiType: this.providerOptions.amiType,
       minSize: this.providerOptions.minSize,
-      maxSize: this.providerOptions.maxSize,
+      maxSize: this.providerOptions.maxSize
     });
 
     return { cluster: cluster, nodeGroup: nodeGroup, version: version };

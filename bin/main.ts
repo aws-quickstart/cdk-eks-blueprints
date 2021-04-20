@@ -90,7 +90,6 @@ class BottlerocketClusterProvider implements ClusterProvider {
         return {cluster: cluster, autoscalingGroup: nodeGroup, version}
 
     }
-
 }
 
 new CdkEksBlueprintStack(app, {id: 'east-br-test', clusterProvider : new BottlerocketClusterProvider}, {
@@ -99,12 +98,12 @@ new CdkEksBlueprintStack(app, {id: 'east-br-test', clusterProvider : new Bottler
     }
 })
 
-    const props : EC2ProviderClusterProps = {
-        version:KubernetesVersion.V1_19,
-        instanceType:new InstanceType('t3.large'),
-        amiType: NodegroupAmiType.AL2_X86_64
-    }
+const props : EC2ProviderClusterProps = {
+    version:KubernetesVersion.V1_19,
+    instanceType:new InstanceType('t3.large'),
+    amiType: NodegroupAmiType.AL2_X86_64
+}
 
-    const myClusterProvider = new EC2ClusterProvider(props);
+const myClusterProvider = new EC2ClusterProvider(props);
 
-    new CdkEksBlueprintStack(app, {id: "test-cluster-provider", clusterProvider: myClusterProvider});
+new CdkEksBlueprintStack(app, {id: "test-cluster-provider", clusterProvider: myClusterProvider});
