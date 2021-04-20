@@ -5,6 +5,13 @@ import { CfnJson, Tags } from "@aws-cdk/core";
 import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
 
 export class ClusterAutoScaler implements ClusterAddOn {
+
+  private versionField?: string;
+
+  constructor( version?: string) {
+    this.versionField = version;
+  }
+  
   /**
    * Version of the autoscaler, controls the image tag
    */
@@ -16,7 +23,7 @@ export class ClusterAutoScaler implements ClusterAddOn {
 
   deploy(clusterInfo: ClusterInfo) {
 
-    const version = this.versionMap.get(clusterInfo.version);
+    const version = this.versionField?? this.versionMap.get(clusterInfo.version);
     const cluster = clusterInfo.cluster;
     
     console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "Cluster autoscaler is supported with EKS EC2 only");
