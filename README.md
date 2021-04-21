@@ -38,7 +38,7 @@ Add the `cdk-eks-blueprint` library as as a dependency to your CDK project.
 
 ```json
 "dependencies": {
-  "@shapirov/cdk-eks-blueprint": "0.1.4"
+  "@shapirov/cdk-eks-blueprint": "0.1.5"
 }
 ```
 
@@ -122,7 +122,7 @@ The goal of this project is to provide a reference implementation of a Shared Se
 | `ArgoCDAddon`            | Adds an ArgoCD controller |
 | `CalicoAddon`            | Adds the Calico 1.7.1 CNI/Network policy engine |
 | `CloudWatchAddon`        | Adds Container Insights support integrating monitoring with CloudWatch |
-| `ClusterAutoscalerAddon` | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
+| [`ClusterAutoscalerAddon`](./docs/addons/cluster-autoscaler.md) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
 | `MetricsServerAddon`| Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddon`        | Adds NGINX ingress controller |
 
@@ -130,11 +130,11 @@ The goal of this project is to provide a reference implementation of a Shared Se
 
 // Todo - Add
 
-### Configuring Addons 
+### Configuring Add-ons 
 
 // Todo - Add
 
-### Creating an Addon
+### Creating an Add-on
 
 // Todo - Add
 
@@ -159,4 +159,4 @@ Example:
 ```   
   cdk bootstrap aws://<AWS_ACCOUNT_ID>/us-east-1
 ```
-In addition to the regular [environment bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) pipeline bootstrapping for pipelines requires a new style of bootstrapping. Execute (with account admin privileges) the command in bootstrap-pipeline.sh.  
+In addition to the regular [environment bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) pipeline bootstrapping for pipelines requires a new style of bootstrapping. Set `AWS_ACCOUNT` environment to your account and execute (with account admin privileges) the command in bootstrap-pipeline.sh.  
