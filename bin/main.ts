@@ -1,18 +1,22 @@
 #!/usr/bin/env node
+import * as cdk from '@aws-cdk/core';
 import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
 import { Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
-import { AppMeshAddon } from '../lib/addons/appmesh/appMeshAddon';
-import { ArgoCDAddOn } from '../lib/addons/argocd/argoCDAddon';
-import { CalicoNetworkPolicyAddon } from '../lib/addons/calico/calicoAddon';
-import { ContainerInsightsAddOn } from '../lib/addons/cloudwatch/containerInsightsAddon';
-import { ClusterAutoScaler } from '../lib/addons/cluster-autoscaler/clusterAutoscalerAddon';
-import { MetricsServerAddon } from '../lib/addons/metrics-server/metricsServerAddon';
-import { NginxAddon } from '../lib/addons/nginx/nginxAddon';
-import { EC2ClusterProvider, EC2ProviderClusterProps } from '../lib/ec2-cluster-provider';
+
+// Blueprint
 import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo, ClusterProvider, TeamSetup } from '../lib/eksBlueprintStack';
+
+// Addons 
+import * as addon from '../lib/addons'
+
+// Cluster Providers
 import { FargateClusterProvider } from '../lib/fargate-cluster-provider';
+import { EC2ClusterProvider, EC2ProviderClusterProps } from '../lib/ec2-cluster-provider';
+
+// Pipeline
 import { PipelineStack } from '../lib/pipelineStack';
+
+// Teams
 import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
 import { TeamRikerSetup } from '../lib/teams/team-riker/setup';
 import { TeamTroiSetup } from '../lib/teams/team-troi/setup';
@@ -20,12 +24,12 @@ import { TeamTroiSetup } from '../lib/teams/team-troi/setup';
 const app = new cdk.App();
 
 const addOns: Array<ClusterAddOn> = [
-    new CalicoNetworkPolicyAddon,
-    new MetricsServerAddon,
-    new ClusterAutoScaler,
-    new ContainerInsightsAddOn,
-    new NginxAddon,
-    new ArgoCDAddOn
+    new addon.CalicoAddon,
+    new addon.MetricsServerAddon,
+    new addon.ClusterAutoScalerAddon,
+    new addon.ContainerInsightsAddOn,
+    new addon.NginxAddon,
+    new addon.ArgoCDAddon
 ];
 
 const allTeams: Array<TeamSetup> = [
@@ -53,7 +57,7 @@ new CdkEksBlueprintStack(app, { id: 'west-dev', addOns: addOns, teams: allTeams 
     },
 });
 
-new CdkEksBlueprintStack(app, { id: 'east-test-main', addOns: [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon] }, {
+new CdkEksBlueprintStack(app, { id: 'east-test-main', addOns: addOns }, {
     env: {
         account: '929819487611',
         region: 'us-east-1',
