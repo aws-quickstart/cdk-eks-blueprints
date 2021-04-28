@@ -24,7 +24,7 @@ const addOns: Array<ClusterAddOn> = [
     new MetricsServerAddon,
     new ClusterAutoScaler,
     new ContainerInsightsAddOn,
-    new NginxAddon, 
+    new NginxAddon,
     new ArgoCDAddOn
 ];
 
@@ -41,30 +41,30 @@ new PipelineStack(app, "factory-pipeline", {
     },
 });
 
-new CdkEksBlueprintStack(app, {id: 'east-dev', addOns: addOns, teams: allTeams}, {
+new CdkEksBlueprintStack(app, { id: 'east-dev', addOns: addOns, teams: allTeams }, {
     env: {
         region: 'us-east-2'
     },
 });
 
-new CdkEksBlueprintStack(app, {id: 'west-dev', addOns: addOns, teams: allTeams }, {
+new CdkEksBlueprintStack(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
     env: {
         region: 'us-west-2'
     },
 });
 
-new CdkEksBlueprintStack(app, {id: 'east-test-main', addOns: [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon]}, {
+new CdkEksBlueprintStack(app, { id: 'east-test-main', addOns: [new MetricsServerAddon, new ClusterAutoScaler, new ContainerInsightsAddOn, new AppMeshAddon] }, {
     env: {
         account: '929819487611',
         region: 'us-east-1',
     },
 });
 
-const fargateProfiles: Map<string, FargateProfileOptions> = new Map([ 
-    ["dynatrace", { selectors: [ { namespace: "dynatrace" }]}]
+const fargateProfiles: Map<string, FargateProfileOptions> = new Map([
+    ["dynatrace", { selectors: [{ namespace: "dynatrace" }] }]
 ]);
 
-new CdkEksBlueprintStack(app, {id: 'east-fargate-test', clusterProvider : new FargateClusterProvider(fargateProfiles)}, {
+new CdkEksBlueprintStack(app, { id: 'east-fargate-test', clusterProvider: new FargateClusterProvider(fargateProfiles) }, {
     env: {
         region: 'us-east-1'
     }
@@ -79,31 +79,31 @@ class BottlerocketClusterProvider implements ClusterProvider {
             outputClusterName: true,
             defaultCapacity: 0, // we want to manage capacity ourselves
             version: version,
-          })
-        ;
+        })
+            ;
         const nodeGroup = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
             instanceType: new InstanceType('t3.small'),
-            minCapacity:  2,
+            minCapacity: 2,
             machineImageType: MachineImageType.BOTTLEROCKET
-          });
-        
-        return {cluster: cluster, autoscalingGroup: nodeGroup, version}
+        });
+
+        return { cluster: cluster, autoscalingGroup: nodeGroup, version }
 
     }
 }
 
-new CdkEksBlueprintStack(app, {id: 'east-br-test', clusterProvider : new BottlerocketClusterProvider}, {
+new CdkEksBlueprintStack(app, { id: 'east-br-test', clusterProvider: new BottlerocketClusterProvider }, {
     env: {
         region: 'us-east-1'
     }
 })
 
-const props : EC2ProviderClusterProps = {
-    version:KubernetesVersion.V1_19,
-    instanceType:new InstanceType('t3.large'),
+const props: EC2ProviderClusterProps = {
+    version: KubernetesVersion.V1_19,
+    instanceType: new InstanceType('t3.large'),
     amiType: NodegroupAmiType.AL2_X86_64
 }
 
 const myClusterProvider = new EC2ClusterProvider(props);
 
-new CdkEksBlueprintStack(app, {id: "test-cluster-provider", clusterProvider: myClusterProvider});
+new CdkEksBlueprintStack(app, { id: "test-cluster-provider", clusterProvider: myClusterProvider });
