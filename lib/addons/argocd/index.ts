@@ -1,6 +1,6 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
-import { loadYaml, readYamlDocument } from "../../utils/yamlUtils";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
+import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
 export class ArgoCDAddon implements ClusterAddOn {
 

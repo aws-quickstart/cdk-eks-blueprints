@@ -1,6 +1,6 @@
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
-import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack"
+import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack"
 
 export class AppMeshAddon implements ClusterAddOn {
 
@@ -29,7 +29,7 @@ export class AppMeshAddon implements ClusterAddOn {
         sa.node.addDependency(appMeshNS);
 
         // App Mesh Controller        
-        const chart = cluster.addHelmChart("AppMeshAddon", {
+        const chart = cluster.addHelmChart("appmesh-addon", {
             chart: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
             release: "appm-release",

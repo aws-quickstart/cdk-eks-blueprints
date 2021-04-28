@@ -3,7 +3,6 @@ import * as yaml from 'js-yaml';
 import * as eks from '@aws-cdk/aws-eks';
 import request from 'sync-request';
 
-
 export function readYamlFromDir(dir: string, cluster: eks.Cluster) {
     fs.readdir(dir, 'utf8', (err, files) => {
         if (files != undefined) {
@@ -47,5 +46,5 @@ export function loadExternalYaml(url: string): any {
 }
 
 export function serializeYaml(document: any): string {
-  return yaml.safeDump(document);
+    return yaml.safeDump(document);
 }
