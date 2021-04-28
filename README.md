@@ -42,7 +42,10 @@ Add the `cdk-eks-blueprint` library as as a dependency to your CDK project.
 }
 ```
 
-Run the following command to install the dependency to your local npm package manager - `npm i @shapirov/cdk-eks-blueprint`
+Run the following command to install the dependency to your local npm package manager - 
+```
+`npm i @shapirov/cdk-eks-blueprint`
+```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
 
@@ -77,7 +80,14 @@ new CdkEksBlueprintStack(app, {id: 'east-test-1', addOns: addOns, teams: []}, {
   },
 });
 ```
-Run the following command to confirm there are no issues with our code - `npm run build`. If there are no errors you should see the following
+
+Run the following command to confirm there are no issues with our code
+
+```
+npm run build 
+```
+
+If there are no errors you should see the following
 ```
 > eks-factory-test@0.1.0 build
 > tsc
