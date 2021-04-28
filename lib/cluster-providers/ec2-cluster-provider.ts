@@ -2,7 +2,7 @@ import { Construct } from "@aws-cdk/core";
 import { InstanceType, IVpc, SubnetSelection, Vpc } from "@aws-cdk/aws-ec2";
 import { Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
 
-import { ClusterInfo, ClusterProvider } from "./eksBlueprintStack";
+import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
 
 export interface EC2ProviderClusterProps extends CommonClusterOptions {
     instanceType?: InstanceType; // m5.large

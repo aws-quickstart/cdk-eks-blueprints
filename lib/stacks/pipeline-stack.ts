@@ -1,5 +1,5 @@
 import { Construct, SecretValue, Stack, StackProps, Stage, StageProps } from "@aws-cdk/core";
-import { CdkEksBlueprintStack } from "./eksBlueprintStack";
+import { CdkEksBlueprintStack } from "./eks-blueprint-stack";
 import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
