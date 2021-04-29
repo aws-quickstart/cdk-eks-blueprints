@@ -1,4 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
 export class NginxAddon implements ClusterAddOn {
 

@@ -2,7 +2,7 @@ import { Construct } from "@aws-cdk/core";
 import { IVpc } from "@aws-cdk/aws-ec2";
 import { FargateCluster, KubernetesVersion, FargateProfileOptions, CommonClusterOptions } from "@aws-cdk/aws-eks";
 
-import { ClusterInfo, ClusterProvider } from "./eksBlueprintStack";
+import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
 
 export class FargateClusterProvider implements ClusterProvider {
 

@@ -1,7 +1,7 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
-import { loadYaml, readYamlDocument } from "../../utils/yamlUtils";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
+import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
 export class ContainerInsightsAddOn implements ClusterAddOn {
 
