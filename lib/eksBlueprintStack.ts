@@ -2,10 +2,11 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
-import { IVpc} from '@aws-cdk/aws-ec2';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
-import { EC2ClusterProvider } from './ec2-cluster-provider';
+import { IVpc } from '@aws-cdk/aws-ec2';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
+import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
+
+import { EC2ClusterProvider } from './ec2-cluster-provider';
 
 export class EksBlueprintProps {
 
@@ -34,7 +35,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version ? : KubernetesVersion  = KubernetesVersion.V1_19;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_19;
 
 }
 
@@ -51,7 +52,7 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
-        
+
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             addOn.deploy(clusterInfo);
         }
@@ -60,7 +61,7 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         }
     }
 
-    initializeVpc(vpcId: string) :IVpc {
+    initializeVpc(vpcId: string): IVpc {
         const id = this.node.id;
         let vpc = undefined;
 
@@ -90,15 +91,15 @@ export interface ClusterProvider {
 }
 
 export interface ClusterAddOn {
-    deploy(clusterInfo : ClusterInfo): void;
+    deploy(clusterInfo: ClusterInfo): void;
 }
 
 export interface TeamSetup {
-    setup(clusterInfo : ClusterInfo): void;
+    setup(clusterInfo: ClusterInfo): void;
 }
 
 export interface ClusterInfo {
-    
+
     readonly cluster: Cluster;
 
     /**
@@ -106,7 +107,7 @@ export interface ClusterInfo {
      */
     readonly nodeGroup?: Nodegroup;
 
-    readonly autoscalingGroup? : AutoScalingGroup;
+    readonly autoscalingGroup?: AutoScalingGroup;
 
     readonly version: KubernetesVersion;
 }

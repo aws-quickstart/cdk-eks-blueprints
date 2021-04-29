@@ -7,7 +7,7 @@ import * as actions from '@aws-cdk/aws-codepipeline-actions';
 export class FactoryApplication extends Stage {
     constructor(scope: Construct, id: string, props?: StageProps) {
         super(scope, id, props);
-        const eksBlueprintStack = new CdkEksBlueprintStack(this, {id: 'eks'});
+        const eksBlueprintStack = new CdkEksBlueprintStack(this, { id: 'eks' });
     }
 }
 
