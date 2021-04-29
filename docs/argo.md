@@ -37,7 +37,7 @@ Copy and paste the full load balancer name and then run the following command
 argocd login <name of your load balancer>
 ```
 
-It will then prompt you for a username and password. The username will be `admin`. 
+It will then prompt you for a username and password. The username will be `admin`. The password will be the output of running the command above.
 
 
 
