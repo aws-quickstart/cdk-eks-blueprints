@@ -1,5 +1,5 @@
 import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../eksBlueprintStack";
-import {ManagedPolicy} from "@aws-cdk/aws-iam";
+import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
 export class AppMeshAddon implements ClusterAddOn {
 
@@ -23,14 +23,14 @@ export class AppMeshAddon implements ClusterAddOn {
             chart: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
             release: "appm-release",
-            namespace: "appmesh-system", 
+            namespace: "appmesh-system",
             values: {
                 "region": cluster.stack.region,
                 "serviceAccount.create": false,
                 "serviceAccount.name": "appmesh-controller"
             }
         });
-        
+
         chart.node.addDependency(sa);
     }
 }
