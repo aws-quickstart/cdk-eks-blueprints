@@ -44,7 +44,7 @@ Add the `cdk-eks-blueprint` library as as a dependency to your CDK project.
 
 Run the following command to install the dependency to your local npm package manager - 
 ```
-`npm i @shapirov/cdk-eks-blueprint`
+npm i @shapirov/cdk-eks-blueprint
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
@@ -93,7 +93,7 @@ If there are no errors you should see the following
 > tsc
 ```
 
-Deploy the stack 
+Deploy the stack using the following command
 
 ```
 cdk deploy
