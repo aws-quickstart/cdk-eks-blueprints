@@ -1,22 +1,25 @@
 {
     "name": "@shapirov/cdk-eks-blueprint",
     "version": "0.1.5",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "main": "dist/lib/index.js",
+    "types": "dist/lib/index.d.ts",
     "bin": {
-        "main": "bin/main.js"
+        "main": "dist/bin/main.js"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "rm -rf dist && tsc",
         "watch": "tsc -w",
         "test": "jest",
-        "cdk": "cdk"
+        "cdk": "cdk",
+        "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "devDependencies": {
         "@aws-cdk/assert": "1.91.0",
         "@types/jest": "^26.0.15",
         "@types/js-yaml": "^3.12.5",
         "@types/node": "10.17.27",
+        "@typescript-eslint/eslint-plugin": "^4.22.0",
+        "@typescript-eslint/parser": "^4.22.0",
         "aws-cdk": "1.91.0",
         "jest": "^26.6.1",
         "ts-jest": "^26.4.3",
