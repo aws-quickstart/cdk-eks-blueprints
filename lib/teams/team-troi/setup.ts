@@ -25,7 +25,7 @@ export class TeamTroiSetup implements TeamSetup {
         sa.node.addDependency(namespace);
         const bucket = new s3.Bucket(stack, 'inf-backend-bucket');
         bucket.grantReadWrite(sa);
-        new cdk.CfnOutput(stack, this.teamName + 'sa-iam-role', { value: sa.role.roleArn })
+        new cdk.CfnOutput(stack, this.teamName + '-sa-iam-role', { value: sa.role.roleArn })
     }
 
     setupNamespacePolicies(cluster: eks.Cluster) {

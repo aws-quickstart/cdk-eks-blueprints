@@ -1,19 +1,18 @@
 import { UntrustedCodeBoundaryPolicy } from "@aws-cdk/aws-codebuild";
 import { PolicyStatement } from "@aws-cdk/aws-iam";
-import { Role, User } from "@aws-cdk/aws-iam";
-import { AnyPrincipal, ArnPrincipal, CompositePrincipal } from "@aws-cdk/aws-iam/lib/principals";
-import { unwatchFile } from "fs";
-import { ClusterInfo, TeamSetup } from "../eksBlueprintStack";
+import * as iam from '@aws-cdk/aws-iam';
+import { ClusterInfo, TeamSetup } from "../stacks/eks-blueprint-stack";
+import { CfnOutput } from "@aws-cdk/core";
 
 export class TeamProps {
 
     readonly name: string;
 
-    readonly adminUser?: User;
-    readonly adminUserRole?: Role;
- 
-    readonly users?: Array<User>;
-    readonly userRole? : Role;
+    readonly adminUser?: iam.User;
+    readonly adminUserRole?: iam.Role;
+
+    readonly users?: Array<iam.User>;
+    readonly userRole?: iam.Role;
 }
 
 export class Team implements TeamSetup {
@@ -25,31 +24,37 @@ export class Team implements TeamSetup {
     }
 
     setup(clusterInfo: ClusterInfo): void {
+        this.defaultSetupAccess(clusterInfo);
+    }
+
+    defaultSetupAccess(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.adminUser ? [this.teamProps.adminUser] : [];
         const adminRole = this.getOrCreateRole(clusterInfo, admins, props.adminUserRole);
 
-        if(adminRole) {
+        new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole.roleArn })
+
+        if (adminRole) {
             awsAuth.addMastersRole(adminRole);
         }
-        
+
         const users = this.teamProps.users ?? [];
         const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRole);
 
-        if(teamRole) {
-            awsAuth.addRoleMapping(teamRole, {groups: [props.name + "-group"], username: props.name});
+        if (teamRole) {
+            awsAuth.addRoleMapping(teamRole, { groups: [props.name + "-group"], username: props.name });
         }
     }
 
-    private getOrCreateRole(clusterInfo: ClusterInfo,  users: Array<User>, role? : Role) : Role | undefined {   
-        if(users?.length == 0) {
+    private getOrCreateRole(clusterInfo: ClusterInfo, users: Array<User>, role?: Role): Role | undefined {
+        if (users?.length == 0) {
             return role;
         }
-        
-        let principals = users?.map(item => new ArnPrincipal(item.userArn));
 
-        if(role) {
+        let principals = users?.map(item => new iam.ArnPrincipal(item.userArn));
+
+        if (role) {
             role.assumeRolePolicy?.addStatements(
                 new PolicyStatement({
                     principals: principals
@@ -57,10 +62,25 @@ export class Team implements TeamSetup {
             );
         }
         else {
-            role = new Role(clusterInfo.cluster, clusterInfo.cluster.clusterName + "Admin", {
-                assumedBy: new CompositePrincipal(...principals)
+            role = new iam.Role(clusterInfo.cluster.stack, clusterInfo.cluster.clusterName + "Admin", {
+                assumedBy: new iam.CompositePrincipal(...principals)
             });
-        }
+            role.addToPolicy(new iam.PolicyStatement({
+                effect: iam.Effect.,
+                resources: [clusterInfo.cluster.clusterArn],
+                actions: [
+                    "eks:DescribeNodegroup",
+                    "eks:ListNodegroups",
+                    "eks:DescribeCluster",
+                    "eks:ListClusters",
+                    "eks:AccessKubernetesApi",
+                    "ssm:GetParameter",
+                    "eks:ListUpdates",
+                    "eks:ListFargateProfiles"
+                ]
+              })
+            );
+    }
 
         return role;
     }
