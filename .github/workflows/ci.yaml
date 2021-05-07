@@ -37,6 +37,10 @@ jobs:
               
     - name: Install Deps         
       run: npm install
+      run: ls node_modules
     
+    - name: Run Linter        
+      run: make lint
+
     - name: Build TSC
-      run: npm run build
+      run: make build
