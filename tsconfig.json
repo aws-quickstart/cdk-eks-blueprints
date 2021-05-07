@@ -30,5 +30,6 @@
         "node_modules",
         "test",
         ".git",
+        "dist"
     ],
 }
