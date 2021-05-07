@@ -44,7 +44,7 @@ Add the `cdk-eks-blueprint` library as as a dependency to your CDK project.
 
 Run the following command to install the dependency to your local npm package manager - 
 ```
-`npm i @shapirov/cdk-eks-blueprint`
+npm i @shapirov/cdk-eks-blueprint
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
@@ -93,35 +93,10 @@ If there are no errors you should see the following
 > tsc
 ```
 
-Deploy the stack 
+Deploy the stack using the following command
 
 ```
 cdk deploy
-```
-
-Once the stack is finished deploying you should see a similar output as the following
-```
-Outputs:
-east-test-1.easttest1ClusterName8D8E5E5E = east-test-1
-east-test-1.easttest1ConfigCommand25ABB520 = aws eks update-kubeconfig --name east-test-1 --region us-east-2 --role-arn arn:aws:iam::XXXXXXXXXXXX:role/east-test-1-easttest1MastersRole19C9E55A-LAAI0A2XIY4G
-east-test-1.easttest1GetTokenCommand337FE3DD = aws eks get-token --cluster-name east-test-1 --region us-east-2 --role-arn arn:aws:iam::XXXXXXXXXXXX:role/east-test-1-easttest1MastersRole19C9E55A-LAAI0A2XIY4G
-```
-
-In order to gain access to your EKS cluster you need to update your kubeconfig and add a new context. Run the command from the output above
-```
-aws eks update-kubeconfig --name east-test-1 --region us-east-2 --role-arn arn:aws:iam::XXXXXXXXXXXX:role/east-test-1-easttest1MastersRole19C9E55A-LAAI0A2XIY4G
-```
-
-Test that you have access to the cluster by running the following command
-```
-kubectl get nodes
-```
-
-You should see the a similar output to the following
-```
-NAME                                         STATUS   ROLES    AGE   VERSION
-ip-10-0-140-245.us-east-2.compute.internal   Ready    <none>   12m   v1.19.6-eks-49a6c0
-ip-10-0-169-22.us-east-2.compute.internal    Ready    <none>   12m   v1.19.6-eks-49a6c0
 ```
 
 ### Stack Configuration
