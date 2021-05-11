@@ -3,7 +3,7 @@ import * as yaml from 'js-yaml';
 import * as eks from '@aws-cdk/aws-eks';
 import request from 'sync-request';
 
-export function readYamlFromDir(dir: string, cluster: eks.Cluster) {
+export function readYamlFromDir(dir: string, cluster: eks.Cluster): void {
     fs.readdir(dir, 'utf8', (err, files) => {
         if (files != undefined) {
             files.forEach((file) => {

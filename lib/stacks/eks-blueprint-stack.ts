@@ -47,7 +47,7 @@ export class CdkEksBlueprintStack extends cdk.Stack {
          * Supported parameters
         */
         const vpcId = this.node.tryGetContext("vpc");
-        let vpc = this.initializeVpc(vpcId);
+        const vpc = this.initializeVpc(vpcId);
 
         const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
 

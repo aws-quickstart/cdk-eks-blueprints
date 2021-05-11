@@ -2,7 +2,7 @@ import * as eks from "@aws-cdk/aws-eks";
 import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
-import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
 export class ClusterAutoScalerAddon implements ClusterAddOn {
 
@@ -21,7 +21,7 @@ export class ClusterAutoScalerAddon implements ClusterAddOn {
         [KubernetesVersion.V1_17, "v1.17.4"]
     ]);
 
-    deploy(clusterInfo: ClusterInfo) {
+    deploy(clusterInfo: ClusterInfo): void {
 
         const version = this.versionField ?? this.versionMap.get(clusterInfo.version);
         const cluster = clusterInfo.cluster;

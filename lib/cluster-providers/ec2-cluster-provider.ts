@@ -1,5 +1,5 @@
 import { Construct } from "@aws-cdk/core";
-import { InstanceType, IVpc, SubnetSelection, Vpc } from "@aws-cdk/aws-ec2";
+import { InstanceType, IVpc, SubnetSelection } from "@aws-cdk/aws-ec2";
 import { Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
 
 import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
