@@ -1,7 +1,25 @@
 # Description
+
 This is an internal readme for development processes that should be followed for this repository.
 
-# Publishing
+## Local Development
+
+This project leverage Makefiles for project automation. We currently support the following commands.
+
+Lint the project with `ESLint`. 
+
+```
+make lint
+```
+
+Build the project with `Typescript`. 
+
+```
+make build.
+```
+
+## Publishing
+
 At the moment leveraging a private NPM repository for "shapirov". TODO: move under aws-labs.
 
 1. Change version in package.json. We are currently using <major>.<minor>.<patch>, e.g. 0.1.5
@@ -12,7 +30,8 @@ At the moment leveraging a private NPM repository for "shapirov". TODO: move und
    1. `npm run build` (compile)
    2. `npm publish` (this will require credentials to npm)
    
-# Submitting Changes
+## Submitting Changes
+
 For direct contributors:
 1. Create a feature branch and commit to that branch.
 2. Create PR to the main branch. 
