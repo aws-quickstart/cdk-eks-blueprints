@@ -2,6 +2,7 @@ import { PolicyStatement } from "@aws-cdk/aws-iam";
 import * as iam from '@aws-cdk/aws-iam';
 import { ClusterInfo, TeamSetup } from "../stacks/eks-blueprint-stack";
 import { CfnOutput } from "@aws-cdk/core";
+import { DefaultTeamRoles } from "./default-team-roles";
 
 /**
  * Team properties.
@@ -51,15 +52,22 @@ export class Team implements TeamSetup {
     readonly teamProps: TeamProps;
 
     constructor(teamProps: TeamProps) {
-        this.teamProps = teamProps ?? new TeamProps;
+        this.teamProps = {
+            name: teamProps.name,
+            namespace: teamProps.namespace?? "team-" + teamProps.name,
+            users: teamProps.users,
+            namespaceAnnotations: teamProps.namespaceAnnotations,
+            namespaceHardLimits: teamProps.namespaceHardLimits,
+            userRole: teamProps.userRole
+        }
     }
 
-    setup(clusterInfo: ClusterInfo): void {
+    public setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAccess(clusterInfo);
         this.setupNamespace(clusterInfo);
     }
 
-    defaultSetupAccess(clusterInfo: ClusterInfo) {
+    protected defaultSetupAccess(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
 
@@ -72,7 +80,11 @@ export class Team implements TeamSetup {
         }
     }
 
-    defaultSetupAdminAccess(clusterInfo: ClusterInfo) {
+    /**
+     * 
+     * @param clusterInfo 
+     */
+    protected defaultSetupAdminAccess(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.users ?? [];
@@ -85,8 +97,14 @@ export class Team implements TeamSetup {
         }
     }
 
-
-    getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.Role): iam.Role | undefined {
+    /**
+     * Creates a new role with trust relationship or adds trust relationship for an existing role.
+     * @param clusterInfo 
+     * @param users 
+     * @param role may be null if both role and users were not provided
+     * @returns 
+     */
+    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.Role): iam.Role | undefined {
         if (users?.length == 0) {
             return role;
         };
@@ -99,7 +117,7 @@ export class Team implements TeamSetup {
             );
         }
         else {
-            role = new iam.Role(clusterInfo.cluster.stack, clusterInfo.cluster.clusterName + 'AccessRole', {
+            role = new iam.Role(clusterInfo.cluster.stack, this.teamProps.namespace + 'AccessRole', {
                 assumedBy: new iam.CompositePrincipal(...users)
             });
             role.addToPolicy(new iam.PolicyStatement({
@@ -122,9 +140,13 @@ export class Team implements TeamSetup {
         return role;
     }
 
-    setupNamespace(clusterInfo: ClusterInfo) {
+    /**
+     * Creates nmaespace and sets up policies.
+     * @param clusterInfo 
+     */
+    protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
-        const namespaceName = props.namespace ?? "team-" + props.name;
+        const namespaceName = props.namespace!;
         const namespace = clusterInfo.cluster.addManifest(props.name, {
             apiVersion: 'v1',
             kind: 'Namespace',
@@ -137,9 +159,17 @@ export class Team implements TeamSetup {
         if(props.namespaceHardLimits) {
             this.setupNamespacePolicies(clusterInfo, namespaceName);
         }
+
+        const defaultRoles = new DefaultTeamRoles().createManifest(namespaceName); //TODO: add support for custom RBAC
+        clusterInfo.cluster.addManifest(namespace + "-rbac",  defaultRoles);
     }
 
-    setupNamespacePolicies(clusterInfo: ClusterInfo, namespaceName: string) {
+    /**
+     * Sets up quotas
+     * @param clusterInfo 
+     * @param namespaceName 
+     */
+    protected setupNamespacePolicies(clusterInfo: ClusterInfo, namespaceName: string) {
         const quotaName = this.teamProps.name + "-quota";
         clusterInfo.cluster.addManifest(quotaName, {
             apiVersion: 'v1',
