@@ -37,7 +37,7 @@ export class TeamProps {
     /**
      *  Team members who need to get access to the cluster
      */
-    readonly users?: Array<iam.User>;
+    readonly users?: Array<iam.ArnPrincipal>;
 
     /**
      * Options existing role that should be used for cluster access. 
@@ -86,23 +86,21 @@ export class Team implements TeamSetup {
     }
 
 
-    getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.User>, role?: iam.Role): iam.Role | undefined {
+    getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.Role): iam.Role | undefined {
         if (users?.length == 0) {
             return role;
-        }
-
-        let principals = users?.map(item => new iam.ArnPrincipal(item.userArn));
+        };
 
         if (role) {
             role.assumeRolePolicy?.addStatements(
                 new PolicyStatement({
-                    principals: principals
+                    principals: users
                 })
             );
         }
         else {
-            role = new iam.Role(clusterInfo.cluster.stack, clusterInfo.cluster.clusterName + "Admin", {
-                assumedBy: new iam.CompositePrincipal(...principals)
+            role = new iam.Role(clusterInfo.cluster.stack, clusterInfo.cluster.clusterName + 'AccessRole', {
+                assumedBy: new iam.CompositePrincipal(...users)
             });
             role.addToPolicy(new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
