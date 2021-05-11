@@ -28,7 +28,6 @@
     "exclude": [
         "cdk.out",
         "node_modules",
-        "bin",
         "test",
         ".git",
     ],

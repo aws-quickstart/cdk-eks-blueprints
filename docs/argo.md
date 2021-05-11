@@ -1,81 +1,98 @@
-# Boostrap Cluster with the Uber App
+# Deploying workloads with ArgoCD
 
-This guide will walk you through how to boostrap your cluster with the Uber application found [here](https://github.com/shapirov103/argo-apps) using ArgoCD. Clone the repo that contains all the artifacts that we will need - https://github.com/shapirov103/argo-apps
+This guide will walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads arcoss multiple namespaces. The sample app of apps repository that we use in this walkthrough can be found [here](https://github.com/kcoleman731/argo-apps.git).
 
-## Install the ArgoCD CLI
+## Install ArgoCD CLI
 
 Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
+
 ```
-argocd version
+argocd version --short --client
 ```
 
-You should see a similar output as below
+You should see output similar to the following:
+
 ```
-argocd: v2.0.1+33eaf11
-  BuildDate: 2021-04-15T22:34:01Z
-  GitCommit: 33eaf11e3abd8c761c726e815cbb4b6af7dcb030
-  GitTreeState: clean
-  GoVersion: go1.16
-  Compiler: gc
-  Platform: darwin/amd64
-argocd-server: v1.7.6+b04c25e
-  BuildDate: 2020-09-19T00:52:04Z
-  GitCommit: b04c25eca8f1660359e325acd4be5338719e59a0
-  GitTreeState: clean
-  GoVersion: go1.14.1
-  Compiler: gc
-  Platform: linux/amd64
-  Ksonnet Version: v0.13.1
-  Kustomize Version: {Version:kustomize/v3.6.1 GitCommit:c97fa946d576eb6ed559f17f2ac43b3b5a8d5dbd BuildDate:2020-05-27T20:47:35Z GoOs:linux GoArch:amd64}
-  Helm Version: version.BuildInfo{Version:"v3.2.0", GitCommit:"e11b7ce3b12db2941e90399e874513fbd24bcb71", GitTreeState:"clean", GoVersion:"go1.13.10"}
-  Kubectl Version: v1.17.8
+argocd: v1.8.7+eb3d1fb.dirty
 ```
-## Login to Argo 
-The next thing we need is the name of the load balancer that is created. Run the following command to get the name of your load balancer
+
+## Exposing ArgoCD
+
+To access the ArgoCD running in your Kubernetes cluster, we need to change the service type of the ArgoCD Server from `ClusterIP` to `LoadBalancer`. 
+
+To do so, first capture the service name in an environment variable.
+
 ```
-kubectl get svc -n argocd | grep argocd-server
+export ARGO_SERVER=$(kubectl get svc -n argocd -l app.kubernetes.io/name=argocd-server -o name) 
 ```
-You should see the following output
+
+Next, patch the service type. 
+
+```
+kubectl patch $ARGO_SERVER -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
+To verfiy the service is updated, print the Kubernetes service resource details.
+
+```
+kubectl get $ARGO_SERVER -n argocd
+```
+
+You should see output similar to the following.
+
 ```
 argocd-server           LoadBalancer   172.20.206.128   afa3926d3e4174c2d8ae2b278d9f8703-1595693244.us-east-2.elb.amazonaws.com   80:32215/TCP,443:32242/TCP   3h41m
 argocd-server-metrics   ClusterIP      172.20.92.95     <none>                                                                    8083/TCP                     3h41m
 ```
 
-Next we need to change the argocd-server service type to `LoadBalancer`. Run the following command
+## Logging Into ArgoCD
+
+ArgoCD will create an `admin` user and password on a fresh install. To get the ArgoCD admin password, run the following.
+
 ```
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+export ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
-Run the following command to get the password for logging in to ArgoCD
+Next, grab the External IP of the LoadBalancer.
+
 ```
-kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2
+export ARGO_LB=$(kubectl get $ARGO_SERVER -n argocd -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 ```
 
-Copy and paste the full load balancer name and then run the following command
+Login via the following.
+
 ```
-argocd login <name of your load balancer>
+argocd login $ARGO_LB --username admin --password $ARGO_PASSWORD
 ```
 
-It will then prompt you for a username and password. The username will be `admin`. The password will be the output of running the command above.
+Note, the Load Balancer takes a few minutes to provision. If you see an error like the following, wait a few minutes and try again. 
 
-## Register the Cluster to Argo
-Run the following command to list all cluster contexts in your current kubeconfig
+```
+FATA[0000] dial tcp: lookup a930ff6f293e3495bb4133f581c0261c-2091079303.us-west-1.elb.amazonaws.com: no such host
+```
+
+## Register EKS cluster with Argo
+
+To beging deploying applications to your EKS cluster via ArgoCD, we first need to register our cluster with ArgoCD. Grab the name of your EKS cluster. 
+
 ```
 kubectl config get-contexts -o name
 ```
 
-You should see an output similar as the following
+You should see an output similar as the following which is your cluster ARN.
+
 ```
-arn:aws:eks:us-east-2:XXXXXXXXXXXX:cluster/east-test-1
-minikube
+arn:aws:eks:us-east-2:XXXXXXXXXXXX:cluster/<CLUSTER_NAME>
 ```
 
 Register your cluster using the following command
+
 ```
-argocd cluster add arn:aws:eks:us-east-2:XXXXXXXXXXXX:cluster/east-test-1
+argocd cluster add <CLUSTER_ARN>
 ```
 
-If the cluster was added successfully you should see an output similar to the following
+If the cluster was added successfully you should see output similar to the following
+
 ```
 INFO[0001] ServiceAccount "argocd-manager" created in namespace "kube-system"
 INFO[0001] ClusterRole "argocd-manager-role" created
@@ -83,26 +100,30 @@ INFO[0001] ClusterRoleBinding "argocd-manager-role-binding" created
 Cluster 'https://CC307FF827597118E788BCF9B6D5E7BB.gr7.us-east-2.eks.amazonaws.com' added
 ```
 
+## Deploy workloads to your cluster
 
-## Create Argo Project
 Create a project in Argo by running the following command
+
 ```
-argocd proj create webteam -d https://kubernetes.default.svc,djl-web
+argocd proj create sample -d https://kubernetes.default.svc,djl-web
 ```
 
-Run the following command to add the application repository to Argo
+Add the App of Apps repository to Argo for the project.
+
 ```
-argocd proj add-source webteam https://github.com/shapirov103/argo-apps.git
+argocd proj add-source sample https://github.com/kcoleman731/argo-apps.git
 ```
 
-Next run the following command to create the application within Argo by running the following command
+Create the application within Argo by running the following command
+
 ```
-argocd app create apps --dest-namespace argocd  --dest-server https://kubernetes.default.svc  --repo git@github.com:shapirov103/argo-apps.git --path "."
+argocd app create sample-apps --dest-namespace argocd  --dest-server https://kubernetes.default.svc  --repo https://github.com/kcoleman731/argo-apps.git --path "."
 ```
 
 Sync the apps by running the following command
+
 ```
-argocd app sync apps 
+argocd app sync sample-apps 
 ```
 
 If everything worked you should see an output similar to the following 
@@ -139,4 +160,15 @@ argoproj.io  Application  argocd     team-riker-guestbook   Synced  Healthy     
 argoproj.io  Application  argocd     inf-backend            Synced  Healthy        application.argoproj.io/inf-backend unchanged
 argoproj.io  Application  argocd     team-burnham-workload  Synced  Healthy        application.argoproj.io/team-burnham-workload unchanged
 ```
+
+## Validate deployments. 
+
+To validate your deployments, leverage kubectl port-forwarding to access the `guestbook-ui` service for `team-burnham`.
+
+```
+kubectl port-forward svc/guestbook-ui -n team-burnham 8080:80
+```
+
+Open up `localhost:8080` in your browser and you should see the application. 
+
 

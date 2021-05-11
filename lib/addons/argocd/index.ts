@@ -6,7 +6,8 @@ export class ArgoCDAddon implements ClusterAddOn {
         clusterInfo.cluster.addHelmChart("argocd-addon", {
             chart: "argo-cd",
             repository: "https://argoproj.github.io/argo-helm",
-            namespace: "argo-cd"
+            version: '3.2.3',
+            namespace: "argocd",
         });
     }
 }
