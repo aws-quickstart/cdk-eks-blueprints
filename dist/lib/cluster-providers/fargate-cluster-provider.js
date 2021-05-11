@@ -1,0 +1,28 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FargateClusterProvider = void 0;
+const aws_eks_1 = require("@aws-cdk/aws-eks");
+class FargateClusterProvider {
+    constructor(inProfiles, clusterOptions) {
+        this.profiles = inProfiles !== null && inProfiles !== void 0 ? inProfiles : new Map();
+        this.clusterOptions = clusterOptions;
+    }
+    createCluster(scope, vpc, version) {
+        // TODO: fix configuration so that it does not always come from context but could be injected
+        const vpcSubnets = scope.node.tryGetContext("vpcSubnets");
+        const id = scope.node.id;
+        const cluster = new aws_eks_1.FargateCluster(scope, id, {
+            vpc: vpc,
+            clusterName: id,
+            outputClusterName: true,
+            version: version,
+            vpcSubnets: vpcSubnets,
+        });
+        for (const [id, options] of this.profiles) {
+            cluster.addFargateProfile(id, options);
+        }
+        return { cluster: cluster, version: version };
+    }
+}
+exports.FargateClusterProvider = FargateClusterProvider;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmFyZ2F0ZS1jbHVzdGVyLXByb3ZpZGVyLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vbGliL2NsdXN0ZXItcHJvdmlkZXJzL2ZhcmdhdGUtY2x1c3Rlci1wcm92aWRlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFFQSw4Q0FBa0g7QUFJbEgsTUFBYSxzQkFBc0I7SUFNL0IsWUFBWSxVQUErQyxFQUFFLGNBQXFDO1FBQzlGLElBQUksQ0FBQyxRQUFRLEdBQUcsVUFBVSxhQUFWLFVBQVUsY0FBVixVQUFVLEdBQUksSUFBSSxHQUFHLEVBQWlDLENBQUM7UUFDdkUsSUFBSSxDQUFDLGNBQWMsR0FBRyxjQUFjLENBQUM7SUFDekMsQ0FBQztJQUVELGFBQWEsQ0FBQyxLQUFnQixFQUFFLEdBQVMsRUFBRSxPQUEwQjtRQUVqRSw2RkFBNkY7UUFDN0YsTUFBTSxVQUFVLEdBQUcsS0FBSyxDQUFDLElBQUksQ0FBQyxhQUFhLENBQUMsWUFBWSxDQUFDLENBQUM7UUFFMUQsTUFBTSxFQUFFLEdBQUcsS0FBSyxDQUFDLElBQUksQ0FBQyxFQUFFLENBQUM7UUFFekIsTUFBTSxPQUFPLEdBQUcsSUFBSSx3QkFBYyxDQUFDLEtBQUssRUFBRSxFQUFFLEVBQUU7WUFDMUMsR0FBRyxFQUFFLEdBQUc7WUFDUixXQUFXLEVBQUUsRUFBRTtZQUNmLGlCQUFpQixFQUFFLElBQUk7WUFDdkIsT0FBTyxFQUFFLE9BQU87WUFDaEIsVUFBVSxFQUFFLFVBQVU7U0FFekIsQ0FBQyxDQUFDO1FBRUgsS0FBSyxNQUFNLENBQUMsRUFBRSxFQUFFLE9BQU8sQ0FBQyxJQUFJLElBQUksQ0FBQyxRQUFRLEVBQUU7WUFDdkMsT0FBTyxDQUFDLGlCQUFpQixDQUFDLEVBQUUsRUFBRSxPQUFPLENBQUMsQ0FBQztTQUMxQztRQUVELE9BQU8sRUFBRSxPQUFPLEVBQUUsT0FBTyxFQUFFLE9BQU8sRUFBRSxPQUFPLEVBQUUsQ0FBQztJQUNsRCxDQUFDO0NBRUo7QUFsQ0Qsd0RBa0NDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQ29uc3RydWN0IH0gZnJvbSBcIkBhd3MtY2RrL2NvcmVcIjtcbmltcG9ydCB7IElWcGMgfSBmcm9tIFwiQGF3cy1jZGsvYXdzLWVjMlwiO1xuaW1wb3J0IHsgRmFyZ2F0ZUNsdXN0ZXIsIEt1YmVybmV0ZXNWZXJzaW9uLCBGYXJnYXRlUHJvZmlsZU9wdGlvbnMsIENvbW1vbkNsdXN0ZXJPcHRpb25zIH0gZnJvbSBcIkBhd3MtY2RrL2F3cy1la3NcIjtcblxuaW1wb3J0IHsgQ2x1c3RlckluZm8sIENsdXN0ZXJQcm92aWRlciB9IGZyb20gXCIuLi9zdGFja3MvZWtzLWJsdWVwcmludC1zdGFja1wiO1xuXG5leHBvcnQgY2xhc3MgRmFyZ2F0ZUNsdXN0ZXJQcm92aWRlciBpbXBsZW1lbnRzIENsdXN0ZXJQcm92aWRlciB7XG5cbiAgICByZWFkb25seSBwcm9maWxlczogTWFwPHN0cmluZywgRmFyZ2F0ZVByb2ZpbGVPcHRpb25zPjtcblxuICAgIGNsdXN0ZXJPcHRpb25zPzogQ29tbW9uQ2x1c3Rlck9wdGlvbnM7IC8vVE9ETzogaW50ZWdyYXRlIGludG8gY2x1c3RlciBjcmVhdGlvblxuXG4gICAgY29uc3RydWN0b3IoaW5Qcm9maWxlcz86IE1hcDxzdHJpbmcsIEZhcmdhdGVQcm9maWxlT3B0aW9ucz4sIGNsdXN0ZXJPcHRpb25zPzogQ29tbW9uQ2x1c3Rlck9wdGlvbnMpIHtcbiAgICAgICAgdGhpcy5wcm9maWxlcyA9IGluUHJvZmlsZXMgPz8gbmV3IE1hcDxzdHJpbmcsIEZhcmdhdGVQcm9maWxlT3B0aW9ucz4oKTtcbiAgICAgICAgdGhpcy5jbHVzdGVyT3B0aW9ucyA9IGNsdXN0ZXJPcHRpb25zO1xuICAgIH1cblxuICAgIGNyZWF0ZUNsdXN0ZXIoc2NvcGU6IENvbnN0cnVjdCwgdnBjOiBJVnBjLCB2ZXJzaW9uOiBLdWJlcm5ldGVzVmVyc2lvbik6IENsdXN0ZXJJbmZvIHtcblxuICAgICAgICAvLyBUT0RPOiBmaXggY29uZmlndXJhdGlvbiBzbyB0aGF0IGl0IGRvZXMgbm90IGFsd2F5cyBjb21lIGZyb20gY29udGV4dCBidXQgY291bGQgYmUgaW5qZWN0ZWRcbiAgICAgICAgY29uc3QgdnBjU3VibmV0cyA9IHNjb3BlLm5vZGUudHJ5R2V0Q29udGV4dChcInZwY1N1Ym5ldHNcIik7XG5cbiAgICAgICAgY29uc3QgaWQgPSBzY29wZS5ub2RlLmlkO1xuXG4gICAgICAgIGNvbnN0IGNsdXN0ZXIgPSBuZXcgRmFyZ2F0ZUNsdXN0ZXIoc2NvcGUsIGlkLCB7XG4gICAgICAgICAgICB2cGM6IHZwYyxcbiAgICAgICAgICAgIGNsdXN0ZXJOYW1lOiBpZCxcbiAgICAgICAgICAgIG91dHB1dENsdXN0ZXJOYW1lOiB0cnVlLFxuICAgICAgICAgICAgdmVyc2lvbjogdmVyc2lvbixcbiAgICAgICAgICAgIHZwY1N1Ym5ldHM6IHZwY1N1Ym5ldHMsXG5cbiAgICAgICAgfSk7XG5cbiAgICAgICAgZm9yIChjb25zdCBbaWQsIG9wdGlvbnNdIG9mIHRoaXMucHJvZmlsZXMpIHtcbiAgICAgICAgICAgIGNsdXN0ZXIuYWRkRmFyZ2F0ZVByb2ZpbGUoaWQsIG9wdGlvbnMpO1xuICAgICAgICB9XG5cbiAgICAgICAgcmV0dXJuIHsgY2x1c3RlcjogY2x1c3RlciwgdmVyc2lvbjogdmVyc2lvbiB9O1xuICAgIH1cblxufSJdfQ==
