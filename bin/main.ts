@@ -55,7 +55,7 @@ new CdkEksBlueprintStack(app, { id: 'east-dev', addOns: addOns, teams: allTeams 
 
 new CdkEksBlueprintStack(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
     env: {
-        region: 'us-west-2'
+        region: 'us-west-1'
     },
 });
 
