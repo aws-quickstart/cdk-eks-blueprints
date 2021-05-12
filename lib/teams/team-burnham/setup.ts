@@ -1,6 +1,6 @@
-import { ArnPrincipal, User } from '@aws-cdk/aws-iam';
-import { CdkEksBlueprintStack, ClusterInfo, TeamSetup } from '../../stacks/eks-blueprint-stack';
+import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Team } from '../team';
+
 export class TeamBurnhamSetup extends Team {
     constructor() {
         super({

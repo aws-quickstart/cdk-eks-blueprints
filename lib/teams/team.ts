@@ -3,6 +3,7 @@ import * as iam from '@aws-cdk/aws-iam';
 import { ClusterInfo, TeamSetup } from "../stacks/eks-blueprint-stack";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
+import { KubernetesManifest } from "@aws-cdk/aws-eks";
 
 /**
  * Team properties.
@@ -135,6 +136,14 @@ export class Team implements TeamSetup {
                 ]
             })
             );
+            role.addToPolicy(new iam.PolicyStatement({
+                effect: iam.Effect.ALLOW,
+                resources: ["*"],
+                actions: [
+                    "eks:ListClusters"
+                ]
+            })
+            );
         }
 
         return role;
@@ -147,21 +156,36 @@ export class Team implements TeamSetup {
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
-        const namespace = clusterInfo.cluster.addManifest(props.name, {
-            apiVersion: 'v1',
-            kind: 'Namespace',
-            metadata: {
-                name: namespaceName,
-                annotations: props.namespaceAnnotations
-            }
+        
+        const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
+            cluster: clusterInfo.cluster,
+            manifest: [{
+                apiVersion: 'v1',
+                kind: 'Namespace',
+                metadata: {
+                    name: namespaceName,
+                    annotations: props.namespaceAnnotations
+                }
+            }],
+            overwrite: true,
+            prune: true
         });
+           
 
         if(props.namespaceHardLimits) {
             this.setupNamespacePolicies(clusterInfo, namespaceName);
         }
 
         const defaultRoles = new DefaultTeamRoles().createManifest(namespaceName); //TODO: add support for custom RBAC
-        clusterInfo.cluster.addManifest(namespace + "-rbac",  defaultRoles);
+        
+        const rbacManifest = new KubernetesManifest(clusterInfo.cluster.stack, namespaceName + "-rbac",  {
+            cluster:clusterInfo.cluster,
+            manifest:defaultRoles,
+            overwrite: true,
+            prune: true
+        });
+
+        rbacManifest.node.addDependency(namespaceManifest);
     }
 
     /**
@@ -187,9 +211,14 @@ export class Team implements TeamSetup {
 
 /**
  * Platform team will setup all team members as admin access to the cluster by adding them to the master group.
+ * The setup skips namespace/quota configuration.
  */
 export class PlatformTeam extends Team {
 
+    /**
+     * Override
+     * @param clusterInfo 
+     */
     setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAdminAccess(clusterInfo);
     }
