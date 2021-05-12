@@ -1,24 +1,23 @@
 export class DefaultTeamRoles {
 
     createManifest(namespace: string): Record<string, any>[] {
-
         return [
             {
-                "apiVersion": "rbac.authorization.k8s.io/v1",
-                "kind": "ClusterRole",
-                "metadata": {
-                    "name": `${namespace}-team-cluster-role`
+                apiVersion: "rbac.authorization.k8s.io/v1",
+                kind: "ClusterRole",
+                metadata: {
+                    name: `${namespace}-team-cluster-role`
                 },
-                "rules": [
+                rules: [
                     {
-                        "apiGroups": [
+                        apiGroups: [
                             ""
                         ],
-                        "resources": [
+                        resources: [
                             "nodes",
                             "namespaces"
                         ],
-                        "verbs": [
+                        verbs: [
                             "get",
                             "list"
                         ]
@@ -26,67 +25,67 @@ export class DefaultTeamRoles {
                 ]
             },
             {
-                "apiVersion": "rbac.authorization.k8s.io/v1",
-                "kind": "ClusterRoleBinding",
-                "metadata": {
-                    "name": `${namespace}-team-cluster-role-binding`
+                apiVersion: "rbac.authorization.k8s.io/v1",
+                kind: "ClusterRoleBinding",
+                metadata: {
+                    name: `${namespace}-team-cluster-role-binding`
                 },
-                "subjects": [
+                subjects: [
                     {
-                        "kind": "Group",
-                        "name": `${namespace}-team-group`,
-                        "apiGroup": "rbac.authorization.k8s.io"
+                        kind: "Group",
+                        name: `${namespace}-team-group`,
+                        apiGroup: "rbac.authorization.k8s.io"
                     }
                 ],
-                "roleRef": {
-                    "kind": "ClusterRole",
-                    "name": `${namespace}-team-cluster-role`,
-                    "apiGroup": "rbac.authorization.k8s.io"
+                roleRef: {
+                    kind: "ClusterRole",
+                    name: `${namespace}-team-cluster-role`,
+                    apiGroup: "rbac.authorization.k8s.io"
                 }
             },
             {
-                "apiVersion": "rbac.authorization.k8s.io/v1",
-                "kind": "Role",
-                "metadata": {
-                    "namespace": namespace,
-                    "name": `${namespace}-team-role`
+                apiVersion: "rbac.authorization.k8s.io/v1",
+                kind: "Role",
+                metadata: {
+                    namespace: namespace,
+                    name: `${namespace}-team-role`
                 },
-                "rules": [
+                rules: [
                     {
-                        "apiGroups": [
+                        apiGroups: [
                             ""
                         ],
-                        "resources": [
+                        resources: [
                             "pods"
                         ],
-                        "verbs": [
+                        verbs: [
                             "get",
                             "list"
                         ]
                     },
                     {
-                        "apiGroups": [
+                        apiGroups: [
                             "apps"
                         ],
-                        "resources": [
+                        resources: [
                             "deployments",
                             "daemonsets",
                             "statefulsets",
                             "replicasets"
                         ],
-                        "verbs": [
+                        verbs: [
                             "get",
                             "list"
                         ]
                     },
                     {
-                        "apiGroups": [
+                        apiGroups: [
                             "batch"
                         ],
-                        "resources": [
+                        resources: [
                             "jobs"
                         ],
-                        "verbs": [
+                        verbs: [
                             "get",
                             "list"
                         ]
@@ -94,23 +93,23 @@ export class DefaultTeamRoles {
                 ]
             },
             {
-                "apiVersion": "rbac.authorization.k8s.io/v1",
-                "kind": "RoleBinding",
-                "metadata": {
-                    "name": `${namespace}-team-role-binding`,
-                    "namespace": namespace
+                apiVersion: "rbac.authorization.k8s.io/v1",
+                kind: "RoleBinding",
+                metadata: {
+                    name: `${namespace}-team-role-binding`,
+                    namespace: namespace
                 },
-                "subjects": [
+                subjects: [
                     {
-                        "kind": "Group",
-                        "name": `${namespace}-team-group`,
-                        "apiGroup": "rbac.authorization.k8s.io"
+                        kind: "Group",
+                        name: `${namespace}-team-group`,
+                        apiGroup: "rbac.authorization.k8s.io"
                     }
                 ],
-                "roleRef": {
-                    "kind": "Role",
-                    "name": `${namespace}-team-role`,
-                    "apiGroup": "rbac.authorization.k8s.io"
+                roleRef: {
+                    kind: "Role",
+                    name: `${namespace}-team-role`,
+                    apiGroup: "rbac.authorization.k8s.io"
                 }
             }
         ]
