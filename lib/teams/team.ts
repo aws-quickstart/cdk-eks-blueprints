@@ -76,7 +76,7 @@ export class Team implements TeamSetup {
         const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRole);
 
         if (teamRole) {
-            awsAuth.addRoleMapping(teamRole, { groups: [props.name + "-group"], username: props.name });
+            awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
             new CfnOutput(clusterInfo.cluster.stack, props.name + ' team role ', { value: teamRole ? teamRole.roleArn : "none" })
         }
     }
@@ -222,5 +222,4 @@ export class PlatformTeam extends Team {
     setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAdminAccess(clusterInfo);
     }
-
 }
