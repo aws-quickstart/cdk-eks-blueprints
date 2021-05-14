@@ -6,7 +6,8 @@ export class NginxAddon implements ClusterAddOn {
         clusterInfo.cluster.addHelmChart("ngninx-addon", {
             chart: "nginx-ingress",
             repository: "https://helm.nginx.com/stable",
-            namespace: "kube-system"
+            namespace: "kube-system",
+            version: "0.9.1"
         });
     }
 }
