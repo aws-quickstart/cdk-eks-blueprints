@@ -7,6 +7,7 @@ export class CalicoAddon implements ClusterAddOn {
             chart: "aws-calico",
             release: "aws-calico",
             repository: "https://aws.github.io/eks-charts",
+            version: "0.3.4",
             namespace: "kube-system"
         });
     }
