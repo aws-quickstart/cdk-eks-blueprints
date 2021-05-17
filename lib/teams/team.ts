@@ -52,7 +52,10 @@ export class Team implements TeamSetup {
 
     readonly teamProps: TeamProps;
 
+    readonly name: string;
+
     constructor(teamProps: TeamProps) {
+        this.name =  teamProps.name;
         this.teamProps = {
             name: teamProps.name,
             namespace: teamProps.namespace?? "team-" + teamProps.name,
