@@ -43,6 +43,8 @@ export class CdkEksBlueprintStack extends cdk.Stack {
 
     constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, props);
+
+        this.validateInput(blueprintProps);
         /*
          * Supported parameters
         */
@@ -58,6 +60,18 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         }
         if (blueprintProps.teams != null) {
             blueprintProps.teams.forEach(team => team.setup(clusterInfo));
+        }
+    }
+
+    private validateInput(blueprintProps : EksBlueprintProps) {
+        const teamNames = new Set<string>();
+        if(blueprintProps.teams) {
+            blueprintProps.teams.forEach(e => {
+                if(teamNames.has(e.name)) {
+                    throw new Error(`Team ${e.name} is registered more than once`);
+                }
+                teamNames.add(e.name);
+            });
         }
     }
 
@@ -95,6 +109,9 @@ export interface ClusterAddOn {
 }
 
 export interface TeamSetup {
+
+    name: string;
+
     setup(clusterInfo: ClusterInfo): void;
 }
 

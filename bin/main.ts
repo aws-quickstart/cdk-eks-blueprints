@@ -20,6 +20,7 @@ import { PipelineStack } from '../lib/stacks/pipeline-stack';
 import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
 import { TeamRikerSetup } from '../lib/teams/team-riker/setup';
 import { TeamTroiSetup } from '../lib/teams/team-troi/setup';
+import { TeamPlatform } from '../lib/teams/team-platform/setup'
 
 const app = new cdk.App();
 
@@ -35,7 +36,8 @@ const addOns: Array<ClusterAddOn> = [
 const allTeams: Array<TeamSetup> = [
     new TeamTroiSetup,
     new TeamRikerSetup,
-    new TeamBurnhamSetup
+    new TeamBurnhamSetup(app),
+    new TeamPlatform,
 ];
 
 new PipelineStack(app, "factory-pipeline", {
@@ -53,7 +55,7 @@ new CdkEksBlueprintStack(app, { id: 'east-dev', addOns: addOns, teams: allTeams 
 
 new CdkEksBlueprintStack(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
     env: {
-        region: 'us-west-2'
+        region: 'us-west-1'
     },
 });
 

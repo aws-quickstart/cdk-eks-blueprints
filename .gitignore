@@ -12,5 +12,8 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
-
 dist
+*.swp
+cdk.context.json
+package-lock.json
+yarn.lock
