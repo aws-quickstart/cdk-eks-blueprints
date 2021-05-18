@@ -111,7 +111,7 @@ export class Team implements TeamSetup {
     protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.Role): iam.Role | undefined {
         if (users?.length == 0) {
             return role;
-        };
+        }
 
         if (role) {
             role.assumeRolePolicy?.addStatements(
