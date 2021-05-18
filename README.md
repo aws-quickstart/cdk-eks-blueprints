@@ -158,7 +158,9 @@ The goal of this project is to provide a reference implementation of a Shared Se
 
 ### Onboarding Tenants
 
-Examples are provided under `lib/teams`, however due to uniqueness of every team, clients are expected to supply implementation of the `TeamSetup` interface.
+In the most generic cases clients are expected to supply implementation of the `TeamSetup` interface.
+Support for teams configuration and authentication both for 'kubectl` access as well as console access is described in [Teams](docs/teams.md) documentation.
+
 
 ### CI/CD
 
