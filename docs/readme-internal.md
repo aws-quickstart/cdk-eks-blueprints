@@ -27,8 +27,9 @@ At the moment leveraging a private NPM repository for "shapirov". TODO: move und
    2. Minor version is used for new features that do not change the way customers interact with the solution. For example, new add-on, extra configuration (optional) for existing add-ons. In some cases it may be used with CDK version upgrades provided they don't cause code changes.
    3. Major version is used for non-compatible changes that will require customers to re-arch. With the exception of version 1. which will be used once the code is production ready (we have tests, pipeline, validation).
 2. Publishing (if not applied through CI):
-   1. `npm run build` (compile)
-   2. `npm publish` (this will require credentials to npm)
+   1. `make build` (compile)
+   2. `make lint` (linting)
+   3. `npm publish` (this will require credentials to npm)
    
 ## Submitting Changes
 
