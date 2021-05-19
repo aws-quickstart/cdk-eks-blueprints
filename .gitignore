@@ -1,0 +1,19 @@
+!jest.config.js
+*.d.ts
+node_modules
+.vscode
+
+.classpath.txt
+.idea
+.settings
+.vscode
+*.iml
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+dist
+*.swp
+cdk.context.json
+package-lock.json
+yarn.lock
