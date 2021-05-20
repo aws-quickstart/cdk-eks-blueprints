@@ -1,4 +1,8 @@
-# quickstart-ssp-amazon-eks—Quick Start
+# Amazon EKS SSP Quickstart
+
+![GitHub](https://img.shields.io/github/license/shapirov103/cdk-eks-blueprint)
+
+Welcome to the `Amazon EKS SSP Quickstart` repository.
 
 For architectural details, step-by-step instructions, and customization options, see the [deployment guide](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
 
@@ -6,27 +10,30 @@ To post feedback, submit feature ideas, or report bugs, use the **Issues** secti
 
 To submit code for this Quick Start, see the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/).
 
-# EKS Blueprint
+## Overview 
 
-The repository contains the source code and configuration for the `EKS Shared Services Platform` reference architecture. 
+This repository contains the source code for the `amazon-eks-ssp` NPM module. `amazon-eks-ssp` is a framework and methodology that makes it easy for customers build Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
-## Getting Started 
+## What is an SSP?
 
-### Install CDK 
+A Shared Services Platform (SSP) is an interenal development platform that abstracts the complexities of cloud infrastrucuture from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, SSPs allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
 
-This reference architecture leverages [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). Install CDK via the following.
+## What can I do with the Quickstart?
 
-```bash
-npm install -g aws-cdk@1.104.0
-```
+Customers can use `Amazon EKS SSP Quickstart` to:
 
-Verify the installation.
+* Deploy batteries included `EKS` clusters across multiple accounts and regions. 
+* Manage configuration for all of your cluster from a single Git repository.
+* Manage the set of addons that are provisioned in each cluster. 
+* Leverage Gitops-based workflows to onboard and manage workloads. 
+* Define teams, namespaces, and their associated access permissions.
+* Integrate cluster access with IAM or OIDC provider of your choosing.
 
-```bash
-cdk --version
-```
+## Documentation
 
-### Project setup
+For complete project documentation, please see our [offical project documentation site](http://aws.amazon.com).
+
+## Getting Started
 
 Create a new CDK project. We use `typescript` for this example. 
 
@@ -42,17 +49,10 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Add the `cdk-eks-blueprint` library as as a dependency to your CDK project. 
+Run the following command to install the dependency in your project.
 
-```json
-"dependencies": {
-  "@shapirov/cdk-eks-blueprint": "0.1.6"
-}
 ```
-
-Run the following command to install the dependency to your local npm package manager - 
-```
-npm i @shapirov/cdk-eks-blueprint
+npm i @shapirov/amazon-eks-ssp
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
@@ -60,28 +60,20 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import {
-    CdkEksBlueprintStack, 
-    ArgoCDAddOn,
-    MetricsServerAddon, 
-    ClusterAutoScaler, 
-    ContainerInsightsAddOn, 
-    NginxAddon, 
-    CalicoNetworkPolicyAddon, 
-    ClusterAddOn
-}  from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@shapirov/amazon-eks-ssp';
 
-const addOns: Array<ClusterAddOn> = [
-  new ArgoCDAddOn,
-  new MetricsServerAddon,
-  new ClusterAutoScaler,
-  new ContainerInsightsAddOn,
-  new NginxAddon, 
-  new CalicoNetworkPolicyAddon,
+const addons = ssp.addons
+const addOns: Array<ssp.ClusterAddOn> = [
+  new addons.NginxAddon, 
+  new addons.ArgoCDAddOn,
+  new addons.ClusterAutoScaler,
+  new addons.MetricsServerAddon,
+  new addons.ContainerInsightsAddOn,
+  new addons.CalicoNetworkPolicyAddon,
 ];
 
 const app = new cdk.App();
-new CdkEksBlueprintStack(app, {id: 'east-test-1', addOns: addOns, teams: []}, {
+new ssp.EksBlueprint(app, {id: 'east-test-1', addOns: addOns, teams: []}, {
   env: {
       account: 'XXXXXXXXXXXX',
       region: 'us-east-2'
@@ -106,86 +98,33 @@ Deploy the stack using the following command
 ```
 cdk deploy
 ```
+---
 
-### Stack Configuration
+## Why should I use this framework?
 
-Supports context variables (specify in cdk.json, cdk.context.json or pass with -c command line option):
+As Kubernetes and EKS adopting grows within a customer organization, managing cluster configuration and all of the workloads/teams that run within the clusters can quickly become overwhelming. We see customers building Shared Services Platfomrs to automate this complexity and make it easier to maintain their EKS estate.  
 
-- `instanceType`: (defaulted to "t3.medium") Type of instance for the EKS cluster, must be a valid instance type like t3.medium
-- `vpc`: Specifies whether to use an existing VPC (if specified) or create a new one if not specified.
-- `minSize`: Min cluster size, must be positive integer greater than 0 (default 1).
-- `maxSize`: Max cluster size, must be greater than minSize.
-- `vpcSubnets`: List of VPC subnets for cluster provisioning (unsupported yet)
+SSPs can be difficult to design and build however. From an operations perspective, you need to determine the right mix of tools and services you want to include in your platform and how they integrate. You also need to determine how to maintain a fleet of clusters and their associated addons across regions. From a developer perspective, you need to determine how to onboard an operate workloads on the platfrom as well. 
 
-### Updating Clusters
+If you are:
 
-// Todo - Add
+##### Net new to EKS
 
-### Upgrading Clusters
+This quick start aims to jumpstart the process for customers. If you are net new to EKS, but know you want to enable multiple development teams, you can use this implementation to quickly deploy a platform and start onboarding workloads. 
 
-// Todo - Add
+##### Migrating from a PaaS
 
-## Solution Details
+If you are migrating to EKS from an on-premise PaaS such as OpenShift or PCF, you can leveage this project to easily deploy EKS clusters and still provide your developers with a completely abstracted experience. 
 
-### Shared Services Platform
+##### Building your own Platform
 
-A Shared Services Platform (SSP) is an interenal development platform that abstracts the complexities of cloud infrastrucuture from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams via a simplified interface, typically a CLI, GUI, Git, or, manifest file. 
+Lastly, if you are currently building your own platform, you can use this project as a reference for your own implementation. 
 
-### Reference Architecture goals.
+## Feedback
 
-The goal of this project is to provide a reference implementation of a Shared Services Platform (SSP) built on top of EKS. At present the implementation provides the following functionality:
+Have feedback or a feature request? 🙏 Please submit an issue in this repository.
 
-  * **Cluster Management** - Provision one or many EKS clusters across one or many regions.
-  * **Add-ons** A modular approach to configuring the clusters with suite of add-ons or plugins that are needed to run workloads in a Kubernetes environment. 
-    * **Custom Add-ons** Add your own add-ons by implementing a `ClusterAddon` SPI (to be extended for lifecycle management). 
-  * **Tenant Onboarding** Seamless onboarding of tenants/workloads onto specific clusters via CDK configuration and Gitops.
+## License
 
-### Supported Addons
+This library is licensed under the Apache 2.0 License.
 
-| AddOn             | Description                                                                       |
-|-------------------|-----------------------------------------------------------------------------------|
-| `AppMeshAddon`           | Adds an AppMesh controller and CRDs (pending validation on the latest version of CDK) |
-| `ArgoCDAddon`            | Adds an ArgoCD controller |
-| `CalicoAddon`            | Adds the Calico 1.7.1 CNI/Network policy engine |
-| `CloudWatchAddon`        | Adds Container Insights support integrating monitoring with CloudWatch |
-| [`ClusterAutoscalerAddon`](./docs/addons/cluster-autoscaler.md) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
-| `MetricsServerAddon`| Adds metrics server (pre-req for HPA and other monitoring tools)|
-| `NginxAddon`        | Adds NGINX ingress controller |
-
-### EKS Cluster Management 
-
-// Todo - Add
-
-### Configuring Add-ons 
-
-// Todo - Add
-
-### Creating an Add-on
-
-// Todo - Add
-
-### Onboarding Tenants
-
-In the most generic cases clients are expected to supply implementation of the `TeamSetup` interface.
-Support for teams configuration and authentication both for 'kubectl` access as well as console access is described in [Teams](docs/teams.md) documentation.
-
-
-### CI/CD
-
-## IaC Pipeline
-
-(work in progress)
-
-Example of IaC self-mutating pipeline based on CodePipeline can be found in the `lib/pipelineStack.ts`.
-
-## Bootstrapping
-
-Each combination of target account and region must be bootstrapped prior to deploying stacks.
-Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
-
-Example: 
-```   
-  cdk bootstrap aws://<AWS_ACCOUNT_ID>/us-east-1
-```
-In addition to the regular [environment bootstrapping](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) pipeline bootstrapping for pipelines requires a new style of bootstrapping. Set `AWS_ACCOUNT` environment to your account and execute (with account admin privileges) the command in bootstrap-pipeline.sh.  
->>>>>>> cdk-eks-remote/main

@@ -13,7 +13,7 @@ argocd version --short --client
 You should see output similar to the following:
 
 ```
-argocd: v1.8.7+eb3d1fb.dirty
+argocd: v2.0.1+33eaf11.dirty
 ```
 
 ## Exposing ArgoCD

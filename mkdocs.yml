@@ -1,0 +1,32 @@
+site_name: Amazon EKS SSP Quickstart
+repo_name: "shapirov/cdk-eks-blueprint"
+repo_url: "https://github.com/shapirov103/cdk-eks-blueprint"
+docs_dir: "docs"
+theme: 
+  name: material
+  features: 
+    - tabs
+nav:
+  - Overview: 'overview.md'
+  - Getting Started: 'getting-started.md'
+  - Teams: 'teams.md'
+  - GitOps with Argo: 'argo.md'
+  - CI/CD: 'ci-cd.md'
+  - Cluster Management: 'cluster-management.md'
+  - Core Concepts: 'core-concepts.md'
+  - Addons:
+    - Overview: 'addons.md'
+    - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
+    - Container Insights: 'addons/container-insights.md'
+  - Cluster Providers: 
+    - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
+    - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
+    - Outpost Cluster Provider: 'cluster-providers/outpost-cluster-provider.md'
+markdown_extensions:
+    - toc:
+        permalink: true
+    - pymdownx.highlight:
+        use_pygments: false
+    - admonition
+    - codehilite
+    
