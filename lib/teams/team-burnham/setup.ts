@@ -3,9 +3,9 @@ import { App } from '@aws-cdk/core';
 import { Team } from '../team';
 
 
-function getUserArns(app: App, key: string) : ArnPrincipal[] {
-    const context : string = app.node.tryGetContext(key);
-    if(context) {
+function getUserArns(app: App, key: string): ArnPrincipal[] {
+    const context: string = app.node.tryGetContext(key);
+    if (context) {
         return context.split(",").map(e => new ArnPrincipal(e));
     }
     return [];

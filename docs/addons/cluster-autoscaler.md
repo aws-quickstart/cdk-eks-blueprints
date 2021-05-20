@@ -1,15 +1,11 @@
-# Container Insights Addon
-
-The `ContainerInsights` addon adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
-
-Customers can use Container Insights to collect, aggregate, and summarize metrics and logs from your containerized applications and microservices.
+# Cluster Autoscaler Add-on
 
 ## Usage
 
 ```typescript
-import { addons }  from '@shapirov/cdk-eks-blueprint';
+import { ClusterAutoScaler }  from '@shapirov/cdk-eks-blueprint';
 
-const myClusterAutoscaler = new addons.ContainerInsights();
+readonly myClusterAutoscaler = new ClusterAutoscaler("v1.19.1");// optionally specify image version to pull  or empty constructor
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
 
 const app = new cdk.App();
@@ -20,4 +16,12 @@ new CdkEksBlueprintStack(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
+
+## Functionality
+
+1. Adds proper IAM permissions (such as modify autoscaling groups, terminate instances, etc.) to the NodeGroup IAM role. 
+2. Configures service account, cluster roles, roles, role bindings and deployment.
+3. Resolves proper CA image to pull based on the Kubernetes version.
+4. Configuration allows passing a specific version of the image to pull.
+5. Applies proper tags for discoverability to the EC2 instances.
 

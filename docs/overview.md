@@ -1,8 +1,8 @@
 # Overview
 
-Welcome to the `Amazon EKS SSP Quickstart` repository.
+Welcome to the `Amazon EKS SSP Quickstart` documentation site.
 
-This repository contains the source code for the `amazon-eks-ssp` NPM module. `amazon-eks-ssp` is a framework and methodology that makes it easy for customers build Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+`Amazon EKS SSP Quickstart` provides a framework and methodology that makes it easy for customers build Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## What is an SSP?
 

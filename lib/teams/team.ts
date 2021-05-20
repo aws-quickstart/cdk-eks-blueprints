@@ -1,9 +1,19 @@
 import { PolicyStatement } from "@aws-cdk/aws-iam";
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo, TeamSetup } from "../stacks/eks-blueprint-stack";
+import { ClusterInfo } from "../stacks/eks-blueprint-stack";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
+
+/**
+ * Interface for a team. 
+ */
+export interface Team {
+
+    name: string;
+
+    setup(clusterInfo: ClusterInfo): void;
+}
 
 /**
  * Team properties.
@@ -29,7 +39,7 @@ export class TeamProps {
     /**
      * Optional, but highly recommended setting to ensure predictable demands.
      */
-    readonly namespaceHardLimits? = {
+    readonly namespaceHardLimits?= {
         'requests.cpu': '10', // TODO verify sane defaults
         'requests.memory': '10Gi',
         'limits.cpu': '20',
@@ -48,17 +58,17 @@ export class TeamProps {
     readonly userRole?: iam.Role;
 }
 
-export class Team implements TeamSetup {
+export class ApplicationTeam implements Team {
 
     readonly teamProps: TeamProps;
 
     readonly name: string;
 
     constructor(teamProps: TeamProps) {
-        this.name =  teamProps.name;
+        this.name = teamProps.name;
         this.teamProps = {
             name: teamProps.name,
-            namespace: teamProps.namespace?? "team-" + teamProps.name,
+            namespace: teamProps.namespace ?? "team-" + teamProps.name,
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
@@ -159,7 +169,7 @@ export class Team implements TeamSetup {
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
-        
+
         const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
             manifest: [{
@@ -173,17 +183,17 @@ export class Team implements TeamSetup {
             overwrite: true,
             prune: true
         });
-           
 
-        if(props.namespaceHardLimits) {
+
+        if (props.namespaceHardLimits) {
             this.setupNamespacePolicies(clusterInfo, namespaceName);
         }
 
         const defaultRoles = new DefaultTeamRoles().createManifest(namespaceName); //TODO: add support for custom RBAC
-        
-        const rbacManifest = new KubernetesManifest(clusterInfo.cluster.stack, namespaceName + "-rbac",  {
-            cluster:clusterInfo.cluster,
-            manifest:defaultRoles,
+
+        const rbacManifest = new KubernetesManifest(clusterInfo.cluster.stack, namespaceName + "-rbac", {
+            cluster: clusterInfo.cluster,
+            manifest: defaultRoles,
             overwrite: true,
             prune: true
         });
@@ -201,7 +211,7 @@ export class Team implements TeamSetup {
         clusterInfo.cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
-            metadata: { 
+            metadata: {
                 name: quotaName,
                 namespace: namespaceName
             },
@@ -216,7 +226,7 @@ export class Team implements TeamSetup {
  * Platform team will setup all team members as admin access to the cluster by adding them to the master group.
  * The setup skips namespace/quota configuration.
  */
-export class PlatformTeam extends Team {
+export class PlatformTeam extends ApplicationTeam {
 
     /**
      * Override
