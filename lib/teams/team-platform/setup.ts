@@ -1,5 +1,5 @@
 import { ArnPrincipal } from "@aws-cdk/aws-iam";
-import { PlatformTeam } from "../team";
+import { PlatformTeam } from "..";
 
 export class TeamPlatform extends PlatformTeam {
     constructor() {

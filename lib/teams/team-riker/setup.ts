@@ -1,6 +1,7 @@
-import { ClusterInfo, TeamSetup } from '../../stacks/eks-blueprint-stack';
+import { ClusterInfo } from '../../stacks/eks-blueprint-stack';
+import { Team } from '..';
 
-export class TeamRikerSetup implements TeamSetup {
+export class TeamRikerSetup implements Team {
 
     readonly name = 'team-riker';
 

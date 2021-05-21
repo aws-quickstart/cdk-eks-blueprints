@@ -1,6 +1,6 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { App } from '@aws-cdk/core';
-import { Team } from '../team';
+import { ApplicationTeam } from '..';
 
 
 function getUserArns(app: App, key: string): ArnPrincipal[] {
@@ -11,7 +11,7 @@ function getUserArns(app: App, key: string): ArnPrincipal[] {
     return [];
 }
 
-export class TeamBurnhamSetup extends Team {
+export class TeamBurnhamSetup extends ApplicationTeam {
     constructor(app: App) {
         super({
             name: "burnham",
