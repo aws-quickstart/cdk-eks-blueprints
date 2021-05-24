@@ -1,10 +1,11 @@
 import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
 import * as s3 from "@aws-cdk/aws-s3";
-import { ClusterInfo, TeamSetup } from '../../stacks/eks-blueprint-stack';
 
+import { ClusterInfo } from '../../stacks/eks-blueprint-stack';
+import { Team } from '..';
 
-export class TeamTroiSetup implements TeamSetup {
+export class TeamTroiSetup implements Team {
     readonly name: string = 'team-troi';
 
     setup(clusterInfo: ClusterInfo) {

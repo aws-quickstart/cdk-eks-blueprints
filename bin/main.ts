@@ -4,8 +4,7 @@ import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
 import { Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
 
 // Blueprint
-import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo, ClusterProvider, TeamSetup } from '../lib/stacks/eks-blueprint-stack';
-
+import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
 // Addons 
 import * as addon from '../lib/addons'
 
@@ -17,6 +16,7 @@ import { EC2ClusterProvider, EC2ProviderClusterProps } from '../lib/cluster-prov
 import { PipelineStack } from '../lib/stacks/pipeline-stack';
 
 // Teams
+import { Team } from '../lib/teams'
 import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
 import { TeamRikerSetup } from '../lib/teams/team-riker/setup';
 import { TeamTroiSetup } from '../lib/teams/team-troi/setup';
@@ -33,7 +33,7 @@ const addOns: Array<ClusterAddOn> = [
     new addon.ArgoCDAddon
 ];
 
-const allTeams: Array<TeamSetup> = [
+const allTeams: Array<Team> = [
     new TeamTroiSetup,
     new TeamRikerSetup,
     new TeamBurnhamSetup(app),

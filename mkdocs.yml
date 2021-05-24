@@ -1,0 +1,31 @@
+site_name: Amazon EKS SSP Quickstart
+repo_name: "aws-quickstart/quickstart-ssp-amazon-eks"
+repo_url: "https://github.com/aws-quickstart/quickstart-ssp-amazon-eks"
+docs_dir: "docs"
+theme: 
+  name: material
+  features: 
+    - tabs
+nav:
+  - Overview: 'overview.md'
+  - Getting Started: 'getting-started.md'
+  - Teams: 'teams.md'
+  - CI/CD: 'ci-cd.md'
+  - Cluster Management: 'cluster-management.md'
+  - Core Concepts: 'core-concepts.md'
+  - Addons:
+    - Overview: 'addons/overview.md'
+    - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
+    - Container Insights: 'addons/container-insights.md'
+  - Cluster Providers: 
+    - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
+    - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
+    - Outpost Cluster Provider: 'cluster-providers/outpost-cluster-provider.md'
+markdown_extensions:
+    - toc:
+        permalink: true
+    - pymdownx.highlight:
+        use_pygments: false
+    - admonition
+    - codehilite
+    

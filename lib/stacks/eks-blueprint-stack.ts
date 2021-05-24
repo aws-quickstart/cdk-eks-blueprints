@@ -7,6 +7,7 @@ import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
+import { Team } from '../teams'
 
 export class EksBlueprintProps {
 
@@ -25,7 +26,7 @@ export class EksBlueprintProps {
     /**
      * Teams if any
      */
-    readonly teams?: Array<TeamSetup> = [];
+    readonly teams?: Array<Team> = [];
     /**
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work
@@ -63,11 +64,11 @@ export class CdkEksBlueprintStack extends cdk.Stack {
         }
     }
 
-    private validateInput(blueprintProps : EksBlueprintProps) {
+    private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        if(blueprintProps.teams) {
+        if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
-                if(teamNames.has(e.name)) {
+                if (teamNames.has(e.name)) {
                     throw new Error(`Team ${e.name} is registered more than once`);
                 }
                 teamNames.add(e.name);
@@ -106,13 +107,6 @@ export interface ClusterProvider {
 
 export interface ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void;
-}
-
-export interface TeamSetup {
-
-    name: string;
-
-    setup(clusterInfo: ClusterInfo): void;
 }
 
 export interface ClusterInfo {

@@ -1,8 +1,10 @@
-import { ClusterInfo, TeamSetup } from '../../stacks/eks-blueprint-stack';
-export class TeamRikerSetup implements TeamSetup {
+import { ClusterInfo } from '../../stacks/eks-blueprint-stack';
+import { Team } from '..';
 
-    readonly name =  'team-riker';
-    
+export class TeamRikerSetup implements Team {
+
+    readonly name = 'team-riker';
+
     setup(clusterInfo: ClusterInfo) {
         clusterInfo.cluster.addManifest(this.name, {
             apiVersion: 'v1',
