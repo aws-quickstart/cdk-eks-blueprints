@@ -9,7 +9,7 @@ readonly myClusterAutoscaler = new ClusterAutoscaler("v1.19.1");// optionally sp
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
 
 const app = new cdk.App();
-new CdkEksBlueprintStack(app, 'my-stack-name', addOns, [], {
+new EksBlueprint(app, 'my-stack-name', addOns, [], {
   env: {
       account: <AWS_ACCOUNT_ID>,
       region: <AWS_REGION>,
