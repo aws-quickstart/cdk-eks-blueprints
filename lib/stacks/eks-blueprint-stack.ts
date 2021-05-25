@@ -40,7 +40,7 @@ export class EksBlueprintProps {
 
 }
 
-export class CdkEksBlueprintStack extends cdk.Stack {
+export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, props);

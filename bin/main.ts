@@ -4,7 +4,7 @@ import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
 import { Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
 
 // Blueprint
-import { CdkEksBlueprintStack, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
+import { EksBlueprint, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
 // Addons 
 import * as addon from '../lib/addons'
 
@@ -47,19 +47,19 @@ new PipelineStack(app, "factory-pipeline", {
     },
 });
 
-new CdkEksBlueprintStack(app, { id: 'east-dev', addOns: addOns, teams: allTeams }, {
+new EksBlueprint(app, { id: 'east-dev', addOns: addOns, teams: allTeams }, {
     env: {
         region: 'us-east-2'
     },
 });
 
-new CdkEksBlueprintStack(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
+new EksBlueprint(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
     env: {
         region: 'us-west-1'
     },
 });
 
-new CdkEksBlueprintStack(app, { id: 'east-test-main', addOns: addOns }, {
+new EksBlueprint(app, { id: 'east-test-main', addOns: addOns }, {
     env: {
         account: '929819487611',
         region: 'us-east-1',
@@ -70,7 +70,7 @@ const fargateProfiles: Map<string, FargateProfileOptions> = new Map([
     ["dynatrace", { selectors: [{ namespace: "dynatrace" }] }]
 ]);
 
-new CdkEksBlueprintStack(app, { id: 'east-fargate-test', clusterProvider: new FargateClusterProvider(fargateProfiles) }, {
+new EksBlueprint(app, { id: 'east-fargate-test', clusterProvider: new FargateClusterProvider(fargateProfiles) }, {
     env: {
         region: 'us-east-1'
     }
@@ -98,7 +98,7 @@ class BottlerocketClusterProvider implements ClusterProvider {
     }
 }
 
-new CdkEksBlueprintStack(app, { id: 'east-br-test', clusterProvider: new BottlerocketClusterProvider }, {
+new EksBlueprint(app, { id: 'east-br-test', clusterProvider: new BottlerocketClusterProvider }, {
     env: {
         region: 'us-east-1'
     }
@@ -112,4 +112,4 @@ const props: EC2ProviderClusterProps = {
 
 const myClusterProvider = new EC2ClusterProvider(props);
 
-new CdkEksBlueprintStack(app, { id: "test-cluster-provider", clusterProvider: myClusterProvider });
+new EksBlueprint(app, { id: "test-cluster-provider", clusterProvider: myClusterProvider });
