@@ -5,10 +5,9 @@
     "@aws-cdk/core:enableStackNameDuplicates": "true",
     "aws-cdk:enableDiffNoFail": "true",
     "@aws-cdk/core:stackRelativeExports": "true",
-    "instanceType": "t3.medium",
-    "vpc": null,
-    "minSize": 1,
-    "maxSize": 2,
-    "vpcList": null
+    "eks.default.instance-type": "m5.large",
+    "eks.default.vpc": null,
+    "eks.default.min-size": 1,
+    "eks.default.max-size": 2
   }
 }
