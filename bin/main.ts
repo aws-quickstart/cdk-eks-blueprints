@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
 import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
-import { Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
+import { CapacityType, Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
 
 // Blueprint
 import { EksBlueprint, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
@@ -105,9 +105,11 @@ new EksBlueprint(app, { id: 'east-br-test', clusterProvider: new BottlerocketClu
 })
 
 const props: EC2ProviderClusterProps = {
+    nodeGroupCapacityType: CapacityType.SPOT,
     version: KubernetesVersion.V1_19,
-    instanceType: new InstanceType('t3.large'),
-    amiType: NodegroupAmiType.AL2_X86_64
+    instanceTypes: [new InstanceType('t3.large')],
+    amiType: NodegroupAmiType.AL2_X86_64,
+    amiReleaseVersion: "1.18.9-20210504" // this will upgrade kubelet to 1.19.6
 }
 
 const myClusterProvider = new EC2ClusterProvider(props);
