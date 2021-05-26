@@ -18,6 +18,14 @@ const DEFAULT_NG_MINSIZE = 1;
  */
 const DEFAULT_NG_MAXSIZE = 3;
 
+const INSTANCE_TYPE_KEY = "eks.default.instance-type";
+
+const MIN_SIZE_KEY = "eks.default.min-size";
+
+const MAX_SIZE_KEY = "eks.default.max-size";
+
+const DESIRED_SIZE_KEY = "eks.default.desired-size";
+
 /**
  * EC2 provider configuration options.
  */
@@ -92,12 +100,12 @@ export class EC2ClusterProvider implements ClusterProvider {
 
         const id = scope.node.id;
 
-        const defaultInstanceType = defaultValue(scope, "eks.default.instance-type", DEFAULT_INSTANCE_TYPE);
+        const defaultInstanceType = defaultValue(scope, INSTANCE_TYPE_KEY, DEFAULT_INSTANCE_TYPE);
         const instanceTypes = this.options.instanceTypes ?? [ defaultInstanceType ];
-        const minSize  = this.options.minSize ?? defaultValue(scope, "eks.default.min-size", DEFAULT_NG_MINSIZE);
-        const maxSize = this.options.maxSize ?? defaultValue(scope, "eks.default.max-size", DEFAULT_NG_MAXSIZE);
+        const minSize  = this.options.minSize ?? defaultValue(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
+        const maxSize = this.options.maxSize ?? defaultValue(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
 
-        const desiredSize = this.options.desiredSize ?? defaultValue(scope, "eks.default.desired-size", minSize);
+        const desiredSize = this.options.desiredSize ?? defaultValue(scope, DESIRED_SIZE_KEY, minSize);
         
         const cluster = new Cluster(scope, id, {
             vpc: vpc,
