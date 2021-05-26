@@ -1,7 +1,7 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { App } from '@aws-cdk/core';
-import { ApplicationTeam } from '..';
 
+import { ApplicationTeam } from '../../../lib/teams';
 
 function getUserArns(app: App, key: string): ArnPrincipal[] {
     const context: string = app.node.tryGetContext(key);

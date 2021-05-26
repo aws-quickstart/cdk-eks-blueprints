@@ -1,117 +1,54 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
-import { InstanceType, IVpc } from '@aws-cdk/aws-ec2';
-import { CapacityType, Cluster, FargateProfileOptions, KubernetesVersion, MachineImageType, NodegroupAmiType } from '@aws-cdk/aws-eks';
-
-// Blueprint
-import { EksBlueprint, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
-// AddOns
-import * as addons from '../lib/addons'
-
-// Cluster Providers
-import { FargateClusterProvider } from '../lib/cluster-providers/fargate-cluster-provider';
-import { EC2ClusterProvider, EC2ProviderClusterProps } from '../lib/cluster-providers/ec2-cluster-provider';
-
-// Pipeline
-import { PipelineStack } from '../lib/stacks/pipeline-stack';
-
-// Teams
-import { Team } from '../lib/teams'
-import { TeamBurnhamSetup } from '../lib/teams/team-burnham/setup';
-import { TeamRikerSetup } from '../lib/teams/team-riker/setup';
-import { TeamTroiSetup } from '../lib/teams/team-troi/setup';
-import { TeamPlatform } from '../lib/teams/team-platform/setup'
 
 const app = new cdk.App();
 
-const addOns: Array<ClusterAddOn> = [
-    new addons.CalicoAddOn,
-    new addons.MetricsServerAddOn,
-    new addons.ClusterAutoScalerAddOn,
-    new addons.ContainerInsightsAddOn,
-    new addons.NginxAddOn,
-    new addons.ArgoCDAddOn
-];
+//-----------------------------------------
+// Single Cluster with multiple teams.
+//-----------------------------------------
 
-const allTeams: Array<Team> = [
-    new TeamTroiSetup,
-    new TeamRikerSetup,
-    new TeamBurnhamSetup(app),
-    new TeamPlatform,
-];
+import MultiTeamStack from '../examples/multi-team-stack'
+new MultiTeamStack(app, 'MultiTeamStack', {});
 
-new PipelineStack(app, "factory-pipeline", {
-    env: {
-        account: "929819487611",
-        region: 'us-east-2'
-    },
-});
 
-new EksBlueprint(app, { id: 'east-dev', addOns: addOns, teams: allTeams }, {
-    env: {
-        region: 'us-east-2'
-    },
-});
+//-----------------------------------------
+// Multiple clusters across regions
+//-----------------------------------------
 
-new EksBlueprint(app, { id: 'west-dev', addOns: addOns, teams: allTeams }, {
-    env: {
-        region: 'us-west-1'
-    },
-});
+import MultiRegionStack from '../examples/multi-region-stack'
+new MultiRegionStack(app, 'MultiRegionStack', {});
 
-new EksBlueprint(app, { id: 'east-test-main', addOns: addOns }, {
-    env: {
-        account: '929819487611',
-        region: 'us-east-1',
-    },
-});
 
-const fargateProfiles: Map<string, FargateProfileOptions> = new Map([
-    ["dynatrace", { selectors: [{ namespace: "dynatrace" }] }]
-]);
+//-----------------------------------------
+// Single Fargate cluster.
+//-----------------------------------------
 
-new EksBlueprint(app, { id: 'east-fargate-test', clusterProvider: new FargateClusterProvider(fargateProfiles) }, {
-    env: {
-        region: 'us-east-1'
-    }
-})
+import FargateStack from '../examples/fargate-stack'
+new FargateStack(app, 'FargateStack', {});
 
-class BottlerocketClusterProvider implements ClusterProvider {
-    createCluster(scope: cdk.Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
 
-        const cluster = new Cluster(scope, scope.node.id, {
-            vpc: vpc,
-            clusterName: scope.node.id,
-            outputClusterName: true,
-            defaultCapacity: 0, // we want to manage capacity ourselves
-            version: version,
-        })
-            ;
-        const nodeGroup = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
-            instanceType: new InstanceType('t3.small'),
-            minCapacity: 2,
-            machineImageType: MachineImageType.BOTTLEROCKET
-        });
+//-----------------------------------------
+// Multiple clusters with a pipeline.
+//-----------------------------------------
 
-        return { cluster: cluster, autoscalingGroup: nodeGroup, version }
+import PipelineStack from '../examples/pipeline-stack'
+new PipelineStack(app, 'PipelineStack', {});
 
-    }
-}
 
-new EksBlueprint(app, { id: 'east-br-test', clusterProvider: new BottlerocketClusterProvider }, {
-    env: {
-        region: 'us-east-1'
-    }
-})
+//-----------------------------------------
+// Single cluster with Bottlerocket nodes.
+//-----------------------------------------
 
-const props: EC2ProviderClusterProps = {
-    nodeGroupCapacityType: CapacityType.SPOT,
-    version: KubernetesVersion.V1_19,
-    instanceTypes: [new InstanceType('t3.large')],
-    amiType: NodegroupAmiType.AL2_X86_64,
-    amiReleaseVersion: "1.18.9-20210504" // this will upgrade kubelet to 1.19.6
-}
+import BottleRocketStack from '../examples/bottlerocket-stack'
+new BottleRocketStack(app, 'BottleRocketStack', {});
 
-const myClusterProvider = new EC2ClusterProvider(props);
 
-new EksBlueprint(app, { id: "test-cluster-provider", clusterProvider: myClusterProvider });
+//-----------------------------------------
+// Single cluster with custom configuration
+//-----------------------------------------
+
+import CustomClusterStack from '../examples/custom-cluster-stack'
+new CustomClusterStack(app, 'CustomClusterStack', {});
+
+
+
