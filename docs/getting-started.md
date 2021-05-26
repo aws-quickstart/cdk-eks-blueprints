@@ -44,7 +44,7 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { EksBluepint, AddOns } from '@shapirov/cdk-eks-blueprint';
+import { EksBlueprint, AddOns } from '@shapirov/cdk-eks-blueprint';
 
 const addOns: Array<ClusterAddOn> = [
   new AddOns.ArgoCDAddOn,
