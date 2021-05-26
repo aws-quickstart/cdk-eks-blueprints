@@ -10,80 +10,73 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 export default class PipelineStack extends cdk.Stack {
-    constructor(app: cdk.App, id: string, props?: cdk.StackProps) {
-        super(app, id, props);
+    constructor(scope: cdk.App, id: string, props: cdk.StackProps) {
+        super(scope, id)
 
-        const pipeline = this.buildPipeline()
+        const pipeline = this.buildPipeline(this)
 
         // Dev cluster.
-        pipeline.addApplicationStage(new ClusterStage(this, 'dev', {
-            env: {
-                region: 'us-east-2'
-            }
-        }));
+        const stage1 = new ClusterStage(this, 'blueprint-dev')
+        pipeline.addApplicationStage(stage1);
 
         // Staging cluster
-        pipeline.addApplicationStage(new ClusterStage(this, 'staging', {
-            env: {
-                region: 'us-east-2'
-            }
-        }));
+        const stage2 = new ClusterStage(this, 'blueprint-staging')
+        pipeline.addApplicationStage(stage2);
 
         // Production cluster
-        pipeline.addApplicationStage(new ClusterStage(this, 'production', {
-            env: {
-                region: 'us-east-2'
-            }
-        }));
+        const stageOpts = { manualApprovals: true }
+        const stage3 = new ClusterStage(this, 'blueprint-production')
+        pipeline.addApplicationStage(stage3, stageOpts);
     }
 
-    private buildPipeline = () => {
+    private buildPipeline = (scope: cdk.Construct) => {
         const sourceArtifact = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
-        return new pipelines.CdkPipeline(this, 'FactoryPipeline', {
+        const sourceAction = new actions.GitHubSourceAction({
+            actionName: 'GitHub',
+            owner: 'aws-quickstart',
+            repo: 'quickstart-ssp-amazon-eks',
+            branch: 'main',
+            output: sourceArtifact,
+            oauthToken: cdk.SecretValue.secretsManager('github-token'),
+        })
+
+        // Use this if you need a build step (if you're not using ts-node
+        // or if you have TypeScript Lambdas that need to be compiled).
+        const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
+            sourceArtifact,
+            cloudAssemblyArtifact,
+            buildCommand: 'npm run build',
+        })
+
+        return new pipelines.CdkPipeline(scope, 'FactoryPipeline', {
             pipelineName: 'FactoryPipeline',
             cloudAssemblyArtifact,
-
-            sourceAction: new actions.GitHubSourceAction({
-                actionName: 'GitHub',
-                owner: 'aws-quickstart',
-                repo: 'quickstart-ssp-amazon-eks',
-                branch: 'main',
-                output: sourceArtifact,
-                oauthToken: cdk.SecretValue.secretsManager('github-token'),
-            }),
-
-            // Use this if you need a build step (if you're not using ts-node
-            // or if you have TypeScript Lambdas that need to be compiled).
-            synthAction: pipelines.SimpleSynthAction.standardNpmSynth({
-                sourceArtifact,
-                cloudAssemblyArtifact,
-                buildCommand: 'npm run build',
-            }),
+            sourceAction,
+            synthAction
         });
     }
 }
 
 export class ClusterStage extends cdk.Stage {
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StageProps) {
+    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
         super(scope, id, props);
 
-        // Teams for the cluster.
-        const teams: Array<ssp.Team> = [
-            new team.TeamPlatform,
-        ];
+        // Setup platform team
+        const accountID = props?.env?.account!
+        const platformTeam = new team.TeamPlatform(accountID)
+        const teams: Array<ssp.Team> = [platformTeam];
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddon,
-            new ssp.ArgoCDAddon,
-            new ssp.CalicoAddon,
-            new ssp.MetricsServerAddon,
-            new ssp.ClusterAutoScalerAddon,
+            new ssp.NginxAddOn,
+            new ssp.ArgoCDAddOn,
+            new ssp.CalicoAddOn,
+            new ssp.MetricsServerAddOn,
+            new ssp.ClusterAutoScalerAddOn,
             new ssp.ContainerInsightsAddOn,
         ];
-
-        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams });
+        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
     }
 }

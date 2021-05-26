@@ -1,10 +1,10 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
-import { App } from '@aws-cdk/core';
+import { Construct } from '@aws-cdk/core';
 
 import { ApplicationTeam } from '../../../lib/teams';
 
-function getUserArns(app: App, key: string): ArnPrincipal[] {
-    const context: string = app.node.tryGetContext(key);
+function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
+    const context: string = scope.node.tryGetContext(key);
     if (context) {
         return context.split(",").map(e => new ArnPrincipal(e));
     }
@@ -12,10 +12,10 @@ function getUserArns(app: App, key: string): ArnPrincipal[] {
 }
 
 export class TeamBurnhamSetup extends ApplicationTeam {
-    constructor(app: App) {
+    constructor(scope: Construct) {
         super({
             name: "burnham",
-            users: getUserArns(app, "team-burnham.users")
+            users: getUserArns(scope, "team-burnham.users")
         });
     }
 }

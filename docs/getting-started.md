@@ -102,12 +102,12 @@ Replace the contents of `bin/main.tsx` with the following:
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { EksBluepint, Addons, Team } from '@shapirov/cdk-eks-blueprint';
+import { EksBluepint, AddOns, Team } from '@shapirov/cdk-eks-blueprint';
 
 import { TeamAwesome } from '../teams/team-awesome'
 
 const addOns: Array<ClusterAddOn> = [
-  new Addons.ArgoCDAddOn,
+  new AddOns.ArgoCDAddOn,
 ];
 
 const teams: Array<Team> = [
@@ -192,7 +192,7 @@ Create a project in Argo by running the following command
 
 ```
 argocd proj create sample \
-    -d https://kubernetes.default.svc
+    -d https://kubernetes.default.svc,argocd \
     -s https://github.com/kcoleman731/argo-apps.git
 ```
 

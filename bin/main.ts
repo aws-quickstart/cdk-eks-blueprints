@@ -3,52 +3,55 @@ import * as cdk from '@aws-cdk/core';
 
 const app = new cdk.App();
 
-//-----------------------------------------
+//-------------------------------------------
 // Single Cluster with multiple teams.
-//-----------------------------------------
+//-------------------------------------------
 
-import MultiTeamStack from '../examples/multi-team-stack'
-new MultiTeamStack(app, 'MultiTeamStack', {});
-
-
-//-----------------------------------------
-// Multiple clusters across regions
-//-----------------------------------------
-
-import MultiRegionStack from '../examples/multi-region-stack'
-new MultiRegionStack(app, 'MultiRegionStack', {});
+import MultiTeamConstruct from '../examples/multi-team-construct'
+new MultiTeamConstruct(app, 'multi-team');
 
 
-//-----------------------------------------
+//-------------------------------------------
+// Multiple clusters, multiple regions.
+//-------------------------------------------
+
+import MultiRegionConstruct from '../examples/multi-region-construct'
+new MultiRegionConstruct(app, 'multi-region');
+
+
+//-------------------------------------------
 // Single Fargate cluster.
-//-----------------------------------------
+//-------------------------------------------
 
-import FargateStack from '../examples/fargate-stack'
-new FargateStack(app, 'FargateStack', {});
+import FargateConstruct from '../examples/fargate-construct'
+new FargateConstruct(app, 'fargate');
 
 
-//-----------------------------------------
-// Multiple clusters with a pipeline.
-//-----------------------------------------
+//-------------------------------------------
+// Multiple clusters with deployment pipeline.
+//-------------------------------------------
 
 import PipelineStack from '../examples/pipeline-stack'
-new PipelineStack(app, 'PipelineStack', {});
+const account = process.env.CDK_DEFAULT_ACCOUNT
+const region = process.env.CDK_DEFAULT_REGION
+const env = { account, region }
+new PipelineStack(app, 'pipeline', { env });
 
 
-//-----------------------------------------
+//-------------------------------------------
 // Single cluster with Bottlerocket nodes.
-//-----------------------------------------
+//-------------------------------------------
 
-import BottleRocketStack from '../examples/bottlerocket-stack'
-new BottleRocketStack(app, 'BottleRocketStack', {});
+import BottleRocketConstruct from '../examples/bottlerocket-construct'
+new BottleRocketConstruct(app, 'bottlerocket');
 
 
-//-----------------------------------------
-// Single cluster with custom configuration
-//-----------------------------------------
+//-------------------------------------------
+// Single cluster with custom configuration.
+//-------------------------------------------
 
-import CustomClusterStack from '../examples/custom-cluster-stack'
-new CustomClusterStack(app, 'CustomClusterStack', {});
+import CustomClusterConstruct from '../examples/custom-cluster-construct'
+new CustomClusterConstruct(app, 'custom-cluster');
 
 
 
