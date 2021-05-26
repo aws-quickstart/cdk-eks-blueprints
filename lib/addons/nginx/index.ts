@@ -1,6 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
-export class NginxAddon implements ClusterAddOn {
+export class NginxAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
         clusterInfo.cluster.addHelmChart("ngninx-addon", {

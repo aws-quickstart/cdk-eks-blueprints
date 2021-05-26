@@ -4,7 +4,7 @@ import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
-export class ClusterAutoScalerAddon implements ClusterAddOn {
+export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
     private versionField?: string;
 

@@ -44,10 +44,10 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { EksBluepint, Addons } from '@shapirov/cdk-eks-blueprint';
+import { EksBluepint, AddOns } from '@shapirov/cdk-eks-blueprint';
 
 const addOns: Array<ClusterAddOn> = [
-  new Addons.ArgoCDAddOn,
+  new AddOns.ArgoCDAddOn,
 ];
 
 const app = new cdk.App();
@@ -66,7 +66,7 @@ Deploy the stack using the following command
 cdk deploy
 ```
 
-Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprint`. 
+Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprint`.
 
 ## Onboard a Team
 

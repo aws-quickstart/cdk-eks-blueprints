@@ -1,6 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
-export class CalicoAddon implements ClusterAddOn {
+export class CalicoAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
         clusterInfo.cluster.addHelmChart("calico-addon", {

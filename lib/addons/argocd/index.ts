@@ -1,6 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
 
-export class ArgoCDAddon implements ClusterAddOn {
+export class ArgoCDAddOn implements ClusterAddOn {
 
     readonly namespace : string;
 
