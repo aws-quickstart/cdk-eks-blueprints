@@ -6,7 +6,7 @@ import { CapacityType, Cluster, FargateProfileOptions, KubernetesVersion, Machin
 // Blueprint
 import { EksBlueprint, ClusterAddOn, ClusterInfo, ClusterProvider } from '../lib/stacks/eks-blueprint-stack';
 // AddOns
-import { AddOns } from '../lib/'
+import * as addons from '../lib/addons'
 
 // Cluster Providers
 import { FargateClusterProvider } from '../lib/cluster-providers/fargate-cluster-provider';
@@ -25,12 +25,12 @@ import { TeamPlatform } from '../lib/teams/team-platform/setup'
 const app = new cdk.App();
 
 const addOns: Array<ClusterAddOn> = [
-    new AddOns.CalicoAddOn,
-    new AddOns.MetricsServerAddOn,
-    new AddOns.ClusterAutoScalerAddOn,
-    new AddOns.ContainerInsightsAddOn,
-    new AddOns.NginxAddOn,
-    new AddOns.ArgoCDAddOn
+    new addons.CalicoAddOn,
+    new addons.MetricsServerAddOn,
+    new addons.ClusterAutoScalerAddOn,
+    new addons.ContainerInsightsAddOn,
+    new addons.NginxAddOn,
+    new addons.ArgoCDAddOn
 ];
 
 const allTeams: Array<Team> = [
