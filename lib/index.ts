@@ -1,4 +1,3 @@
 export * from './stacks/eks-blueprint-stack';
-export * as Addons from './addons';
+export * as AddOns from './addons';
 export * as Teams from './teams';
-

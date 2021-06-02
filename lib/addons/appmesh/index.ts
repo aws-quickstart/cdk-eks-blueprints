@@ -2,7 +2,7 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
 import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack"
 
-export class AppMeshAddon implements ClusterAddOn {
+export class AppMeshAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
 
