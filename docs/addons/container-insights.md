@@ -7,9 +7,9 @@ Customers can use Container Insights to collect, aggregate, and summarize metric
 ## Usage
 
 ```typescript
-import { addons }  from '@shapirov/cdk-eks-blueprint';
+import { AddOns }  from '@shapirov/cdk-eks-blueprint';
 
-const myClusterAutoscaler = new addons.ContainerInsights();
+const myClusterAutoscaler = new AddOns.ContainerInsights();
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
 
 const app = new cdk.App();
