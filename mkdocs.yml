@@ -13,7 +13,7 @@ nav:
   - CI/CD: 'ci-cd.md'
   - Cluster Management: 'cluster-management.md'
   - Core Concepts: 'core-concepts.md'
-  - Addons:
+  - AddOns:
     - Overview: 'addons/overview.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'

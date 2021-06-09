@@ -27,6 +27,7 @@ export class EksBlueprintProps {
      * Teams if any
      */
     readonly teams?: Array<Team> = [];
+
     /**
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work

@@ -1,12 +1,15 @@
 import { Construct } from "@aws-cdk/core";
-import { InstanceType, InstanceClass,  InstanceSize, IVpc, SubnetSelection } from "@aws-cdk/aws-ec2";
+import { InstanceType, InstanceClass, InstanceSize, IVpc, SubnetSelection } from "@aws-cdk/aws-ec2";
 import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
 import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
+
+// Utils 
+import { valueFromContext } from '../utils/context-utils'
 
 /**
  * Default instance type for managed node group provisioning
  */
-const DEFAULT_INSTANCE_TYPE = InstanceType.of(InstanceClass.M5, InstanceSize.LARGE);
+const DEFAULT_INSTANCE_TYPES = [InstanceType.of(InstanceClass.M5, InstanceSize.LARGE)];
 
 /**
  * Default min size of MNG
@@ -30,7 +33,7 @@ const DESIRED_SIZE_KEY = "eks.default.desired-size";
  * EC2 provider configuration options.
  */
 export interface EC2ProviderClusterProps extends CommonClusterOptions {
-    
+
     /**
      * Instance types used for the node group. Mulitple types makes sense if capacity type is SPOT.
      */
@@ -74,17 +77,6 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
 }
 
 /**
- * Looks up default value from context (cdk.json, cdk.context.json and ~/.cdk.json)
- * @param construct 
- * @param key 
- * @param defaultValue 
- * @returns 
- */
-function  defaultValue(construct: Construct, key: string, defaultValue : any) {
-    return construct.node.tryGetContext(key) ?? defaultValue;
-}
-
-/**
  * Base implementation of an EC2 cluster provider with managed node group.
  */
 export class EC2ClusterProvider implements ClusterProvider {
@@ -97,16 +89,15 @@ export class EC2ClusterProvider implements ClusterProvider {
     }
 
     createCluster(scope: Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
-
         const id = scope.node.id;
 
-        const defaultInstanceType = defaultValue(scope, INSTANCE_TYPE_KEY, DEFAULT_INSTANCE_TYPE);
-        const instanceTypes = this.options.instanceTypes ?? [ defaultInstanceType ];
-        const minSize  = this.options.minSize ?? defaultValue(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
-        const maxSize = this.options.maxSize ?? defaultValue(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
+        // Props for the cluster.
+        const instanceTypes = this.options.instanceTypes ?? valueFromContext(scope, INSTANCE_TYPE_KEY, DEFAULT_INSTANCE_TYPES);
+        const minSize = this.options.minSize ?? valueFromContext(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
+        const maxSize = this.options.maxSize ?? valueFromContext(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
+        const desiredSize = this.options.desiredSize ?? valueFromContext(scope, DESIRED_SIZE_KEY, minSize);
 
-        const desiredSize = this.options.desiredSize ?? defaultValue(scope, DESIRED_SIZE_KEY, minSize);
-        
+        // Create an EKS Cluster
         const cluster = new Cluster(scope, id, {
             vpc: vpc,
             clusterName: id,
@@ -114,12 +105,13 @@ export class EC2ClusterProvider implements ClusterProvider {
             defaultCapacity: 0, // we want to manage capacity ourselves
             version: this.options.version,
             vpcSubnets: this.options.vpcSubnets,
-        });   
+        });
 
+        // Create a managed node group.
         const nodeGroup = cluster.addNodegroupCapacity(id + "-ng", {
-            capacityType: this.options.nodeGroupCapacityType, 
-            instanceTypes: instanceTypes,
             amiType: this.options.amiType,
+            capacityType: this.options.nodeGroupCapacityType,
+            instanceTypes: instanceTypes,
             minSize: minSize,
             maxSize: maxSize,
             desiredSize: desiredSize,
@@ -128,5 +120,4 @@ export class EC2ClusterProvider implements ClusterProvider {
 
         return { cluster: cluster, nodeGroup: nodeGroup, version: version };
     }
-
 }

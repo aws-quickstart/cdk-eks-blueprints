@@ -236,8 +236,3 @@ export class PlatformTeam extends ApplicationTeam {
         this.defaultSetupAdminAccess(clusterInfo);
     }
 }
-
-// Temp - TODO Remove.
-export { TeamTroiSetup } from './team-troi/setup'
-export { TeamRikerSetup } from './team-riker/setup'
-export { TeamBurnhamSetup } from './team-burnham/setup'

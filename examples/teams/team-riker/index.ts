@@ -1,5 +1,5 @@
-import { ClusterInfo } from '../../stacks/eks-blueprint-stack';
-import { Team } from '..';
+import { ClusterInfo } from '../../../lib/stacks/eks-blueprint-stack';
+import { Team } from '../../../lib/teams';
 
 export class TeamRikerSetup implements Team {
 

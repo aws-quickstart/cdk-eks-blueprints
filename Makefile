@@ -17,6 +17,9 @@ lint:
 build:
 	rm -rf dist && $(TSC)
 
+list: 
+	$(CDK) list
+
 mkdocs:
 	mkdocs serve 
 
