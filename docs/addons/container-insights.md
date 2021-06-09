@@ -92,6 +92,10 @@ Once the update is complete, you should see a similar output
 }
 ```
 
+## View metrics for cluster and workloads
+Under Performance Monitoring, the Container Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance. 
+![CloudWatch](/screenshots/eks-blueprint-cwinsights-performance-monitoring.png)
+
 ## View cluster level logs
 After you have enabled any of the control plane log types for your Amazon EKS cluster, you can view them on the CloudWatch console.
 
@@ -109,7 +113,7 @@ Next in the console, click on Log groups under Logs.
 
 You will see under log streams all the log streams from your Amazon EKS control plane. 
 
-(insert image)
+![CloudWatch](../../screenshots/eks-blueprint-cwlogs.png)
 
 
 ## View workload level logs
@@ -120,7 +124,7 @@ In the navigation pane, choose Insights.
 
 Near the top of the screen is the query editor. When you first open CloudWatch Logs Insights, this box contains a default query that returns the 20 most recent log events.
 
-In the box above the query editor, select one of the Container Insights log groups to query. For the following example queries to work, the log group name must end with performance.
+In the box above the query editor, select one of the Container Insights log groups to query. For the following example queries to work, the log group name must end with performance. We will look at `/aws/containerinsights/east-dev/performance`
 
 When you select a log group, CloudWatch Logs Insights automatically detects fields in the data in the log group and displays them in Discovered fields in the right pane. It also displays a bar graph of log events in this log group over time. This bar graph shows the distribution of events in the log group that matches your query and time range, not only the events displayed in the table.
 
@@ -128,21 +132,22 @@ In the query editor, replace the default query with the following query and choo
 
 STATS avg(node_cpu_utilization) as avg_node_cpu_utilization by NodeName
 `SORT avg_node_cpu_utilization DESC`
-This query shows a list of nodes, sorted by average node CPU utilization.
+This query shows a list of nodes, sorted by average node CPU utilization. Below is an example of what the visualization should look like.
+
+![CloudWatch](../../screenshots/eks-blueprint-cloudwatch-loginsights.png)
 
 To try another example, replace that query with another query and choose Run query. More sample queries are listed later on this page.
 
 STATS avg(number_of_container_restarts) as avg_number_of_container_restarts by PodName
 `SORT avg_number_of_container_restarts DESC`
-This query displays a list of your pods, sorted by average number of container restarts.
+This query displays a list of your pods, sorted by average number of container restarts as shown below
+
+![CloudWatch](../../screenshots/eks-blueprint-cloudwatch-loginsights-2.png)
 
 If you want to try another query, you can use include fields in the list at the right of the screen. For more information about query syntax, see CloudWatch Logs Insights Query Syntax.
-
-## View metrics for cluster and workloads
-Under Performance monitoring, the Container Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance. 
 
 ## View containers via that container map in container insights.
 
 In order to view a map of all of your containers running inside your cluster, click on `View your container map` in the Container Insights tab. You will then see a map of all of your namespaces and their associated pods and services.
 
-(insert image)
+![CloudWatch](../../screenshots/eks-blueprint-container-insights.png)
