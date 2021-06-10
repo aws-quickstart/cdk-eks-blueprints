@@ -4,7 +4,7 @@
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
-This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a framework that makes it easy for customers build a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a CDK construct that makes it easy for customers to deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## What is an SSP?
 
@@ -91,6 +91,11 @@ Deploy the stack using the following command
 ```
 cdk deploy
 ```
+
+### Examples 
+
+To view more examples for how you can leverage `cdk-eks-blueprint`, see the `examples` directory.
+
 ---
 
 ## Why should I use this framework?  

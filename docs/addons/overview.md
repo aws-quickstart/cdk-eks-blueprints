@@ -1,6 +1,6 @@
-# Addons
+# AddOns
 
-## Supported Addons
+## Supported AddOns
 
 | AddOn             | Description                                                                       |
 |-------------------|-----------------------------------------------------------------------------------|
