@@ -7,12 +7,13 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 export default class FargateConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string) {
+    constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
         super(scope, id); {
 
             // Setup platform team
-            const accountID = process.env.CDK_DEFAULT_ACCOUNT!
-            const platformTeam = new team.TeamPlatform(accountID)
+            const accountID = props?.env?.account
+            const region = props?.env?.region
+            const platformTeam = new team.TeamPlatform(<string> accountID)
             const teams: Array<ssp.Team> = [platformTeam];
 
             // AddOns for the cluster.
@@ -31,7 +32,7 @@ export default class FargateConstruct extends cdk.Construct {
             const clusterProvider = new ssp.FargateClusterProvider(fargateProfiles)
             new ssp.EksBlueprint(scope, { id: stackID, teams, addOns, clusterProvider }, {
                 env: {
-                    region: 'us-east-1'
+                    region: region
                 }
             })
         }

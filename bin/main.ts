@@ -2,12 +2,32 @@
 import * as cdk from '@aws-cdk/core';
 
 const app = new cdk.App();
+let account: string, region: string;
+let context_account: string, context_region :string;
+
+context_account = valueFromContext(app, "account", false);
+context_region = valueFromContext(app, "region", false);
+if (context_account.trim() != "") {
+    account = context_account;
+}
+else {
+    account = <string> process.env.CDK_DEFAULT_ACCOUNT;
+}
+
+if (context_region.trim() != "") {
+    region = context_region;
+}
+else {
+    region = <string> process.env.CDK_DEFAULT_REGION
+}
+const env = { account, region };
+
 
 //-------------------------------------------
 // Single Cluster with multiple teams.
 //-------------------------------------------
 
-import MultiTeamConstruct from '../examples/multi-team-construct'
+import MultiTeamConstruct from '../examples/multi-team-construct';
 new MultiTeamConstruct(app, 'multi-team');
 
 
@@ -15,7 +35,7 @@ new MultiTeamConstruct(app, 'multi-team');
 // Multiple clusters, multiple regions.
 //-------------------------------------------
 
-import MultiRegionConstruct from '../examples/multi-region-construct'
+import MultiRegionConstruct from '../examples/multi-region-construct';
 new MultiRegionConstruct(app, 'multi-region');
 
 
@@ -23,18 +43,15 @@ new MultiRegionConstruct(app, 'multi-region');
 // Single Fargate cluster.
 //-------------------------------------------
 
-import FargateConstruct from '../examples/fargate-construct'
-new FargateConstruct(app, 'fargate');
+import FargateConstruct from '../examples/fargate-construct';
+new FargateConstruct(app, 'fargate', { env });
 
 
 //-------------------------------------------
 // Multiple clusters with deployment pipeline.
 //-------------------------------------------
 
-import PipelineStack from '../examples/pipeline-stack'
-const account = process.env.CDK_DEFAULT_ACCOUNT
-const region = process.env.CDK_DEFAULT_REGION
-const env = { account, region }
+import PipelineStack from '../examples/pipeline-stack';
 new PipelineStack(app, 'pipeline', { env });
 
 
@@ -42,8 +59,8 @@ new PipelineStack(app, 'pipeline', { env });
 // Single cluster with Bottlerocket nodes.
 //-------------------------------------------
 
-import BottleRocketConstruct from '../examples/bottlerocket-construct'
-new BottleRocketConstruct(app, 'bottlerocket');
+import BottleRocketConstruct from '../examples/bottlerocket-construct';
+new BottleRocketConstruct(app, 'bottlerocket', { env });
 
 
 //-------------------------------------------
@@ -51,7 +68,6 @@ new BottleRocketConstruct(app, 'bottlerocket');
 //-------------------------------------------
 
 import CustomClusterConstruct from '../examples/custom-cluster-construct'
-new CustomClusterConstruct(app, 'custom-cluster');
-
-
+import {valueFromContext} from "../lib/utils/context-utils";
+new CustomClusterConstruct(app, 'custom-cluster', { env });
 

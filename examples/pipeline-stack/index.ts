@@ -65,7 +65,7 @@ export class ClusterStage extends cdk.Stage {
 
         // Setup platform team
         const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(accountID!)
+        const platformTeam = new team.TeamPlatform(<string> accountID)
         const teams: Array<ssp.Team> = [platformTeam];
 
         // AddOns for the cluster.

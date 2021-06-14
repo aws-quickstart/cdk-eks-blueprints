@@ -6,7 +6,7 @@ import { IVpc } from '@aws-cdk/aws-ec2';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 
-import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
+import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider'
 import { Team } from '../teams'
 
 export class EksBlueprintProps {

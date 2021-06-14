@@ -4,7 +4,8 @@ import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, Nodegro
 import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
 
 // Utils 
-import { valueFromContext } from '../utils/context-utils'
+import { valueFromContext, kubernetesVersionContext, kubernetesVersionDefault} from '../utils/context-utils'
+import {Context} from "aws-cdk/lib/settings";
 
 /**
  * Default instance type for managed node group provisioning
@@ -84,8 +85,17 @@ export class EC2ClusterProvider implements ClusterProvider {
     readonly options: EC2ProviderClusterProps;
 
 
-    constructor(options?: EC2ProviderClusterProps) {
-        this.options = options ?? { version: KubernetesVersion.V1_19 };
+    constructor(scope?: Construct, options?: EC2ProviderClusterProps) {
+        if (options != null)
+        {
+            this.options = options;
+        }
+        else {
+            if (scope != null)
+                this.options = { version: kubernetesVersionContext(scope)};
+            else
+                this.options = { version: kubernetesVersionDefault()};
+        }
     }
 
     createCluster(scope: Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
@@ -96,7 +106,6 @@ export class EC2ClusterProvider implements ClusterProvider {
         const minSize = this.options.minSize ?? valueFromContext(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
         const maxSize = this.options.maxSize ?? valueFromContext(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
         const desiredSize = this.options.desiredSize ?? valueFromContext(scope, DESIRED_SIZE_KEY, minSize);
-
         // Create an EKS Cluster
         const cluster = new Cluster(scope, id, {
             vpc: vpc,
