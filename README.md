@@ -8,7 +8,7 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 
 ## What is an SSP?
 
-A Shared Services Platform (SSP) is an internal development platform that abstracts the complexities of cloud infrastrucuture from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, SSPs allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
+A Shared Services Platform (SSP) is an internal development platform that abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, SSPs allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
 
 ## What can I do with this QuickStart?
 
@@ -24,7 +24,7 @@ Customers can use `cdk-eks-blueprint` to:
 
 ## Documentation
 
-For complete project documentation, please see our [offical project documentation site](http://aws.amazon.com).
+For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
 
 ## Getting Started
 
@@ -51,18 +51,18 @@ npm i @shapirov/cdk-eks-blueprint
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
-const addons = ssp.addons
+const addons = ssp;
+
 const addOns: Array<ssp.ClusterAddOn> = [
-  new addons.NginxAddon, 
+  new addons.NginxAddOn, 
   new addons.ArgoCDAddOn,
-  new addons.ClusterAutoScaler,
-  new addons.MetricsServerAddon,
+  new addons.ClusterAutoScalerAddOn,
+  new addons.MetricsServerAddOn,
   new addons.ContainerInsightsAddOn,
-  new addons.CalicoNetworkPolicyAddon,
+  new addons.CalicoAddOn,
 ];
 
 const app = new cdk.App();
