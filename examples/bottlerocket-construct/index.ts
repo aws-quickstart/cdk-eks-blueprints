@@ -8,13 +8,13 @@ import * as team from '../teams'
 
 export default class BottlerocketConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id);
+        super(scope, id)
 
         // Setup platform team
         const accountID = props?.env?.account
         const region = props?.env?.region
         const platformTeam = new team.TeamPlatform(<string>accountID)
-        const teams: Array<ssp.Team> = [platformTeam];
+        const teams: Array<ssp.Team> = [platformTeam]
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [

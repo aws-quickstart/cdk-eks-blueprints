@@ -1,5 +1,5 @@
-import * as cdk from '@aws-cdk/core';
-import * as eks from '@aws-cdk/aws-eks';
+import * as cdk from '@aws-cdk/core'
+import * as eks from '@aws-cdk/aws-eks'
 // SSP Lib
 import * as ssp from '../../lib'
 

@@ -1,4 +1,4 @@
-import * as cdk from '@aws-cdk/core';
+import * as cdk from '@aws-cdk/core'
 
 // SSP Lib
 import * as ssp from '../../lib'
@@ -8,7 +8,7 @@ import * as team from '../teams'
 
 export default class MultiRegionConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id);
+        super(scope, id)
 
         // Setup platform team
         const accountID = props?.env?.account

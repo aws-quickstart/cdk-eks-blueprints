@@ -1,7 +1,7 @@
-import * as cdk from '@aws-cdk/core';
-import * as pipelines from '@aws-cdk/pipelines';
-import * as codepipeline from '@aws-cdk/aws-codepipeline';
-import * as actions from '@aws-cdk/aws-codepipeline-actions';
+import * as cdk from '@aws-cdk/core'
+import * as pipelines from '@aws-cdk/pipelines'
+import * as codepipeline from '@aws-cdk/aws-codepipeline'
+import * as actions from '@aws-cdk/aws-codepipeline-actions'
 
 // SSP Lib
 import * as ssp from '../../lib'
@@ -26,12 +26,12 @@ export default class PipelineStack extends cdk.Stack {
         // Production cluster
         const stageOpts = { manualApprovals: true }
         const stage3 = new ClusterStage(this, 'blueprint-production')
-        pipeline.addApplicationStage(stage3, stageOpts);
+        pipeline.addApplicationStage(stage3, stageOpts)
     }
 
     private buildPipeline = (scope: cdk.Construct) => {
-        const sourceArtifact = new codepipeline.Artifact();
-        const cloudAssemblyArtifact = new codepipeline.Artifact();
+        const sourceArtifact = new codepipeline.Artifact()
+        const cloudAssemblyArtifact = new codepipeline.Artifact()
 
         const sourceAction = new actions.GitHubSourceAction({
             actionName: 'GitHub',
@@ -66,7 +66,7 @@ export class ClusterStage extends cdk.Stage {
         // Setup platform team
         const accountID = props?.env?.account
         const platformTeam = new team.TeamPlatform(<string> accountID)
-        const teams: Array<ssp.Team> = [platformTeam];
+        const teams: Array<ssp.Team> = [platformTeam]
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [

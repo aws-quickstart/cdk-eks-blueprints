@@ -1,4 +1,4 @@
-import * as cdk from '@aws-cdk/core';
+import * as cdk from '@aws-cdk/core'
 
 // SSP Lib
 import * as ssp from '../../lib'
@@ -38,7 +38,7 @@ export default class MultiTeamConstruct extends cdk.Construct {
             env: {
                 region: region,
             },
-        });
+        })
     }
 }
 
