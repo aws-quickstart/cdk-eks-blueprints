@@ -28,6 +28,19 @@ For complete project documentation, please see our [official project documentati
 
 ## Getting Started
 
+Install CDK matching the version of the SSP Quickstart.
+
+```bash
+npm install -g aws-cdk@1.104.0
+```
+
+Verify the installation.
+
+```bash
+cdk --version
+# must output 1.104.0
+```
+
 Create a new CDK project. We use `typescript` for this example. 
 
 ```bash
