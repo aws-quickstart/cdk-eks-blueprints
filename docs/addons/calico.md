@@ -2,7 +2,7 @@
 
 The `Calico` addon adds support for [Calico CNI](https://docs.projectcalico.org/about/about-calico) to an EKS cluster.
 
-Calico is an open source networking and network security solution for containers, virtual machines, and native host-based workloads.To secure workloads in Kubernetes, Calico utilizes Network Policies.  
+Calico is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as we will see below.
 
 ## Usage
 
@@ -42,7 +42,9 @@ Cluster Type:      typha,kdd,k8s,ecs
 
 ### Pod to Pod communications with no policies
 
-Looking at the app of apps installed using ArgoCD, currently there are no network policy. To verify this, run the following:
+If you deploy [App of Apps installed using ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), you will notice that there are no network policies. 
+
+To verify this, run the following:
 
 ```bash
 kubectl get networkpolicy -A
@@ -55,7 +57,7 @@ No resource found
 
 This means that any resources within the cluster should be able to make ingress and egress connections with other resources within and outside the cluster. You can verify, for example, that you are able to ping from `team-riker` pod to `team-burnham` pod.
 
-First we retrieve the pod name from `team-burnham` namespace and retrieve its DNS:
+First we retrieve the pod name from the `team-burnham` namespace its podIP:
 
 ```bash
 BURNHAM_POD=$(kubectl get pod -n team-burnham -o jsonpath='{.items[0].metadata.name}') 
@@ -63,14 +65,14 @@ BURNHAM_POD_IP=$(kubectl get pod -n team-burnham $BURNHAM_POD -o jsonpath='{.sta
 BURNHAM_POD_DEP=$(kubectl get deployments -n team-burnham -o jsonpath='{.items[0].metadata.name}')
 ```
 
-Now we can get a shell from the pod in `team-riker` namespace and ping the pod from `team-burnham` namespace:
+Now we can start a shell from the pod in the `team-riker` namespace and ping the pod from `team-burnham` namespace:
 
 ```bash
 RIKER_POD=$(kubectl -n team-riker get pod -o jsonpath='{.items[0].metadata.name}')
 kubectl exec --stdin --tty -n team-riker $RIKER_POD -- /bin/bash
 ```
 
-Note: since this opens a shell inside the pod, it will not have the environment variable from your local shell. You should retrieve the actual podIP and the deployment name from the environment variables `BURNHAM_POD` and `BURNHAM_POD_DEP`.
+Note: since this opens a shell inside the pod, it will not have the environment variables saved above. You should retrieve the actual podIP and the deployment name from the environment variables `BURNHAM_POD` and `BURNHAM_POD_DEP`.
 
 With those actual values, ping the DNS of the pod from `team-burnham`:
 
@@ -135,7 +137,7 @@ You can either save it as `calico-global-deny-all.yaml` or copy the file in this
 ```bash
 DATASTORE_TYPE=kubernetes \
     KUBECONFIG=~/.kube/config
-    calicoctl apply -f global-deny-all.yaml 
+    calicoctl apply -f calico-global-deny-all.yaml 
 ```
 
 You should see the following:
@@ -152,4 +154,37 @@ You can try to ping the pod from `team-burnham` from a shell within the pod from
 The above GlobalNetworkPolicy removes the ability for pods to communicate with other pods in all namespaces except `kube-system`. 
 However, you can still apply Kubernetes NetworkPolicy on top of that to “poke holes” for egress and ingress needs. 
 
-For example, if you wanted to open all traffic between `team-burnham` and `team-riker`, the following Kubernetes NetworkPolicy could be applied.
+For example, if you wanted to open all traffic between `team-burnham` and `team-riker`, the following Kubernetes NetworkPolicy could be applied. This policy allows any endpoint (i.e. pods) from `team-riker` namespace to make ping requests (ICMP) to any endpoint in `team-burnham` namespace.
+
+```yaml
+# This GlobalNetworkPolicy uses Calico's CRD
+# (https://docs.projectcalico.org/v3.5/reference/calicoctl/resources/globalnetworkpolicy)
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-burnham-riker
+spec:
+  namespaceSelector: name == 'team-burnham'
+  order: 3000
+  types:
+    - Ingress
+
+  # ingress network rules
+  ingress:
+    # Allow all ingress traffic from team-riker to team-burnham namespaces
+    - action: Allow
+      protocol: ICMP
+      source:
+        namespaceSelector: name == 'team-riker'
+      icmp:
+        type: 8
+
+```
+
+Apply the new GlobalNetworkPolicy:
+
+```bash
+calicoctl apply -f calico-allow-burnham-riker.yaml     
+```
+
+Once the policy is successfully applied, once again try to ping from one pod to the other. You sholud be able to ping successfully.

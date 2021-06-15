@@ -1,0 +1,21 @@
+# This GlobalNetworkPolicy uses Calico's CRD
+# (https://docs.projectcalico.org/v3.5/reference/calicoctl/resources/globalnetworkpolicy)
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-burnham-riker
+spec:
+  namespaceSelector: name == 'team-burnham'
+  order: 3000
+  types:
+    - Ingress
+
+  # ingress network rules
+  ingress:
+    # Allow all ingress traffic from team-riker to team-burnham namespaces
+    - action: Allow
+      protocol: ICMP
+      source:
+        namespaceSelector: name == 'team-riker'
+      icmp:
+        type: 8

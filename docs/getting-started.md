@@ -220,9 +220,7 @@ To validate your deployments, leverage kubectl port-forwarding to access the `gu
 kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
 ```
 
-Open up `localhost:4040` in your browser and you should see the application. 
-
-## Using Calico CNI to apply network policies.
+Open up `localhost:4040` in your browser and you should see the application.
 
 
 
