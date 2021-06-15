@@ -12,6 +12,8 @@
         "eks.bottlerocket.instance-type": "t3.large",
         "account": "",
         "region": "us-west-2",
-        "kubernetes_version": "V1_19"
+        "kubernetes_version": "V1_19",
+        "multi_region_1": "us-east-2",
+        "multi_region_2": "us-east-1"
     }
 }

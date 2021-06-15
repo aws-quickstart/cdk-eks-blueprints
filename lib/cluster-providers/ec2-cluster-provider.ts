@@ -117,10 +117,11 @@ export class EC2ClusterProvider implements ClusterProvider {
         });
 
         // Create a managed node group.
-        const nodeGroup = cluster.addNodegroupCapacity(id + "-ng", {
+
+        const nodeGroup = cluster.addNodegroupCapacity(id + "-ng",  {
             amiType: this.options.amiType,
             capacityType: this.options.nodeGroupCapacityType,
-            instanceTypes: instanceTypes,
+            instanceType: instanceTypes,
             minSize: minSize,
             maxSize: maxSize,
             desiredSize: desiredSize,

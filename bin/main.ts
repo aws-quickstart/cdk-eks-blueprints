@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core'
+import { valueFromContext } from '../lib/utils/context-utils'
 
 const app = new cdk.App()
+
 let account: string, region: string
 let context_account: string, context_region :string
 
@@ -68,6 +70,5 @@ new BottleRocketConstruct(app, 'bottlerocket', { env })
 //-------------------------------------------
 
 import CustomClusterConstruct from '../examples/custom-cluster-construct'
-import {valueFromContext} from "../lib/utils/context-utils";
 new CustomClusterConstruct(app, 'custom-cluster', { env })
 
