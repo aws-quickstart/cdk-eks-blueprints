@@ -1,11 +1,8 @@
 {
     "name": "@shapirov/cdk-eks-blueprint",
-    "version": "0.1.8",
-    "main": "dist/lib/index.js",
-    "types": "dist/lib/index.d.ts",
-    "bin": {
-        "main": "dist/bin/main.js"
-    },
+    "version": "0.1.7",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf dist && tsc",
         "watch": "tsc -w",
