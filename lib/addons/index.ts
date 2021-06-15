@@ -1,7 +1,7 @@
 export { AppMeshAddOn } from './appmesh'
 export { ArgoCDAddOn } from './argocd'
 export { CalicoAddOn } from './calico'
-export { ContainerInsightsAddOn } from './cloudwatch'
+export { ContainerInsightsAddOn } from './container-insights'
 export { ClusterAutoScalerAddOn } from './cluster-autoscaler'
 export { MetricsServerAddOn } from './metrics-server'
 export { NginxAddOn } from './nginx'

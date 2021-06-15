@@ -16,7 +16,7 @@ Add the following as an add-on to your main.ts file to add Containers Insights t
 ```typescript
 import { AddOns }  from '@shapirov/cdk-eks-blueprint';
 
-const myClusterAutoscaler = new AddOns.ContainerInsights();
+const myClusterAutoscaler = new AddOns.ContainerInsightsAddOn();
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
 
 const app = new cdk.App();
