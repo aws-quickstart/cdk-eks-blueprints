@@ -80,7 +80,7 @@ touch team-awesome.tsx
 
 Paste the following code the file. 
 
-```typescript
+```javascript
 import { ClusterInfo, ApplicationTeam } from '../../stacks/eks-blueprint-stack';
 
 export class TeamAwesome extends ApplicationTeam {
@@ -99,7 +99,7 @@ export class TeamAwesome extends ApplicationTeam {
 
 Replace the contents of `bin/main.tsx` with the following:
 
-```typescript
+```javascript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { EksBluepint, AddOns, Team } from '@shapirov/cdk-eks-blueprint';
