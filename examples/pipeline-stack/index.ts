@@ -10,7 +10,7 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 export default class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    constructor(scope: cdk.App, id: string, _props?: cdk.StackProps) {
         super(scope, id)
 
         const pipeline = this.buildPipeline(this)
