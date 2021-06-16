@@ -83,7 +83,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
             chart: AWS_LOAD_BALANCER_CONTROLLER,
             repository: 'https://aws.github.io/eks-charts',
             namespace: this.options.namespace,
-            release: 'aws-load-balancer-controller',
+            release: AWS_LOAD_BALANCER_CONTROLLER,
             version: this.options.chartVersion,
             wait: true,
             timeout: cdk.Duration.minutes(15),
