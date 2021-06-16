@@ -7,14 +7,21 @@ import request from 'sync-request';
  * Configuration options for AWS Load Balancer controller
  */
 export interface AwsLoadBalancerControllerProps {
+
     /**
      * Namespace where controller will be installed
      */
     namespace?: string,
+
     /**
      * Version of the controller, i.e. v2.2.0 
      */
     version?: string,
+
+    /**
+     * Helm chart version to use to install. Expected to match the controller version, e.g. v2.2.0 maps to 1.2.0
+     */
+    chartVersion?: string,
 
     /**
      * Enable Shield (must be false for CN partition)
@@ -38,6 +45,7 @@ export interface AwsLoadBalancerControllerProps {
 const AwsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
     namespace: 'kube-system',
     version: 'v2.2.0',
+    chartVersion: '1.2.0',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false
@@ -50,19 +58,20 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
     private options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        this.options = { ...AwsLoadBalancerControllerDefaults, ...props ?? {}};
+        this.options = { ...AwsLoadBalancerControllerDefaults, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
 
         const cluster = clusterInfo.cluster; 
-        const awsControllerBaseResourceBaseUrl = `https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/${this.options.version}/docs`;
-        const awsControllerPolicyUrl = `${awsControllerBaseResourceBaseUrl}/install/iam_policy${cluster.stack.region.startsWith('cn-') ? '_cn' : ''}.json`;
-        
+               
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
             namespace: this.options.namespace,
         });
+
+        const awsControllerBaseResourceBaseUrl = `https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/${this.options.version}/docs`;
+        const awsControllerPolicyUrl = `${awsControllerBaseResourceBaseUrl}/install/iam_policy${cluster.stack.region.startsWith('cn-') ? '_cn' : ''}.json`;
 
         const policyJson = request('GET', awsControllerPolicyUrl).getBody().toString();
         
@@ -75,7 +84,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
             repository: 'https://aws.github.io/eks-charts',
             namespace: this.options.namespace,
             release: 'aws-load-balancer-controller',
-            version: '1.2.0', // mapping to v2.2.0
+            version: this.options.chartVersion,
             wait: true,
             timeout: cdk.Duration.minutes(15),
             values: {
