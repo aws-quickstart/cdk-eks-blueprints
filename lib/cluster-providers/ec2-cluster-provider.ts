@@ -125,7 +125,7 @@ export class EC2ClusterProvider implements ClusterProvider {
             minSize: minSize,
             maxSize: maxSize,
             desiredSize: desiredSize,
-            releaseVersion: this.options.amiReleaseVersion, 
+            releaseVersion: this.options.amiReleaseVersion,
         });
 
         return { cluster: cluster, nodeGroup: nodeGroup, version: version };
