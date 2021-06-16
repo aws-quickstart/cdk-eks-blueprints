@@ -1,16 +1,16 @@
 ### CI/CD
 
-While it may be conveninet to leveage the CDK command line tool to deploy your first cluster, we reccomend setting up automated pipelines that will be responsible for deploying and updating your EKS based infrastructure. 
+While it is conveninet to leveage the CDK command line tool to deploy your first cluster, we reccomend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure. 
 
 To accomplish this, the EKS SSP - Refernce Solution leverages the [`CDK Pipelines`](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) module. This module makes it trivial to create Continuous Delivery pipelines via CodePipeline that are responsible for deploying and updating your infrastructure. 
 
-Aditionally, the the EKS SSP - Refernce Solution leverage out of the box GitHub integration that the `CDK Pipelines` module provides in order to integrate our pipelines with Git. The end result is that any new configuration we push to the GitHub repository containing our CDK will be automatically deployed.
+Aditionally, the the EKS SSP - Refernce Solution leverages the GitHub integration that the `CDK Pipelines` module provides in order to integrate our pipelines with Git. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
 
 ## Building our Pipeline
 
 ### Create a GitHub Source Action
 
-We want all pushes to our git repo to kick of our pipeline. So the first thing we want to do is great a GitHub action.
+We want all pushes to our git repo to kick off our pipeline. So the first thing we want to do is great a GitHub action.
 
 ```javascript
 const sourceArtifact = new codepipeline.Artifact();
