@@ -3,34 +3,28 @@ import * as cdk from '@aws-cdk/core'
 import { valueFromContext } from '../lib/utils/context-utils'
 
 const app = new cdk.App()
+const ACCOUNT_KEY = "account"
+const REGION_KEY = "region"
 
-let account: string, region: string
-let context_account: string, context_region :string
+const accountProcess: string = <string> process.env.CDK_DEFAULT_ACCOUNT
+const regionProcess: string =  <string> process.env.CDK_DEFAULT_REGION
 
-context_account = valueFromContext(app, "account", false)
-context_region = valueFromContext(app, "region", false)
-if (context_account.trim() != "") {
-    account = context_account
-}
-else {
-    account = <string> process.env.CDK_DEFAULT_ACCOUNT
-}
+const account: string  = valueFromContext(app, ACCOUNT_KEY, accountProcess)
+const region: string  = valueFromContext(app, REGION_KEY, regionProcess)
 
-if (context_region.trim() != "") {
-    region = context_region
-}
-else {
-    region = <string> process.env.CDK_DEFAULT_REGION
-}
-const env = { account, region }
+if (account == "" || account == null)
+    throw "Account not set, please see Readme"
+if (region == "" || region == null)
+    throw "Region not set, please see Readme"
 
+const env = {account, region}
 
 //-------------------------------------------
 // Single Cluster with multiple teams.
 //-------------------------------------------
 
 import MultiTeamConstruct from '../examples/multi-team-construct'
-new MultiTeamConstruct(app, 'multi-team')
+new MultiTeamConstruct(app, 'multi-team');
 
 
 //-------------------------------------------
@@ -38,7 +32,7 @@ new MultiTeamConstruct(app, 'multi-team')
 //-------------------------------------------
 
 import MultiRegionConstruct from '../examples/multi-region-construct'
-new MultiRegionConstruct(app, 'multi-region')
+new MultiRegionConstruct(app, 'multi-region');
 
 
 //-------------------------------------------
@@ -46,7 +40,7 @@ new MultiRegionConstruct(app, 'multi-region')
 //-------------------------------------------
 
 import FargateConstruct from '../examples/fargate-construct'
-new FargateConstruct(app, 'fargate', { env })
+new FargateConstruct(app, 'fargate', { env });
 
 
 //-------------------------------------------
@@ -54,7 +48,7 @@ new FargateConstruct(app, 'fargate', { env })
 //-------------------------------------------
 
 import PipelineStack from '../examples/pipeline-stack'
-new PipelineStack(app, 'pipeline', { env })
+new PipelineStack(app, 'pipeline', { env });
 
 
 //-------------------------------------------

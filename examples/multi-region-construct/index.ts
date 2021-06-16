@@ -7,7 +7,6 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 import { valueFromContext } from '../../lib/utils/context-utils'
-import {Construct} from "@aws-cdk/core";
 
 export default class MultiRegionConstruct extends cdk.Construct {
 

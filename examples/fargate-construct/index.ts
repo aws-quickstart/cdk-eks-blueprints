@@ -11,9 +11,9 @@ export default class FargateConstruct extends cdk.Construct {
         super(scope, id); {
 
             // Setup platform team
-            const accountID = props?.env?.account
+            const accountId = props?.env?.account
             const region = props?.env?.region
-            const platformTeam = new team.TeamPlatform(<string> accountID)
+            const platformTeam = new team.TeamPlatform(<string> accountId)
             const teams: Array<ssp.Team> = [platformTeam];
 
             // AddOns for the cluster.

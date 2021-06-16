@@ -10,22 +10,22 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 export default class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    constructor(scope: cdk.App, id: string,  props?: cdk.StageProps ) {
         super(scope, id)
 
         const pipeline = this.buildPipeline(this)
 
         // Dev cluster.
-        const stage1 = new ClusterStage(this, 'blueprint-dev')
+        const stage1 = new ClusterStage(this, 'blueprint-dev',props)
         pipeline.addApplicationStage(stage1);
 
         // Staging cluster
-        const stage2 = new ClusterStage(this, 'blueprint-staging')
+        const stage2 = new ClusterStage(this, 'blueprint-staging',props)
         pipeline.addApplicationStage(stage2);
 
         // Production cluster
         const stageOpts = { manualApprovals: true }
-        const stage3 = new ClusterStage(this, 'blueprint-production')
+        const stage3 = new ClusterStage(this, 'blueprint-production',props)
         pipeline.addApplicationStage(stage3, stageOpts)
     }
 
@@ -64,8 +64,8 @@ export class ClusterStage extends cdk.Stage {
         super(scope, id, props);
 
         // Setup platform team
-        const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(<string> accountID)
+        const accountId = props?.env?.account
+        const platformTeam = new team.TeamPlatform(<string> accountId)
         const teams: Array<ssp.Team> = [platformTeam]
 
         // AddOns for the cluster.

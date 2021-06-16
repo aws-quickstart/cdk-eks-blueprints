@@ -20,9 +20,7 @@ export function kubernetesVersionContext(construct: Construct) {
         eks_version = kubernetesVersionDefault()
     }
     else {
-        if (eks_context.trim() == "V1_20")
-            eks_version = KubernetesVersion.V1_20
-        else if (eks_context.trim()  == "V1_19")
+        if (eks_context.trim()  == "V1_19")
             eks_version = KubernetesVersion.V1_19
         else if (eks_context.trim() == "V1.18")
             eks_version = KubernetesVersion.V1_18

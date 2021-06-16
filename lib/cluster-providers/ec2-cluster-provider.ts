@@ -5,7 +5,6 @@ import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
 
 // Utils 
 import { valueFromContext, kubernetesVersionContext, kubernetesVersionDefault} from '../utils/context-utils'
-import {Context} from "aws-cdk/lib/settings";
 
 /**
  * Default instance type for managed node group provisioning
@@ -87,14 +86,12 @@ export class EC2ClusterProvider implements ClusterProvider {
 
     constructor(scope?: Construct, options?: EC2ProviderClusterProps) {
         if (options != null)
-        {
             this.options = options;
-        }
         else {
             if (scope != null)
-                this.options = { version: kubernetesVersionContext(scope)};
+                this.options = {version: kubernetesVersionContext(scope)};
             else
-                this.options = { version: kubernetesVersionDefault()};
+                this.options = {version: kubernetesVersionDefault()};
         }
     }
 
@@ -121,7 +118,7 @@ export class EC2ClusterProvider implements ClusterProvider {
         const nodeGroup = cluster.addNodegroupCapacity(id + "-ng",  {
             amiType: this.options.amiType,
             capacityType: this.options.nodeGroupCapacityType,
-            instanceType: instanceTypes,
+            instanceTypes: instanceTypes,
             minSize: minSize,
             maxSize: maxSize,
             desiredSize: desiredSize,

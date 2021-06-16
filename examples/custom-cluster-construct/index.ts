@@ -17,8 +17,8 @@ export default class CustomClusterConstruct extends cdk.Construct {
         super(scope, id)
 
         // Setup platform team
-        const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(<string>accountID)
+        const accountId = props?.env?.account
+        const platformTeam = new team.TeamPlatform(<string>accountId)
         const teams: Array<ssp.Team> = [platformTeam]
 
 
