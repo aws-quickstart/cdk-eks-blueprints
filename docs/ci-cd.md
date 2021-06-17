@@ -150,30 +150,51 @@ import * as ssp from '../../lib'
 // Team implementations
 import * as team from '../teams'
 
-export default class PipelineStack extends cdk.Stack {
+export class ClusterStage extends cdk.Stage {
+    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
+        super(scope, id, props);
+
+        // Setup platform team
+        const accountID = props?.env?.account
+        const platformTeam = new team.TeamPlatform(accountID!)
+        const teams: Array<ssp.Team> = [platformTeam];
+
+        // AddOns for the cluster.
+        const addOns: Array<ssp.ClusterAddOn> = [
+            new ssp.NginxAddOn,
+            new ssp.ArgoCDAddOn,
+            new ssp.CalicoAddOn,
+            new ssp.MetricsServerAddOn,
+            new ssp.ClusterAutoScalerAddOn,
+            new ssp.ContainerInsightsAddOn,
+        ];
+        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
+    }
+}
+
+export class PipelineStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id)
 
         const pipeline = this.buildPipeline(this)
 
-        // Dev cluster.
-        const stage1 = new ClusterStage(this, 'blueprint-dev')
-        pipeline.addApplicationStage(stage1);
+        // Dev cluster
+        const dev = new ClusterStage(this, 'blueprint-dev')
+        pipeline.addApplicationStage(dev);
 
-        // Staging cluster
-        const stage2 = new ClusterStage(this, 'blueprint-staging')
-        pipeline.addApplicationStage(stage2);
+        // Test cluster
+        const test = new ClusterStage(this, 'blueprint-test')
+        pipeline.addApplicationStage(test);
 
-        // Production cluster
-        const stageOpts = { manualApprovals: true }
-        const stage3 = new ClusterStage(this, 'blueprint-production')
-        pipeline.addApplicationStage(stage3, stageOpts);
+        // Prod cluster
+        const prod = new ClusterStage(this, 'blueprint-prod')
+        pipeline.addApplicationStage(prod, { manualApprovals: true });
     }
+}
 
-    private buildPipeline = (scope: cdk.Construct) => {
+export class Pipeline {
+    constructor() {
         const sourceArtifact = new codepipeline.Artifact();
-        
-
         const sourceAction = new actions.GitHubSourceAction({
             actionName: 'GitHub',
             owner: 'aws-quickstart',
@@ -201,25 +222,4 @@ export default class PipelineStack extends cdk.Stack {
     }
 }
 
-export class ClusterStage extends cdk.Stage {
-    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
-        super(scope, id, props);
 
-        // Setup platform team
-        const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(accountID!)
-        const teams: Array<ssp.Team> = [platformTeam];
-
-        // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
-        ];
-        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
-    }
-}
-```
