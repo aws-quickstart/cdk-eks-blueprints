@@ -11,7 +11,7 @@ function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
     return [];
 }
 
-export class TeamBurnhamSetup extends ApplicationTeam {
+export class TeamBurnham extends ApplicationTeam {
     constructor(scope: Construct) {
         super({
             name: "burnham",

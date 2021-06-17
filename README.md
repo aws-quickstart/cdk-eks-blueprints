@@ -26,6 +26,12 @@ Customers can use `cdk-eks-blueprint` to:
 
 For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
 
+## Examples 
+
+To view a library of sample implementations, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
+
+You can also view a sample implementation in `bin/main.ts`.
+
 ## Getting Started
 
 Install CDK matching the version of the SSP Quickstart.

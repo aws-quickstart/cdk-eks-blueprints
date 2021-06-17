@@ -1,25 +1,25 @@
 import * as cdk from '@aws-cdk/core';
 
-// SSP Lib
+// SSP lib.
 import * as ssp from '../../lib'
 
-// Team implementations
+// Example teams.
 import * as team from '../teams'
 
-export default class MultiTeamConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string) {
+export default class BlueprintConstruct extends cdk.Construct {
+    constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
         super(scope, id);
 
-        // Setup platform team
-        const accountID = process.env.CDK_DEFAULT_ACCOUNT!
+        // Setup platform team.
+        const accountID = props.env.account
         const platformTeam = new team.TeamPlatform(accountID)
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
             platformTeam,
-            new team.TeamTroiSetup,
-            new team.TeamRikerSetup,
-            new team.TeamBurnhamSetup(scope)
+            new team.TeamTroi,
+            new team.TeamRiker,
+            new team.TeamBurnham(scope)
         ];
 
         // AddOns for the cluster.
@@ -33,12 +33,7 @@ export default class MultiTeamConstruct extends cdk.Construct {
             new ssp.AwsLoadBalancerControllerAddOn()
         ];
 
-        const stackID = `${id}-blueprint`
-        new ssp.EksBlueprint(scope, { id: stackID, addOns, teams }, {
-            env: {
-                region: 'us-east-2',
-            },
-        });
+        new ssp.EksBlueprint(scope, { id, addOns, teams }, props)
     }
 }
 
