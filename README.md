@@ -28,7 +28,7 @@ For complete project documentation, please see our [official project documentati
 
 ## Examples 
 
-To view a library of sample implementations, please see our [SSP Patters Repository](https://github.com/shapirov103/eks-ssp-patterns).
+To view a library of sample implementations, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
 
 You can also view a sample implementation in `bin/main.ts`.
 
