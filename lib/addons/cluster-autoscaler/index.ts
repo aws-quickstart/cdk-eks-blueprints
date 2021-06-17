@@ -2,7 +2,7 @@ import * as eks from "@aws-cdk/aws-eks";
 import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
