@@ -29,6 +29,8 @@ const MAX_SIZE_KEY = "eks.default.max-size";
 
 const DESIRED_SIZE_KEY = "eks.default.desired-size";
 
+const PRIVATE_CLUSTER = "eks.default.private-cluster";
+
 /**
  * EC2 provider configuration options.
  */
@@ -76,8 +78,8 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
     nodeGroupCapacityType?: CapacityType;
 
     /**
-     * Is it a private only EKS Cluster
-     *
+     * Is it a private only EKS Cluster.
+     * Defaults to private cluster, override to false for public
      * @default true
      */
      privateCluster?: boolean;
@@ -103,8 +105,9 @@ export class EC2ClusterProvider implements ClusterProvider {
         const minSize = this.options.minSize ?? valueFromContext(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
         const maxSize = this.options.maxSize ?? valueFromContext(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
         const desiredSize = this.options.desiredSize ?? valueFromContext(scope, DESIRED_SIZE_KEY, minSize);
-        const endpointAccess = this.options.privateCluster ? EndpointAccess.PRIVATE : EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = this.options.privateCluster ? [{ subnetType: SubnetType.PRIVATE }] : this.options.vpcSubnets;
+        const privateCluster = this.options.privateCluster ?? valueFromContext(scope, PRIVATE_CLUSTER, true);
+        const endpointAccess = privateCluster ? EndpointAccess.PRIVATE : EndpointAccess.PUBLIC_AND_PRIVATE;
+        const vpcSubnets = privateCluster ? [{ subnetType: SubnetType.PRIVATE }] : this.options.vpcSubnets;
 
         // Create an EKS Cluster
         const cluster = new Cluster(scope, id, {
