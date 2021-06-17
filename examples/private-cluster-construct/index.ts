@@ -31,7 +31,7 @@ export default class PrivateClusterConstruct extends cdk.Construct {
 
         const stackID = `${id}-blueprint`
         const clusterProvider = new ssp.EC2ClusterProvider(clusterProps);
-        new ssp.EksBlueprint(scope, { id: stackID, teams, addOns, clusterProvider }, { 
+        new ssp.EksBlueprint(scope, { id: stackID, teams, addOns, clusterProvider }, {
             env: {
                 region: 'us-west-1'
             }
