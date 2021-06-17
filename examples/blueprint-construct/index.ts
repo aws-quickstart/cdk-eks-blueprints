@@ -11,8 +11,8 @@ export default class BlueprintConstruct extends cdk.Construct {
         super(scope, id);
 
         // Setup platform team.
-        const accountID = props.env.account
-        const platformTeam = new team.TeamPlatform(accountID)
+        const account = props.env!.account!
+        const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
         const teams: Array<ssp.teams.Team> = [
@@ -33,7 +33,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.AwsLoadBalancerControllerAddOn()
         ];
 
-        new ssp.EksBlueprint(scope, { id, addOns, teams }, props)
+        const blueprintID = `${id}-dev`
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams }, props)
     }
 }
 

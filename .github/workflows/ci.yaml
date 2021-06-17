@@ -36,10 +36,16 @@ jobs:
           ${{ runner.os }}-
               
     - name: Install Deps         
-      run: npm install
+      run: make deps
     
     - name: Run Linter        
       run: make lint
 
     - name: Build TSC
       run: make build
+    
+    - name: Run CDK List
+      run: cdk list
+
+    - name: Run CDK Synth
+      run: cdk synth
