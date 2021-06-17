@@ -45,7 +45,7 @@ jobs:
       run: make build
     
     - name: Run CDK List
-      run: cdk list
+      run: make list
 
     - name: Run CDK Synth
-      run: cdk synth
+      run: make synth
