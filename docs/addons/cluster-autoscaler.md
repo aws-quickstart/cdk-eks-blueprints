@@ -52,18 +52,23 @@ NAME                                         STATUS   ROLES    AGE   VERSION
 ip-10-0-189-107.us-west-2.compute.internal   Ready    <none>   80m   v1.19.6-eks-49a6c0
 ```
 
-The first step is to create a sample application via deployment and request 100m of CPU:
+The first step is to create a sample application via deployment and request 20m of CPU:
 
 ```bash
 kubectl create deployment php-apache --image=us.gcr.io/k8s-artifacts-prod/hpa-example
-kubectl set resources deploy php-apache --requests=cpu=100m 
+kubectl set resources deploy php-apache --requests=cpu=20m 
 kubectl expose php-apache --port 80
 ```
 
-You can see the number of initial pods within the deployment:
+You can see that there's 1 pod currently running:
 
 ```bash
 kubectl get pod -l app=php-apache
+```
+
+```
+NAME                          READY   STATUS    RESTARTS   AGE
+php-apache-55c4584468-vsbl7   1/1     Running   0          63s
 ```
 
 ### Create HPA resource
@@ -84,7 +89,7 @@ kubectl get hpa
 
 ```
 NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-php-apache   Deployment/php-apache   25%/50%   1         10        2          52s
+php-apache   Deployment/php-apache   10%/50%   1         20        2          52s
 ```
 
 ### Generate load
@@ -106,7 +111,7 @@ while true; do wget -q -O - http://php-apache; done
 While the load is being generated, access another terminal to verify that HPA is working. The following command should return a list of many nods created (as many as 10):
 
 ```bash
-kubectl get pods -l app=nginx -o wide --watch
+kubectl get pods -l app=php-apache -o wide --watch
 ```
 
 With more pods being created, you would expect more nodes to be created; you can access the Cluster Autoscaler logs to confirm:
