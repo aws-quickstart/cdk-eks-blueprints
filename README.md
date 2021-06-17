@@ -73,24 +73,23 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
-const addons = ssp;
+const app = new cdk.App();
 
+// AddOns for the cluster.
 const addOns: Array<ssp.ClusterAddOn> = [
-  new addons.NginxAddOn, 
-  new addons.ArgoCDAddOn,
-  new addons.ClusterAutoScalerAddOn,
-  new addons.MetricsServerAddOn,
-  new addons.ContainerInsightsAddOn,
-  new addons.CalicoAddOn,
+    new ssp.AddOns.NginxAddOn,
+    new ssp.AddOns.ArgoCDAddOn,
+    new ssp.AddOns.CalicoAddOn,
+    new ssp.AddOns.MetricsServerAddOn,
+    new ssp.AddOns.ClusterAutoScalerAddOn,
+    new ssp.AddOns.ContainerInsightsAddOn,
+    new ssp.AddOns.AwsLoadBalancerControllerAddOn()
 ];
 
-const app = new cdk.App();
-new ssp.EksBlueprint(app, { id: 'east-test-1', addOns }, {
-  env: {
-      account: 'XXXXXXXXXXXX',
-      region: 'us-east-2'
-  },
-});
+const account = 'XXXXXXXXXXXX'
+const region = 'us-east-2'
+const props = { env: { account, region } }
+new ssp.Stacks.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
 ```
 
 Run the following command to confirm there are no issues with your code
