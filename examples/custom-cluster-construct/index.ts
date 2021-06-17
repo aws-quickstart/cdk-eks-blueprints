@@ -29,8 +29,7 @@ export default class CustomClusterConstruct extends cdk.Construct {
         const clusterProps: ssp.EC2ProviderClusterProps = {
             version: eks.KubernetesVersion.V1_19,
             instanceTypes: [new ec2.InstanceType('t3.large')],
-            amiType: eks.NodegroupAmiType.AL2_X86_64,
-            privateCluster: false
+            amiType: eks.NodegroupAmiType.AL2_X86_64
         }
 
         const stackID = `${id}-blueprint`

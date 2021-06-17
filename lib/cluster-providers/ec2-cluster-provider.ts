@@ -80,7 +80,7 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
     /**
      * Is it a private only EKS Cluster.
      * Defaults to private cluster, override to false for public
-     * @default true
+     * @default false
      */
      privateCluster?: boolean;
 }
