@@ -4,7 +4,7 @@ import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 
 /**
- * ClusterInfo describes and EKS cluster.
+ * ClusterInfo describes an EKS cluster.
  */
 export interface ClusterInfo {
 

@@ -77,13 +77,13 @@ const app = new cdk.App();
 
 // AddOns for the cluster.
 const addOns: Array<ssp.ClusterAddOn> = [
-    new ssp.AddOns.NginxAddOn,
-    new ssp.AddOns.ArgoCDAddOn,
-    new ssp.AddOns.CalicoAddOn,
-    new ssp.AddOns.MetricsServerAddOn,
-    new ssp.AddOns.ClusterAutoScalerAddOn,
-    new ssp.AddOns.ContainerInsightsAddOn,
-    new ssp.AddOns.AwsLoadBalancerControllerAddOn()
+    new ssp.addons.NginxAddOn,
+    new ssp.addons.ArgoCDAddOn,
+    new ssp.addons.CalicoAddOn,
+    new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
+    new ssp.addons.ContainerInsightsAddOn,
+    new ssp.addons.AwsLoadBalancerControllerAddOn()
 ];
 
 const account = 'XXXXXXXXXXXX'
