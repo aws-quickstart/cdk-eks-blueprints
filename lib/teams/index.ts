@@ -1,5 +1,5 @@
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo } from "../stacks/eks-blueprint-stack";
+import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
@@ -123,7 +123,7 @@ export class ApplicationTeam implements Team {
         }
 
         if (role) {
-            users.forEach(user=> role?.grant(user, "sts:assumeRole"));
+            users.forEach(user => role?.grant(user, "sts:assumeRole"));
         }
         else {
             role = new iam.Role(clusterInfo.cluster.stack, this.teamProps.namespace + 'AccessRole', {
@@ -150,7 +150,7 @@ export class ApplicationTeam implements Team {
                 actions: [
                     "eks:ListClusters"
                 ]
-              })
+            })
             );
         }
 

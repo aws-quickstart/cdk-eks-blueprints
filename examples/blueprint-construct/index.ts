@@ -15,7 +15,7 @@ export default class BlueprintConstruct extends cdk.Construct {
         const platformTeam = new team.TeamPlatform(accountID)
 
         // Teams for the cluster.
-        const teams: Array<ssp.Team> = [
+        const teams: Array<ssp.teams.Team> = [
             platformTeam,
             new team.TeamTroi,
             new team.TeamRiker,
@@ -24,13 +24,13 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
-            new ssp.AwsLoadBalancerControllerAddOn()
+            new ssp.addons.NginxAddOn,
+            new ssp.addons.ArgoCDAddOn,
+            new ssp.addons.CalicoAddOn,
+            new ssp.addons.MetricsServerAddOn,
+            new ssp.addons.ClusterAutoScalerAddOn,
+            new ssp.addons.ContainerInsightsAddOn,
+            new ssp.addons.AwsLoadBalancerControllerAddOn()
         ];
 
         new ssp.EksBlueprint(scope, { id, addOns, teams }, props)

@@ -1,7 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
-import { ClusterAddOn, ClusterInfo } from "../../stacks";
 import request from 'sync-request';
+import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
 /**
  * Configuration options for AWS Load Balancer controller
@@ -63,8 +63,8 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const cluster = clusterInfo.cluster; 
-               
+        const cluster = clusterInfo.cluster;
+
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
             namespace: this.options.namespace,
@@ -74,7 +74,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
         const awsControllerPolicyUrl = `${awsControllerBaseResourceBaseUrl}/install/iam_policy${cluster.stack.region.startsWith('cn-') ? '_cn' : ''}.json`;
 
         const policyJson = request('GET', awsControllerPolicyUrl).getBody().toString();
-        
+
         ((JSON.parse(policyJson)).Statement as []).forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
@@ -89,7 +89,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
             timeout: cdk.Duration.minutes(15),
             values: {
                 clusterName: cluster.clusterName,
-                    serviceAccount: {
+                serviceAccount: {
                     create: false,
                     name: serviceAccount.serviceAccountName,
                 },
@@ -99,7 +99,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
                 enableWafv2: this.options.enableWafv2,
             },
         });
-        
+
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
     }
 }
