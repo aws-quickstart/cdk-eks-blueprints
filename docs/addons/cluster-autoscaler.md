@@ -3,9 +3,9 @@
 ## Usage
 
 ```typescript
-import { ClusterAutoScaler }  from '@shapirov/cdk-eks-blueprint';
+import { ClusterAutoScalerAddOn }  from '@shapirov/cdk-eks-blueprint';
 
-readonly myClusterAutoscaler = new ClusterAutoscaler("v1.19.1");// optionally specify image version to pull  or empty constructor
+readonly myClusterAutoscaler = new ClusterAutoscalerAddOn("v1.19.1");// optionally specify image version to pull  or empty constructor
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
 
 const app = new cdk.App();

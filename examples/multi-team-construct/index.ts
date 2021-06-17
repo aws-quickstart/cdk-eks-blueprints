@@ -30,6 +30,7 @@ export default class MultiTeamConstruct extends cdk.Construct {
             new ssp.MetricsServerAddOn,
             new ssp.ClusterAutoScalerAddOn,
             new ssp.ContainerInsightsAddOn,
+            new ssp.AwsLoadBalancerControllerAddOn()
         ];
 
         const stackID = `${id}-blueprint`
