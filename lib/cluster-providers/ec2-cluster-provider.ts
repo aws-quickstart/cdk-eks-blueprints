@@ -78,8 +78,8 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
     nodeGroupCapacityType?: CapacityType;
 
     /**
-     * Is it a private only EKS Cluster.
-     * Defaults to private cluster, override to false for public
+     * Is it a private only EKS Cluster?
+     * Defaults to private_and_public cluster, set to true for private cluster
      * @default false
      */
      privateCluster?: boolean;
