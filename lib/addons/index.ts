@@ -1,5 +1,6 @@
 export { AppMeshAddOn } from './appmesh'
 export { ArgoCDAddOn } from './argocd'
+export { AwsLoadBalancerControllerAddOn} from './aws-loadbalancer-controller'
 export { CalicoAddOn } from './calico'
 export { ContainerInsightsAddOn } from './container-insights'
 export { ClusterAutoScalerAddOn } from './cluster-autoscaler'
