@@ -42,4 +42,3 @@ export interface ClusterProvider {
 export interface ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void;
 }
-

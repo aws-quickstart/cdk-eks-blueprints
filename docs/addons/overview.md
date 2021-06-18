@@ -11,3 +11,4 @@
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler.md) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
 | `MetricsServerAddOn`| Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddOn`        | Adds NGINX ingress controller |
+| `SSMAgentAddOn` | Installs SSM Agent on Amazon EKS worker nodes by using Kubernetes DaemonSet |
