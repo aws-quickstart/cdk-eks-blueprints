@@ -22,6 +22,9 @@ build:
 list: 
 	$(CDK) list
 
+synth:
+	$(CDK) synth
+
 mkdocs:
 	mkdocs serve 
 

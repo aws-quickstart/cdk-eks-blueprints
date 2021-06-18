@@ -2,7 +2,7 @@ import { Construct } from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
 
-import { ClusterInfo, ClusterProvider } from "../stacks/eks-blueprint-stack";
+import { ClusterInfo, ClusterProvider } from "../stacks/cluster-types";
 
 export class BottlerocketClusterProvider implements ClusterProvider {
 

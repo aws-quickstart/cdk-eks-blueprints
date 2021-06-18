@@ -26,6 +26,12 @@ Customers can use `cdk-eks-blueprint` to:
 
 For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
 
+## Examples
+
+To view a library of sample implementations, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
+
+You can also view a sample implementation in `bin/main.ts`.
+
 ## Getting Started
 
 Install CDK matching the version of the SSP Quickstart.
@@ -67,24 +73,23 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
-const addons = ssp;
+const app = new cdk.App();
 
+// AddOns for the cluster.
 const addOns: Array<ssp.ClusterAddOn> = [
-  new addons.NginxAddOn, 
-  new addons.ArgoCDAddOn,
-  new addons.ClusterAutoScalerAddOn,
-  new addons.MetricsServerAddOn,
-  new addons.ContainerInsightsAddOn,
-  new addons.CalicoAddOn,
+    new ssp.addons.NginxAddOn,
+    new ssp.addons.ArgoCDAddOn,
+    new ssp.addons.CalicoAddOn,
+    new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
+    new ssp.addons.ContainerInsightsAddOn,
+    new ssp.addons.AwsLoadBalancerControllerAddOn()
 ];
 
-const app = new cdk.App();
-new ssp.EksBlueprint(app, { id: 'east-test-1', addOns }, {
-  env: {
-      account: 'XXXXXXXXXXXX',
-      region: 'us-east-2'
-  },
-});
+const account = 'XXXXXXXXXXXX'
+const region = 'us-east-2'
+const props = { env: { account, region } }
+new ssp.Stacks.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
 ```
 
 Run the following command to confirm there are no issues with your code

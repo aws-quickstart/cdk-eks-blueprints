@@ -1,6 +1,6 @@
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
-import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack"
+import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
 export class AppMeshAddOn implements ClusterAddOn {
 
