@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  repositories: |
+    - url: https://github.com/helm/charts.git
+    - url: https://github.com/shapirov103/argo-apps #app of apps 
+    - url: https://github.com/argoproj/argo-rollouts.git
+  resource.customizations: |
+    admissionregistration.k8s.io/MutatingWebhookConfiguration:
+      ignoreDifferences: |
+        jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+      # do we want to include a healthcheck here? 
+
+ 

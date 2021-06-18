@@ -1,0 +1,4 @@
+configMapGenerator:
+  - name: argocd-cm
+    files: 
+    - application.properties
