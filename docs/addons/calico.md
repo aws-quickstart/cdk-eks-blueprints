@@ -1,8 +1,8 @@
 # Calico Add-on
 
-The `Calico` addon adds support for [Calico CNI](https://docs.projectcalico.org/about/about-calico) to an EKS cluster.
+The `Calico` addon adds support for Kubernetes Network Policies to an EKS cluster.
 
-Calico is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as we will see below.
+[Project Calico](https://www.projectcalico.org/) is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as we will see below.
 
 ## Usage
 
@@ -22,9 +22,16 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 ```
 ## Securing your environment with Calico network policies
 
+By default, installing Calico addon for network policy support will enable customers to define standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
+However, Calico also allows Custom Resource Definitions (CRD) which gives you the ability to add features not in the Kubernetes policies, such as:
+- Explicit Deny rules
+- Layer 7 rule support (i.e. Http Request types)
+- Endpoint support other than standard pods: OpenShift, VMs, interfaces, etc. 
+
+In order to use CRDs (in particular for *projectcalico.org/v3* Calico API), you need to install the Calico CLI (`calicoctl`).
+
 ### Installing calicoctl
 
-In order to use Calico Customer Resource Definitions (CRD), you need to install `calicoctl`. 
 Follow the instructions found [here](https://docs.projectcalico.org/getting-started/clis/calicoctl/install), under *Install calicoctl as a binary on a single host* it will include instructions for your specific OS. You can test that calicoctl was installed correctly using the following:
 
 ```bash
