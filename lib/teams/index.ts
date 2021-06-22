@@ -1,6 +1,5 @@
-import { PolicyStatement } from "@aws-cdk/aws-iam";
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo } from "../stacks/eks-blueprint-stack";
+import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
@@ -55,7 +54,7 @@ export class TeamProps {
      * Options existing role that should be used for cluster access. 
      * If userRole and users are not provided, then no IAM setup is performed. 
      */
-    readonly userRole?: iam.Role;
+    readonly userRole?: iam.IRole;
 }
 
 export class ApplicationTeam implements Team {
@@ -118,23 +117,19 @@ export class ApplicationTeam implements Team {
      * @param role may be null if both role and users were not provided
      * @returns 
      */
-    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.Role): iam.Role | undefined {
+    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.IRole): iam.IRole | undefined {
         if (users?.length == 0) {
             return role;
         }
 
         if (role) {
-            role.assumeRolePolicy?.addStatements(
-                new PolicyStatement({
-                    principals: users
-                })
-            );
+            users.forEach(user => role?.grant(user, "sts:assumeRole"));
         }
         else {
             role = new iam.Role(clusterInfo.cluster.stack, this.teamProps.namespace + 'AccessRole', {
                 assumedBy: new iam.CompositePrincipal(...users)
             });
-            role.addToPolicy(new iam.PolicyStatement({
+            role.addToPrincipalPolicy(new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
                 resources: [clusterInfo.cluster.clusterArn],
                 actions: [
@@ -149,7 +144,7 @@ export class ApplicationTeam implements Team {
                 ]
             })
             );
-            role.addToPolicy(new iam.PolicyStatement({
+            role.addToPrincipalPolicy(new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
                 resources: ["*"],
                 actions: [

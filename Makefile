@@ -4,6 +4,7 @@
 TSC := node node_modules/.bin/tsc
 ESLINT := node node_modules/.bin/eslint
 CDK := node node_modules/.bin/cdk
+COPY := node node_modules/.bin/copyfiles
 
 # Dependecies
 HOMEBREW_LIBS :=  nvm typescript argocd
@@ -16,9 +17,13 @@ lint:
 
 build:
 	rm -rf dist && $(TSC)
+	$(COPY) lib/**/*.yaml dist/ -u 1
 
 list: 
 	$(CDK) list
+
+synth: 
+	$(CDK) synth
 
 mkdocs:
 	mkdocs serve 

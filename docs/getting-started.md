@@ -7,7 +7,7 @@ This getting started guide will walk you through setting up a new CDK project wh
 The quickstart leverages [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). Install CDK via the following.
 
 ```bash
-npm install -g aws-cdk
+npm install -g aws-cdk@1.104.0
 ```
 
 Verify the installation.
@@ -44,7 +44,7 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { EksBlueprint, AddOns } from '@shapirov/cdk-eks-blueprint';
+import { EksBlueprint, AddOns, ClusterAddOn } from '@shapirov/cdk-eks-blueprint';
 
 const addOns: Array<ClusterAddOn> = [
   new AddOns.ArgoCDAddOn,
@@ -75,13 +75,16 @@ Now that we have our cluster deployed, it is time to onboard our first team. In 
 Create a new file called `team-awesome`.
 
 ```
-touch team-awesome.tsx
+mkdir teams
+touch teams/team-awesome.tsx
 ```
 
 Paste the following code the file. 
 
 ```typescript
-import { ClusterInfo, ApplicationTeam } from '../../stacks/eks-blueprint-stack';
+import { ArnPrincipal } from '@aws-cdk/aws-iam';
+import { App } from '@aws-cdk/core';
+import { ClusterInfo, ApplicationTeam } from '@shapirov/cdk-eks-blueprint';
 
 export class TeamAwesome extends ApplicationTeam {
     constructor(app: App) {
@@ -97,14 +100,14 @@ export class TeamAwesome extends ApplicationTeam {
 }
 ```
 
-Replace the contents of `bin/main.tsx` with the following:
+Replace the contents of `bin/<your-app-name>.ts` with the following:
 
 ```typescript
-import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
-import { EksBluepint, AddOns, Team } from '@shapirov/cdk-eks-blueprint';
 
-import { TeamAwesome } from '../teams/team-awesome'
+import * as cdk from '@aws-cdk/core';
+import { EksBluepint, AddOns, ClusterAddOn, Team } from '@shapirov/cdk-eks-blueprint';
+
+import { TeamAwesome } from '../teams/team-awesome';
 
 const addOns: Array<ClusterAddOn> = [
   new AddOns.ArgoCDAddOn,

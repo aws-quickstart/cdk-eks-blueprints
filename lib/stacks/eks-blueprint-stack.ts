@@ -3,14 +3,17 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
-import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
+import { KubernetesVersion } from '@aws-cdk/aws-eks';
 
-import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { Team } from '../teams'
+import { ClusterAddOn, ClusterProvider } from './cluster-types'
+import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 
 export class EksBlueprintProps {
 
+    /**
+     * The id for the blueprint.
+     */
     readonly id: string;
 
     /**
@@ -100,26 +103,4 @@ export class EksBlueprint extends cdk.Stack {
 
         return vpc;
     }
-}
-
-export interface ClusterProvider {
-    createCluster(scope: cdk.Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo;
-}
-
-export interface ClusterAddOn {
-    deploy(clusterInfo: ClusterInfo): void;
-}
-
-export interface ClusterInfo {
-
-    readonly cluster: Cluster;
-
-    /**
-     * Either and EKS NodeGroup for managed node groups, or and autoscaling group for self-managed.
-     */
-    readonly nodeGroup?: Nodegroup;
-
-    readonly autoscalingGroup?: AutoScalingGroup;
-
-    readonly version: KubernetesVersion;
 }

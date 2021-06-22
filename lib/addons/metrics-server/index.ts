@@ -1,4 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../stacks/eks-blueprint-stack";
+import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 
 export class MetricsServerAddOn implements ClusterAddOn {

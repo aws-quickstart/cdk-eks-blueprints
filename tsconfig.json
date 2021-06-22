@@ -32,4 +32,7 @@
         ".git",
         "dist"
     ],
+    "include": [
+        "lib"
+    ]
 }
