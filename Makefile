@@ -22,7 +22,7 @@ build:
 list: 
 	$(CDK) list
 
-synth: 
+synth:
 	$(CDK) synth
 
 mkdocs:
