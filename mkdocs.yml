@@ -15,8 +15,6 @@ nav:
   - Core Concepts: 'core-concepts.md'
   - AddOns:
     - Overview: 'addons/index.md'
-    - App Mesh: 'addons/app-mesh.md'
-    - Argo CD: 'addons/argo-cd.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
   - Cluster Providers: 
@@ -29,8 +27,3 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - toc:
       permalink: true
-  # - pymdownx.highlight:
-  #   linenums: true
-  # - admonition
-  # - codehilite
-    
