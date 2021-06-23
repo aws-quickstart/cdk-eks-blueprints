@@ -26,7 +26,7 @@ Customers can use `cdk-eks-blueprint` to:
 
 For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
 
-## Examples 
+## Examples
 
 To view a library of sample implementations, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
 
