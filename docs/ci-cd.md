@@ -1,59 +1,34 @@
-### CI/CD
+# CI/CD
 
 While it is conveninet to leveage the CDK command line tool to deploy your first cluster, we reccomend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure. 
 
 To accomplish this, the EKS SSP - Refernce Solution leverages the [`Pipelines`](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module. This module makes it trivial to create Continuous Delivery (CD) pipelines via CodePipeline that are responsible for deploying and updating your infrastructure. 
 
-Aditionally, the the EKS SSP - Refernce Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with Git. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
+Aditionally, the the EKS SSP - Refernce Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
 
-## Complete Implementation
+## Creating a pipeline
 
-The below code example provides a complete example for how to leverag the `Pipelines` CDK module to setup a CD pipeline for an EKS blueprint. Below, we will break down each code section individually. 
+We can create a new `CodePipeline` resource via the following. 
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
-import * as pipelines from '@aws-cdk/pipelines';
-import * as codepipeline from '@aws-cdk/aws-codepipeline';
-import * as actions from '@aws-cdk/aws-codepipeline-actions';
+import * as ssp from '@shapirov/cdk-eks-blueprint'
 
-// SSP Lib
-import * as ssp from '../../lib'
+const pipeline = ssp.CodePipeline.build({
+    name: 'blueprint-pipeline',
+    owner: '<REPO_OWNER>',
+    repo: '<REPO_NAME>',
+    branch: 'main',
+    secretKey: '<SECRET_KEY>',
+    scope: scope
+})
+```
 
-// Team implementations
-import * as team from '../teams'
+## Creating stages 
 
-class Pipeline {
-    public static build = (scope: cdk.App) => {
-        // Github action.
-        const sourceArtifact = new codepipeline.Artifact();
-        const oathToken = cdk.SecretValue.secretsManager('github-token')
-        const sourceAction = new actions.GitHubSourceAction({
-            actionName: `pipeline-github-action`,
-            owner: 'aws-quickstarts',
-            repo: 'quickstart-ssp-amazon-eks',
-            branch: 'main',
-            output: sourceArtifact,
-            oauthToken: oathToken,
-        })
+Once our pipeline is created, we need to a `stage` for the pipeline. To do so, we can wrap our `EksBlueprint` stack in a `cdk.Stage` object.  
 
-        // Synth action.
-        const cloudAssemblyArtifact = new codepipeline.Artifact();
-        const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
-            sourceArtifact,
-            cloudAssemblyArtifact,
-            buildCommand: 'npm run build',
-        })
-
-        return new pipelines.CdkPipeline(scope, 'blueprint-pipeline', {
-            pipelineName: 'blueprint-pipeline',
-            cloudAssemblyArtifact,
-            sourceAction,
-            synthAction
-        });
-    }
-}
-
-class ClusterStage extends cdk.Stage {
+```typescript
+export class ClusterStage extends cdk.Stage {
     constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
         super(scope, id, props);
 
@@ -71,164 +46,74 @@ class ClusterStage extends cdk.Stage {
             new ssp.ClusterAutoScalerAddOn,
             new ssp.ContainerInsightsAddOn,
         ];
-        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
+        new ssp.EksBlueprint(this, { id: 'blueprint-cluster', addOns, teams }, props);
     }
 }
+```
 
-class PipelineStack extends cdk.Stack {
+## Adding stages to the pipeline. 
+
+Once a stage is created, we simply add it to the pipeline. 
+
+```typescript
+const dev = new ClusterStage(this, 'blueprint-stage-dev')
+pipeline.addApplicationStage(dev);
+```
+
+Adding stages to deploy multiple pipelines is trivial. 
+
+```typescript
+const dev = new ClusterStage(this, 'blueprint-stage-dev')
+pipeline.addApplicationStage(dev);
+
+const test = new ClusterStage(this, 'blueprint-stage-test')
+pipeline.addApplicationStage(test);
+```
+
+We can also add manual approvals for production stages. 
+
+```typescript
+const prod = new ClusterStage(this, 'blueprint-stage-prod', {mannualApprovals: true})
+pipeline.addApplicationStage(prod);
+```
+
+## Putting it all together
+
+The below code block contains the complete implemenation of a CodePipeline that is responsible for deploying three different clusters across three different pipeline stages. 
+
+```typescript
+import * as cdk from '@aws-cdk/core';
+
+// SSP Lib
+import * as ssp from '@shapirov/cdk-eks-blueprint'
+
+// Team implementations
+import * as team from 'path/to/teams'
+
+export class PipelineStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id)
 
-        const pipeline = Pipeline.build(scope)
-        const dev = new ClusterStage(this, 'blueprint-cluster-stage')
+        const pipeline = ssp.CodePipeline.build({
+            name: 'blueprint-pipeline',
+            owner: '<REPO_OWNER>',
+            repo: '<REPO_NAME>',
+            branch: 'main',
+            secretKey: '<SECRET_KEY>',
+            scope: scope
+        })
+
+        const dev = new ClusterStage(this, 'blueprint-stage-dev')
         pipeline.addApplicationStage(dev);
+
+        const test = new ClusterStage(this, 'blueprint-stage-test')
+        pipeline.addApplicationStage(test);  
+
+        // Manual approvals for Prod deploys.
+        const prod = new ClusterStage(this, 'blueprint-stage-prod')
+        pipeline.addApplicationStage(prod, { manualApprovals: true }));
     }
 }
-```
-
-## Breaking it down. 
-
-### Create a GitHub Source Action
-
-We want all pushes to our git repo to kick off our pipeline. So the first thing we want to do is great a GitHub action.
-
-```javascript
-const sourceArtifact = new codepipeline.Artifact();
-const sourceAction = new actions.GitHubSourceAction({
-    actionName: 'GitHub',
-    output: sourceArtifact,
-    owner: '<REPO_OWNER>',
-    repo: '<REPO_NAME>',
-    branch: '<REPO_BRANCH>',
-    oauthToken: cdk.SecretValue.plainText('GITHUB_TOKEN'),
-})
-```
-
-### Create Synth Action
-
-Next, we need to create a build step that will build any synth all new CDK code in our CD pipeline. We can do so via the following:
-
-```javascript
-const cloudAssemblyArtifact = new codepipeline.Artifact();
-const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
-    sourceArtifact,
-    cloudAssemblyArtifact,
-    buildCommand: 'npm run build',
-})
-```
-
-### Create the pipeline.
-
-Last, we create the actual pipeline with the above actions. 
-
-```javascript
-new pipelines.CdkPipeline(scope, 'FactoryPipeline', {
-    pipelineName: 'FactoryPipeline',
-    cloudAssemblyArtifact,
-    sourceAction,
-    synthAction,
-});
-```
-
-### Putting it all together.
-
-We can combine the above code into a single function which build our pipeline.
-
-```javascript
-const buildPipeline = (scope: cdk.Stack) => {
-    const sourceArtifact = new codepipeline.Artifact();
-    const sourceAction = new actions.GitHubSourceAction({
-        actionName: 'GitHub',
-        output: sourceArtifact,
-        owner: '<REPO_OWNER>',
-        repo: '<REPO_NAME>',
-        branch: '<REPO_BRANCH>',
-        oauthToken: cdk.SecretValue.plainText('GITHUB_TOKEN'),
-    })
-
-    // Use this if you need a build step (if you're not using ts-node
-    // or if you have TypeScript Lambdas that need to be compiled).
-    const cloudAssemblyArtifact = new codepipeline.Artifact();
-    const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
-        sourceArtifact,
-        cloudAssemblyArtifact,
-        buildCommand: 'npm run build',
-    })
-
-   return new pipelines.CdkPipeline(scope, 'FactoryPipeline', {
-        pipelineName: 'FactoryPipeline',
-        cloudAssemblyArtifact,
-        sourceAction,
-        synthAction,
-    });
-}
-```
-
-## Adding Cluster Stages
-
-In order to leverage our pipeline to deploy a CDK stack, we need to add a pipeline stage. To create a stage, we can create a class which extends `cdk.Stage` and put our blueprint stack implementation in the class.
-
-```javascript
-export class BlueprintStage extends cdk.Stage {
-    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
-        super(scope, id, props);
-
-        // Setup platform team
-        const accountID = process.env.CDK_DEFAULT_ACCOUNT!
-        const platformTeam = new AdminTeam(accountID!)
-        const teams: Array<ssp.Team> = [platformTeam];
-
-        // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            // new ssp.ContainerInsightsAddOn,
-        ];
-        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
-    }
-}
-```
-
-Then we can simply add application stages via the following.
-
-```javascript
-const pipeline = this.buildPipeline(this)
-
-const stage1 = new ClusterStage(this, 'blueprint-dev')
-pipeline.addApplicationStage(stage1);
-```
-
-We can add additional stages for additional clusters.
-
-```javascript
-// Staging cluster
-const stage2 = new ClusterStage(this, 'blueprint-staging')
-pipeline.addApplicationStage(stage2);
-
-// Production cluster
-const stageOpts = { manualApprovals: true }
-const stage3 = new ClusterStage(this, 'blueprint-production')
-pipeline.addApplicationStage(stage3, stageOpts);
-```
-
-##  Complete Implementation
-
-We can combine all of the above into a single file that can be deployed as a stack.
-
-```javascript
-import * as cdk from '@aws-cdk/core';
-import * as pipelines from '@aws-cdk/pipelines';
-import * as codepipeline from '@aws-cdk/aws-codepipeline';
-import * as actions from '@aws-cdk/aws-codepipeline-actions';
-
-// SSP Lib
-import * as ssp from '../../lib'
-
-// Team implementations
-import * as team from '../teams'
 
 export class ClusterStage extends cdk.Stage {
     constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
@@ -248,58 +133,7 @@ export class ClusterStage extends cdk.Stage {
             new ssp.ClusterAutoScalerAddOn,
             new ssp.ContainerInsightsAddOn,
         ];
-        new ssp.EksBlueprint(this, { id: 'eks', addOns, teams }, props);
+        new ssp.EksBlueprint(this, { id: 'blueprint-cluster', addOns, teams }, props);
     }
 }
-
-export class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
-        super(scope, id)
-
-        const pipeline = this.buildPipeline(this)
-
-        // Dev cluster
-        const dev = new ClusterStage(this, 'blueprint-dev')
-        pipeline.addApplicationStage(dev);
-
-        // Test cluster
-        const test = new ClusterStage(this, 'blueprint-test')
-        pipeline.addApplicationStage(test);
-
-        // Prod cluster
-        const prod = new ClusterStage(this, 'blueprint-prod')
-        pipeline.addApplicationStage(prod, { manualApprovals: true });
-    }
-}
-
-export class Pipeline {
-    constructor() {
-        const sourceArtifact = new codepipeline.Artifact();
-        const sourceAction = new actions.GitHubSourceAction({
-            actionName: 'GitHub',
-            owner: 'aws-quickstart',
-            repo: 'quickstart-ssp-amazon-eks',
-            branch: 'main',
-            output: sourceArtifact,
-            oauthToken: cdk.SecretValue.secretsManager('github-token'),
-        })
-
-        // Use this if you need a build step (if you're not using ts-node
-        // or if you have TypeScript Lambdas that need to be compiled).
-        const cloudAssemblyArtifact = new codepipeline.Artifact();
-        const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
-            sourceArtifact,
-            cloudAssemblyArtifact,
-            buildCommand: 'npm run build',
-        })
-
-        return new pipelines.CdkPipeline(scope, 'FactoryPipeline', {
-            pipelineName: 'FactoryPipeline',
-            cloudAssemblyArtifact,
-            sourceAction,
-            synthAction
-        });
-    }
-}
-
-
+```

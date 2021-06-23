@@ -6,7 +6,7 @@ import * as actions from '@aws-cdk/aws-codepipeline-actions';
 /**
  * Props for the Pipeline.
  */
-type PipelineProps = {
+export type PipelineProps = {
     /**
      * The name for the pipeline.
      */
@@ -39,15 +39,15 @@ type PipelineProps = {
 }
 
 /**
- * Pipeline deploys a new CodePipeline resource.
+ * CodePipeline deploys a new CodePipeline resource.
  */
-export default class Pipeline {
+export class CodePipeline {
 
     public static build = (props: PipelineProps) => {
         const sourceArtifact = new codepipeline.Artifact();
         const oathToken = cdk.SecretValue.secretsManager(props.secretKey)
         const sourceAction = new actions.GitHubSourceAction({
-            actionName: `${props.name}}-github-action`,
+            actionName: `${props.name}-github-action`,
             owner: props.owner,
             repo: props.repo,
             branch: props.branch,
