@@ -1,5 +1,3 @@
-import { pipeline } from 'stream';
-
 export * from './addons'
 export * as addons from './addons';
 

@@ -13,7 +13,7 @@ export type PipelineProps = {
     name: string
 
     /**
-     * The owner of the repository for the pipeline.
+     * The owner of the repository for the pipeline (GitHub handle).
      */
     owner: string
 
@@ -30,7 +30,7 @@ export type PipelineProps = {
     /**
      * Secret key for GitHub OAuth credentials (stored in SecretsManager).
      */
-    secretKey: string
+    secretKey?: string
 
     /**
      * The CDK scope for the pipeline.
@@ -45,7 +45,7 @@ export class CodePipeline {
 
     public static build = (props: PipelineProps) => {
         const sourceArtifact = new codepipeline.Artifact();
-        const oathToken = cdk.SecretValue.secretsManager(props.secretKey)
+        const oathToken = cdk.SecretValue.secretsManager(props.secretKey || '')
         const sourceAction = new actions.GitHubSourceAction({
             actionName: `${props.name}-github-action`,
             owner: props.owner,
