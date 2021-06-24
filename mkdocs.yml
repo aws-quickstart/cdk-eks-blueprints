@@ -7,14 +7,14 @@ theme:
   features: 
     - tabs
 nav:
-  - Overview: 'overview.md'
+  - Overview: 'index.md'
   - Getting Started: 'getting-started.md'
   - Teams: 'teams.md'
   - CI/CD: 'ci-cd.md'
   - Cluster Management: 'cluster-management.md'
   - Core Concepts: 'core-concepts.md'
   - AddOns:
-    - Overview: 'addons/overview.md'
+    - Overview: 'addons/index.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
   - Cluster Providers: 
@@ -22,10 +22,8 @@ nav:
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
     - Outpost Cluster Provider: 'cluster-providers/outpost-cluster-provider.md'
 markdown_extensions:
-    - toc:
-        permalink: true
-    - pymdownx.highlight:
-        use_pygments: false
-    - admonition
-    - codehilite
-    
+  - pymdownx.highlight  
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - toc:
+      permalink: true
