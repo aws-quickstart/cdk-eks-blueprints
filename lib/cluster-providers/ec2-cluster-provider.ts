@@ -1,6 +1,6 @@
 import { Construct } from "@aws-cdk/core";
-import { InstanceType, InstanceClass, InstanceSize, IVpc, SubnetSelection } from "@aws-cdk/aws-ec2";
-import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
+import { InstanceType, InstanceClass, InstanceSize, IVpc, SubnetSelection, SubnetType } from "@aws-cdk/aws-ec2";
+import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType, EndpointAccess } from "@aws-cdk/aws-eks";
 import { ClusterInfo, ClusterProvider } from "../stacks/cluster-types";
 
 // Utils 
@@ -28,6 +28,8 @@ const MIN_SIZE_KEY = "eks.default.min-size";
 const MAX_SIZE_KEY = "eks.default.max-size";
 
 const DESIRED_SIZE_KEY = "eks.default.desired-size";
+
+const PRIVATE_CLUSTER = "eks.default.private-cluster";
 
 /**
  * EC2 provider configuration options.
@@ -74,6 +76,13 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
      * Select either SPOT or ON-DEMAND
      */
     nodeGroupCapacityType?: CapacityType;
+
+    /**
+     * Is it a private only EKS Cluster?
+     * Defaults to private_and_public cluster, set to true for private cluster
+     * @default false
+     */
+     privateCluster?: boolean;
 }
 
 /**
@@ -96,6 +105,9 @@ export class EC2ClusterProvider implements ClusterProvider {
         const minSize = this.options.minSize ?? valueFromContext(scope, MIN_SIZE_KEY, DEFAULT_NG_MINSIZE);
         const maxSize = this.options.maxSize ?? valueFromContext(scope, MAX_SIZE_KEY, DEFAULT_NG_MAXSIZE);
         const desiredSize = this.options.desiredSize ?? valueFromContext(scope, DESIRED_SIZE_KEY, minSize);
+        const privateCluster = this.options.privateCluster ?? valueFromContext(scope, PRIVATE_CLUSTER, false);
+        const endpointAccess = privateCluster ? EndpointAccess.PRIVATE : EndpointAccess.PUBLIC_AND_PRIVATE;
+        const vpcSubnets = privateCluster ? [{ subnetType: SubnetType.PRIVATE }] : this.options.vpcSubnets;
 
         // Create an EKS Cluster
         const cluster = new Cluster(scope, id, {
@@ -104,7 +116,8 @@ export class EC2ClusterProvider implements ClusterProvider {
             outputClusterName: true,
             defaultCapacity: 0, // we want to manage capacity ourselves
             version: this.options.version,
-            vpcSubnets: this.options.vpcSubnets,
+            vpcSubnets: vpcSubnets,
+            endpointAccess: endpointAccess
         });
 
         // Create a managed node group.

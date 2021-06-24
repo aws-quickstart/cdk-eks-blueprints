@@ -43,7 +43,7 @@ jobs:
 
     - name: Build TSC
       run: make build
-    
+
     - name: Run CDK List
       run: make list
 
