@@ -7,7 +7,7 @@ export class ContainerInsightsAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "ContainerInsightsAddon can only be used with EKS EC2 at the moment. "
-            + "If using customer cluster provider, make sure you return the node group");
+            + "If using custom cluster provider, make sure you return the node group");
 
         // Setup managed policy.
         const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup;
@@ -20,7 +20,8 @@ export class ContainerInsightsAddOn implements ClusterAddOn {
         const manifest = docArray.split("---").map(e => loadYaml(e));
         new KubernetesManifest(cluster.stack, "cluster-insights", {
             cluster,
-            manifest
+            manifest,
+            overwrite: true
         });
     }
 }
