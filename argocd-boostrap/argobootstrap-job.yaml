@@ -1,27 +1,30 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: argocd-boostrap
+  name: test
 spec:
   parallelism: 1
   completions: 1
   template:
     spec:
-      initContainers:
+      containers:
       - name: bootstrap-argo
-        image: alpine:latest 
+        image: curlimages/curl
+
         command: 
         - /bin/sh
         args:
         - -c 
         - |
+          echo "install kubectl"
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           echo "Install Argo CD"
           kubectl create namespace argocd
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
           echo "Install ArgoCD CLI"
           VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
-          sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$VERSION/argocd-linux-amd64
-          sudo chmod +x /usr/local/bin/argocd
+          curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$VERSION/argocd-linux-amd64
+          chmod +x /usr/local/bin/argocd
           echo "Expose ArgoCD API server"
           kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
           export ARGOCD_SERVER=`kubectl get svc argocd-server -n argocd -o json | jq --raw-output .status.loadBalancer.ingress[0].hostname`
@@ -32,12 +35,12 @@ spec:
           echo "create EKS cluster configuration"
           CONTEXT_NAME=`kubectl config view -o jsonpath='{.contexts[].name}'`
           argocd cluster add $CONTEXT_NAME
-        env:
-        - name: #replace with git repo for app of apps repository
-          valueFrom:
-            secretkeyRef:
-              name: cluster-build
-              key: gitrepo 
+        # env:
+        # - name: #replace with git repo for app of apps repository
+        #   valueFrom:
+        #     secretkeyRef:
+        #       name: cluster-build
+        #       key: gitrepo 
       restartPolicy: Never
 
 
