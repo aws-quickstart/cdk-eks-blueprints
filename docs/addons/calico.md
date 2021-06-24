@@ -22,44 +22,21 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 ```
 ## Securing your environment with Calico network policies
 
-By default, installing Calico addon for network policy support will enable customers to define standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
-However, Calico also allows Custom Resource Definitions (CRD) which gives you the ability to add features not in the Kubernetes policies, such as:
+By default, installing Calico addon for network policy support will enable customers to define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
+However, Calico also allows Custom Resource Definitions (CRD) which gives you the ability to add features not in the standard Kubernetes policies, such as:
 - Explicit Deny rules
 - Layer 7 rule support (i.e. Http Request types)
 - Endpoint support other than standard pods: OpenShift, VMs, interfaces, etc. 
 
-In order to use CRDs (in particular for *projectcalico.org/v3* Calico API), you need to install the Calico CLI (`calicoctl`).
-
-### Installing calicoctl
-
-Follow the instructions found [here](https://docs.projectcalico.org/getting-started/clis/calicoctl/install), under *Install calicoctl as a binary on a single host* it will include instructions for your specific OS. You can test that calicoctl was installed correctly using the following:
-
-```bash
-calicoctl version
-```
-
-You should see output similar to the following:
-
-```
-Client Version:    v3.19.1
-Git commit:        6fc0db96
-Cluster Version:   v3.15.1
-Cluster Type:      typha,kdd,k8s,ecs
-```
+In order to use CRDs (in particular defined within the *projectcalico.org/v3* Calico API), you need to install the Calico CLI (`calicoctl`). More information for Calico CRDs are defined in the [Calico Policy](https://docs.projectcalico.org/security/calico-policy) section of the official documentations. 
+You will look at how the standard Kubernetes Network Policies are applied in the following example. This will be done using `kubectl`.
 
 ### Pod to Pod communications with no policies
 
-If you deploy [App of Apps installed using ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), you will notice that there are no network policies. 
-
-To verify this, run the following:
+If you deploy [App of Apps installed using ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), you can verify that there are no network policies in place:
 
 ```bash
 kubectl get networkpolicy -A
-```
-You should see the following output:
-
-```
-No resource found
 ```
 
 This means that any resources within the cluster should be able to make ingress and egress connections with other resources within and outside the cluster. You can verify, for example, that you are able to ping from `team-riker` pod to `team-burnham` pod.
@@ -69,129 +46,95 @@ First we retrieve the pod name from the `team-burnham` namespace its podIP:
 ```bash
 BURNHAM_POD=$(kubectl get pod -n team-burnham -o jsonpath='{.items[0].metadata.name}') 
 BURNHAM_POD_IP=$(kubectl get pod -n team-burnham $BURNHAM_POD -o jsonpath='{.status.podIP}')
-BURNHAM_POD_DEP=$(kubectl get deployments -n team-burnham -o jsonpath='{.items[0].metadata.name}')
 ```
 
 Now we can start a shell from the pod in the `team-riker` namespace and ping the pod from `team-burnham` namespace:
 
 ```bash
 RIKER_POD=$(kubectl -n team-riker get pod -o jsonpath='{.items[0].metadata.name}')
-kubectl exec --stdin --tty -n team-riker $RIKER_POD -- /bin/bash
+kubectl exec -ti -n team-riker $RIKER_POD -- sh
 ```
 
-Note: since this opens a shell inside the pod, it will not have the environment variables saved above. You should retrieve the actual podIP and the deployment name from the environment variables `BURNHAM_POD` and `BURNHAM_POD_DEP`.
+Note: since this opens a shell inside the pod, it will not have the environment variables saved above. You should retrieve the actual podIP from the environment variable `BURNHAM_POD_IP`.
 
-With those actual values, ping the DNS of the pod from `team-burnham`:
+With those actual values, curl the IP and port 80 of the pod from `team-burnham`:
 
 ```bash
-root@kustomize-guestbook-ui-85985d774c-tvk6n:/var/www/html# ping <podIP>.<deployment name>.team-burnham.svc.cluster.local
+# curl -s <Team Burnham Pod IP>:80>/dev/null && echo Success. || echo Fail. 
 ```
 
-You should see it pinging successfully:
+You should see `Success.`
 
-```
-PING 10-0-184-139.guestbook-ui.team-burnham.svc.cluster.local (10.0.184.139): 56 data bytes
-64 bytes from 10.0.184.139: icmp_seq=0 ttl=254 time=0.101 ms
-64 bytes from 10.0.184.139: icmp_seq=1 ttl=254 time=0.069 ms
-64 bytes from 10.0.184.139: icmp_seq=2 ttl=254 time=0.069 ms
-64 bytes from 10.0.184.139: icmp_seq=3 ttl=254 time=0.073 ms
-```
-### Applying Policies using Calico to block traffic
+### Applying Kubernetes Network Policy to block traffic
 
-One of the powerful things about Calico is the ability to apply a Global Network Policy - policy across all namespaces.
-
-Let's apply the following Global Network Policy:
+Let's apply the following Network Policy:
 
 ```yaml
-apiVersion: projectcalico.org/v3
-kind: GlobalNetworkPolicy
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: global-deny-all
+  name: default-deny
 spec:
-  order: 2000
-  types:
-  - Ingress
-  - Egress
-
-  # egress network rules
-  egress:
-  # Allow all egress traffic from kube-system.
-  - action: Allow
-    destination: {}
-    source:
-      namespaceSelector: name == 'kube-system'
-
-  # Allow egress DNS traffic to any destination.
-  - action: Allow
-    protocol: UDP
-    destination:
-      nets:
-        - 0.0.0.0/0
-      ports:
-        - 53
-
-  # ingress network rules
-  ingress:
-  # Allow all ingress traffic for the kube-system namespace.
-  - action: Allow
-    destination:
-      namespaceSelector: name == 'kube-system'
-    source: {}
+  podSelector:
+    matchLabels: {}
 ```
 
-You can either save it as `calico-global-deny-all.yaml` or copy the file in this directory. Run the following command to apply the policy:
+Save it as `deny-all.yaml`. Run the following commands to apply the policy to both `team-riker` and `team-burnham` namespaces:
 
 ```bash
-DATASTORE_TYPE=kubernetes \
-    KUBECONFIG=~/.kube/config
-    calicoctl apply -f calico-global-deny-all.yaml 
+kubectl -n team-riker apply -f deny-all.yaml 
+kubectl -n team-burnham apply -f deny-all.yaml
 ```
 
-You should see the following:
-
-```
-Successfully applied 1 'GlobalNetworkPolicy' resource(s)
-```
-
-The policy blocks all egress and ingress traffic in namespaces except `kube-system`, with the exception of DNS traffic (UDP:53). 
-You can try to ping the pod from `team-burnham` from a shell within the pod from `team-riker` and see that now you won't receive any response back.
+This will essentially prevent access to all resources within both namespaces. Try curl commands from above to verify that it fails.
 
 ### Applying additional policy to re-open pod to pod communications
 
-The above GlobalNetworkPolicy removes the ability for pods to communicate with other pods in all namespaces except `kube-system`. 
-However, you can still apply Kubernetes NetworkPolicy on top of that to “poke holes” for egress and ingress needs. 
+You can apply Kubernetes NetworkPolicy on top of that to “poke holes” for egress and ingress needs. 
 
-For example, if you wanted to open all traffic between `team-burnham` and `team-riker`, the following Kubernetes NetworkPolicy could be applied. This policy allows any endpoint (i.e. pods) from `team-riker` namespace to make ping requests (ICMP) to any endpoint in `team-burnham` namespace.
+For example, if you wanted to be able to curl from the `team-riker` pod to the `team-burnham` pod, the following Kubernetes NetworkPolicy should be applied. 
 
 ```yaml
-# This GlobalNetworkPolicy uses Calico's CRD
-# (https://docs.projectcalico.org/v3.5/reference/calicoctl/resources/globalnetworkpolicy)
-apiVersion: projectcalico.org/v3
-kind: GlobalNetworkPolicy
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: allow-burnham-riker
+  namespace: team-burnham
+  name: allow-riker-to-burnham
 spec:
-  namespaceSelector: name == 'team-burnham'
-  order: 3000
-  types:
+  podSelector:
+    matchLabels:
+      app: guestbook-ui
+  policyTypes:
     - Ingress
-
-  # ingress network rules
+    - Egress
   ingress:
-    # Allow all ingress traffic from team-riker to team-burnham namespaces
-    - action: Allow
-      protocol: ICMP
-      source:
-        namespaceSelector: name == 'team-riker'
-      icmp:
-        type: 8
-
+    - from:
+        - podSelector:
+            matchLabels:
+              app: guestbook-ui
+          namespaceSelector:
+            matchLabels:
+              name: team-riker
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: guestbook-ui
+          namespaceSelector:
+            matchLabels:
+              name: team-riker
+      ports:
+        - protocol: TCP
+          port: 80
 ```
 
-Apply the new GlobalNetworkPolicy:
+Save as `allow-burnham-riker.yaml` and apply the new NetworkPolicy:
 
 ```bash
-calicoctl apply -f calico-allow-burnham-riker.yaml     
+kubectl apply -f allow-burnham-riker.yaml     
 ```
 
-Once the policy is successfully applied, once again try to ping from one pod to the other. You sholud be able to ping successfully.
+Once the policy is applied, once again try the curl command from above. You should now see `Success.` once again.
