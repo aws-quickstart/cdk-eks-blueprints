@@ -2,7 +2,7 @@
 
 The `Calico` addon adds support for Kubernetes Network Policies to an EKS cluster.
 
-[Project Calico](https://www.projectcalico.org/) is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as we will see below.
+[Project Calico](https://www.projectcalico.org/) is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as you will see below.
 
 ## Usage
 
@@ -20,16 +20,18 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
-## Securing your environment with Calico network policies
+## Securing your environment with Kubernetes Network Policies
 
-By default, installing Calico addon for network policy support will enable customers to define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
+By default, native VPC-CNI plugin for Kubernetes on EKS does not support Kubernetes Network Policies. Installing Calico addon (or alternate CNI provider) for network policy support will enable customers to define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
+
 However, Calico also allows Custom Resource Definitions (CRD) which gives you the ability to add features not in the standard Kubernetes policies, such as:
 - Explicit Deny rules
 - Layer 7 rule support (i.e. Http Request types)
 - Endpoint support other than standard pods: OpenShift, VMs, interfaces, etc. 
 
-In order to use CRDs (in particular defined within the *projectcalico.org/v3* Calico API), you need to install the Calico CLI (`calicoctl`). More information for Calico CRDs are defined in the [Calico Policy](https://docs.projectcalico.org/security/calico-policy) section of the official documentations. 
-You will look at how the standard Kubernetes Network Policies are applied in the following example. This will be done using `kubectl`.
+In order to use CRDs (in particular defined within the *projectcalico.org/v3* Calico API), you need to install the Calico CLI ([calicoctl](https://docs.projectcalico.org/getting-started/clis/calicoctl/install)). You can find more information about Calico Network Policy and using `calicoctl` [here](https://docs.projectcalico.org/security/calico-network-policy). 
+
+In this section, you will look at how the standard Kubernetes Network Policies are applied. This will be done using `kubectl`.
 
 ### Pod to Pod communications with no policies
 
@@ -41,14 +43,14 @@ kubectl get networkpolicy -A
 
 This means that any resources within the cluster should be able to make ingress and egress connections with other resources within and outside the cluster. You can verify, for example, that you are able to ping from `team-riker` pod to `team-burnham` pod.
 
-First we retrieve the pod name from the `team-burnham` namespace its podIP:
+First you retrieve the pod name from the `team-burnham` namespace its podIP:
 
 ```bash
 BURNHAM_POD=$(kubectl get pod -n team-burnham -o jsonpath='{.items[0].metadata.name}') 
 BURNHAM_POD_IP=$(kubectl get pod -n team-burnham $BURNHAM_POD -o jsonpath='{.status.podIP}')
 ```
 
-Now we can start a shell from the pod in the `team-riker` namespace and ping the pod from `team-burnham` namespace:
+Now you can start a shell from the pod in the `team-riker` namespace and ping the pod from `team-burnham` namespace:
 
 ```bash
 RIKER_POD=$(kubectl -n team-riker get pod -o jsonpath='{.items[0].metadata.name}')
