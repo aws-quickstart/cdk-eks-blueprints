@@ -93,4 +93,5 @@ At this point you should be able to execute `kubectl ...` commands against your 
 
 **Limitations**
 
-This approach cannot be used for Fargate or BottleRocket based providers.
+* This approach cannot be used for Fargate or BottleRocket based providers.
+* `socat` is available on EKS optimized AMI out of the box but may have to be explicitly installed on others AMIs.
