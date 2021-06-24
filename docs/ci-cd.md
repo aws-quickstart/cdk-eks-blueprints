@@ -95,42 +95,45 @@ import * as ssp from '@shapirov/cdk-eks-blueprint'
 import * as team from 'path/to/teams'
 
 export class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id)
 
-        const pipeline = ssp.CodePipeline.build({
+        const pipeline = this.buildPipeline(scope)
+
+        const dev = new ClusterStage(this, 'blueprint-stage-dev', {
+            env: {
+                account: 'XXXXXXXXXXX',
+                region: 'us-west-1',
+            }
+        })
+        pipeline.addApplicationStage(dev)
+
+        const test = new ClusterStage(this, 'blueprint-stage-test', {
+            env: {
+                account: 'XXXXXXXXXXX',
+                region: 'us-west-1',
+            }
+        )
+        pipeline.addApplicationStage(test)  
+
+        // Manual approvals for Prod deploys.
+        const prod = new ClusterStage(this, 'blueprint-stage-prod',{
+            env: {
+                account: 'XXXXXXXXXXX',
+                region: 'us-west-1',
+            }
+        })
+        pipeline.addApplicationStage(prod, { manualApprovals: true })
+    }
+
+    buildPipeline = (scope: cdk.Stack) => {
+        return ssp.CodePipeline.build({
             name: 'blueprint-pipeline',
             owner: '<REPO_OWNER>',
             repo: '<REPO_NAME>',
             branch: 'main',
             secretKey: '<SECRET_KEY>',
             scope: scope
-        })
-
-        const dev = new ClusterStage(this, 'blueprint-stage-dev')
-        pipeline.addApplicationStage(dev, {
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
-        })
-
-        const test = new ClusterStage(this, 'blueprint-stage-test')
-        pipeline.addApplicationStage(test, {
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
-        })  
-
-        // Manual approvals for Prod deploys.
-        const prod = new ClusterStage(this, 'blueprint-stage-prod')
-        pipeline.addApplicationStage(prod, {
-            manualApprovals: true,
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
         })
     }
 }
