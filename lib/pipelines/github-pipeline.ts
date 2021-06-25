@@ -39,7 +39,7 @@ export type PipelineProps = {
 }
 
 /**
- * CodePipeline deploys a new CodePipeline resource.
+ * CodePipeline deploys a new CodePipeline resource that is integrated with a GitHub repository.
  */
 export class CodePipeline {
 
@@ -55,13 +55,20 @@ export class CodePipeline {
             oauthToken: oathToken,
         })
 
-        // Use this if you need a build step (if you're not using ts-node
-        // or if you have TypeScript Lambdas that need to be compiled).
         const cloudAssemblyArtifact = new codepipeline.Artifact();
-        const synthAction = pipelines.SimpleSynthAction.standardNpmSynth({
+        const synthAction = new pipelines.SimpleSynthAction({
             sourceArtifact,
             cloudAssemblyArtifact,
-            buildCommand: 'npm run build',
+            installCommands: [
+                // Upgrade NPM to v7.
+                'npm install --global npm',
+                // Install deps
+                'npm install',
+                // Install global CDK.
+                'npm install -g aws-cdk@1.104.0'
+            ],
+            buildCommands: ['npm run build'],
+            synthCommand: 'cdk synth'
         })
 
         return new pipelines.CdkPipeline(props.scope, props.name, {
