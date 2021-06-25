@@ -18,11 +18,11 @@ A Shared Services Platform (SSP) is an internal development platform that abstra
 
 Customers can use this QuickStart to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
 
-✅  Deploy Well-Architected EKS clusters across any number of accounts and regions.
-✅  Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
-✅  Define teams, namespaces, and their associated access permissions for your clusters.
-✅  Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
-✅  Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
+- [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
+- [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
+- [x] Define teams, namespaces, and their associated access permissions for your clusters.
+- [x] Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
+- [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
 
 ## Examples
 
@@ -115,13 +115,13 @@ cdk deploy
 
 This will provision the following:
 
-✅  A new Well-Architected VPC with both Public and Private subnets.
-✅  A new Well-Architected EKS cluster in the region and account you specify.
-✅  [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
-✅  [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
-✅  [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
-✅  AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
-✅  AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
+- [x] A new Well-Architected VPC with both Public and Private subnets.
+- [x] A new Well-Architected EKS cluster in the region and account you specify.
+- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
+- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
+- [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
+- [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
+- [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
 
 ---
 
