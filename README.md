@@ -1,10 +1,14 @@
-# Amazon EKS SSP Quickstart
+# Amazon EKS SSP Quick Start
 
-![GitHub](https://img.shields.io/github/license/shapirov103/cdk-eks-blueprint)
+![GitHub](https://img.shields.io/github/license/aws-quickstart/quickstart-ssp-amazon-eks)
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
-This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a CDK construct that makes it easy for customers to deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+
+## Documentation
+
+For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
 
 ## What is an SSP?
 
@@ -12,29 +16,30 @@ A Shared Services Platform (SSP) is an internal development platform that abstra
 
 ## What can I do with this QuickStart?
 
-Customers can use `cdk-eks-blueprint` to:
+Customers can use this QuickStart to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
 
-* Deploy "blueprint" `EKS` clusters across multiple accounts and regions. 
-* Declare the set of addons that are provisioned into each cluster. 
-* Manage configuration for all of your clusters from a single Git repository.
-* Define teams, namespaces, and their associated access permissions.
-* Integrate cluster access with IAM or OIDC provider of your choosing. 
-* Leverage GitOps-based workflows to onboard and manage workloads for your teams. 
-
-
-## Documentation
-
-For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
+✅  Deploy Well-Architected EKS clusters across any number of accounts and regions.
+✅  Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
+✅  Define teams, namespaces, and their associated access permissions for your clusters.
+✅  Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
+✅  Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
 
 ## Examples
 
-To view a library of sample implementations, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
+To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
 
-You can also view a sample implementation in `bin/main.ts`.
+You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
 ## Getting Started
 
-Install CDK matching the version of the SSP Quickstart.
+First, make sure you have the [`aws-cli`](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed. To verify your installation, run the following: 
+
+```bash
+aws --version
+# output aws-cli/2.2.3 Python/3.9.5 Darwin/20.3.0 source/x86_64 prompt/off
+```
+
+Install CDK matching the current version of the SSP QuickStart (which can be found in package.json).
 
 ```bash
 npm install -g aws-cdk@1.104.0
@@ -53,7 +58,7 @@ Create a new CDK project. We use `typescript` for this example.
 cdk init app --language typescript
 ```
 
-Bootstrap your environment. For more information see Bootstrapping below.  
+[Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment.
 
 ```bash
 cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
@@ -61,7 +66,7 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Run the following command to install the dependency in your project.
+Run the following command to install the `cdk-eks-blueprint` dependency in your project.
 
 ```
 npm i @shapirov/cdk-eks-blueprint
@@ -77,19 +82,17 @@ const app = new cdk.App();
 
 // AddOns for the cluster.
 const addOns: Array<ssp.ClusterAddOn> = [
-    new ssp.addons.NginxAddOn,
     new ssp.addons.ArgoCDAddOn,
     new ssp.addons.CalicoAddOn,
     new ssp.addons.MetricsServerAddOn,
-    new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
     new ssp.addons.AwsLoadBalancerControllerAddOn()
 ];
 
-const account = 'XXXXXXXXXXXX'
+const account = '<YOUR_ACCOUNT_ID'
 const region = 'us-east-2'
 const props = { env: { account, region } }
-new ssp.Stacks.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
+new ssp.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
 ```
 
 Run the following command to confirm there are no issues with your code
@@ -110,21 +113,27 @@ Deploy the stack using the following command
 cdk deploy
 ```
 
-### Examples 
+This will provision the following:
 
-To view more examples for how you can leverage `cdk-eks-blueprint`, see the `examples` directory.
+✅  A new Well-Architected VPC with both Public and Private subnets.
+✅  A new Well-Architected EKS cluster in the region and account you specify.
+✅  [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
+✅  [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
+✅  [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
+✅  AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
+✅  AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
 
 ---
 
-## Why should I use this framework?  
+## Why should I use this QuickStart?  
 
-SSPs can be difficult to design and build. From an operations perspective, you need to determine the right mix of tools and services you want to include in your platform and how they integrate. You also need to determine how to maintain a fleet of clusters and their associated addons across regions. From a developer perspective, you need to determine how to onboard an operate workloads on the platfrom as well. 
+The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provide cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge. 
 
-The `cdk-eks-blueprint` framework provides logical abstractions and perscriptive guidance for building a well-architected platform, and ultimately, will help accelerate time to market for your platform implementation.
+AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. These platforms require investment of time and engineering resources to build however. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives. 
 
 ## Feedback
 
-For architectural details, step-by-step instructions, and customization options, see the [deployment guide](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
+For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
 
 To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo. 
 
