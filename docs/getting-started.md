@@ -206,9 +206,11 @@ Open up `localhost:4040` in your browser and you should see the application.
 
 ## Next Steps
 
-For information on setting up Continuous Delivery pipelines for your infrastructure, see CI/CD documentation.
+For information on setting up Continuous Delivery pipelines for your infrastructure, see [`CI/CD` documentation](/ci-cd/).
 
-For information on supported Addons, see Addon documentation
+For information on supported Addons, see [`AddOn` documentation](/addons/)
 
-For information on Onboarding teams to your clusters, see Team documentation. 
+For information on Onboarding teams to your clusters, see [`Team` documentation](/teams/). 
+
+For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](/workloads/). 
 
