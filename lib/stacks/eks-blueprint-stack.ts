@@ -4,6 +4,7 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
+import { IConstruct, Construct } from 'constructs';
 
 import { Team } from '../teams'
 import { ClusterAddOn, ClusterProvider } from './cluster-types'
@@ -46,7 +47,7 @@ export class EksBlueprintProps {
 
 export class EksBlueprint extends cdk.Stack {
 
-    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, props);
 
         this.validateInput(blueprintProps);
