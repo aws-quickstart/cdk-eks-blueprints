@@ -8,7 +8,7 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 
 ## Documentation
 
-For complete project documentation, please see our [official project documentation site](http://aws.amazon.com).
+For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
 
 ## What is an SSP?
 
@@ -127,9 +127,9 @@ This will provision the following:
 
 ## Why should I use this QuickStart?  
 
-The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provide cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge. 
+The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge. 
 
-AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. These platforms require investment of time and engineering resources to build however. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives. 
+AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives. 
 
 ## Feedback
 
