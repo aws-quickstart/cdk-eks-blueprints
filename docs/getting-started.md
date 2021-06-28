@@ -223,6 +223,10 @@ To validate your deployments, leverage kubectl port-forwarding to access the `gu
 kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
 ```
 
-Open up `localhost:4040` in your browser and you should see the application. 
+Open up `localhost:4040` in your browser and you should see the application.
+
+
+
+
 
 
