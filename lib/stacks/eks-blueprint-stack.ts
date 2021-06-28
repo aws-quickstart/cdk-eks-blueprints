@@ -4,7 +4,7 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import { IConstruct, Construct } from 'constructs';
+import { Construct } from 'constructs';
 
 import { Team } from '../teams'
 import { ClusterAddOn, ClusterProvider } from './cluster-types'
