@@ -100,7 +100,7 @@ export class PipelineStack extends cdk.Stack {
 
         const pipeline = this.buildPipeline(scope)
 
-        const dev = new ClusterStage(this, 'blueprint-stage-dev', {
+        const dev = new ClusterStage(this, 'dev-stage', {
             env: {
                 account: 'XXXXXXXXXXX',
                 region: 'us-west-1',
@@ -108,7 +108,7 @@ export class PipelineStack extends cdk.Stack {
         })
         pipeline.addApplicationStage(dev)
 
-        const test = new ClusterStage(this, 'blueprint-stage-test', {
+        const test = new ClusterStage(this, 'test-stage', {
             env: {
                 account: 'XXXXXXXXXXX',
                 region: 'us-west-1',
@@ -117,7 +117,7 @@ export class PipelineStack extends cdk.Stack {
         pipeline.addApplicationStage(test)  
 
         // Manual approvals for Prod deploys.
-        const prod = new ClusterStage(this, 'blueprint-stage-prod',{
+        const prod = new ClusterStage(this, 'prod-stage',{
             env: {
                 account: 'XXXXXXXXXXX',
                 region: 'us-west-1',
