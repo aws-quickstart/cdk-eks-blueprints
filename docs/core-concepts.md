@@ -4,26 +4,26 @@ This document provides a high level overview of the Core Concepts that are embed
 
 | Concept       | Description                                                           |     
 |---------------|-----------------------------------------------------------------------|
-| [Blueprint](##Blueprint) | A `blueprint` combines `clusters`, `add-ons`, and `teams` into a cohesive object that can deployed as a whole. |                             
-| [Cluster](##Cluster) | A Well-Architected EKS Cluster. |
-| [Add-on](##Add-on) | A tool or service, represented by Kubernetes or AWS resources, which supports Kubernetes workloads. |
-| [Team](##Team) | A logical grouping of IAM identities that have access to a Kubernetes namespace(s). |
-| [Pipeline](##Pipeline) | Continuous Delivery pipelines for deploying `clusters` and `add-ons`. |
-| [Application](##Application) | An application that runs within an EKS Cluster. |
+| [Blueprint](#blueprint) | A `blueprint` combines `clusters`, `add-ons`, and `teams` into a cohesive object that can deployed as a whole. |                             
+| [Cluster](#cluster) | A Well-Architected EKS Cluster. |
+| [Add-on](#add-on) | A tool or service, represented by Kubernetes or AWS resources, which supports Kubernetes workloads. |
+| [Team](#team) | A logical grouping of IAM identities that have access to a Kubernetes namespace(s). |
+| [Pipeline](#pipeline) | Continuous Delivery pipelines for deploying `clusters` and `add-ons`. |
+| [Application](#application) | An application that runs within an EKS Cluster. |
 
 ## Blueprint 
 
-The `cdk-eks-blueprint` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS `cluster`, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. 
+The `cdk-eks-blueprint` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS cluster, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. 
 
-To view sample `blueprint` implementations, see our [patters repository](https://github.com/aws-samples/ssp-eks-patterns). 
+To view sample `blueprint` implementations, please see our [patterns repository](https://github.com/aws-samples/ssp-eks-patterns). 
 
 ## Cluster
 
-A `cluster` is simply an EKS cluster. The `cdk-eks-blueprint` framework provides for customizing the compute options you leverage with your clusters. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `EC2ClusterProvider`.
+A `cluster` is simply an EKS cluster. The `cdk-eks-blueprint` framework provides for customizing the compute options you leverage with your `clusters`. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `EC2ClusterProvider`.
 
 Each `ClusterProvider` provides additional configuration options as well. For example, the `EC2ClusterProvider` allows you to configure instance types, min and max instance counts, and amiType, among other options. 
 
-See our [`Cluster Providers`](./cluster-providers) documentation page for detailed information. 
+See our [`Cluster Providers`](../cluster-providers) documentation page for detailed information. 
 
 ## Add-on
 
@@ -31,22 +31,22 @@ See our [`Cluster Providers`](./cluster-providers) documentation page for detail
 
 For examples, the `MetricsServerAddon` only deploys the Kubernetes manifests that are needed to run the Kubernetes Metrics Server. By contrast, the `AWSLoadBalancerControllerAddon` deploys Kubernetes YAML, in addition to creating resources via AWS APIs that are needed to support the AWS Load Balancer Controller. 
 
-See our [`AddOns`](./add-ons) documentation page for detailed information. 
+See our [`AddOns`](../add-ons) documentation page for detailed information. 
 
 ## Team 
 
 `Teams` allow you to configure the logical grouping of users that have access to your EKS clusters, in addition to the access permissions they are granted. The framework currently supports two types of `teams`: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` members are granted access to specific namespaces. `PlatformTeam` members are granted administrative access to your clusters. 
 
-See our [`Teams`](./teams) documentation page for detailed information. 
+See our [`Teams`](../teams) documentation page for detailed information. 
 
 ## Pipeline
 
 `Pipelines` allow you to configure `Continuous Delivery` (CD) pipelines for your cluster `blueprints` that are directly integrated with your Git provider.
 
-See our [`Pipelines`](./pipelines) documentation page for detailed information. 
+See our [`Pipelines`](../pipelines) documentation page for detailed information. 
 
 ## Application
 
 `Applications` represent the actual workloads that run within a Kubernetes cluster. The framework leverages a GitOps approach for deploying applications onto clusters. 
 
-See our [`Applications](./applications) documentation for detailed information.
+See our [`Applications](../applications) documentation for detailed information.
