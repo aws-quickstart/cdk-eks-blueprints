@@ -1,10 +1,11 @@
 import { Construct } from "@aws-cdk/core";
 import { InstanceType, InstanceClass, InstanceSize, IVpc, SubnetSelection } from "@aws-cdk/aws-ec2";
-import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType } from "@aws-cdk/aws-eks";
+import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, Nodegroup, NodegroupAmiType } from "@aws-cdk/aws-eks";
 import { ClusterInfo, ClusterProvider } from "../stacks/cluster-types";
 
 // Utils 
 import { valueFromContext } from '../utils/context-utils'
+import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
 
 /**
  * Default instance type for managed node group provisioning
@@ -120,4 +121,15 @@ export class EC2ClusterProvider implements ClusterProvider {
 
         return { cluster: cluster, nodeGroup: nodeGroup, version: version };
     }
+}
+
+/**
+ * Validates that cluster is backed by EC2 either through a managed node group or through a self-managed autoscaling group.
+ * @param clusterInfo 
+ * @param source Used for error message to identify the source of the check
+ * @returns 
+ */
+export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string) : Nodegroup | AutoScalingGroup {
+    console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, `${source} is supported with EKS EC2 only`);
+    return clusterInfo.nodeGroup || clusterInfo.autoscalingGroup!;
 }

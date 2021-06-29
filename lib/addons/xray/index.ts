@@ -1,13 +1,13 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
+import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
 export class XrayAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
-        console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "X-Ray can only be used with EKS EC2 at the moment. "
-            + "If using a custom cluster provider, make sure the returned ClusterInfo object has nodeGroup field populated.");
+        assertEC2NodeGroup(clusterInfo, "X-Ray Addon");
 
         // Setup managed policy.
         const opts = { name: 'xray-account', namespace: "xray-system" }

@@ -12,7 +12,7 @@ export class ContainerInsightsAddOn implements ClusterAddOn {
         // Setup managed policy.
         const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup;
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy')
-        nodeGroup!.role.addManagedPolicy(policy)
+        nodeGroup!.role.addManagedPolicy(policy);
 
         // Apply manifest
         const doc = readYamlDocument(__dirname + '/cwagent-fluentd-quickstart.yaml');
