@@ -1,14 +1,23 @@
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
-
+/**
+ * Properties available to configure the nginx ingress controller.
+ */
 export interface NginxAddOnProps {
     /**
      * tcp, http
      */
     backendProtocol?: string,
 
+    /**
+     * Enabling cross AZ loadbalancing for 
+     */
     crossZoneEnabled?: boolean,
 
+    /**
+     * If the load balancer created for the ingress is internet facing.
+     * Internal if set to false.
+     */
     internetFacing?: boolean,
 
     /**
@@ -29,28 +38,44 @@ const nginxAddonDefaults: NginxAddOnProps = {
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
     internetFacing: true,
-    targetType: 'ip'
+    targetType: 'ip',
 }
 
 
 export class NginxAddOn implements ClusterAddOn {
 
-/* 
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-    
-    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
-    service.beta.kubernetes.io/aws-load-balancer-type: "external"
-*/  
+    readonly options: NginxAddOnProps;
+
+    constructor(props?: NginxAddOnProps) {
+        this.options = { ...nginxAddonDefaults, ...props };
+    }
 
     deploy(clusterInfo: ClusterInfo): void {
+
+        const props = this.options;
+
+        const presetAnnotations  = {
+            'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
+            'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': props.crossZoneEnabled,
+            'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
+            'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
+            'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType
+        }
+
+        const values = props.values ?? {};
+
+        values['controller'] = {
+            service: {
+                annotations: presetAnnotations
+            }
+        };
+
         clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
             repository: "https://helm.nginx.com/stable",
             namespace: "kube-system",
             version: "0.9.3",
-            values: {}
+            values
         });
     }
 }
