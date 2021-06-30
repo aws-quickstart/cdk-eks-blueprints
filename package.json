@@ -1,6 +1,6 @@
 {
     "name": "@shapirov/cdk-eks-blueprint",
-    "version": "0.10.4",
+    "version": "0.11.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {

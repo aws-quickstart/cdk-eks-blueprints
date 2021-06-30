@@ -25,6 +25,11 @@ export interface NginxAddOnProps {
      * Instance mode: traditional NodePort mode on the instance. 
      */
     targetType?: string,
+    
+    /**
+     * Used in conjunction with external DNS add-on to handle automatic registration of the service with Route53.  
+     */
+    externaDnsHostname?: string,
 
     /**
      * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
@@ -59,14 +64,16 @@ export class NginxAddOn implements ClusterAddOn {
             'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': props.crossZoneEnabled,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
             'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
-            'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType
+            'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType,
+            'external-dns.alpha.kubernetes.io/hostname': props.externaDnsHostname,
         }
 
         const values = props.values ?? {};
+        const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
 
         values['controller'] = {
             service: {
-                annotations: presetAnnotations
+                annotations: serviceAnnotations
             }
         };
 
