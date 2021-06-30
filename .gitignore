@@ -8,6 +8,7 @@ node_modules
 .settings
 .vscode
 *.iml
+.code
 
 # CDK asset staging directory
 .cdk.staging

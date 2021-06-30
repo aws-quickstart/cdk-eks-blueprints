@@ -7,25 +7,28 @@ theme:
   features: 
     - tabs
 nav:
-  - Overview: 'overview.md'
+  - Overview: 'index.md'
   - Getting Started: 'getting-started.md'
-  - Teams: 'teams.md'
-  - CI/CD: 'ci-cd.md'
-  - Cluster Management: 'cluster-management.md'
   - Core Concepts: 'core-concepts.md'
+  - CI/CD: 'ci-cd.md'
+  - Teams: 'teams.md'
   - AddOns:
-    - Overview: 'addons/overview.md'
+    - Overview: 'addons/index.md'
+    - App Mesh: 'addons/app-mesh.md'
+    - ArgoCD: 'addons/argo-cd.md'
+    - Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
   - Cluster Providers: 
     - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
-    - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
-    - Outpost Cluster Provider: 'cluster-providers/outpost-cluster-provider.md'
 markdown_extensions:
-    - toc:
-        permalink: true
-    - pymdownx.highlight:
-        use_pygments: false
-    - admonition
-    - codehilite
-    
+  - def_list
+  - pymdownx.highlight  
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+plugins:
+  - search
