@@ -3,45 +3,42 @@ kind: Job
 metadata:
   name: test
 spec:
-  parallelism: 1
   completions: 1
+  parallelism: 1
   template:
     spec:
+      restartPolicy: Never
       containers:
-      - name: bootstrap-argo
-        image: curlimages/curl
-
-        command: 
-        - /bin/sh
-        args:
-        - -c 
+      - name: test
+        image: argocd-bootstrap:latest
+        command:
+        - "bash"
+        - "-c"
         - |
-          echo "install kubectl"
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          echo "Install Argo CD"
-          kubectl create namespace argocd
-          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-          echo "Install ArgoCD CLI"
-          VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
-          curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$VERSION/argocd-linux-amd64
-          chmod +x /usr/local/bin/argocd
-          echo "Expose ArgoCD API server"
-          kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-          export ARGOCD_SERVER=`kubectl get svc argocd-server -n argocd -o json | jq --raw-output .status.loadBalancer.ingress[0].hostname`
+          export ARGOCD_SERVER=test 
           echo "login to the server and change password"
-          ARGO_PWD=`kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2`
+          ARGO_PWD= test
           argocd login $ARGOCD_SERVER --username admin --password $ARGO_PWD --insecure
+          echo "mount secret obtained in step above and mount it as a secret to this job"
+          echo "updated argocd password"
           argocd account update-password
           echo "create EKS cluster configuration"
           CONTEXT_NAME=`kubectl config view -o jsonpath='{.contexts[].name}'`
           argocd cluster add $CONTEXT_NAME
-        # env:
-        # - name: #replace with git repo for app of apps repository
-        #   valueFrom:
-        #     secretkeyRef:
-        #       name: cluster-build
-        #       key: gitrepo 
-      restartPolicy: Never
+          echo "bootstrap app of apps"
+          argocd app create apps --dest-namespace argocd  --dest-server https://kubernetes.default.svc  --repo git@github.com:shapirov103/argo-apps.git --path "."
+          argocd app sync apps        
+        volumeMounts:
+        - mountPath: /input
+          name: input
+      volumes:
+      - name: input
+        emptyDir: {}
+
+
+
+        
+
 
 
 

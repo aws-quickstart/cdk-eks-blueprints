@@ -1,18 +1,19 @@
-FROM argoproj/argocd:latest
+FROM alpine:latest
 
-# Switch to root for the ability to perform install
-USER root
+# Install tools needed - curl, unzip, python utilities, awscli, argocd
+RUN apk update \
+    && apk --no-cache add curl \
+    && apk --no-cache add unzip \
+    && apk --no-cache add python3 \
+    && apk --no-cache add py3-pip \
+    && pip3 install --upgrade pip \
+    && pip3 install \
+        awscli \
+    && rm -rf /var/cache/apk/* \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install -i /usr/local/aws-cli -b /usr/local/bin \
+    && curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 \ 
+    && chmod +x /usr/local/bin/argocd
 
-# Install tools needed 
-RUN apt-get update && \
-    apt-get install -y \
-        curl \
-        argocd \
-        jq \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')&& \
-    chmod +x /usr/local/bin/argocd
-
-# Switch back to non-root user
-USER argocd
+# CMD []
