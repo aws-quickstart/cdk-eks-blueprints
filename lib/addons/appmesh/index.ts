@@ -13,7 +13,7 @@ export interface AppMeshAddOnProps {
     /**
      * Tracing provider. Supported values are x-ray, jaeger, datadog
      */
-    tracingProvider?: string
+    tracingProvider?: "x-ray" | "jaeger" | "datadog"
 
     /**
      * Used for Datadog or Jaeger tracing. Example values: datadog.appmesh-system. Refer to https://aws.github.io/aws-app-mesh-controller-for-k8s/guide/tracing/ for more information.
@@ -62,7 +62,7 @@ export class AppMeshAddOn implements ClusterAddOn {
             const ng = assertEC2NodeGroup(clusterInfo, "App Mesh X-Ray integration");
             ng.role.addManagedPolicy(xrayPolicy);
         }
-
+      
         // App Mesh Namespace
         const appMeshNS = cluster.addManifest('appmesh-ns', {
             apiVersion: 'v1',

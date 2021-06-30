@@ -4,7 +4,12 @@ import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
+/**
+ * Implementation of AWS X-Ray add-on for EKS SSP. Installs xray daemonset and exposes 
+ * an internal ClusterIP service for tracing on port 2000 (UDP).
+ */
 export class XrayAddOn implements ClusterAddOn {
+
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         assertEC2NodeGroup(clusterInfo, "X-Ray Addon");
