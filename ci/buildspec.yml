@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+  build:
+    commands:
+      - npm install aws-cdk@1.104.0 -g
+      - npm ci
+artifacts:
+  files: '**/*'
+cache:
+  - 'node_modules/**/*' 
