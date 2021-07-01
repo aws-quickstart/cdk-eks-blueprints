@@ -1,7 +1,12 @@
+#!/usr/bin/env node
+import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as logs from '@aws-cdk/aws-logs';
 import { Bucket } from '@aws-cdk/aws-s3';
+
+
+const app = new cdk.App();
 
 export class CiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -34,3 +39,5 @@ export class CiStack extends cdk.Stack {
     });
   }
 }
+
+new CiStack(app, 'CiStack', {});
