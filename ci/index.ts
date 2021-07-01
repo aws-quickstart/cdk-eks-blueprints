@@ -3,8 +3,6 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as logs from '@aws-cdk/aws-logs';
-import { Bucket } from '@aws-cdk/aws-s3';
-
 
 const app = new cdk.App();
 
@@ -28,7 +26,6 @@ export class CiStack extends cdk.Stack {
       source,
       projectName: 'QuickstartSspAmazonEksBuild', // to uniquely identify our project
       badge: true, // copy the URL from CLI and update the top level README.md
-      cache: codebuild.Cache.bucket(new Bucket(this, 'QuickstartSspAmazonEksBuildCache')),
       buildSpec: codebuild.BuildSpec.fromSourceFilename('ci/buildspec.yml'),
       concurrentBuildLimit: 1, // so that we don't exceed any account limits
       logging: {
