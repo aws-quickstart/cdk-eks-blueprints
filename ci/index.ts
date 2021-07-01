@@ -40,4 +40,4 @@ export class CiStack extends cdk.Stack {
   }
 }
 
-new CiStack(app, 'CiStack', {});
+new CiStack(app, 'CiStack');
