@@ -8,9 +8,9 @@ phases:
     commands:
       - npm install aws-cdk@1.104.0 -g
       - npm install
-      - cdk deploy -a "npx ts-node examples/blueprint-construct/index.ts" --all --require-approval never
+      - cdk deploy --all --require-approval never
     finally:
-      - cdk destroy -a "npx ts-node examples/blueprint-construct/index.ts" --all --force
+      - cdk destroy --all --force
 cache:
   paths:
     - 'node_modules/**/*' 
