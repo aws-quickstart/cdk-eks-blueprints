@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import * as cdk from '@aws-cdk/core';
 
 // SSP lib.
