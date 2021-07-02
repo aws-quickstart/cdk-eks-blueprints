@@ -8,6 +8,6 @@ phases:
     commands:
       - npm install aws-cdk@1.104.0 -g
       - npm install
-      - cdk deploy --all --require-approval never
+      - cdk deploy --verbose --all --require-approval never
     finally:
-      - cdk destroy --all --force
+      - cdk destroy --verbose --all --force
