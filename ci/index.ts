@@ -13,9 +13,16 @@ export class CiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // Parameters
+    const ghOwner = new cdk.CfnParameter(this, 'GitHubOwner', {
+      type: "String",
+      description: "The GitHub organization you own.",
+      default: "aws-quickstart"
+    });
+
     // Setup the CodeBuild project for our GitHub repo
     const source = codebuild.Source.gitHub({
-      owner: 'askulkarni2',
+      owner: ghOwner.valueAsString,
       repo: 'quickstart-ssp-amazon-eks',
       reportBuildStatus: true,
       webhook: true,
