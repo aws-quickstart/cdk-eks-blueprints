@@ -18,3 +18,4 @@ The framework currently supports the following AddOns.
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
 | `MetricsServerAddOn`| Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddOn` | Adds NGINX ingress controller |
+| `XrayAddOn` | (./xray) Adds XRay Daemon to the EKS Cluster |

@@ -2,6 +2,7 @@ import * as eks from "@aws-cdk/aws-eks";
 import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
+import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
@@ -25,11 +26,8 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
         const version = this.versionField ?? this.versionMap.get(clusterInfo.version);
         const cluster = clusterInfo.cluster;
-
-        console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "Cluster autoscaler is supported with EKS EC2 only");
-
-        const ng = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup!;
-
+       
+        const ng = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
 
         const autoscalerStmt = new iam.PolicyStatement();
         autoscalerStmt.addResources("*");
