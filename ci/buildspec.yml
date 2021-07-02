@@ -8,11 +8,6 @@ phases:
     commands:
       - npm install aws-cdk@1.104.0 -g
       - npm install
-      - ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | awk -F: '{print $5}')
-      - >
-        env CDK_NEW_BOOTSTRAP=1  cdk bootstrap
-          --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
-          aws://${ACCOUNT_ID}/${AWS_REGION}
       - cdk deploy --all --require-approval never
     finally:
       - cdk destroy --all --force

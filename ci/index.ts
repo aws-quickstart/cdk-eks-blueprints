@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as logs from '@aws-cdk/aws-logs';
+import { PolicyStatement } from '@aws-cdk/aws-iam';
 
 const app = new cdk.App();
 
@@ -22,7 +23,7 @@ export class CiStack extends cdk.Stack {
       ],
     });
 
-    new codebuild.Project(this, 'QuickstartSspAmazonEksBuild', {
+    const project = new codebuild.Project(this, 'QuickstartSspAmazonEksBuild', {
       source,
       projectName: 'QuickstartSspAmazonEksBuild', // to uniquely identify our project
       badge: true, // copy the URL from CLI and update the top level README.md
@@ -34,6 +35,10 @@ export class CiStack extends cdk.Stack {
         }
       }, 
     });
+    project.addToRolePolicy(new PolicyStatement({
+      resources: [`arn:${cdk.Aws.PARTITION}:iam::${cdk.Aws.ACCOUNT_ID}:role/cdk-${cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER}-deploy-role-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.REGION}`],
+      actions: ['sts:AssumeRole']
+    }))
   }
 }
 
