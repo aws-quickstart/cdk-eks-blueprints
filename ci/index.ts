@@ -26,6 +26,7 @@ export class CiStack extends cdk.Stack {
       repo: 'quickstart-ssp-amazon-eks',
       reportBuildStatus: true,
       webhook: true,
+      branchOrRef: "main",
       webhookFilters: [
         codebuild.FilterGroup
           .inEventOf(codebuild.EventAction.PULL_REQUEST_MERGED)
