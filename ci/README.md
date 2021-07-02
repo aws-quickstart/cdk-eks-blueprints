@@ -42,7 +42,7 @@ export GITHUB_TOKEN=<personal_access_token>
 aws codebuild import-source-credentials \
   --server-type GITHUB \
   --auth-type PERSONAL_ACCESS_TOKEN \
-  --token $GITHUB_TOKEN 
+  --token $GITHUB_TOKEN
 ```
 
 Deploy the CodeBuild Project. Use the `--parameters GitHubOwner=<value>` to override the value for `owner` used in the CodeBuild project. If you do not specify the input parameter we will try to use `aws-quickstart` by default.
