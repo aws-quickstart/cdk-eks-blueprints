@@ -4,6 +4,8 @@ import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as logs from '@aws-cdk/aws-logs';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
+// Utils
+import { valueFromContext } from '../lib/utils/context-utils';
 
 const app = new cdk.App();
 
@@ -35,9 +37,22 @@ export class CiStack extends cdk.Stack {
         }
       }, 
     });
+
+    const qualifier = valueFromContext(this,
+        '@aws-cdk/core:bootstrapQualifier',
+        cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER
+    );
+
     project.addToRolePolicy(new PolicyStatement({
-      resources: [`arn:${cdk.Aws.PARTITION}:iam::${cdk.Aws.ACCOUNT_ID}:role/cdk-${cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER}-deploy-role-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.REGION}`],
+      resources: [
+        `arn:${cdk.Aws.PARTITION}:iam::${cdk.Aws.ACCOUNT_ID}:role/cdk-${qualifier}-deploy-role-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.REGION}`,
+        `arn:${cdk.Aws.PARTITION}:iam::${cdk.Aws.ACCOUNT_ID}:role/cdk-${qualifier}-file-publishing-role-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.REGION}`
+        ],
       actions: ['sts:AssumeRole']
+    }))
+    project.addToRolePolicy(new PolicyStatement({
+      resources: [`*`],
+      actions: ['ec2:DescribeAvailabilityZones']
     }))
   }
 }
