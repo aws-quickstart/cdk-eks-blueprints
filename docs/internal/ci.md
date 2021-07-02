@@ -2,7 +2,7 @@
 
 This example shows how to enable a CodeBuild based Continuous Integration process for the SSP blueprint. The CodeBuild project is provisioned using a CDK application.
 
-The [buildspec.yml](buildspec.yml) provided deploys the sample blueprint stacks provided in [examples](../examples/blueprint-construct/) and can be used directly if you wish to setup the CodeBuild project manually through the console or via the CLI.
+The [buildspec.yml](../../ci/buildspec.yml) provided deploys the sample blueprint stacks provided in [examples](../../bin/main.ts). The buildspec can be used directly if you wish to setup the CodeBuild project manually through the console or via the CLI.
 
 ## Deploy CodeBuild Project
 
