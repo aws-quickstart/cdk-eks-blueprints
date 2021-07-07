@@ -61,7 +61,7 @@ export class NginxAddOn implements ClusterAddOn {
 
         const presetAnnotations  = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
-            'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': props.crossZoneEnabled,
+            'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': `${props.crossZoneEnabled}`,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
             'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
             'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType,

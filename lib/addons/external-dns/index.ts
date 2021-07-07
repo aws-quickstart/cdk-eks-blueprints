@@ -18,8 +18,11 @@ export interface ExternalDnsProps {
      */
     readonly version?: string;
 
-    readonly hostedZones: IHostedZone[];
+    readonly hostedZone: HostedZoneProvider;
 }
+
+
+export type HostedZoneProvider = (clusterInfo: ClusterInfo) => IHostedZone[];
 
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
@@ -47,12 +50,14 @@ export class ExternalDnsAddon implements ClusterAddOn {
         });
         
         const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
+
+        const hostedZones = this.options.hostedZone(clusterInfo);
   
         sa.addToPrincipalPolicy(
             new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ['route53:ChangeResourceRecordSets', 'route53:ListResourceRecordSets'],
-                resources: this.options.hostedZones.map((hostedZone) => hostedZone.hostedZoneArn),
+                resources: hostedZones.map(hostedZone => hostedZone.hostedZoneArn),
             }),
         );
 
@@ -74,7 +79,7 @@ export class ExternalDnsAddon implements ClusterAddOn {
             version: this.options.version ?? '5.1.3',
             values: {
                 provider: 'aws',
-                zoneIdFilters: this.options.hostedZones.map((hostedZone) => hostedZone.hostedZoneId),
+                zoneIdFilters: hostedZones.map(hostedZone => hostedZone.hostedZoneId),
                 aws: {
                     region,
                 },
