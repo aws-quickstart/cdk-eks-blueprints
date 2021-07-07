@@ -6,14 +6,14 @@ This document provides a high level overview of the Core Concepts that are embed
 |---------------|-----------------------------------------------------------------------|
 | [Blueprint](#blueprint) | A `blueprint` combines `clusters`, `add-ons`, and `teams` into a cohesive object that can deployed as a whole. |                             
 | [Cluster](#cluster) | A Well-Architected EKS Cluster. |
-| [Add-on](#add-on) | A tool or service, represented by Kubernetes or AWS resources, which supports Kubernetes workloads. |
+| [Add-on](#add-on) |  Allow you to configure, deploy, and update the operational software, or add-ons, that provide key functionality to support your Kubernetes applications. |
 | [Team](#team) | A logical grouping of IAM identities that have access to a Kubernetes namespace(s). |
 | [Pipeline](#pipeline) | Continuous Delivery pipelines for deploying `clusters` and `add-ons`. |
 | [Application](#application) | An application that runs within an EKS Cluster. |
 
 ## Blueprint 
 
-The `cdk-eks-blueprint` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS cluster, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. 
+The `cdk-eks-blueprint` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS cluster, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. `Blueprints` also leverage GitOps tooling to facilitate cluster bootstrapping and workload onboarding. 
 
 To view sample `blueprint` implementations, please see our [patterns repository](https://github.com/aws-samples/ssp-eks-patterns). 
 
