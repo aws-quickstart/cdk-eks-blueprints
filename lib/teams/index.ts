@@ -33,7 +33,7 @@ export class TeamProps {
     /**
      *  Annotations such as necessary for GitOps engine. 
      */
-    readonly namespaceAnnotations?= { "argocd.argoproj.io/sync-wave": "-1" };
+    readonly namespaceAnnotations? : { [key: string]: any; } = { "argocd.argoproj.io/sync-wave": "-1" };
 
     /**
      * Optional, but highly recommended setting to ensure predictable demands.

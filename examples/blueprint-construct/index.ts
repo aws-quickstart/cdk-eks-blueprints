@@ -24,6 +24,7 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
+            new ssp.addons.AppMeshAddOn,
             new ssp.addons.NginxAddOn,
             new ssp.addons.ArgoCDAddOn,
             new ssp.addons.CalicoAddOn,

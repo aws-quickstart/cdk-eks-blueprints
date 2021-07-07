@@ -2,14 +2,14 @@
 *.d.ts
 node_modules
 .vscode
-
+.local-pack
 .classpath.txt
 .idea
 .settings
 .vscode
 *.iml
 .code
-
+*.tgz
 # CDK asset staging directory
 .cdk.staging
 cdk.out
