@@ -13,21 +13,7 @@ spec:
         image: argocd-bootstrap:latest
         command:
         - "bash"
-        - "-c"
-        - |
-          export ARGOCD_SERVER=test 
-          echo "login to the server and change password"
-          ARGO_PWD= test
-          argocd login $ARGOCD_SERVER --username admin --password $ARGO_PWD --insecure
-          echo "mount secret obtained in step above and mount it as a secret to this job"
-          echo "updated argocd password"
-          argocd account update-password
-          echo "create EKS cluster configuration"
-          CONTEXT_NAME=`kubectl config view -o jsonpath='{.contexts[].name}'`
-          argocd cluster add $CONTEXT_NAME
-          echo "bootstrap app of apps"
-          argocd app create apps --dest-namespace argocd  --dest-server https://kubernetes.default.svc  --repo git@github.com:shapirov103/argo-apps.git --path "."
-          argocd app sync apps        
+        - "-c"     
         volumeMounts:
         - mountPath: /input
           name: input
