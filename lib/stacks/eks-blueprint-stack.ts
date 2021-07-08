@@ -7,7 +7,7 @@ import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
 
 import { Team } from '../teams'
-import { ClusterAddOn, ClusterProvider } from './cluster-types'
+import { ClusterAddOn, ClusterPostDeploy, ClusterProvider } from './cluster-types'
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 
 export class EksBlueprintProps {
@@ -61,12 +61,21 @@ export class EksBlueprint extends cdk.Stack {
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
 
+        const postDeploymentSteps = Array<ClusterPostDeploy>();
+
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             addOn.deploy(clusterInfo);
+            const postDeploy : any  = addOn;
+            if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
+                postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
+            }
         }
+        
         if (blueprintProps.teams != null) {
             blueprintProps.teams.forEach(team => team.setup(clusterInfo));
         }
+
+        postDeploymentSteps.forEach(step => step.postDeploy(clusterInfo, blueprintProps.teams ?? []));
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
