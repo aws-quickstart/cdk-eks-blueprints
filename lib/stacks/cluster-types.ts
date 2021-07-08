@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
+import { Team } from '../teams';
 
 /**
  * ClusterInfo describes an EKS cluster.
@@ -41,5 +42,14 @@ export interface ClusterProvider {
  */
 export interface ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void;
+}
+
+/**
+ * Optional interface to allow cluster bootstrapping after provisioning of add-ons and teams is complete.
+ * Can be leveraged to bootstrap workloads, perform cluster checks. 
+ * ClusterAddOn implementation may implement this interface in order to get post deployment hook point.
+ */
+export interface ClusterPostDeploy {
+    postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void;
 }
 
