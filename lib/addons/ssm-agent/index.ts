@@ -30,14 +30,9 @@ export class SSMAgentAddOn implements ClusterAddOn {
                     spec: {
                         containers: [
                             {
-                                image: "amazonlinux",
+                                image: "public.ecr.aws/y9z4e3w0/test-ssp/addon-ssm-agent",
                                 imagePullPolicy: "Always",
                                 name: "ssm",
-                                command: ["/bin/bash"],
-                                args: [
-                                    "-c",
-                                    "echo '* * * * * root yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm & rm -rf /etc/cron.d/ssmstart' > /etc/cron.d/ssmstart"
-                                ],
                                 securityContext: {
                                     allowPrivilegeEscalation: true
                                 },
