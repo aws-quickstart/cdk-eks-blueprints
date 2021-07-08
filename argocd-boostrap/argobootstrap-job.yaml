@@ -1,25 +1,29 @@
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: test
+# spec:
+#   template:
+#     spec:
+#       restartPolicy: Never
+#       containers:
+#       - name: test
+#         image: argocd-bootstrap:latest
+
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: test
+  name: pi
+  namespace: argocd
 spec:
-  completions: 1
-  parallelism: 1
   template:
     spec:
-      restartPolicy: Never
       containers:
-      - name: test
+      - name: pi
         image: argocd-bootstrap:latest
-        command:
-        - "bash"
-        - "-c"     
-        volumeMounts:
-        - mountPath: /input
-          name: input
-      volumes:
-      - name: input
-        emptyDir: {}
+        imagePullPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4
 
 
 
