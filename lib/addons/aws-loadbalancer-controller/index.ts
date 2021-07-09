@@ -44,8 +44,8 @@ export interface AwsLoadBalancerControllerProps {
  */
 const awsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
     namespace: 'kube-system',
-    version: 'v2.2.0',
-    chartVersion: '1.2.0',
+    version: 'v2.2.1',
+    chartVersion: '1.2.3',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false
