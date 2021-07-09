@@ -60,7 +60,7 @@ export class DelegatingHostedZoneProvider implements HostedZoneProvider {
         if (this.wildcardSubdomain) {
             new CnameRecord(stack, `${this.subdomain}-cname`, {
                 zone: subZone,
-                domainName: `*.{subdomain}`
+                domainName: `*.${this.subdomain}`
             });
         }
 
