@@ -4,13 +4,11 @@
 
 Supports context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 
-- `eks.default.instance-type`: (defaulted to "m5.large") Type of instance for the EKS cluster, must be a valid instance type like t3.medium
-- `eks.default.vpc`: Specifies whether to use an existing VPC (if specified) or create a new one if not specified.
+- `eks.default.instance-type`: Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 - `eks.default.min-size`: Min cluster size, must be positive integer greater than 0 (default 1).
 - `eks.default.max-size`: Max cluster size, must be greater than minSize (default 3).
 - `eks.default.desired-size`: Desired cluster size, must be greater or equal to minSize (default `min-size`).
-
-`eks.default.vpc` supports an option to look up default VPC in your account/region if the value is set to `default`. Note, there should be  public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
+- `eks.default.private-cluster`: Specifies whether to use private cluster or not (default false). Note that should you utilize public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `EC2ProviderClusterProps` to each cluster provider.
 
