@@ -23,7 +23,6 @@ spec:
         image: argocd-bootstrap:latest
         imagePullPolicy: Always
       restartPolicy: Never
-  backoffLimit: 4
 
 
 
