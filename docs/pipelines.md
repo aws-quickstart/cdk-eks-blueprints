@@ -1,4 +1,4 @@
-# CI/CD
+# Continuous Delivery
 
 While it is convenient to leverage the CDK command line tool to deploy your first cluster, we recommend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure. 
 
