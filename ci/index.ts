@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as logs from '@aws-cdk/aws-logs';
+import { Bucket } from '@aws-cdk/aws-s3';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
 // Utils
 import { valueFromContext } from '../lib/utils/context-utils';
@@ -18,6 +19,12 @@ export class CiStack extends cdk.Stack {
       type: "String",
       description: "The GitHub organization you own.",
       default: "aws-quickstart"
+    });
+
+    const contextLocation = new cdk.CfnParameter(this, 'ContextLocation', {
+      type: "String",
+      description: "Optional s3 based location of a CDK context file. E.g. s3://path/to/cdk.context.json",
+      default: ""
     });
 
     // Setup the CodeBuild project for our GitHub repo
@@ -39,11 +46,17 @@ export class CiStack extends cdk.Stack {
       badge: true, // copy the URL from CLI and update the top level README.md
       buildSpec: codebuild.BuildSpec.fromSourceFilename('ci/buildspec.yml'),
       concurrentBuildLimit: 1, // so that we don't exceed any account limits
+      environmentVariables: {
+        CONTEXT_LOCATION: {
+          type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+          value: contextLocation.valueAsString
+        }
+      },
       logging: {
         cloudWatch: {
           logGroup: new logs.LogGroup(this, `QuickstartSspAmazonEksBuildLogGroup`),
         }
-      }, 
+      },
     });
 
     const qualifier = valueFromContext(this,
@@ -57,11 +70,18 @@ export class CiStack extends cdk.Stack {
         `arn:${cdk.Aws.PARTITION}:iam::${cdk.Aws.ACCOUNT_ID}:role/cdk-${qualifier}-file-publishing-role-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.REGION}`
         ],
       actions: ['sts:AssumeRole']
-    }))
+    }));
+
     project.addToRolePolicy(new PolicyStatement({
       resources: [`*`],
       actions: ['ec2:DescribeAvailabilityZones']
-    }))
+    }));
+
+    if (contextLocation.valueAsString.includes("s3://")) {
+      const s3Url = new URL(contextLocation.valueAsString);
+      const bucket = Bucket.fromBucketName(this, 'ContextBucket', s3Url.host);
+      bucket.grantRead(project);
+    }
   }
 }
 
