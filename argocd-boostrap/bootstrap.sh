@@ -11,6 +11,8 @@ export ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret 
 echo "login to the server and change password"
 argocd login $ARGO_SERVER --username admin --password $ARGO_PASSWORD 
 
+echo "bootstrap app of apps"
+argocd app create apps --dest-namespace argocd  --dest-server https://kubernetes.default.svc  --repo git@github.com:shapirov103/argo-apps.git --path "."
 
 # echo "mount secret obtained in step above and mount it as a secret to this job"
 # echo "updated argocd password"

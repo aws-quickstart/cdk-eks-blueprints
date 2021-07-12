@@ -1,28 +1,16 @@
-# apiVersion: batch/v1
-# kind: Job
-# metadata:
-#   name: test
-# spec:
-#   template:
-#     spec:
-#       restartPolicy: Never
-#       containers:
-#       - name: test
-#         image: argocd-bootstrap:latest
-
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: pi
-  namespace: argocd
+  name: test
 spec:
   template:
     spec:
       containers:
       - name: pi
-        image: argocd-bootstrap:latest
-        imagePullPolicy: Always
+        image: andwizzle93/argocd-bootstrap
       restartPolicy: Never
+  backoffLimit: 4
+
 
 
 
