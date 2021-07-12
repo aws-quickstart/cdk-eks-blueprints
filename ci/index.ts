@@ -57,8 +57,8 @@ export class CiStack extends cdk.Stack {
     });
 
     const qualifier = valueFromContext(this,
-        '@aws-cdk/core:bootstrapQualifier',
-        cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER
+      '@aws-cdk/core:bootstrapQualifier',
+      cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER
     );
 
     project.addToRolePolicy(new PolicyStatement({
