@@ -42,6 +42,18 @@ export class LookupHostedZoneProvider implements HostedZoneProvider {
         return [HostedZone.fromLookup(clusterInfo.cluster.stack, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName })];
     }
 }
+/**
+ * Direct import hosted zone provider, based on a known hosted zone ID. 
+ * Recommended method if hosted zone id is known, as it avoids extra look-ups.
+ */
+export class ImportHostedZoneProvider  implements HostedZoneProvider {
+
+    constructor(private hostedZoneId: string, private id?: string) { }
+
+    provide(clusterInfo: ClusterInfo): IHostedZone[] {
+        return [HostedZone.fromHostedZoneId(clusterInfo.cluster.stack, this.id ??  `${this.hostedZoneId}-Import`, 'ZOJJZC49E0EPZ')];
+    }
+}
 
 export class DelegatingHostedZoneProvider implements HostedZoneProvider {
     constructor(private parentDomain: string,
