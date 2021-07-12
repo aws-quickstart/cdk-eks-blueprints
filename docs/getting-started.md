@@ -163,7 +163,7 @@ While still port-forwarding, login via the following.
 argocd login localhost:8080 --username admin --password $ARGO_PASSWORD
 ```
 
-You can also login to the ArgoCD UI with generated password. 
+You can also login to the ArgoCD UI with generated password and the username `admin`. 
 
 ```
 echo $ARGO_PASSWORD
@@ -176,7 +176,7 @@ Create a project in Argo by running the following command
 ```
 argocd proj create sample \
     -d https://kubernetes.default.svc,argocd \
-    -s https://github.com/shapirov103/argo-apps.git
+    -s https://github.com/aws-samples/ssp-eks-workloads.git
 ```
 
 Create the application within Argo by running the following command
@@ -185,14 +185,14 @@ Create the application within Argo by running the following command
 argocd app create dev-apps \
     --dest-namespace argocd  \
     --dest-server https://kubernetes.default.svc  \
-    --repo https://github.com/shapirov103/argo-apps.git \
+    --repo https://github.com/aws-samples/ssp-eks-workloads.git \
     --path "envs/dev"
 ```
 
 Sync the apps by running the following command
 
 ```
-argocd app sync sample-apps 
+argocd app sync dev-apps 
 ```
 
 ### Validate deployments. 
@@ -205,17 +205,12 @@ kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
 
 Open up `localhost:4040` in your browser and you should see the application.
 
-
-
-
-
 ## Next Steps
 
-For information on setting up Continuous Delivery pipelines for your infrastructure, see [`CI/CD` documentation](/ci-cd/).
+For information on Onboarding teams to your clusters, see [`Team` documentation](./teams/). 
 
-For information on supported Addons, see [`AddOn` documentation](/addons/)
+For information on setting up Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](./ci-cd/).
 
-For information on Onboarding teams to your clusters, see [`Team` documentation](/teams/). 
+For information on supported Add-ons, see [`Add-on` documentation](./addons/)
 
-For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](/workloads/). 
-
+For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](./workloads/). 
