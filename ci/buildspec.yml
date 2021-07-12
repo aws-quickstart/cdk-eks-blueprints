@@ -9,7 +9,7 @@ phases:
     commands:
   pre_build:
     commands:
-      - > 
+      - >
         [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
   build:
     commands:
