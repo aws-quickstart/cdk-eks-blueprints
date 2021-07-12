@@ -69,7 +69,7 @@ aws ssm send-command \
   --parameters commands="nohup sudo socat TCP-LISTEN:443\,fork TCP:$CLUSTER_API:443 &"
 ```
 
-2. Update `~/.kube/config` to use port 8443 instead of 443 as your local host may not allow you to bind port 443 (my machine does not allow me to bind to 443)
+2. Update `~/.kube/config` to use port 8443 instead of 443 as your local host may not allow you to bind port 443 (depending on your machine network configuration you may not be able to bind to port 443. In such a case, you can bind to port 8443)
 
 ```bash
 sed -i -e "s/https:\/\/$CLUSTER_API/https:\/\/$CLUSTER_API:8443/" ~/.kube/config
