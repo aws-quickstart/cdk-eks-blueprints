@@ -28,7 +28,7 @@ synth:
 mkdocs:
 	mkdocs serve 
 
-mkdocs-deploy:
+push-mkdocs:
 	mkdocs gh-deploy
 
 bootstrap:
