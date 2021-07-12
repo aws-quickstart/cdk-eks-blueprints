@@ -4,6 +4,8 @@ This example shows how to enable a CodeBuild based Continuous Integration proces
 
 The [buildspec.yml](../../ci/buildspec.yml) provided deploys the sample blueprint stacks provided in [examples](../../bin/main.ts). The buildspec can be used directly if you wish to setup the CodeBuild project manually through the console or via the CLI.
 
+Optionally, you can also provide an S3 bucket location for a `cdk.context.json` that contains key-values for any context you want to provide to your application such as route 53 domain, domain account, subzone, IAM users, etc.
+
 ## Deploy CodeBuild Project
 
 First, clone this project.
@@ -45,11 +47,18 @@ aws codebuild import-source-credentials \
   --token $GITHUB_TOKEN
 ```
 
+Optionally, upload a cdk.context.json file into an S3 bucket which can be accessed by the CodeBuild project.
+
+```sh
+aws s3 cp cdk.context.json \
+  s3://<s3bucket>/cdk.context.json
+```
 Deploy the CodeBuild Project. Use the `--parameters GitHubOwner=<value>` to override the value for `owner` used in the CodeBuild project. If you do not specify the input parameter we will try to use `aws-quickstart` by default.
 
 ```sh
 cdk deploy -a "npx ts-node ci/index.ts" \
-  --parameters GitHubOwner=<GitHubOwner>"
+  --parameters GitHubOwner=<GitHubOwner> \
+  --context eks.default.context-location=s3://<s3bucket>/cdk.context.json"
 ```
 
 After the deployment is completed the CodeBuild project will be configured to build and deploy the blueprint stack on every pull-request merge to the `main` branch.

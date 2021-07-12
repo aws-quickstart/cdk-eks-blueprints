@@ -2,7 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
-import * as logs from '@aws-cdk/aws-logs';
+import { LogGroup } from '@aws-cdk/aws-logs';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
 // Utils
@@ -21,11 +21,8 @@ export class CiStack extends cdk.Stack {
       default: "aws-quickstart"
     });
 
-    const contextLocation = new cdk.CfnParameter(this, 'ContextLocation', {
-      type: "String",
-      description: "Optional s3 based location of a CDK context file. E.g. s3://path/to/cdk.context.json",
-      default: ""
-    });
+    // Context
+    const contextLocation = valueFromContext(this, 'eks.default.context-location', '');
 
     // Setup the CodeBuild project for our GitHub repo
     const source = codebuild.Source.gitHub({
@@ -49,12 +46,12 @@ export class CiStack extends cdk.Stack {
       environmentVariables: {
         CONTEXT_LOCATION: {
           type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
-          value: contextLocation.valueAsString
+          value: contextLocation
         }
       },
       logging: {
         cloudWatch: {
-          logGroup: new logs.LogGroup(this, `QuickstartSspAmazonEksBuildLogGroup`),
+          logGroup: new LogGroup(this, `QuickstartSspAmazonEksBuildLogGroup`),
         }
       },
     });
@@ -77,8 +74,8 @@ export class CiStack extends cdk.Stack {
       actions: ['ec2:DescribeAvailabilityZones']
     }));
 
-    if (contextLocation.valueAsString.includes("s3://")) {
-      const s3Url = new URL(contextLocation.valueAsString);
+    if (contextLocation.includes('s3://')) {
+      const s3Url = new URL(contextLocation);
       const bucket = Bucket.fromBucketName(this, 'ContextBucket', s3Url.host);
       bucket.grantRead(project);
     }
