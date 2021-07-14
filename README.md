@@ -12,6 +12,10 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 
 For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
 
+## Examples
+
+To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns).
+
 ## What is an SSP?
 
 A Shared Services Platform (SSP) is an internal development platform that abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, SSPs allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
