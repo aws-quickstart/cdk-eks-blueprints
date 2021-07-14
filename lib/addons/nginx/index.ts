@@ -1,3 +1,4 @@
+import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 
 /**
@@ -79,6 +80,7 @@ export class NginxAddOn implements ClusterAddOn {
 
         clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
+            release: Constants.SSP_ADDON, 
             repository: "https://helm.nginx.com/stable",
             namespace: "kube-system",
             version: "0.9.3",

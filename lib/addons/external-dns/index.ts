@@ -1,6 +1,7 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement, Role } from '@aws-cdk/aws-iam';
 import { IHostedZone, HostedZone, PublicHostedZone, CrossAccountZoneDelegationRecord, CnameRecord} from '@aws-cdk/aws-route53';
+import { Constants } from '..';
 import { ClusterAddOn, ClusterInfo } from '../../stacks/cluster-types';
 
 
@@ -155,7 +156,7 @@ export class ExternalDnsAddon implements ClusterAddOn {
             namespace,
             repository: 'https://charts.bitnami.com/bitnami',
             chart: 'external-dns',
-            release: 'external-dns',
+            release: Constants.SSP_ADDON,
             version: this.options.version ?? '5.1.3',
             values: {
                 provider: 'aws',
