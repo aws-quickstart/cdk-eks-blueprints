@@ -11,7 +11,7 @@ Optionally, you can also provide an S3 bucket location for a `cdk.context.json` 
 First, clone this project.
 
 ```sh
-git clone https://github.com/askulkarni2/quickstart-ssp-amazon-eks.git
+git clone https://github.com/aws-quickstart/quickstart-ssp-amazon-eks.git
 
 cd quickstart-ssp-amazon-eks
 ```
