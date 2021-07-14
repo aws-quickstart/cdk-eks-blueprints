@@ -1,4 +1,4 @@
-site_name: Amazon EKS SSP Quickstart
+site_name: Amazon EKS SSP Quick Start
 repo_name: "aws-quickstart/quickstart-ssp-amazon-eks"
 repo_url: "https://github.com/aws-quickstart/quickstart-ssp-amazon-eks"
 docs_dir: "docs"
@@ -10,16 +10,18 @@ nav:
   - Overview: 'index.md'
   - Getting Started: 'getting-started.md'
   - Core Concepts: 'core-concepts.md'
-  - CI/CD: 'ci-cd.md'
   - Teams: 'teams.md'
+  - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
     - App Mesh: 'addons/app-mesh.md'
     - ArgoCD: 'addons/argo-cd.md'
-    - Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
+    - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
+    - Calico: 'addons/calico.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
   - Cluster Providers: 
+    - Overview: 'cluster-providers/index.md'
     - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
 markdown_extensions:
   - def_list

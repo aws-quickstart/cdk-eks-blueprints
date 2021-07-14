@@ -55,7 +55,7 @@ When configured, App Mesh will automatically inject an XRay sidecar to handle tr
 
 ## App Mesh and XRay Integration Example
 
-`team-burnham` sample workload repository is configured with an [example workload](https://github.com/shapirov103/argo-apps/tree/master/teams/team-burnham/dev) that demonstrates meshified workloads with SSP. 
+`team-burnham` sample workload repository is configured with an [example workload](https://github.com/aws-samples/ssp-eks-workloads/tree/master/teams/team-burnham/dev) that demonstrates meshified workloads with SSP. 
 
 After workload is bootstrapped with ArgoCD or applied directly to the cluster in `team-burnham` namespace it will create a [DJ application](https://github.com/aws/aws-app-mesh-examples/tree/main/examples/apps/djapp) similar to the one used for the [EKS Workshop](https://www.eksworkshop.com/intermediate/330_app_mesh/). 
 It was adapted for GitOps integration with SSP and relies on automatic sidecar injection as well as tracing integration with App Mesh.
