@@ -28,6 +28,9 @@ synth:
 mkdocs:
 	mkdocs serve 
 
+push-mkdocs:
+	mkdocs gh-deploy
+
 bootstrap:
 	@for LIB in $(HOMEBREW_LIBS) ; do \
 		LIB=$$LIB make check-lib ; \

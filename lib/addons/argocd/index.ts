@@ -21,6 +21,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
     postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void {
         //TODO: implement this method
-        console.log("postDeploy for ArgoCD AddOn!", clusterInfo, teams);
+        console.assert(clusterInfo !== null && teams !== null);
     }
 }
