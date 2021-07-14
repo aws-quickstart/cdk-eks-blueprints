@@ -109,7 +109,7 @@ export class EC2ClusterProvider implements ClusterProvider {
         const desiredSize = this.options.desiredSize ?? valueFromContext(scope, DESIRED_SIZE_KEY, minSize);
         const privateCluster = this.options.privateCluster ?? valueFromContext(scope, PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? EndpointAccess.PRIVATE : EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = (privateCluster === true)? [{ subnetType: SubnetType.PRIVATE }] : this.options.vpcSubnets;
+        const vpcSubnets = (privateCluster === true) ? [{ subnetType: SubnetType.PRIVATE }] : this.options.vpcSubnets;
 
         // Create an EKS Cluster
         const cluster = new Cluster(scope, id, {
