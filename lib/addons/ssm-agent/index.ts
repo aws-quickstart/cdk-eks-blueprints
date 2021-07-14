@@ -30,7 +30,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
                     spec: {
                         containers: [
                             {
-                                image: "public.ecr.aws/y9z4e3w0/eks-ssp-test/addon-ssm-agent",
+                                image: "public.ecr.aws/y9z4e3w0/eks-ssp-test/addon-ssm-agent:3.0.1390.0",
                                 imagePullPolicy: "Always",
                                 name: "ssm",
                                 securityContext: {
