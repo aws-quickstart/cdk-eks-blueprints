@@ -16,6 +16,6 @@ The framework currently supports the following add-ons.
 | [`CalicoAddOn`](./calico) | Adds the Calico 1.7.1 CNI/Network policy engine |
 | [`ContainerInsightsAddOn`](./container-insights) | Adds Container Insights support integrating monitoring with CloudWatch |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
-| `MetricsServerAddOn`| Adds metrics server (pre-req for HPA and other monitoring tools)|
+| [`MetricsServerAddOn`](./metrics-server.md) | Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddOn` | Adds NGINX ingress controller |
 | `XrayAddOn` | (./xray) Adds XRay Daemon to the EKS Cluster |
