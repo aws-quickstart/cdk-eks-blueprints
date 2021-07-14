@@ -18,5 +18,5 @@ The framework currently supports the following add-ons.
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler) | Adds the standard cluster autoscaler ([Karpenter](https://github.com/awslabs/karpenter) is coming)|
 | [`MetricsServerAddOn`](./metrics-server.md) | Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddOn` | Adds NGINX ingress controller |
-| [`XrayAddOn`](./xray) | Adds XRay Daemon to the EKS Cluster |
+| [`XrayAddOn`](./xray.md) | Adds XRay Daemon to the EKS Cluster |
 | [`SSMAgentAddOn`](./ssm-agent.md) | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes | 
