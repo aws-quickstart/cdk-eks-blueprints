@@ -119,7 +119,7 @@ token:      XXXXXXXXXXXXXXXXXXXXXX
 Start the kubectl proxy.
 
 ```sh
-kubectl proxy
+$ kubectl proxy
 ```
 
 Open the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login) in your browser and login using the value for `token` above.
