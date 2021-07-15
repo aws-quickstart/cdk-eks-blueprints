@@ -18,7 +18,7 @@ export interface SecretsStoreAddOnProps {
   readonly version?: string;
 
   /**
-   * Rotation Poll Interval, e.g. '120s'. 
+   * Rotation Poll Interval, e.g. '120s'.
    * If provided, sets auto rotation to true and sets the polling interval.
    */
   readonly rotationPollInterval?: string;
@@ -26,13 +26,13 @@ export interface SecretsStoreAddOnProps {
   /**
    * List of provider-specific configuration
    */
-  providerConfig?: ProviderConfig[];
+  secretsProviderConfigs?: SecretsProviderConfig[];
 }
 
 /**
  * Group provider configuration together.
  */
-interface ProviderConfig {
+interface SecretsProviderConfig {
   /**
    * Team Namespace. E.g. 'team-Riker'
    */

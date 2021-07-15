@@ -14,7 +14,7 @@ import { SecretsStoreAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-ek
 
 const secretsStoreAddOn = new SecretsStoreAddOn({
   rotationPollInterval: '120s',
-  providerConfig: [
+  secretsProviderConfigs: [
     {
       namespace: 'team-riker',
       secrets: [
@@ -30,7 +30,7 @@ const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: { 
+  env: {
       account: <AWS_ACCOUNT_ID>,
       region: <AWS_REGION>,
   },
