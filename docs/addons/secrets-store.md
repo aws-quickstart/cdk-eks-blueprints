@@ -10,7 +10,7 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 
 #### **`index.ts`**
 ```typescript
-import { SecretsStoreAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { SecretsStoreAddOn, SecretType, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
 const secretsStoreAddOn = new SecretsStoreAddOn({
   rotationPollInterval: '120s',
