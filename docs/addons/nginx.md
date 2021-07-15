@@ -17,7 +17,7 @@ const nginxAddOn = new NginxAddOn(({
     backendProtocol: "tcp", 
     externaDnsHostname: subdomain, 
     crossZoneEnabled: false 
-    }));
+}));
 
 const addOns: Array<ClusterAddOn> = [ nginxAddOn ];
 

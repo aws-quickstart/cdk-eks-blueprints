@@ -52,7 +52,7 @@ export class ImportHostedZoneProvider  implements HostedZoneProvider {
     constructor(private hostedZoneId: string, private id?: string) { }
 
     provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        return [HostedZone.fromHostedZoneId(clusterInfo.cluster.stack, this.id ??  `${this.hostedZoneId}-Import`, 'ZOJJZC49E0EPZ')];
+        return [HostedZone.fromHostedZoneId(clusterInfo.cluster.stack, this.id ??  `${this.hostedZoneId}-Import`, this.hostedZoneId)];
     }
 }
 
