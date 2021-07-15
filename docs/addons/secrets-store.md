@@ -20,7 +20,7 @@ const secretsStoreAddOn = new SecretsStoreAddOn({
       secrets: [
         {
           secretName: 'mysecret',
-          secretType: ssp.SecretType.SECRETSMANAGER
+          secretType: SecretType.SECRETSMANAGER
         }
       ]
     }
