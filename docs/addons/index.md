@@ -19,3 +19,4 @@ The framework currently supports the following add-ons.
 | [`MetricsServerAddOn`](./metrics-server.md) | Adds metrics server (pre-req for HPA and other monitoring tools)|
 | `NginxAddOn` | Adds NGINX ingress controller |
 | `XrayAddOn` | (./xray) Adds XRay Daemon to the EKS Cluster |
+| [`SecretsStoreAddOn`](./secrets-store.md) |  Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster |
