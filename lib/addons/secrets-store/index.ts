@@ -26,7 +26,7 @@ export interface SecretsStoreAddOnProps {
   /**
    * List of provider-specific configuration
    */
-  secretsProviderConfigs?: SecretsProviderConfig[];
+  readonly secretsProviderConfigs?: SecretsProviderConfig[];
 }
 
 /**
