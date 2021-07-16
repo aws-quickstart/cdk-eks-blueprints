@@ -13,10 +13,7 @@ import { NginxAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-bluep
 
 const subdomain  = ...;
 const nginxAddOn = new NginxAddOn(({ 
-    internetFacing: true, 
-    backendProtocol: "tcp", 
-    externaDnsHostname: subdomain, 
-    crossZoneEnabled: false 
+    externaDnsHostname: subdomain
 }));
 
 const addOns: Array<ClusterAddOn> = [ nginxAddOn ];
@@ -38,22 +35,17 @@ NAME                                                              READY   STATUS
 ssp-addon-nginx-ingress-78b8567p4q6   1/1     Running   0          4d10h
 ```
 
-Note that the ingress is deployed in the `kube-system` namespace.
+Note that the ingress controller is deployed in the `kube-system` namespace.
 
 Once deployed, it allows applications to create ingress objects and use host based routing with external DNS support, if External DNS Add-on is installed.
 
 ## Configuration
 
  - `backendProtocol`: indication for AWS Load Balancer controller with respect to the protocol supported on the load balancer. TCP by default.
-
  - `crossZoneEnabled`: whether to create a cross-zone load balancer with the service that backs NGINX.
-
  - `internetFacing`: whether the created load balancer is internet facing. Defaults to `true` if not specified. Internal load balancer is provisioned if set to `false`
-
  -  `targetType`: `IP` or `instance` mode. Defaults to `IP` which requires VPC-CNI and has better performance eliminating a hop through kubeproxy. Instance mode leverages traditional NodePort mode on the instances. 
- 
- - `externaDnsHostname`: Used in conjunction with the external DNS add-on to handle automatic registration of the service with Route53. 
-
+ - `externaDnsHostname`: Used in conjunction with the [external DNS add-on](./external-dns.md) to handle automatic registration of the service with Route53. 
  - `values`: Arbitrary values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
 
 ## DNS Integration and Routing

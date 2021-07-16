@@ -1,8 +1,8 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
-import { Effect, PolicyStatement, Role } from '@aws-cdk/aws-iam';
-import { IHostedZone, HostedZone, PublicHostedZone, CrossAccountZoneDelegationRecord, CnameRecord} from '@aws-cdk/aws-route53';
+import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Constants } from '..';
 import { ClusterAddOn, ClusterInfo } from '../../stacks/cluster-types';
+import { HostedZoneProvider } from './hosted-provider';
 
 
 /**
@@ -20,89 +20,12 @@ export interface ExternalDnsProps {
      */
     readonly version?: string;
 
+    /**
+     * Hosted zone provider (@see HostedZoneProvider) that can provide one or more hosted zones for external DNS.
+     */
     readonly hostedZone: HostedZoneProvider;
 }
 
-
-export interface HostedZoneProvider {
-    provide(clusterInfo: ClusterInfo): IHostedZone[];
-}
-
-/**
- * Simple lookup host zone provider
- */
-export class LookupHostedZoneProvider implements HostedZoneProvider {
-
-    /**
-     * @param hostedZoneName name of the host zone to lookup
-     * @param id  optional id for the structure (for tracking). set to hostzonename by default
-     */
-    constructor(private hostedZoneName: string, private id?: string) { }
-
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        return [HostedZone.fromLookup(clusterInfo.cluster.stack, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName })];
-    }
-}
-/**
- * Direct import hosted zone provider, based on a known hosted zone ID. 
- * Recommended method if hosted zone id is known, as it avoids extra look-ups.
- */
-export class ImportHostedZoneProvider  implements HostedZoneProvider {
-
-    constructor(private hostedZoneId: string, private id?: string) { }
-
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        return [HostedZone.fromHostedZoneId(clusterInfo.cluster.stack, this.id ??  `${this.hostedZoneId}-Import`, this.hostedZoneId)];
-    }
-}
-
-export class DelegatingHostedZoneProvider implements HostedZoneProvider {
-    constructor(private parentDomain: string,
-        private subdomain: string,
-        private parentDnsAccountId: string,
-        private delegatingRoleName: string,
-        private wildcardSubdomain? : boolean) { }
-
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        const stack = clusterInfo.cluster.stack;
-
-        const subZone = new PublicHostedZone(stack, `${this.subdomain}-SubZone`, {
-            zoneName: this.subdomain
-        });
-        
-        if (this.wildcardSubdomain) {
-            new CnameRecord(stack, `${this.subdomain}-cname`, {
-                zone: subZone,
-                domainName: `${this.subdomain}`,
-                recordName: `*.${this.subdomain}`
-            });
-        }
-
-        // 
-        // import the delegation role by constructing the roleArn.
-        // Assuming the parent account has the delegating role with 
-        // trust relationship setup to the child account.
-        //
-        const delegationRoleArn = stack.formatArn({
-            region: '', // IAM is global in each partition
-            service: 'iam',
-            account: this.parentDnsAccountId,
-            resource: 'role',
-            resourceName: this.delegatingRoleName
-        });
-
-        const delegationRole = Role.fromRoleArn(stack, 'DelegationRole', delegationRoleArn);
-
-        // create the record
-        new CrossAccountZoneDelegationRecord(stack, `${this.subdomain}-delegate`, {
-            delegatedZone: subZone,
-            parentHostedZoneName: this.parentDomain, // or you can use parentHostedZoneId
-            delegationRole,
-        });
-
-        return [subZone];
-    }
-}
 
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.

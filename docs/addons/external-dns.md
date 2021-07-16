@@ -10,13 +10,7 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
 readonly externalDns = new ssp.addons.ExternalDnsAddon({
-    hostedZone: new ssp.addons.DelegatingHostedZoneProvider(
-        parentDomain,
-        subdomain, 
-        parentDnsAccountId,
-        'DomainOperatorRole', 
-        true
-    )
+    hostedZone: new ssp.addons.LookupHostedZoneProvider(myHostedZoneName)
 });
 
 const addOns: Array<ClusterAddOn> = [ externalDns ];
@@ -66,7 +60,7 @@ Note the `external-dns.alpha.kubernetes.io/hostname` annotation for the service 
 
 In order for external DNS to work, you need to supply one or more hosted zones. You need a reference to the EKS stack in order to either create or look up the hosted zones. 
 
-To help customers handle common use cases for Route 53 provisioning the platform provides a few convenience providers. 
+To help customers handle common use cases for Route 53 provisioning the framework provides a few convenience providers. 
 
 **Name look-up and direct import provider:**
 This provider will allow to bind to an existing hosted zone based on its name.
@@ -115,13 +109,13 @@ The setup will look the following way:
 ```typescript
 const useWildcardDomain = true
 readonly externalDns = new ssp.addons.ExternalDnsAddon({
-    hostedZone: new ssp.addons.DelegatingHostedZoneProvider(
-        'myglobal-domain.com',
-        'dev.myglobal-domain.com', 
-        parentAccountId,
-        'DomainOperatorRole', 
-        useWildcardDomain
-    )
+    hostedZone: new ssp.addons.DelegatingHostedZoneProvider({
+        parentDomain: 'myglobal-domain.com',
+        subdomain: 'dev.myglobal-domain.com', 
+        parentAccountId: parentDnsAccountId,
+        delegatingRoleName: 'DomainOperatorRole', 
+        wildcardSubdomain: useWildcardDomain
+    })
 });
 ```
 
@@ -131,26 +125,9 @@ The parameter `useWildcardDomain` above when set to true will also create a CNAM
 
 ## Configuration Options
 
-See description below:
-
-```typescript
-    /**
-     * Target namespace where add-on will be installed. Changing this value on the operating cluster is not recommended. 
-     * @default `external-dns`
-     */
-    readonly namespace?: string;
-
-    /**
-     * The add-on is leveraging a Bitnami helm chart. This parameter allows overriding the helm chart version used.
-     * @default `5.1.3`
-     */
-    readonly version?: string;
-
-   /**
-    * Hosted zone provider is a function that returns one or more hosted zone that the add-on will leverage for the service and ingress configuration.
-    */ 
-    readonly hostedZone: HostedZoneProvider;
-```
+   - `namespace`: Optional target namespace where add-on will be installed. Changing this value on the operating cluster is not recommended. Set to `external-dns` by default.
+   - `version`: The add-on is leveraging a Bitnami helm chart. This parameter allows overriding the helm chart version used.
+   - `hostedZone`: Hosted zone provider is a interface that provides one or more hosted zones that the add-on will leverage for the service and ingress configuration.
 
 ## Functionality
 
