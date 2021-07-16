@@ -36,6 +36,8 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 
 To validate that SSM Agent is running on worker node instance:
 
+> **Pre-Requisite**: Install the Session Manager plugin for the AWS CLI as per [instructions](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) for your OS.
+
 1. Get the EC2 Instance Id of a worker node
 
 ```bash
@@ -53,8 +55,6 @@ aws ssm start-session --target $instance_id
 If you are disabling public access for your EKS cluster endpoint such that the cluster endpoint is provisioned as private only i.e `endpointPublicAccess=false` and `endpointPrivateAccess=true`, then you can use one of the worker nodes as a TCP jump box to your EKS cluster api.
 
 To set up a TCP tunnel with your worker node as a jump box:
-
-> **Pre-Requisite**: Install the Session Manager plugin for the AWS CLI as per [instructions](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) for your OS.
 
 1. Use SSM `send-command` api to create a TCP tunnel to Cluster API using `socat`:
 
