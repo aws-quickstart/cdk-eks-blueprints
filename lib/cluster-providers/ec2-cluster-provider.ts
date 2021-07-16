@@ -39,11 +39,6 @@ const PRIVATE_CLUSTER = "eks.default.private-cluster";
 export interface EC2ProviderClusterProps extends CommonClusterOptions {
 
     /**
-     * Instance types used for the node group. Mulitple types makes sense if capacity type is SPOT.
-     */
-    instanceTypes?: InstanceType[]; // m5.large
-
-    /**
      * Min size of the node group
      */
     minSize?: number;
@@ -59,14 +54,14 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
     desiredSize?: number;
 
     /**
+     * Instance types used for the node group. Mulitple types makes sense if capacity type is SPOT.
+     */
+    instanceTypes?: InstanceType[]; // m5.large
+
+    /**
      * Choose AMI type for the managed node group.
      */
     amiType?: NodegroupAmiType.AL2_X86_64;
-
-    /**
-     * Subnets are passed to the cluster configuration.
-     */
-    vpcSubnets?: SubnetSelection[];
 
     /**
      * This property is used to upgrade node groups to the latest kubelet by upgrading node group AMI.
@@ -80,11 +75,16 @@ export interface EC2ProviderClusterProps extends CommonClusterOptions {
     nodeGroupCapacityType?: CapacityType;
 
     /**
+     * Subnets are passed to the cluster configuration.
+     */
+    vpcSubnets?: SubnetSelection[];
+
+    /**
      * Is it a private only EKS Cluster?
      * Defaults to private_and_public cluster, set to true for private cluster
      * @default false
      */
-     privateCluster?: boolean;
+    privateCluster?: boolean;
 }
 
 /**
@@ -117,7 +117,7 @@ export class EC2ClusterProvider implements ClusterProvider {
             clusterName: id,
             outputClusterName: true,
             defaultCapacity: 0, // we want to manage capacity ourselves
-            version: this.options.version,
+            version: version,
             vpcSubnets: vpcSubnets,
             endpointAccess: endpointAccess
         });
@@ -143,7 +143,7 @@ export class EC2ClusterProvider implements ClusterProvider {
  * @param source Used for error message to identify the source of the check
  * @returns 
  */
-export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string) : Nodegroup | AutoScalingGroup {
+export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): Nodegroup | AutoScalingGroup {
     console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, `${source} is supported with EKS EC2 only`);
     return clusterInfo.nodeGroup || clusterInfo.autoscalingGroup!;
 }
