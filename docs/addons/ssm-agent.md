@@ -54,6 +54,8 @@ If you are disabling public access for your EKS cluster endpoint such that the c
 
 To set up a TCP tunnel with your worker node as a jump box:
 
+> **Pre-Requisite**: Install the Session Manager plugin for the AWS CLI as per [instructions](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) for your OS.
+
 1. Use SSM `send-command` api to create a TCP tunnel to Cluster API using `socat`:
 
 ```bash
