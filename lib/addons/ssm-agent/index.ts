@@ -25,14 +25,31 @@ export class SSMAgentAddOn implements ClusterAddOn {
             },
             spec: {
                 selector: { matchLabels: appLabel },
+                updateStrategy: { type: "RollingUpdate" },
                 template: {
                     metadata: { labels: appLabel },
                     spec: {
                         containers: [
                             {
+                                name: "pause",
+                                image: "gcr.io/google_containers/pause",
+                                resources: {
+                                    limits: {
+                                        cpu: "100m",
+                                        memory: "128Mi",
+                                    },
+                                    requests: {
+                                        cpu: "100m",
+                                        memory: "128Mi",
+                                    },
+                                }
+                            }
+                        ],
+                        initContainers: [
+                            {
                                 image: "public.ecr.aws/y9z4e3w0/eks-ssp-test/addon-ssm-agent:3.0.1390.0",
                                 imagePullPolicy: "Always",
-                                name: "ssm",
+                                name: "ssm-install",
                                 securityContext: {
                                     allowPrivilegeEscalation: true
                                 },
@@ -45,11 +62,11 @@ export class SSMAgentAddOn implements ClusterAddOn {
                                 resources: {
                                     limits: {
                                         cpu: "100m",
-                                        memory: "300Mi",
+                                        memory: "256Mi",
                                     },
                                     requests: {
                                         cpu: "100m",
-                                        memory: "300Mi",
+                                        memory: "256Mi",
                                     },
                                 },
                                 terminationMessagePath: "/dev/termination.log",
