@@ -13,7 +13,7 @@ phases:
         [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
   build:
     commands:
-      - npm install aws-cdk@1.104.0 -g
+      - npm install aws-cdk@1.113.0 -g
       - npm install
       - cdk deploy --verbose --all --require-approval never
     finally:
