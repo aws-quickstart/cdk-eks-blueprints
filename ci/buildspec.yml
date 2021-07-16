@@ -1,0 +1,20 @@
+version: 0.2
+env:
+  variables:
+    CONTEXT_LOCATION:
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+  pre_build:
+    commands:
+      - >
+        [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
+  build:
+    commands:
+      - npm install aws-cdk@1.113.0 -g
+      - npm install
+      - cdk deploy --verbose --all --require-approval never
+    finally:
+      - cdk destroy --verbose --all --force
