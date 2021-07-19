@@ -72,10 +72,13 @@ export class EksBlueprint extends cdk.Stack {
         }
         
         if (blueprintProps.teams != null) {
-            blueprintProps.teams.forEach(team => team.setup(clusterInfo));
+            for(let team of blueprintProps.teams) {
+                team.setup(clusterInfo);
+            }
         }
-
-        postDeploymentSteps.forEach(step => step.postDeploy(clusterInfo, blueprintProps.teams ?? []));
+        for(let step of postDeploymentSteps) {
+            step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+        }
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {

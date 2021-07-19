@@ -1,6 +1,8 @@
+
 # Amazon EKS SSP Quick Start
 
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/quickstart-ssp-amazon-eks)
+![Build](https://codebuild.us-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiYVN6RlEyQmNNRVRxRWYxUkhBcStQcHFkTExZa2dtZXBWcDdqZ2lWNCtXVENOcWwzV0F0cklUOXlnVGtMZ1BzR0JLZUtHU2V3dUcwb0NOMmdxWGxKOFpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlEyWmdVeXlxMS9UOVk0QUMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
@@ -46,14 +48,14 @@ aws --version
 Install CDK matching the current version of the SSP QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@1.104.0
+npm install -g aws-cdk@1.113.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 1.104.0
+# must output 1.113.0
 ```
 
 Create a new CDK project. We use `typescript` for this example. 
