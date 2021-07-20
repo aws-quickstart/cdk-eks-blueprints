@@ -1,4 +1,6 @@
 import { HelmChart, KubernetesManifest } from "@aws-cdk/aws-eks";
+import { Secret } from "@aws-cdk/aws-secretsmanager";
+
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
 import { Team } from "../../teams";
 
@@ -19,16 +21,18 @@ export interface ArgoApplicationRepository {
     name?: string,
 
     /**
-     * Secret reference (partial arn) to pull the secret.
-     * 
+     * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
+     * The secret must exist in the same region and account where the stack will run. 
      */
-    credentialsArn: string,
+    credentialsSecretName?: string,
 
     /**
      * Depending on credentials type the arn should either point to an SSH key
-     * or a json 
+     * or a json file with username/password attributes.
+     * For TOKEN type per ArgoCD documentation (https://argoproj.github.io/argo-cd/user-guide/private-repositories/) 
+     * username can be any non-empty username and token value as password.
      */
-    credentialsType: "USERNAME" | "TOKEN" | "SSH"
+    credentialsType?: "USERNAME" | "TOKEN" | "SSH"
 
 }
 
@@ -53,7 +57,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     readonly options: ArgoCDAddOnProps;
     private chartNode: HelmChart;
 
-    constructor(props: ArgoCDAddOnProps) {
+    constructor(props?: ArgoCDAddOnProps) {
         this.options = { ...argoDefaults, ...props };
     }
 
@@ -68,12 +72,13 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     }
 
     postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void {
+        console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
         if(!appRepo) {
             return;
         }
-        if(appRepo.sshKeyArn) {
-            this.createSecretKey(appRepo, clusterInfo);
+        if(appRepo.credentialsSecretName) {
+            this.createSecretKey(clusterInfo, appRepo.credentialsSecretName);
         }
 
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
@@ -113,8 +118,21 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         manifest.node.addDependency(this.chartNode);
     }
 
-    createSecretKey(clusterInfo : ClusterInfo) {
-        const appRepo = this.options.bootstrapRepo;
+    createSecretKey(clusterInfo : ClusterInfo, secretName : string) {
+        const appRepo = this.options.bootstrapRepo!;
+        const secret  = Secret.fromSecretNameV2(clusterInfo.cluster.stack, "argo-imported-secret", secretName);
+        
+        let credentials = {}
+
+        switch(appRepo?.credentialsType) {
+            case "SSH":
+                credentials = { sshPrivateKey: secret.secretValue.toString() };
+                break;
+            case "USERNAME":
+            case "TOKEN": 
+                credentials = secret.secretValue.toJSON();
+                break;
+        }
 
         new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
             cluster: clusterInfo.cluster,
@@ -129,7 +147,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                   }
                 },
                 stringData: {
-                  url: appRepo.repoUrl
+                  url: appRepo.repoUrl,
+                  credentials
                 }
             }],
             overwrite: true,
