@@ -228,11 +228,11 @@ export class ApplicationTeam implements Team {
      * Sets up secrets
      * @param clusterInfo
      */
-     protected setupSecrets(clusterInfo: ClusterInfo) {
-        /**
-         * TODO: Setup IAM, ASCP CRD
-         */
-     }
+    protected setupSecrets(clusterInfo: ClusterInfo) {
+    /**
+     * TODO: Setup IAM, ASCP CRD
+     */
+    }
 
 }
 
