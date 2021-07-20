@@ -60,7 +60,7 @@ export class TeamProps {
     /**
      * List of Secrets to setup and retrive
      */
-    readonly secrets: Secret[];
+    //readonly secrets: Secret[];
 }
 
 export class ApplicationTeam implements Team {
@@ -78,7 +78,7 @@ export class ApplicationTeam implements Team {
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             userRole: teamProps.userRole,
-            secrets: teamProps.secrets
+            //secrets: teamProps.secrets
         }
     }
 
