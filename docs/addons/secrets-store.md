@@ -1,6 +1,6 @@
 # Secrets Store Add-on
 
-The Secrets Store Add-on provisions the [AWS Secrets Manager and Config Provider for Secret Store CSI Driver(ASCP)](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
+The Secrets Store Add-on provisions the [AWS Secrets Manager and Config Provider(ASCP) for Secret Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
 
 With ASCP, you can securely store and manage your secrets in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager) or [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and retrieve them through your application workloads running on Kubernetes. You no longer have to write custom code for your applications.
 
@@ -10,26 +10,38 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 
 #### **`index.ts`**
 ```typescript
-import { SecretsStoreAddOn, SecretType, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import * as cdk from '@aws-cdk/core';
+import {
+  SecretsStoreAddOn,
+  SecretType,
+  ClusterAddOn,
+  EksBlueprint,
+  ApplicationTeam
+} from '@shapirov/cdk-eks-blueprint';
 
 const secretsStoreAddOn = new SecretsStoreAddOn({
-  rotationPollInterval: '120s',
-  secretsProviderConfigs: [
-    {
-      namespace: 'team-riker',
+  rotationPollInterval: '120s'
+});
+const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
+
+// Setup application team with secrets
+class TeamBurnham extends ApplicationTeam {
+  constructor(scope: Construct) {
+    super({
+      name: "burnham",
       secrets: [
         {
           secretName: 'mysecret',
           secretType: SecretType.SECRETSMANAGER
         }
       ]
-    }
-  ]
-});
-const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
+    });
+  }
+}
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
+const teams: Array<ApplicationTeam> = [ new TeamBurnham(app) ];
+new EksBlueprint(app, 'my-stack-name', addOns, teams, {
   env: {
       account: <AWS_ACCOUNT_ID>,
       region: <AWS_REGION>,

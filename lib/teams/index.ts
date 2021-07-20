@@ -3,6 +3,7 @@ import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
+import { Secret } from '../addons/secrets-store';
 
 /**
  * Interface for a team. 
@@ -55,6 +56,11 @@ export class TeamProps {
      * If userRole and users are not provided, then no IAM setup is performed. 
      */
     readonly userRole?: iam.IRole;
+
+    /**
+     * List of Secrets to setup and retrive
+     */
+    readonly secrets: Secret[];
 }
 
 export class ApplicationTeam implements Team {
@@ -71,13 +77,15 @@ export class ApplicationTeam implements Team {
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
-            userRole: teamProps.userRole
+            userRole: teamProps.userRole,
+            secrets: teamProps.secrets
         }
     }
 
     public setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAccess(clusterInfo);
         this.setupNamespace(clusterInfo);
+        this.setupSecrets(clusterInfo);
     }
 
     protected defaultSetupAccess(clusterInfo: ClusterInfo) {
@@ -215,6 +223,17 @@ export class ApplicationTeam implements Team {
             }
         });
     }
+
+    /**
+     * Sets up secrets
+     * @param clusterInfo
+     */
+     protected setupSecrets(clusterInfo: ClusterInfo) {
+        /**
+         * TODO: Setup IAM, ASCP CRD
+         */
+     }
+
 }
 
 /**
@@ -225,7 +244,7 @@ export class PlatformTeam extends ApplicationTeam {
 
     /**
      * Override
-     * @param clusterInfo 
+     * @param clusterInfo
      */
     setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAdminAccess(clusterInfo);
