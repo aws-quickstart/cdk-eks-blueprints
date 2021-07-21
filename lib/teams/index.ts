@@ -60,7 +60,7 @@ export class TeamProps {
     /**
      * List of Secrets to setup and retrive
      */
-    //readonly secrets: Secret[];
+    readonly secrets: Secret[];
 }
 
 export class ApplicationTeam implements Team {
@@ -78,7 +78,7 @@ export class ApplicationTeam implements Team {
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             userRole: teamProps.userRole,
-            //secrets: teamProps.secrets
+            secrets: teamProps.secrets
         }
     }
 
@@ -166,7 +166,7 @@ export class ApplicationTeam implements Team {
     }
 
     /**
-     * Creates nmaespace and sets up policies.
+     * Creates namespace and sets up policies.
      * @param clusterInfo 
      */
     protected setupNamespace(clusterInfo: ClusterInfo) {
@@ -229,9 +229,26 @@ export class ApplicationTeam implements Team {
      * @param clusterInfo
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
-    /**
-     * TODO: Setup IAM, ASCP CRD
-     */
+        const secrets = this.teamProps.secrets;
+        if (Array.isArray(secrets) && secrets.length) {
+            const cluster = clusterInfo.cluster;
+            const secretProviderClass = this.teamProps.name + '-aws-secrets';
+            const serviceAccount = this.teamProps.name + '-sa'; 
+            const secretObjects = undefined;
+            cluster.addManifest(secretProviderClass, {
+                apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
+                kind: 'SecretProviderClass',
+                metadata: {
+                    name: secretProviderClass
+                },
+                spec: {
+                    provider: 'aws',
+                    parameters: {
+                        objects: secretObjects
+                    }
+                }
+            });
+        }
     }
 
 }
