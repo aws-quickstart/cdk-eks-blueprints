@@ -1,5 +1,6 @@
 import { HelmChart, KubernetesManifest } from "@aws-cdk/aws-eks";
 import { Secret } from "@aws-cdk/aws-secretsmanager";
+import { SecretValue } from "@aws-cdk/core";
 
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
 import { Team } from "../../teams";
@@ -122,15 +123,15 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         const appRepo = this.options.bootstrapRepo!;
         const secret  = Secret.fromSecretNameV2(clusterInfo.cluster.stack, "argo-imported-secret", secretName);
         
-        let credentials = {}
+        let credentials = { url: appRepo.repoUrl };
 
         switch(appRepo?.credentialsType) {
             case "SSH":
-                credentials = { sshPrivateKey: secret.secretValue.toString() };
+                credentials = {...credentials, ...{ sshPrivateKey: secret.secretValue.toString()}};
                 break;
             case "USERNAME":
             case "TOKEN": 
-                credentials = secret.secretValue.toJSON();
+                credentials = {...credentials, ...secret.secretValue.toJSON()};
                 break;
         }
 
@@ -146,13 +147,11 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                     "argocd.argoproj.io/secret-type": "repository"
                   }
                 },
-                stringData: {
-                  url: appRepo.repoUrl,
-                  credentials
-                }
+                stringData: credentials,
             }],
             overwrite: true,
-            prune: true
+            prune: true, 
+            skipValidation: true
         });
         manifest.node.addDependency(this.chartNode);
     }
