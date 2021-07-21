@@ -50,7 +50,7 @@ export interface ArgoCDAddOnProps {
 }
 
 const argoDefaults: ArgoCDAddOnProps = {
-    namespace: "arogcd"
+    namespace: "argocd"
 }
 export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
@@ -134,7 +134,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 break;
         }
 
-        new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
+        const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
             cluster: clusterInfo.cluster,
             manifest: [{
                 apiVersion: "v1",
@@ -153,6 +153,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             }],
             overwrite: true,
             prune: true
-        })
+        });
+        manifest.node.addDependency(this.chartNode);
     }
 }
