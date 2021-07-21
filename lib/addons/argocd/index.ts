@@ -50,7 +50,7 @@ export interface ArgoCDAddOnProps {
 }
 
 const argoDefaults: ArgoCDAddOnProps = {
-    namespace: "arogcd"
+    namespace: "argocd"
 }
 export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
@@ -126,8 +126,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
         switch(appRepo?.credentialsType) {
             case "SSH":
-                credentials = { sshPrivateKey: secret.secretValue.toString() };
-                break;
             case "USERNAME":
             case "TOKEN": 
                 credentials = secret.secretValue.toJSON();
@@ -152,7 +150,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }],
             overwrite: true,
-            prune: true
+            prune: true,
+            skipValidation: true   
         })
     }
 }
