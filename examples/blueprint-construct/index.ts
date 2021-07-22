@@ -36,7 +36,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.MetricsServerAddOn,
             new ssp.addons.ClusterAutoScalerAddOn,
             new ssp.addons.ContainerInsightsAddOn,
-            new ssp.addons.AwsLoadBalancerControllerAddOn()
+            new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            new ssp.addons.SSMAgentAddOn()
         ];
         const region = 'us-west-2'
         const clusterProps: ssp.EC2ProviderClusterProps = {
@@ -55,5 +56,3 @@ export default class BlueprintConstruct extends cdk.Construct {
         new ssp.EksBlueprint(scope, blueprintProps, props)
     }
 }
-
-
