@@ -1,6 +1,5 @@
 import { HelmChart, KubernetesManifest } from "@aws-cdk/aws-eks";
-import { Secret } from "@aws-cdk/aws-secretsmanager";
-import { SecretValue } from "@aws-cdk/core";
+import { SecretsManager } from "aws-sdk";
 
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
 import { Team } from "../../teams";
@@ -28,7 +27,7 @@ export interface ArgoApplicationRepository {
     credentialsSecretName?: string,
 
     /**
-     * Depending on credentials type the arn should either point to an SSH key
+     * Depending on credentials type the arn should either point to an SSH key (plain text value)
      * or a json file with username/password attributes.
      * For TOKEN type per ArgoCD documentation (https://argoproj.github.io/argo-cd/user-guide/private-repositories/) 
      * username can be any non-empty username and token value as password.
@@ -67,7 +66,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             chart: "argo-cd",
             release: "ssp-addon",
             repository: "https://argoproj.github.io/argo-helm",
-            version: '3.2.3',
+            version: '3.10.0',
             namespace: this.options.namespace
         });
     }
@@ -119,19 +118,20 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         manifest.node.addDependency(this.chartNode);
     }
 
-    createSecretKey(clusterInfo : ClusterInfo, secretName : string) {
+    async createSecretKey(clusterInfo : ClusterInfo, secretName : string) {
+
         const appRepo = this.options.bootstrapRepo!;
-        const secret  = Secret.fromSecretNameV2(clusterInfo.cluster.stack, "argo-imported-secret", secretName);
-        
         let credentials = { url: appRepo.repoUrl };
+
+        const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
 
         switch(appRepo?.credentialsType) {
             case "SSH":
-                credentials = {...credentials, ...{ sshPrivateKey: secret.secretValue.toString()}};
+                credentials = {...credentials, ...{ sshPrivateKey: secretValue }};
                 break;
             case "USERNAME":
             case "TOKEN": 
-                credentials = {...credentials, ...secret.secretValue.toJSON()};
+                credentials = {...credentials, ...JSON.parse(secretValue)};
                 break;
         }
 
@@ -154,5 +154,25 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             skipValidation: true
         });
         manifest.node.addDependency(this.chartNode);
+    }
+
+    async getSecretValue(secretName: string, region: string): Promise<string> {
+        const secretManager = new SecretsManager({ region: region });
+        let secretString = "";
+        try {
+            let response = await secretManager.getSecretValue({ SecretId: secretName }).promise();
+            if (response) {
+                if (response.SecretString) {
+                    secretString = response.SecretString;
+                } else if (response.SecretBinary) {
+                    throw new Error(`Invalid secret format for ${secretName}. Expected string value, received binary.`);
+                }
+            }
+            return secretString;
+        } 
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
     }
 }

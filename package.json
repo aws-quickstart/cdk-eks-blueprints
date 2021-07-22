@@ -41,6 +41,7 @@
         "@aws-cdk/aws-secretsmanager": "1.113.0",
         "@aws-cdk/core": "1.113.0",
         "@aws-cdk/pipelines": "1.113.0",
+        "aws-sdk": "^2.952.0",
         "js-yaml": "3.13.1",
         "sync-request": "6.1.0",
         "user": "^0.0.0"
