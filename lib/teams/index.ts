@@ -3,6 +3,7 @@ import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
+import { readYamlFromDir } from '../utils/yaml-utils'; 
 
 /**
  * Interface for a team. 
@@ -55,6 +56,11 @@ export class TeamProps {
      * If userRole and users are not provided, then no IAM setup is performed. 
      */
     readonly userRole?: iam.IRole;
+
+    /**
+     * Optional, directory where network policy files are stored
+     */
+    readonly networkPoliciesDir?: string;
 }
 
 export class ApplicationTeam implements Team {
@@ -71,7 +77,8 @@ export class ApplicationTeam implements Team {
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
-            userRole: teamProps.userRole
+            userRole: teamProps.userRole,
+            networkPoliciesDir: teamProps.networkPoliciesDir
         }
     }
 
@@ -102,8 +109,13 @@ export class ApplicationTeam implements Team {
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.users ?? [];
         const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRole);
+        const networkPoliciesDir = this.teamProps.networkPoliciesDir;
 
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" })
+
+        if (networkPoliciesDir){
+            readYamlFromDir(networkPoliciesDir, clusterInfo.cluster)
+        }
 
         if (adminRole) {
             awsAuth.addMastersRole(adminRole);

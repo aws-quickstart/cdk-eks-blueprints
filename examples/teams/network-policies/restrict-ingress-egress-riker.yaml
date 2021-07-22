@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-egress-only
-  namespace: team-burnham
+  name: restrict-ingress-egress-riker
+  namespace: team-riker
 spec:
   podSelector: {}
   policyTypes:
@@ -12,17 +12,17 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: team-riker
-    - podSelector:
-        matchLabels:
-          app: guestbook-ui
+          name: team-troi
     ports:
     - protocol: TCP
       port: 80
   egress:
   - to:
-    - ipBlock:
-        cidr: 10.0.0.0/24
+    - namespaceSelector:
+        matchLabels:
+          name: team-burnham
     ports:
     - protocol: TCP
-      port: 5978
+      port: 53
+    - protocol: UDP
+      port: 53
