@@ -1,9 +1,10 @@
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk from "@aws-cdk/core";
+import * as iam from "@aws-cdk/aws-iam";
 import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { Secret } from '../addons/secrets-store';
+import { Secret, SecretType } from "../addons/secrets-store";
 
 /**
  * Interface for a team. 
@@ -60,7 +61,7 @@ export class TeamProps {
     /**
      * List of Secrets to setup and retrive
      */
-    readonly secrets: Secret[];
+    readonly secrets?: Secret[];
 }
 
 export class ApplicationTeam implements Team {
@@ -233,8 +234,53 @@ export class ApplicationTeam implements Team {
         if (Array.isArray(secrets) && secrets.length) {
             const cluster = clusterInfo.cluster;
             const secretProviderClass = this.teamProps.name + '-aws-secrets';
-            const serviceAccount = this.teamProps.name + '-sa'; 
-            const secretObjects = undefined;
+            type secretObject = {
+                objectName: string;
+                objectType: SecretType;
+                region?: string;
+            }
+            let objects: secretObject[] = [];
+
+            const serviceAccount = cluster.addServiceAccount(this.teamProps.name + '-sa', {
+                name: this.teamProps.name + '-sa',
+                namespace: this.teamProps.namespace
+            });
+
+            secrets.forEach( (secret) => {
+                const objectName = secret.secretName;
+                const objectType = secret.secretType;
+                const region = secret.secretRegion ? secret.secretRegion : cdk.Aws.REGION;
+                const accountId = secret.secretAccountId ? secret.secretAccountId : cdk.Aws.ACCOUNT_ID;
+
+                objects.push({
+                    objectName,
+                    objectType,
+                    region,
+                });
+
+                let policyStatement: iam.PolicyStatement;
+
+                if (secret.secretType === SecretType.SECRETSMANAGER) {
+                    policyStatement = new iam.PolicyStatement({
+                        actions: [
+                            'secretsmanager:GetSecretValue',
+                            'secretsmanager:DescribeSecret'
+                        ],
+                        resources: [`arn:${cdk.Aws.PARTITION}:secretsmanager:${region}:${accountId}:secret:${secret.secretName}-??????`]
+                    });
+                }
+                else {
+                    policyStatement = new iam.PolicyStatement({
+                        actions: [
+                            'ssm:GetParameters'
+                        ],
+                        resources: [`arn:${cdk.Aws.PARTITION}:ssm:${region}:${accountId}:parameter/${secret.secretName}`]
+                    });
+                }
+
+                serviceAccount.addToPrincipalPolicy(policyStatement);
+            });
+
             cluster.addManifest(secretProviderClass, {
                 apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
                 kind: 'SecretProviderClass',
@@ -244,13 +290,12 @@ export class ApplicationTeam implements Team {
                 spec: {
                     provider: 'aws',
                     parameters: {
-                        objects: secretObjects
+                        objects: objects.toString(),
                     }
                 }
             });
         }
     }
-
 }
 
 /**

@@ -1,3 +1,4 @@
+import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import * as cdk from "@aws-cdk/core";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 import { loadExternalYaml } from "../../utils/yaml-utils";
@@ -5,7 +6,7 @@ import { loadExternalYaml } from "../../utils/yaml-utils";
 /**
  * Configuration options for Secrets Store AddOn
  */
-export interface SecretsStoreAddOnProps {
+export interface SecretsStoreAddOnProps extends cdk.ResourceProps {
   /**
    * Namespace where Secrets Store CSI driver will be installed
    * @default 'kube-system'
@@ -23,6 +24,7 @@ export interface SecretsStoreAddOnProps {
    */
   readonly rotationPollInterval?: string;
 }
+
 export interface Secret {
   /**
    * Specify the name of the secret or parameter.
@@ -63,9 +65,10 @@ const SECRETS_STORE_CSI_DRIVER = 'secrets-store-csi-driver';
 export class SecretsStoreAddOn implements ClusterAddOn {
 
   private options: SecretsStoreAddOnProps;
+  public secretsProvider: KubernetesManifest;
 
   constructor(props?: SecretsStoreAddOnProps) {
-      this.options = { ...SecretsStoreAddOnDefaults, ...props };
+    this.options = { ...SecretsStoreAddOnDefaults, ...props };
   }
 
   deploy(clusterInfo: ClusterInfo): void {
@@ -73,12 +76,12 @@ export class SecretsStoreAddOn implements ClusterAddOn {
 
     const values = new Map([
       ['linux.image.tag', this.options.version]
-    ])
+    ]);
 
     // TODO: Fix me, something is not working
     if (this.options.rotationPollInterval) {
       values.set('enableSecretRotation', 'true');
-      values.set('rotationPollInterval', this.options.rotationPollInterval)
+      values.set('rotationPollInterval', this.options.rotationPollInterval);
     }
 
     cluster.addHelmChart('SecretsStoreCSIDriver', {
@@ -94,6 +97,6 @@ export class SecretsStoreAddOn implements ClusterAddOn {
 
     const manifestUrl = `https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml`;
     const manifest = loadExternalYaml(manifestUrl);
-    clusterInfo.cluster.addManifest('SecretsStoreCsiDriverProviderAws', ...manifest);
+    this.secretsProvider = clusterInfo.cluster.addManifest('SecretsStoreCsiDriverProviderAws', ...manifest);
   }
 }

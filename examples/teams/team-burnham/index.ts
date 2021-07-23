@@ -1,6 +1,6 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Construct } from '@aws-cdk/core';
-
+import { SecretType } from '../../../lib/addons/secrets-store';
 import { ApplicationTeam } from '../../../lib/teams';
 
 function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
@@ -15,7 +15,13 @@ export class TeamBurnham extends ApplicationTeam {
     constructor(scope: Construct) {
         super({
             name: "burnham",
-            users: getUserArns(scope, "team-burnham.users")
+            users: getUserArns(scope, "team-burnham.users"),
+            secrets: [
+                {
+                    secretName: 'GITHUB_TOKEN',
+                    secretType: SecretType.SECRETSMANAGER,
+                }
+            ],
         });
     }
 }

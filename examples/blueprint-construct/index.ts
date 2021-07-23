@@ -11,26 +11,26 @@ export default class BlueprintConstruct extends cdk.Construct {
         super(scope, id);
 
         // Setup platform team.
-        const account = props.env!.account!
-        const platformTeam = new team.TeamPlatform(account)
+        const account = props.env!.account!;
+        const platformTeam = new team.TeamPlatform(account);
 
         // Teams for the cluster.
         const teams: Array<ssp.teams.Team> = [
             platformTeam,
-            new team.TeamTroi,
-            new team.TeamRiker,
+            new team.TeamTroi(),
+            new team.TeamRiker(),
             new team.TeamBurnham(scope)
         ];
 
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.addons.AppMeshAddOn,
-            new ssp.addons.NginxAddOn,
-            new ssp.addons.ArgoCDAddOn,
-            new ssp.addons.CalicoAddOn,
-            new ssp.addons.MetricsServerAddOn,
-            new ssp.addons.ClusterAutoScalerAddOn,
-            new ssp.addons.ContainerInsightsAddOn,
+            new ssp.addons.AppMeshAddOn(),
+            new ssp.addons.NginxAddOn(),
+            new ssp.addons.ArgoCDAddOn(),
+            new ssp.addons.CalicoAddOn(),
+            new ssp.addons.MetricsServerAddOn(),
+            new ssp.addons.ClusterAutoScalerAddOn(),
+            new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn()
