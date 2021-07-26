@@ -1,4 +1,5 @@
 import { HelmChart, KubernetesManifest } from "@aws-cdk/aws-eks";
+import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { SecretsManager } from "aws-sdk";
 
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
@@ -122,6 +123,11 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
         const appRepo = this.options.bootstrapRepo!;
         let credentials = { url: appRepo.repoUrl };
+
+        const sa = clusterInfo.cluster.addServiceAccount('argo-sa-account',
+            {name: "argcdcd-secrets-manager", namespace: this.options.namespace});
+        const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");
+        sa.role.addManagedPolicy(secretPolicy);
 
         const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
 
