@@ -4,7 +4,7 @@ The `cdk-eks-blueprint` framework leverages a modular approach to managing [Add-
 
 Within the context of the `cdk-eks-blueprint` framework, an Add-n is simply an interface, and the implementation of an add-on can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources. 
 
-## Supported Add-os
+## Supported Add-ons
 
 The framework currently supports the following add-ons.
 
