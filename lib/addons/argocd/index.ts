@@ -4,6 +4,7 @@ import { SecretsManager } from "aws-sdk";
 
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
 import { Team } from "../../teams";
+import * as yaml from 'yaml';
 
 export interface ArgoApplicationRepository {
     /**
@@ -63,6 +64,22 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     }
 
     deploy(clusterInfo: ClusterInfo): void {
+
+        let repo = "";
+
+        if(this.options.bootstrapRepo) {
+             repo = yaml.stringify(
+                [{
+                    url: this.options.bootstrapRepo.repoUrl,
+                    sshPrivateKeySecret: {
+                        name: "bootstrap-repo-secret1",
+                        key: "sshPrivateKey"
+                    }  
+                }]
+            );
+            console.log(repo)
+        }
+
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
             chart: "argo-cd",
             release: "ssp-addon",
@@ -73,6 +90,9 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 server: {
                     serviceAccount: {
                         create: false
+                    },
+                    config: {
+                        repositories: repo
                     }
                 }
             }
