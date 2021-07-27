@@ -7,8 +7,7 @@ import BlueprintConstruct from '../examples/blueprint-construct'
 // Team directories for network policy.
 const burnhamPolicyDir = './examples/teams/team-burnham/'
 const rikerPolicyDir = './examples/teams/team-riker/'
-var teamPolicyDirList = [burnhamPolicyDir,rikerPolicyDir]
-
+const teamPolicyDirList = [burnhamPolicyDir,rikerPolicyDir]
 const app = new cdk.App();
 
 const account = process.env.CDK_DEFAULT_ACCOUNT

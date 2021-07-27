@@ -1,6 +1,4 @@
 import * as cdk from '@aws-cdk/core';
-import { NodegroupAmiType, KubernetesVersion, CapacityType } from '@aws-cdk/aws-eks';
-import { InstanceType } from "@aws-cdk/aws-ec2";
 
 // SSP lib.
 import * as ssp from '../../lib'
