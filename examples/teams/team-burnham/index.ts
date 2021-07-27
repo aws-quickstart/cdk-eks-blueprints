@@ -12,10 +12,11 @@ function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
 }
 
 export class TeamBurnham extends ApplicationTeam {
-    constructor(scope: Construct) {
+    constructor(scope: Construct, policyDir: string) {
         super({
             name: "burnham",
-            users: getUserArns(scope, "team-burnham.users")
+            users: getUserArns(scope, "team-burnham.users"),
+            networkPoliciesDir: policyDir
         });
     }
 }

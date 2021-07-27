@@ -3,10 +3,10 @@ import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { readYamlFromDir } from '../utils/yaml-utils'; 
+import { readYamlFromDir } from '../utils/yaml-utils';
 
 /**
- * Interface for a team. 
+ * Interface for a team.
  */
 export interface Team {
 
@@ -22,7 +22,7 @@ export class TeamProps {
 
     /**
      * Required unique name for organization.
-     * May map to an OU name. 
+     * May map to an OU name.
      */
     readonly name: string;
 
@@ -32,7 +32,7 @@ export class TeamProps {
     readonly namespace?: string;
 
     /**
-     *  Annotations such as necessary for GitOps engine. 
+     *  Annotations such as necessary for GitOps engine.
      */
     readonly namespaceAnnotations? : { [key: string]: any; } = { "argocd.argoproj.io/sync-wave": "-1" };
 
@@ -52,13 +52,13 @@ export class TeamProps {
     readonly users?: Array<iam.ArnPrincipal>;
 
     /**
-     * Options existing role that should be used for cluster access. 
-     * If userRole and users are not provided, then no IAM setup is performed. 
+     * Options existing role that should be used for cluster access.
+     * If userRole and users are not provided, then no IAM setup is performed.
      */
     readonly userRole?: iam.IRole;
 
     /**
-     * Optional, directory where network policy files are stored
+     * Optional, directory where a team's network policy files are stored
      */
     readonly networkPoliciesDir?: string;
 }
@@ -101,21 +101,16 @@ export class ApplicationTeam implements Team {
     }
 
     /**
-     * 
-     * @param clusterInfo 
+     *
+     * @param clusterInfo
      */
     protected defaultSetupAdminAccess(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.users ?? [];
         const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRole);
-        const networkPoliciesDir = this.teamProps.networkPoliciesDir;
 
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" })
-
-        if (networkPoliciesDir){
-            readYamlFromDir(networkPoliciesDir, clusterInfo.cluster)
-        }
 
         if (adminRole) {
             awsAuth.addMastersRole(adminRole);
@@ -124,10 +119,10 @@ export class ApplicationTeam implements Team {
 
     /**
      * Creates a new role with trust relationship or adds trust relationship for an existing role.
-     * @param clusterInfo 
-     * @param users 
+     * @param clusterInfo
+     * @param users
      * @param role may be null if both role and users were not provided
-     * @returns 
+     * @returns
      */
     protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.IRole): iam.IRole | undefined {
         if (users?.length == 0) {
@@ -170,12 +165,13 @@ export class ApplicationTeam implements Team {
     }
 
     /**
-     * Creates nmaespace and sets up policies.
-     * @param clusterInfo 
+     * Creates namespace and sets up policies.
+     * @param clusterInfo
      */
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
+        const policyDir = props.networkPoliciesDir;
 
         const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
@@ -206,12 +202,15 @@ export class ApplicationTeam implements Team {
         });
 
         rbacManifest.node.addDependency(namespaceManifest);
+        if (policyDir){
+            readYamlFromDir(policyDir, clusterInfo.cluster, namespaceManifest)
+        }
     }
 
     /**
      * Sets up quotas
-     * @param clusterInfo 
-     * @param namespaceName 
+     * @param clusterInfo
+     * @param namespaceName
      */
     protected setupNamespacePolicies(clusterInfo: ClusterInfo, namespaceName: string) {
         const quotaName = this.teamProps.name + "-quota";
@@ -237,7 +236,7 @@ export class PlatformTeam extends ApplicationTeam {
 
     /**
      * Override
-     * @param clusterInfo 
+     * @param clusterInfo
      */
     setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAdminAccess(clusterInfo);

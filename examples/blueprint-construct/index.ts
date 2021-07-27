@@ -8,23 +8,20 @@ import * as ssp from '../../lib'
 // Example teams.
 import * as team from '../teams'
 
-// Network policies.
-const networkPoliciesDir = './examples/teams/network-policies'
-
 export default class BlueprintConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
+    constructor(scope: cdk.Construct, id: string, policyDirList: Array<string>, props: cdk.StackProps) {
         super(scope, id);
 
         // Setup platform team.
         const account = props.env!.account!
-        const platformTeam = new team.TeamPlatform(account, networkPoliciesDir)
+        const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
         const teams: Array<ssp.teams.Team> = [
             platformTeam,
             new team.TeamTroi,
-            new team.TeamRiker,
-            new team.TeamBurnham(scope)
+            new team.TeamRiker(scope, policyDirList[0]),
+            new team.TeamBurnham(scope, policyDirList[1])
         ];
 
         // AddOns for the cluster.
@@ -39,20 +36,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SSMAgentAddOn()
         ];
-        const region = 'us-west-2'
-        const clusterProps: ssp.EC2ProviderClusterProps = {
-            nodeGroupCapacityType: CapacityType.ON_DEMAND,
-            version: KubernetesVersion.V1_20,
-            instanceTypes: [new InstanceType('m5.large')],
-            amiType: NodegroupAmiType.AL2_X86_64,
-            amiReleaseVersion: "1.20.4-20210628"
-        }
-        const blueprintProps = {
-            id: 'test-cdk-ssp-'+region,
-            addOns,
-            teams,
-            clusterProvider: new ssp.EC2ClusterProvider(clusterProps)
-        }
-        new ssp.EksBlueprint(scope, blueprintProps, props)
+
+        const blueprintID = `${id}-dev`
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams }, props)
     }
 }
