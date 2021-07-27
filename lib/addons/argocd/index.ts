@@ -68,7 +68,14 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             release: "ssp-addon",
             repository: "https://argoproj.github.io/argo-helm",
             version: '3.10.0',
-            namespace: this.options.namespace
+            namespace: this.options.namespace,
+            values: {
+                server: {
+                    serviceAccount: {
+                        create: false
+                    }
+                }
+            }
         });
     }
 
@@ -124,8 +131,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         const appRepo = this.options.bootstrapRepo!;
         let credentials = { url: appRepo.repoUrl };
 
-        const sa = clusterInfo.cluster.addServiceAccount('argo-sa-account',
-            {name: "argcdcd-secrets-manager", namespace: this.options.namespace});
+        const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server',
+            {name: "argocd-server", namespace: this.options.namespace});
         const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");
         sa.role.addManagedPolicy(secretPolicy);
 
