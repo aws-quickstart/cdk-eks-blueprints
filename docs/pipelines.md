@@ -41,7 +41,7 @@ export class ClusterStage extends cdk.Stage {
         const platformTeam = new team.TeamPlatform(accountID!)
         const teams: Array<ssp.Team> = [platformTeam];
 
-        // AddOns for the cluster.
+        // Add-ons for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.NginxAddOn,
             new ssp.ArgoCDAddOn,
@@ -147,7 +147,7 @@ export class ClusterStage extends cdk.Stage {
         const platformTeam = new team.TeamPlatform(accountID!)
         const teams: Array<ssp.Team> = [platformTeam];
 
-        // AddOns for the cluster.
+        // Add-ons for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.NginxAddOn,
             new ssp.ArgoCDAddOn,
