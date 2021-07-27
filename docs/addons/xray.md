@@ -1,4 +1,4 @@
-# AWS X-Ray AddOn
+# AWS X-Ray Add-on
 
 [AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. The X-Ray addon provisions X-Ray daemon into an EKS cluster. This daemon exposes an internal endpoint `xray-service.xray-system.svc.cluster.local:2000` that could be leveraged to aggregate and post traces to the AWS X-Ray service. 
 

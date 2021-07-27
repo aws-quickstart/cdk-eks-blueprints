@@ -1,4 +1,4 @@
-# Container Insights Addon
+# Container Insights Add-on
 
 The `ContainerInsights` addon adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
 
