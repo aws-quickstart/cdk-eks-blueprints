@@ -1,4 +1,4 @@
-# Argo CD AddOn
+# Argo CD Add-on
 
 [Argo CD](https://argoproj.github.io/argo-cd/) is a declarative, GitOps continuous delivery tool for Kubernetes. The Argo CD addon provisions [Argo CD](https://argoproj.github.io/argo-cd/) into an EKS cluster.
 
