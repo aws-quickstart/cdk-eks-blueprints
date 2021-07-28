@@ -3,7 +3,7 @@ import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { readYamlFromDir } from '../utils/yaml-utils';
+import { applyYamlFromDir } from '../utils/yaml-utils';
 
 /**
  * Interface for a team.
@@ -171,7 +171,7 @@ export class ApplicationTeam implements Team {
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
-        const policyDir = props.networkPoliciesDir;
+        const networkPoliciesDir = props.networkPoliciesDir;
 
         const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
@@ -202,8 +202,8 @@ export class ApplicationTeam implements Team {
         });
 
         rbacManifest.node.addDependency(namespaceManifest);
-        if (policyDir){
-            readYamlFromDir(policyDir, clusterInfo.cluster, namespaceManifest)
+        if (networkPoliciesDir){
+            applyYamlFromDir(networkPoliciesDir, clusterInfo.cluster, namespaceManifest)
         }
     }
 

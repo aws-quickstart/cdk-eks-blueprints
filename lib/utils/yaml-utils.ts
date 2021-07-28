@@ -4,7 +4,7 @@ import * as eks from '@aws-cdk/aws-eks';
 import request from 'sync-request';
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 
-export function readYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
+export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
     fs.readdir(dir, 'utf8', (err, files) => {
         if (files != undefined) {
             files.forEach((file) => {
