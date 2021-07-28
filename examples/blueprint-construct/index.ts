@@ -18,8 +18,8 @@ export default class BlueprintConstruct extends cdk.Construct {
         const teams: Array<ssp.teams.Team> = [
             platformTeam,
             new team.TeamTroi,
-            new team.TeamRiker(scope, policyDirList[0]),
-            new team.TeamBurnham(scope, policyDirList[1])
+            new team.TeamRiker(scope, policyDirList[1]),
+            new team.TeamBurnham(scope, policyDirList[0])
         ];
 
         // AddOns for the cluster.
