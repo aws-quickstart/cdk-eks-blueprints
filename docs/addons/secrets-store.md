@@ -113,6 +113,13 @@ spec:
 EOF
 ```
 
+Apply the manifest.
+
+```sh
+$ kubectl apply -f test-secret.yaml                           
+deployment.apps/app-deployment created
+```
+
 Test that the deployment has completed and the pod is running successfully.
 
 ```sh
@@ -126,5 +133,5 @@ Next, we can test whether the secret `GITHUB_TOKEN` has been successfully. We wi
 ```sh
 $ kubectl exec app-deployment-6867fc6bd6-jzdwh -n team-burnham -- cat /mnt/secrets-store/GITHUB_TOKEN
 
-XXXXXXXXXXXXXXX
+ghp_XXXXXXXXXXXXXXX
 ```
