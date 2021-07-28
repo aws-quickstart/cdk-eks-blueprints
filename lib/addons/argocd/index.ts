@@ -99,7 +99,6 @@ const userNameRepoRef = (url: string, secretName: string) : string => yaml.strin
         }]
 );
 
-
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
@@ -117,12 +116,14 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     */
     async deploy(clusterInfo: ClusterInfo) : Promise<any> {
 
+        const namespace = this.createNamespace(clusterInfo);
+
         let repo = "";
         const sa  = this.createServiceAccount(clusterInfo);
+        sa.node.addDependency(namespace);
 
         if(this.options.bootstrapRepo?.credentialsSecretName) {
-            repo = await this.createSecretKey(clusterInfo, this.options.bootstrapRepo.credentialsSecretName);
-            console.log(repo);
+            repo = await this.createSecretKey(clusterInfo, this.options.bootstrapRepo.credentialsSecretName, namespace);
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -142,8 +143,23 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }
         });
-        console.log(this.chartNode.node);
-        //this.chartNode.node.addDependency(sa);
+
+        this.chartNode.node.addDependency(sa);
+    }
+
+    protected createNamespace(clusterInfo: ClusterInfo) : KubernetesManifest {
+        return new KubernetesManifest(clusterInfo.cluster.stack, "argo-namespace-struct", {
+            cluster: clusterInfo.cluster,
+            manifest: [{
+                apiVersion: 'v1',
+                kind: 'Namespace',
+                metadata: {
+                    name: this.options.namespace,
+                }
+            }],
+            overwrite: true,
+            prune: true
+        });
     }
 
     /**
@@ -154,7 +170,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      */
     async postDeploy(clusterInfo: ClusterInfo, teams: Team[]) {
         console.assert(teams != null);
-        console.log('in post deploy')
         const appRepo = this.options.bootstrapRepo;
         
         if(!appRepo) {
@@ -196,19 +211,19 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         // Make sure the bootstrap is only applied after successful ArgoCD installation.
         //
         manifest.node.addDependency(this.chartNode);
-        console.log("after post deploy", this.chartNode);
     }
 
     /**
      * Creates a secret key 
      * @param clusterInfo 
      * @param secretName 
+     * @param dependency dependency for the created secret to control order of execution 
      * @returns reference to the secret to add to the ArgoCD config map
      */
-    protected async createSecretKey(clusterInfo : ClusterInfo, secretName : string) : Promise<string> {
+    protected async createSecretKey(clusterInfo : ClusterInfo, secretName : string, dependency: KubernetesManifest) : Promise<string> {
 
         const appRepo = this.options.bootstrapRepo!;
-        let credentials = { url: appRepo.repoUrl };
+        let credentials = { url: btoa(appRepo.repoUrl) };
 
         const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
         
@@ -230,7 +245,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 result = userNameRepoRef(appRepo.repoUrl, secretName);
                 break;
         }
-
+        
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
             cluster: clusterInfo.cluster,
             manifest: [{
@@ -247,8 +262,9 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             }],
             overwrite: true,
         });
+        
+        manifest.node.addDependency(dependency);
 
-        manifest.node.addDependency(this.chartNode);
         return result;
     }
 
@@ -283,7 +299,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      * @param clusterInfo 
      * @returns 
      */
-    protected createServiceAccount(clusterInfo: ClusterInfo) : ServiceAccount {
+    protected createServiceAccount(clusterInfo: ClusterInfo ) : ServiceAccount {
         const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server', { 
             name: "argocd-server", 
             namespace: this.options.namespace
