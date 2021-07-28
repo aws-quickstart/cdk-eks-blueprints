@@ -22,7 +22,6 @@ export function readYamlFromDir(dir: string, cluster: eks.Cluster): void {
         } else {
             console.log(`${dir} is empty`);
         }
-
     })
 }
 

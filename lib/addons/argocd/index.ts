@@ -1,10 +1,12 @@
-import { HelmChart, KubernetesManifest } from "@aws-cdk/aws-eks";
+import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { SecretsManager } from "aws-sdk";
 
 import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
 import { Team } from "../../teams";
 import * as yaml from 'yaml';
+import { btoa } from '../../utils/string-utils';
+
 
 export interface ArgoApplicationRepository {
     /**
@@ -42,6 +44,10 @@ export interface ArgoApplicationRepository {
  * Configuration options for ArgoCD add-on.
  */
 export interface ArgoCDAddOnProps {
+
+    /**
+     * Namespace where add-on will be deployed. 
+     */
     namespace?: string,
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
@@ -51,9 +57,52 @@ export interface ArgoCDAddOnProps {
     bootstrapRepo?: ArgoApplicationRepository
 }
 
+
 const argoDefaults: ArgoCDAddOnProps = {
     namespace: "argocd"
 }
+
+/**
+ * Local function to create a secret reference for SSH key.
+ * @param url 
+ * @param secretName 
+ * @returns 
+ */
+const sshRepoRef = (url: string, secretName : string) : string => yaml.stringify(
+    [{
+        url,
+        sshPrivateKeySecret: {
+            name: secretName,
+            key: "sshPrivateKey"
+        }  
+    }]
+);
+
+
+/**
+ * Local function to a secret reference for username/pwd or username/token key.
+ * @param url 
+ * @param secretName 
+ * @returns 
+ */
+const userNameRepoRef = (url: string, secretName: string) : string => yaml.stringify(
+        [{
+            url,
+            usernameSecret: {
+                name: secretName,
+                key: "username"
+            },
+            passwordSecret: {
+                name: secretName,
+                key: "password"
+            }  
+        }]
+);
+
+
+/**
+ * Implementation of ArgoCD add-on and post deployment hook.
+ */
 export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
@@ -63,21 +112,17 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         this.options = { ...argoDefaults, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    /**
+     * Impementation of the add-on contract deploy method.
+    */
+    async deploy(clusterInfo: ClusterInfo) : Promise<any> {
 
         let repo = "";
+        const sa  = this.createServiceAccount(clusterInfo);
 
-        if(this.options.bootstrapRepo) {
-             repo = yaml.stringify(
-                [{
-                    url: this.options.bootstrapRepo.repoUrl,
-                    sshPrivateKeySecret: {
-                        name: "bootstrap-repo-secret1",
-                        key: "sshPrivateKey"
-                    }  
-                }]
-            );
-            console.log(repo)
+        if(this.options.bootstrapRepo?.credentialsSecretName) {
+            repo = await this.createSecretKey(clusterInfo, this.options.bootstrapRepo.credentialsSecretName);
+            console.log(repo);
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -97,16 +142,23 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }
         });
+        console.log(this.chartNode.node);
+        //this.chartNode.node.addDependency(sa);
     }
 
-    postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void {
+    /**
+     * Post deployment step is used to create a bootstrap repository if options are provided for the add-on.
+     * @param clusterInfo 
+     * @param teams 
+     * @returns 
+     */
+    async postDeploy(clusterInfo: ClusterInfo, teams: Team[]) {
         console.assert(teams != null);
+        console.log('in post deploy')
         const appRepo = this.options.bootstrapRepo;
+        
         if(!appRepo) {
             return;
-        }
-        if(appRepo.credentialsSecretName) {
-            this.createSecretKey(clusterInfo, appRepo.credentialsSecretName);
         }
 
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
@@ -144,27 +196,38 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         // Make sure the bootstrap is only applied after successful ArgoCD installation.
         //
         manifest.node.addDependency(this.chartNode);
+        console.log("after post deploy", this.chartNode);
     }
 
-    async createSecretKey(clusterInfo : ClusterInfo, secretName : string) {
+    /**
+     * Creates a secret key 
+     * @param clusterInfo 
+     * @param secretName 
+     * @returns reference to the secret to add to the ArgoCD config map
+     */
+    protected async createSecretKey(clusterInfo : ClusterInfo, secretName : string) : Promise<string> {
 
         const appRepo = this.options.bootstrapRepo!;
         let credentials = { url: appRepo.repoUrl };
 
-        const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server',
-            {name: "argocd-server", namespace: this.options.namespace});
-        const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");
-        sa.role.addManagedPolicy(secretPolicy);
-
         const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
+        
+        let result = "";
 
         switch(appRepo?.credentialsType) {
             case "SSH":
-                credentials = {...credentials, ...{ sshPrivateKey: secretValue }};
+                credentials = {...credentials, ...{ sshPrivateKey: btoa(secretValue) }};
+                result = sshRepoRef(appRepo.repoUrl, secretName);
                 break;
             case "USERNAME":
             case "TOKEN": 
-                credentials = {...credentials, ...JSON.parse(secretValue)};
+                // eslint-disable-next-line no-case-declarations
+                const secretJson : any = JSON.parse(secretValue);
+                credentials = {...credentials, ...{
+                    username: btoa(secretJson["username"]),
+                    password: btoa(secretJson["password"])
+                }};
+                result = userNameRepoRef(appRepo.repoUrl, secretName);
                 break;
         }
 
@@ -174,22 +237,28 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 apiVersion: "v1",
                 kind: "Secret", 
                 metadata: {
-                  name: appRepo?.name?? "bootstrap-repo-secret",
+                  name: secretName,
                   namespace: this.options.namespace,
                   labels: {
-                    "argocd.argoproj.io/secret-type": "repository"
+                    "argocd.argoproj.io/secret-type": "repo-creds"
                   }
                 },
-                stringData: credentials,
+                data: credentials,
             }],
             overwrite: true,
-            prune: true, 
-            skipValidation: true
         });
+
         manifest.node.addDependency(this.chartNode);
+        return result;
     }
 
-    async getSecretValue(secretName: string, region: string): Promise<string> {
+    /**
+     * Gets secret value from AWS Secret Manager. Requires access rights to the secret, specified by the secretName parameter.
+     * @param secretName name of the secret to retrieve
+     * @param region 
+     * @returns 
+     */
+    protected async getSecretValue(secretName: string, region: string): Promise<string> {
         const secretManager = new SecretsManager({ region: region });
         let secretString = "";
         try {
@@ -207,5 +276,21 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             console.log(error);
             throw error;
         }
+    }
+
+    /**
+     * Creates a service account that can access secrets
+     * @param clusterInfo 
+     * @returns 
+     */
+    protected createServiceAccount(clusterInfo: ClusterInfo) : ServiceAccount {
+        const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server', { 
+            name: "argocd-server", 
+            namespace: this.options.namespace
+        });
+
+        const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");
+        sa.role.addManagedPolicy(secretPolicy);
+        return sa;
     }
 }

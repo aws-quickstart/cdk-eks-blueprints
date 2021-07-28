@@ -60,11 +60,14 @@ export class EksBlueprint extends cdk.Stack {
         const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
-
         const postDeploymentSteps = Array<ClusterPostDeploy>();
+        const promises = Array<Promise<any>>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            addOn.deploy(clusterInfo);
+            const result : any = addOn.deploy(clusterInfo);
+            if(result as Promise<any>) {
+                promises.push(<Promise<any>>result);
+            }
             const postDeploy : any  = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
@@ -76,9 +79,13 @@ export class EksBlueprint extends cdk.Stack {
                 team.setup(clusterInfo);
             }
         }
-        for(let step of postDeploymentSteps) {
-            step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
-        }
+
+        // Promise.all(promises).then(() => {
+        //     console.log("after promises");
+        //     // for(let step of postDeploymentSteps) {
+        //     //     step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+        //     // }
+        // }).catch(err => { throw new Error(err)});
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
