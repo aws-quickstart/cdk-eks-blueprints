@@ -41,12 +41,12 @@ export interface Secret {
    * AWS region to use when retrieving secrets from Secrets Manager
    * or Parameter Store
    */
-  readonly secretRegion?: 'string';
+  readonly secretRegion?: string;
 
   /**
    * AWS Account Id where the secret lives.
    */
-  readonly secretAccountId?: 'string';
+  readonly secretAccountId?: string;
 }
 
 // create an interface for SecretProvider
