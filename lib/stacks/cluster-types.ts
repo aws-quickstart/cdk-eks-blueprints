@@ -28,6 +28,11 @@ export interface ClusterInfo {
      * The Kubernetes version for the cluster.
      */
     readonly version: KubernetesVersion;
+
+    /**
+     * AddOns provisioned in the cluster
+     */
+    provisionedAddOns?: Map<string, cdk.Construct>;
 }
 
 /**
@@ -41,7 +46,8 @@ export interface ClusterProvider {
  * ClusterAddOn is the interface to which all Cluster addons should conform.
  */
 export interface ClusterAddOn {
-    deploy(clusterInfo: ClusterInfo): void;
+    readonly name?: string;
+    deploy(clusterInfo: ClusterInfo): cdk.Construct | void;
 }
 
 /**

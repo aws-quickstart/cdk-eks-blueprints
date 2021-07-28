@@ -19,9 +19,7 @@ import {
   ApplicationTeam
 } from '@shapirov/cdk-eks-blueprint';
 
-const secretsStoreAddOn = new SecretsStoreAddOn({
-  rotationPollInterval: '120s'
-});
+const secretsStoreAddOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
 
 // Setup application team with secrets
@@ -31,7 +29,7 @@ class TeamBurnham extends ApplicationTeam {
       name: "burnham",
       secrets: [
         {
-          secretName: 'mysecret',
+          secretName: 'GITHUB_TOKEN',
           secretType: SecretType.SECRETSMANAGER
         }
       ]
@@ -60,3 +58,73 @@ new EksBlueprint(app, 'my-stack-name', addOns, teams, {
 ## Security Considerations
 
 The AWS Secrets Manger and Config Provider provides compatibility for legacy applications that access secrets as mounted files in the pod. Security conscious appliations should use the native AWS APIs to fetch secrets and optionally cache them in memory rather than storing them in the file system.
+
+## Example
+
+After the Blueprint stack is deployed you can test consuming the secret from within a `deployment`.
+
+This sample `deployment` pulls an `alpine` image. We will mount the secrets under `/mnt/secrets-store` directory as shown in the manifest below.
+
+```yaml
+cat << 'EOF' >> test-secrets.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: myapp
+  namespace: team-burnham
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      serviceAccountName: burnham-sa
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "burnham-aws-secrets"
+      containers:
+      - name: app-deployment
+        image: ubuntu
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: secrets-store-inline
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+EOF
+```
+
+Test that the deployment has completed and the pod is running successfully.
+
+```sh
+$ kubectl get pods -n team-burnham
+NAME                              READY   STATUS    RESTARTS   AGE
+app-deployment-6867fc6bd6-jzdwh   1/1     Running   0          46s
+```
+
+Next, we can test whether the secret `GITHUB_TOKEN` has been successfully. We will use the `kubectl exec` command to print our secret to stdout.
+
+```sh
+$ kubectl exec app-deployment-6867fc6bd6-jzdwh -n team-burnham -- cat /mnt/secrets-store/GITHUB_TOKEN
+
+XXXXXXXXXXXXXXX
+```

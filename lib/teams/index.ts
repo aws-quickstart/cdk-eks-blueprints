@@ -5,6 +5,7 @@ import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { Secret, SecretType } from "../addons/secrets-store";
+import { Constants } from "..";
 
 /**
  * Interface for a team. 
@@ -61,7 +62,7 @@ export class TeamProps {
     /**
      * List of Secrets to setup and retrive
      */
-    readonly secrets?: Secret[];
+    readonly secrets?: Array<Secret>;
 }
 
 export class ApplicationTeam implements Team {
@@ -69,6 +70,8 @@ export class ApplicationTeam implements Team {
     readonly teamProps: TeamProps;
 
     readonly name: string;
+
+    private namespaceManifest: KubernetesManifest;
 
     constructor(teamProps: TeamProps) {
         this.name = teamProps.name;
@@ -174,7 +177,7 @@ export class ApplicationTeam implements Team {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
 
-        const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
+        this.namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
             manifest: [{
                 apiVersion: 'v1',
@@ -202,7 +205,7 @@ export class ApplicationTeam implements Team {
             prune: true
         });
 
-        rbacManifest.node.addDependency(namespaceManifest);
+        rbacManifest.node.addDependency(this.namespaceManifest);
     }
 
     /**
@@ -212,7 +215,7 @@ export class ApplicationTeam implements Team {
      */
     protected setupNamespacePolicies(clusterInfo: ClusterInfo, namespaceName: string) {
         const quotaName = this.teamProps.name + "-quota";
-        clusterInfo.cluster.addManifest(quotaName, {
+        const quotaManifest = clusterInfo.cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
             metadata: {
@@ -223,6 +226,7 @@ export class ApplicationTeam implements Team {
                 hard: this.teamProps.namespaceHardLimits
             }
         });
+        quotaManifest.node.addDependency(this.namespaceManifest);
     }
 
     /**
@@ -231,69 +235,88 @@ export class ApplicationTeam implements Team {
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
         const secrets = this.teamProps.secrets;
-        if (Array.isArray(secrets) && secrets.length) {
-            const cluster = clusterInfo.cluster;
-            const secretProviderClass = this.teamProps.name + '-aws-secrets';
-            type secretObject = {
-                objectName: string;
-                objectType: SecretType;
-                region?: string;
-            }
-            let objects: secretObject[] = [];
+        if (clusterInfo.provisionedAddOns) {
+            if (clusterInfo.provisionedAddOns.has(Constants.SECRETS_STORE_CSI_DRIVER)) {
+                if (Array.isArray(secrets) && secrets.length) {
+                    const cluster = clusterInfo.cluster;
+                    const secretProviderClass = this.teamProps.name + '-aws-secrets';
+                    type secretObject = {
+                        objectName: string;
+                        objectType: SecretType;
+                        region?: string;
+                    }
+                    let objects: secretObject[] = [];
 
-            const serviceAccount = cluster.addServiceAccount(this.teamProps.name + '-sa', {
-                name: this.teamProps.name + '-sa',
-                namespace: this.teamProps.namespace
-            });
-
-            secrets.forEach( (secret) => {
-                const objectName = secret.secretName;
-                const objectType = secret.secretType;
-                const region = secret.secretRegion ? secret.secretRegion : cdk.Aws.REGION;
-                const accountId = secret.secretAccountId ? secret.secretAccountId : cdk.Aws.ACCOUNT_ID;
-
-                objects.push({
-                    objectName,
-                    objectType,
-                    region,
-                });
-
-                let policyStatement: iam.PolicyStatement;
-
-                if (secret.secretType === SecretType.SECRETSMANAGER) {
-                    policyStatement = new iam.PolicyStatement({
-                        actions: [
-                            'secretsmanager:GetSecretValue',
-                            'secretsmanager:DescribeSecret'
-                        ],
-                        resources: [`arn:${cdk.Aws.PARTITION}:secretsmanager:${region}:${accountId}:secret:${secret.secretName}-??????`]
+                    const serviceAccount = cluster.addServiceAccount(this.teamProps.name + '-sa', {
+                        name: this.teamProps.name + '-sa',
+                        namespace: this.teamProps.namespace
                     });
+                    serviceAccount.node.addDependency(this.namespaceManifest);
+
+                    secrets.forEach( (secret) => {
+                        const objectName = secret.secretName;
+                        const objectType = secret.secretType;
+                        const region = secret.secretRegion ? secret.secretRegion : cdk.Aws.REGION;
+                        const accountId = secret.secretAccountId ? secret.secretAccountId : cdk.Aws.ACCOUNT_ID;
+
+                        objects.push({
+                            objectName,
+                            objectType,
+                            region,
+                        });
+
+                        let policyStatement: iam.PolicyStatement;
+
+                        if (secret.secretType === SecretType.SECRETSMANAGER) {
+                            policyStatement = new iam.PolicyStatement({
+                                actions: [
+                                    'secretsmanager:GetSecretValue',
+                                    'secretsmanager:DescribeSecret'
+                                ],
+                                resources: [`arn:${cdk.Aws.PARTITION}:secretsmanager:${region}:${accountId}:secret:${secret.secretName}-??????`]
+                            });
+                        }
+                        else {
+                            policyStatement = new iam.PolicyStatement({
+                                actions: [
+                                    'ssm:GetParameters'
+                                ],
+                                resources: [`arn:${cdk.Aws.PARTITION}:ssm:${region}:${accountId}:parameter/${secret.secretName}`]
+                            });
+                        }
+                        serviceAccount.addToPrincipalPolicy(policyStatement);
+                    });
+
+                    const secretProviderClassManifest = cluster.addManifest(secretProviderClass, {
+                        apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
+                        kind: 'SecretProviderClass',
+                        metadata: {
+                            name: secretProviderClass,
+                            namespace: this.teamProps.namespace
+                        },
+                        spec: {
+                            provider: 'aws',
+                            parameters: {
+                                objects: JSON.stringify(objects),
+                            }
+                        }
+                    });
+
+                    secretProviderClassManifest.node.addDependency(
+                        serviceAccount,
+                        clusterInfo.provisionedAddOns.get(Constants.SECRETS_STORE_CSI_DRIVER)!
+                    );
                 }
                 else {
-                    policyStatement = new iam.PolicyStatement({
-                        actions: [
-                            'ssm:GetParameters'
-                        ],
-                        resources: [`arn:${cdk.Aws.PARTITION}:ssm:${region}:${accountId}:parameter/${secret.secretName}`]
-                    });
+                    throw new Error(`Team secret list is empty`);
                 }
-
-                serviceAccount.addToPrincipalPolicy(policyStatement);
-            });
-
-            cluster.addManifest(secretProviderClass, {
-                apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
-                kind: 'SecretProviderClass',
-                metadata: {
-                    name: secretProviderClass
-                },
-                spec: {
-                    provider: 'aws',
-                    parameters: {
-                        objects: objects.toString(),
-                    }
-                }
-            });
+            }
+            else {
+                throw new Error(`Secrets Driver ${Constants.SECRETS_STORE_CSI_DRIVER} is not provided in addons`);
+            }
+        }
+        else {
+            throw new Error(`Provisioned addons is empty`);
         }
     }
 }

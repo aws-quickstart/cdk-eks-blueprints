@@ -57,14 +57,20 @@ export class EksBlueprint extends cdk.Stack {
         const vpcId = this.node.tryGetContext("vpc");
         const vpc = this.initializeVpc(vpcId);
 
-        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
+        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider();
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
 
         const postDeploymentSteps = Array<ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            addOn.deploy(clusterInfo);
+            const node = addOn.deploy(clusterInfo);
+            if (node instanceof cdk.Construct) {
+                if (clusterInfo.provisionedAddOns == undefined) {
+                    clusterInfo.provisionedAddOns = new Map<string, cdk.Construct>();
+                }
+                clusterInfo.provisionedAddOns.set(addOn.name!, node);
+            }
             const postDeploy : any  = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);

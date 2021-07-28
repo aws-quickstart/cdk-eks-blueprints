@@ -1,6 +1,6 @@
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import * as cdk from "@aws-cdk/core";
 import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { Constants } from "..";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 
 /**
@@ -49,6 +49,9 @@ export interface Secret {
   readonly secretAccountId?: 'string';
 }
 
+// create an interface for SecretProvider
+// can provide their secret generation
+
 export enum SecretType {
   SSMPARAMETER = 'ssmparameter',
   SECRETSMANAGER = 'secretsmanager'
@@ -59,19 +62,17 @@ const SecretsStoreAddOnDefaults: SecretsStoreAddOnProps = {
   version: 'v0.0.23',
   rotationPollInterval: undefined
 }
-
-const SECRETS_STORE_CSI_DRIVER = 'secrets-store-csi-driver';
-
 export class SecretsStoreAddOn implements ClusterAddOn {
 
   private options: SecretsStoreAddOnProps;
-  public secretsProvider: KubernetesManifest;
+  public name: string;
 
   constructor(props?: SecretsStoreAddOnProps) {
     this.options = { ...SecretsStoreAddOnDefaults, ...props };
+    this.name = Constants.SECRETS_STORE_CSI_DRIVER;
   }
 
-  deploy(clusterInfo: ClusterInfo): void {
+  deploy(clusterInfo: ClusterInfo): cdk.Construct {
     const cluster = clusterInfo.cluster;
 
     const values = new Map([
@@ -84,19 +85,21 @@ export class SecretsStoreAddOn implements ClusterAddOn {
       values.set('rotationPollInterval', this.options.rotationPollInterval);
     }
 
-    cluster.addHelmChart('SecretsStoreCSIDriver', {
-      chart: SECRETS_STORE_CSI_DRIVER,
+    const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', {
+      chart: Constants.SECRETS_STORE_CSI_DRIVER,
       repository: 'https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts',
       namespace: this.options.namespace,
       version: this.options.version,
-      release: SECRETS_STORE_CSI_DRIVER,
+      release: Constants.SECRETS_STORE_CSI_DRIVER,
       wait: true,
       timeout: cdk.Duration.minutes(15),
       values,
     });
 
     const manifestUrl = `https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml`;
-    const manifest = loadExternalYaml(manifestUrl);
-    this.secretsProvider = clusterInfo.cluster.addManifest('SecretsStoreCsiDriverProviderAws', ...manifest);
+    const manifest: Record<string, any>[] = loadExternalYaml(manifestUrl);
+    const secretProviderManifest = clusterInfo.cluster.addManifest('SecretsStoreCsiDriverProviderAws', ...manifest);
+    secretProviderManifest.node.addDependency(secretStoreCSIDriverHelmChart);
+    return secretProviderManifest;
   }
 }
