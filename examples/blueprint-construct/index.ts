@@ -27,7 +27,8 @@ export default class BlueprintConstruct extends cdk.Construct {
                 path: 'envs/prod',
                 credentialsSecretName: 'github-ssh-test',
                 credentialsType: 'SSH'
-            }
+            },
+            adminPasswordSecretName: 'argo-admin-secret'
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
@@ -42,7 +43,6 @@ export default class BlueprintConstruct extends cdk.Construct {
                     }
                 }
             }}),
-            new ssp.addons.ArgoCDAddOn,
             new ssp.addons.CalicoAddOn,
             new ssp.addons.MetricsServerAddOn,
             new ssp.addons.ClusterAutoScalerAddOn,

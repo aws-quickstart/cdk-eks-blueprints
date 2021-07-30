@@ -6,6 +6,9 @@ import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/clust
 import { Team } from "../../teams";
 import * as yaml from 'yaml';
 import { btoa } from '../../utils/string-utils';
+import { Construct } from "@aws-cdk/core";
+
+import bcrypt = require('bcrypt');
 
 
 export interface ArgoApplicationRepository {
@@ -49,7 +52,7 @@ export interface ArgoCDAddOnProps {
      * Namespace where add-on will be deployed. 
      */
     namespace?: string,
-    
+
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
@@ -61,8 +64,16 @@ export interface ArgoCDAddOnProps {
      * Optional admin password secret (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
      * store as bcrypt hash. 
+     * Note: at present, change of password will require manual restart of argocd server. 
      */
-    adminPasswordSecretName?: string 
+    adminPasswordSecretName?: string,
+
+    /**
+     * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
+     */
+    values?: {
+        [key: string]: any;
+    };
 }
 
 
@@ -76,16 +87,15 @@ const argoDefaults: ArgoCDAddOnProps = {
  * @param secretName 
  * @returns 
  */
-const sshRepoRef = (url: string, secretName : string) : string => yaml.stringify(
+const sshRepoRef = (url: string, secretName: string): string => yaml.stringify(
     [{
         url,
         sshPrivateKeySecret: {
             name: secretName,
             key: "sshPrivateKey"
-        }  
+        }
     }]
 );
-
 
 /**
  * Local function to a secret reference for username/pwd or username/token key.
@@ -93,18 +103,18 @@ const sshRepoRef = (url: string, secretName : string) : string => yaml.stringify
  * @param secretName 
  * @returns 
  */
-const userNameRepoRef = (url: string, secretName: string) : string => yaml.stringify(
-        [{
-            url,
-            usernameSecret: {
-                name: secretName,
-                key: "username"
-            },
-            passwordSecret: {
-                name: secretName,
-                key: "password"
-            }  
-        }]
+const userNameRepoRef = (url: string, secretName: string): string => yaml.stringify(
+    [{
+        url,
+        usernameSecret: {
+            name: secretName,
+            key: "username"
+        },
+        passwordSecret: {
+            name: secretName,
+            key: "password"
+        }
+    }]
 );
 
 /**
@@ -122,16 +132,33 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     /**
      * Impementation of the add-on contract deploy method.
     */
-    async deploy(clusterInfo: ClusterInfo) : Promise<any> {
+    async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const namespace = this.createNamespace(clusterInfo);
 
-        let repo = "";
-        const sa  = this.createServiceAccount(clusterInfo);
+        const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        if(this.options.bootstrapRepo?.credentialsSecretName) {
-            repo = await this.createSecretKey(clusterInfo, this.options.bootstrapRepo.credentialsSecretName, namespace);
+        const repo = await this.createSecretKey(clusterInfo, namespace);
+
+        const values = this.options.values ?? {
+            server: {
+                serviceAccount: {
+                    create: false
+                },
+                config: {
+                    repositories: repo
+                }
+            }
+        };
+
+        if(this.options.adminPasswordSecretName) {
+            const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
+            values['configs'] = {
+                secret: {
+                    argocdServerAdminPassword: adminSecret
+                }
+            }
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -140,39 +167,14 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             repository: "https://argoproj.github.io/argo-helm",
             version: '3.10.0',
             namespace: this.options.namespace,
-            values: {
-                server: {
-                    serviceAccount: {
-                        create: false
-                    },
-                    config: {
-                        repositories: repo
-                    }
-                }
-            }
+            values: values
         });
+
         this.chartNode.node.addDependency(sa);
+        return this.chartNode;
     }
 
-    /**
-     * Creates namespace, which is a prerequisite for service account creation and subsequent chart execution.
-     * @param clusterInfo 
-     * @returns 
-     */
-    protected createNamespace(clusterInfo: ClusterInfo) : KubernetesManifest {
-        return new KubernetesManifest(clusterInfo.cluster.stack, "argo-namespace-struct", {
-            cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: 'v1',
-                kind: 'Namespace',
-                metadata: {
-                    name: this.options.namespace,
-                }
-            }],
-            overwrite: true,
-            prune: true
-        });
-    }
+
 
     /**
      * Post deployment step is used to create a bootstrap repository if options are provided for the add-on.
@@ -183,14 +185,14 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     async postDeploy(clusterInfo: ClusterInfo, teams: Team[]) {
         console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
-        
-        if(!appRepo) {
+
+        if (!appRepo) {
             return;
         }
 
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
             cluster: clusterInfo.cluster,
-            manifest : [{
+            manifest: [{
                 apiVersion: "argoproj.io/v1alpha1",
                 kind: "Application",
                 metadata: {
@@ -198,8 +200,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                     namespace: this.options.namespace
                 },
                 spec: {
-                    destination:{
-                        namespace: "default", 
+                    destination: {
+                        namespace: "default",
                         server: "https://kubernetes.default.svc"
                     },
                     project: "default",
@@ -217,12 +219,40 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }],
             overwrite: true,
-            prune: true  
+            prune: true
         });
         //
         // Make sure the bootstrap is only applied after successful ArgoCD installation.
         //
         manifest.node.addDependency(this.chartNode);
+    }
+
+    /**
+     * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
+     */
+    protected async createAdminSecret(region: string) : Promise<string> {
+        const secretValue = await this.getSecretValue(this.options.adminPasswordSecretName!, region);
+        return  bcrypt.hash(secretValue, 10);
+    }
+
+    /**
+     * Creates namespace, which is a prerequisite for service account creation and subsequent chart execution.
+     * @param clusterInfo 
+     * @returns 
+    */
+    protected createNamespace(clusterInfo: ClusterInfo): KubernetesManifest {
+        return new KubernetesManifest(clusterInfo.cluster.stack, "argo-namespace-struct", {
+            cluster: clusterInfo.cluster,
+            manifest: [{
+                apiVersion: 'v1',
+                kind: 'Namespace',
+                metadata: {
+                    name: this.options.namespace,
+                }
+            }],
+            overwrite: true,
+            prune: true
+        });
     }
 
     /**
@@ -232,51 +262,56 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      * @param dependency dependency for the created secret to control order of execution 
      * @returns reference to the secret to add to the ArgoCD config map
      */
-    protected async createSecretKey(clusterInfo : ClusterInfo, secretName : string, dependency: KubernetesManifest) : Promise<string> {
+    protected async createSecretKey(clusterInfo: ClusterInfo, dependency: KubernetesManifest): Promise<string> {
+
+        const secretName = this.options.bootstrapRepo?.credentialsSecretName;
+        if (!secretName) {
+            return "";
+        }
 
         const appRepo = this.options.bootstrapRepo!;
         let credentials = { url: btoa(appRepo.repoUrl) };
 
         const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
-        
+
         let result = "";
 
-        switch(appRepo?.credentialsType) {
+        switch (appRepo?.credentialsType) {
             case "SSH":
-                credentials = {...credentials, ...{ sshPrivateKey: btoa(secretValue) }};
+                credentials = { ...credentials, ...{ sshPrivateKey: btoa(secretValue) } };
                 result = sshRepoRef(appRepo.repoUrl, secretName);
                 break;
             case "USERNAME":
-            case "TOKEN": 
+            case "TOKEN":
                 // eslint-disable-next-line no-case-declarations
-                const secretJson : any = JSON.parse(secretValue);
-                credentials = {...credentials, ...{
-                    username: btoa(secretJson["username"]),
-                    password: btoa(secretJson["password"])
-                }};
+                const secretJson: any = JSON.parse(secretValue);
+                credentials = { ...credentials, ...{
+                        username: btoa(secretJson["username"]),
+                        password: btoa(secretJson["password"])
+                    }
+                };
                 result = userNameRepoRef(appRepo.repoUrl, secretName);
                 break;
         }
-        
+
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
             cluster: clusterInfo.cluster,
             manifest: [{
                 apiVersion: "v1",
-                kind: "Secret", 
+                kind: "Secret",
                 metadata: {
-                  name: secretName,
-                  namespace: this.options.namespace,
-                  labels: {
-                    "argocd.argoproj.io/secret-type": "repo-creds"
-                  }
+                    name: secretName,
+                    namespace: this.options.namespace,
+                    labels: {
+                        "argocd.argoproj.io/secret-type": "repo-creds"
+                    }
                 },
                 data: credentials,
             }],
             overwrite: true,
         });
-        
-        manifest.node.addDependency(dependency);
 
+        manifest.node.addDependency(dependency);
         return result;
     }
 
@@ -299,7 +334,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }
             return secretString;
-        } 
+        }
         catch (error) {
             console.log(error);
             throw error;
@@ -311,9 +346,9 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      * @param clusterInfo 
      * @returns 
      */
-    protected createServiceAccount(clusterInfo: ClusterInfo ) : ServiceAccount {
-        const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server', { 
-            name: "argocd-server", 
+    protected createServiceAccount(clusterInfo: ClusterInfo): ServiceAccount {
+        const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server', {
+            name: "argocd-server",
             namespace: this.options.namespace
         });
 
