@@ -49,12 +49,20 @@ export interface ArgoCDAddOnProps {
      * Namespace where add-on will be deployed. 
      */
     namespace?: string,
+    
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
      * after the infrastructure and team provisioning is complete. 
      */
-    bootstrapRepo?: ArgoApplicationRepository
+    bootstrapRepo?: ArgoApplicationRepository,
+
+    /**
+     * Optional admin password secret (plaintext).
+     * This allows to control admin password across the enterprise. Password will be retrieved and 
+     * store as bcrypt hash. 
+     */
+    adminPasswordSecretName?: string 
 }
 
 
@@ -143,10 +151,14 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 }
             }
         });
-
         this.chartNode.node.addDependency(sa);
     }
 
+    /**
+     * Creates namespace, which is a prerequisite for service account creation and subsequent chart execution.
+     * @param clusterInfo 
+     * @returns 
+     */
     protected createNamespace(clusterInfo: ClusterInfo) : KubernetesManifest {
         return new KubernetesManifest(clusterInfo.cluster.stack, "argo-namespace-struct", {
             cluster: clusterInfo.cluster,

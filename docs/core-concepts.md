@@ -31,7 +31,7 @@ See our [`Cluster Providers`](../cluster-providers) documentation page for detai
 
 For examples, the `MetricsServerAddon` only deploys the Kubernetes manifests that are needed to run the Kubernetes Metrics Server. By contrast, the `AWSLoadBalancerControllerAddon` deploys Kubernetes YAML, in addition to creating resources via AWS APIs that are needed to support the AWS Load Balancer Controller. 
 
-See our [`AddOns`](../add-ons) documentation page for detailed information. 
+See our [`Add-ons`](../add-ons) documentation page for detailed information. 
 
 ## Team 
 

@@ -1,6 +1,6 @@
-# AWS App Mesh AddOn
+# AWS App Mesh Add-on
 
-[AWS App Mesh](https://aws.amazon.com/app-mesh/) is a service mesh that makes it easy to monitor and control services.The App Mesh addon provisions the necessary AWS resources and Helm charts into an EKS cluster that are needed to support App Mesh for EKS workloads. 
+[AWS App Mesh](https://aws.amazon.com/app-mesh/) is a service mesh that makes it easy to monitor and control services.The App Mesh add-on provisions the necessary AWS resources and Helm charts into an EKS cluster that are needed to support App Mesh for EKS workloads. 
 
 Full documentation on using App Mesh with EKS [can be found here](https://docs.aws.amazon.com/app-mesh/latest/userguide/getting-started-kubernetes.html).
 
