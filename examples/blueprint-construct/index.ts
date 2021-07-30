@@ -32,10 +32,7 @@ export default class BlueprintConstruct extends cdk.Construct {
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn,
-<<<<<<< HEAD
-            new ssp.addons.NginxAddOn,
             prodBootstrapArgo,
-=======
             new ssp.addons.NginxAddOn({values: {
                 controller: {
                     service: {
@@ -46,7 +43,6 @@ export default class BlueprintConstruct extends cdk.Construct {
                 }
             }}),
             new ssp.addons.ArgoCDAddOn,
->>>>>>> main
             new ssp.addons.CalicoAddOn,
             new ssp.addons.MetricsServerAddOn,
             new ssp.addons.ClusterAutoScalerAddOn,
