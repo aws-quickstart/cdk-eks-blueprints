@@ -42,10 +42,10 @@ export interface AwsLoadBalancerControllerProps {
 /**
  * Defaults options for load balancer controller.
  */
-const AwsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
+const awsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
     namespace: 'kube-system',
-    version: 'v2.2.0',
-    chartVersion: '1.2.0',
+    version: 'v2.2.1',
+    chartVersion: '1.2.3',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false
@@ -58,7 +58,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
     private options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        this.options = { ...AwsLoadBalancerControllerDefaults, ...props };
+        this.options = { ...awsLoadBalancerControllerDefaults, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {

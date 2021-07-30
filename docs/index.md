@@ -13,7 +13,7 @@ A Shared Services Platform (SSP) is an internal development platform that abstra
 Customers can use this Quick Start to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
-- [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
+- [x] Manage cluster configuration, including add-ons that run in each cluster, from a single Git repository.
 - [x] Define teams, namespaces, and their associated access permissions for your clusters.
 - [x] Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
 - [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
