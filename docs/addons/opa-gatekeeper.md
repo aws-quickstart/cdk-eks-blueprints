@@ -2,7 +2,9 @@
 
 The Open Policy Agent (OPA, pronounced “oh-pa”) is an open source, general-purpose policy engine that unifies policy enforcement across the stack. OPA provides a high-level declarative language that lets you specify policy as code and simple APIs to offload policy decision-making from your software. You can use OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, and more. OPA uses a policy language known as Rego which is a query language which was purpose built to support structured document models such as JSON. To learn more about Rego check out this [link](https://www.openpolicyagent.org/docs/latest/policy-language/).
 
-OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. Gatekeeper also provides audit functionality as well. The diagram below shows how Gatekeeper interacts with the Kube API Server
+OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. Gatekeeper also provides audit functionality as well. The diagram below shows how Gatekeeper interacts with the Kube API Server.
+
+![opa](https://d33wubrfki0l68.cloudfront.net/a5ed0c27ff2dda6abb18b9bc960f2ad4120d937a/a5939/docs/latest/images/kubernetes-admission-flow.png))
 
 In the context of a Shared Services Platform running on Amazon EKS, platform teams and administrators need a way of being able to set policies to adhere to governance and security requirements for all workloads and teams working on the same cluster. Examples of standard use cases for using policies via OPA Gatekeeper are shown below:
 
@@ -16,9 +18,6 @@ In the context of a Shared Services Platform running on Amazon EKS, platform tea
 ## How does Gatekeeper work with OPA and Kube-mgmt?
 
 The Kubernetes API Server is configured to query OPA for admission control decisions when objects (e.g., Pods, Services, etc.) are created, updated, or deleted. The API Server sends the entire Kubernetes object in the webhook request to OPA. OPA evaluates the policies it has loaded using the admission review as input. The diagram below shows the flow between a user making a request to the Kube-API server and how AdmissionReview and AdmissionRequests are made through OPA Gatekeeper.
-
-![opa](https://d33wubrfki0l68.cloudfront.net/a5ed0c27ff2dda6abb18b9bc960f2ad4120d937a/a5939/docs/latest/images/kubernetes-admission-flow.png))
-
 
 ## Example Policies
 The following policy denies objects that include container images referring to illegal registries:
@@ -162,5 +161,35 @@ spec:
         }
 ```
 
-If we apply this to our cluster by running 
+All the Gatekeeper policy examples can be found under the examples directory in the SSP repository. If you go into the examples directory and go into the gatekeeper-library folder, we can apply this to our cluster by running the 
+```bash
+kubectl apply -f /examples/gatekeeper-library/library/general/allowedrepos/samples/repo-must-be-openpolicyagent command. If we run a 
 
+```bash
+kubectl get pods
+``` 
+
+we should see the following output:
+
+```bash
+NAME                  READY   STATUS    RESTARTS   AGE
+opa-allowed           1/1     Running   0          76s
+```
+
+If we inspect the pods and look at the containers.spec section of the pod we see the following:
+
+```yaml
+Containers:
+  opa:
+    Container ID:  docker://1b2da3c7d7c41becac49613ed7db863c7b1365137bbfe1b108220d4ffba188b3
+    Image:         openpolicyagent/opa:0.9.2
+    Image ID:      docker-pullable://openpolicyagent/opa@sha256:04ff8fce2afd1a3bc26260348e5b290e8d945b1fad4b4c16d22834c2f3a1814a
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      run
+      --server
+      --addr=localhost:8080
+```
+
+This is exactly what is defined in our example_allowed.yaml file so we know that our policy was deployed successfully using OPA Gatekeeper. For more information on OPA Gatekeeper policies, check out the GitHub repo which can be found [here](https://github.com/open-policy-agent/gatekeeper-library)
