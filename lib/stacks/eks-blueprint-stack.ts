@@ -45,11 +45,16 @@ export class EksBlueprintProps {
 
 }
 
+function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): StackProps {
+    const result =  stackProps ?? {};
+    const trackableDescription = `${result.description?? ""} SSP tacking (${usageIdentifier})`.trimLeft();
+    return { ...stackProps, ...{description: trackableDescription}};
+}
+
 export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
-        super(scope, blueprintProps.id, props);
-
+        super(scope, blueprintProps.id, withUsageTracking("qs-1s1r465hk", props));
         this.validateInput(blueprintProps);
         /*
          * Supported parameters

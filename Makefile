@@ -22,6 +22,9 @@ build:
 list: 
 	$(CDK) list
 
+run-test:
+	npm test
+
 synth:
 	$(CDK) synth
 
