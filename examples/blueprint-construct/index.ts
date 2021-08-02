@@ -23,26 +23,15 @@ export default class BlueprintConstruct extends cdk.Construct {
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             bootstrapRepo: {
-                repoUrl: 'git@github.com:aws-samples/ssp-eks-workloads.git',
+                repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
                 path: 'envs/prod',
-                credentialsSecretName: 'github-ssh-test',
-                credentialsType: 'SSH'
-            },
-            adminPasswordSecretName: 'argo-admin-secret'
+            }
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn,
             prodBootstrapArgo,
-            new ssp.addons.NginxAddOn({values: {
-                controller: {
-                    service: {
-                        annotations: {
-                            "key1": "value1"
-                        }
-                    }
-                }
-            }}),
+            new ssp.addons.NginxAddOn,
             new ssp.addons.CalicoAddOn,
             new ssp.addons.MetricsServerAddOn,
             new ssp.addons.ClusterAutoScalerAddOn,
