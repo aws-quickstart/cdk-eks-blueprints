@@ -56,10 +56,8 @@ export class ExternalDnsAddon implements ClusterAddOn {
             overwrite: true
         });
 
-        const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
-
         const hostedZones = this.options.hostedZone.provide(clusterInfo);
-
+        const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
         sa.addToPrincipalPolicy(
             new PolicyStatement({
                 effect: Effect.ALLOW,
