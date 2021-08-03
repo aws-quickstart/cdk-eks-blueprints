@@ -41,16 +41,25 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_19;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
 
 }
 
+/**
+ * Adds usage tracking info to the stack props
+ * @param usageIdentifier 
+ * @param stackProps 
+ * @returns 
+ */
 function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): StackProps {
     const result =  stackProps ?? {};
     const trackableDescription = `${result.description?? ""} SSP tacking (${usageIdentifier})`.trimLeft();
     return { ...stackProps, ...{description: trackableDescription}};
 }
 
+/**
+ * Entry point stack for the EKS blueprint.
+ */
 export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {

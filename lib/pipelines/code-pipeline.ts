@@ -65,7 +65,7 @@ export class CodePipeline {
                 // Install deps
                 'npm install',
                 // Install global CDK.
-                'npm install -g aws-cdk@1.113.0'
+                'npm install -g aws-cdk@1.116.0'
             ],
             buildCommands: ['npm run build'],
             synthCommand: 'cdk synth'

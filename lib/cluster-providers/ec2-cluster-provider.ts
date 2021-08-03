@@ -96,7 +96,7 @@ export class EC2ClusterProvider implements ClusterProvider {
 
 
     constructor(options?: EC2ProviderClusterProps) {
-        this.options = options ?? { version: KubernetesVersion.V1_19 };
+        this.options = options ?? { version: KubernetesVersion.V1_20 };
     }
 
     createCluster(scope: Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo {
