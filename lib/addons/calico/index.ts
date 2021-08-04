@@ -1,4 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export class CalicoAddOn implements ClusterAddOn {
 

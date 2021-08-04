@@ -1,7 +1,7 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Constants } from '..';
-import { ClusterAddOn, ClusterInfo } from '../../stacks/cluster-types';
+import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HostedZoneProvider } from './hosted-provider';
 
 

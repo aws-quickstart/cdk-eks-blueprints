@@ -5,10 +5,8 @@ import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
-
-import { Team } from '../teams'
-import { ClusterAddOn, ClusterPostDeploy, ClusterProvider } from './cluster-types'
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
+import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
 
 export class EksBlueprintProps {
 
@@ -45,6 +43,10 @@ export class EksBlueprintProps {
 
 }
 
+/**
+ * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
+ * and orcherstrates provisioning of add-ons, teams and post deployment hooks. 
+ */
 export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
