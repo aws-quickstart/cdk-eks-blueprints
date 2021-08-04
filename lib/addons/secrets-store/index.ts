@@ -129,7 +129,7 @@ const SecretsStoreAddOnDefaults: SecretsStoreAddOnProps = {
   namespace: 'kube-system',
   version: 'v0.0.23',
   rotationPollInterval: undefined,
-  syncSecrets: false
+  syncSecrets: true
 }
 
 export class SecretsStoreAddOn implements ClusterAddOn {
