@@ -107,6 +107,25 @@ The application promotion process in the above example is handled entirely throu
 1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up application that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 
 2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
 
+## Secrets Support
+
+The framework provides support to supply repository and administrator secrets in AWS Secrets Manager. This support is evolving and will be improved over time as ArgoCD itself matures. 
+
+**SSH Key Authentication**
+
+1. Set `credentialsType` to `SSH` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
+2. Define the secret in AWS Secret Manager as "Plain Text" that contains the private SSH key and (**important**) replicate it to all the desired regions. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) on details on setting up SSH access.
+
+**Username Password and Token Authentication** 
+1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
+2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
+3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/ssp-eks-workloads.git.
+
+**Admin Secret**
+
+1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password. 
+2. Replicate the secret to all the desired regions.
+3. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
 ## Functionality
 
 1. Creates the namespace specified in the construction parameter (`argocd` by default).
