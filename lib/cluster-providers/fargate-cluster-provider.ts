@@ -35,7 +35,10 @@ export class FargateClusterProvider implements ClusterProvider {
             cluster.addFargateProfile(id, options);
         }
 
-        return { cluster: cluster, version: version };
+        return new ClusterInfo({
+            cluster: cluster,
+            version: version 
+        });
     }
 
 }

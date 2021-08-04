@@ -5,9 +5,9 @@ import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import { Team } from '../teams';
 
 /**
- * ClusterInfo describes an EKS cluster.
+ * Props for ClusterInfo.
  */
-export interface ClusterInfo {
+export interface ClusterInfoProps {
 
     /**
      * The EKS cluster.
@@ -28,11 +28,55 @@ export interface ClusterInfo {
      * The Kubernetes version for the cluster.
      */
     readonly version: KubernetesVersion;
+}
+
+/**
+ * ClusterInfo desribes an EKS Cluster
+ */
+export class ClusterInfo {
+    
+    /**
+     * Attributes
+     */
+    readonly cluster: Cluster;
+    readonly version: KubernetesVersion;
+    readonly nodeGroup?: Nodegroup;
+    readonly autoScalingGroup?: AutoScalingGroup;
+    private readonly provisionedAddOns: Map<string, cdk.Construct>;
 
     /**
-     * AddOns provisioned in the cluster
+     * Constructor for ClusterInfo
+     * @param props 
      */
-    provisionedAddOns?: Map<string, cdk.Construct>;
+    constructor(props: ClusterInfoProps){
+        this.cluster = props.cluster;
+        this.nodeGroup = props.nodeGroup ? props.nodeGroup : undefined;
+        this.autoScalingGroup = props.autoscalingGroup ? props.autoscalingGroup : undefined;
+        this.provisionedAddOns = new Map<string, cdk.Construct>();
+    }
+
+    /**
+     * Update provisionedAddOns map
+     * @param addOn 
+     * @param construct 
+     */
+    public addProvisionedAddOn(addOn: string, construct: cdk.Construct) {
+        this.provisionedAddOns.set(addOn, construct);
+    }
+
+    /**
+     * Given the addOn name, return the provisioned addOn construct
+     * @param addOn 
+     * @returns cdk.Construct | undefined
+     */
+    public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
+        if (this.provisionedAddOns) {
+            return this.provisionedAddOns.get(addOn);
+        }
+        else {
+            return undefined;
+        }
+    }
 }
 
 /**

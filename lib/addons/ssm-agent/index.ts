@@ -5,11 +5,11 @@ import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
 export class SSMAgentAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
-        console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "SSMAgentAddon can only be used with EKS EC2 at the moment. "
+        console.assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, "SSMAgentAddon can only be used with EKS EC2 at the moment. "
             + "If using customer cluster provider, make sure you return the node group");
 
         // Setup managed policy.
-        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup;
+        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoScalingGroup;
         // Add AWS Managed Policy for SSM
         nodeGroup!.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
 
