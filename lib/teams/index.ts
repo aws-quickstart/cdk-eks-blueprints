@@ -191,7 +191,6 @@ export class ApplicationTeam implements Team {
             prune: true
         });
 
-
         if (props.namespaceHardLimits) {
             this.setupNamespacePolicies(clusterInfo, namespaceName);
         }
@@ -243,12 +242,12 @@ export class ApplicationTeam implements Team {
 
         if (clusterInfo.provisionedAddOns) {
             if (clusterInfo.provisionedAddOns.has(Constants.SECRETS_STORE_CSI_DRIVER)) {
-                
+
                 const cluster = clusterInfo.cluster;
                 const secretProviderClass = this.teamProps.name + '-aws-secrets';
-                
+
                 let awsSecretObjects: secretsProvider.AwsSecret[] = [];
-                
+
                 const serviceAccount = cluster.addServiceAccount(this.teamProps.name + '-sa', {
                     name: this.teamProps.name + '-sa',
                     namespace: this.teamProps.namespace
@@ -304,7 +303,7 @@ export class ApplicationTeam implements Team {
                     }
                     serviceAccount.addToPrincipalPolicy(policyStatement);
                 });
-                
+
                 let secretProviderManifestData:secretProviderManifestDataSpec = {
                     apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
                     kind: 'SecretProviderClass',
