@@ -9,7 +9,7 @@ export { HostedZoneProvider, LookupHostedZoneProvider, DelegatingHostedZoneProvi
 export { MetricsServerAddOn } from './metrics-server'
 export { NginxAddOn } from './nginx'
 export { XrayAddOn } from './xray'
-export { SecretsStoreAddOn, SecretType } from './secrets-store'
+export { SecretsStoreAddOn } from './secrets-store'
 export { SSMAgentAddOn } from './ssm-agent'
 
 export class Constants {

@@ -4,8 +4,6 @@ The Secrets Store Add-on provisions the [AWS Secrets Manager and Config Provider
 
 With ASCP, you can securely store and manage your secrets in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager) or [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and retrieve them through your application workloads running on Kubernetes. You no longer have to write custom code for your applications.
 
-> **Compatibility**: This addon is only compatible with following Cluster Providers.<br/> [EC2 Cluster Provider](./../cluster-providers/ec2-cluster-provider.md)
-
 ## Usage
 
 #### **`index.ts`**
@@ -13,13 +11,14 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 import * as cdk from '@aws-cdk/core';
 import {
   SecretsStoreAddOn,
-  SecretType,
+  AwsSecretType,
+  KubernetesSecretType,
   ClusterAddOn,
   EksBlueprint,
   ApplicationTeam
 } from '@shapirov/cdk-eks-blueprint';
 
-const secretsStoreAddOn = new SecretsStoreAddOn();
+const secretsStoreAddOn = new SecretsStoreAddOn({ syncSecrets: true });
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
 
 // Setup application team with secrets
@@ -27,12 +26,34 @@ class TeamBurnham extends ApplicationTeam {
   constructor(scope: Construct) {
     super({
       name: "burnham",
-      secrets: [
-        {
-          secretName: 'GITHUB_TOKEN',
-          secretType: SecretType.SECRETSMANAGER
-        }
-      ]
+      secrets: {
+        awsSecrets: [
+          {
+            objectName: 'GITHUB_TOKEN',
+            objectType: AwsSecretType.SSMPARAMETER
+          },
+          {
+            objectName: 'PRIVATE_KEY',
+            objectType: AwsSecretType.SECRETSMANAGER
+          }
+        ],
+        kubernetesSecrets: [
+          {
+            secretName: 'burhnam-github-secrets',
+            type: KubernetesSecretType.OPAQUE,
+            data: [
+              {
+                objectName: 'GITHUB_TOKEN',
+                key: 'github_token'
+              },
+              {
+                objectName: 'PRIVATE_KEY',
+                key: 'private_key'
+              }
+            ]
+          }
+        ]
+      }
     });
   }
 }
@@ -51,13 +72,13 @@ new EksBlueprint(app, 'my-stack-name', addOns, teams, {
 
 1. Installs the [Kubernetes Secrets Store CSI Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) in the `kube-system` namespace.
 2. Installs [AWS Secrets Manager and Config Provider for Secret Store CSI Driver](https://github.com/aws/secrets-store-csi-driver-provider-aws) in the `kube-system` namespace.
-3. Create an IAM access policy for scoped down to just the secrets the provided namespace should have access to.
-4. Create an [IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) to be used and associate the above IAM policy with that service account.
-5. Create the [SecretProviderClass](https://github.com/aws/secrets-store-csi-driver-provider-aws#secretproviderclass-options) which tells the AWS provider which secrets can be mounted in an application pod in the provided namespace.
+3. Creates an IAM access policy for scoped down to just the secrets the provided namespace should have access to.
+4. Creates an [IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) to be used and associate the above IAM policy with that service account.
+5. Creates the [SecretProviderClass](https://github.com/aws/secrets-store-csi-driver-provider-aws#secretproviderclass-options) which tells the AWS provider which secrets can be mounted in an application pod in the provided namespace.
 
 ## Security Considerations
 
-The AWS Secrets Manger and Config Provider provides compatibility for legacy applications that access secrets as mounted files in the pod. Security conscious appliations should use the native AWS APIs to fetch secrets and optionally cache them in memory rather than storing them in the file system.
+The AWS Secrets Manger and Config Provider provides compatibility for legacy applications that access secrets as mounted files in the pod. Security conscious applications should use the native AWS APIs to fetch secrets and optionally cache them in memory rather than storing them in the file system.
 
 ## Example
 
@@ -93,7 +114,7 @@ spec:
           volumeAttributes:
             secretProviderClass: "burnham-aws-secrets"
       containers:
-      - name: app-deployment
+      - name: test-mount-volume
         image: ubuntu
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]
@@ -104,20 +125,52 @@ spec:
           requests:
             cpu: "100m"
             memory: "128Mi"
-        ports:
-        - containerPort: 80
         volumeMounts:
         - name: secrets-store-inline
           mountPath: "/mnt/secrets-store"
           readOnly: true
+      - name: test-env-var
+        image: ubuntu
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: burhnam-github-secrets
+                key: github_token
 EOF
 ```
 
 Apply the manifest.
 
 ```sh
-$ kubectl apply -f test-secret.yaml                           
+$ kubectl apply -f test-secrets.yaml
 deployment.apps/app-deployment created
+```
+
+Test that kubernetes secret `burnham-github-secrets` was created.
+
+```sh
+$ kubectl describe secrets burhnam-github-secrets -n team-burnham
+Name:         burhnam-github-secrets
+Namespace:    team-burnham
+Labels:       secrets-store.csi.k8s.io/managed=true
+Annotations:  <none>
+
+Type:  Opaque
+
+Data
+====
+github_token:  40 bytes
+private_key:   1856 bytes
 ```
 
 Test that the deployment has completed and the pod is running successfully.
@@ -128,10 +181,21 @@ NAME                              READY   STATUS    RESTARTS   AGE
 app-deployment-6867fc6bd6-jzdwh   1/1     Running   0          46s
 ```
 
-Next, we can test whether the secret `GITHUB_TOKEN` has been successfully. We will use the `kubectl exec` command to print our secret to stdout.
+Next, test whether the secret `PRIVATE_KEY` can be accessed from within the `test-volume-mount` container.
 
 ```sh
-$ kubectl exec app-deployment-6867fc6bd6-jzdwh -n team-burnham -- cat /mnt/secrets-store/GITHUB_TOKEN
+$ kubectl exec app-deployment-6867fc6bd6-jzdwh -c test-mount-volume -n team-burnham -- cat /mnt/secrets-store/PRIVATE_KEY
 
-ghp_XXXXXXXXXXXXXXX
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+...
+-----END OPENSSH PRIVATE KEY-----
+```
+
+Test whether `GITHUB_TOKEN` is available as an environment variable from within the `test-env-var` container.
+
+```sh
+$ kubectl exec app-deployment-6867fc6bd6-jzdwh -c test-env-var -n team-burnham -- echo $GITHUB_TOKEN
+
+ghp_XXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
