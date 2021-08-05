@@ -3,7 +3,7 @@ import { PolicyStatement } from "@aws-cdk/aws-iam";
 import { ClusterInfo } from "../../stacks/cluster-types";
 import { Constants } from "..";
 import { loadExternalYaml } from "../../utils/yaml-utils";
-import { Secrets, SecretsProvider } from "./secret-provider";
+import { SecretsInfo, SecretsProvider } from "./secret-provider";
 import { KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ApplicationTeam, TeamProps } from "../../teams";
 import { CfnOutput } from "@aws-cdk/core";
@@ -206,7 +206,7 @@ export class CsiDriverProviderAws implements SecretsProvider {
   }
 }
 
-export class CsiDriverProviderAwsSecrets implements Secrets {
+export class CsiDriverProviderAwsSecrets implements SecretsInfo {
 
   readonly secrets: CsiDriverProviderAwsSecretsProps
 

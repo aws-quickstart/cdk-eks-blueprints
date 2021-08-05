@@ -3,7 +3,7 @@ import { ClusterInfo } from "../stacks/cluster-types";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { Secrets } from "../addons/secrets-store/secret-provider";
+import { SecretsInfo } from "../addons/secrets-store/secret-provider";
 
 /**
  * Interface for a team. 
@@ -60,7 +60,7 @@ export class TeamProps {
     /**
      * Secrets Information
      */
-    readonly secretInfo?: Secrets;
+    readonly secretInfo?: SecretsInfo;
 }
 
 export class ApplicationTeam implements Team {

@@ -14,7 +14,7 @@ export interface SecretsProvider {
 /**
  * Secrets to be provided
  */
-export interface Secrets {
+export interface SecretsInfo {
   secrets: any;
   setupSecrets?(clusterInfo: ClusterInfo, team: ApplicationTeam): any;
 }
