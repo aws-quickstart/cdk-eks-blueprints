@@ -1,6 +1,6 @@
 {
     "name": "@shapirov/cdk-eks-blueprint",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -41,8 +41,12 @@
         "@aws-cdk/aws-secretsmanager": "1.113.0",
         "@aws-cdk/core": "1.113.0",
         "@aws-cdk/pipelines": "1.113.0",
+        "@types/bcrypt": "^5.0.0",
+        "aws-sdk": "^2.952.0",
+        "bcrypt": "^5.0.1",
         "js-yaml": "3.13.1",
         "sync-request": "6.1.0",
-        "user": "^0.0.0"
+        "user": "^0.0.0",
+        "yaml": "^1.10.2"
     }
 }

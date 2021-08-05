@@ -1,5 +1,5 @@
 import { Constants } from "..";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 /**
  * Properties available to configure the nginx ingress controller.

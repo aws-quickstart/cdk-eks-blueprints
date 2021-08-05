@@ -1,5 +1,4 @@
-import { ClusterInfo } from '../../../lib/stacks/cluster-types';
-import { Team } from '../../../lib/teams';
+import { ClusterInfo, Team } from '../../../lib';
 
 export class TeamRiker implements Team {
 

@@ -1,7 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import request from 'sync-request';
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 /**
  * Configuration options for AWS Load Balancer controller
