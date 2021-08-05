@@ -40,7 +40,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.ClusterAutoScalerAddOn,
             new ssp.addons.ContainerInsightsAddOn,
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            new ssp.addons.SecretsStoreAddOn({ syncSecrets: true }),
+            new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn()
         ];
 

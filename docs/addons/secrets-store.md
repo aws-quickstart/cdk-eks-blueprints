@@ -1,11 +1,10 @@
 # Secrets Store Add-on
 
-The Secrets Store Add-on provisions the [AWS Secrets Manager and Config Provider(ASCP) for Secret Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
+The Secrets Store Add-on implements a Secret Provider interface that allows you to bring your own secrets provider. By default, the add-on provisions the [AWS Secrets Manager and Config Provider(ASCP) for Secret Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
 
 With ASCP, you can securely store and manage your secrets in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager) or [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and retrieve them through your application workloads running on Kubernetes. You no longer have to write custom code for your applications.
 
 ## Usage
-
 #### **`index.ts`**
 ```typescript
 import * as cdk from '@aws-cdk/core';
@@ -18,7 +17,7 @@ import {
   ApplicationTeam
 } from '@shapirov/cdk-eks-blueprint';
 
-const secretsStoreAddOn = new SecretsStoreAddOn({ syncSecrets: true });
+const secretsStoreAddOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
 
 // Setup application team with secrets
@@ -26,7 +25,7 @@ class TeamBurnham extends ApplicationTeam {
   constructor(scope: Construct) {
     super({
       name: "burnham",
-      secrets: {
+      secrets: new CsiDriverProviderAwsSecrets({
         awsSecrets: [
           {
             objectName: 'GITHUB_TOKEN',
@@ -53,7 +52,7 @@ class TeamBurnham extends ApplicationTeam {
             ]
           }
         ]
-      }
+      })
     });
   }
 }
@@ -84,7 +83,7 @@ The AWS Secrets Manger and Config Provider provides compatibility for legacy app
 
 After the Blueprint stack is deployed you can test consuming the secret from within a `deployment`.
 
-This sample `deployment` pulls an `alpine` image. We will mount the secrets under `/mnt/secrets-store` directory as shown in the manifest below.
+This sample `deployment` shows how to consume the secrets as mounted volumes as well as environment variables.
 
 ```yaml
 cat << 'EOF' >> test-secrets.yaml
@@ -105,7 +104,7 @@ spec:
       labels:
         app: myapp
     spec:
-      serviceAccountName: burnham-sa
+      serviceAccountName: burnham-secrets-sa
       volumes:
       - name: secrets-store-inline
         csi:

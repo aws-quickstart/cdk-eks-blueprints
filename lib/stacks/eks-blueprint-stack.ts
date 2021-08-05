@@ -64,10 +64,7 @@ export class EksBlueprint extends cdk.Stack {
         const postDeploymentSteps = Array<ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const node = addOn.deploy(clusterInfo);
-            if (node instanceof cdk.Construct) {
-                clusterInfo.addProvisionedAddOn(addOn.name!, node);
-            }
+            addOn.deploy(clusterInfo);
             
             const postDeploy : any  = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {

@@ -67,7 +67,7 @@ export class ClusterInfo {
     /**
      * Given the addOn name, return the provisioned addOn construct
      * @param addOn 
-     * @returns cdk.Construct | undefined
+     * @returns undefined
      */
     public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
         if (this.provisionedAddOns) {
@@ -91,7 +91,7 @@ export interface ClusterProvider {
  */
 export interface ClusterAddOn {
     readonly name?: string;
-    deploy(clusterInfo: ClusterInfo): cdk.Construct | void;
+    deploy(clusterInfo: ClusterInfo): void;
 }
 
 /**

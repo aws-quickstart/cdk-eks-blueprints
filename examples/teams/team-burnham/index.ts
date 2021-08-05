@@ -1,6 +1,10 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Construct } from '@aws-cdk/core';
-import { AwsSecretType, KubernetesSecretType } from '../../../lib/addons/secrets-store';
+import {
+    AwsSecretType,
+    CsiDriverProviderAwsSecrets,
+    KubernetesSecretType
+} from '../../../lib/addons/secrets-store/csi-driver-provider-aws';
 import { ApplicationTeam } from '../../../lib/teams';
 
 function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
@@ -16,33 +20,35 @@ export class TeamBurnham extends ApplicationTeam {
         super({
             name: "burnham",
             users: getUserArns(scope, "team-burnham.users"),
-            secrets: {
-                awsSecrets: [
-                    {
-                        objectName: 'GITHUB_TOKEN',
-                        objectType: AwsSecretType.SSMPARAMETER
-                    },
-                    {
-                        objectName: 'PRIVATE_KEY',
-                        objectType: AwsSecretType.SECRETSMANAGER
-                    }
-                ],
-                kubernetesSecrets: [
-                    {
-                        secretName: 'burhnam-github-secrets',
-                        type: KubernetesSecretType.OPAQUE,
-                        data: [
-                            {
-                                objectName: 'GITHUB_TOKEN',
-                                key: 'github_token'
-                            },
-                            {
-                                objectName: 'PRIVATE_KEY',
-                                key: 'private_key'
-                            }
-                        ]
-                    }
-                ]
+            secretInfo: {
+                secrets: new CsiDriverProviderAwsSecrets({
+                    awsSecrets: [
+                        {
+                            objectName: 'GITHUB_TOKEN',
+                            objectType: AwsSecretType.SSMPARAMETER
+                        },
+                        {
+                            objectName: 'PRIVATE_KEY',
+                            objectType: AwsSecretType.SECRETSMANAGER
+                        }
+                    ],
+                    kubernetesSecrets: [
+                        {
+                            secretName: 'burhnam-github-secrets',
+                            type: KubernetesSecretType.OPAQUE,
+                            data: [
+                                {
+                                    objectName: 'GITHUB_TOKEN',
+                                    key: 'github_token'
+                                },
+                                {
+                                    objectName: 'PRIVATE_KEY',
+                                    key: 'private_key'
+                                }
+                            ]
+                        }
+                    ]
+                })
             }
         });
     }
