@@ -15,26 +15,23 @@ export default class BlueprintConstruct extends cdk.Construct {
         const platformTeam = new team.TeamPlatform(account);
 
         // Teams for the cluster.
-        const teams: Array<ssp.teams.Team> = [
+        const teams: Array<ssp.Team> = [
             platformTeam,
             new team.TeamTroi(),
             new team.TeamRiker(),
             new team.TeamBurnham(scope)
         ];
-
+        const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
+            bootstrapRepo: {
+                repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+                path: 'envs/prod',
+            }
+        });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn,
-            new ssp.addons.NginxAddOn({values: {
-                controller: {
-                    service: {
-                        annotations: {
-                            "key1": "value1"
-                        }
-                    }
-                }
-            }}),
-            new ssp.addons.ArgoCDAddOn,
+            prodBootstrapArgo,
+            new ssp.addons.NginxAddOn,
             new ssp.addons.CalicoAddOn,
             new ssp.addons.MetricsServerAddOn,
             new ssp.addons.ClusterAutoScalerAddOn,

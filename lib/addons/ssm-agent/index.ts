@@ -1,6 +1,6 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export class SSMAgentAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {

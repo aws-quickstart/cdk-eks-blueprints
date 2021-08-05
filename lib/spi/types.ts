@@ -1,13 +1,46 @@
 import * as cdk from '@aws-cdk/core';
-import { IVpc } from '@aws-cdk/aws-ec2';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
-import { Team } from '../teams';
+import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks'
+
+/**
+ * Data type defining an application repository (git). 
+ */
+export interface ApplicationRepository {
+    /**
+     * Expected to support helm style repo at the moment
+     */
+    repoUrl: string,
+
+    /** 
+     * Path within the repository 
+     */
+    path?: string,
+
+    /**
+     * Optional name for the bootstrap application
+     */
+    name?: string,
+
+    /**
+     * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
+     * The secret must exist in the same region and account where the stack will run. 
+     */
+    credentialsSecretName?: string,
+
+    /**
+     * Depending on credentials type the arn should either point to an SSH key (plain text value)
+     * or a json file with username/password attributes.
+     * For TOKEN type per ArgoCD documentation (https://argoproj.github.io/argo-cd/user-guide/private-repositories/) 
+     * username can be any non-empty username and token value as password.
+     */
+    credentialsType?: "USERNAME" | "TOKEN" | "SSH"
+
+}
 
 /**
  * Props for ClusterInfo.
  */
-export interface ClusterInfoProps {
+ export interface ClusterInfoProps {
 
     /**
      * The EKS cluster.
@@ -78,28 +111,3 @@ export class ClusterInfo {
         }
     }
 }
-
-/**
- * ClusterProvider is the interface to which all Cluster Providers should conform.
- */
-export interface ClusterProvider {
-    createCluster(scope: cdk.Construct, vpc: IVpc, version: KubernetesVersion): ClusterInfo;
-}
-
-/**
- * ClusterAddOn is the interface to which all Cluster addons should conform.
- */
-export interface ClusterAddOn {
-    readonly name?: string;
-    deploy(clusterInfo: ClusterInfo): void;
-}
-
-/**
- * Optional interface to allow cluster bootstrapping after provisioning of add-ons and teams is complete.
- * Can be leveraged to bootstrap workloads, perform cluster checks. 
- * ClusterAddOn implementation may implement this interface in order to get post deployment hook point.
- */
-export interface ClusterPostDeploy {
-    postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void;
-}
-

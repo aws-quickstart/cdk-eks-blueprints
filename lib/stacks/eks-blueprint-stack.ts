@@ -5,10 +5,8 @@ import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
-
-import { Team } from '../teams'
-import { ClusterAddOn, ClusterPostDeploy, ClusterProvider } from './cluster-types'
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
+import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
 
 export class EksBlueprintProps {
 
@@ -45,6 +43,10 @@ export class EksBlueprintProps {
 
 }
 
+/**
+ * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
+ * and orcherstrates provisioning of add-ons, teams and post deployment hooks. 
+ */
 export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
@@ -60,13 +62,15 @@ export class EksBlueprint extends cdk.Stack {
         const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider();
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
-
         const postDeploymentSteps = Array<ClusterPostDeploy>();
+        const promises = Array<Promise<any>>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            addOn.deploy(clusterInfo);
-            
-            const postDeploy : any  = addOn;
+            const result : any = addOn.deploy(clusterInfo);
+            if(result) {
+                promises.push(<Promise<any>>result);
+            }
+            const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
             }
@@ -77,9 +81,12 @@ export class EksBlueprint extends cdk.Stack {
                 team.setup(clusterInfo);
             }
         }
-        for(let step of postDeploymentSteps) {
-            step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
-        }
+
+        Promise.all(promises).then(() => {
+            for(let step of postDeploymentSteps) {
+                step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+            }
+        }).catch(err => { throw new Error(err)});
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {

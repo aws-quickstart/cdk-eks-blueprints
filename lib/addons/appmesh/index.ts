@@ -1,7 +1,7 @@
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export interface AppMeshAddOnProps {
     /**

@@ -1,4 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 
 export class MetricsServerAddOn implements ClusterAddOn {

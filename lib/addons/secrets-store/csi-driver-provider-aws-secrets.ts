@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import { PolicyStatement } from "@aws-cdk/aws-iam";
-import { ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterInfo } from "../../../lib";
 import { Constants } from "..";
 import { SecretsInfo } from "./secret-provider";
 import { ServiceAccount } from "@aws-cdk/aws-eks";

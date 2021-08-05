@@ -1,5 +1,5 @@
 import { Constants } from "..";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../../lib";
 import { CsiDriverProviderAws } from "./csi-driver-provider-aws";
 import { SecretsProvider } from "./secret-provider";
 

@@ -1,5 +1,5 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterInfo } from "../../../lib";
 import { ApplicationTeam } from "../../teams";
 
 /**

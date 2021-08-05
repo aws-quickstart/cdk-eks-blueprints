@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import { ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterInfo } from "../../../lib";
 import { Constants } from "..";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { SecretsProvider } from "./secret-provider";

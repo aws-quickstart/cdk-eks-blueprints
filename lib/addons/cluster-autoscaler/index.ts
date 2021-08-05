@@ -3,7 +3,7 @@ import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import { assertEC2NodeGroup } from "../../cluster-providers";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
@@ -17,6 +17,7 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
      * Version of the autoscaler, controls the image tag
      */
     readonly versionMap = new Map([
+        [KubernetesVersion.V1_20, "v1.20.0"],
         [KubernetesVersion.V1_19, "v1.19.1"],
         [KubernetesVersion.V1_18, "v1.18.3"],
         [KubernetesVersion.V1_17, "v1.17.4"]
