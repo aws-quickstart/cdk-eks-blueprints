@@ -2,9 +2,9 @@ import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Construct } from '@aws-cdk/core';
 import {
     AwsSecretType,
-    CsiDriverProviderAwsSecrets,
+    CsiDriverProviderAwsSecretsInfo,
     KubernetesSecretType
-} from '../../../lib/addons/secrets-store/csi-driver-provider-aws';
+} from '../../../lib/addons/secrets-store/csi-driver-provider-aws-secrets';
 import { ApplicationTeam } from '../../../lib/teams';
 
 function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
@@ -21,7 +21,7 @@ export class TeamBurnham extends ApplicationTeam {
             name: "burnham",
             users: getUserArns(scope, "team-burnham.users"),
             secretInfo: {
-                secrets: new CsiDriverProviderAwsSecrets({
+                secrets: new CsiDriverProviderAwsSecretsInfo({
                     awsSecrets: [
                         {
                             objectName: 'GITHUB_TOKEN',
