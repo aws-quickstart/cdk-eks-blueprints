@@ -62,14 +62,12 @@ export class EksBlueprint extends cdk.Stack {
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = Array<Map<string, Promise<cdk.Construct>>>();
+        const promises = new Map<string, Promise<cdk.Construct>>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(clusterInfo);
             if(result) {
-                const promise = new Map();
-                promise.set(addOn.constructor.name, result);
-                promises.push(promise);
+                promises.set(addOn.constructor.name, result);
             }
             const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
@@ -77,23 +75,20 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        promises.forEach( (result) => {
-            result.forEach(async (promise, addon) => {
-                const construct = await promise;
-                console.log(`Adding ${addon}`);
-                clusterInfo.addProvisionedAddOn(addon, construct);
+        Promise.all(promises.values()).then((constructs) => {
+            constructs.forEach((construct) => {
+                //TODO: need the keys here
+                clusterInfo.addProvisionedAddOn(, construct);
             });
-        });
-
-        if (blueprintProps.teams != null) {
-            for(let team of blueprintProps.teams) {
-                team.setup(clusterInfo);
+            if (blueprintProps.teams != null) {
+                for(let team of blueprintProps.teams) {
+                    team.setup(clusterInfo);
+                }
             }
-        }
-
-        for(let step of postDeploymentSteps) {
-            step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
-        }
+            for(let step of postDeploymentSteps) {
+                step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+            }
+        }).catch(err => { throw new Error(err)});
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
