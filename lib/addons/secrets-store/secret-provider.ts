@@ -1,4 +1,4 @@
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
+import { Construct } from "@aws-cdk/core";
 import { ClusterInfo } from "../../../lib";
 import { ApplicationTeam } from "../../teams";
 
@@ -8,7 +8,7 @@ import { ApplicationTeam } from "../../teams";
  * use the one we provide using AWS Secrets Manager and Config Provider(ASCP)
  */
 export interface SecretsProvider {
-  provide(clusterInfo: ClusterInfo): KubernetesManifest;
+  provide(clusterInfo: ClusterInfo): Construct;
 }
 
 /**
@@ -16,5 +16,5 @@ export interface SecretsProvider {
  */
 export interface SecretsInfo {
   secrets: any;
-  setupSecrets?(clusterInfo: ClusterInfo, team: ApplicationTeam): any;
+  setupSecrets?(clusterInfo: ClusterInfo, team: ApplicationTeam, secretsManifest: Construct): any;
 }

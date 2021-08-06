@@ -14,5 +14,4 @@ export { SSMAgentAddOn } from './ssm-agent'
 
 export class Constants {
     public static readonly SSP_ADDON = "ssp-addon";
-    public static readonly SECRETS_STORE_CSI_DRIVER = "secrets-store-csi-driver";
 }

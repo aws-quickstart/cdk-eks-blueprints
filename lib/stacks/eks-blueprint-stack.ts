@@ -4,7 +4,6 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Construct } from 'constructs';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
 
@@ -49,7 +48,7 @@ export class EksBlueprintProps {
  */
 export class EksBlueprint extends cdk.Stack {
 
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, props);
 
         this.validateInput(blueprintProps);
@@ -63,30 +62,38 @@ export class EksBlueprint extends cdk.Stack {
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = Array<Promise<any>>();
+        const promises = Array<Map<string, Promise<cdk.Construct>>>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result : any = addOn.deploy(clusterInfo);
+            const result = addOn.deploy(clusterInfo);
             if(result) {
-                promises.push(<Promise<any>>result);
+                const promise = new Map();
+                promise.set(addOn.constructor.name, result);
+                promises.push(promise);
             }
             const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
             }
         }
-        
+
+        promises.forEach( (result) => {
+            result.forEach(async (promise, addon) => {
+                const construct = await promise;
+                console.log(`Adding ${addon}`);
+                clusterInfo.addProvisionedAddOn(addon, construct);
+            });
+        });
+
         if (blueprintProps.teams != null) {
             for(let team of blueprintProps.teams) {
                 team.setup(clusterInfo);
             }
         }
 
-        Promise.all(promises).then(() => {
-            for(let step of postDeploymentSteps) {
-                step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
-            }
-        }).catch(err => { throw new Error(err)});
+        for(let step of postDeploymentSteps) {
+            step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+        }
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {

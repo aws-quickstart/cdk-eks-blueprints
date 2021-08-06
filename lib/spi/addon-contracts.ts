@@ -1,10 +1,13 @@
 import { Team, ClusterInfo } from '.';
+import { Construct } from '@aws-cdk/core';
 
 /**
  * ClusterAddOn is the interface to which all Cluster addons should conform.
+ * @param clusterInfo
+ * @returns Promise<cdk.Construct>
  */
 export declare interface ClusterAddOn {
-    deploy(clusterInfo: ClusterInfo): void;
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> | void;
 }
 
 /**

@@ -46,11 +46,9 @@ const CsiDriverProviderAwsDefaults: CsiDriverProviderAwsProps = {
 export class CsiDriverProviderAws implements SecretsProvider {
 
   private options: CsiDriverProviderAwsProps;
-  public name: string;
 
   constructor(props?: CsiDriverProviderAwsProps) {
     this.options = { ...CsiDriverProviderAwsDefaults, ...props };
-    this.name = Constants.SECRETS_STORE_CSI_DRIVER;
   }
 
   provide(clusterInfo: ClusterInfo): KubernetesManifest {
@@ -89,11 +87,11 @@ export class CsiDriverProviderAws implements SecretsProvider {
     }
 
     const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', {
-      chart: Constants.SECRETS_STORE_CSI_DRIVER,
+      chart: 'secrets-store-csi-driver',
       repository: 'https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts',
       namespace: this.options.namespace,
       version: this.options.version,
-      release: Constants.SECRETS_STORE_CSI_DRIVER,
+      release: Constants.SSP_ADDON,
       wait: true,
       timeout: cdk.Duration.minutes(15),
       values,

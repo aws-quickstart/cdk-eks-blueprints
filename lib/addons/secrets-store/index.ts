@@ -1,7 +1,7 @@
-import { Constants } from "..";
-import { ClusterAddOn, ClusterInfo } from "../../../lib";
-import { CsiDriverProviderAws } from "./csi-driver-provider-aws";
-import { SecretsProvider } from "./secret-provider";
+import { Construct } from '@aws-cdk/core';
+import { ClusterAddOn, ClusterInfo } from '../../../lib';
+import { CsiDriverProviderAws } from './csi-driver-provider-aws';
+import { SecretsProvider } from './secret-provider';
 
 /**
  * Configuration options for Secrets Store AddOn
@@ -27,7 +27,6 @@ const SecretsStoreAddOnDefaults: SecretsStoreAddOnProps = {
 export class SecretsStoreAddOn implements ClusterAddOn {
 
   private options: SecretsStoreAddOnProps;
-  public name: string;
 
   constructor(props?: SecretsStoreAddOnProps) {
     this.options = { ...SecretsStoreAddOnDefaults, ...props };
@@ -39,8 +38,11 @@ export class SecretsStoreAddOn implements ClusterAddOn {
     }
   }
 
-  deploy(clusterInfo: ClusterInfo): void {
+  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const secretsManifest = this.options.secretsProvider!.provide(clusterInfo);
-    clusterInfo.addProvisionedAddOn(Constants.SECRETS_STORE_CSI_DRIVER, secretsManifest)
+
+    return new Promise<Construct>( (resolve) => {
+      resolve(secretsManifest);
+    });
   }
 }

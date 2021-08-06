@@ -1,11 +1,10 @@
 import * as cdk from "@aws-cdk/core";
 import { PolicyStatement } from "@aws-cdk/aws-iam";
 import { ClusterInfo } from "../../../lib";
-import { Constants } from "..";
 import { SecretsInfo } from "./secret-provider";
 import { ServiceAccount } from "@aws-cdk/aws-eks";
 import { ApplicationTeam, TeamProps } from "../../teams";
-import { CfnOutput } from "@aws-cdk/core";
+import { CfnOutput, Construct } from "@aws-cdk/core";
 
 export interface CsiDriverProviderAwsSecretsInfoProps {
   /**
@@ -117,15 +116,12 @@ export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
    * Setup the secrets for CSI driver
    * @param clusterInfo
    */
-  setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam): void {
-    const csiDriver = clusterInfo.getProvisionedAddOn(Constants.SECRETS_STORE_CSI_DRIVER);
-    console.assert(csiDriver != null, 'Secrets Driver ${Constants.SECRETS_STORE_CSI_DRIVER} is not provided in addons');
-
+  setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct): void {
     // Create the service account for the team
     const serviceAccount = this.createServiceAccount(clusterInfo, team);
 
     // Create and apply SecretProviderClass manifest
-    this.createSecretProviderClass(clusterInfo, serviceAccount, team.teamProps);
+    this.createSecretProviderClass(clusterInfo, serviceAccount, team.teamProps, csiDriver!);
   }
 
   /**
@@ -182,7 +178,7 @@ export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
    * @param serviceAccount
    * @param teamProps
    */
-  private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, teamProps: TeamProps) {
+  private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, teamProps: TeamProps, csiDriver: Construct) {
     const cluster = clusterInfo.cluster;
     const secretProviderClass = teamProps.name + '-aws-secrets';
 
@@ -204,7 +200,7 @@ export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
 
     secretProviderClassManifest.node.addDependency(
       serviceAccount,
-      clusterInfo.getProvisionedAddOn(Constants.SECRETS_STORE_CSI_DRIVER)!
+      csiDriver
     );
   }
 }

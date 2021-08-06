@@ -224,7 +224,9 @@ export class ApplicationTeam implements Team {
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
         if (this.teamProps.secretInfo !== undefined) {
-            this.teamProps.secretInfo.secrets.setupSecrets(clusterInfo, this);
+            const csiDriver = clusterInfo.getProvisionedAddOn('SecretsStoreAddOn');
+            console.assert(csiDriver != null, 'SecretsStoreAddOn is not provided in addons')
+            this.teamProps.secretInfo.secrets.setupSecrets(clusterInfo, this, csiDriver);
         }
     }
 }
