@@ -7,6 +7,7 @@ import * as spi from "../../spi";
 import { getSecretValue, btoa } from '../../utils';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
 import { Constants } from "..";
+import * as spi from "../../spi";
 
 /**
  * Configuration options for add-on.
@@ -29,7 +30,7 @@ export interface ArgoCDAddOnProps {
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
      * after the infrastructure and team provisioning is complete. 
      */
-    bootstrapRepo?: spi.ApplicationRepository;
+    bootstrapRepo?: spi.ApplicationRepository,
 
     /**
      * Optional admin password secret (plaintext).

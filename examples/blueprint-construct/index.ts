@@ -37,13 +37,17 @@ export default class BlueprintConstruct extends cdk.Construct {
             new team.TeamRiker(scope, teamManifestDirList[1]),
             new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
-        const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
+
+        // Configure ArgoCD with our App of Apps repository.
+        const argo = new ssp.addons.ArgoCDAddOn({
             bootstrapRepo: {
                 repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
                 path: 'envs/prod',
             }
         });
-        // AddOns for the cluster.
+
+
+        // Configure add-ons for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
