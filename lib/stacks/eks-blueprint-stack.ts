@@ -62,12 +62,14 @@ export class EksBlueprint extends cdk.Stack {
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = new Map<string, Promise<cdk.Construct>>();
+        const promises = Array<Promise<cdk.Construct>>();
+        const addOns: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(clusterInfo);
             if(result) {
-                promises.set(addOn.constructor.name, result);
+                promises.push(result);
+                addOns.push(addOn.constructor.name);
             }
             const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
@@ -75,10 +77,10 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
+        // Wait for all addon promises to be resolved
         Promise.all(promises.values()).then((constructs) => {
-            constructs.forEach((construct) => {
-                //TODO: need the keys here
-                clusterInfo.addProvisionedAddOn(, construct);
+            constructs.forEach( (construct, index) => {
+                clusterInfo.addProvisionedAddOn(addOns[index], construct);
             });
             if (blueprintProps.teams != null) {
                 for(let team of blueprintProps.teams) {
