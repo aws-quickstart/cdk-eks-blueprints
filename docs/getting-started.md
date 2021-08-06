@@ -147,7 +147,7 @@ kubectl port-forward $ARGO_SERVER -n argocd 8080:443
 
 Open your browser to http://localhost:8080 and you should see the ArgoCD login screen.
 
-![ArgoCD](../assets/images/argo-cd.png)
+![ArgoCD](assets/images/argo-cd.png)
 
 ### Logging Into ArgoCD
 

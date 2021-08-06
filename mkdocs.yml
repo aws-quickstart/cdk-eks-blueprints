@@ -29,6 +29,8 @@ nav:
   - Cluster Providers: 
     - Overview: 'cluster-providers/index.md'
     - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
+  - Advanced:
+    - Multi Cluster Management: 'advanced/multi-cluster-management.md'
 markdown_extensions:
   - def_list
   - pymdownx.highlight  
