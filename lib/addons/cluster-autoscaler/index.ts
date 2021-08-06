@@ -255,11 +255,11 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
                                         resources: {
                                             limits: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                             requests: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                         },
                                         command: [
