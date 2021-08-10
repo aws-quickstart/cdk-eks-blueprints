@@ -39,10 +39,6 @@ export class SecretsStoreAddOn implements ClusterAddOn {
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    const secretsManifest = this.options.secretsProvider!.provide(clusterInfo);
-
-    return new Promise<Construct>( (resolve) => {
-      resolve(secretsManifest);
-    });
+    return Promise.resolve(this.options.secretsProvider!.provide(clusterInfo));
   }
 }

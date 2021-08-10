@@ -202,5 +202,9 @@ export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
       serviceAccount,
       csiDriver
     );
+
+    new CfnOutput(clusterInfo.cluster.stack, `team-${teamProps.name}-secret-provider-class `, {
+      value: secretProviderClass
+    });
   }
 }

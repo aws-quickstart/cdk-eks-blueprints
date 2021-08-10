@@ -133,11 +133,7 @@ export class EC2ClusterProvider implements ClusterProvider {
             releaseVersion: this.options.amiReleaseVersion
         });
 
-        return new ClusterInfo({
-            cluster: cluster,
-            nodeGroup: nodeGroup,
-            version: version 
-        });
+        return new ClusterInfo(cluster, version, nodeGroup);
     }
 }
 

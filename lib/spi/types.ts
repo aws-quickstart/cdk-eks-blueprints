@@ -1,6 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks'
+import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 
 /**
  * Data type defining an application repository (git). 
@@ -37,40 +37,8 @@ export interface ApplicationRepository {
 
 }
 
-/**
- * Props for ClusterInfo.
- */
- export interface ClusterInfoProps {
-
-    /**
-     * The EKS cluster.
-     */
-    readonly cluster: Cluster;
-
-    /**
-     * Either and EKS NodeGroup for managed node groups, or and autoscaling group for self-managed.
-     */
-    readonly nodeGroup?: Nodegroup;
-
-    /**
-     * The autoscaling group for the cluster.
-     */
-    readonly autoscalingGroup?: AutoScalingGroup;
-
-    /**
-     * The Kubernetes version for the cluster.
-     */
-    readonly version: KubernetesVersion;
-}
-
-/**
- * ClusterInfo desribes an EKS Cluster
- */
 export class ClusterInfo {
     
-    /**
-     * Attributes
-     */
     readonly cluster: Cluster;
     readonly version: KubernetesVersion;
     readonly nodeGroup?: Nodegroup;
@@ -81,10 +49,17 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props 
      */
-    constructor(props: ClusterInfoProps){
-        this.cluster = props.cluster;
-        this.nodeGroup = props.nodeGroup ? props.nodeGroup : undefined;
-        this.autoScalingGroup = props.autoscalingGroup ? props.autoscalingGroup : undefined;
+    constructor(cluster: Cluster, version: KubernetesVersion, nodeGroup?: Nodegroup | AutoScalingGroup) {
+        this.cluster = cluster;
+        this.version = version;
+        if (nodeGroup) {
+            if (nodeGroup instanceof Nodegroup) {
+                this.nodeGroup = nodeGroup;
+            }
+            else {
+                this.autoScalingGroup = nodeGroup;
+            }
+        }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
     }
 
