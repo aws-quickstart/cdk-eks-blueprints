@@ -12,11 +12,12 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // Setup platform team.
         const account = props.env!.account!
-        const platformTeam = new team.TeamPlatform(account)
+        
+        // TODO: fix IAM user provisioning for admin user
+        // const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            platformTeam,
             new team.TeamTroi,
             new team.TeamRiker,
             new team.TeamBurnham(scope)
