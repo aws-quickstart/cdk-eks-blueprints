@@ -25,8 +25,8 @@ The CI system attached to the project will run all stacks under examples as end-
 Currently it works the following way:
 
 - A human maintainer reviews the pr code to ensure it is not malicious 
-- If the code is trusted and the maintainer wishes to run e2e tests, they comment on the pr with /do-e2e-tests ssp-amazon-eks-cdk-ci codebuild project runs in us=west-2 in an isengard account, so any visibility into the state can only occur through AWS maintainers.
-- If job succeeds, the CI bot approves the pr. If it fails it requests changes. Details on what failed will need to be manually shared with external contributors. Internal contributors can look at the Codebuild logs in the Isengard account.
+- If the code is trusted and the maintainer wishes to run e2e tests, they comment on the pr with /do-e2e-tests. This will trigger the build and test. Any visibility into the state can only occur through AWS maintainers.
+- If job succeeds, the CI bot approves the PR. If it fails it requests changes. Details on what failed will need to be manually shared with external contributors.
 - At present shapirov103, kcoleman731 and askulkarni2 have rights to invoke the bot. 
 
 ## Publishing
