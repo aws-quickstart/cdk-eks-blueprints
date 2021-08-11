@@ -38,6 +38,13 @@ export type PipelineProps = {
     scope: cdk.Construct
 }
 
+
+export class CodePipelineStack extends cdk.Stack {
+    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+        super(scope, id)
+    }
+}
+
 /**
  * CodePipeline deploys a new CodePipeline resource that is integrated with a GitHub repository.
  */
