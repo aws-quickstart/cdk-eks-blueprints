@@ -72,7 +72,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, teams, {
 1. Installs the [Kubernetes Secrets Store CSI Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) in the `kube-system` namespace.
 2. Installs [AWS Secrets Manager and Config Provider for Secret Store CSI Driver](https://github.com/aws/secrets-store-csi-driver-provider-aws) in the `kube-system` namespace.
 3. Creates an IAM access policy for scoped down to just the secrets the provided namespace should have access to.
-4. Creates an [IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) `[team-name]-secrets-sa` to be used and associate the above IAM policy with that service account.
+4. Updates [IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) `[team-name]-sa` for policies to grant read access to the provided secrets.
 5. Creates a [SecretProviderClass](https://github.com/aws/secrets-store-csi-driver-provider-aws#secretproviderclass-options) `[team-name]-aws-secrets` which tells the AWS provider which secrets can be mounted in an application pod in the provided namespace.
 
 ## Security Considerations
@@ -104,7 +104,7 @@ spec:
       labels:
         app: myapp
     spec:
-      serviceAccountName: burnham-secrets-sa
+      serviceAccountName: burnham-sa
       volumes:
       - name: secrets-store-inline
         csi:

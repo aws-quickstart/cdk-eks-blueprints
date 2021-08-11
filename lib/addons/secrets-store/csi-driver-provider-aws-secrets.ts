@@ -70,12 +70,17 @@ export enum KubernetesSecretType {
   TLS = 'kubernetes.io/tls'
 }
 
+interface secretObject {
+    objectName: string;
+    objectType: string;
+}
+export class TeamSecrets {
 
-export class TeamSecrets{
+  private secretObjects: secretObject[];
 
-  private secretObjects: Array<Map<string, string>>;
-
-  constructor(private props: TeamSecretsProps) {}
+  constructor(private props: TeamSecretsProps) {
+    this.secretObjects = [];
+  }
 
   /**
    * Setup the secrets for CSI driver
@@ -96,24 +101,23 @@ export class TeamSecrets{
    */
   private addPolicyToServiceAccount(team: ApplicationTeam) {
     const serviceAccount = team.serviceAccount;
-    this.secretObjects = [];
     
     if (this.props.secretsManagerSecrets) {
       this.props.secretsManagerSecrets.forEach( (secretManagerSecret) => {
-        const objectMap = new Map();
-        objectMap.set('objectName', secretManagerSecret.secretName);
-        objectMap.set('objectType', AwsSecretType.SECRETSMANAGER);
-        this.secretObjects.push(objectMap);
+        this.secretObjects.push ({
+          objectName: secretManagerSecret.secretName,
+          objectType: AwsSecretType.SECRETSMANAGER
+        });
         secretManagerSecret.grantRead(serviceAccount);
       });
     }
 
     if (this.props.ssmSecrets) {
       this.props.ssmSecrets.forEach( (ssmSecret) => {
-        const objectMap = new Map();
-        objectMap.set('objectName', ssmSecret.parameterName);
-        objectMap.set('objectType', AwsSecretType.SSMPARAMETER);
-        this.secretObjects.push(objectMap);
+        this.secretObjects.push({
+          objectName: ssmSecret.parameterName,
+          objectType: AwsSecretType.SSMPARAMETER
+        })
         ssmSecret.grantRead(serviceAccount);
       });
     }
@@ -128,7 +132,6 @@ export class TeamSecrets{
   private createSecretProviderClass(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct) {
     const cluster = clusterInfo.cluster;
     const secretProviderClass = team.teamProps.name + '-aws-secrets';
-
     const secretProviderClassManifest = cluster.addManifest(secretProviderClass, {
       apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
       kind: 'SecretProviderClass',

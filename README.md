@@ -28,7 +28,7 @@ Customers can use this QuickStart to easily architect and deploy a multi-tenant 
 - [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
 - [x] Define teams, namespaces, and their associated access permissions for your clusters.
 - [x] Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
-- [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
+- [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams.
 
 ## Examples
 
