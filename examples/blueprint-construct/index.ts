@@ -15,7 +15,7 @@ export default class BlueprintConstruct extends cdk.Construct {
         const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
-        const teams: Array<ssp.teams.Team> = [
+        const teams: Array<ssp.Team> = [
             platformTeam,
             new team.TeamTroi,
             new team.TeamRiker,

@@ -1,47 +1,14 @@
+import { Construct } from "@aws-cdk/core";
 import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { SecretsManager } from "aws-sdk";
+import { ApplicationRepository, ClusterAddOn, ClusterPostDeploy, ClusterInfo, Team } from "../../spi";
 
-import { ClusterAddOn, ClusterInfo, ClusterPostDeploy } from "../../stacks/cluster-types";
-import { Team } from "../../teams";
-import * as yaml from 'yaml';
+import { getSecretValue } from '../../utils/secrets-manager-utils';
+import { sshRepoRef, userNameRepoRef } from './manifest-utils';
 import { btoa } from '../../utils/string-utils';
-import { Construct } from "@aws-cdk/core";
-
 import bcrypt = require('bcrypt');
+import { Constants } from "..";
 
-
-export interface ArgoApplicationRepository {
-    /**
-     * Expected to support helm style repo at the moment
-     */
-    repoUrl: string,
-
-    /** 
-     * Path within the repository 
-     */
-    path?: string,
-
-    /**
-     * Optional name for the bootstrap application
-     */
-    name?: string,
-
-    /**
-     * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
-     * The secret must exist in the same region and account where the stack will run. 
-     */
-    credentialsSecretName?: string,
-
-    /**
-     * Depending on credentials type the arn should either point to an SSH key (plain text value)
-     * or a json file with username/password attributes.
-     * For TOKEN type per ArgoCD documentation (https://argoproj.github.io/argo-cd/user-guide/private-repositories/) 
-     * username can be any non-empty username and token value as password.
-     */
-    credentialsType?: "USERNAME" | "TOKEN" | "SSH"
-
-}
 
 /**
  * Configuration options for ArgoCD add-on.
@@ -58,7 +25,7 @@ export interface ArgoCDAddOnProps {
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
      * after the infrastructure and team provisioning is complete. 
      */
-    bootstrapRepo?: ArgoApplicationRepository,
+    bootstrapRepo?: ApplicationRepository,
 
     /**
      * Optional admin password secret (plaintext).
@@ -82,42 +49,6 @@ const argoDefaults: ArgoCDAddOnProps = {
 }
 
 /**
- * Local function to create a secret reference for SSH key.
- * @param url 
- * @param secretName 
- * @returns 
- */
-const sshRepoRef = (url: string, secretName: string): string => yaml.stringify(
-    [{
-        url,
-        sshPrivateKeySecret: {
-            name: secretName,
-            key: "sshPrivateKey"
-        }
-    }]
-);
-
-/**
- * Local function to a secret reference for username/pwd or username/token key.
- * @param url 
- * @param secretName 
- * @returns 
- */
-const userNameRepoRef = (url: string, secretName: string): string => yaml.stringify(
-    [{
-        url,
-        usernameSecret: {
-            name: secretName,
-            key: "username"
-        },
-        passwordSecret: {
-            name: secretName,
-            key: "password"
-        }
-    }]
-);
-
-/**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
 export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
@@ -133,7 +64,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      * Impementation of the add-on contract deploy method.
     */
     async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-
         const namespace = this.createNamespace(clusterInfo);
 
         const sa = this.createServiceAccount(clusterInfo);
@@ -163,7 +93,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
             chart: "argo-cd",
-            release: "ssp-addon",
+            release: Constants.SSP_ADDON,
             repository: "https://argoproj.github.io/argo-helm",
             version: '3.10.0',
             namespace: this.options.namespace,
@@ -173,7 +103,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         this.chartNode.node.addDependency(sa);
         return this.chartNode;
     }
-
 
 
     /**
@@ -201,7 +130,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 },
                 spec: {
                     destination: {
-                        namespace: "default",
+                        namespace: this.options.namespace,
                         server: "https://kubernetes.default.svc"
                     },
                     project: "default",
@@ -231,7 +160,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
      */
     protected async createAdminSecret(region: string) : Promise<string> {
-        const secretValue = await this.getSecretValue(this.options.adminPasswordSecretName!, region);
+        const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
         return  bcrypt.hash(secretValue, 10);
     }
 
@@ -272,7 +201,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
         const appRepo = this.options.bootstrapRepo!;
         let credentials = { url: btoa(appRepo.repoUrl) };
 
-        const secretValue = await this.getSecretValue(secretName, clusterInfo.cluster.stack.region);
+        const secretValue = await getSecretValue(secretName, clusterInfo.cluster.stack.region);
 
         let result = "";
 
@@ -313,32 +242,6 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
         manifest.node.addDependency(dependency);
         return result;
-    }
-
-    /**
-     * Gets secret value from AWS Secret Manager. Requires access rights to the secret, specified by the secretName parameter.
-     * @param secretName name of the secret to retrieve
-     * @param region 
-     * @returns 
-     */
-    protected async getSecretValue(secretName: string, region: string): Promise<string> {
-        const secretManager = new SecretsManager({ region: region });
-        let secretString = "";
-        try {
-            let response = await secretManager.getSecretValue({ SecretId: secretName }).promise();
-            if (response) {
-                if (response.SecretString) {
-                    secretString = response.SecretString;
-                } else if (response.SecretBinary) {
-                    throw new Error(`Invalid secret format for ${secretName}. Expected string value, received binary.`);
-                }
-            }
-            return secretString;
-        }
-        catch (error) {
-            console.log(error);
-            throw error;
-        }
     }
 
     /**

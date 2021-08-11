@@ -1,18 +1,10 @@
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo } from "../stacks/cluster-types";
+import { ClusterInfo, Team } from "../spi";
 import { CfnOutput } from "@aws-cdk/core";
 import { DefaultTeamRoles } from "./default-team-roles";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 
-/**
- * Interface for a team. 
- */
-export interface Team {
 
-    name: string;
-
-    setup(clusterInfo: ClusterInfo): void;
-}
 
 /**
  * Team properties.

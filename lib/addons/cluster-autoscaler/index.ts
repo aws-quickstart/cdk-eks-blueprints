@@ -3,7 +3,7 @@ import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import { assertEC2NodeGroup } from "../../cluster-providers";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
@@ -255,11 +255,11 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
                                         resources: {
                                             limits: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                             requests: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                         },
                                         command: [

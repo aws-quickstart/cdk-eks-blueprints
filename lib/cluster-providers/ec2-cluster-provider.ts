@@ -2,7 +2,7 @@ import { Construct } from "@aws-cdk/core";
 
 import { InstanceType, InstanceClass, InstanceSize, IVpc, SubnetSelection, SubnetType } from "@aws-cdk/aws-ec2";
 import { CapacityType, Cluster, CommonClusterOptions, KubernetesVersion, NodegroupAmiType, EndpointAccess, Nodegroup } from "@aws-cdk/aws-eks";
-import { ClusterInfo, ClusterProvider } from "../stacks/cluster-types";
+import { ClusterInfo, ClusterProvider } from "..";
 
 // Utils 
 import { valueFromContext } from '../utils/context-utils'
