@@ -10,6 +10,10 @@ export { MetricsServerAddOn } from './metrics-server'
 export { NginxAddOn } from './nginx'
 export { XrayAddOn } from './xray'
 export { SecretsStoreAddOn } from './secrets-store'
+export { SecretProvider,
+    LookupSecretsManagerSecretByName,
+    LookupSecretsManagerSecretByArn,
+    LookupSsmSecretByAttrs } from './secrets-store/secret-provider'
 export { SSMAgentAddOn } from './ssm-agent'
 
 export class Constants {

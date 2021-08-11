@@ -1,11 +1,12 @@
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo, Team } from "../spi";
-import { CfnOutput } from "@aws-cdk/core";
-import { DefaultTeamRoles } from "./default-team-roles";
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { SecretsInfo } from "../addons/secrets-store/secret-provider";
-
-
+import { ClusterInfo, Team } from '../spi';
+import { CfnOutput } from '@aws-cdk/core';
+import { DefaultTeamRoles } from './default-team-roles';
+import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
+import { TeamSecrets } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
+import { SecretProvider } from '../addons';
+import { IStringParameter } from '@aws-cdk/aws-ssm';
+import { ISecret } from '@aws-cdk/aws-secretsmanager';
 
 /**
  * Team properties.
@@ -39,6 +40,11 @@ export class TeamProps {
     }
 
     /**
+     * Service Account Name
+     */
+    readonly serviceAccountName?: string;
+
+    /**
      *  Team members who need to get access to the cluster
      */
     readonly users?: Array<iam.ArnPrincipal>;
@@ -50,9 +56,9 @@ export class TeamProps {
     readonly userRole?: iam.IRole;
 
     /**
-     * Secrets Information
+     * Team Secrets
      */
-    readonly secretInfo?: SecretsInfo;
+    readonly secretProviders?: SecretProvider[];
 }
 
 export class ApplicationTeam implements Team {
@@ -63,6 +69,8 @@ export class ApplicationTeam implements Team {
 
     public namespaceManifest: KubernetesManifest;
 
+    public serviceAccount: ServiceAccount;
+
     constructor(teamProps: TeamProps) {
         this.name = teamProps.name;
         this.teamProps = {
@@ -71,14 +79,16 @@ export class ApplicationTeam implements Team {
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
+            serviceAccountName: teamProps.serviceAccountName,
             userRole: teamProps.userRole,
-            secretInfo: teamProps.secretInfo
+            secretProviders: teamProps.secretProviders
         }
     }
 
     public setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAccess(clusterInfo);
         this.setupNamespace(clusterInfo);
+        this.setupServiceAccount(clusterInfo);
         this.setupSecrets(clusterInfo);
     }
 
@@ -217,16 +227,50 @@ export class ApplicationTeam implements Team {
         });
         quotaManifest.node.addDependency(this.namespaceManifest);
     }
+    
+    /**
+     * Sets up ServiceAccount for the team namespace
+     * @param clusterInfo 
+     */
+    protected setupServiceAccount(clusterInfo: ClusterInfo) {
+        const serviceAccountName = this.teamProps.serviceAccountName? this.teamProps.serviceAccountName : `${this.teamProps.name}-sa`;
+        const cluster = clusterInfo.cluster;
+        
+        this.serviceAccount = cluster.addServiceAccount(`${this.teamProps.name}-service-account`, {
+            name: serviceAccountName,
+            namespace: this.teamProps.namespace
+        });
+        this.serviceAccount.node.addDependency(this.namespaceManifest);
+
+        const serviceAccountOutput = new CfnOutput(clusterInfo.cluster.stack, `${this.teamProps.name}-sa`, {
+            value: serviceAccountName
+        });
+        serviceAccountOutput.node.addDependency(this.namespaceManifest);
+    }
 
     /**
      * Sets up secrets
      * @param clusterInfo
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
-        if (this.teamProps.secretInfo !== undefined) {
-            const csiDriver = clusterInfo.getProvisionedAddOn('SecretsStoreAddOn');
-            console.assert(csiDriver != null, 'SecretsStoreAddOn is not provided in addons')
-            this.teamProps.secretInfo.secrets.setupSecrets(clusterInfo, this, csiDriver);
+        if (this.teamProps.secretProviders) {
+            const secretsDriver = clusterInfo.getProvisionedAddOn('SecretsStoreAddOn');
+            console.assert(secretsDriver != null, 'SecretsStoreAddOn is not provided in addons');
+            let ssmSecrets = Array<IStringParameter>();
+            let secretsManagerSecrets = Array<ISecret>();
+            this.teamProps.secretProviders.forEach( (provider) => {
+                const providedSecret = provider.provide(clusterInfo);
+                if (Object.hasOwnProperty.call(providedSecret,'secretArn')) {
+                    secretsManagerSecrets.push(providedSecret as ISecret);
+                }
+                else {
+                    ssmSecrets.push(providedSecret as IStringParameter);
+                }
+            });
+            new TeamSecrets({
+                secretsManagerSecrets,
+                ssmSecrets
+            }).setupSecrets(clusterInfo, this, secretsDriver!);
         }
     }
 }

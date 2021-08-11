@@ -1,48 +1,15 @@
-import * as cdk from "@aws-cdk/core";
-import { PolicyStatement } from "@aws-cdk/aws-iam";
-import { ClusterInfo } from "../../../lib";
-import { SecretsInfo } from "./secret-provider";
-import { ServiceAccount } from "@aws-cdk/aws-eks";
-import { ApplicationTeam, TeamProps } from "../../teams";
-import { CfnOutput, Construct } from "@aws-cdk/core";
-
-export interface CsiDriverProviderAwsSecretsInfoProps {
-  /**
-   * AWS Secrets to fetch
-   */
-  awsSecrets: AwsSecret[];
-
-  /**
-   * Kubernetes Secrets to sync
-   */
-  kubernetesSecrets?: KubernetesSecret[];
-}
+import { ClusterInfo } from '../../../lib';
+import { ApplicationTeam } from '../../teams';
+import { CfnOutput, Construct } from '@aws-cdk/core';
+import { ISecret } from '@aws-cdk/aws-secretsmanager';
+import { IStringParameter } from '@aws-cdk/aws-ssm';
 
 /**
- * Configuration for AWS Secrets
+ * TeamSecrets Props
  */
-export interface AwsSecret {
-  /**
-   * Specify the name of the secret or parameter.
-   *
-   */
-  readonly objectName: string;
-
-  /**
-   * SecretType. Can be 'SSMPARAMETER' or 'SECRETSMANAGER'
-   */
-  readonly objectType: AwsSecretType;
-
-  /**
-   * AWS region to use when retrieving secrets from Secrets Manager
-   * or Parameter Store
-   */
-  readonly region?: string;
-
-  /**
-   * AWS Account Id where the secret lives.
-   */
-  readonly accountId?: string;
+export interface TeamSecretsProps {
+  secretsManagerSecrets?: ISecret[];
+  ssmSecrets?: IStringParameter[];
 }
 
 /**
@@ -104,13 +71,11 @@ export enum KubernetesSecretType {
 }
 
 
-export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
+export class TeamSecrets{
 
-  readonly secrets: CsiDriverProviderAwsSecretsInfoProps
+  private secretObjects: Array<Map<string, string>>;
 
-  constructor(secrets: CsiDriverProviderAwsSecretsInfoProps) {
-    this.secrets = secrets;
-  }
+  constructor(private props: TeamSecretsProps) {}
 
   /**
    * Setup the secrets for CSI driver
@@ -118,92 +83,73 @@ export class CsiDriverProviderAwsSecretsInfo implements SecretsInfo {
    */
   setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct): void {
     // Create the service account for the team
-    const serviceAccount = this.createServiceAccount(clusterInfo, team);
+    this.addPolicyToServiceAccount(team);
 
     // Create and apply SecretProviderClass manifest
-    this.createSecretProviderClass(clusterInfo, serviceAccount, team.teamProps, csiDriver!);
+    this.createSecretProviderClass(clusterInfo, team, csiDriver);
   }
 
   /**
    * Creates Service Account for CSI Secrets driver and sets up the IAM Policies
    * needed to access the AWS Secrets
-   * @param cluster
    * @param team
    */
-  private createServiceAccount(clusterInfo: ClusterInfo, team: ApplicationTeam): ServiceAccount {
-    const cluster = clusterInfo.cluster;
-    const serviceAccount = cluster.addServiceAccount(team.teamProps.name + '-sa', {
-      name: team.teamProps.name + '-secrets-sa',
-      namespace: team.teamProps.namespace
-    });
-    serviceAccount.node.addDependency(team.namespaceManifest);
+  private addPolicyToServiceAccount(team: ApplicationTeam) {
+    const serviceAccount = team.serviceAccount;
+    this.secretObjects = [];
+    
+    if (this.props.secretsManagerSecrets) {
+      this.props.secretsManagerSecrets.forEach( (secretManagerSecret) => {
+        const objectMap = new Map();
+        objectMap.set('objectName', secretManagerSecret.secretName);
+        objectMap.set('objectType', AwsSecretType.SECRETSMANAGER);
+        this.secretObjects.push(objectMap);
+        secretManagerSecret.grantRead(serviceAccount);
+      });
+    }
 
-    this.secrets.awsSecrets.forEach( (awsSecret)  => {
-      const objectName = awsSecret.objectName;
-      const region = awsSecret.region ? awsSecret.region : cdk.Aws.REGION;
-      const accountId = awsSecret.accountId ? awsSecret.accountId : cdk.Aws.ACCOUNT_ID;
-      const partition = cdk.Aws.PARTITION
-      let policyStatement: PolicyStatement;
-
-      if (awsSecret.objectType === AwsSecretType.SECRETSMANAGER) {
-        policyStatement = new PolicyStatement({
-            actions: [
-                'secretsmanager:GetSecretValue',
-                'secretsmanager:DescribeSecret'
-            ],
-            resources: [`arn:${partition}:secretsmanager:${region}:${accountId}:secret:${objectName}-??????`]
-        });
-      }
-      else {
-        policyStatement = new PolicyStatement({
-            actions: [
-                'ssm:GetParameters'
-            ],
-            resources: [`arn:${partition}:ssm:${region}:${accountId}:parameter/${objectName}`]
-        });
-      }
-      serviceAccount.addToPrincipalPolicy(policyStatement);
-    });
-
-    new CfnOutput(clusterInfo.cluster.stack, `team-${team.teamProps.name}-service-account`, {
-      value: serviceAccount.serviceAccountName
-    });
-
-    return serviceAccount;
+    if (this.props.ssmSecrets) {
+      this.props.ssmSecrets.forEach( (ssmSecret) => {
+        const objectMap = new Map();
+        objectMap.set('objectName', ssmSecret.parameterName);
+        objectMap.set('objectType', AwsSecretType.SSMPARAMETER);
+        this.secretObjects.push(objectMap);
+        ssmSecret.grantRead(serviceAccount);
+      });
+    }
   }
 
   /**
    * Create and apply the SecretProviderClass manifest
-   * @param cluster
-   * @param serviceAccount
-   * @param teamProps
+   * @param clusterInfo
+   * @param team
+   * @param csiDriver
    */
-  private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, teamProps: TeamProps, csiDriver: Construct) {
+  private createSecretProviderClass(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct) {
     const cluster = clusterInfo.cluster;
-    const secretProviderClass = teamProps.name + '-aws-secrets';
+    const secretProviderClass = team.teamProps.name + '-aws-secrets';
 
     const secretProviderClassManifest = cluster.addManifest(secretProviderClass, {
       apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
       kind: 'SecretProviderClass',
       metadata: {
         name: secretProviderClass,
-        namespace: teamProps.namespace
+        namespace: team.teamProps.namespace
       },
       spec: {
         provider: 'aws',
         parameters: {
-          objects: JSON.stringify(this.secrets.awsSecrets),
+          objects: JSON.stringify(this.secretObjects),
         },
-        secretObjects: this.secrets.kubernetesSecrets ? this.secrets.kubernetesSecrets : undefined
       }
     });
 
     secretProviderClassManifest.node.addDependency(
-      serviceAccount,
+      team.serviceAccount,
       csiDriver
     );
 
-    new CfnOutput(clusterInfo.cluster.stack, `team-${teamProps.name}-secret-provider-class `, {
+    new CfnOutput(clusterInfo.cluster.stack, `team-${team.teamProps.name}-secret-provider-class `, {
       value: secretProviderClass
     });
   }

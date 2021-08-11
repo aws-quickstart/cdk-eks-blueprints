@@ -2,56 +2,17 @@ import * as cdk from "@aws-cdk/core";
 import { ClusterInfo } from "../../../lib";
 import { Constants } from "..";
 import { loadExternalYaml } from "../../utils/yaml-utils";
-import { SecretsProvider } from "./secret-provider";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 
-/**
- * Props for CsiDriverProviderAws
- */
-export interface CsiDriverProviderAwsProps {
-  /**
-   * Namespace where Secrets Store CSI driver will be installed
-   * @default 'kube-system'
-   */
-  readonly namespace?: string;
+export class CsiDriverProviderAws {
 
-  /**
-   * Version of the Secrets Store CSI Driver. Eg. v0.0.23
-   * @default 'v0.0.23/'
-   */
-  readonly version?: string;
+  constructor(
+    private namespace: string,
+    private version: string,
+    private rotationPollInterval?: string,
+    private syncSecrets?: boolean) {}
 
-  /**
-   * Rotation Poll Interval, e.g. '120s'.
-   * @default undefined
-   * If provided, sets auto rotation to true and sets the polling interval.
-   */
-  readonly rotationPollInterval?: string;
-
-  /**
-   * Sync Secret
-   * @default false
-   */
-  readonly syncSecrets?: boolean;
-}
-
-
-const CsiDriverProviderAwsDefaults: CsiDriverProviderAwsProps = {
-  namespace: 'kube-system',
-  version: 'v0.0.23',
-  rotationPollInterval: undefined,
-  syncSecrets: true
-}
-
-export class CsiDriverProviderAws implements SecretsProvider {
-
-  private options: CsiDriverProviderAwsProps;
-
-  constructor(props?: CsiDriverProviderAwsProps) {
-    this.options = { ...CsiDriverProviderAwsDefaults, ...props };
-  }
-
-  provide(clusterInfo: ClusterInfo): KubernetesManifest {
+  deploy(clusterInfo: ClusterInfo): KubernetesManifest {
     const cluster = clusterInfo.cluster;
 
     type chartValues = {
@@ -70,17 +31,17 @@ export class CsiDriverProviderAws implements SecretsProvider {
     let values: chartValues = {
       linux: {
         image: {
-          tag: this.options.version!
+          tag: this.version
         }
       }
     };
 
-    if (typeof(this.options.rotationPollInterval) === 'string') {
+    if (typeof(this.rotationPollInterval) === 'string') {
       values.enableSecretRotation = 'true';
-      values.rotationPollInterval = this.options.rotationPollInterval;
+      values.rotationPollInterval = this.rotationPollInterval;
     }
 
-    if (this.options.syncSecrets === true) {
+    if (this.syncSecrets === true) {
       values.syncSecret = {
         enabled: 'true'
       }
@@ -89,8 +50,8 @@ export class CsiDriverProviderAws implements SecretsProvider {
     const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', {
       chart: 'secrets-store-csi-driver',
       repository: 'https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts',
-      namespace: this.options.namespace,
-      version: this.options.version,
+      namespace: this.namespace,
+      version: this.version,
       release: Constants.SSP_ADDON,
       wait: true,
       timeout: cdk.Duration.minutes(15),

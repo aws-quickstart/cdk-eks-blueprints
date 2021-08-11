@@ -1,11 +1,7 @@
 import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Construct } from '@aws-cdk/core';
-import {
-    AwsSecretType,
-    CsiDriverProviderAwsSecretsInfo,
-    KubernetesSecretType
-} from '../../../lib/addons/secrets-store/csi-driver-provider-aws-secrets';
 import { ApplicationTeam } from '../../../lib/teams';
+import { LookupSecretsManagerSecretByName, LookupSsmSecretByAttrs } from '../../../lib/addons/secrets-store/secret-provider';
 
 function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
     const context: string = scope.node.tryGetContext(key);
@@ -20,36 +16,10 @@ export class TeamBurnham extends ApplicationTeam {
         super({
             name: "burnham",
             users: getUserArns(scope, "team-burnham.users"),
-            secretInfo: {
-                secrets: new CsiDriverProviderAwsSecretsInfo({
-                    awsSecrets: [
-                        {
-                            objectName: 'GITHUB_TOKEN',
-                            objectType: AwsSecretType.SSMPARAMETER
-                        },
-                        {
-                            objectName: 'PRIVATE_KEY',
-                            objectType: AwsSecretType.SECRETSMANAGER
-                        }
-                    ],
-                    kubernetesSecrets: [
-                        {
-                            secretName: 'burhnam-github-secrets',
-                            type: KubernetesSecretType.OPAQUE,
-                            data: [
-                                {
-                                    objectName: 'GITHUB_TOKEN',
-                                    key: 'github_token'
-                                },
-                                {
-                                    objectName: 'PRIVATE_KEY',
-                                    key: 'private_key'
-                                }
-                            ]
-                        }
-                    ]
-                })
-            }
+            secretProviders: [
+                new LookupSecretsManagerSecretByName('PRIVATE_KEY'),
+                new LookupSsmSecretByAttrs('GITHUB_TOKEN', 1)
+            ]
         });
     }
 }

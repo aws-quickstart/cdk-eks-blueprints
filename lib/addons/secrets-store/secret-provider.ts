@@ -1,20 +1,87 @@
-import { Construct } from "@aws-cdk/core";
-import { ClusterInfo } from "../../../lib";
-import { ApplicationTeam } from "../../teams";
+import { ClusterInfo } from '../../../lib';
+import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
+import { IStringParameter, StringParameter } from '@aws-cdk/aws-ssm';
+import { IKey } from '@aws-cdk/aws-kms';
 
 /**
  * Secret Provider Interface
- * You can provide() your own Secrets driver OR
- * use the one we provide using AWS Secrets Manager and Config Provider(ASCP)
+ * You can provide() your own Secrets
  */
-export interface SecretsProvider {
-  provide(clusterInfo: ClusterInfo): Construct;
+export interface SecretProvider {
+  provide(clusterInfo: ClusterInfo): ISecret | IStringParameter;
 }
 
 /**
- * Secrets to be provided
+ * Lookup Secret in SecretsManager by Name
  */
-export interface SecretsInfo {
-  secrets: any;
-  setupSecrets?(clusterInfo: ClusterInfo, team: ApplicationTeam, secretsManifest: Construct): any;
+export class LookupSecretsManagerSecretByName implements SecretProvider {
+  /**
+   * @param secretName
+   * @param id
+   */
+  constructor(private secretName: string, private id?: string) {}
+
+  provide(clusterInfo: ClusterInfo): ISecret {
+    return Secret.fromSecretNameV2(
+      clusterInfo.cluster.stack,
+      this.id ?? `${this.secretName}-Lookup`,
+      this.secretName
+    );
+  }
+}
+
+/**
+ * Lookup Secret in SecretsManager by Arn
+ */
+ export class LookupSecretsManagerSecretByArn implements SecretProvider {
+  /**
+   * @param secretArn
+   * @param id
+   */
+  constructor(private secretArn: string, private id?: string) {}
+
+  provide(clusterInfo: ClusterInfo): ISecret {
+    return Secret.fromSecretCompleteArn(
+      clusterInfo.cluster.stack,
+      this.id ?? `${this.secretArn}-Lookup`,
+      this.secretArn
+    );
+  }
+}
+
+/**
+ * Lookup SSM Parameter Store Secret by Name
+ */
+ export class LookupSsmSecretByAttrs implements SecretProvider {
+  /**
+   * @param secretName 
+   * @param version 
+   * @param encryptionKey 
+   * @param simpleName 
+   * @param id 
+   */
+  constructor(
+    private secretName: string,
+    private version: number,
+    private encryptionKey?: IKey,
+    private simpleName?: boolean,
+    private id?: string,
+  ) {}
+
+  /**
+   * Lookup the secret string parameter
+   * @param clusterInfo 
+   * @returns 
+   */
+  provide(clusterInfo: ClusterInfo): IStringParameter {
+    return StringParameter.fromSecureStringParameterAttributes(
+      clusterInfo.cluster.stack,
+      this.id ?? `${this.secretName}-Lookup`, {
+        parameterName: this.secretName,
+        version: this.version,
+        encryptionKey: this.encryptionKey,
+        simpleName: this.simpleName
+      }
+    );
+  }
 }
