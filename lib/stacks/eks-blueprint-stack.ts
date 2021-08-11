@@ -1,12 +1,12 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
-import { StackProps } from '@aws-cdk/core';
+import { ScopedAws, StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
 
-import { Team } from '../teams'
+import { Team, TeamProps } from '../teams'
 import { ClusterAddOn, ClusterPostDeploy, ClusterProvider } from './cluster-types'
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 
@@ -58,10 +58,72 @@ function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): St
 }
 
 /**
+ * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
+ * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
+ * in accounts and regions. 
+ */
+export class BlueprintBuilder {
+
+    private props: Partial<EksBlueprintProps>;
+    private account?: string;
+    private region?: string;
+
+    constructor() {
+        this.props = { addOns: new Array<ClusterAddOn>(), teams: new Array<Team>()};
+    }
+
+    public withName(name: string) : this {
+        this.props = {...this.props, ...{name}};
+        return this;
+    }
+
+    public withAccount(account?: string): this {
+        this.account = account;
+        return this;
+    }
+
+    public withRegion(region?: string) : this {
+        this.region = region;
+        return this;
+    }
+
+    public withBlueprintProps(props: Partial<EksBlueprintProps>) : this {
+        this.props = {...this.props, ...props};
+        return this;
+    }
+
+    public withAddons(...addOns: ClusterAddOn[]) : this {
+        this.props = {...this.props, ...{ addOns: this.props.addOns?.concat(addOns)}};
+        return this;
+    }
+
+    public withId( id: string): this {
+        this.props = { ...this.props, ...{id}};
+        return this;
+    }
+
+    public withTeams(...teams: Team[]) : this {
+        this.props = {...this.props, ...{teams: this.props.teams?.concat(teams)}};
+        return this;
+    }
+
+    public build(scope: Construct, id: string, stackProps? : StackProps): EksBlueprint {
+        return new EksBlueprint(scope, {...this.props, ...{id}}, 
+            {...stackProps, ...{ env: {account: this.account, region: this.region}}});
+    }
+
+    public clone(region?: string, account?: string): BlueprintBuilder {
+        return new BlueprintBuilder().withBlueprintProps(Object.create(this.props))
+            .withAccount(account).withRegion(region);
+    }
+}
+
+
+/**
  * Entry point stack for the EKS blueprint.
  */
 export class EksBlueprint extends cdk.Stack {
-
+    
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking("qs-1s1r465hk", props));
         this.validateInput(blueprintProps);
