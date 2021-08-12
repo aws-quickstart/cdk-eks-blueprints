@@ -11,7 +11,6 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 ```typescript
 import * as cdk from '@aws-cdk/core';
 import {
-  Team,
   SecretProvider
   ClusterAddOn,
   EksBlueprint,
@@ -21,41 +20,50 @@ import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 
 const secretsStoreAddOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
-const name = 'team-riker';
 
 // Setup application team with secrets
-export class TeamRiker extends ApplicationTeam implements Team  {
-    constructor() {
-        super(
-            {
-                name,
-                teamSecrets: [
-                    {
-                        secretProvider: new RikerSecretProvider(),
-                        kubernetesSecret: {}
+export class TeamBurnham extends ApplicationTeam {
+    constructor(scope: Construct) {
+        super({
+            name: "burnham",
+            users: getUserArns(scope, "team-burnham.users"),
+            teamSecrets: [
+                {
+                    secretProvider: new GenerateSecretManagerProvider('auth-credentials'),
+                    kubernetesSecret: {
+                        type: KubernetesSecretType.BASIC_AUTH,
+                        data: [
+                            {
+                                objectName: 'auth-credentials',
+                                key: 'username'
+                            },
+                            {
+                                objectName: 'auth-credentials',
+                                key: 'password'
+                            }
+                        ]
                     }
-                ]
-            }
-        );
-    }
-
-    setup(clusterInfo: ClusterInfo) {
-        clusterInfo.cluster.addManifest(this.name, {
-            apiVersion: 'v1',
-            kind: 'Namespace',
-            metadata: { name }
+                }
+            ]
         });
     }
 }
 
-class RikerSecretProvider implements SecretProvider {
-    provide(clusterInfo: ClusterInfo): ISecret  {
-        return new Secret(clusterInfo.cluster.stack, 'TemplatedSecret', {
+class GenerateSecretManagerProvider implements SecretProvider {
+    
+    constructor(private secretName: string) {}
+
+    provide(clusterInfo: ClusterInfo): ISecret {
+        const secret = new Secret(clusterInfo.cluster.stack, 'AuthCredentials', {
+            secretName: this.secretName,
             generateSecretString: {
-              secretStringTemplate: JSON.stringify({ username: 'user' }),
-              generateStringKey: 'password',
+                secretStringTemplate: JSON.stringify({ username: 'user' }),
+                generateStringKey: 'password',
             }
         });
+        // create this secret first
+        clusterInfo.cluster.node.addDependency(secret);
+        return secret
     }
 }
 
@@ -101,14 +109,14 @@ spec:
       labels:
         app: myapp
     spec:
-      serviceAccountName: riker-sa
+      serviceAccountName: burnham-sa
       volumes:
       - name: secrets-store-inline
         csi:
           driver: secrets-store.csi.k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: "riker-aws-secrets"
+            secretProviderClass: "burnham-aws-secrets"
       containers:
       - name: test-mount-volume
         image: ubuntu
@@ -140,8 +148,8 @@ spec:
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: riker-secrets
-                key: GITHUB_TOKEN
+                name: AuthCredentials
+                key: AuthCredentials
 EOF
 ```
 

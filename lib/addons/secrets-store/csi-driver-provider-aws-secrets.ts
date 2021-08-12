@@ -129,11 +129,21 @@ export class TeamSecrets {
       }
 
       if (teamSecret.kubernetesSecret) {
+        const data: KubernetesSecretObjectData[] = [];
+        if (teamSecret.kubernetesSecret.data) {
+          teamSecret.kubernetesSecret.data.forEach ( (item) => {
+            const dataObject: KubernetesSecretObjectData = {
+              objectName: item.objectName ?? secretName,
+              key: item.key ?? secretName
+            }
+            data.push(dataObject);
+          });
+        }
         const kubernetesSecret: KubernetesSecret = {
           secretName: teamSecret.kubernetesSecret.secretName ?? `${team.name}-secrets`,
           type: teamSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
           labels: teamSecret.kubernetesSecret.labels ?? undefined,
-          data: teamSecret.kubernetesSecret.data ?? [{ objectName: secretName, key: secretName }]
+          data,
         }
         this.kubernetesSecrets.push(kubernetesSecret);
       }

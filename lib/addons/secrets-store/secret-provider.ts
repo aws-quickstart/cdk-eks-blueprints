@@ -8,7 +8,7 @@ import { IKey } from '@aws-cdk/aws-kms';
  * You can provide() your own Secrets
  */
 export interface SecretProvider {
-  provide(clusterInfo: ClusterInfo): ISecret | IStringParameter;
+  provide(clusterInfo?: ClusterInfo): ISecret | IStringParameter;
 }
 
 /**
