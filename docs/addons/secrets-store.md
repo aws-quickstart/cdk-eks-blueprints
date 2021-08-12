@@ -1,70 +1,67 @@
 # Secrets Store Add-on
 
-The Secrets Store Add-on implements a Secret Provider interface that allows you to bring your own secrets provider. By default, the add-on provisions the [AWS Secrets Manager and Config Provider(ASCP) for Secret Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
+The Secrets Store Add-on provisions the [AWS Secrets Manager and Config Provider(ASCP) for Secret Store CSI Driver](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html) on your EKS cluster. With ASCP, you now have a plugin for the industry-standard Kubernetes Secrets Store [Container Storage Interface (CSI) Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) used for providing secrets to applications operating on Amazon Elastic Kubernetes Service.
 
 With ASCP, you can securely store and manage your secrets in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager) or [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and retrieve them through your application workloads running on Kubernetes. You no longer have to write custom code for your applications.
 
 ## Usage
-#### **`index.ts`**
+
+### **`index.ts`**
+
 ```typescript
 import * as cdk from '@aws-cdk/core';
 import {
-  SecretsStoreAddOn,
-  AwsSecretType,
-  KubernetesSecretType,
+  Team,
+  SecretProvider
   ClusterAddOn,
   EksBlueprint,
   ApplicationTeam
 } from '@shapirov/cdk-eks-blueprint';
+import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 
 const secretsStoreAddOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
+const name = 'team-riker';
 
 // Setup application team with secrets
-class TeamBurnham extends ApplicationTeam {
-  constructor(scope: Construct) {
-    super({
-      name: "burnham",
-      secrets: new CsiDriverProviderAwsSecrets({
-        awsSecrets: [
-          {
-            objectName: 'GITHUB_TOKEN',
-            objectType: AwsSecretType.SSMPARAMETER
-          },
-          {
-            objectName: 'PRIVATE_KEY',
-            objectType: AwsSecretType.SECRETSMANAGER
-          }
-        ],
-        kubernetesSecrets: [
-          {
-            secretName: 'burhnam-github-secrets',
-            type: KubernetesSecretType.OPAQUE,
-            data: [
-              {
-                objectName: 'GITHUB_TOKEN',
-                key: 'github_token'
-              },
-              {
-                objectName: 'PRIVATE_KEY',
-                key: 'private_key'
-              }
-            ]
-          }
-        ]
-      })
-    });
-  }
+export class TeamRiker extends ApplicationTeam implements Team  {
+    constructor() {
+        super(
+            {
+                name,
+                teamSecrets: [
+                    {
+                        secretProvider: new RikerSecretProvider(),
+                        kubernetesSecret: {}
+                    }
+                ]
+            }
+        );
+    }
+
+    setup(clusterInfo: ClusterInfo) {
+        clusterInfo.cluster.addManifest(this.name, {
+            apiVersion: 'v1',
+            kind: 'Namespace',
+            metadata: { name }
+        });
+    }
+}
+
+class RikerSecretProvider implements SecretProvider {
+    provide(clusterInfo: ClusterInfo): ISecret  {
+        return new Secret(clusterInfo.cluster.stack, 'TemplatedSecret', {
+            generateSecretString: {
+              secretStringTemplate: JSON.stringify({ username: 'user' }),
+              generateStringKey: 'password',
+            }
+        });
+    }
 }
 
 const app = new cdk.App();
 const teams: Array<ApplicationTeam> = [ new TeamBurnham(app) ];
-new EksBlueprint(app, 'my-stack-name', addOns, teams, {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+new EksBlueprint(app, 'my-stack-name', addOns, teams});
 ```
 
 ## Functionality
@@ -85,7 +82,7 @@ After the Blueprint stack is deployed you can test consuming the secret from wit
 
 This sample `deployment` shows how to consume the secrets as mounted volumes as well as environment variables.
 
-```yaml
+```sh
 cat << 'EOF' >> test-secrets.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -93,7 +90,7 @@ metadata:
   name: app-deployment
   labels:
     app: myapp
-  namespace: team-burnham
+  namespace: team-riker
 spec:
   replicas: 1
   selector:
@@ -104,14 +101,14 @@ spec:
       labels:
         app: myapp
     spec:
-      serviceAccountName: burnham-sa
+      serviceAccountName: riker-sa
       volumes:
       - name: secrets-store-inline
         csi:
           driver: secrets-store.csi.k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: "burnham-aws-secrets"
+            secretProviderClass: "riker-aws-secrets"
       containers:
       - name: test-mount-volume
         image: ubuntu
@@ -143,8 +140,8 @@ spec:
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: burhnam-github-secrets
-                key: github_token
+                name: riker-secrets
+                key: GITHUB_TOKEN
 EOF
 ```
 

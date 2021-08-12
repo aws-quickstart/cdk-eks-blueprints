@@ -3,13 +3,14 @@ import { ApplicationTeam } from '../../teams';
 import { CfnOutput, Construct } from '@aws-cdk/core';
 import { ISecret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter } from '@aws-cdk/aws-ssm';
+import { SecretProvider } from './secret-provider';
 
 /**
- * TeamSecrets Props
+ * TeamSecret Props
  */
 export interface TeamSecretsProps {
-  secretsManagerSecrets?: ISecret[];
-  ssmSecrets?: IStringParameter[];
+  secretProvider: SecretProvider;
+  kubernetesSecret?: KubernetesSecret;
 }
 
 /**
@@ -25,7 +26,7 @@ export interface KubernetesSecret {
   /**
    * Type of Kubernetes Secret
    */
-  type: KubernetesSecretType
+  type?: KubernetesSecretType
 
   /**
    * Secret Labels
@@ -33,28 +34,28 @@ export interface KubernetesSecret {
   labels?: Map<string, string>;
 
   /**
-   * Secret Data
+   * Kubernetes SecretObject Data
    */
-  data: KubernetesSecretData[];
+  data?: KubernetesSecretObjectData[];
 }
 
 /**
  * Data for Kubernetes Secrets
  */
-export interface KubernetesSecretData {
+interface KubernetesSecretObjectData {
 
   /**
    * Name of the AWS Secret that is syncd
    */
-  objectName: string;
+  objectName?: string;
 
   /**
    * Kubernetes Secret Key
    */
-  key: string;
+  key?: string;
 }
 
-export enum AwsSecretType {
+enum AwsSecretType {
   SSMPARAMETER = 'ssmparameter',
   SECRETSMANAGER = 'secretsmanager'
 }
@@ -70,16 +71,18 @@ export enum KubernetesSecretType {
   TLS = 'kubernetes.io/tls'
 }
 
-interface secretObject {
+interface parameterObject {
     objectName: string;
     objectType: string;
 }
 export class TeamSecrets {
 
-  private secretObjects: secretObject[];
+  private parameterObjects: parameterObject[];
+  private kubernetesSecrets: KubernetesSecret[];
 
-  constructor(private props: TeamSecretsProps) {
-    this.secretObjects = [];
+  constructor(private teamSecrets: TeamSecretsProps[]) {
+    this.parameterObjects = [];
+    this.kubernetesSecrets = [];
   }
 
   /**
@@ -88,7 +91,7 @@ export class TeamSecrets {
    */
   setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct): void {
     // Create the service account for the team
-    this.addPolicyToServiceAccount(team);
+    this.addPolicyToServiceAccount(clusterInfo, team);
 
     // Create and apply SecretProviderClass manifest
     this.createSecretProviderClass(clusterInfo, team, csiDriver);
@@ -99,28 +102,42 @@ export class TeamSecrets {
    * needed to access the AWS Secrets
    * @param team
    */
-  private addPolicyToServiceAccount(team: ApplicationTeam) {
+  private addPolicyToServiceAccount(clusterInfo: ClusterInfo, team: ApplicationTeam) {
     const serviceAccount = team.serviceAccount;
-    
-    if (this.props.secretsManagerSecrets) {
-      this.props.secretsManagerSecrets.forEach( (secretManagerSecret) => {
-        this.secretObjects.push ({
+
+    this.teamSecrets.forEach( (teamSecret) => {
+      let secretName: string;
+      const secret: ISecret | IStringParameter = teamSecret.secretProvider.provide(clusterInfo); 
+
+      if (Object.hasOwnProperty.call(secret, 'secretArn')) {
+        const secretManagerSecret = secret as ISecret;
+        secretName = secretManagerSecret.secretName;
+        this.parameterObjects.push({
           objectName: secretManagerSecret.secretName,
           objectType: AwsSecretType.SECRETSMANAGER
         });
         secretManagerSecret.grantRead(serviceAccount);
-      });
-    }
-
-    if (this.props.ssmSecrets) {
-      this.props.ssmSecrets.forEach( (ssmSecret) => {
-        this.secretObjects.push({
+      }
+      else {
+        const ssmSecret = secret as IStringParameter;
+        secretName = ssmSecret.parameterName;
+        this.parameterObjects.push({
           objectName: ssmSecret.parameterName,
           objectType: AwsSecretType.SSMPARAMETER
-        })
+        });
         ssmSecret.grantRead(serviceAccount);
-      });
-    }
+      }
+
+      if (teamSecret.kubernetesSecret) {
+        const kubernetesSecret: KubernetesSecret = {
+          secretName: teamSecret.kubernetesSecret.secretName ?? `${team.name}-secrets`,
+          type: teamSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
+          labels: teamSecret.kubernetesSecret.labels ?? undefined,
+          data: teamSecret.kubernetesSecret.data ?? [{ objectName: secretName, key: secretName }]
+        }
+        this.kubernetesSecrets.push(kubernetesSecret);
+      }
+    });
   }
 
   /**
@@ -142,8 +159,9 @@ export class TeamSecrets {
       spec: {
         provider: 'aws',
         parameters: {
-          objects: JSON.stringify(this.secretObjects),
+          objects: JSON.stringify(this.parameterObjects),
         },
+        secretObjects: this.kubernetesSecrets
       }
     });
 

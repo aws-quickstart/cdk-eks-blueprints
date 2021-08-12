@@ -3,10 +3,7 @@ import { ClusterInfo, Team } from '../spi';
 import { CfnOutput } from '@aws-cdk/core';
 import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
-import { TeamSecrets } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
-import { SecretProvider } from '../addons';
-import { IStringParameter } from '@aws-cdk/aws-ssm';
-import { ISecret } from '@aws-cdk/aws-secretsmanager';
+import { TeamSecrets, TeamSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 
 /**
  * Team properties.
@@ -58,7 +55,7 @@ export class TeamProps {
     /**
      * Team Secrets
      */
-    readonly secretProviders?: SecretProvider[];
+    readonly teamSecrets?: TeamSecretsProps[];
 }
 
 export class ApplicationTeam implements Team {
@@ -81,7 +78,7 @@ export class ApplicationTeam implements Team {
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
             userRole: teamProps.userRole,
-            secretProviders: teamProps.secretProviders
+            teamSecrets: teamProps.teamSecrets
         }
     }
 
@@ -253,24 +250,10 @@ export class ApplicationTeam implements Team {
      * @param clusterInfo
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
-        if (this.teamProps.secretProviders) {
+        if (this.teamProps.teamSecrets) {
             const secretsDriver = clusterInfo.getProvisionedAddOn('SecretsStoreAddOn');
             console.assert(secretsDriver != null, 'SecretsStoreAddOn is not provided in addons');
-            let ssmSecrets = Array<IStringParameter>();
-            let secretsManagerSecrets = Array<ISecret>();
-            this.teamProps.secretProviders.forEach( (provider) => {
-                const providedSecret = provider.provide(clusterInfo);
-                if (Object.hasOwnProperty.call(providedSecret,'secretArn')) {
-                    secretsManagerSecrets.push(providedSecret as ISecret);
-                }
-                else {
-                    ssmSecrets.push(providedSecret as IStringParameter);
-                }
-            });
-            new TeamSecrets({
-                secretsManagerSecrets,
-                ssmSecrets
-            }).setupSecrets(clusterInfo, this, secretsDriver!);
+            new TeamSecrets(this.teamProps.teamSecrets).setupSecrets(clusterInfo, this, secretsDriver!);
         }
     }
 }

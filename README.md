@@ -2,7 +2,7 @@
 # Amazon EKS SSP Quick Start
 
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/quickstart-ssp-amazon-eks)
-![Build](https://codebuild.us-west-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiYVN6RlEyQmNNRVRxRWYxUkhBcStQcHFkTExZa2dtZXBWcDdqZ2lWNCtXVENOcWwzV0F0cklUOXlnVGtMZ1BzR0JLZUtHU2V3dUcwb0NOMmdxWGxKOFpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlEyWmdVeXlxMS9UOVk0QUMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
+![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSs[…]R5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
@@ -11,10 +11,6 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 ## Documentation
 
 For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
-
-## Examples
-
-To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns).
 
 ## What is an SSP?
 
@@ -38,7 +34,7 @@ You can also find a sample implementation that resides in this repository in `bi
 
 ## Getting Started
 
-First, make sure you have the [`aws-cli`](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed. To verify your installation, run the following: 
+First, make sure you have the [`aws-cli`](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed. To verify your installation, run the following:
 
 ```bash
 aws --version
@@ -58,7 +54,7 @@ cdk --version
 # must output 1.113.0
 ```
 
-Create a new CDK project. We use `typescript` for this example. 
+Create a new CDK project. We use `typescript` for this example.
 
 ```bash
 cdk init app --language typescript
@@ -74,7 +70,7 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 Run the following command to install the `cdk-eks-blueprint` dependency in your project.
 
-```
+```sh
 npm i @shapirov/cdk-eks-blueprint
 ```
 
@@ -103,19 +99,20 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
 
 Run the following command to confirm there are no issues with your code
 
-```
+```sh
 npm run build 
 ```
 
 If there are no errors you should see the following
-```
+
+```sh
 > eks-factory-test@0.1.0 build
 > tsc
 ```
 
 Deploy the stack using the following command
 
-```
+```sh
 cdk deploy
 ```
 
@@ -123,7 +120,7 @@ This will provision the following:
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
+- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments.
 - [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
@@ -133,19 +130,18 @@ This will provision the following:
 
 ## Why should I use this QuickStart?  
 
-The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge. 
+The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge.
 
-AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives. 
+AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
 
 ## Feedback
 
 For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
 
-To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo. 
+To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo.
 
 To submit code for this Quick Start, see the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/).
 
 ## License
 
 This library is licensed under the Apache 2.0 License.
-
