@@ -2,40 +2,62 @@ import * as cdk from '@aws-cdk/core';
 import * as pipelines from '@aws-cdk/pipelines';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
+import { Construct, StackProps } from '@aws-cdk/core';
+import { ApplicationRepository, StackBuilder } from '../spi';
+import { StageProps } from '@aws-cdk/aws-codepipeline';
+import { AddStageOptions } from '@aws-cdk/pipelines';
+
+
+/**
+ * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
+ */
+export type GitHubSourceRepository = Omit<ApplicationRepository, "credentialsType">;
 
 /**
  * Props for the Pipeline.
  */
 export type PipelineProps = {
+    
     /**
      * The name for the pipeline.
      */
-    name: string
+    name: string;
 
     /**
      * The owner of the repository for the pipeline (GitHub handle).
      */
-    owner: string
+    owner: string;
 
     /**
-     * The name of the repository for the pipeline.
+     * Repository for the pipeline
      */
-    repo: string
+    repository: GitHubSourceRepository;
 
-    /**
-     * The branch for the pipeline.
-     */
-    branch: string
+    stages: [ {
+        id: string,
+        stackBuilder: StackBuilder,
+        stageProps?: AddStageOptions
+    }]
+    
+}
 
-    /**
-     * Secret key for GitHub OAuth credentials (stored in SecretsManager).
-     */
-    secretKey?: string
 
-    /**
-     * The CDK scope for the pipeline.
-     */
-    scope: cdk.Construct
+export class PipelineStack extends cdk.Stack {
+    constructor(scope: Construct, pipelineProps: PipelineProps, id: string,  props: StackProps) {
+        super(scope, id, props);
+        const pipeline  = CodePipeline.build(scope, pipelineProps);
+        for(let stage of pipelineProps.stages) {
+            pipeline.addApplicationStage(new ApplicationStage(this, stage.id, stage.stackBuilder), stage.stageProps);
+        }
+    }
+}
+
+
+export class ApplicationStage extends cdk.Stage {
+    constructor(scope: cdk.Stack, id: string, builder: StackBuilder, props?: cdk.StageProps) {
+        super(scope, id, props);
+        builder.build(scope, id, props);
+    }
 }
 
 
@@ -48,16 +70,15 @@ export class CodePipelineStack extends cdk.Stack {
 /**
  * CodePipeline deploys a new CodePipeline resource that is integrated with a GitHub repository.
  */
-export class CodePipeline {
-
-    public static build = (props: PipelineProps) => {
+class CodePipeline {
+    public static build(scope: Construct, props: PipelineProps) {
         const sourceArtifact = new codepipeline.Artifact();
-        const oathToken = cdk.SecretValue.secretsManager(props.secretKey || '')
+        const oathToken = cdk.SecretValue.secretsManager(props.repository.credentialsSecretName || '')
         const sourceAction = new actions.GitHubSourceAction({
             actionName: `${props.name}-github-action`,
             owner: props.owner,
-            repo: props.repo,
-            branch: props.branch,
+            repo: props.repository.repoUrl,
+            branch: props.repository.branch,
             output: sourceArtifact,
             oauthToken: oathToken,
         })
@@ -78,7 +99,7 @@ export class CodePipeline {
             synthCommand: 'cdk synth'
         })
 
-        return new pipelines.CdkPipeline(props.scope, props.name, {
+        return new pipelines.CdkPipeline(scope, props.name, {
             pipelineName: props.name,
             cloudAssemblyArtifact,
             sourceAction,
