@@ -1,18 +1,12 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
-import { ScopedAws, StackProps } from '@aws-cdk/core';
+import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
-<<<<<<< HEAD
-
-import { Team, TeamProps } from '../teams'
-import { ClusterAddOn, ClusterPostDeploy, ClusterProvider } from './cluster-types'
-=======
->>>>>>> main
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
-import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
+import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, StackBuilder } from '../spi';
 
 export class EksBlueprintProps {
 
@@ -66,7 +60,7 @@ function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): St
  * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
  * in accounts and regions. 
  */
-export class BlueprintBuilder {
+export class BlueprintBuilder implements StackBuilder {
 
     private props: Partial<EksBlueprintProps>;
     private account?: string;

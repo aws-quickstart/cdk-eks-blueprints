@@ -21,6 +21,11 @@ export interface ApplicationRepository {
     name?: string,
 
     /**
+     * Optional branch (defaults to main)
+     */
+    branch?: string,
+
+    /**
      * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
      * The secret must exist in the same region and account where the stack will run. 
      */
@@ -29,8 +34,7 @@ export interface ApplicationRepository {
     /**
      * Depending on credentials type the arn should either point to an SSH key (plain text value)
      * or a json file with username/password attributes.
-     * For TOKEN type per ArgoCD documentation (https://argoproj.github.io/argo-cd/user-guide/private-repositories/) 
-     * username can be any non-empty username and token value as password.
+     * For TOKEN type username can be any non-empty username and token value as password.
      */
     credentialsType?: "USERNAME" | "TOKEN" | "SSH"
 
