@@ -60,7 +60,7 @@ export class TeamProps {
     /**
      * Optional, directory where a team's network policy files are stored
      */
-    readonly networkPoliciesDir?: string;
+    readonly teamManifestDir?: string;
 }
 
 export class ApplicationTeam implements Team {
@@ -78,7 +78,7 @@ export class ApplicationTeam implements Team {
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             userRole: teamProps.userRole,
-            networkPoliciesDir: teamProps.networkPoliciesDir
+            teamManifestDir: teamProps.teamManifestDir
         }
     }
 
@@ -171,7 +171,7 @@ export class ApplicationTeam implements Team {
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
-        const networkPoliciesDir = props.networkPoliciesDir;
+        const teamManifestDir = props.teamManifestDir;
 
         const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
@@ -202,8 +202,8 @@ export class ApplicationTeam implements Team {
         });
 
         rbacManifest.node.addDependency(namespaceManifest);
-        if (networkPoliciesDir){
-            applyYamlFromDir(networkPoliciesDir, clusterInfo.cluster, namespaceManifest)
+        if (teamManifestDir){
+            applyYamlFromDir(teamManifestDir, clusterInfo.cluster, namespaceManifest)
         }
     }
 

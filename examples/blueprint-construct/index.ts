@@ -7,9 +7,9 @@ import * as ssp from '../../lib'
 import * as team from '../teams'
 
 // Team directories for network policy.
-const burnhamPolicyDir = './examples/teams/team-burnham/'
-const rikerPolicyDir = './examples/teams/team-riker/'
-const teamPolicyDirList = [burnhamPolicyDir,rikerPolicyDir]
+const burnhamManifestDir = './examples/teams/team-burnham/'
+const rikerManifestDir = './examples/teams/team-riker/'
+const teamManifestDirList = [burnhamManifestDir,rikerManifestDir]
 
 export default class BlueprintConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
@@ -23,8 +23,8 @@ export default class BlueprintConstruct extends cdk.Construct {
         const teams: Array<ssp.teams.Team> = [
             platformTeam,
             new team.TeamTroi,
-            new team.TeamRiker(scope, teamPolicyDirList[1]),
-            new team.TeamBurnham(scope, teamPolicyDirList[0])
+            new team.TeamRiker(scope, teamManifestDirList[1]),
+            new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
 
         // AddOns for the cluster.
