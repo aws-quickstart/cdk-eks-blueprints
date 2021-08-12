@@ -7,6 +7,7 @@ import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, StackBuilder } from '../spi';
+import { withUsageTracking } from '../utils/usage-utils';
 
 export class EksBlueprintProps {
 
@@ -43,17 +44,6 @@ export class EksBlueprintProps {
 
 }
 
-/**
- * Adds usage tracking info to the stack props
- * @param usageIdentifier 
- * @param stackProps 
- * @returns 
- */
-function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): StackProps {
-    const result =  stackProps ?? {};
-    const trackableDescription = `${result.description?? ""} SSP tacking (${usageIdentifier})`.trimLeft();
-    return { ...stackProps, ...{description: trackableDescription}};
-}
 
 /**
  * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
@@ -63,25 +53,28 @@ function withUsageTracking(usageIdentifier: string, stackProps?: StackProps): St
 export class BlueprintBuilder implements StackBuilder {
 
     private props: Partial<EksBlueprintProps>;
-    private account?: string;
-    private region?: string;
+    private env: {
+        account?: string,
+        region?: string
+    }
 
     constructor() {
         this.props = { addOns: new Array<ClusterAddOn>(), teams: new Array<Team>()};
+        this.env = {};
     }
 
-    public withName(name: string) : this {
+    public name(name: string) : this {
         this.props = {...this.props, ...{name}};
         return this;
     }
 
-    public withAccount(account?: string): this {
-        this.account = account;
+    public account(account?: string): this {
+        this.env.account = account;
         return this;
     }
 
-    public withRegion(region?: string) : this {
-        this.region = region;
+    public region(region?: string) : this {
+        this.env.region = region;
         return this;
     }
 
@@ -90,29 +83,29 @@ export class BlueprintBuilder implements StackBuilder {
         return this;
     }
 
-    public withAddons(...addOns: ClusterAddOn[]) : this {
+    public addons(...addOns: ClusterAddOn[]) : this {
         this.props = {...this.props, ...{ addOns: this.props.addOns?.concat(addOns)}};
         return this;
     }
 
-    public withId( id: string): this {
+    public id( id: string): this {
         this.props = { ...this.props, ...{id}};
         return this;
     }
 
-    public withTeams(...teams: Team[]) : this {
+    public teams(...teams: Team[]) : this {
         this.props = {...this.props, ...{teams: this.props.teams?.concat(teams)}};
         return this;
     }
 
-    public build(scope: Construct, id: string, stackProps? : StackProps): EksBlueprint {
-        return new EksBlueprint(scope, {...this.props, ...{id}}, 
-            {...stackProps, ...{ env: {account: this.account, region: this.region}}});
-    }
-
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps(Object.create(this.props))
-            .withAccount(account).withRegion(region);
+            .account(account).region(region);
+    }
+
+    public build(scope: Construct, id: string, stackProps? : StackProps): EksBlueprint {
+        return new EksBlueprint(scope, {...this.props, ...{id}}, 
+            {...stackProps, ...{ env: this.env}});
     }
 }
 
@@ -122,9 +115,15 @@ export class BlueprintBuilder implements StackBuilder {
  * and orcherstrates provisioning of add-ons, teams and post deployment hooks. 
  */
 export class EksBlueprint extends cdk.Stack {
+
+    static readonly USAGE_ID = "qs-1s1r465hk";
+
+    public static builder() : BlueprintBuilder {
+        return new BlueprintBuilder();
+    }
     
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
-        super(scope, blueprintProps.id, withUsageTracking("qs-1s1r465hk", props));
+        super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
         /*
          * Supported parameters
