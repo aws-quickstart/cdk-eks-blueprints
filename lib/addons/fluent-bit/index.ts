@@ -1,4 +1,5 @@
 import * as eks from '@aws-cdk/aws-eks';
+import * as es from '@aws-cdk/aws-elasticsearch';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 
 import { Constants } from "..";
@@ -20,19 +21,7 @@ export interface FluentBitAddOnProps {
     /**
      * Props for Elasticsearch support.
      */
-    readonly elasticsearch?: ElasticsearchProps
-}
-
-export interface ElasticsearchProps {
-    /**
-     * The ARN for the Elasticsearch domain.
-     */
-    readonly domainArn: string
-
-    /**
-     * The endpoint for the Elasticsearch domain.
-     */
-    readonly domainEndpoint: string
+    readonly elasticsearch?: es.DomainAttributes
 }
 
 /**
@@ -86,23 +75,18 @@ export class FluentBitAddOn implements ClusterAddOn {
      * @param serviceAccount The service account to use for FluentBit.
      */
     protected applyForElasticsearch(cluster: eks.Cluster, namespace: string, serviceAccount: eks.ServiceAccount) {
-        /**
-         * Create the IAM Policy for the service account 
-         * Allows the SA to make requests to the Elasticsearch domain. 
-         */
-        const domainProps = this.props?.elasticsearch
-        const domainArn = domainProps?.domainArn!
-        const policy = new PolicyStatement({
-            effect: Effect.ALLOW,
-            actions: ['es:ESHttp*'],
-            resources: [domainArn]
-        })
-        serviceAccount.addToPrincipalPolicy(policy);
+        // Grant SA write access for the Elasticsearch domain. 
+        const stack = cluster.stack
+        const id = `${namespace}-es-domain-id`
+        const domainAttributes = this.props.elasticsearch
+        if (!domainAttributes) {
+            throw new Error(`Must supply Elasticsearch domain attributes.`);
+        }
+        const domain = es.Domain.fromDomainAttributes(stack, id, domainAttributes)
+        domain.grantWrite(serviceAccount)
 
-        /**
-         * Configure our Helm chart values to enable Elasticsearch.
-         */
-        const domainEndpoint = domainProps?.domainEndpoint!
+        // Configure our Helm chart values to enable Elasticsearch.    
+        const domainEndpoint = domain.domainEndpoint
         const values = {
             serviceAccount: {
                 name: serviceAccount.serviceAccountName,
