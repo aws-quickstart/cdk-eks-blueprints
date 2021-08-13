@@ -17,7 +17,7 @@ export class TeamAwesome extends ApplicationTeam {
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user1`),  
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user2`)
             ],
-            manifestDir: './examples/teams/team-awesome/'
+            teamManifestDir: './examples/teams/team-awesome/'
         });
     }
 }
