@@ -2,7 +2,7 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
-import { IVpc } from '@aws-cdk/aws-ec2';
+import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
@@ -33,13 +33,17 @@ export class EksBlueprintProps {
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work
      */
-    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider;
+    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider();
 
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
     readonly version?: KubernetesVersion = KubernetesVersion.V1_19;
 
+    /**
+     * VPC
+     */
+    readonly vpc?: Vpc;
 }
 
 /**
@@ -53,11 +57,16 @@ export class EksBlueprint extends cdk.Stack {
 
         this.validateInput(blueprintProps);
         /*
-         * Supported parameters
+        * Supported parameters
         */
-        const vpcId = this.node.tryGetContext("vpc");
-        const vpc = this.initializeVpc(vpcId);
-
+        let vpc: IVpc;
+        if (blueprintProps.vpc) {
+            vpc = blueprintProps.vpc;
+        }
+        else {
+            const vpcId = this.node.tryGetContext("vpc");
+            vpc = this.initializeVpc(vpcId);
+        }
         const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider();
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
