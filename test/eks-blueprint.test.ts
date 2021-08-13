@@ -1,5 +1,7 @@
 import { expect as expectCDK, haveResource } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
+import { throws } from 'assert';
+import { ArgoCDAddOn, ClusterAutoScalerAddOn, NginxAddOn, PlatformTeam } from '../lib';
 import * as ssp from '../lib/stacks/eks-blueprint-stack';
 
 test('Usage tracking created', () => {
@@ -17,6 +19,35 @@ test('Usage tracking created', () => {
     console.log(stack.templateOptions.description);
     // AND
     expect(stack.templateOptions.description).toContain("SSP tacking (qs");
+
+});
+
+test('Blueprint builder creates correct stack', () => {
+    const app = new cdk.App();
+
+    const blueprint = ssp.EksBlueprint.builder();
+
+    blueprint.account("123567891").region('us-west-1')
+        .addons(new ArgoCDAddOn)
+        .addons(new NginxAddOn)
+        .teams(new PlatformTeam({name: 'platform'}));
+
+    console.log('builder1',  (blueprint as any).props);
+
+    const stack1 = blueprint.build(app, "stack-1");
+
+    const blueprint2 = blueprint.clone('us-west-2', '1234567891').addons(new ClusterAutoScalerAddOn);
+    console.log('builder2',  (blueprint2 as any).props);
+    console.log('builder1',  (blueprint as any).props);
+    const stack2 = blueprint2.build(app, 'stack-2');
+
+    const blueprint3 = ssp.EksBlueprint.builder().withBlueprintProps({
+        addOns: [new ArgoCDAddOn],
+        name: 'my-blueprint3', 
+        id: 'my-blueprint3-id'
+    });
+    console.log('builder3',  (blueprint3 as any).props);
+    const stack3 = blueprint3.build(app, 'stack-3');
 
 });
 

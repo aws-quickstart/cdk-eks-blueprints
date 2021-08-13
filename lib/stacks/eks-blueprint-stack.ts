@@ -88,6 +88,11 @@ export class BlueprintBuilder implements StackBuilder {
         return this;
     }
 
+    public clusterProvider(clusterProvider: ClusterProvider) {
+        this.props = {...this.props, ...{ clusterProvider: clusterProvider }};
+        return this;
+    }
+
     public id( id: string): this {
         this.props = { ...this.props, ...{id}};
         return this;
@@ -99,7 +104,7 @@ export class BlueprintBuilder implements StackBuilder {
     }
 
     public clone(region?: string, account?: string): BlueprintBuilder {
-        return new BlueprintBuilder().withBlueprintProps(Object.create(this.props))
+        return new BlueprintBuilder().withBlueprintProps({...this.props})
             .account(account).region(region);
     }
 
