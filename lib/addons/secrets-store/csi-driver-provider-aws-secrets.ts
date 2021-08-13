@@ -71,13 +71,14 @@ export enum KubernetesSecretType {
   TLS = 'kubernetes.io/tls'
 }
 
-interface parameterObject {
+interface ParameterObject {
     objectName: string;
     objectType: string;
 }
+
 export class TeamSecrets {
 
-  private parameterObjects: parameterObject[];
+  private parameterObjects: ParameterObject[];
   private kubernetesSecrets: KubernetesSecret[];
 
   constructor(private teamSecrets: TeamSecretsProps[]) {

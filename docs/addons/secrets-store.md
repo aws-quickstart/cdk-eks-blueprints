@@ -143,6 +143,10 @@ spec:
 EOF
 ```
 
+The values for `serviceAccountName` and the `secretProviderClass` shown in the example above are obtained from CloudFormation outputs of the blueprint stack shown in the screenshot below as `burnhamsa` and `teamburnhamsecretproviderclass`.
+
+![outputs](./../assets/images/cloudformation-outputs.png)
+
 Apply the manifest.
 
 ```sh
