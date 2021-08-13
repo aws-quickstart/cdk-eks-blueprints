@@ -7,7 +7,12 @@ phases:
     runtime-versions:
       nodejs: 14
     commands:
-      - if [ ! -z "${COMMIT_ID}" ]; then git checkout main; git merge --no-edit ${COMMIT_ID}; fi
+      - |
+        if [ ! -z "${COMMIT_ID}" ]; then 
+          git fetch origin pull/${PR_NUMBER}/head:pr
+          git checkout main
+          git merge --no-edit ${COMMIT_ID}
+        fi
       - | 
         npm install aws-cdk@1.113.0 -g
         npm install
