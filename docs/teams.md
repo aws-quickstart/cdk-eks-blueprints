@@ -72,7 +72,7 @@ The `DefaultTeamRoles` class provides default RBAC configuration for `Applicatio
 
 ## Team Benefits 
 
-By managing teams via infrastrucutre as code, we achieve the following benefits:
+By managing teams via infrastructure as code, we achieve the following benefits:
 
 1. Self-documenting code
 2. Centralized logic related to the team
@@ -102,7 +102,7 @@ Platform administrators must use the role output for their team name, such as pl
 
 ## Console Access
 
-Provided that each team has recieved the name of the role that was created for the cluster access, each team member listed in the users section will be able to assume the role in the target account. 
+Provided that each team has received the name of the role that was created for the cluster access, each team member listed in the users section will be able to assume the role in the target account. 
 
 To do that, users should use "Switch Roles" function in the console and specify the provided role. This will enable EKS console access to list clusters and to get console visibility into the workloads that belong to the team. 
 

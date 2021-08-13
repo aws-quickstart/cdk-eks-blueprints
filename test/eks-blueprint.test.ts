@@ -35,6 +35,7 @@ test('Blueprint builder creates correct stack', () => {
     console.log('builder1',  (blueprint as any).props);
 
     const stack1 = blueprint.build(app, "stack-1");
+    assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
 
     const blueprint2 = blueprint.clone('us-west-2', '1234567891').addons(new ClusterAutoScalerAddOn);
     console.log('builder2',  (blueprint2 as any).props);
@@ -51,3 +52,12 @@ test('Blueprint builder creates correct stack', () => {
 
 });
 
+function assertBlueprint(stack: cdk.Stack, ...charts: string[]) {
+    for(let chart of charts) {
+        expectCDK(stack).to(haveResource('Custom::AWSCDK-EKS-HelmChart', {
+            chart: chart
+        }));
+    }    
+    
+    expect(stack.templateOptions.description).toContain("SSP tacking (qs");
+}
