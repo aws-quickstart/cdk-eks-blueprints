@@ -21,7 +21,7 @@ export interface KubernetesSecret {
   /**
    * Kubernetes Secret Name
    */
-  secretName?: string;
+  secretName: string;
 
   /**
    * Type of Kubernetes Secret
@@ -106,6 +106,8 @@ export class TeamSecrets {
     const serviceAccount = team.serviceAccount;
 
     this.teamSecrets.forEach( (teamSecret) => {
+      const data: KubernetesSecretObjectData[] = [];
+      let kubernetesSecret: KubernetesSecret;
       let secretName: string;
       const secret: ISecret | IStringParameter = teamSecret.secretProvider.provide(clusterInfo); 
 
@@ -129,7 +131,6 @@ export class TeamSecrets {
       }
 
       if (teamSecret.kubernetesSecret) {
-        const data: KubernetesSecretObjectData[] = [];
         if (teamSecret.kubernetesSecret.data) {
           teamSecret.kubernetesSecret.data.forEach ( (item) => {
             const dataObject: KubernetesSecretObjectData = {
@@ -139,8 +140,15 @@ export class TeamSecrets {
             data.push(dataObject);
           });
         }
-        const kubernetesSecret: KubernetesSecret = {
-          secretName: teamSecret.kubernetesSecret.secretName ?? `${team.name}-secrets`,
+        else {
+          const dataObject: KubernetesSecretObjectData = {
+            objectName: secretName,
+            key: secretName
+          }
+          data.push(dataObject);
+        }
+        kubernetesSecret = {
+          secretName: teamSecret.kubernetesSecret.secretName,
           type: teamSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
           labels: teamSecret.kubernetesSecret.labels ?? undefined,
           data,

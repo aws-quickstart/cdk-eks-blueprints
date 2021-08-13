@@ -21,7 +21,11 @@ import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 const secretsStoreAddOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
 
-// Setup application team with secrets
+/* Setup application team with secrets
+ * Here we are generating a new SecretManager secret for AuthPassword
+ * We are also looking up a pre-existing secret in Parameter Store called GITHUB_TOKEN
+ */
+
 export class TeamBurnham extends ApplicationTeam {
     constructor(scope: Construct) {
         super({
@@ -29,19 +33,20 @@ export class TeamBurnham extends ApplicationTeam {
             users: getUserArns(scope, "team-burnham.users"),
             teamSecrets: [
                 {
-                    secretProvider: new GenerateSecretManagerProvider('auth-credentials'),
+                    secretProvider: new GenerateSecretManagerProvider(),
                     kubernetesSecret: {
-                        type: KubernetesSecretType.BASIC_AUTH,
+                        secretName: 'auth-password',
                         data: [
                             {
-                                objectName: 'auth-credentials',
-                                key: 'username'
-                            },
-                            {
-                                objectName: 'auth-credentials',
                                 key: 'password'
                             }
                         ]
+                    }
+                },
+                {
+                    secretProvider: new LookupSsmSecretByAttrs('GITHUB_TOKEN', 1),
+                    kubernetesSecret: {
+                        secretName: 'github'
                     }
                 }
             ]
@@ -50,17 +55,8 @@ export class TeamBurnham extends ApplicationTeam {
 }
 
 class GenerateSecretManagerProvider implements SecretProvider {
-    
-    constructor(private secretName: string) {}
-
     provide(clusterInfo: ClusterInfo): ISecret {
-        const secret = new Secret(clusterInfo.cluster.stack, 'AuthCredentials', {
-            secretName: this.secretName,
-            generateSecretString: {
-                secretStringTemplate: JSON.stringify({ username: 'user' }),
-                generateStringKey: 'password',
-            }
-        });
+        const secret = new Secret(clusterInfo.cluster.stack, 'AuthPassword');
         // create this secret first
         clusterInfo.cluster.node.addDependency(secret);
         return secret
@@ -91,14 +87,14 @@ After the Blueprint stack is deployed you can test consuming the secret from wit
 This sample `deployment` shows how to consume the secrets as mounted volumes as well as environment variables.
 
 ```sh
-cat << 'EOF' >> test-secrets.yaml
+cat << EOF >> test-secrets.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-deployment
   labels:
     app: myapp
-  namespace: team-riker
+  namespace: team-burnham
 spec:
   replicas: 1
   selector:
@@ -116,25 +112,10 @@ spec:
           driver: secrets-store.csi.k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: "burnham-aws-secrets"
+            secretProviderClass: burnham-aws-secrets
       containers:
-      - name: test-mount-volume
-        image: ubuntu
-        command: [ "/bin/bash", "-c", "--" ]
-        args: [ "while true; do sleep 30; done;" ]
-        resources:
-          limits:
-            cpu: "100m"
-            memory: "128Mi"
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-        volumeMounts:
-        - name: secrets-store-inline
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
-      - name: test-env-var
-        image: ubuntu
+      - name: test-secrets
+        image: public.ecr.aws/ubuntu/ubuntu:latest
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]
         resources:
@@ -145,11 +126,20 @@ spec:
             cpu: "100m"
             memory: "128Mi"
         env:
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: auth-password
+                key: password
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: AuthCredentials
-                key: AuthCredentials
+                name: github
+                key: GITHUB_TOKEN
+        volumeMounts:
+          - name: secrets-store-inline
+            mountPath: /mnt/secrets-store
+            readOnly: true
 EOF
 ```
 
@@ -163,18 +153,12 @@ deployment.apps/app-deployment created
 Test that kubernetes secret `burnham-github-secrets` was created.
 
 ```sh
-$ kubectl describe secrets burhnam-github-secrets -n team-burnham
-Name:         burhnam-github-secrets
-Namespace:    team-burnham
-Labels:       secrets-store.csi.k8s.io/managed=true
-Annotations:  <none>
-
-Type:  Opaque
-
-Data
-====
-github_token:  40 bytes
-private_key:   1856 bytes
+kubectl get secrets -n team-burnham
+NAME                     TYPE                                  DATA   AGE
+auth-password            Opaque                                1      19s
+burnham-sa-token-fqjqw   kubernetes.io/service-account-token   3      64m
+default-token-7fn69      kubernetes.io/service-account-token   3      64m
+github                   Opaque                                1      19s
 ```
 
 Test that the deployment has completed and the pod is running successfully.
@@ -185,21 +169,18 @@ NAME                              READY   STATUS    RESTARTS   AGE
 app-deployment-6867fc6bd6-jzdwh   1/1     Running   0          46s
 ```
 
-Next, test whether the secret `PRIVATE_KEY` can be accessed from within the `test-volume-mount` container.
+Next, test whether the secret `PASSWORD` is available as an environment variable from within the `app-deployment` pod.
 
 ```sh
-$ kubectl exec app-deployment-6867fc6bd6-jzdwh -c test-mount-volume -n team-burnham -- cat /mnt/secrets-store/PRIVATE_KEY
+$ kubectl exec app-deployment-6867fc6bd6-jzdwh -n team-burnham -- echo $PASSWORD
 
------BEGIN OPENSSH PRIVATE KEY-----
-...
-...
------END OPENSSH PRIVATE KEY-----
+XXXXXXXXXXXXXXXXXX
 ```
 
-Test whether `GITHUB_TOKEN` is available as an environment variable from within the `test-env-var` container.
+Test whether `GITHUB_TOKEN` is available as an environment variable from within the `app-deployment` pod.
 
 ```sh
-$ kubectl exec app-deployment-6867fc6bd6-jzdwh -c test-env-var -n team-burnham -- echo $GITHUB_TOKEN
+$ kubectl exec app-deployment-6867fc6bd6-jzdwh -n team-burnham -- echo $GITHUB_TOKEN
 
 ghp_XXXXXXXXXXXXXXXXXXXXXXXXXX
 ```

@@ -1,6 +1,5 @@
 import * as cdk from "@aws-cdk/core";
 import { ClusterInfo } from "../../../lib";
-import { Constants } from "..";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 
@@ -25,7 +24,8 @@ export class CsiDriverProviderAws {
       rotationPollInterval?: string,
       syncSecret?: {
         enabled: string
-      }
+      },
+      grpcSupportedProviders: string
     }
 
     let values: chartValues = {
@@ -33,7 +33,8 @@ export class CsiDriverProviderAws {
         image: {
           tag: this.version
         }
-      }
+      },
+      grpcSupportedProviders: 'aws'
     };
 
     if (typeof(this.rotationPollInterval) === 'string') {
@@ -47,12 +48,13 @@ export class CsiDriverProviderAws {
       }
     }
 
+    const chart = 'secrets-store-csi-driver';
     const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', {
-      chart: 'secrets-store-csi-driver',
+      chart,
       repository: 'https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts',
       namespace: this.namespace,
+      release: chart,
       version: this.version,
-      release: Constants.SSP_ADDON,
       wait: true,
       timeout: cdk.Duration.minutes(15),
       values,

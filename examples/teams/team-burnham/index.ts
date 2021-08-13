@@ -2,7 +2,7 @@ import { ArnPrincipal } from '@aws-cdk/aws-iam';
 import { Construct } from '@aws-cdk/core';
 import { ApplicationTeam } from '../../../lib/teams';
 import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
-import { ClusterInfo, LookupSecretsManagerSecretByName, SecretProvider } from '../../../lib';
+import { ClusterInfo, SecretProvider } from '../../../lib';
 
 function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
     const context: string = scope.node.tryGetContext(key);
@@ -21,10 +21,8 @@ export class TeamBurnham extends ApplicationTeam {
                 {
                     secretProvider: new GenerateSecretManagerProvider(),
                     kubernetesSecret: {
+                        secretName: 'auth-password',
                         data: [
-                            {
-                                key: 'username'
-                            },
                             {
                                 key: 'password'
                             }
@@ -38,12 +36,7 @@ export class TeamBurnham extends ApplicationTeam {
 
 class GenerateSecretManagerProvider implements SecretProvider {
     provide(clusterInfo: ClusterInfo): ISecret {
-        const secret = new Secret(clusterInfo.cluster.stack, 'AuthCredentials', {
-            generateSecretString: {
-                secretStringTemplate: JSON.stringify({ username: 'user' }),
-                generateStringKey: 'password',
-            }
-        });
+        const secret = new Secret(clusterInfo.cluster.stack, 'AuthPassword');
         // create this secret first
         clusterInfo.cluster.node.addDependency(secret);
         return secret
