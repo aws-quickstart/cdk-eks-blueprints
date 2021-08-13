@@ -33,7 +33,7 @@ export class TeamBurnham extends ApplicationTeam {
             users: getUserArns(scope, "team-burnham.users"),
             teamSecrets: [
                 {
-                    secretProvider: new GenerateSecretManagerProvider(),
+                    secretProvider: new GenerateSecretManagerProvider('AuthPassword),
                     kubernetesSecret: {
                         secretName: 'auth-password',
                         data: [
@@ -55,8 +55,14 @@ export class TeamBurnham extends ApplicationTeam {
 }
 
 class GenerateSecretManagerProvider implements SecretProvider {
+
+    construct(private secretName: string) {}
+
     provide(clusterInfo: ClusterInfo): ISecret {
-        const secret = new Secret(clusterInfo.cluster.stack, 'AuthPassword');
+        const secret = new Secret(clusterInfo.cluster.stack, 'AuthPassword', {
+          secretName: this.secretName
+        });
+
         // create this secret first
         clusterInfo.cluster.node.addDependency(secret);
         return secret
