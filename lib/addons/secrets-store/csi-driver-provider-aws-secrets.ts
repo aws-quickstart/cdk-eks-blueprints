@@ -87,8 +87,10 @@ export class TeamSecrets {
   }
 
   /**
-   * Setup the secrets for CSI driver
-   * @param clusterInfo
+   * Setup Team secrets
+   * @param clusterInfo 
+   * @param team 
+   * @param csiDriver 
    */
   setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct): void {
     // Create the service account for the team
@@ -101,6 +103,7 @@ export class TeamSecrets {
   /**
    * Creates Service Account for CSI Secrets driver and sets up the IAM Policies
    * needed to access the AWS Secrets
+   * @param clusterInfo
    * @param team
    */
   private addPolicyToServiceAccount(clusterInfo: ClusterInfo, team: ApplicationTeam) {
