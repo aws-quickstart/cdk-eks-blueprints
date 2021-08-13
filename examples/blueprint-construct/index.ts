@@ -10,15 +10,15 @@ export default class BlueprintConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
         super(scope, id);
 
+        // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
-        const account = props.env!.account!;
-        const platformTeam = new team.TeamPlatform(account);
+        //const account = props.env!.account!
+        // const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            platformTeam,
-            new team.TeamTroi(),
-            new team.TeamRiker(),
+            new team.TeamTroi,
+            new team.TeamRiker,
             new team.TeamBurnham(scope)
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
