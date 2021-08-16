@@ -1,6 +1,6 @@
 site_name: Amazon EKS SSP Quick Start
-repo_name: "aws-quickstart/quickstart-ssp-amazon-eks"
-repo_url: "https://github.com/aws-quickstart/quickstart-ssp-amazon-eks"
+repo_name: "aws-quickstart/ssp-amazon-eks"
+repo_url: "https://github.com/aws-quickstart/ssp-amazon-eks"
 docs_dir: "docs"
 theme: 
   name: material
@@ -24,6 +24,7 @@ nav:
     - Metrics Server: 'addons/metrics-server.md'
     - Nginx: 'addons/nginx.md'
     - SSM Agent: 'addons/ssm-agent.md'
+    - Secrets Store: 'addons/secrets-store.md'
     - Weave GitOps: 'https://github.com/weaveworks/weave-gitops-ssp-addon'
     - AWS XRay: 'addons/xray.md'
   - Cluster Providers: 
