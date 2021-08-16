@@ -2,7 +2,7 @@
 # Amazon EKS SSP Quick Start
 
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/quickstart-ssp-amazon-eks)
-![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSs[…]R5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
+![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSsvbE9mR0ZWeTJjbi96OUpBREorSG51UjMzQ1UyNXdmUzZ2dUJoTkhIODFJWjN2QjRGcnhWS0pYLzFQRU5uOThiUEp1WjEzS0htbUpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlRkUFRoTWtjdElBMkR5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
