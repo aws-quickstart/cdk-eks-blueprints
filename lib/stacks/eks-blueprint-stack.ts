@@ -2,9 +2,8 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
-import { IVpc } from '@aws-cdk/aws-ec2';
+import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Construct } from 'constructs';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy } from '../spi';
 
@@ -34,13 +33,17 @@ export class EksBlueprintProps {
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work
      */
-    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider;
+    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider();
 
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
     readonly version?: KubernetesVersion = KubernetesVersion.V1_19;
 
+    /**
+     * VPC
+     */
+    readonly vpc?: Vpc;
 }
 
 /**
@@ -49,40 +52,50 @@ export class EksBlueprintProps {
  */
 export class EksBlueprint extends cdk.Stack {
 
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, props);
 
         this.validateInput(blueprintProps);
         /*
-         * Supported parameters
+        * Supported parameters
         */
-        const vpcId = this.node.tryGetContext("vpc");
-        const vpc = this.initializeVpc(vpcId);
-
-        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
+        let vpc: IVpc;
+        if (blueprintProps.vpc) {
+            vpc = blueprintProps.vpc;
+        }
+        else {
+            const vpcId = this.node.tryGetContext("vpc");
+            vpc = this.initializeVpc(vpcId);
+        }
+        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider();
 
         const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = Array<Promise<any>>();
+        const promises = Array<Promise<cdk.Construct>>();
+        const addOnKeys: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result : any = addOn.deploy(clusterInfo);
+            const result = addOn.deploy(clusterInfo);
             if(result) {
-                promises.push(<Promise<any>>result);
+                promises.push(result);
+                addOnKeys.push(addOn.constructor.name);
             }
             const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
             }
         }
-        
-        if (blueprintProps.teams != null) {
-            for(let team of blueprintProps.teams) {
-                team.setup(clusterInfo);
-            }
-        }
 
-        Promise.all(promises).then(() => {
+        // Wait for all addon promises to be resolved
+        Promise.all(promises.values()).then((constructs) => {
+            constructs.forEach( (construct, index) => {
+                clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+            });
+            if (blueprintProps.teams != null) {
+                for(let team of blueprintProps.teams) {
+                    team.setup(clusterInfo);
+                }
+            }
             for(let step of postDeploymentSteps) {
                 step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
             }
