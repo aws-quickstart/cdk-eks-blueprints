@@ -6,11 +6,11 @@ import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 export class ContainerInsightsAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
-        console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, "ContainerInsightsAddon can only be used with EKS EC2 at the moment. "
+        console.assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, "ContainerInsightsAddon can only be used with EKS EC2 at the moment. "
             + "If using custom cluster provider, make sure you return the node group");
 
         // Setup managed policy.
-        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoscalingGroup;
+        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoScalingGroup;
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy')
         nodeGroup!.role.addManagedPolicy(policy);
 

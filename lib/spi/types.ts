@@ -1,5 +1,6 @@
+import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks'
+import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 
 /**
  * Data type defining an application repository (git). 
@@ -36,28 +37,52 @@ export interface ApplicationRepository {
 
 }
 
-/**
- * ClusterInfo describes an EKS cluster.
- */
- export declare interface ClusterInfo {
-
-    /**
-     * The EKS cluster.
-     */
+export class ClusterInfo {
+    
     readonly cluster: Cluster;
-
-    /**
-     * Either and EKS NodeGroup for managed node groups, or and autoscaling group for self-managed.
-     */
-    readonly nodeGroup?: Nodegroup;
-
-    /**
-     * The autoscaling group for the cluster.
-     */
-    readonly autoscalingGroup?: AutoScalingGroup;
-
-    /**
-     * The Kubernetes version for the cluster.
-     */
     readonly version: KubernetesVersion;
+    readonly nodeGroup?: Nodegroup;
+    readonly autoScalingGroup?: AutoScalingGroup;
+    private readonly provisionedAddOns: Map<string, cdk.Construct>;
+
+    /**
+     * Constructor for ClusterInfo
+     * @param props 
+     */
+    constructor(cluster: Cluster, version: KubernetesVersion, nodeGroup?: Nodegroup | AutoScalingGroup) {
+        this.cluster = cluster;
+        this.version = version;
+        if (nodeGroup) {
+            if (nodeGroup instanceof Nodegroup) {
+                this.nodeGroup = nodeGroup;
+            }
+            else {
+                this.autoScalingGroup = nodeGroup;
+            }
+        }
+        this.provisionedAddOns = new Map<string, cdk.Construct>();
+    }
+
+    /**
+     * Update provisionedAddOns map
+     * @param addOn 
+     * @param construct 
+     */
+    public addProvisionedAddOn(addOn: string, construct: cdk.Construct) {
+        this.provisionedAddOns.set(addOn, construct);
+    }
+
+    /**
+     * Given the addOn name, return the provisioned addOn construct
+     * @param addOn 
+     * @returns undefined
+     */
+    public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
+        if (this.provisionedAddOns) {
+            return this.provisionedAddOns.get(addOn);
+        }
+        else {
+            return undefined;
+        }
+    }
 }
