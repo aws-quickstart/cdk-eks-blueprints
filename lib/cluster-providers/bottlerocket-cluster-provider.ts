@@ -23,7 +23,7 @@ export class BottlerocketClusterProvider implements ClusterProvider {
             machineImageType: eks.MachineImageType.BOTTLEROCKET
         });
 
-        return { cluster: cluster, autoscalingGroup: nodeGroup, version }
+        return new ClusterInfo(cluster, version, nodeGroup);
     }
 
 }

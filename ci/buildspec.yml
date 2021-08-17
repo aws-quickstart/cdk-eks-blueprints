@@ -7,20 +7,23 @@ phases:
     runtime-versions:
       nodejs: 14
     commands:
-      - if [ ! -z "${COMMIT_ID}" ]; then git checkout main; git merge --no-edit ${COMMIT_ID}; fi
+      - |
+        if [ ! -z "${COMMIT_ID}" ]; then 
+          git fetch origin pull/${PR_NUMBER}/head:pr
+          git checkout main
+          # git merge needs user details, but we don't push anything, so the contents are unimportant
+          git -c "user.name=CI Bot" -c "user.email=dev@null" merge --no-edit ${COMMIT_ID}
+        fi
       - | 
-        npm install aws-cdk@1.116.0 -g
-        npm install
+        make deps
       - >
-        # if there's no CDKToolkit stack then bootstrap cdk
-        aws cloudformation describe-stacks --stack-name CDKToolkit --region ${AWS_REGION} 
-        || CDK_NEW_BOOTSTRAP=1 cdk bootstrap aws://$(aws sts get-caller-identity --output text --query Account --region ${AWS_REGION})/${AWS_REGION}
+        make bootstrap-cdk
   pre_build:
     commands:
       - >
         [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
   build:
     commands:
-      - cdk deploy --verbose --all --require-approval never
+      - make deploy-all
     finally:
-      - cdk destroy --verbose --all --force
+      - make destroy-all

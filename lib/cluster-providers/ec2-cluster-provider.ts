@@ -133,7 +133,7 @@ export class EC2ClusterProvider implements ClusterProvider {
             releaseVersion: this.options.amiReleaseVersion
         });
 
-        return { cluster: cluster, nodeGroup: nodeGroup, version: version };
+        return new ClusterInfo(cluster, version, nodeGroup);
     }
 }
 
@@ -144,6 +144,6 @@ export class EC2ClusterProvider implements ClusterProvider {
  * @returns 
  */
 export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): Nodegroup | AutoScalingGroup {
-    console.assert(clusterInfo.nodeGroup || clusterInfo.autoscalingGroup, `${source} is supported with EKS EC2 only`);
-    return clusterInfo.nodeGroup || clusterInfo.autoscalingGroup!;
+    console.assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, `${source} is supported with EKS EC2 only`);
+    return clusterInfo.nodeGroup || clusterInfo.autoScalingGroup!;
 }

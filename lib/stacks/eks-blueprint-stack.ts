@@ -2,9 +2,8 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
-import { IVpc } from '@aws-cdk/aws-ec2';
+import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Construct } from 'constructs';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
 import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, AsyncStackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
@@ -35,13 +34,17 @@ export class EksBlueprintProps {
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work
      */
-    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider;
+    readonly clusterProvider?: ClusterProvider = new EC2ClusterProvider();
 
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
     readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
 
+    /**
+     * VPC
+     */
+    readonly vpc?: Vpc;
 }
 
 
@@ -108,12 +111,12 @@ export class BlueprintBuilder implements AsyncStackBuilder {
             .account(account).region(region);
     }
 
-    public build(scope: Construct, id: string, stackProps? : StackProps): EksBlueprint {
+    public build(scope: cdk.Construct, id: string, stackProps? : StackProps): EksBlueprint {
         return new EksBlueprint(scope, {...this.props, ...{id}}, 
             {...stackProps, ...{ env: this.env}});
     }
 
-    public async buildAsync(scope: Construct, id: string, stackProps?: StackProps) : Promise<EksBlueprint> {
+    public async buildAsync(scope: cdk.Construct, id: string, stackProps?: StackProps) : Promise<EksBlueprint> {
         return this.build(scope, id, stackProps).waitForAsyncTasks();
     }
 }
@@ -125,6 +128,7 @@ export class BlueprintBuilder implements AsyncStackBuilder {
  */
 export class EksBlueprint extends cdk.Stack {
 
+
     static readonly USAGE_ID = "qs-1s1r465hk";
 
     private asyncTasks: Promise<any>;
@@ -133,50 +137,69 @@ export class EksBlueprint extends cdk.Stack {
         return new BlueprintBuilder();
     }
     
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
         /*
-         * Supported parameters
+        * Supported parameters
         */
-        const vpcId = this.node.tryGetContext("vpc");
-        const vpc = this.initializeVpc(vpcId);
+        let vpc: IVpc;
+        if (blueprintProps.vpc) {
+            vpc = blueprintProps.vpc;
+        }
+        else {
+            const vpcId = this.node.tryGetContext("vpc");
+            vpc = this.initializeVpc(vpcId);
+        }
+        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider();
 
-        const clusterProvider = blueprintProps.clusterProvider ?? new EC2ClusterProvider;
-
-        const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_19);
+        const clusterInfo = clusterProvider.createCluster(this, vpc, blueprintProps.version ?? KubernetesVersion.V1_20);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = Array<Promise<any>>();
+        const promises = Array<Promise<cdk.Construct>>();
+        const addOnKeys: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result : any = addOn.deploy(clusterInfo);
+            const result = addOn.deploy(clusterInfo);
             if(result) {
-                promises.push(<Promise<any>>result);
+                promises.push(result);
+                addOnKeys.push(addOn.constructor.name);
             }
             const postDeploy : any = addOn;
             if((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
                 postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
             }
         }
-        
-        if (blueprintProps.teams != null) {
-            for(let team of blueprintProps.teams) {
-                team.setup(clusterInfo);
-            }
-        }
 
-        this.asyncTasks = Promise.all(promises).then(() => {
+        this.asyncTasks = Promise.all(promises.values()).then((constructs) => {
+            constructs.forEach( (construct, index) => {
+                clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+            });
+            if (blueprintProps.teams != null) {
+                for(let team of blueprintProps.teams) {
+                    team.setup(clusterInfo);
+                }
+            }
+
             for(let step of postDeploymentSteps) {
                 step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
             }
         });
+
         this.asyncTasks.catch(err => { throw new Error(err)});
     }
 
+    /**
+     * Since constructor cannot be marked as async, adding a separate method to wait
+     * for async code to finish. 
+     * @returns Promise that resolves to the blueprint
+     */
     public async waitForAsyncTasks() : Promise<EksBlueprint> {
-        return this.asyncTasks.then(()=> {
-            return this;
-        });
+        if(this.asyncTasks) {
+            return this.asyncTasks.then(()=> {
+                return this;
+            });
+        }
+        return Promise.resolve(this);
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
