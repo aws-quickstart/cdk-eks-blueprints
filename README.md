@@ -10,7 +10,7 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 
 ## Documentation
 
-For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
+For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/ssp-amazon-eks/).
 
 ## What is an SSP?
 
