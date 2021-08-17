@@ -6,7 +6,7 @@
     "scripts": {
         "build": "rm -rf dist && tsc",
         "watch": "tsc -w",
-        "test": "jest",
+        "test": "jest --verbose",
         "cdk": "cdk",
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },

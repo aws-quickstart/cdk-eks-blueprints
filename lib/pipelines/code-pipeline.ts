@@ -3,7 +3,7 @@ import * as pipelines from '@aws-cdk/pipelines';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, StackProps } from '@aws-cdk/core';
-import { ApplicationRepository, StackBuilder } from '../spi';
+import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { AddStageOptions } from '@aws-cdk/pipelines';
 import { withUsageTracking } from '../utils/usage-utils'; 
 
@@ -59,7 +59,10 @@ export interface StackStage {
     stageProps?: AddStageOptions
 }
 
-export class PipelineBuilder implements StackBuilder {
+/**
+ * Builder for CodePipeline.
+ */
+export class CodePipelineBuilder implements StackBuilder {
 
     private props: Partial<PipelineProps>;
 
@@ -68,22 +71,22 @@ export class PipelineBuilder implements StackBuilder {
         this.props = { stages: []};
     }
 
-    public name(name: string): PipelineBuilder {
+    public name(name: string): CodePipelineBuilder {
         this.props.name = name;
         return this;
     }
 
-    public owner(owner: string) : PipelineBuilder {
+    public owner(owner: string) : CodePipelineBuilder {
         this.props.owner = owner;
         return this;
     }
 
-    public repository(repo: GitHubSourceRepository): PipelineBuilder {
+    public repository(repo: GitHubSourceRepository): CodePipelineBuilder {
         this.props.repository = repo;
         return this;
     }
 
-    public stage(stackStage: StackStage) : PipelineBuilder {
+    public stage(stackStage: StackStage) : CodePipelineBuilder {
         this.props.stages?.push(stackStage);
         return this;
     }
@@ -92,7 +95,7 @@ export class PipelineBuilder implements StackBuilder {
         console.assert(this.props.name && this.props.owner && this.props.repository!.credentialsSecretName && this.props.stages, 
             "Please populate name, owner, repository (including credentialsSecretName) and stage fields with values for the pipeline stack");
         const fullProps = this.props as PipelineProps;
-        return new PipelineStack(scope, fullProps, id, stackProps);
+        return new CodePipelineStack(scope, fullProps, id, stackProps);
     }
 }
 
@@ -100,35 +103,48 @@ export class PipelineBuilder implements StackBuilder {
  * Pipeline stack is generating a self-mutating pipeline to faciliate full CI/CD experience with the platform 
  * for infrastructure changes.
  */
-export class PipelineStack extends cdk.Stack {
+export class CodePipelineStack extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465k6";
 
     static builder() {
-        return new PipelineBuilder();
+        return new CodePipelineBuilder();
     }
 
     constructor(scope: Construct, pipelineProps: PipelineProps, id: string,  props?: StackProps) {
-        super(scope, id, withUsageTracking(PipelineStack.USAGE_ID, props));
-        const pipeline  = CodePipeline.build(scope, pipelineProps);
+        super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
+        const pipeline  = CodePipeline.build(this, pipelineProps);
         for(let stage of pipelineProps.stages) {
-            pipeline.addApplicationStage(new ApplicationStage(this, stage.id, stage.stackBuilder), stage.stageProps);
+            const appStage = new ApplicationStage(this, stage.id, stage.stackBuilder);
+            appStage.waitForAsyncTasks().then( res => {
+                pipeline.addApplicationStage(res, stage.stageProps);
+            });
         }
     }
 }
 
 
 export class ApplicationStage extends cdk.Stage {
-    constructor(scope: cdk.Stack, id: string, builder: StackBuilder, props?: cdk.StageProps) {
+
+    private asyncTask: Promise<any>;
+
+    constructor(scope: cdk.Stack, id: string, builder: StackBuilder | AsyncStackBuilder, props?: cdk.StageProps) {
         super(scope, id, props);
-        builder.build(scope, id, props);
+        if((<AsyncStackBuilder>builder).buildAsync !== undefined) {
+            this.asyncTask = (<AsyncStackBuilder>builder).buildAsync(this, `${id}-blueprint`, props);
+        }
+        else {
+            builder.build(this, `${id}-blueprint`, props);
+        }
     }
-}
 
-
-export class CodePipelineStack extends cdk.Stack {
-    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
-        super(scope, id)
+    public async waitForAsyncTasks() : Promise<ApplicationStage> {
+        if(this.asyncTask) {
+            return this.asyncTask.then(()=> {
+                return this;
+            });
+        }
+        return Promise.resolve(this);
     }
 }
 

@@ -6,7 +6,7 @@ import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from 'constructs';
 import { EC2ClusterProvider } from '../cluster-providers/ec2-cluster-provider';
-import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, StackBuilder } from '../spi';
+import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, AsyncStackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
 export class EksBlueprintProps {
@@ -50,7 +50,7 @@ export class EksBlueprintProps {
  * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
  * in accounts and regions. 
  */
-export class BlueprintBuilder implements StackBuilder {
+export class BlueprintBuilder implements AsyncStackBuilder {
 
     private props: Partial<EksBlueprintProps>;
     private env: {
@@ -112,6 +112,10 @@ export class BlueprintBuilder implements StackBuilder {
         return new EksBlueprint(scope, {...this.props, ...{id}}, 
             {...stackProps, ...{ env: this.env}});
     }
+
+    public async buildAsync(scope: Construct, id: string, stackProps?: StackProps) : Promise<EksBlueprint> {
+        return this.build(scope, id, stackProps).waitForAsyncTasks();
+    }
 }
 
 
@@ -122,6 +126,8 @@ export class BlueprintBuilder implements StackBuilder {
 export class EksBlueprint extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465hk";
+
+    private asyncTasks: Promise<any>;
 
     public static builder() : BlueprintBuilder {
         return new BlueprintBuilder();
@@ -159,11 +165,18 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        Promise.all(promises).then(() => {
+        this.asyncTasks = Promise.all(promises).then(() => {
             for(let step of postDeploymentSteps) {
                 step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
             }
-        }).catch(err => { throw new Error(err)});
+        });
+        this.asyncTasks.catch(err => { throw new Error(err)});
+    }
+
+    public async waitForAsyncTasks() : Promise<EksBlueprint> {
+        return this.asyncTasks.then(()=> {
+            return this;
+        });
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
