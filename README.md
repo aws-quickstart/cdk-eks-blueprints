@@ -10,7 +10,7 @@ This repository contains the source code for the [`cdk-eks-blueprint`](https://w
 
 ## Documentation
 
-For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
+For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/ssp-amazon-eks/).
 
 ## What is an SSP?
 
@@ -136,7 +136,7 @@ AWS customers are building internal platforms to tame this complexity, automate 
 
 ## Feedback
 
-For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
+For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/ssp-amazon-eks/).
 
 To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo.
 
