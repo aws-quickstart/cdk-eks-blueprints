@@ -45,31 +45,12 @@ export default class BlueprintConstruct extends cdk.Construct {
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-<<<<<<< HEAD
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
             new ssp.addons.ClusterAutoScalerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
-=======
-            new ssp.addons.AppMeshAddOn,
-            new ssp.addons.NginxAddOn({values: {
-                controller: {
-                    service: {
-                        annotations: {
-                            "key1": "value1"
-                        }
-                    }
-                }
-            }}),
-            new ssp.addons.ArgoCDAddOn,
-            new ssp.addons.CalicoAddOn,
-            new ssp.addons.OpaAddOn,
-            new ssp.addons.MetricsServerAddOn,
-            new ssp.addons.ClusterAutoScalerAddOn,
-            new ssp.addons.ContainerInsightsAddOn,
->>>>>>> 43e50943 (adding opa to blueprint-construct)
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn(),

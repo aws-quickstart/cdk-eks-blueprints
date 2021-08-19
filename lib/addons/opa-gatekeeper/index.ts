@@ -1,38 +1,36 @@
 import { ClusterAddOn, ClusterInfo } from "../../../lib"; 
-import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
 /**
- * Properties available to configure OPA Gatekeeper.
+ * Properties available to configure with OPA Gatekeeper. The Helm chart automatically sets the Gatekeeper flag --exempt-namespace={{ .Release.Namespace }} in order to exempt the namespace where the chart is installed, and adds the admission.gatekeeper.sh/ignore label to the namespace during a post-install hook.
  */
  export interface OpaGatekeeperAddOnProps {
     /**
-     * Default constraint
+     * Add labels to the namespace during post install hooks
      */
-    defaultConstraint?: string,
+    labelNamespaceEnabled?: string,
 
     /**
-     * Default policy
+     * Image with kubectl to label the namespace
      */
-    crossZoneEnabled?: boolean,
+    labelNamespaceImageRepository?: string,
 
     /**
-     * Default audit functionality 
+     * Image tag
      */
-    internetFacing?: boolean,
+    labelNamespaceImageTag?: string,
+
+     /**
+     * Image pullPolicy
+     */
+    labelNamespacePullPolicy?: string,
 
     /**
-     * IP or instance mode. Default: IP, requires VPC-CNI, has better performance eliminating a hop through kubeproxy
-     * Instance mode: traditional NodePort mode on the instance. 
+     * Frequency with which audit is run
      */
-    targetType?: string,
-    
-    /**
-     * Used in conjunction with external DNS add-on to handle automatic registration of the service with Route53.  
-     */
-    externaDnsHostname?: string,
+    auditInterval?: string,
 
     /**
-     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
+     * Values to pass to the chart as per https://github.com/open-policy-agent/gatekeeper/blob/master/charts/gatekeeper/README.md
      */
     values?: {
         [key: string]: any;
@@ -40,19 +38,26 @@ import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 }
 
 const opagatekeeperAddonDefaults: OpaGatekeeperAddOnProps = {
-
+    labelNamespaceEnabled: 'true',
 }
 
+export class OpaGatekeeperAddOn implements ClusterAddOn {
 
-export class OpaGatekeeperAddOn implements OpaGatekeeperAddOn {
+    readonly options?: OpaGatekeeperAddOnProps;
+
+    constructor(props?: OpaGatekeeperAddOnProps) {
+        this.options = { ...opagatekeeperAddonDefaults, ...props };
+    }
 
     deploy(clusterInfo: ClusterInfo): void {
-        clusterInfo.cluster.addHelmChart("OpaGatekeeper-addon", {
+        const props = this.options;
+
+        clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
             version: "3.6.0-beta.3",
-            namespace: "kube-system"
+            namespace: "gatekeeper-system"
         });
     }
 }
