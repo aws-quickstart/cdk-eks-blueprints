@@ -6,7 +6,7 @@ You are also able to create your own team implementations by creating classes th
 
 ### ApplicationTeam 
 
-To create an `ApplicationTeam` for your cluster, simplye implement a class that extends `ApplicationTeam`. You will need to supply a team name and an array of users.  
+To create an `ApplicationTeam` for your cluster, simply implement a class that extends `ApplicationTeam`. You will need to supply a team name, an array of users, and (optionally) a directory where you may optionally place any policy definitions and generic manifests for the team. These manifests will be applied by the platform and will be outside of the team control **NOTE:** The files are not checked for accuracy, and you must ensure, for example, that the namespace provided match the actual namespace. 
 
 ```typescript
 export class TeamAwesome extends ApplicationTeam {
@@ -17,7 +17,7 @@ export class TeamAwesome extends ApplicationTeam {
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user1`),  
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user2`)
             ]
-
+        manifestDir: './examples/teams/team-awesome/'
         });
     }
 }
@@ -30,6 +30,7 @@ The `ApplicationTeam` will do the following:
 - Register IAM users for cross-account access
 - Create a shared role for cluster access. Alternatively, an existing role can be supplied.
 - Register provided users/role in the `awsAuth` map for `kubectl` and console access to the cluster and namespace.
+- (Optionally) read all additional manifests (e.g., network policies, OPA policies, others) stored in a provided directory, and applies them.
 
 ### PlatformTeam 
 

@@ -4,6 +4,7 @@ import { CfnOutput } from '@aws-cdk/core';
 import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
 import { TeamSecrets, TeamSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
+import { applyYamlFromDir } from '../utils/yaml-utils'
 
 /**
  * Team properties.
@@ -56,6 +57,11 @@ export class TeamProps {
      * Team Secrets
      */
     readonly teamSecrets?: TeamSecretsProps[];
+
+    /**
+     * Optional, directory where a team's network policy files are stored
+     */
+     readonly teamManifestDir?: string;
 }
 
 export class ApplicationTeam implements Team {
@@ -78,7 +84,8 @@ export class ApplicationTeam implements Team {
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
             userRole: teamProps.userRole,
-            teamSecrets: teamProps.teamSecrets
+            teamSecrets: teamProps.teamSecrets,
+            teamManifestDir: teamProps.teamManifestDir
         }
     }
 
@@ -173,6 +180,7 @@ export class ApplicationTeam implements Team {
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
+        const teamManifestDir = props.teamManifestDir;
 
         this.namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
@@ -202,6 +210,9 @@ export class ApplicationTeam implements Team {
         });
 
         rbacManifest.node.addDependency(this.namespaceManifest);
+        if (teamManifestDir){
+            applyYamlFromDir(teamManifestDir, clusterInfo.cluster, this.namespaceManifest)
+        }
     }
 
     /**
