@@ -7,6 +7,10 @@ import * as ssp from '../../lib'
 // Example teams.
 import * as team from '../teams'
 
+const burnhamManifestDir = './examples/teams/team-burnham/'
+const rikerManifestDir = './examples/teams/team-riker/'
+const teamManifestDirList = [burnhamManifestDir,rikerManifestDir]
+
 export interface BlueprintConstructProps {
     /**
      * Id
@@ -30,8 +34,8 @@ export default class BlueprintConstruct extends cdk.Construct {
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
             new team.TeamTroi,
-            new team.TeamRiker,
-            new team.TeamBurnham(scope)
+            new team.TeamRiker(scope, teamManifestDirList[1]),
+            new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             bootstrapRepo: {

@@ -2,8 +2,16 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as eks from '@aws-cdk/aws-eks';
 import request from 'sync-request';
+import { KubernetesManifest } from '@aws-cdk/aws-eks';
 
-export function readYamlFromDir(dir: string, cluster: eks.Cluster): void {
+/**
+ * Applies all manifests from a directory. Note: The manifests are not checked, 
+ * so user must ensure the manifests have the correct namespaces. 
+ * @param dir 
+ * @param cluster 
+ * @param namespaceManifest 
+ */
+export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
     fs.readdir(dir, 'utf8', (err, files) => {
         if (files != undefined) {
             files.forEach((file) => {
@@ -12,7 +20,8 @@ export function readYamlFromDir(dir: string, cluster: eks.Cluster): void {
                         if (data != undefined) {
                             let i = 0;
                             yaml.loadAll(data).forEach((item) => {
-                                cluster.addManifest(file.substr(0, file.length - 5) + i, item);
+                                const resources = cluster.addManifest(file.substr(0, file.length - 5) + i, item);
+                                resources.node.addDependency(namespaceManifest)
                                 i++;
                             })
                         }
