@@ -59,7 +59,7 @@ export class TeamProps {
     readonly teamSecrets?: TeamSecretsProps[];
 
     /**
-     * Optional, directory where a team's network policy files are stored
+     * Optional, directory where a team's manifests are stored
      */
      readonly teamManifestDir?: string;
 }
@@ -210,6 +210,7 @@ export class ApplicationTeam implements Team {
         });
 
         rbacManifest.node.addDependency(this.namespaceManifest);
+
         if (teamManifestDir){
             applyYamlFromDir(teamManifestDir, clusterInfo.cluster, this.namespaceManifest)
         }

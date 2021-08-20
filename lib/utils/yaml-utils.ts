@@ -4,6 +4,13 @@ import * as eks from '@aws-cdk/aws-eks';
 import request from 'sync-request';
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 
+/**
+ * Applies all manifests from a directory. Note: The manifests are not checked, 
+ * so user must ensure the manifests have the correct namespaces. 
+ * @param dir 
+ * @param cluster 
+ * @param namespaceManifest 
+ */
 export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
     fs.readdir(dir, 'utf8', (err, files) => {
         if (files != undefined) {
