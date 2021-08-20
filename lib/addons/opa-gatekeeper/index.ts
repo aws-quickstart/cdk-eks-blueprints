@@ -1,4 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../../lib"; 
+import { ClusterAddOn, ClusterInfo } from "../../spi"; 
 
 /**
  * Properties available to configure with OPA Gatekeeper. The Helm chart automatically sets the Gatekeeper flag --exempt-namespace={{ .Release.Namespace }} in order to exempt the namespace where the chart is installed, and adds the admission.gatekeeper.sh/ignore label to the namespace during a post-install hook.
@@ -57,7 +57,7 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
             version: "3.6.0-beta.3",
-            namespace: "gatekeeper-system"
+            namespace: "kube-system"
         });
     }
 }
