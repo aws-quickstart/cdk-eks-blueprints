@@ -1,5 +1,5 @@
 import { Construct } from '@aws-cdk/core';
-import { ClusterAddOn, ClusterInfo } from '../../../lib';
+import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';
 
 /**

@@ -1,4 +1,4 @@
-import { ClusterInfo } from '../../../lib';
+import { ClusterInfo } from '../../spi';
 import { ApplicationTeam } from '../../teams';
 import { CfnOutput, Construct } from '@aws-cdk/core';
 import { ISecret } from '@aws-cdk/aws-secretsmanager';

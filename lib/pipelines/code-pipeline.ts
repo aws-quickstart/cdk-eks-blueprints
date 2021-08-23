@@ -10,6 +10,7 @@ import { withUsageTracking } from '../utils/usage-utils';
 
 /**
  * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
+ * repoUrl 
  */
 export type GitHubSourceRepository = Omit<ApplicationRepository, "credentialsType">;
 
@@ -171,13 +172,12 @@ class CodePipeline {
             installCommands: [
                 // Upgrade NPM to v7.
                 'npm install --global npm',
+                'apt install make', 
                 // Install deps
-                'npm install',
-                // Install global CDK.
-                'npm install -g aws-cdk@1.119.0'
+                'make deps',
             ],
-            buildCommands: ['npm run build'],
-            synthCommand: 'cdk synth'
+            buildCommands: ['make build'],
+            synthCommand: 'make synth'
         })
 
         return new pipelines.CdkPipeline(scope, props.name, {

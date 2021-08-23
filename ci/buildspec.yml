@@ -20,6 +20,8 @@ phases:
         make bootstrap-cdk
   pre_build:
     commands:
+      - | 
+        make run-test   
       - >
         [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
   build:
