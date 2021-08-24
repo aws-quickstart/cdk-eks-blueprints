@@ -1,4 +1,4 @@
-import { ClusterInfo } from '../../../lib';
+import { ClusterInfo } from '../../spi';
 import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter, StringParameter } from '@aws-cdk/aws-ssm';
 import { IKey } from '@aws-cdk/aws-kms';

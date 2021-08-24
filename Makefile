@@ -23,6 +23,9 @@ list:
 	$(DEPS)
 	$(CDK) list
 
+run-test:
+	npm test
+
 synth:
 	$(DEPS)
 	$(CDK) synth

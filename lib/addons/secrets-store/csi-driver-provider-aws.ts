@@ -1,5 +1,5 @@
 import * as cdk from "@aws-cdk/core";
-import { ClusterInfo } from "../../../lib";
+import { ClusterInfo } from "../../spi";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 
