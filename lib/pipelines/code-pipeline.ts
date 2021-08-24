@@ -93,8 +93,10 @@ export class CodePipelineBuilder implements StackBuilder {
     }
     
     build(scope: cdk.Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
-        console.assert(this.props.name && this.props.owner && this.props.repository!.credentialsSecretName && this.props.stages, 
-            "Please populate name, owner, repository (including credentialsSecretName) and stage fields with values for the pipeline stack");
+        console.assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
+        console.assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
+        console.assert(this.props.repository!.credentialsSecretName, "repository.credentialsSecretName is required for the pipeline stack. Please provide value.");
+        console.assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
         const fullProps = this.props as PipelineProps;
         return new CodePipelineStack(scope, fullProps, id, stackProps);
     }
@@ -160,7 +162,7 @@ class CodePipeline {
             actionName: `${props.name}-github-action`,
             owner: props.owner,
             repo: props.repository.repoUrl,
-            branch: props.repository.branch,
+            branch: props.repository.branch ?? 'main',
             output: sourceArtifact,
             oauthToken: oauthToken
         })
@@ -172,12 +174,12 @@ class CodePipeline {
             installCommands: [
                 // Upgrade NPM to v7.
                 'npm install --global npm',
-                'apt install make', 
+                'npm install -g aws-cdk@1.119.0', 
                 // Install deps
-                'make deps',
+                'npm install',
             ],
-            buildCommands: ['make build'],
-            synthCommand: 'make synth'
+            buildCommands: ['npm run build'],
+            synthCommand: 'cdk synth'
         })
 
         return new pipelines.CdkPipeline(scope, props.name, {
