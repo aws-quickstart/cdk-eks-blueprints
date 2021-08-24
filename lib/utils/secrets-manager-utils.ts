@@ -20,7 +20,7 @@ import { SecretsManager } from "aws-sdk";
         return secretString;
     }
     catch (error) {
-        console.log(error);
+        console.log(secretName, error);
         throw error;
     }
 }
