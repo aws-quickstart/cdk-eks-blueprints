@@ -1,8 +1,6 @@
-# AWS X-Ray Add-on
+# AWS X-Ray add-on
 
-[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. The X-Ray addon provisions X-Ray daemon into an EKS cluster. This daemon exposes an internal endpoint `xray-service.xray-system.svc.cluster.local:2000` that could be leveraged to aggregate and post traces to the AWS X-Ray service. 
-
-For instructions on getting started with X-Ray on EKS refer to the [EKS Workshop X-Ray Section](https://www.eksworkshop.com/intermediate/245_x-ray/).
+[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. The X-Ray add-on provisions the X-Ray daemon into an Amazon EKS cluster. This daemon exposes an internal endpoint `xray-service.xray-system.svc.cluster.local:2000` that can be used to aggregate and post traces to the AWS X-Ray service. For more information, see [EKS Workshop X-Ray Section](https://www.eksworkshop.com/intermediate/245_x-ray/).
 
 ## Usage
 
@@ -21,11 +19,11 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 });
 ```
 
-Once deployed, it allows applications to be instrumented with X-Ray by leveraging the X-Ray SDK.  Examples of such integration can be found on [GitHub](https://github.com/aws-samples/aws-xray-kubernetes).
+Once deployed, your applications can integrate with X-Ray through the X-Ray SDK. For examples of integrations, see [aws-xray-kubernetes](https://github.com/aws-samples/aws-xray-kubernetes).
 
 ## Functionality
 
 1. Creates the `xray-system` namespace.
 2. Deploys the [`xray-daemon`](https://www.eksworkshop.com/intermediate/245_x-ray/x-ray-daemon/) manifests into the cluster.
-3. Configures Kubernetes service account with IRSA (`AWSXRayDaemonWriteAccess`) for communication between the cluster and the AWS X-Ray service 
+3. Configures a Kubernetes service account with IRSA (`AWSXRayDaemonWriteAccess`) for communication between the cluster and the AWS X-Ray service.
 

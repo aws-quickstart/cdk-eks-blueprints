@@ -1,13 +1,11 @@
-# AWS Load Balancer Controller Add-on
-The AWS Load Balancer Controller manages AWS Elastic Load Balancers for a Kubernetes cluster. The controller provisions the following resources:
+# AWS Load Balancer Controller add-on
+The AWS Load Balancer Controller manages Elastic Load Balancing for Kubernetes clusters. The controller provisions the following resources:
 
-- An AWS Application Load Balancer (ALB) when you create a Kubernetes Ingress.
+- An Application Load Balancer when you create Kubernetes inbound traffic.
 
-- An AWS Network Load Balancer (NLB) when you create a Kubernetes Service of type LoadBalancer. In the past, you used the Kubernetes in-tree load balancer for instance targets, but used the AWS Load balancer Controller for IP targets. With the AWS Load Balancer Controller version 2.2.0 or later, you can create Network Load Balancers using either target type. For more information about NLB target types, see [Target type](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html#target-type) in the User Guide for Network Load Balancers.
+- A Network Load Balancer when you create a Kubernetes service of type `LoadBalancer`. Previously, Kubernetes used an in-tree load balancer for instance targets and the AWS Load Balancer Controller for IP targets. With the AWS Load Balancer Controller (version 2.2.0 or later), you can create Network Load Balancers using either target type. For more information, see [Target type](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html#target-type) in the User Guide for Network Load Balancers. For more information, see [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
 
-For more information about AWS Load Balancer Controller please see the [official documentation](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
-
-This controller is a required for proper configuration of other ingress controllers such as NGINX.
+This controller is required for proper configuration of other inbound controllers, such as NGINX.
 
 ## Usage
 
@@ -25,7 +23,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
-To validate that controller is running ensure that controller deployment is in `RUNNING` state:
+Ensure that the controller state is `RUNNING`:
 
 ```bash
 # Assuming controller is installed in kube-system namespace
@@ -55,7 +53,7 @@ spec:
 
 ## Functionality
 
-1. Adds proper IAM permissions and creates a Kubernetes service account with IRSA integration. 
-2. Allows configuration options such as enabling WAF and Shield. 
-3. Allows to replace the helm chart version if a specific version of the controller is needed.
+1. Adds proper AWS Identity and Access Management (IAM) permissions and creates a Kubernetes service account with IRSA integration. 
+2. Allows you to configure options, such as enabling WAF and Shield. 
+3. If you need a specific controller version, it allows you to replace the helm-chart version.
 

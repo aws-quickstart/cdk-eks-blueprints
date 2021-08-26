@@ -1,8 +1,8 @@
-# Metrics Server AddOn
+# Kubernetes Metrics Server add-on
 
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server)  is a scalable, efficient source of container resource metrics for Kubernetes built-in autoscaling pipelines. It is not deployed by default in Amazon EKS clusters. The Metrics Server is commonly used by other Kubernetes add ons, such as the [Horizontal Pod Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/horizontal-pod-autoscaler.html), [Vertical Autoscaling](https://docs.aws.amazon.com/eks/latest/userguide/vertical-pod-autoscaler.html) or the [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
+[Kubernetes Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is a scalable source of container metrics for Kubernetes autoscaling pipelines. It is not deployed by default in Amazon EKS clusters. The Metrics Server is commonly used by other Kubernetes add-ons, such as [Horizontal Pod Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/horizontal-pod-autoscaler.html), [Vertical Autoscaling](https://docs.aws.amazon.com/eks/latest/userguide/vertical-pod-autoscaler.html), and [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
 
-> **Important**: Don't use Metrics Server when you need an accurate source of resource usage metrics or as a monitoring solution.
+> **Important**: Do not use Metrics Server as a monitoring tool or for when you need accurate resource usage metrics.
 
 ## Usage
 
@@ -23,7 +23,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 });
 ```
 
-Once deployed, you can see metrics-server pod in the `kube-system` namespace.
+When deployed, you can see the `metrics-server` pod in the `kube-system` namespace.
 
 ```sh
 $ kubectl get deployments -n kube-system
@@ -34,13 +34,11 @@ metrics-server                                                1/1     1         
 
 ## Functionality
 
-1. Deploys the metrics-server for the given version using the [components.yaml](https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml) in `kube-system` namespace.
+1. Deploys Kubernetes Metrics Server for a given version using [components.yaml](https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml) in the `kube-system` namespace.
 
-## Testing with Kubernetes Dashboard
+## Testing with Kubernetes dashboard
 
-For testing, we will use the [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html) to view CPU and memory metrics of our cluster.
-
-Apply the kubernetes dashboard manifest.
+To view CPU and memory metrics of your cluster, use [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
 
 ```sh
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.5/aio/deploy/recommended.yaml
@@ -61,7 +59,7 @@ service/dashboard-metrics-scraper created
 deployment.apps/dashboard-metrics-scraper created
 ```
 
-Create a file called eks-admin-service-account.yaml with the text below. This manifest defines a service account and cluster role binding called eks-admin.
+Use the following commands to create a file called `eks-admin-service-account.yaml`. This manifest defines a service account and cluster role binding called `eks-admin`.
 
 ```sh
 $ cat << 'EOF' >> eks-admin-service-account.yaml
@@ -96,7 +94,7 @@ serviceaccount/eks-admin created
 clusterrolebinding.rbac.authorization.k8s.io/eks-admin created
 ```
 
-Retrieve an authentication token for the eks-admin service account. Copy the <authentication_token> value from the output. You use this token to connect to the dashboard.
+Retrieve an authentication token for the `eks-admin` service account. Copy the <authentication_token> value from the output, and use the token to connect to the dashboard.
 
 ```sh
 $ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')
@@ -122,8 +120,8 @@ Start the kubectl proxy.
 $ kubectl proxy
 ```
 
-Open the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login) in your browser and login using the value for `token` above.
+In your browser, navigate to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login) and log in using the token value from the previous step.
 
 ![dashboard](https://raw.githubusercontent.com/kubernetes/dashboard/master/docs/images/dashboard-ui.png)
 
->**Note**: It may take a few minutes before CPU and memory metrics appear in the dashboard
+>**Note**: It may take a few minutes before CPU and memory metrics appear in the dashboard.

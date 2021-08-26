@@ -1,8 +1,6 @@
 # External DNS Add-on
 
-External DNS add-on is based on the [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) open source project and allows integration of exposed Kubernetes services and Ingresses with DNS providers, in particular [Amazon Route 53](https://aws.amazon.com/route53/).
-
-The add-on provides functionality to configure IAM policies and Kubernetes service accounts for Route 53 integration support based on [AWS Tutorial for External DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md).
+The External DNS add-on is based on the [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) open-source project and integrates exposed Kubernetes services and inbound traffic from DNS providers, in particular [Amazon Route 53](https://aws.amazon.com/route53/). The add-on also provides functionality for configuring IAM policies and Kubernetes service accounts for Route 53 integration support. For more information, see [Setting up ExternalDNS for Services on AWS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md).
 
 ## Usage
 
@@ -23,7 +21,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
-To validate that external DNS add-on is running ensure that the add-on deployment is in `RUNNING` state:
+To validate that External DNS is running, ensure that the add-on status is `RUNNING`:
 
 ```bash
 # Assuming add-on is installed in the external-dns namespace.
@@ -32,8 +30,7 @@ NAME                           READY   STATUS    RESTARTS   AGE
 external-dns-fcf6c9c66-xd8f4   1/1     Running   0          3d3h
 ```
 
-You can now provision external services and ingresses integrating with Route 53. 
-For example to provision an NLB you can use the following service manifest:
+You can now provision external services and inboud traffic using Amazon Route 53. For example, to provision a Network Load Balancer, use the following service manifest:
 
 ```yaml
 apiVersion: v1
@@ -54,16 +51,14 @@ spec:
     name: your-app
 ```
 
-Note the `external-dns.alpha.kubernetes.io/hostname` annotation for the service name that allows specifying its domain name. 
+Note the `external-dns.alpha.kubernetes.io/hostname` annotation for the service name. This allows you to specify its domain name. 
 
-## Hosted Zone Providers
+## Hosted-zone providers
 
-In order for external DNS to work, you need to supply one or more hosted zones. You need a reference to the EKS stack in order to either create or look up the hosted zones. 
-
-To help customers handle common use cases for Route 53 provisioning the framework provides a few convenience providers. 
+For External DNS to work, you must provide one or more hosted zones. To either create or look up the hosted zones, you must have a reference to the Amazon EKS stack. To help customers handle common use cases for Amazon Route 53, the framework provides a few providers. 
 
 **Name look-up and direct import provider:**
-This provider will allow to bind to an existing hosted zone based on its name.
+This provider allows you to bind to an existing hosted zone, based on its name.
 
 ```typescript
     const myDomainName = ""
@@ -72,7 +67,7 @@ This provider will allow to bind to an existing hosted zone based on its name.
     })
 ```
 
-If the hosted zone ID is known, then the recommended approach is to use a `ImportHostedZoneProvider` which bypasses any lookup calls.
+If the hosted-zone ID is known, use `ImportHostedZoneProvider`, which bypasses any lookup calls.
 
 ```typescript
     const myHostedZoneId = ""
@@ -81,30 +76,30 @@ If the hosted zone ID is known, then the recommended approach is to use a `Impor
     })
 ```
 
-**Delegating Hosted Zone Provider**
+**Delegating a hosted-zone provider**
 
-In many cases, enterprises choose to decouple provisioning of root domains and subdomains. A common pattern is to have a specific DNS account (AWS account) hosting the root domain, while subdomains may be created within individual workload accounts. 
-
-This implies cross-account access from child account to the parent DNS account for subdomain delegation. 
+In many cases, enterprises choose to decouple provisioning of root domains and subdomains. A common pattern is to have a specific DNS account (AWS account) that hosts the root domain, while subdomains are created within individual workload accounts. This implies cross-account access from child accounts to parent DNS accounts for subdomain delegation. 
 
 Prerequisites:
 
-1. Parent account defines an IAM role with the following managed policies:
+1. The parent account defines an IAM role with the following managed policies:
 `AmazonRoute53DomainsFullAccess`
 `AmazonRoute53ReadOnlyAccess`
 `AmazonRoute53AutoNamingFullAccess`
 
-2. Create trust relationship between this role and the child account that is expected to add subdomains. For info see [IAM tutorial](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html).
+2. Create a trust relationship between this role and the child account that is expected to add subdomains. For more information, see [IAM tutorial: Delegate access across AWS accounts using IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html).
 
 Example:
 
-Let's assume that parent DNS account `parentAccountId` has domain named `myglobal-domain.com`. Now when provisioned an SSP EKS cluster you would like to use a stage specific name like `dev.myglobal-domain.com` or `test.myglobal-domain.com`. In addition to these requirements, you would like to enable tenant specific access to those domains such as `my-tenant1.dev.myglobal-domain.com` or team specific access `team-riker.dev.myglobal-domain.com`. 
+Assume that the parent DNS account `parentAccountId` has a domain named `myglobal-domain.com`. When an SSP EKS cluster is provisioned in this domain, use a stage-specific name such as `dev.myglobal-domain.com` or `test.myglobal-domain.com`. In addition to these requirements, enable tenant-specific access to the domains, such as `my-tenant1.dev.myglobal-domain.com` or team-specific access `team-riker.dev.myglobal-domain.com`. 
 
-The setup will look the following way:
+The following is a summary of this setup:
 
-1. In the `parentAccountId` account you create a role for delegation (`DomainOperatorRole` in this example) and a trust relationship to the child account in which SSP EKS blueprint will be provisioned. In a general case, the number of child accounts can be large, so each of them will have to be listed in the trust relationship.
-2. In the `parentAccountId` you create a public hosted zone for `myglobal-domain.com`. With that the setup that may require separate automation (or a manual process) is complete. 
-3. Use the following configuration of the add-on:
+1. In `parentAccountId`, you create a role for delegation (`DomainOperatorRole` in this example) and a trust relationship to the child account in which SSP EKS blueprint is provisioned. Generally, the number of child accounts can be large, so each of them must be listed in the trust relationship.
+2. In `parentAccountId`, you create a public hosted zone for `myglobal-domain.com`. 
+//TODO Unsure what the following sentence means.
+The setup that may require separate automation (or manual processes) is complete. 
+3. Use the following add-on configuration:
 
 ```typescript
 const useWildcardDomain = true
@@ -119,16 +114,14 @@ readonly externalDns = new ssp.addons.ExternalDnsAddon({
 });
 ```
 
-The parameter `useWildcardDomain` above when set to true will also create a CNAME for `*.dev.myglobal-domain.com`. This is at the moment used for host based routing within EKS (e.g. with NGINX ingress).
+When `useWildcardDomain` is set to `true`, the add-on creates a CNAME for `*.dev.myglobal-domain.com`. At the moment, this is used for host-based routing within EKS (e.g., with NGINX inbound traffic).
 
+## Configuration options
 
-
-## Configuration Options
-
-   - `namespace`: Optional target namespace where add-on will be installed. Changing this value on the operating cluster is not recommended. Set to `external-dns` by default.
-   - `version`: The add-on is leveraging a Bitnami helm chart. This parameter allows overriding the helm chart version used.
-   - `hostedZone`: Hosted zone provider is a interface that provides one or more hosted zones that the add-on will leverage for the service and ingress configuration.
+   - `namespace`: Optional target namespace where an add-on is installed. Do not change this value on the operating cluster. By default, it is set to `external-dns`.
+   - `version`: Add-on uses a Bitnami helm chart. This parameter allows you to override the helm chart version.
+   - `hostedZone`: An interface that provides one or more hosted zones that the add-on uses for the service and inbound configuration.
 
 ## Functionality
 
-Applies External-DNS configuration for AWS DNS provider. See [AWS Tutorial for External DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md) for more information.
+This applies the External DNS configuration for the DNS provider. For more information, see [Setting up ExternalDNS for Services on AWS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md).

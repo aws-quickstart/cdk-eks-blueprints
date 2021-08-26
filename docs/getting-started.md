@@ -77,7 +77,7 @@ Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprin
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
 - [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
-- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
+- [x] [Argo CD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
 - [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
@@ -113,13 +113,13 @@ kubectl get namespace
 
 You should see output that lists all namespaces in your cluster. 
 
-## Deploy workloads with ArgoCD
+## Deploy workloads with Argo CD
 
-Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
+Next, let's walk you through how to deploy workloads to your cluster with Argo CD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
 
-### Install ArgoCD CLI
+### Install Argo CD CLI
 
-Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
+Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the Argo CD CLI was installed correctly using the following:
 
 ```
 argocd version --short --client
@@ -131,9 +131,9 @@ You should see output similar to the following:
 argocd: v2.0.1+33eaf11.dirty
 ```
 
-### Exposing ArgoCD
+### Exposing Argo CD
 
-To access ArgoCD running in your Kubernetes cluster, we can leverage [Kubernetes Port Forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/). To do so, first capture the ArgoCD service name in an environment variable.
+To access Argo CD running in your Kubernetes cluster, we can leverage [Kubernetes Port Forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/). To do so, first capture the ArgoCD service name in an environment variable.
 
 ```
 export ARGO_SERVER=$(kubectl get svc -n argocd -l app.kubernetes.io/name=argocd-server -o name) 
