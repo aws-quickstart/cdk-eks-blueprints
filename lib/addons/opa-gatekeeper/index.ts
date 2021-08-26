@@ -50,7 +50,6 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        const props = this.options;
 
         clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
