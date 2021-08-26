@@ -1,8 +1,8 @@
 # Calico Add-on
 
-The `Calico` addon adds support for Kubernetes Network Policies to an EKS cluster.
+The `Calico` add-on provides support for Kubernetes network policies for EKS clusters.
 
-[Project Calico](https://www.projectcalico.org/) is an open source networking and network security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico utilizes Network Policies as you will see below.
+[Project Calico](https://www.projectcalico.org/) is an open-source networking and network-security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico uses network policies that are described in the following sections.
 
 ## Usage
 
@@ -20,56 +20,56 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
-## Securing your environment with Kubernetes Network Policies
+## Secure your environment using Kubernetes network policies
 
-By default, native VPC-CNI plugin for Kubernetes on EKS does not support Kubernetes Network Policies. Installing Calico addon (or alternate CNI provider) for network policy support will enable customers to define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
+By default, the native VPC CNI add-on does not support Kubernetes network policies. Installing Calico (or other CNI provider) for network policy support means customers can define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). 
 
-However, Calico also allows Custom Resource Definitions (CRD) which gives you the ability to add features not in the standard Kubernetes policies, such as:
-- Explicit Deny rules
-- Layer 7 rule support (i.e. Http Request types)
-- Endpoint support other than standard pods: OpenShift, VMs, interfaces, etc. 
+Calico also, however, allows Custom Resource Definitions (CRD) that provide the ability to add features that are not in the standard Kubernetes policies, such as the following:
+- Explicit deny rules
+- Layer 7 rule support (i.e., HTTP request types)
+- Endpoint support other than standard pods, such as OpenShift, VMs, and interfaces. 
 
-In order to use CRDs (in particular defined within the *projectcalico.org/v3* Calico API), you need to install the Calico CLI ([calicoctl](https://docs.projectcalico.org/getting-started/clis/calicoctl/install)). You can find more information about Calico Network Policy and using `calicoctl` [here](https://docs.projectcalico.org/security/calico-network-policy). 
+To use CRDs (in particular, those defined within the *projectcalico.org/v3* Calico API), install [Calico CLI](https://docs.projectcalico.org/getting-started/clis/calicoctl/install). For more information, see [Get started with Calico network policy](https://docs.projectcalico.org/security/calico-network-policy). 
 
-In this section, you will look at how the standard Kubernetes Network Policies are applied. This will be done using `kubectl`.
+The following section discusses how to use `kubectl` to apply standard Kubernetes network policies.
 
-### Pod to Pod communications with no policies
+### Pod-to-pod communications with no policies
 
-If you deploy [App of Apps installed using ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), you can verify that there are no network policies in place:
+If you [Deploy workloads with ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), verify that there are no network policies in place:
 
 ```bash
 kubectl get networkpolicy -A
 ```
 
-This means that any resources within the cluster should be able to make ingress and egress connections with other resources within and outside the cluster. You can verify, for example, that you are able to ping from `team-riker` pod to `team-burnham` pod.
+This means that any resources within the cluster should be able to make inbound and outbound connections with other resources within and outside the cluster. For example, verify that you can ping from the `team-riker` pod to the `team-burnham` pod:
 
-First you retrieve the pod name from the `team-burnham` namespace its podIP:
+Retrieve the pod name from the `team-burnham` namespace:
 
 ```bash
 BURNHAM_POD=$(kubectl get pod -n team-burnham -o jsonpath='{.items[0].metadata.name}') 
 BURNHAM_POD_IP=$(kubectl get pod -n team-burnham $BURNHAM_POD -o jsonpath='{.status.podIP}')
 ```
 
-Now you can start a shell from the pod in the `team-riker` namespace and ping the pod from `team-burnham` namespace:
+Start a shell from the pod in the `team-riker` namespace. and ping the pod from `team-burnham` namespace:
 
 ```bash
 RIKER_POD=$(kubectl -n team-riker get pod -o jsonpath='{.items[0].metadata.name}')
 kubectl exec -ti -n team-riker $RIKER_POD -- sh
 ```
 
-Note: since this opens a shell inside the pod, it will not have the environment variables saved above. You should retrieve the actual podIP from the environment variable `BURNHAM_POD_IP`.
+Note: This opens a shell inside the pod that does not have your saved environment variables. Retrieve the actual pod IP from the environment variable `BURNHAM_POD_IP`.
 
-With those actual values, curl the IP and port 80 of the pod from `team-burnham`:
+With the returned values, use curl to retrieve the IP and port 80 of the pod from `team-burnham`:
 
 ```bash
 # curl -s <Team Burnham Pod IP>:80>/dev/null && echo Success. || echo Fail. 
 ```
 
-You should see `Success.`
+It should return `Success`.
 
-### Applying Kubernetes Network Policy to block traffic
+### Applying a Kubernetes network policy to block traffic
 
-Let's apply the following Network Policy:
+Apply the following network policy:
 
 ```yaml
 kind: NetworkPolicy
@@ -81,20 +81,20 @@ spec:
     matchLabels: {}
 ```
 
-Save it as `deny-all.yaml`. Run the following commands to apply the policy to both `team-riker` and `team-burnham` namespaces:
+Save it as `deny-all.yaml`, and run the following commands to apply the policy to both the `team-riker` and `team-burnham` namespaces:
 
 ```bash
 kubectl -n team-riker apply -f deny-all.yaml 
 kubectl -n team-burnham apply -f deny-all.yaml
 ```
 
-This will essentially prevent access to all resources within both namespaces. Try curl commands from above to verify that it fails.
+This prevents access to all resources within both namespaces. To verify that it fails, use the previous curl commands.
 
 ### Applying additional policy to re-open pod to pod communications
 
 You can apply Kubernetes NetworkPolicy on top of that to “poke holes” for egress and ingress needs. 
 
-For example, if you wanted to be able to curl from the `team-riker` pod to the `team-burnham` pod, the following Kubernetes NetworkPolicy should be applied. 
+For example, if you want to use curl from the `team-riker` pod to the `team-burnham` pod, apply the following Kubernetes network policy. 
 
 ```yaml
 kind: NetworkPolicy
@@ -133,10 +133,10 @@ spec:
           port: 80
 ```
 
-Save as `allow-burnham-riker.yaml` and apply the new NetworkPolicy:
+Save it as `allow-burnham-riker.yaml`, and apply the new network policy:
 
 ```bash
 kubectl apply -f allow-burnham-riker.yaml     
 ```
 
-Once the policy is applied, once again try the curl command from above. You should now see `Success.` once again.
+After you apply the policy, test it again using the curl command. It should return `Success`.
