@@ -29,7 +29,9 @@ nav:
     - AWS XRay: 'addons/xray.md'
   - Cluster Providers: 
     - Overview: 'cluster-providers/index.md'
-    - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
+    - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
+    - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
+    - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
 markdown_extensions:
   - def_list
   - pymdownx.highlight  

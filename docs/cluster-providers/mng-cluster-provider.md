@@ -1,11 +1,11 @@
-# EC2 Cluster Provider
+# Managed Node Group Cluster Provider
 
-The `EC2ClusterProvider` allows you to provision an EKS cluster which leverages [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs) for compute capacity. MNGs automate the provisioning and lifecycle management of nodes (Amazon EC2 instances) for Amazon EKS Kubernetes clusters.
+The `MngClusterProvider` allows you to provision an EKS cluster which leverages [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs) for compute capacity. MNGs automate the provisioning and lifecycle management of nodes (Amazon EC2 instances) for Amazon EKS Kubernetes clusters.
 
 ## Usage 
 
 ```typescript
-const props: EC2ProviderClusterProps = {
+const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
@@ -15,8 +15,8 @@ const props: EC2ProviderClusterProps = {
     version: KubernetesVersion.V1_20,
     amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
 }
-const clusterProvider = new ssp.EC2ClusterProvider(props);
-new ssp.EksBlueprint(scope, { id: 'blueprint', teams, addOns, clusterProvider });
+const clusterProvider = new ssp.MngClusterProvider(props);
+new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 ```
 
 ## Configuration
@@ -43,7 +43,7 @@ Configuration can also be supplied via context variables (specify in cdk.json, c
 - `eks.default.instance-type` 
 - `eks.default.private-cluster`
 
-Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `EC2ProviderClusterProps` to each cluster provider.
+Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `MngProviderClusterProps` to each cluster blueprint.
 
 ## Upgrading Worker Nodes
 
