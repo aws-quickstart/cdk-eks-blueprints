@@ -25,6 +25,7 @@ THe `EC2ClusterProvider` supports the following configuration options.
 
 | Prop                  | Description |
 |-----------------------|-------------|
+| name                  | The name for the cluster.
 | minSize               | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize               | Max cluster size, must be greater than minSize (default 3).
 | desiredSize           | Desired cluster size, must be greater or equal to minSize (default `min-size`).

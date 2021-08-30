@@ -16,6 +16,10 @@ import * as constants from './constants'
  * Configuration options for the cluster provider.
  */
 export interface AsgClusterProviderProps extends eks.CommonClusterOptions {
+    /**
+     * The name for the cluster.
+     */
+    name?: string
 
     /**
      * Min size of the node group
@@ -75,19 +79,21 @@ export class AsgClusterProvider implements ClusterProvider {
         this.props = props ?? { version: eks.KubernetesVersion.V1_20 };
     }
 
-    createCluster(scope: Construct, vpc: ec2.IVpc, name?: string): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
         const id = scope.node.id;
 
         // Cluster options.
+        const clusterName = this.props.name ?? id
+        const outputClusterName = true
         const version = this.props.version
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE }] : this.props.vpcSubnets;
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
 
         const cluster = new eks.Cluster(scope, scope.node.id, {
-            vpc: vpc,
-            clusterName: name ?? id,
-            outputClusterName: true,
+            vpc,
+            clusterName,
+            outputClusterName,
             version,
             vpcSubnets,
             endpointAccess,
@@ -101,7 +107,6 @@ export class AsgClusterProvider implements ClusterProvider {
         const maxSize = this.props.maxSize ?? valueFromContext(scope, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = this.props.desiredSize ?? valueFromContext(scope, constants.DESIRED_SIZE_KEY, minSize);
         const updatePolicy = UpdatePolicy.rollingUpdate()
-
 
         // Create an autoscaling group
         const asg = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {

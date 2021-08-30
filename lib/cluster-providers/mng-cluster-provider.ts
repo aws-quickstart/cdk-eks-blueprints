@@ -16,6 +16,10 @@ import * as constants from './constants'
  * Configuration options for the cluster provider.
  */
 export interface MngClusterProviderProps extends eks.CommonClusterOptions {
+    /**
+    * The name for the cluster.
+    */
+    name?: string
 
     /**
      * Min size of the node group
@@ -70,7 +74,7 @@ export interface MngClusterProviderProps extends eks.CommonClusterOptions {
 }
 
 /**
- * MngClusterProvider provisions an EKS cluster with managed node group for managed capacity.
+ * MngClusterProvider provisions an EKS cluster with a managed node group for managed capacity.
  */
 export class MngClusterProvider implements ClusterProvider {
 
@@ -84,6 +88,8 @@ export class MngClusterProvider implements ClusterProvider {
         const id = scope.node.id;
 
         // Props for the cluster.
+        const clusterName = this.props.name ?? id
+        const outputClusterName = true
         const version = this.props.version
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
@@ -92,8 +98,8 @@ export class MngClusterProvider implements ClusterProvider {
         // Create an EKS Cluster
         const cluster = new eks.Cluster(scope, id, {
             vpc,
-            clusterName: name ?? id,
-            outputClusterName: true,
+            clusterName,
+            outputClusterName,
             version,
             vpcSubnets,
             endpointAccess,

@@ -1,6 +1,6 @@
 # Auto Scaling Group Cluster Provider
 
-The `AsgClusterProvider` allows you to provision an EKS cluster which leverages [EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html)(ASGs) for compute capacity. An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management
+The `AsgClusterProvider` allows you to provision an EKS cluster which leverages [EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html)(ASGs) for compute capacity. An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management.
 
 ## Usage 
 
@@ -19,18 +19,19 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 
 ## Configuration
 
-The `AsgClusterProvider` supports the following configuration options. 
+`AsgClusterProvider` supports the following configuration options. 
 
-| Prop                  | Description |
-|-----------------------|-------------|
-| minSize               | Min cluster size, must be positive integer greater than 0 (default 1).
-| maxSize               | Max cluster size, must be greater than minSize (default 3).
-| desiredSize           | Desired cluster size, must be greater or equal to minSize (default `min-size`).
-| instanceType          | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
-| machineImageType      | Machine Image Type for the Autoscaling Group.
-| updatePolicy          | Update policy for the Autoscaling Group.
-| vpcSubnets            | The subnets for the cluster.
-| privateCluster        | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
+| Prop              | Description |
+|-------------------|-------------|
+| name              | The name for the cluster.
+| minSize           | Min cluster size, must be positive integer greater than 0 (default 1).
+| maxSize           | Max cluster size, must be greater than minSize (default 3).
+| desiredSize       | Desired cluster size, must be greater or equal to minSize (default `min-size`).
+| instanceType      | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
+| machineImageType  | Machine Image Type for the Autoscaling Group.
+| updatePolicy      | Update policy for the Autoscaling Group.
+| vpcSubnets        | The subnets for the cluster.
+| privateCluster    | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
 Configuration can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 
@@ -44,7 +45,7 @@ Configuration of the EC2 parameters through context parameters makes sense if yo
 
 ## Bottlerocket ASG
 
-[Bottlerocket](https://aws.amazon.com/bottlerocket/) is a Linux-based open-source operating system that is purpose-built by Amazon Web Services for running containers. Customers can leverage `AsgClusterProvider` to provision EKS clusters with Bottlerocket nodes. To do so, set the `machineImageType` property to `eks.MachineImageType.BOTTLEROCKET`.
+[Bottlerocket](https://aws.amazon.com/bottlerocket/) is a Linux-based open-source operating system that is purpose-built by Amazon Web Services for running containers. Customers can leverage the `AsgClusterProvider` to provision EKS clusters with Bottlerocket nodes. To do so, set the `machineImageType` property to `eks.MachineImageType.BOTTLEROCKET`.
 
 ```typescript
 const props: AsgClusterProviderProps = {

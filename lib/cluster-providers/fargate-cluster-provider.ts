@@ -16,6 +16,11 @@ import * as constants from './constants'
  */
 export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
     /**
+    * The name for the cluster.
+    */
+    name?: string
+
+    /**
      * The Fargate for the cluster.
      */
     fargateProfiles: Map<string, eks.FargateProfileOptions>,
@@ -47,19 +52,21 @@ export class FargateClusterProvider implements ClusterProvider {
         };
     }
 
-    createCluster(scope: Construct, vpc: ec2.IVpc, name: string): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
+        const clusterName = this.props.name ?? id
+        const outputClusterName = true
         const version = this.props.version
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE }] : this.props.vpcSubnets;
 
         const cluster = new eks.FargateCluster(scope, id, {
-            vpc: vpc,
-            clusterName: name ?? id,
-            outputClusterName: true,
+            vpc,
+            clusterName,
+            outputClusterName,
             version: version,
             vpcSubnets,
             endpointAccess,

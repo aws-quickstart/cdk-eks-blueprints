@@ -4,7 +4,7 @@ The `FargateClusterProvider` allows you to provision an EKS cluster which runs K
 
 ## Usage 
 
-I the below example, the Fargate profile indicates that all Pods in the `dynatrace` namespace should run on Fargate.
+In the example below, the Fargate profile indicates that all Pods in the `dynatrace` namespace should run on Fargate.
 
 ```typescript
 const fargateProfiles: Map<string, eks.FargateProfileOptions> = new Map([
@@ -17,10 +17,11 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 
 ## Configuration
 
-THe `FargateClusterProvider` supports the following configuration options. 
+`FargateClusterProvider` supports the following configuration options. 
 
 | Prop                  | Description |
 |-----------------------|-------------|
+| name                  | The name for the cluster.
 | fargateProfiles       | A map of Fargate profiles to use with the cluster.
 | vpcSubnets            | The subnets for the cluster.
 | privateCluster        | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
