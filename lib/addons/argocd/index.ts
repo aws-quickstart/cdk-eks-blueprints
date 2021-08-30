@@ -1,31 +1,34 @@
+import bcrypt = require('bcrypt');
 import { Construct } from "@aws-cdk/core";
 import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { ApplicationRepository, ClusterAddOn, ClusterPostDeploy, ClusterInfo, Team } from "../../spi";
 
+import { ApplicationRepository, ClusterAddOn, ClusterPostDeploy, ClusterInfo, Team } from "../../spi";
 import { getSecretValue } from '../../utils/secrets-manager-utils';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
 import { btoa } from '../../utils/string-utils';
-import bcrypt = require('bcrypt');
 import { Constants } from "..";
 
-
 /**
- * Configuration options for ArgoCD add-on.
+ * Configuration options for add-on.
  */
 export interface ArgoCDAddOnProps {
-
     /**
      * Namespace where add-on will be deployed. 
      */
-    namespace?: string,
+    namespace?: string
+
+    /**
+    * Helm chart version to use to install.
+    */
+    chartVersion?: string
 
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
      * after the infrastructure and team provisioning is complete. 
      */
-    bootstrapRepo?: ApplicationRepository,
+    bootstrapRepo?: ApplicationRepository
 
     /**
      * Optional admin password secret (plaintext).
@@ -33,7 +36,7 @@ export interface ArgoCDAddOnProps {
      * store as bcrypt hash. 
      * Note: at present, change of password will require manual restart of argocd server. 
      */
-    adminPasswordSecretName?: string,
+    adminPasswordSecretName?: string
 
     /**
      * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
@@ -43,9 +46,12 @@ export interface ArgoCDAddOnProps {
     };
 }
 
-
-const argoDefaults: ArgoCDAddOnProps = {
-    namespace: "argocd"
+/**
+ * Defaults options for the add-on
+ */
+const defaultProps: ArgoCDAddOnProps = {
+    namespace: "argocd",
+    chartVersion: '3.17.5'
 }
 
 /**
@@ -53,11 +59,11 @@ const argoDefaults: ArgoCDAddOnProps = {
  */
 export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
-    readonly options: ArgoCDAddOnProps;
+    readonly props: ArgoCDAddOnProps;
     private chartNode: HelmChart;
 
     constructor(props?: ArgoCDAddOnProps) {
-        this.options = { ...argoDefaults, ...props };
+        this.props = { ...defaultProps, ...props };
     }
 
     /**
@@ -71,7 +77,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
 
         const repo = await this.createSecretKey(clusterInfo, namespace);
 
-        const values = this.options.values ?? {
+        const values = this.props.values ?? {
             server: {
                 serviceAccount: {
                     create: false
@@ -82,7 +88,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             }
         };
 
-        if(this.options.adminPasswordSecretName) {
+        if (this.props.adminPasswordSecretName) {
             const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
             values['configs'] = {
                 secret: {
@@ -95,8 +101,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             chart: "argo-cd",
             release: Constants.SSP_ADDON,
             repository: "https://argoproj.github.io/argo-helm",
-            version: '3.10.0',
-            namespace: this.options.namespace,
+            version: this.props.chartVersion,
+            namespace: this.props.namespace,
             values: values
         });
 
@@ -113,7 +119,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      */
     async postDeploy(clusterInfo: ClusterInfo, teams: Team[]) {
         console.assert(teams != null);
-        const appRepo = this.options.bootstrapRepo;
+        const appRepo = this.props.bootstrapRepo;
 
         if (!appRepo) {
             return;
@@ -126,11 +132,11 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 kind: "Application",
                 metadata: {
                     name: appRepo.name ?? "bootstrap-apps",
-                    namespace: this.options.namespace
+                    namespace: this.props.namespace
                 },
                 spec: {
                     destination: {
-                        namespace: this.options.namespace,
+                        namespace: this.props.namespace,
                         server: "https://kubernetes.default.svc"
                     },
                     project: "default",
@@ -140,7 +146,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                         },
                         path: appRepo.path,
                         repoURL: appRepo.repoUrl,
-                        targetRevision: "HEAD"
+                        targetRevision: appRepo.targetRevision || 'HEAD'
                     },
                     syncPolicy: {
                         automated: {}
@@ -159,9 +165,9 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     /**
      * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
      */
-    protected async createAdminSecret(region: string) : Promise<string> {
-        const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
-        return  bcrypt.hash(secretValue, 10);
+    protected async createAdminSecret(region: string): Promise<string> {
+        const secretValue = await getSecretValue(this.props.adminPasswordSecretName!, region);
+        return bcrypt.hash(secretValue, 10);
     }
 
     /**
@@ -176,7 +182,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 apiVersion: 'v1',
                 kind: 'Namespace',
                 metadata: {
-                    name: this.options.namespace,
+                    name: this.props.namespace,
                 }
             }],
             overwrite: true,
@@ -193,12 +199,12 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
      */
     protected async createSecretKey(clusterInfo: ClusterInfo, dependency: KubernetesManifest): Promise<string> {
 
-        const secretName = this.options.bootstrapRepo?.credentialsSecretName;
+        const secretName = this.props.bootstrapRepo?.credentialsSecretName;
         if (!secretName) {
             return "";
         }
 
-        const appRepo = this.options.bootstrapRepo!;
+        const appRepo = this.props.bootstrapRepo!;
         let credentials = { url: btoa(appRepo.repoUrl) };
 
         const secretValue = await getSecretValue(secretName, clusterInfo.cluster.stack.region);
@@ -214,7 +220,8 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
             case "TOKEN":
                 // eslint-disable-next-line no-case-declarations
                 const secretJson: any = JSON.parse(secretValue);
-                credentials = { ...credentials, ...{
+                credentials = {
+                    ...credentials, ...{
                         username: btoa(secretJson["username"]),
                         password: btoa(secretJson["password"])
                     }
@@ -230,7 +237,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
                 kind: "Secret",
                 metadata: {
                     name: secretName,
-                    namespace: this.options.namespace,
+                    namespace: this.props.namespace,
                     labels: {
                         "argocd.argoproj.io/secret-type": "repo-creds"
                     }
@@ -252,7 +259,7 @@ export class ArgoCDAddOn implements ClusterAddOn, ClusterPostDeploy {
     protected createServiceAccount(clusterInfo: ClusterInfo): ServiceAccount {
         const sa = clusterInfo.cluster.addServiceAccount('argo-cd-server', {
             name: "argocd-server",
-            namespace: this.options.namespace
+            namespace: this.props.namespace
         });
 
         const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");

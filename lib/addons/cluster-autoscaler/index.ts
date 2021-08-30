@@ -5,12 +5,30 @@ import { CfnJson, Tags } from "@aws-cdk/core";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 
+/**
+ * Configuration options for the add-on.
+ */
+export interface ClusterAutoScalerAddOnProps {
+
+    /**
+     * Version of the Cluster Autoscaler
+     */
+    version?: string
+}
+
+/**
+ * Defaults options for the add-on
+ */
+const defaultProps: ClusterAutoScalerAddOnProps = {
+    version: 'v1.20.0'
+}
+
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
-    private versionField?: string;
+    private props?: ClusterAutoScalerAddOnProps;
 
-    constructor(version?: string) {
-        this.versionField = version;
+    constructor(props?: ClusterAutoScalerAddOnProps) {
+        this.props = { ...defaultProps, ...props }
     }
 
     /**
@@ -25,9 +43,9 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const version = this.versionField ?? this.versionMap.get(clusterInfo.version);
+        const version = this.props?.version ?? this.versionMap.get(clusterInfo.version);
         const cluster = clusterInfo.cluster;
-       
+
         const ng = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
 
         const autoscalerStmt = new iam.PolicyStatement();

@@ -1,9 +1,9 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Constants } from '..';
+
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HostedZoneProvider } from './hosted-provider';
-
 
 /**
  * Configuration options for the external DNS add-on.
@@ -25,7 +25,6 @@ export interface ExternalDnsProps {
      */
     readonly hostedZone: HostedZoneProvider;
 }
-
 
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
@@ -52,6 +51,7 @@ export class ExternalDnsAddon implements ClusterAddOn {
             }],
             overwrite: true
         });
+
 
         const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
 

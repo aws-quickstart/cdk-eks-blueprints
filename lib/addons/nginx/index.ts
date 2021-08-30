@@ -6,6 +6,16 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
  */
 export interface NginxAddOnProps {
     /**
+     * Version for the Nginx Helm chart.
+     */
+    version?: string
+
+    /**
+     * Namespace for the add-on.
+     */
+    namespace?: string
+
+    /**
      * tcp, http
      */
     backendProtocol?: string,
@@ -26,11 +36,11 @@ export interface NginxAddOnProps {
      * Instance mode: traditional NodePort mode on the instance. 
      */
     targetType?: string,
-    
+
     /**
      * Used in conjunction with external DNS add-on to handle automatic registration of the service with Route53.  
      */
-    externaDnsHostname?: string,
+    externalDnsHostname?: string,
 
     /**
      * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
@@ -40,33 +50,37 @@ export interface NginxAddOnProps {
     };
 }
 
-const nginxAddonDefaults: NginxAddOnProps = {
+/**
+ * Defaults options for the add-on
+ */
+const defaultProps: NginxAddOnProps = {
+    version: "0.9.3",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
+    values: {}
 }
-
 
 export class NginxAddOn implements ClusterAddOn {
 
-    readonly options: NginxAddOnProps;
+    readonly props: NginxAddOnProps;
 
     constructor(props?: NginxAddOnProps) {
-        this.options = { ...nginxAddonDefaults, ...props };
+        this.props = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const props = this.options;
+        const props = this.props;
 
-        const presetAnnotations  = {
+        const presetAnnotations = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
             'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': `${props.crossZoneEnabled}`,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
             'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
             'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType,
-            'external-dns.alpha.kubernetes.io/hostname': props.externaDnsHostname,
+            'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         }
 
         const values = props.values ?? {};
@@ -80,10 +94,10 @@ export class NginxAddOn implements ClusterAddOn {
 
         clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
-            release: Constants.SSP_ADDON, 
             repository: "https://helm.nginx.com/stable",
-            namespace: "kube-system",
-            version: "0.9.3",
+            release: Constants.SSP_ADDON,
+            namespace: props.namespace,
+            version: props.version,
             values
         });
     }
