@@ -9,8 +9,8 @@ For instructions on getting started with X-Ray on EKS refer to the [EKS Workshop
 ```typescript
 import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
-const xrayAddOn = new XrayAddOn();
-const addOns: Array<ClusterAddOn> = [ xrayAddOn ];
+const addOn = new XrayAddOn();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {

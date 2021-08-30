@@ -9,11 +9,10 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ```typescript
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
-readonly externalDns = new ssp.addons.ExternalDnsAddon({
-    hostedZone: new ssp.addons.LookupHostedZoneProvider(myHostedZoneName)
-});
-
-const addOns: Array<ClusterAddOn> = [ externalDns ];
+const hostedZoneName '...'
+const hostedZone = new ssp.addons.LookupHostedZoneProvider(hostedZoneName)
+const addOn = new ssp.addons.ExternalDnsAddon({ hostedZone });
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
@@ -23,6 +22,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
+
 To validate that external DNS add-on is running ensure that the add-on deployment is in `RUNNING` state:
 
 ```bash
@@ -32,8 +32,8 @@ NAME                           READY   STATUS    RESTARTS   AGE
 external-dns-fcf6c9c66-xd8f4   1/1     Running   0          3d3h
 ```
 
-You can now provision external services and ingresses integrating with Route 53. 
-For example to provision an NLB you can use the following service manifest:
+## Using External DNS
+You can now provision external services and ingresses integrating with Route 53. For example to provision an NLB you can use the following service manifest:
 
 ```yaml
 apiVersion: v1

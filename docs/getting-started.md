@@ -7,7 +7,7 @@ This getting started guide will walk you through setting up a new CDK project wh
 To use the `cdk-eks-blueprint` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
 
 ```bash
-npm install -g aws-cdk@1.119.0
+npm install -g aws-cdk@1.113.0
 ```
 
 Verify the installation.
@@ -30,7 +30,7 @@ Install the `cdk-eks-blueprint` NPM package via the following.
 npm i @shapirov/cdk-eks-blueprint
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
+Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster into the account and region that you specify.
 
 ```typescript
 import 'source-map-support/register';
@@ -41,7 +41,6 @@ const app = new cdk.App();
 
 const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.NginxAddOn,
-    new ssp.addons.ArgoCDAddOn,
     new ssp.addons.CalicoAddOn,
     new ssp.addons.MetricsServerAddOn,
     new ssp.addons.ClusterAutoScalerAddOn,
@@ -49,7 +48,7 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.AwsLoadBalancerControllerAddOn()
 ];
 
-const opts = { id: 'east-test-1', addOns }
+const opts = { id: 'east-test-1' }
 new ssp.EksBlueprint(app, opts, {
     env: {
         account: 'XXXXXXXXXXXXX',
@@ -77,7 +76,6 @@ Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprin
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
 - [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
-- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
 - [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
@@ -115,22 +113,55 @@ You should see output that lists all namespaces in your cluster.
 
 ## Deploy workloads with ArgoCD
 
-Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
+Next, let's walk you through how you can begin deploying workloads to your cluster. The `cdk-eks-blueprint` framework leverages a GitOps approach to onborading and managing workloads. The framework currently supports both ArgoCD and Weave GitOps. 
 
-You can leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
+For this tutorial, we will use ArgoCD. We will also leverage the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample App of Apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
 
-### Install ArgoCD CLI
+We will also leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. 
 
-Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
+Replace the contents of `bin/<your-main-file>.ts` with the following. Notice, that we have added configuration for the `ArgoCDAddOn`.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from '@aws-cdk/core';
+import * as ssp from '@shapirov/cdk-eks-blueprint';
+
+const app = new cdk.App();
+
+const argoAddOn = new ssp.addons.ArgoCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads',
+        path: 'envs/dev',
+    }
+})
+
+const externalDns = new ssp.addons.ExternalDnsAddon({
+    hostedZone: new ssp.addons.LookupHostedZoneProvider(myHostedZoneName)
+});
+
+const addOns: Array<ssp.ClusterAddOn> = [
+    argoAddOn,
+    new ssp.addons.NginxAddOn,
+    new ssp.addons.CalicoAddOn,
+    new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
+    new ssp.addons.ContainerInsightsAddOn,
+    new ssp.addons.AwsLoadBalancerControllerAddOn()
+];
+
+const opts = { id: 'east-test-1' }
+new ssp.EksBlueprint(app, opts, {
+    env: {
+        account: 'XXXXXXXXXXXXX',
+        region: 'us-east-1'
+    },
+});
+```
+
+Deploy the stack using the following command and ArgoCD will be deployed and boostrapped into your cluster.
 
 ```
-argocd version --short --client
-```
-
-You should see output similar to the following:
-
-```
-argocd: v2.0.1+33eaf11.dirty
+cdk deploy
 ```
 
 ### Exposing ArgoCD
@@ -153,48 +184,16 @@ Open your browser to http://localhost:8080 and you should see the ArgoCD login s
 
 ### Logging Into ArgoCD
 
-ArgoCD will create an `admin` user and password on a fresh install. To get the ArgoCD admin password, run the following.
+At deploy time, ArgoCD will create an `admin` user and password on a fresh install. To get the ArgoCD admin password, run the following.
 
 ```
 export ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
-While still port-forwarding, login via the following.
-
-```
-argocd login localhost:8080 --username admin --password $ARGO_PASSWORD
-```
-
-You can also login to the ArgoCD UI with generated password and the username `admin`. 
+While still port-forwarding, login to the ArgoCD UI with generated password and the username `admin`. 
 
 ```
 echo $ARGO_PASSWORD
-```
-
-### Deploy workloads to your cluster
-
-Create a project in Argo by running the following command
-
-```
-argocd proj create sample \
-    -d https://kubernetes.default.svc,argocd \
-    -s https://github.com/aws-samples/ssp-eks-workloads.git
-```
-
-Create the application within Argo by running the following command
-
-```
-argocd app create dev-apps \
-    --dest-namespace argocd  \
-    --dest-server https://kubernetes.default.svc  \
-    --repo https://github.com/aws-samples/ssp-eks-workloads.git \
-    --path "envs/dev"
-```
-
-Sync the apps by running the following command
-
-```
-argocd app sync dev-apps 
 ```
 
 ### Validate deployments. 
@@ -206,6 +205,48 @@ kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
 ```
 
 Open up `localhost:4040` in your browser and you should see the application.
+
+## External DNS
+
+Now that we have our workloads deployed, lets set up DNS so that they have propper host names. To complete this portion of the tutorial, you will need to have have Route53 Hosted Zone that you can use. 
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from '@aws-cdk/core';
+import * as ssp from '@shapirov/cdk-eks-blueprint';
+
+const app = new cdk.App();
+
+const hostedZoneName = '<YOUR_HOSTED_ZONE_NAME'
+const hostedZone = new ssp.addons.LookupHostedZoneProvider(hostedZoneName)
+const externalDns = new ssp.addons.ExternalDnsAddon({ hostedZone });
+
+const argoAddOn = new ssp.addons.ArgoCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads',
+        path: 'envs/dev',
+    }
+})
+
+const addOns: Array<ssp.ClusterAddOn> = [
+    argoAddOn,
+    externalDns
+    new ssp.addons.NginxAddOn,
+    new ssp.addons.CalicoAddOn,
+    new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
+    new ssp.addons.ContainerInsightsAddOn,
+    new ssp.addons.AwsLoadBalancerControllerAddOn()
+];
+
+const opts = { id: 'east-test-1' }
+new ssp.EksBlueprint(app, opts, {
+    env: {
+        account: 'XXXXXXXXXXXXX',
+        region: 'us-east-1'
+    },
+});
+```
 
 ## Next Steps
 

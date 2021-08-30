@@ -6,17 +6,12 @@ Other than handling Kubernetes ingress objects, this ingress controller can faci
 
 ## Usage
 
-NGINX add-on is a standard SSP add-on and it is usage is similar to the rest of the add-ons.
-
 ```typescript
 import { NginxAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
-const subdomain  = ...;
-const nginxAddOn = new NginxAddOn(({ 
-    externaDnsHostname: subdomain
-}));
-
-const addOns: Array<ClusterAddOn> = [ nginxAddOn ];
+const externalDnsHostname  = ...;
+const addOn = new NginxAddOn({ externalDnsHostname });
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {

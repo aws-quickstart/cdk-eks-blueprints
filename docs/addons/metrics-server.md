@@ -8,11 +8,11 @@
 
 #### **`index.ts`**
 ```typescript
-import { MetricsServerAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { MetricsServerAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
 # Deploy Metrics Server v0.5.0
-const metricServerAddOn = new MetricsServerAddOn('v0.5.0');
-const addOns: Array<ClusterAddOn> = [ metricServerAddOn ];
+const addOn = new MetricsServerAddOn('v0.5.0');
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {

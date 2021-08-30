@@ -1,10 +1,11 @@
 # Container Insights Add-on
 
-The `ContainerInsights` addon adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
+The Container Insights add-on adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
 
-Customers can use Container Insights to collect, aggregate, and summarize metrics and logs from your containerized applications and microservices. Container Insights collects data as performance log events using embedded metric format. These performance log events are entries that use a structured JSON schema that enables high-cardinality data to be ingested and stored at scale. From this data, CloudWatch creates aggregated metrics at the cluster, node, pod, task, and service level as CloudWatch metrics. The metrics that Container Insights collects are available in CloudWatch automatic dashboards, and also viewable in the Metrics section of the CloudWatch console.
+Customers can use Container Insights to collect, aggregate, and summarize metrics and logs from your containerized applications and microservices. Container Insights collects data as performance log events using an embedded metric format. These performance log events are entries that use a structured JSON schema that enables high-cardinality data to be ingested and stored at scale. From this data, CloudWatch creates aggregated metrics at the cluster, node, pod, task, and service level as CloudWatch metrics. The metrics that Container Insights collects are available in CloudWatch automatic dashboards, and also viewable in the Metrics section of the CloudWatch console.
 
 **IMPORTANT**
+
 CloudWatch does not automatically create all possible metrics from the log data, to help you manage your Container Insights costs. However, you can view additional metrics and additional levels of granularity by using CloudWatch Logs Insights to analyze the raw performance log events.
 
 Metrics collected by Container Insights are charged as custom metrics. For more information about [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), see Amazon CloudWatch Pricing.
@@ -14,10 +15,10 @@ Metrics collected by Container Insights are charged as custom metrics. For more 
 Add the following as an add-on to your main.ts file to add Containers Insights to your cluster
 
 ```typescript
-import { AddOns }  from '@shapirov/cdk-eks-blueprint';
+import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
-const myClusterAutoscaler = new AddOns.ContainerInsightsAddOn();
-const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
+const addOn = new ContainerInsightsAddOn();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
@@ -28,11 +29,16 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 });
 ```
 
-Next run `cdk deploy` to update your CDK stack. 
-
 ## Prerequisites
 
-Once the Container Insights add-on has been installed to your cluster check to see that the CloudWatch Agent and the FluentD daemons are running. Run `kubectl get all -n amazon-cloudwatch` and you should see the following output.
+Once the Container Insights add-on has been installed in your cluster, validate that the CloudWatch Agent and the FluentD daemons are running. 
+
+```bash
+`kubectl get all -n amazon-cloudwatch`
+```
+
+You should see output similar to the following: 
+
 ```
 NAME                           READY   STATUS    RESTARTS   AGE
 pod/cloudwatch-agent-k8wxl     1/1     Running   0          105s
@@ -43,12 +49,17 @@ daemonset.apps/cloudwatch-agent     1         1         1       1            1  
 daemonset.apps/fluentd-cloudwatch   1         1         1       1            1           <none>          106s
 ```
 
-To enable or disable control plane logs with the console, please run the following command in your terminal - `aws eks update-cluster-config \
+To enable or disable control plane logs with the console, run the following command in your terminal.
+
+```bash
+aws eks update-cluster-config \
     --region us-east-2 \
     --name east-dev \
-    --logging '{"clusterLogging":[{"types":["api","audit","authenticator","controllerManager","scheduler"],"enabled":true}]}'`
+    --logging '{"clusterLogging":[{"types":["api","audit","authenticator","controllerManager","scheduler"],"enabled":true}]}'
+```
 
-You should see a similar output as the following
+You should see a similar output as the following.
+
 ```json
 {
     "update": {
@@ -67,12 +78,16 @@ You should see a similar output as the following
 }
 ```
 
-You can also monitor the status of your log configuration update to your cluster by running the following command - `aws eks describe-update \
+You can also monitor the status of your log configuration update to your cluster by running the following command. 
+
+```bash
+aws eks describe-update \
     --region <region-code>\
     --name <prod> \
-    --update-id <883405c8-65c6-4758-8cee-2a7c1340a6d9>`
+    --update-id <883405c8-65c6-4758-8cee-2a7c1340a6d9>
+```
 
-Once the update is complete, you should see a similar output 
+Once the update is complete, you should see a similar output.
 
 ```json
 {
@@ -93,10 +108,13 @@ Once the update is complete, you should see a similar output
 ```
 
 ## View metrics for cluster and workloads
+
 Under Performance Monitoring, the Container Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance. 
+
 ![CloudWatch](/screenshots/eks-blueprint-cwinsights-performance-monitoring.png)
 
 ## View cluster level logs
+
 After you have enabled any of the control plane log types for your Amazon EKS cluster, you can view them on the CloudWatch console.
 
 To view these logs on the CloudWatch console follow these steps:
@@ -114,7 +132,6 @@ Next in the console, click on Log groups under Logs.
 You will see under log streams all the log streams from your Amazon EKS control plane. 
 
 ![CloudWatch](../../screenshots/eks-blueprint-cwlogs.png)
-
 
 ## View workload level logs
 
