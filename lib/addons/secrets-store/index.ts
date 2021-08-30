@@ -43,18 +43,18 @@ const defaultProps: SecretsStoreAddOnProps = {
 
 export class SecretsStoreAddOn implements ClusterAddOn {
 
-    private props: SecretsStoreAddOnProps;
+    private options: SecretsStoreAddOnProps;
 
     constructor(props?: SecretsStoreAddOnProps) {
-        this.props = { ...defaultProps, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const csiDriverProviderAws = new CsiDriverProviderAws(
-            this.props.namespace!,
-            this.props.version!,
-            this.props.rotationPollInterval,
-            this.props.syncSecrets!
+            this.options.namespace!,
+            this.options.version!,
+            this.options.rotationPollInterval,
+            this.options.syncSecrets!
         );
 
         return Promise.resolve(csiDriverProviderAws.deploy(clusterInfo));

@@ -64,15 +64,15 @@ const defaultProps: NginxAddOnProps = {
 
 export class NginxAddOn implements ClusterAddOn {
 
-    readonly props: NginxAddOnProps;
+    readonly options: NginxAddOnProps;
 
     constructor(props?: NginxAddOnProps) {
-        this.props = { ...defaultProps, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const props = this.props;
+        const props = this.options;
 
         const presetAnnotations = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,

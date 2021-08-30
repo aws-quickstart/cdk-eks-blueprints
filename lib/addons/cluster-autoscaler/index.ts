@@ -24,10 +24,10 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
-    private props: ClusterAutoScalerAddOnProps;
+    private options: ClusterAutoScalerAddOnProps;
 
     constructor(props?: ClusterAutoScalerAddOnProps) {
-        this.props = { ...defaultProps, ...props }
+        this.options = { ...defaultProps, ...props }
     }
 
     /**
@@ -42,7 +42,7 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const version = this.props?.version ?? this.versionMap.get(clusterInfo.version);
+        const version = this.options?.version ?? this.versionMap.get(clusterInfo.version);
         const cluster = clusterInfo.cluster;
 
         const ng = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");

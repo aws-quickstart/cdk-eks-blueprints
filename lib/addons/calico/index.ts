@@ -31,10 +31,10 @@ const defaultProps: CalicoAddOnProps = {
 
 export class CalicoAddOn implements ClusterAddOn {
 
-    private props: CalicoAddOnProps;
+    private options: CalicoAddOnProps;
 
     constructor(props?: CalicoAddOnProps) {
-        this.props = { ...defaultProps, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
@@ -42,9 +42,9 @@ export class CalicoAddOn implements ClusterAddOn {
             chart: "aws-calico",
             release: "aws-calico",
             repository: "https://aws.github.io/eks-charts",
-            version: this.props.chartVersion,
-            namespace: this.props.namespace,
-            values: this.props.values
+            version: this.options.chartVersion,
+            namespace: this.options.namespace,
+            values: this.options.values
         });
     }
 }

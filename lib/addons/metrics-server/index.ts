@@ -20,14 +20,14 @@ const defaultProps: MetricsServerAddOnProps = {
 
 export class MetricsServerAddOn implements ClusterAddOn {
 
-    private props: MetricsServerAddOnProps;
+    private options: MetricsServerAddOnProps;
 
     constructor(props?: MetricsServerAddOnProps) {
-        this.props = { ...defaultProps, ...props }
+        this.options = { ...defaultProps, ...props }
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        const version = this.props.version
+        const version = this.options.version
         const manifestUrl = `https://github.com/kubernetes-sigs/metrics-server/releases/download/${version}/components.yaml`;
         const manifest = loadExternalYaml(manifestUrl);
         clusterInfo.cluster.addManifest('my-resource', ...manifest);

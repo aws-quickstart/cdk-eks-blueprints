@@ -42,10 +42,10 @@ const defaultProps: AppMeshAddOnProps = {
 
 export class AppMeshAddOn implements ClusterAddOn {
 
-    readonly props: AppMeshAddOnProps;
+    readonly options: AppMeshAddOnProps;
 
     constructor(props?: AppMeshAddOnProps) {
-        this.props = { ...defaultProps, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
@@ -64,7 +64,7 @@ export class AppMeshAddOn implements ClusterAddOn {
         const appMeshPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSAppMeshFullAccess");
         sa.role.addManagedPolicy(appMeshPolicy);
 
-        if (this.props.enableTracing && this.props.tracingProvider === "x-ray") {
+        if (this.options.enableTracing && this.options.tracingProvider === "x-ray") {
             const ng = assertEC2NodeGroup(clusterInfo, "App Mesh X-Ray integration");
             const xrayPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess");
             ng.role.addManagedPolicy(xrayPolicy);
@@ -87,10 +87,10 @@ export class AppMeshAddOn implements ClusterAddOn {
                     'name': 'appmesh-controller'
                 },
                 tracing: {
-                    enabled: this.props.enableTracing,
-                    provider: this.props.tracingProvider,
-                    address: this.props.tracingAddress,
-                    port: this.props.tracingPort
+                    enabled: this.options.enableTracing,
+                    provider: this.options.tracingProvider,
+                    address: this.options.tracingAddress,
+                    port: this.options.tracingPort
                 }
             }
         });
