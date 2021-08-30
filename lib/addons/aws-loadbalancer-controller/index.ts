@@ -55,20 +55,20 @@ const AWS_LOAD_BALANCER_CONTROLLER = 'aws-load-balancer-controller';
 
 export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
 
-    private options: AwsLoadBalancerControllerProps;
+    private props: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        this.options = { ...defaultProps, ...props };
+        this.props = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
-            namespace: this.options.namespace,
+            namespace: this.props.namespace,
         });
 
-        const awsControllerBaseResourceBaseUrl = `https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/${this.options.version}/docs`;
+        const awsControllerBaseResourceBaseUrl = `https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/${this.props.version}/docs`;
         const awsControllerPolicyUrl = `${awsControllerBaseResourceBaseUrl}/install/iam_policy${cluster.stack.region.startsWith('cn-') ? '_cn' : ''}.json`;
 
         const policyJson = request('GET', awsControllerPolicyUrl).getBody().toString();
@@ -80,9 +80,9 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
         const awsLoadBalancerControllerChart = cluster.addHelmChart('AWSLoadBalancerController', {
             chart: AWS_LOAD_BALANCER_CONTROLLER,
             repository: 'https://aws.github.io/eks-charts',
-            namespace: this.options.namespace,
+            namespace: this.props.namespace,
             release: AWS_LOAD_BALANCER_CONTROLLER,
-            version: this.options.chartVersion,
+            version: this.props.chartVersion,
             wait: true,
             timeout: cdk.Duration.minutes(15),
             values: {
@@ -92,9 +92,9 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
                     name: serviceAccount.serviceAccountName,
                 },
                 // must disable waf features for aws-cn partition
-                enableShield: this.options.enableShield,
-                enableWaf: this.options.enableWaf,
-                enableWafv2: this.options.enableWafv2,
+                enableShield: this.props.enableShield,
+                enableWaf: this.props.enableWaf,
+                enableWafv2: this.props.enableWafv2,
             },
         });
 

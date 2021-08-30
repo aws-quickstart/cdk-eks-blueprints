@@ -9,7 +9,6 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
  * Configuration options for the add-on.
  */
 export interface ClusterAutoScalerAddOnProps {
-
     /**
      * Version of the Cluster Autoscaler
      */
@@ -25,7 +24,7 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
-    private props?: ClusterAutoScalerAddOnProps;
+    private props: ClusterAutoScalerAddOnProps;
 
     constructor(props?: ClusterAutoScalerAddOnProps) {
         this.props = { ...defaultProps, ...props }

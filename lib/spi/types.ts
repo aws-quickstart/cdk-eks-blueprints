@@ -22,6 +22,11 @@ export interface ApplicationRepository {
     name?: string,
 
     /**
+     * Optional target revision for the repository.
+     */
+    targetRevision?: string
+
+    /**
      * Optional branch (defaults to main)
      */
     branch?: string,
@@ -42,7 +47,7 @@ export interface ApplicationRepository {
 }
 
 export class ClusterInfo {
-    
+
     readonly cluster: Cluster;
     readonly version: KubernetesVersion;
     readonly nodeGroup?: Nodegroup;
