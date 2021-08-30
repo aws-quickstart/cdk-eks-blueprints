@@ -41,7 +41,7 @@ aws-load-balancer-controller                               2/2     2            
 
 ## Creating a Load Balanced Service
 
-Once the AWS Load Balancer Controller add-on is installed in your cluster, it is able to provision both Network Load Balancers and Application Load Balancers on your behalf. For example, the following manifest is applied to your cluster, it will create an NLB.
+Once the AWS Load Balancer Controller add-on is installed in your cluster, it is able to provision both Network Load Balancers and Application Load Balancers on your behalf. For example, when the following manifest is applied to your cluster, it will create an NLB.
 
 ```yaml
 apiVersion: v1

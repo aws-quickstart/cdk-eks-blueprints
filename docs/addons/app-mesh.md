@@ -9,8 +9,8 @@ Full documentation on using App Mesh with EKS [can be found here](https://docs.a
 ```typescript
 import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
-const addon = new AppMeshAddOn();
-const addOns: Array<ClusterAddOn> = [ addon ];
+const addOn = new AppMeshAddOn();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
@@ -63,8 +63,6 @@ const appMeshAddOn = new ssp.AppMeshAddOn({enableTracing: true, tracingProvider:
 When configured, App Mesh will automatically inject an XRay sidecar to handle tracing which enables troubleshooting latency issues.
 
 ## App Mesh and XRay Integration Example
-
-// TODO - Update - the below is inaccurate.
 
 `team-burnham` sample workload repository is configured with an [example workload](https://github.com/aws-samples/ssp-eks-workloads/tree/master/teams/team-burnham/dev) that demonstrates a "meshified" workload.
 
