@@ -9,7 +9,7 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ```typescript
 import * as ssp from '@shapirov/cdk-eks-blueprint';
 
-const hostedZoneName '...'
+const hostedZoneName = ...
 const hostedZone = new ssp.addons.LookupHostedZoneProvider(hostedZoneName)
 const addOn = new ssp.addons.ExternalDnsAddon({ hostedZone });
 const addOns: Array<ClusterAddOn> = [ addOn ];

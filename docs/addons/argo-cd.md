@@ -38,7 +38,7 @@ The above will create an `argocd` namespace and install all Argo CD components. 
 
 ## Setting an Admin Password
 
-By default, the Argo CD add-on will create a new admin password for you. To specify you own, you can leverage the AWS Secrets manage integration.
+By default, the Argo CD add-on will create a new admin password for you. To specify your own, you can leverage the AWS Secrets Manager.
 
 ```typescript
 const argoCDAddOn = new ArgoCDAddOn({
@@ -139,8 +139,8 @@ The framework provides support to supply repository and administrator secrets in
 
 ## Known Issues
 
-1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up application that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 
-2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
+1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up applications that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 
+2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
 
 
 
