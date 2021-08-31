@@ -18,8 +18,8 @@ import {
 } from '@shapirov/cdk-eks-blueprint';
 import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 
-const secretsStoreAddOn = new SecretsStoreAddOn();
-const addOns: Array<ClusterAddOn> = [ secretsStoreAddOn ];
+const addOn = new SecretsStoreAddOn();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 /* Setup application team with secrets
  * Here we are generating a new SecretManager secret for AuthPassword
