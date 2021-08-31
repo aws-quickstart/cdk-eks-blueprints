@@ -4,7 +4,7 @@ import request from 'sync-request';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 /**
- * Configuration options for AWS Load Balancer controller
+ * Configuration options for the add-on.
  */
 export interface AwsLoadBalancerControllerProps {
 
@@ -40,9 +40,9 @@ export interface AwsLoadBalancerControllerProps {
 }
 
 /**
- * Defaults options for load balancer controller.
+ * Defaults options for the add-on
  */
-const awsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
+const defaultProps: AwsLoadBalancerControllerProps = {
     namespace: 'kube-system',
     version: 'v2.2.1',
     chartVersion: '1.2.3',
@@ -58,13 +58,11 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
     private options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        this.options = { ...awsLoadBalancerControllerDefaults, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-
         const cluster = clusterInfo.cluster;
-
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
             namespace: this.options.namespace,

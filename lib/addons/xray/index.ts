@@ -1,8 +1,10 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
+
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
+import { createNamespace } from "../../utils/namespace-utils"
 
 /**
  * Implementation of AWS X-Ray add-on for EKS SSP. Installs xray daemonset and exposes 
@@ -23,12 +25,8 @@ export class XrayAddOn implements ClusterAddOn {
         sa.role.addManagedPolicy(cloudMapPolicy);
 
         // X-Ray Namespace
-        const xrayNS = cluster.addManifest('xray-ns', {
-            apiVersion: 'v1',
-            kind: 'Namespace',
-            metadata: { name: 'xray-system' }
-        });
-        sa.node.addDependency(xrayNS);
+        const namespace = createNamespace('xray-system', cluster)
+        sa.node.addDependency(namespace);
 
         // Apply manifest
         const doc = readYamlDocument(__dirname + '/xray-ds.yaml');
@@ -39,7 +37,6 @@ export class XrayAddOn implements ClusterAddOn {
             manifest,
             overwrite: true
         });
-
         statement.node.addDependency(sa);
     }
 }

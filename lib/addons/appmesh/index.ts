@@ -2,7 +2,11 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { createNamespace } from "../../utils/namespace-utils";
 
+/**
+ * Configuration options for the add-on.
+ */
 export interface AppMeshAddOnProps {
     /**
      * If set to true, will enable tracing through App Mesh sidecars, such as X-Ray distributed tracing.
@@ -16,7 +20,8 @@ export interface AppMeshAddOnProps {
     tracingProvider?: "x-ray" | "jaeger" | "datadog"
 
     /**
-     * Used for Datadog or Jaeger tracing. Example values: datadog.appmesh-system. Refer to https://aws.github.io/aws-app-mesh-controller-for-k8s/guide/tracing/ for more information.
+     * Used for Datadog or Jaeger tracing. Example values: datadog.appmesh-system. 
+     * Refer to https://aws.github.io/aws-app-mesh-controller-for-k8s/guide/tracing/ for more information.
      * Ignored for X-Ray.
      */
     tracingAddress?: string,
@@ -27,19 +32,21 @@ export interface AppMeshAddOnProps {
     tracingPort?: string
 }
 
-const appMeshAddonDefaults : AppMeshAddOnProps = {
+/**
+ * Defaults options for the add-on
+ */
+const defaultProps: AppMeshAddOnProps = {
     enableTracing: false,
     tracingProvider: "x-ray"
 }
 
 export class AppMeshAddOn implements ClusterAddOn {
 
-    readonly appMeshOptions : AppMeshAddOnProps;
+    readonly options: AppMeshAddOnProps;
 
-    constructor(appMeshProps?: AppMeshAddOnProps) {
-        this.appMeshOptions = { ...appMeshAddonDefaults, ...appMeshProps };
+    constructor(props?: AppMeshAddOnProps) {
+        this.options = { ...defaultProps, ...props };
     }
-
 
     deploy(clusterInfo: ClusterInfo): void {
 
@@ -57,37 +64,33 @@ export class AppMeshAddOn implements ClusterAddOn {
         const appMeshPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSAppMeshFullAccess");
         sa.role.addManagedPolicy(appMeshPolicy);
 
-        if(this.appMeshOptions.enableTracing && this.appMeshOptions.tracingProvider === "x-ray") {
-            const xrayPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess");
+        if (this.options.enableTracing && this.options.tracingProvider === "x-ray") {
             const ng = assertEC2NodeGroup(clusterInfo, "App Mesh X-Ray integration");
+            const xrayPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess");
             ng.role.addManagedPolicy(xrayPolicy);
         }
-      
+
         // App Mesh Namespace
-        const appMeshNS = cluster.addManifest('appmesh-ns', {
-            apiVersion: 'v1',
-            kind: 'Namespace',
-            metadata: { name: 'appmesh-system' }
-        });
-        sa.node.addDependency(appMeshNS);
+        const namespace = createNamespace('appmesh-system', cluster)
+        sa.node.addDependency(namespace);
 
         // App Mesh Controller        
         const chart = cluster.addHelmChart("appmesh-addon", {
             chart: "appmesh-controller",
             repository: "https://aws.github.io/eks-charts",
-            release: "appm-release",
+            release: "appmesh-release",
             namespace: "appmesh-system",
             values: {
                 region: cluster.stack.region,
-                serviceAccount: { 
-                   create: false,
-                   'name': 'appmesh-controller'
+                serviceAccount: {
+                    create: false,
+                    'name': 'appmesh-controller'
                 },
                 tracing: {
-                    enabled: this.appMeshOptions.enableTracing,
-                    provider: this.appMeshOptions.tracingProvider,
-                    address: this.appMeshOptions.tracingAddress,
-                    port: this.appMeshOptions.tracingPort
+                    enabled: this.options.enableTracing,
+                    provider: this.options.tracingProvider,
+                    address: this.options.tracingAddress,
+                    port: this.options.tracingPort
                 }
             }
         });

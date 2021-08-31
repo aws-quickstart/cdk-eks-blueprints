@@ -15,7 +15,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
 
         // Apply manifest.
         // See APG Pattern https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/install-ssm-agent-on-amazon-eks-worker-nodes-by-using-kubernetes-daemonset.html
-        const appLabel = { app: "ssm-installer"};
+        const appLabel = { app: "ssm-installer" };
 
         const daemonSet = {
             apiVersion: "apps/v1",
