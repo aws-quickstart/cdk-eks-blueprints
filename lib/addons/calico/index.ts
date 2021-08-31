@@ -7,18 +7,20 @@ export interface CalicoAddOnProps {
 
     /**
      * Namespace where Calico will be installed
+     * @default kube-system
      */
-    namespace?: string
+    namespace?: string;
 
     /**
      * Helm chart version to use to install.
+     * @default 0.3.4
      */
-    chartVersion?: string
+    chartVersion?: string;
 
     /**
      * Values for the Helm chart.
      */
-    values?: any
+    values?: any;
 }
 
 /**
@@ -27,7 +29,7 @@ export interface CalicoAddOnProps {
 const defaultProps: CalicoAddOnProps = {
     namespace: 'kube-system',
     chartVersion: '0.3.4',
-}
+};
 
 export class CalicoAddOn implements ClusterAddOn {
 

@@ -15,20 +15,22 @@ import { Constants } from "..";
 export interface ArgoCDAddOnProps {
     /**
      * Namespace where add-on will be deployed. 
+     * @default argocd
      */
-    namespace?: string
+    namespace?: string;
 
     /**
     * Helm chart version to use to install.
+    * @default 3.17.5
     */
-    chartVersion?: string
+    chartVersion?: string;
 
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
      * after the infrastructure and team provisioning is complete. 
      */
-    bootstrapRepo?: spi.ApplicationRepository
+    bootstrapRepo?: spi.ApplicationRepository;
 
     /**
      * Optional admin password secret (plaintext).
@@ -36,7 +38,7 @@ export interface ArgoCDAddOnProps {
      * store as bcrypt hash. 
      * Note: at present, change of password will require manual restart of argocd server. 
      */
-    adminPasswordSecretName?: string
+    adminPasswordSecretName?: string;
 
     /**
      * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
@@ -52,7 +54,7 @@ export interface ArgoCDAddOnProps {
 const defaultProps: ArgoCDAddOnProps = {
     namespace: "argocd",
     chartVersion: '3.17.5'
-}
+};
 
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
@@ -68,7 +70,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     }
 
     /**
-     * Impementation of the add-on contract deploy method.
+     * Implementation of the add-on contract deploy method.
     */
     async deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
         const namespace = this.createNamespace(clusterInfo);
@@ -95,7 +97,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
                 secret: {
                     argocdServerAdminPassword: adminSecret
                 }
-            }
+            };
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -147,7 +149,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
                         },
                         path: appRepo.path,
                         repoURL: appRepo.repoUrl,
-                        targetRevision: appRepo.targetRevision || 'HEAD'
+                        targetRevision: appRepo.targetRevision ?? 'HEAD'
                     },
                     syncPolicy: {
                         automated: {}

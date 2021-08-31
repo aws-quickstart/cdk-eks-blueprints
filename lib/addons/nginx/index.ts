@@ -7,40 +7,45 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 export interface NginxAddOnProps {
     /**
      * Version for the Nginx Helm chart.
+     * @default 0.9.3
      */
-    version?: string
+    version?: string;
 
     /**
      * Namespace for the add-on.
      */
-    namespace?: string
+    namespace?: string;
 
     /**
      * tcp, http
+     * @default tcp
      */
-    backendProtocol?: string,
+    backendProtocol?: string;
 
     /**
      * Enabling cross AZ loadbalancing for 
+     * @default true
      */
-    crossZoneEnabled?: boolean,
+    crossZoneEnabled?: boolean;
 
     /**
      * If the load balancer created for the ingress is internet facing.
      * Internal if set to false.
+     * @default true
      */
-    internetFacing?: boolean,
+    internetFacing?: boolean;
 
     /**
      * IP or instance mode. Default: IP, requires VPC-CNI, has better performance eliminating a hop through kubeproxy
      * Instance mode: traditional NodePort mode on the instance. 
+     * @default ip
      */
-    targetType?: string,
+    targetType?: string;
 
     /**
      * Used in conjunction with external DNS add-on to handle automatic registration of the service with Route53.  
      */
-    externalDnsHostname?: string,
+    externalDnsHostname?: string;
 
     /**
      * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
@@ -60,7 +65,7 @@ const defaultProps: NginxAddOnProps = {
     internetFacing: true,
     targetType: 'ip',
     values: {}
-}
+};
 
 export class NginxAddOn implements ClusterAddOn {
 
@@ -81,7 +86,7 @@ export class NginxAddOn implements ClusterAddOn {
             'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
             'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType,
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
-        }
+        };
 
         const values = props.values ?? {};
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
