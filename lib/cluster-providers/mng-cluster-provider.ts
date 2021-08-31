@@ -84,7 +84,7 @@ export class MngClusterProvider implements ClusterProvider {
         this.props = props ?? { version: eks.KubernetesVersion.V1_20 };
     }
 
-    createCluster(scope: Construct, vpc: IVpc, name?: string): ClusterInfo {
+    createCluster(scope: Construct, vpc: IVpc): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.

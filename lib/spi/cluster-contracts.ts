@@ -1,7 +1,6 @@
 import { ClusterInfo } from '.';
 import { Construct } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
-import { KubernetesVersion } from '@aws-cdk/aws-eks';
 
 
 /**
