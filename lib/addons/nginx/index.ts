@@ -55,6 +55,7 @@ export interface NginxAddOnProps {
     };
 }
 
+
 /**
  * Defaults options for the add-on
  */
