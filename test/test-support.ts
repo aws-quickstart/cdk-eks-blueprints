@@ -1,4 +1,4 @@
-import { NestedStack, NestedStackProps } from '@aws-cdk/core';
+import { Construct, NestedStack, NestedStackProps } from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import { NestedStackBuilder } from '../lib';
 
@@ -9,13 +9,13 @@ export class MyVpcStack extends NestedStack {
 
     public static builder(): NestedStackBuilder {
         return {
-            build(scope, id, props) {
+            build(scope: Construct, id: string, props: NestedStackProps) {
                 return new MyVpcStack(scope, id, props);
             }
         };
     }
 
-    constructor(scope, id, props: NestedStackProps) {
+    constructor(scope: Construct, id: string, props: NestedStackProps) {
         super(scope, id, props);
         this.vpc = new ec2.Vpc(this, 'test-vpc', {
             cidr: '10.0.0.0/20',
