@@ -89,7 +89,7 @@ test('Pipeline Builder Creates correct pipeline', () => {
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 });
 
-test("Nested stack add-on creates correct nested stack", () => {
+test("Nested stack add-on creates correct nested stack", async () => {
     const app = new cdk.App();
 
     const vpcAddOn = new NestedStackAddOn( {
@@ -103,7 +103,9 @@ test("Nested stack add-on creates correct nested stack", () => {
         .addons(vpcAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
-    blueprint.build(app, "stack-with-nested");
+    const parentStack =  await blueprint.buildAsync(app, "stack-with-nested");
+    const clusterInfo = parentStack.getClusterInfo();
+    expect(clusterInfo.getProvisionedAddOn("vpc-nested-stack")).toBeDefined();
     
 });
 

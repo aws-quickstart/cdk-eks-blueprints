@@ -1,4 +1,5 @@
 import { Construct, NestedStackProps } from "@aws-cdk/core";
+import { IdentityStore } from "aws-sdk";
 import { ClusterAddOn, ClusterInfo, NestedStackBuilder } from "../../spi";
 
 /**
@@ -23,7 +24,11 @@ export class NestedStackAddOnProps {
 
 export class NestedStackAddOn  implements ClusterAddOn {
 
-    constructor(private readonly props: NestedStackAddOnProps) {}
+    readonly id? : string;
+
+    constructor(private readonly props: NestedStackAddOnProps) {
+        this.id = props.id;
+    }
 
     deploy(clusterInfo: ClusterInfo): void | Promise<Construct> {
         const props = this.props;

@@ -5,7 +5,7 @@ import { StackProps } from '@aws-cdk/core';
 import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
-import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, AsyncStackBuilder } from '../spi';
+import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, AsyncStackBuilder, ClusterInfo } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
 export class EksBlueprintProps {
@@ -130,7 +130,9 @@ export class EksBlueprint extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465hk";
 
-    private asyncTasks: Promise<any>;
+    private asyncTasks: Promise<void | cdk.Construct[]>;
+
+    private clusterInfo: ClusterInfo;
 
     public static builder(): BlueprintBuilder {
         return new BlueprintBuilder();
@@ -154,16 +156,16 @@ export class EksBlueprint extends cdk.Stack {
         const version = blueprintProps.version ?? KubernetesVersion.V1_20
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
-        const clusterInfo = clusterProvider.createCluster(this, vpc);
+        this.clusterInfo = clusterProvider.createCluster(this, vpc);
         const postDeploymentSteps = Array<ClusterPostDeploy>();
         const promises = Array<Promise<cdk.Construct>>();
         const addOnKeys: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result = addOn.deploy(clusterInfo);
+            const result = addOn.deploy(this.clusterInfo);
             if (result) {
                 promises.push(result);
-                addOnKeys.push(addOn.constructor.name);
+                addOnKeys.push(addOn.id ?? addOn.constructor.name);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
@@ -173,16 +175,16 @@ export class EksBlueprint extends cdk.Stack {
 
         this.asyncTasks = Promise.all(promises.values()).then((constructs) => {
             constructs.forEach((construct, index) => {
-                clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+                this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
-                    team.setup(clusterInfo);
+                    team.setup(this.clusterInfo);
                 }
             }
 
             for (let step of postDeploymentSteps) {
-                step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+                step.postDeploy(this.clusterInfo, blueprintProps.teams ?? []);
             }
         });
 
@@ -201,6 +203,15 @@ export class EksBlueprint extends cdk.Stack {
             });
         }
         return Promise.resolve(this);
+    }
+
+    /**
+     * This method returns all the constructs produced by during the cluster creation (e.g. add-ons).
+     * May be used in testing for verification.
+     * @returns cluster info object
+     */
+    getClusterInfo() : ClusterInfo {
+        return this.clusterInfo;
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {
