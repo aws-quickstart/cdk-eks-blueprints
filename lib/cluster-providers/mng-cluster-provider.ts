@@ -1,7 +1,7 @@
 import { Construct } from "@aws-cdk/core";
 import * as eks from "@aws-cdk/aws-eks";
 import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
-import { InstanceType, IVpc, SubnetSelection, SubnetType } from "@aws-cdk/aws-ec2";
+import { IMachineImage, InstanceType, IVpc, LaunchTemplate, SubnetSelection, SubnetType, UserData } from "@aws-cdk/aws-ec2";
 
 // Cluster
 import { ClusterInfo, ClusterProvider } from "..";
@@ -54,6 +54,16 @@ export interface MngClusterProviderProps extends eks.CommonClusterOptions {
      * Look up the versions here (mapped to Kubernetes version): https://docs.aws.amazon.com/eks/latest/userguide/eks-linux-ami-versions.html
      */
     amiReleaseVersion?: string;
+
+    /**
+     * The custom AMI for the node group. `amiType` and `amiReleaseVersion` will be ignored if this is set.
+     */
+    customAmi?: IMachineImage;
+
+    /**
+     * The userData for worker node when using custom AMI. Only applicable when customAmi is used.
+     */
+    userData?: UserData;
 
     /**
      * Select either SPOT or ON-DEMAND
@@ -115,16 +125,33 @@ export class MngClusterProvider implements ClusterProvider {
         const maxSize = this.props.maxSize ?? valueFromContext(scope, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = this.props.desiredSize ?? valueFromContext(scope, constants.DESIRED_SIZE_KEY, minSize);
 
+        // Create launch template if custom AMI is provided.
+        const lt = new LaunchTemplate(scope, `${id}-lt`, {
+            machineImage: this.props.customAmi,
+            userData: this.props.userData,
+        });
+
         // Create a managed node group.
-        const mng = cluster.addNodegroupCapacity(id + "-ng", {
-            amiType,
+        const commonNodegroupProps = {
             capacityType,
             instanceTypes,
             minSize,
             maxSize,
             desiredSize,
-            releaseVersion
-        });
+        };
+        const nodegroupProps = this.props.customAmi ? {
+            ...commonNodegroupProps,
+            launchTemplateSpec: {
+                id: lt.launchTemplateId!,
+                version: lt.latestVersionNumber,
+            },
+        } : {
+            ...commonNodegroupProps,
+            amiType,
+            releaseVersion,
+        };
+
+        const mng = cluster.addNodegroupCapacity(id + "-ng", nodegroupProps);
         return new ClusterInfo(cluster, version, mng)
     }
 }
