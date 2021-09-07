@@ -1,5 +1,4 @@
 import { Construct, NestedStackProps } from "@aws-cdk/core";
-import { IdentityStore } from "aws-sdk";
 import { ClusterAddOn, ClusterInfo, NestedStackBuilder } from "../../spi";
 
 /**
@@ -12,7 +11,7 @@ export class NestedStackAddOnProps {
     id: string;
 
     /**
-     * Builder that genertes the stack.
+     * Builder that generates the stack.
      */
     builder: NestedStackBuilder;
 
