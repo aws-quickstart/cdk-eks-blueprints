@@ -74,12 +74,15 @@ export default class MultiRegionConstruct extends cdk.Construct {
         const teams: Array<ssp.Team> = [platformTeam];
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
+            new ssp.addons.NginxAddOn,
+            new ssp.addons.ArgoCDAddOn,
+            new ssp.addons.CalicoAddOn,
+            new ssp.addons.MetricsServerAddOn,
+            new ssp.addons.ClusterAutoScalerAddOn,
+            new ssp.addons.ContainerInsightsAddOn,
+            new ssp.addons.VpcCniAddOn(),
+            new ssp.addons.CoreDnsAddOn(),
+            new ssp.addons.KubeProxyAddOn()
         ];
         const east = 'blueprint-us-east-2'
         new ssp.EksBlueprint(scope, { id: `${id}-${east}`, addOns, teams }, {

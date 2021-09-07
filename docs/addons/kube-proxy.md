@@ -33,14 +33,12 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 # Assuming cluster version is 1.20, below command shows versions of the Kube-proxy add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
     --addon-name kube-proxy \
-    --kubernetes-version 1.20 \
+    --kubernetes-version 1.19 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 # Output
-v1.20.4-eksbuild.2
-True
 v1.19.6-eksbuild.2
-False
+True
 v1.18.8-eksbuild.1
 False
 ```

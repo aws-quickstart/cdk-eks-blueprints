@@ -37,13 +37,15 @@ aws eks describe-addon-versions \
 --kubernetes-version 1.19 \
 --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" --output text
 # Output
-1.8.0
+v1.8.3-eksbuild.1
+False
+v1.8.0-eksbuild.1
 True
-1.7.0
+v1.7.0-eksbuild.1
 False
 ```
 # Validation
-To validate that Kube-proxy add-on is running, ensure that both the core-dns pods are in Running state
+To validate that coredns add-on is running, ensure that both the coredns pods are in Running state
 ```bash
 $ kubectl get pods  -n kube-system|grep coredns
 NAME                           READY    STATUS    RESTARTS     AGE
@@ -57,6 +59,8 @@ aws eks describe-addon \
     --addon-name coredns \
     --query "addon.addonVersion" \
     --output text
+# Output
+v1.8.0-eksbuild.1
 ```  
 
 ## Functionality

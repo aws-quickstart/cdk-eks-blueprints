@@ -19,5 +19,3 @@ export class VpcCniAddOn implements ClusterAddOn {
         });
     }
 }
-
-

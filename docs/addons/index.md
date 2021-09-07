@@ -24,3 +24,6 @@ The framework currently supports the following add-ons.
 | [`NginxAddOn`](./nginx.md) | Adds NGINX ingress controller |
 | [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-ssp-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn |
 | [`XrayAddOn`](./xray) | Adds XRay Daemon to the EKS Cluster |
+| [`CoreDNSAddon`](./coredns.md) | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
+| [`KubeProxyAddon`](./kube-proxy.md) | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node
+| [`VPCCniAddon`](./vpc-cni.md) | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.
