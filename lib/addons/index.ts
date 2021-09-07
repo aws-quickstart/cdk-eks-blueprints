@@ -15,6 +15,9 @@ export { SecretProvider,
     LookupSecretsManagerSecretByArn,
     LookupSsmSecretByAttrs } from './secrets-store/secret-provider'
 export { SSMAgentAddOn } from './ssm-agent'
+export { VpcCniAddOn } from './vpc-cni'
+export { CoreDnsAddOn } from './coredns'
+export { KubeProxyAddOn } from './kube-proxy'
 
 export class Constants {
     public static readonly SSP_ADDON = "ssp-addon";
