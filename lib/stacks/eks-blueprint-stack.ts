@@ -164,8 +164,10 @@ export class EksBlueprint extends cdk.Stack {
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
+                const addOnKey = this.getAddOnNameorId(addOn);
                 promises.push(result);
-                addOnKeys.push(addOn.id ?? addOn.constructor.name);
+                addOnKeys.push(addOnKey);
+                this.clusterInfo.addpreProvisionedAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
@@ -248,5 +250,9 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         return vpc;
+    }
+
+    private getAddOnNameorId(addOn: spi.ClusterAddOn) {
+        return addOn.id ?? addOn.constructor.name;
     }
 }

@@ -53,6 +53,7 @@ export class ClusterInfo {
     readonly nodeGroup?: Nodegroup;
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
+    private readonly preProvisionedAddOns: Map<string, Promise<cdk.Construct>>;
 
     /**
      * Constructor for ClusterInfo
@@ -70,6 +71,7 @@ export class ClusterInfo {
             }
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
+        this.preProvisionedAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
     /**
@@ -93,5 +95,24 @@ export class ClusterInfo {
         else {
             return undefined;
         }
+    }
+
+    /**
+     * Set the preProvisionedAddOn map with the promise for the construct 
+     * of the addon being provisioned 
+     * @param addOn 
+     * @param promise 
+     */
+     public addpreProvisionedAddOn(addOn: string, promise: Promise<cdk.Construct>) {
+        this.preProvisionedAddOns.set(addOn, promise);
+    }
+    
+    /**
+     * Returns the promise for the Addon construct
+     * @param addOn
+     * @returns Promise<cdk.Construct>
+     */
+    public getpreProvisionedAddOn(addOn: string): Promise<cdk.Construct> | undefined {
+        return this.preProvisionedAddOns.get(addOn);
     }
 }

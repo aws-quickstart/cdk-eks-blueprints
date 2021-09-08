@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import request from 'sync-request';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { Construct } from "@aws-cdk/core";
 
 /**
  * Configuration options for the add-on.
@@ -61,7 +62,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
@@ -99,5 +100,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
+        // return the Promise Construct for any teams that may depend on this
+        return Promise.resolve(awsLoadBalancerControllerChart);
     }
 }
