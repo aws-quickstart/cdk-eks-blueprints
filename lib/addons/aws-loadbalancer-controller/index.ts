@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
-import request from 'sync-request';
+import request from "sync-request";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Construct } from "@aws-cdk/core";
 
