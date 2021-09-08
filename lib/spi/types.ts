@@ -98,15 +98,15 @@ export class ClusterInfo {
     }
 
     /**
-     * Set the preProvisionedAddOn map with the promise for the construct 
-     * of the addon being provisioned 
-     * @param addOn 
-     * @param promise 
+     * Set the preProvisionedAddOn map with the promise for the construct
+     * of the addon being provisioned
+     * @param addOn
+     * @param promise
      */
      public addpreProvisionedAddOn(addOn: string, promise: Promise<cdk.Construct>) {
         this.preProvisionedAddOns.set(addOn, promise);
     }
-    
+
     /**
      * Returns the promise for the Addon construct
      * @param addOn

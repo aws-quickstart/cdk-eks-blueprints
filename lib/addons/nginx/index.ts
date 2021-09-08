@@ -117,7 +117,7 @@ export class NginxAddOn implements ClusterAddOn {
             version: props.version,
             values
         });
-        
+
         const asyncTasks = Promise.all(dependencies.values()).then((constructs) => {
             constructs.forEach((construct) => {
                 nginxHelmChart.node.addDependency(construct);
