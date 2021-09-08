@@ -1,6 +1,8 @@
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
+import { NestedStackAddOn } from '../lib';
+import { MyVpcStack } from './test-support';
 
 test('Usage tracking created', () => {
     const app = new cdk.App();
@@ -28,7 +30,7 @@ test('Blueprint builder creates correct stack', async () => {
     blueprint.account("123567891").region('us-west-1')
         .addons(new ssp.ArgoCDAddOn)
         .addons(new ssp.NginxAddOn)
-        .teams(new ssp.PlatformTeam({name: 'platform'}));
+        .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
     const stack1 = await blueprint.buildAsync(app, "stack-1");
 
@@ -41,7 +43,7 @@ test('Blueprint builder creates correct stack', async () => {
 
     const blueprint3 = ssp.EksBlueprint.builder().withBlueprintProps({
         addOns: [new ssp.ArgoCDAddOn],
-        name: 'my-blueprint3', 
+        name: 'my-blueprint3',
         id: 'my-blueprint3-id'
     });
 
@@ -49,7 +51,7 @@ test('Blueprint builder creates correct stack', async () => {
     assertBlueprint(stack3, 'argo-cd');
 });
 
-test('Pipeline Builder Creates correct pipeline', ()=> {
+test('Pipeline Builder Creates correct pipeline', () => {
 
     const app = new cdk.App();
 
@@ -58,7 +60,7 @@ test('Pipeline Builder Creates correct pipeline', ()=> {
         .region('us-west-1')
         .addons(new ssp.ArgoCDAddOn)
         .addons(new ssp.NginxAddOn)
-        .teams(new ssp.PlatformTeam({name: 'platform'}));
+        .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
     const pipeline = ssp.CodePipelineStack.builder()
         .name("ssp-pipeline-inaction")
@@ -68,15 +70,15 @@ test('Pipeline Builder Creates correct pipeline', ()=> {
             credentialsSecretName: 'github-token',
             name: 'my-iac-pipeline'
         })
-        .stage( {
+        .stage({
             id: 'us-east-1-ssp',
             stackBuilder: blueprint.clone('us-east-1'),
         })
-        .stage( {
+        .stage({
             id: 'us-east-2-ssp',
             stackBuilder: blueprint.clone('us-east-2')
         })
-        .stage( {
+        .stage({
             id: 'prod-ssp',
             stackBuilder: blueprint.clone('us-west-2'),
             stageProps: { manualApprovals: true }
@@ -87,12 +89,33 @@ test('Pipeline Builder Creates correct pipeline', ()=> {
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 });
 
-function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
-    for(let chart of charts) {
-        expectCDK(stack).to(haveResourceLike('Custom::AWSCDK-EKS-HelmChart', {
-                Chart: chart
-        }));
-    }    
+test("Nested stack add-on creates correct nested stack", async () => {
+    const app = new cdk.App();
+
+    const vpcAddOn = new NestedStackAddOn( {
+        builder: MyVpcStack.builder(),
+        id: "vpc-nested-stack"
+    });
     
+    const blueprint = ssp.EksBlueprint.builder();
+
+    blueprint.account("123567891").region('us-west-1')
+        .addons(vpcAddOn)
+        .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+    const parentStack =  await blueprint.buildAsync(app, "stack-with-nested");
+    const clusterInfo = parentStack.getClusterInfo();
+    expect(clusterInfo.getProvisionedAddOn("vpc-nested-stack")).toBeDefined();
+    
+});
+
+function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
+    for (let chart of charts) {
+        expectCDK(stack).to(haveResourceLike('Custom::AWSCDK-EKS-HelmChart', {
+            Chart: chart
+        }));
+    }
+
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 }
+
