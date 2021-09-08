@@ -252,7 +252,12 @@ export class EksBlueprint extends cdk.Stack {
         return vpc;
     }
 
-    private getAddOnNameorId(addOn: spi.ClusterAddOn) {
+    /**
+     * Returns AddOn Id if defined else returns the class name
+     * @param addOn 
+     * @returns 
+     */
+    private getAddOnNameorId(addOn: spi.ClusterAddOn): string {
         return addOn.id ?? addOn.constructor.name;
     }
 }
