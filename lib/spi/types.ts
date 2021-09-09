@@ -103,7 +103,7 @@ export class ClusterInfo {
      * @param addOn
      * @param promise
      */
-     public addpreProvisionedAddOn(addOn: string, promise: Promise<cdk.Construct>) {
+     public addPreProvisionedAddOn(addOn: string, promise: Promise<cdk.Construct>) {
         this.preProvisionedAddOns.set(addOn, promise);
     }
 
@@ -112,7 +112,7 @@ export class ClusterInfo {
      * @param addOn
      * @returns Promise<cdk.Construct>
      */
-    public getpreProvisionedAddOn(addOn: string): Promise<cdk.Construct> | undefined {
+    public getPreProvisionedAddOn(addOn: string): Promise<cdk.Construct> | undefined {
         return this.preProvisionedAddOns.get(addOn);
     }
 }
