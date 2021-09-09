@@ -158,15 +158,11 @@ export class EksBlueprint extends cdk.Stack {
 
         this.clusterInfo = clusterProvider.createCluster(this, vpc);
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
-        const promises = Array<Promise<cdk.Construct>>();
-        const addOnKeys: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
                 const addOnKey = this.getAddOnNameorId(addOn);
-                promises.push(result);
-                addOnKeys.push(addOnKey);
                 this.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
@@ -175,10 +171,15 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        this.asyncTasks = Promise.all(promises.values()).then((constructs) => {
+        const scheduledAddOns = this.clusterInfo.getAllScheduledAddons();
+        const addOnKeys = [...scheduledAddOns.keys()];
+        const promises = scheduledAddOns.values();
+
+        this.asyncTasks = Promise.all(promises).then((constructs) => {
             constructs.forEach((construct, index) => {
                 this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
+
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
                     team.setup(this.clusterInfo);

@@ -115,4 +115,12 @@ export class ClusterInfo {
     public getScheduledAddOn(addOn: string): Promise<cdk.Construct> | undefined {
         return this.scheduledAddOns.get(addOn);
     }
+
+    /**
+     * Returns all scheduled addons
+     * @returns scheduledAddOns: Map<string, Promise<cdk.Construct>>
+     */
+    public getAllScheduledAddons(): Map<string, Promise<cdk.Construct>> {
+        return this.scheduledAddOns;
+    }
 }
