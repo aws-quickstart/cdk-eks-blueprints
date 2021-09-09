@@ -53,7 +53,7 @@ export class ClusterInfo {
     readonly nodeGroup?: Nodegroup;
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
-    private readonly preProvisionedAddOns: Map<string, Promise<cdk.Construct>>;
+    private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
 
     /**
      * Constructor for ClusterInfo
@@ -71,7 +71,7 @@ export class ClusterInfo {
             }
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
-        this.preProvisionedAddOns = new Map<string, Promise<cdk.Construct>>();
+        this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
     /**
@@ -103,8 +103,8 @@ export class ClusterInfo {
      * @param addOn
      * @param promise
      */
-     public addPreProvisionedAddOn(addOn: string, promise: Promise<cdk.Construct>) {
-        this.preProvisionedAddOns.set(addOn, promise);
+     public addScheduledAddOn(addOn: string, promise: Promise<cdk.Construct>) {
+        this.scheduledAddOns.set(addOn, promise);
     }
 
     /**
@@ -112,7 +112,7 @@ export class ClusterInfo {
      * @param addOn
      * @returns Promise<cdk.Construct>
      */
-    public getPreProvisionedAddOn(addOn: string): Promise<cdk.Construct> | undefined {
-        return this.preProvisionedAddOns.get(addOn);
+    public getScheduledAddOn(addOn: string): Promise<cdk.Construct> | undefined {
+        return this.scheduledAddOns.get(addOn);
     }
 }

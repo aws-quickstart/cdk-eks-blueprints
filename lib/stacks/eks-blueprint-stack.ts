@@ -167,7 +167,7 @@ export class EksBlueprint extends cdk.Stack {
                 const addOnKey = this.getAddOnNameorId(addOn);
                 promises.push(result);
                 addOnKeys.push(addOnKey);
-                this.clusterInfo.addPreProvisionedAddOn(addOnKey, result);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
