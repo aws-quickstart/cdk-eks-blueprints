@@ -1,3 +1,5 @@
+import { TagType } from '@aws-cdk/core'
+
 export * from './appmesh'
 export * from './argocd'
 export * from './aws-loadbalancer-controller'
@@ -17,3 +19,13 @@ export * from './nested-stack'
 export class Constants {
     public static readonly SSP_ADDON = "ssp-addon";
 }
+
+
+export function dependsOn(...addons: string[]) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      console.log("addons", addons);
+      console.log("target", target);
+      console.log("propertykey", propertyKey);
+      console.log("descriptor", descriptor);
+    };
+  }

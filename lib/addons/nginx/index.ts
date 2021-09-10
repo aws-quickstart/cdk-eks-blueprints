@@ -1,5 +1,6 @@
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { dependsOn } from '..'
 
 /**
  * Properties available to configure the nginx ingress controller.
@@ -76,6 +77,7 @@ export class NginxAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
+    @dependsOn('awslbcontroller')
     deploy(clusterInfo: ClusterInfo): void {
 
         const props = this.options;

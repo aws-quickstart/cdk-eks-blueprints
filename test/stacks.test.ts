@@ -1,4 +1,5 @@
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
+import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
 import { NestedStackAddOn } from '../lib';
@@ -28,6 +29,9 @@ test('Blueprint builder creates correct stack', async () => {
     const blueprint = ssp.EksBlueprint.builder();
 
     blueprint.account("123567891").region('us-west-1')
+        .clusterProvider(new ssp.MngClusterProvider( {
+            version: KubernetesVersion.V1_20,
+        }))
         .addons(new ssp.ArgoCDAddOn)
         .addons(new ssp.NginxAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
