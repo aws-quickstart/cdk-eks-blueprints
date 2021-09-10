@@ -6,7 +6,7 @@ import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import * as spi from '../spi';
-import { withUsageTracking } from '../utils/usage-utils';
+import { withUsageTracking, getAddOnNameOrId } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -162,7 +162,7 @@ export class EksBlueprint extends cdk.Stack {
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                const addOnKey = this.getAddOnNameorId(addOn);
+                const addOnKey = getAddOnNameOrId(addOn);
                 this.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
@@ -251,14 +251,5 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         return vpc;
-    }
-
-    /**
-     * Returns AddOn Id if defined else returns the class name
-     * @param addOn 
-     * @returns 
-     */
-    private getAddOnNameorId(addOn: spi.ClusterAddOn): string {
-        return addOn.id ?? addOn.constructor.name;
     }
 }
