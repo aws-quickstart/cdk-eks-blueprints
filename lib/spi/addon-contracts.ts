@@ -10,6 +10,12 @@ import { Construct } from '@aws-cdk/core';
  * @returns Promise<cdk.Construct> | void
  */
 export declare interface ClusterAddOn {
+    
+    /** 
+     * Optional identifier of the addon. This is needed for add-ons that can be added multiple times to the blueprint.
+    */
+    id? : string;
+
     deploy(clusterInfo: ClusterInfo): Promise<Construct> | void;
 }
 

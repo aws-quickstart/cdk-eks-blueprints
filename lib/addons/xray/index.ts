@@ -3,8 +3,7 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
-import { createNamespace } from "../../utils/namespace-utils"
+import { loadYaml, readYamlDocument, createNamespace } from "../../utils";
 
 /**
  * Implementation of AWS X-Ray add-on for EKS SSP. Installs xray daemonset and exposes 
