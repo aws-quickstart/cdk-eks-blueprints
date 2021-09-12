@@ -4,9 +4,8 @@ import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks"
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 
 import * as spi from "../../spi";
-import { getSecretValue } from '../../utils/secrets-manager-utils';
+import { getSecretValue, btoa } from '../../utils';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
-import { btoa } from '../../utils/string-utils';
 import { Constants } from "..";
 
 /**

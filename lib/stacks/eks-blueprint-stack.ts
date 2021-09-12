@@ -5,8 +5,8 @@ import { StackProps } from '@aws-cdk/core';
 import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
-import { ClusterAddOn, Team, ClusterProvider, ClusterPostDeploy, AsyncStackBuilder } from '../spi';
-import { withUsageTracking } from '../utils/usage-utils';
+import * as spi from '../spi';
+import { withUsageTracking, getAddOnNameOrId } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -23,18 +23,18 @@ export class EksBlueprintProps {
     /**
      * Add-ons if any.
      */
-    readonly addOns?: Array<ClusterAddOn> = [];
+    readonly addOns?: Array<spi.ClusterAddOn> = [];
 
     /**
      * Teams if any
      */
-    readonly teams?: Array<Team> = [];
+    readonly teams?: Array<spi.Team> = [];
 
     /**
      * EC2 or Fargate are supported in the blueprint but any implementation conforming the interface
      * will work
      */
-    readonly clusterProvider?: ClusterProvider = new MngClusterProvider();
+    readonly clusterProvider?: spi.ClusterProvider = new MngClusterProvider();
 
     /**
      * Kubernetes version (must be initialized for addons to work properly)
@@ -53,7 +53,7 @@ export class EksBlueprintProps {
  * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
  * in accounts and regions. 
  */
-export class BlueprintBuilder implements AsyncStackBuilder {
+export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     private props: Partial<EksBlueprintProps>;
     private env: {
@@ -62,7 +62,7 @@ export class BlueprintBuilder implements AsyncStackBuilder {
     }
 
     constructor() {
-        this.props = { addOns: new Array<ClusterAddOn>(), teams: new Array<Team>() };
+        this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>() };
         this.env = {};
     }
 
@@ -86,12 +86,12 @@ export class BlueprintBuilder implements AsyncStackBuilder {
         return this;
     }
 
-    public addons(...addOns: ClusterAddOn[]): this {
+    public addons(...addOns: spi.ClusterAddOn[]): this {
         this.props = { ...this.props, ...{ addOns: this.props.addOns?.concat(addOns) } };
         return this;
     }
 
-    public clusterProvider(clusterProvider: ClusterProvider) {
+    public clusterProvider(clusterProvider: spi.ClusterProvider) {
         this.props = { ...this.props, ...{ clusterProvider: clusterProvider } };
         return this;
     }
@@ -101,7 +101,7 @@ export class BlueprintBuilder implements AsyncStackBuilder {
         return this;
     }
 
-    public teams(...teams: Team[]): this {
+    public teams(...teams: spi.Team[]): this {
         this.props = { ...this.props, ...{ teams: this.props.teams?.concat(teams) } };
         return this;
     }
@@ -130,7 +130,9 @@ export class EksBlueprint extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465hk";
 
-    private asyncTasks: Promise<any>;
+    private asyncTasks: Promise<void | cdk.Construct[]>;
+
+    private clusterInfo: spi.ClusterInfo;
 
     public static builder(): BlueprintBuilder {
         return new BlueprintBuilder();
@@ -154,35 +156,38 @@ export class EksBlueprint extends cdk.Stack {
         const version = blueprintProps.version ?? KubernetesVersion.V1_20
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
-        const clusterInfo = clusterProvider.createCluster(this, vpc);
-        const postDeploymentSteps = Array<ClusterPostDeploy>();
-        const promises = Array<Promise<cdk.Construct>>();
-        const addOnKeys: string[] = [];
+        this.clusterInfo = clusterProvider.createCluster(this, vpc);
+        const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result = addOn.deploy(clusterInfo);
+            const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                promises.push(result);
-                addOnKeys.push(addOn.constructor.name);
+                const addOnKey = getAddOnNameOrId(addOn);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
-            if ((postDeploy as ClusterPostDeploy).postDeploy !== undefined) {
-                postDeploymentSteps.push(<ClusterPostDeploy>postDeploy);
+            if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
+                postDeploymentSteps.push(<spi.ClusterPostDeploy>postDeploy);
             }
         }
 
-        this.asyncTasks = Promise.all(promises.values()).then((constructs) => {
+        const scheduledAddOns = this.clusterInfo.getAllScheduledAddons();
+        const addOnKeys = [...scheduledAddOns.keys()];
+        const promises = scheduledAddOns.values();
+
+        this.asyncTasks = Promise.all(promises).then((constructs) => {
             constructs.forEach((construct, index) => {
-                clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+                this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
+
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
-                    team.setup(clusterInfo);
+                    team.setup(this.clusterInfo);
                 }
             }
 
             for (let step of postDeploymentSteps) {
-                step.postDeploy(clusterInfo, blueprintProps.teams ?? []);
+                step.postDeploy(this.clusterInfo, blueprintProps.teams ?? []);
             }
         });
 
@@ -201,6 +206,15 @@ export class EksBlueprint extends cdk.Stack {
             });
         }
         return Promise.resolve(this);
+    }
+
+    /**
+     * This method returns all the constructs produced by during the cluster creation (e.g. add-ons).
+     * May be used in testing for verification.
+     * @returns cluster info object
+     */
+    getClusterInfo() : spi.ClusterInfo {
+        return this.clusterInfo;
     }
 
     private validateInput(blueprintProps: EksBlueprintProps) {

@@ -47,14 +47,14 @@ export default class BlueprintConstruct extends cdk.Construct {
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
-            new ssp.addons.NginxAddOn(),
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
             new ssp.addons.ClusterAutoScalerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
-            new ssp.addons.SSMAgentAddOn()
+            new ssp.addons.SSMAgentAddOn(),
+            new ssp.addons.NginxAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`
