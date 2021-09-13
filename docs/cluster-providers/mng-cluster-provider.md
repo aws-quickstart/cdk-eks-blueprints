@@ -32,8 +32,7 @@ THe `EC2ClusterProvider` supports the following configuration options.
 | instanceTypes         | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 | amiType               | The AMI type for the managed node group.
 | amiReleaseVersion     | The AMI Kuberenetes release version for the node group.
-| customAmi             | The custom AMI ID for the node group, `amiType` and `amiReleaseVersion` will be ignored if this is set.
-| userData              | The userData for worker node when using custom AMI, only applicable when customAmi is used.
+| customAmi             | The custom AMI and the userData for the node group, `amiType` and `amiReleaseVersion` will be ignored if this is set.
 | nodeGroupCapacityType | The capacity type for the node group (on demand or spot).
 | vpcSubnets            | The subnets for the cluster.
 | privateCluster        | public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
@@ -88,7 +87,9 @@ const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
     version: KubernetesVersion.V1_20,
     instanceTypes: [new InstanceType('t3.large')],
-    customAmi: MachineImage.genericLinux({'us-east-1': 'ami-0be34337b485b2609'}),
-    userData: userData,
+    customAmi: {
+        machineImage: MachineImage.genericLinux({'us-east-1': 'ami-0be34337b485b2609'}),
+        userData: userData,
+    },
 }
 ```
