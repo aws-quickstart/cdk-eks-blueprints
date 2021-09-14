@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
+import { EksBlueprintProps } from '../stacks';
 
 /**
  * Data type defining an application repository (git). 
@@ -47,7 +48,27 @@ export interface ApplicationRepository {
 }
 
 export class ResourceContext {
+
+    private readonly resources: Map<string, cdk.Construct> = new Map();
+    private readonly resourcesByType: Map<string, cdk.Construct> = new Map();
+    private readonly properties: EksBlueprintProps;
+
+    constructor(props: EksBlueprintProps) {
+        this.properties = props;
+    }
     
+    public add(name: string, type: string, resource: cdk.Construct) {
+        this.resources.set(name, resource);
+        this.resourcesByType.set(type, resource);
+    }
+
+    public get(name: string) : cdk.Construct | undefined {
+        return this.resources.get(name);
+    }
+
+    public byType(type: string) : cdk.Construct | undefined {
+        return this.resourcesByType.get(type);
+    }
 }
 
 export class ClusterInfo {
