@@ -6,7 +6,7 @@ import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import * as spi from '../spi';
-import { withUsageTracking } from '../utils/usage-utils';
+import { withUsageTracking, getAddOnNameOrId } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -158,14 +158,12 @@ export class EksBlueprint extends cdk.Stack {
 
         this.clusterInfo = clusterProvider.createCluster(this, vpc);
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
-        const promises = Array<Promise<cdk.Construct>>();
-        const addOnKeys: string[] = [];
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                promises.push(result);
-                addOnKeys.push(addOn.id ?? addOn.constructor.name);
+                const addOnKey = getAddOnNameOrId(addOn);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
@@ -173,10 +171,15 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        this.asyncTasks = Promise.all(promises.values()).then((constructs) => {
+        const scheduledAddOns = this.clusterInfo.getAllScheduledAddons();
+        const addOnKeys = [...scheduledAddOns.keys()];
+        const promises = scheduledAddOns.values();
+
+        this.asyncTasks = Promise.all(promises).then((constructs) => {
             constructs.forEach((construct, index) => {
                 this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
+
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
                     team.setup(this.clusterInfo);
