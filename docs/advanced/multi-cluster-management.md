@@ -1,15 +1,15 @@
-# Multi-Cluster Management
+# Multicluster management
 
-Multi-cluster management refers to the strategies associated with managing and updating cluster configuration across many Amazon EKS clusters. Infrastructure as code (IaC) tools like the AWS CDK provides the ability to bring automation and consistency when deploying your clusters. You need the ability to apply the same configurations to as many of your clusters as necessary and by defining all of your resources via Infrastructure as Code (IaC), it removes the problem of having to generate or apply custom YAML files for each one of your clusters allowing your teams to move faster. Defining your clusters resources using the AWS CDK allows your teams to focus on the underlying workloads as the infrastructure components will be taken care of via the AWS CDK. 
+Multicluster management refers to strategies associated with managing and updating your cluster configuration across Amazon EKS clusters. Infrastructure as code (IaC) tools, such as AWS CDK, provide automation and consistency when deploying clusters. You must have the ability to apply the same configurations to as many of your clusters as necessary. Using IaC to define your resources removes the problem of having to generate or apply custom YAML files for each cluster. Defining your cluster resources allows teams to focus on underlying workloads because the infrastructure components are handled by AWS CDK. 
 
-The main benefits organizations can see using the AWS CDK to manage their Amazon EKS clusters can be summarized as follows:
-- Consistency across all clusters and environments
-- Streamlining access control across your organization
-- Ease of management for multiple clusters
-- Access to GitOps methodologies and best practices
-- Automated lifecycle management for cluster deployment
+The benefits of using AWS CDK to manage Amazon EKS clusters include the following:
+- Consistency across clusters and environments.
+- Streamlining access control across an organization.
+- Management for multiple clusters.
+- Access to GitOps methodologies and best practices.
+- Automated lifecycle management for cluster deployment.
 
-The Amazon EKS SSP Quick Start references the [ssp-eks-patterns repository](https://github.com/aws-samples/ssp-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
+Amazon EKS SSP references the [ssp-eks-patterns repository](https://github.com/aws-samples/ssp-eks-patterns), which includes examples of deployment patterns and options for including patterns for multiple clusters that can be deployed across Regions. In the `main.ts` file in the patterns repository, the stacks that define an Amazon EKS cluster and its associated pipelines are deployed to different Regions, as shown in the following snippet:
 
 ```typescript
 #!/usr/bin/env node
@@ -40,7 +40,7 @@ const env = { account, region }
 new PipelineStack(app, 'pipeline', { env });
 ```
 
-Using the AWS CDK, you can define the specific region to deploy your clusters using environment variables as a construct in Typescript as shown in the example above. If you were to deploy all the stacks in your main.ts file you would be able to view your running clusters by region by running the following command
+Using AWS CDK, define the Region to deploy your clusters, and use environment variables as a construct in TypeScript, as shown in the previous example. If you deploy all of the stacks in your `main.ts` file, you can view your running clusters by Region using the following command:
 
 ```bash
 aws eks list-cluster --region <insert region>
@@ -50,14 +50,14 @@ If for example you chose the region us-west-2, you would get a similar output:
 ```json
 {
     "clusters": [
-        "all clusters in this region"
+        "all clusters in this Region"
     ]
 }
 ```
 
-## Multi-Region Management 
+## Multi-Region management 
 
-In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the ssp-ek-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
+In a production environment, it is common to have clusters in different locations. Clusters can be in different Regions, on-premises, or part of a hybrid cloud model. Some common design patterns that come into play for managing multiple clusters across operational models include aspects such as high availability, data replication, networking, and traffic routing. In the `ssp-ek-patterns/lib/` multi-Region-construct directory, there is an `index.ts` file that demonstrates how to deploy multiple clusters to different Regions, as shown in the following example:
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
@@ -96,4 +96,4 @@ export default class MultiRegionConstruct extends cdk.Construct {
     }
 }
 ```
-This construct imports all of the core components of the Shared Services Platform library, Teams construct, and Addons as modules which then deploys our clusters to different regions. The main point to take away from this is that we are adding automation and consistency to our clusters as we deploy multiple clusters to multiple regions since all of our components have already been defined in the Shared Services Platform library along with Teams and Addons. 
+This construct imports all of the core components of the Shared Services Platform library, the `Teams` construct, and `Addons` as modules that deploy clusters to different Regions. The take away from this is that we add automation and consistency to the clusters as we deploy them to multiple Regions. All of the components are defined in the Shared Services Platform library, along with `Teams` and `Addons`. 

@@ -1,10 +1,10 @@
 # Getting Started 
 
-This getting started guide will walk you through setting up a new CDK project which leverages the `cdk-eks-blueprint` NPM module to deploy a simple SSP. 
+This guide walks you through setting up a new CDK project that uses the `cdk-eks-blueprint` NPM module to deploy an SSP. 
 
 ## Project setup
 
-To use the `cdk-eks-blueprint` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
+To use the `cdk-eks-blueprint` module, you must have the [AWS Cloud Development Kit (AWS CDK)](https://aws.amazon.com/cdk/) installed. To install AWS CDK, follow these steps:
 
 ```bash
 npm install -g aws-cdk@1.113.0
@@ -24,13 +24,13 @@ cdk init app --language typescript
 
 ## Deploy a Blueprint EKS Cluster
 
-Install the `cdk-eks-blueprint` NPM package via the following.
+Install the `cdk-eks-blueprint` NPM package.
 
 ```bash
 npm i @shapirov/cdk-eks-blueprint
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
+Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root directory) using the following code. This code deploys a new Amazon EKS Cluster and installs the `ArgoCD` add-on.
 
 ```typescript
 import 'source-map-support/register';
@@ -58,7 +58,7 @@ new ssp.EksBlueprint(app, opts, {
 });
 ```
 
-Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
+Each combination of target account and Region must be bootstrapped prior to deploying stacks. Bootstrapping creates IAM roles and Lambda functions that can execute some of the common CDK constructs.
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment with the following command. 
 
@@ -66,28 +66,28 @@ Each combination of target account and region must be bootstrapped prior to depl
 cdk bootstrap
 ```
 
-Deploy the stack using the following command. This command will take roughly 20 minutes to complete.
+Run the following command to deploy the stack, which takes about 20 minutes to complete.
 
 ```
 cdk deploy
 ```
 
-Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprint`. The above code will provision the following:
+When you deploy your first EKS cluster using `cdk-eks-blueprint`, AWS CDK provisions the following in your cluster:
 
-- [x] A new Well-Architected VPC with both Public and Private subnets.
-- [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
-- [x] [Argo CD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
-- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
-- [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
-- [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
-- [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
-- [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
-- [x] AWS and Kubernetes resources needed to support [AWS X-Ray](https://aws.amazon.com/xray/).
+- [x] A well-architected virtual private cloud (VPC) with public and private subnets.
+- [x] A well-architected Amazon EKS cluster in the Region and account you specify.
+- [x] [NGINX](https://kubernetes.github.io/ingress-nginx/deploy/) to serve as a reverse proxy for your workloads. 
+- [x] [Argo CD](https://argoproj.github.io/argo-cd/) to support GitOps deployments. 
+- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) for network policies.
+- [x] [Kubernetes Metrics Server](https://github.com/kubernetes-sigs/metrics-server) for collecting metrics.
+- [x] AWS and Kubernetes resources to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
+- [x] AWS and Kubernetes resources to forward logs and metrics to [Amazon CloudWatch Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
+- [x] AWS and Kubernetes resources to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
+- [x] AWS and Kubernetes resources to support [AWS X-Ray](https://aws.amazon.com/xray/).
 
-## Cluster Access
+## Cluster access
 
-Once the deploy completes, you will see output in your terminal window similar to the following:
+When the deployment completes, you should see an output that is similar to the following:
 
 ```bash
 Outputs:
@@ -99,71 +99,71 @@ Stack ARN:
 arn:aws:cloudformation:us-east-1:115717706081:stack/east-test-1/e1b9e6a0-d5f6-11eb-8498-0a374cd00e27
 ```
 
-To update your Kubernetes config for you new cluster, copy and run the `east-test-1.easttest1ConfigCommand25ABB520` command (the second command) in your terminal. 
+To update your Kubernetes cluster configuration, run `east-test-1.easttest1ConfigCommand25ABB520`. 
 
 ```
 aws eks update-kubeconfig --name east-test-1 --region us-east-1 --role-arn <ROLE_ARN>
 ```
 
-Validate that you now have `kubectl` access to your cluster via the following:
+Validate that you now have Kubectl access to your cluster.
 
 ```
 kubectl get namespace
 ```
 
-You should see output that lists all namespaces in your cluster. 
+You should see an output that lists all of your cluster namespaces. 
 
-## Deploy workloads with Argo CD
+## Deploy workloads using Argo CD
 
-Next, let's walk you through how to deploy workloads to your cluster with Argo CD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
+Deploy your cluster workloads using Argo CD, which uses the [App of Apps Pattern](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) to deploy multiple workloads across multiple namespaces. For the sample App of Apps repository used here, see [SSP EKS Workloads](https://github.com/aws-samples/ssp-eks-workloads).
 
-### Install Argo CD CLI
+### Install the Argo CD CLI
 
-Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the Argo CD CLI was installed correctly using the following:
+For OS-specific installation instructions, see [Argo CD — Declarative GitOps CD for Kubernetes](https://argoproj.github.io/argo-cd/cli_installation/). To test the Argo CD CLI installation, run the following command:
 
 ```
 argocd version --short --client
 ```
 
-You should see output similar to the following:
+You should see an output that is similar to the following:
 
 ```
 argocd: v2.0.1+33eaf11.dirty
 ```
 
-### Exposing Argo CD
+### Expose Argo CD
 
-To access Argo CD running in your Kubernetes cluster, we can leverage [Kubernetes Port Forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/). To do so, first capture the ArgoCD service name in an environment variable.
+To access Argo CD in your Kubernetes cluster, see [Use Port Forwarding to Access Applications in a Cluster](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/). Note that you must first capture the Argo CD service name in an environment variable.
 
 ```
 export ARGO_SERVER=$(kubectl get svc -n argocd -l app.kubernetes.io/name=argocd-server -o name) 
 ```
 
-Next, in a new terminal tab, expose the service locally.
+In a new terminal, expose the service locally.
 
 ```
 kubectl port-forward $ARGO_SERVER -n argocd 8080:443
 ```
 
-Open your browser to http://localhost:8080 and you should see the ArgoCD login screen.
+In your browser, navigate to http://localhost:8080. You should see the Argo CD login screen.
 
 ![ArgoCD](assets/images/argo-cd.png)
 
-### Logging Into ArgoCD
+### Log in to Argo CD
 
-ArgoCD will create an `admin` user and password on a fresh install. To get the ArgoCD admin password, run the following.
+If you are installing Argo CD for the first time, Argo CD creates an `admin` user and password. To retrieve the Argo CD administrator password, run the following command:
 
 ```
 export ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
-While still port-forwarding, login via the following.
+During port forwarding, log in using the following command:
 
 ```
 argocd login localhost:8080 --username admin --password $ARGO_PASSWORD
 ```
 
-You can also login to the ArgoCD UI with generated password and the username `admin`. 
+Optionally, you can log in to the Argo CD UI using a generated password and the user name `admin`. 
 
 ```
 echo $ARGO_PASSWORD
@@ -171,7 +171,7 @@ echo $ARGO_PASSWORD
 
 ### Deploy workloads to your cluster
 
-Create a project in Argo by running the following command
+Create a project in Argo CD by running the following command:
 
 ```
 argocd proj create sample \
@@ -179,7 +179,7 @@ argocd proj create sample \
     -s https://github.com/aws-samples/ssp-eks-workloads.git
 ```
 
-Create the application within Argo by running the following command
+Create the application within Argo CD by running the following command:
 
 ```
 argocd app create dev-apps \
@@ -189,28 +189,28 @@ argocd app create dev-apps \
     --path "envs/dev"
 ```
 
-Sync the apps by running the following command
+Synchronize your applications by running the following command:
 
 ```
 argocd app sync dev-apps 
 ```
 
-### Validate deployments. 
+### Validate deployments 
 
-To validate your deployments, leverage `kubectl port-forwarding` to access the `guestbook-ui` service for `team-burnham`.
+To validate your deployments, use `kubectl port-forwarding` to access the `guestbook-ui` service for `team-burnham`.
 
 ```
 kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
 ```
 
-Open up `localhost:4040` in your browser and you should see the application.
+In your browser, navigate to `localhost:4040`. You should see your application.
 
-## Next Steps
+## Next steps
 
-For information on onboarding teams to your clusters, see [`Team` documentation](../teams). 
+For more information about onboarding teams to your clusters, see [`Team` documentation](../teams). 
 
-For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../ci-cd).
+For more information about deploying CD pipelines for your infrastructure, see [`Pipelines` documentation](../ci-cd).
 
-For information on supported add-ons, see [`Add-on` documentation](../addons)
+For more information about supported add-ons, see [`Add-on` documentation](../addons).
 
-For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](../workloads). 
+For more information about onboarding and managing workloads in your clusters, see [`Workload` documentation](../workloads). 
