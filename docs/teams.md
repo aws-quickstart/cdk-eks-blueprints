@@ -1,12 +1,12 @@
 # Teams
 
-The `cdk-eks-blueprint` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two `Team` types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` represent teams managing workloads running in cluster namespaces and `PlatformTeam` represents platform administrators who have admin access (masters group) to clusters.
+The `cdk-eks-blueprint` framework provides support for onboarding, managing, and configuring cluster access. It supports two team types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` manages workloads that run in cluster namespaces, and `PlatformTeam` is a platform for administrators who have access (masters group) to clusters.
 
-You are also able to create your own team implementations by creating classes that inherits from `Team`.
+You can create your own team implementations by creating classes that inherit from `ApplicationTeam`.
 
 ### ApplicationTeam 
 
-To create an `ApplicationTeam` for your cluster, simplye implement a class that extends `ApplicationTeam`. You will need to supply a team name and an array of users.  
+To create an `ApplicationTeam` for your cluster, implement a class that extends `ApplicationTeam`. You must supply a team name and an array of users.  
 
 ```typescript
 export class TeamAwesome extends ApplicationTeam {
@@ -23,17 +23,18 @@ export class TeamAwesome extends ApplicationTeam {
 }
 ```
 
-The `ApplicationTeam` will do the following:
+The `ApplicationTeam` class does the following:
 
-- Create a namespace
-- Register quotas
-- Register IAM users for cross-account access
-- Create a shared role for cluster access. Alternatively, an existing role can be supplied.
-- Register provided users/role in the `awsAuth` map for `kubectl` and console access to the cluster and namespace.
+- Create a namespace.
+- Registers quotas.
+- Registers IAM users for cross-account access.
+- Creates a shared role for cluster access. Optionally, an existing role can be used.
+- Registers users and roles in the `awsAuth` map for Kubectl.
+- Provides console access to the cluster and namespace.
 
 ### PlatformTeam 
 
-To create an `PlatformTeam` for your cluster, simplye implement a class that extends `PlatformTeam`. You will need to supply a team name and an array of users.  
+To create a `PlatformTeam` class for your cluster, implement a class that extends `PlatformTeam`. You must supply a team name and an array of users.  
 
 ```typescript
 export class TeamAwesome extends PlatformTeam {
@@ -51,10 +52,10 @@ export class TeamAwesome extends PlatformTeam {
 ```
 The `PlatformTeam` class does the following:
 
- - registers IAM users for admin access to the cluster (`kubectl` and console)
- - registers an existing role (or create a new role) for cluster access with trust relationship with the provided/created role
+ - Registers IAM users for administrator access to the cluster (Kubectl and console).
+ - Registers an existing role (or creates a new role) for cluster access with trust a relationship with the provided or created role.
  
-To reduce verbosity for some of the use cases, such as for platform teams, when in reality the use case is simply to enable admin cluster access for a specific role the blueprint provides support for add-hoc team creation as well. For example:
+To reduce verbosity for some use cases, such as for platform teams, the following use case enables administrator cluster access for a specific role, and the blueprint provides add-hoc support for creating teams:
 
 ```typescript
 const adminTeam = new PlatformTeam( {
@@ -65,25 +66,25 @@ const adminTeam = new PlatformTeam( {
 
 ### DefaultTeamRoles 
 
-The `DefaultTeamRoles` class provides default RBAC configuration for `ApplicationTeams`:
+The `DefaultTeamRoles` class provides a default RBAC configuration for `ApplicationTeams`:
 
- - Cluster role, group identity and cluster role bindings to view nodes and namespaces
- - Namespace role and role binding for the group to view pods, deployments, daemonsets, services
+ - Cluster role, group identity, and cluster role bindings for viewing nodes and namespaces.
+ - Namespace role and role binding for the group to view pods, deployments, daemonsets, and services.
 
-## Team Benefits 
+## Team benefits 
 
-By managing teams via infrastrucutre as code, we achieve the following benefits:
+Managing teams using infrastrucutre as code provides the following benefits:
 
-1. Self-documenting code
-2. Centralized logic related to the team
-3. Clear place where to add additional provisioning, for example adding Kubernetes Service Accounts and/or infrastructure, such as S3 buckets
-4. IDE support to locate the required team, e.g. CTRL+T in VSCode to lookup class name.
+1. Self-documenting code.
+2. Centralized logic related to the team.
+3. A location to add additional provisioning, such as adding Kubernetes service accounts and/or infrastructure (for example, S3 buckets).
+4. IDE support to locate a team (for example, `CTRL+T` in VSCode to look up a class name).
 
-The example above is shown for a platform team, but it could be similarly applied to a regular team with restricted access. 
+The previous example is intended for a platform team, but it can be applied to a team with restricted access. 
 
-## Cluster Access (`kubectl`)
+## Cluster access (Kubectl)
 
-The stack output will contain the `kubeconfig` update command, which should be shared with the development and platform teams.
+The stack output contains the `kubeconfig` update command, which should be shared with development and platform teams.
 
 ```
 ${teamname}teamrole	arn:aws:iam::${account}:role/west-dev-${teamname}AccessRole3CDA6927-1QA4S3TYMY36N
@@ -95,25 +96,20 @@ teamtroisaiamrole	arn:aws:iam::${account}:role/west-dev-westdevinfbackendRole861
 westdevConfigCommand1AE70258	aws eks update-kubeconfig --name west-dev --region us-west-1 --role-arn arn:aws:iam::${account}:role/west-dev-westdevMastersRole509E4B82-101MDZNTGFF08
 ```
 
-Note the last command is to update `kubeconfig` with the proper context to access cluster using `kubectl`. The last argument of this command is `--role-arn` which by default is set to the cluster master role. 
+Note that these commands update `kubeconfig` with the proper context to access clusters through Kubectl. The last argument of this command is `--role-arn`, which by default is set to the cluster master role. 
 
 Developers (members of each team) should use the role name for the team role, such as `burnhamteamrole` for team name `burnham`. 
-Platform administrators must use the role output for their team name, such as platformteamadmin in the above example.
+Platform administrators must use the role output for their team name, such as `platformteamadmin` in the previous example.
 
-## Console Access
+## Console access
 
-Provided that each team has recieved the name of the role that was created for the cluster access, each team member listed in the users section will be able to assume the role in the target account. 
-
-To do that, users should use "Switch Roles" function in the console and specify the provided role. This will enable EKS console access to list clusters and to get console visibility into the workloads that belong to the team. 
+If each team recieves the role name created for cluster access, each team member in the users section can assume the role in the target account. To do this, use the `Switch Roles` function in the console, and specify the role. This enables Amazon EKS console access to list clusters and get console visibility into the workloads that belong to the team. 
 
 ## Examples
 
-There are a few team examples under /teams folder.
+There are a few team examples in the `/teams` folder. The example for `team-burnham` includes a way to specify IAM users through a local or project CDK context. Project context is defined in `cdk.json` under the context key, and local context is defined in `~/.cdk.json` under the context key. 
 
-The example for team-burnham includes a way to specify IAM users through a local or project CDK context. 
-Project context is defined in `cdk.json` under context key and local context is defined in `~/.cdk.json` under context key. 
-
-Example:
+For example:
 
 ```
 ➜ cat ~/.cdk.json 

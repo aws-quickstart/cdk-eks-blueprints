@@ -1,14 +1,12 @@
 # Pipelines
 
-While it is convenient to leverage the CDK command line tool to deploy your first cluster, we recommend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure. 
+While it is convenient to use the CDK CLI to deploy your first cluster, we recommend setting up automated pipelines that deploy and update your Amazon EKS infrastructure. To accomplish this, use the [CDK Pipelines](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module, which uses AWS CodePipeline to create CI/CD pipelines that help to manage your infrastructure. 
 
-To accomplish this, the EKS SSP - Reference Solution leverages the [`Pipelines`](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module. This module makes it trivial to create Continuous Delivery (CD) pipelines via CodePipeline that are responsible for deploying and updating your infrastructure. 
-
-Additionally, the EKS SSP - Reference Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
+Additionally, SSP uses a GitHub integration that the pipelines CDK module provides in order to integrate CI/CD pipelines with GitHub. The result is that new configurations pushed to a GitHub repository that contain the CDK are automatically deployed.
 
 ## Creating a pipeline
 
-We can create a new `CodePipeline` resource via the following. 
+Create a new `CodePipeline` resource using the following code: 
 
 ```typescript
 import * as ssp from '@shapirov/cdk-eks-blueprint'
@@ -25,7 +23,7 @@ const pipeline = ssp.CodePipeline.build({
 
 ## Creating stages 
 
-Once our pipeline is created, we need to define a `stage` for the pipeline. To do so, we can wrap our `EksBlueprint` stack in a `cdk.Stage` object.  
+After you create a pipeline, define a stage for it by wrapping the `EksBlueprint` stack in a `cdk.Stage` object.  
 
 ```typescript
 import * as ssp from '@shapirov/cdk-eks-blueprint'
@@ -55,16 +53,16 @@ export class ClusterStage extends cdk.Stage {
 }
 ```
 
-## Adding stages to the pipeline. 
+## Adding stages to the pipeline 
 
-Once a stage is created, we simply add it to the pipeline. 
+Add a stage to your pipeline using the following commands: 
 
 ```typescript
 const dev = new ClusterStage(this, 'blueprint-stage-dev')
 pipeline.addApplicationStage(dev);
 ```
 
-Adding stages to deploy multiple pipelines is trivial. 
+Add stages to deploy multiple pipelines:
 
 ```typescript
 const dev = new ClusterStage(this, 'blueprint-stage-dev')
@@ -74,7 +72,7 @@ const test = new ClusterStage(this, 'blueprint-stage-test')
 pipeline.addApplicationStage(test);
 ```
 
-We can also add manual approvals for production stages. 
+Add manual approvals for production stages: 
 
 ```typescript
 const prod = new ClusterStage(this, 'blueprint-stage-prod')
@@ -83,7 +81,7 @@ pipeline.addApplicationStage(prod, {manualApprovals: true});
 
 ## Putting it all together
 
-The below code block contains the complete implementation of a CodePipeline that is responsible for deploying three different clusters across three different accounts by using three different pipeline stages. 
+The following code block contains an AWS CodePipeline implementation that uses three pipeline stages to deploy three clusters across three accounts: 
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
