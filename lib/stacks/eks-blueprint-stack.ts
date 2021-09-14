@@ -41,10 +41,7 @@ export class EksBlueprintProps {
      */
     readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
 
-    /**
-     * VPC
-     */
-    readonly vpc?: Vpc;
+    readonly namedResourceProviders?: Array<spi.NamedResourceProvider> = [];
 }
 
 
@@ -106,6 +103,11 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
+    public namedResourceProviders(...resourceProviders: spi.NamedResourceProvider[]): this {
+        this.props = { ...this.props, ...{ namedResourceProviders: this.props.namedResourceProviders?.concat(resourceProviders) } };
+        return this;
+    }
+
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps({ ...this.props })
             .account(account).region(region);
@@ -153,7 +155,7 @@ export class EksBlueprint extends cdk.Stack {
             vpc = this.initializeVpc(vpcId);
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_20
+        const version = blueprintProps.version ?? KubernetesVersion.V1_20;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpc);

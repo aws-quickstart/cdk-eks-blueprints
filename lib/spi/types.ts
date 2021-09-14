@@ -46,6 +46,10 @@ export interface ApplicationRepository {
 
 }
 
+export class ResourceContext {
+    
+}
+
 export class ClusterInfo {
 
     readonly cluster: Cluster;
@@ -89,12 +93,7 @@ export class ClusterInfo {
      * @returns undefined
      */
     public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
-        if (this.provisionedAddOns) {
-            return this.provisionedAddOns.get(addOn);
-        }
-        else {
-            return undefined;
-        }
+        return this.provisionedAddOns.get(addOn);
     }
 
     /**

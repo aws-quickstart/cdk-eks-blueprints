@@ -27,3 +27,7 @@ export declare interface ClusterAddOn {
 export declare interface ClusterPostDeploy {
     postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void;
 }
+
+export declare interface NamedResourceProvider {
+    provide(scope: Construct): Record<string, Construct>;
+}
