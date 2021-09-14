@@ -48,7 +48,6 @@ export default class BlueprintConstruct extends cdk.Construct {
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
-            new ssp.addons.NginxAddOn(),
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
             new ssp.addons.ClusterAutoScalerAddOn(),
@@ -56,11 +55,16 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn(),
+<<<<<<< HEAD
             new ssp.addons.NginxAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
             new ssp.addons.OpaGatekeeperAddOn()
+=======
+            new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.NginxAddOn(),
+>>>>>>> 10b88649 (Fixing addon dep issue)
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
