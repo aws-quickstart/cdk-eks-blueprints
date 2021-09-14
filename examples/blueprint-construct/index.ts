@@ -6,6 +6,7 @@ import * as ssp from '../../lib'
 
 // Example teams.
 import * as team from '../teams'
+import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 
 const burnhamManifestDir = './examples/teams/team-burnham/'
 const rikerManifestDir = './examples/teams/team-riker/'
@@ -57,7 +58,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.NginxAddOn()
         ];
 
-        const blueprintID = `${blueprintProps.id}-dev`
-        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, vpc: blueprintProps.vpc }, props)
+        const blueprintID = `${blueprintProps.id}-dev`;
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, namedResourceProviders: [new DirectVpcProvider(blueprintProps.vpc)]} , props);
     }
 }

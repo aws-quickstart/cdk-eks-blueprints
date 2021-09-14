@@ -7,6 +7,7 @@ import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import * as spi from '../spi';
 import { withUsageTracking, getAddOnNameOrId } from '../utils';
+import { VpcProvider } from '../resource-providers/vpc';
 
 export class EksBlueprintProps {
 
@@ -41,7 +42,13 @@ export class EksBlueprintProps {
      */
     readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
 
+    /**
+     * Named resource providers to leverage for cluster resources.
+     * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
+     * VPC for the cluster can be registed under the name of 'vpc' or as a single provider of type 
+     */
     readonly namedResourceProviders?: Array<spi.NamedResourceProvider> = [];
+
 }
 
 
@@ -146,19 +153,21 @@ export class EksBlueprint extends cdk.Stack {
         /*
         * Supported parameters
         */
-        let vpc: IVpc;
-        if (blueprintProps.vpc) {
-            vpc = blueprintProps.vpc;
-        }
-        else {
-            const vpcId = this.node.tryGetContext("vpc");
-            vpc = this.initializeVpc(vpcId);
+
+        const resourceContext = this.provideNamedResources(blueprintProps);
+
+        let vpcResource : spi.NamedResource<IVpc> | undefined = resourceContext.get('vpc') ?? resourceContext.byType(spi.ResourceType.Vpc);
+
+        if(!vpcResource) {
+            vpcResource = resourceContext.add(new VpcProvider());
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_20;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpc);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource.resource);
+        this.clusterInfo.setResourceContext(resourceContext);
+        
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
@@ -219,6 +228,17 @@ export class EksBlueprint extends cdk.Stack {
         return this.clusterInfo;
     }
 
+    private provideNamedResources(blueprintProps: EksBlueprintProps) : spi.ResourceContext {
+        const result = new spi.ResourceContext(this, blueprintProps);
+
+        for(let resourceProvider of blueprintProps.namedResourceProviders ?? []) {
+            result.add(resourceProvider);
+        }
+
+        return result;
+    }
+
+
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
         if (blueprintProps.teams) {
@@ -229,29 +249,5 @@ export class EksBlueprint extends cdk.Stack {
                 teamNames.add(e.name);
             });
         }
-    }
-
-    initializeVpc(vpcId: string): IVpc {
-        const id = this.node.id;
-        let vpc = undefined;
-
-        if (vpcId != null) {
-            if (vpcId === "default") {
-                console.log(`looking up completely default VPC`);
-                vpc = ec2.Vpc.fromLookup(this, id + "-vpc", { isDefault: true });
-            } else {
-                console.log(`looking up non-default ${vpcId} VPC`);
-                vpc = ec2.Vpc.fromLookup(this, id + "-vpc", { vpcId: vpcId });
-            }
-        }
-
-        if (vpc == null) {
-            // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
-            // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
-            // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
-            vpc = new ec2.Vpc(this, id + "-vpc");
-        }
-
-        return vpc;
     }
 }

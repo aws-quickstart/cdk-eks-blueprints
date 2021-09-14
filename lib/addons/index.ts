@@ -7,7 +7,7 @@ export * from './calico'
 export * from './container-insights'
 export * from './cluster-autoscaler'
 export * from './external-dns'
-export * from './external-dns/hosted-provider'
+export * from '../resource-providers/hosted-zone'
 export * from './metrics-server'
 export * from './nginx'
 export * from './xray'
@@ -19,13 +19,3 @@ export * from './nested-stack'
 export class Constants {
     public static readonly SSP_ADDON = "ssp-addon";
 }
-
-
-export function dependsOn(...addons: string[]) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-      console.log("addons", addons);
-      console.log("target", target);
-      console.log("propertykey", propertyKey);
-      console.log("descriptor", descriptor);
-    };
-  }

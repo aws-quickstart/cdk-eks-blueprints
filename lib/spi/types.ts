@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import { EksBlueprintProps } from '../stacks';
+import { NamedResourceProvider } from '.';
 
 /**
  * Data type defining an application repository (git). 
@@ -47,46 +48,71 @@ export interface ApplicationRepository {
 
 }
 
+/**
+ * General type for any named resource such as VPC, hosted zone, certificate. 
+ */
+export interface NamedResource<Type extends cdk.IResource = cdk.IResource> {
+    /**
+     * Name of the resource
+     */
+    readonly name: string,
+
+    /**
+     * Resource type. See {@link ResourceType} for an example of common resource types.
+     */
+    readonly type: string,
+
+    /**
+     * CDK Resource / construct.
+     */
+    readonly resource: Type
+}
+
+export enum ResourceType {
+    Vpc = 'Vpc',
+    HostedZone = 'HostedZone',
+    Certificate = 'Certificate'    
+}
+
 export class ResourceContext {
 
-    private readonly resources: Map<string, cdk.Construct> = new Map();
-    private readonly resourcesByType: Map<string, cdk.Construct> = new Map();
-    private readonly properties: EksBlueprintProps;
+    private readonly resources: Map<string, NamedResource> = new Map();
+    private readonly resourcesByType: Map<string, NamedResource> = new Map();
 
-    constructor(props: EksBlueprintProps) {
-        this.properties = props;
-    }
+    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
     
-    public add(name: string, type: string, resource: cdk.Construct) {
-        this.resources.set(name, resource);
-        this.resourcesByType.set(type, resource);
+    public add<T extends cdk.IResource = cdk.IResource>(provider: NamedResourceProvider<T>) : NamedResource<T> {
+        const resource = provider.provide(this);
+        console.assert(!this.resources.has(resource.name), `Overwriting ${resource.name} resource during execution is not allowed.`);
+        this.resources.set(resource.name, resource);
+        this.resourcesByType.set(resource.type, resource);
+        return resource;
     }
 
-    public get(name: string) : cdk.Construct | undefined {
-        return this.resources.get(name);
+    public get<T extends cdk.IResource = cdk.IResource>(name: string) : NamedResource<T> | undefined {
+        return <NamedResource<T>>this.resources.get(name);
     }
 
-    public byType(type: string) : cdk.Construct | undefined {
-        return this.resourcesByType.get(type);
+    public byType<T extends cdk.IResource = cdk.IResource>(type: string) : NamedResource<T> | undefined {
+        return <NamedResource<T>>this.resourcesByType.get(type);
     }
 }
 
+
 export class ClusterInfo {
 
-    readonly cluster: Cluster;
-    readonly version: KubernetesVersion;
     readonly nodeGroup?: Nodegroup;
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
+    private resourceContext: ResourceContext;
 
     /**
      * Constructor for ClusterInfo
      * @param props 
      */
-    constructor(cluster: Cluster, version: KubernetesVersion, nodeGroup?: Nodegroup | AutoScalingGroup) {
+    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, nodeGroup?: Nodegroup | AutoScalingGroup) {
         this.cluster = cluster;
-        this.version = version;
         if (nodeGroup) {
             if (nodeGroup instanceof Nodegroup) {
                 this.nodeGroup = nodeGroup;
@@ -97,6 +123,14 @@ export class ClusterInfo {
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
+    }
+
+    /**
+     * Injection method to provide resource context.
+     * @param resourceContext 
+     */
+    public setResourceContext(resourceContext: ResourceContext) {
+        this.resourceContext = resourceContext;
     }
 
     /**
@@ -143,4 +177,13 @@ export class ClusterInfo {
     public getAllScheduledAddons(): Map<string, Promise<cdk.Construct>> {
         return this.scheduledAddOns;
     }
+
+    public getNamedResource<T extends cdk.IResource>(name: string): T | undefined {
+        return this.resourceContext.get<T>(name)?.resource;
+    }
+
+    public getResourceByType<T extends cdk.IResource>(type: string): T | undefined {
+        return this.resourceContext.get<T>(type)?.resource;
+    }
+
 }
