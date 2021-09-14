@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
+import { EksBlueprintProps } from '../stacks';
 
 /**
  * Data type defining an application repository (git). 
@@ -46,6 +47,30 @@ export interface ApplicationRepository {
 
 }
 
+export class ResourceContext {
+
+    private readonly resources: Map<string, cdk.Construct> = new Map();
+    private readonly resourcesByType: Map<string, cdk.Construct> = new Map();
+    private readonly properties: EksBlueprintProps;
+
+    constructor(props: EksBlueprintProps) {
+        this.properties = props;
+    }
+    
+    public add(name: string, type: string, resource: cdk.Construct) {
+        this.resources.set(name, resource);
+        this.resourcesByType.set(type, resource);
+    }
+
+    public get(name: string) : cdk.Construct | undefined {
+        return this.resources.get(name);
+    }
+
+    public byType(type: string) : cdk.Construct | undefined {
+        return this.resourcesByType.get(type);
+    }
+}
+
 export class ClusterInfo {
 
     readonly cluster: Cluster;
@@ -53,6 +78,7 @@ export class ClusterInfo {
     readonly nodeGroup?: Nodegroup;
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
+    private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
 
     /**
      * Constructor for ClusterInfo
@@ -70,6 +96,7 @@ export class ClusterInfo {
             }
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
+        this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
     /**
@@ -87,11 +114,33 @@ export class ClusterInfo {
      * @returns undefined
      */
     public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
-        if (this.provisionedAddOns) {
-            return this.provisionedAddOns.get(addOn);
-        }
-        else {
-            return undefined;
-        }
+        return this.provisionedAddOns.get(addOn);
+    }
+
+    /**
+     * Set the preProvisionedAddOn map with the promise for the construct
+     * of the addon being provisioned
+     * @param addOn
+     * @param promise
+     */
+     public addScheduledAddOn(addOn: string, promise: Promise<cdk.Construct>) {
+        this.scheduledAddOns.set(addOn, promise);
+    }
+
+    /**
+     * Returns the promise for the Addon construct
+     * @param addOn
+     * @returns Promise<cdk.Construct>
+     */
+    public getScheduledAddOn(addOn: string): Promise<cdk.Construct> | undefined {
+        return this.scheduledAddOns.get(addOn);
+    }
+
+    /**
+     * Returns all scheduled addons
+     * @returns scheduledAddOns: Map<string, Promise<cdk.Construct>>
+     */
+    public getAllScheduledAddons(): Map<string, Promise<cdk.Construct>> {
+        return this.scheduledAddOns;
     }
 }

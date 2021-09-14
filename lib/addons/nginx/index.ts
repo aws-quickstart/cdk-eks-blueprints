@@ -1,3 +1,4 @@
+import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { dependsOn } from '..'
@@ -82,6 +83,17 @@ export class NginxAddOn implements ClusterAddOn {
 
         const props = this.options;
 
+        const dependencies = Array<Promise<Construct>>();
+        const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
+        console.assert(awsLoadBalancerControllerAddOnPromise, 'NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn');
+        dependencies.push(awsLoadBalancerControllerAddOnPromise!);
+
+        if (props.externalDnsHostname) {
+            const externalDnsAddOnPromise = clusterInfo.getScheduledAddOn('ExternalDnsAddon');
+            console.assert(externalDnsAddOnPromise, 'NginxAddOn has a dependency on ExternalDnsAddOn');
+            dependencies.push(externalDnsAddOnPromise!);
+        }
+
         const presetAnnotations = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
             'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': `${props.crossZoneEnabled}`,
@@ -100,7 +112,7 @@ export class NginxAddOn implements ClusterAddOn {
             }
         };
 
-        clusterInfo.cluster.addHelmChart("nginx-addon", {
+        const nginxHelmChart = clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
             repository: "https://helm.nginx.com/stable",
             release: Constants.SSP_ADDON,
@@ -108,5 +120,11 @@ export class NginxAddOn implements ClusterAddOn {
             version: props.version,
             values
         });
+
+        Promise.all(dependencies.values()).then((constructs) => {
+            constructs.forEach((construct) => {
+                nginxHelmChart.node.addDependency(construct);
+            });
+        }).catch(err => { throw new Error(err) });
     }
 }

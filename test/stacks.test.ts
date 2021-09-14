@@ -33,6 +33,7 @@ test('Blueprint builder creates correct stack', async () => {
             version: KubernetesVersion.V1_20,
         }))
         .addons(new ssp.ArgoCDAddOn)
+        .addons(new ssp.AwsLoadBalancerControllerAddOn)
         .addons(new ssp.NginxAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
@@ -63,6 +64,7 @@ test('Pipeline Builder Creates correct pipeline', () => {
         .account("123567891")
         .region('us-west-1')
         .addons(new ssp.ArgoCDAddOn)
+        .addons(new ssp.AwsLoadBalancerControllerAddOn)
         .addons(new ssp.NginxAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
