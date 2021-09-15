@@ -2,7 +2,8 @@ import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
-import { NestedStackAddOn } from '../lib';
+import { ExternalDnsAddon, ImportHostedZoneProvider, NestedStackAddOn, NginxAddOn } from '../lib';
+import { CreateCertificateProvider } from '../lib/resource-providers/certificate';
 import { MyVpcStack } from './test-support';
 
 test('Usage tracking created', () => {
@@ -113,6 +114,25 @@ test("Nested stack add-on creates correct nested stack", async () => {
     const clusterInfo = parentStack.getClusterInfo();
     expect(clusterInfo.getProvisionedAddOn("vpc-nested-stack")).toBeDefined();
     
+});
+
+test("Named resource providers are correctly registered and discovered", () => {
+    const app = new cdk.App();
+
+    const blueprint = ssp.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .namedResourceProviders(new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+        .namedResourceProviders(new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', 'my.domain.com'))
+        .addons(new ExternalDnsAddon({hostedZoneResources: ['my.domain.com']}))
+        .addons(new NginxAddOn({
+            certificateResourceName: 'domain-wildcard-cert',
+            externalDnsHostname: 'my.domain.com'
+        }))
+        .build(app, 'stack-with-resource-providers');
+    
+    expect(blueprint.getClusterInfo().getNamedResource('domain-wildcard-cert')).toBeDefined();
+    expect(blueprint.getClusterInfo().getNamedResource('my.domain.com')).toBeDefined();
+    expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
 });
 
 function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
