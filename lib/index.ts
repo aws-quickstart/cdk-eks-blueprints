@@ -12,3 +12,5 @@ export * as pipelines from './pipelines';
 
 export * from './cluster-providers'
 export * from './spi';
+
+export * from './resource-providers';

@@ -1,21 +1,18 @@
-import { NamedResourceProvider, ResourceType } from "..";
-import { ResourceContext, NamedResource } from "../spi";
+import { ResourceProvider } from "..";
+import { ResourceContext } from "../spi";
 import * as ec2 from '@aws-cdk/aws-ec2';
 
 /**
  * VPC resource provider 
  */
-export class VpcProvider implements NamedResourceProvider<ec2.IVpc> {
-    readonly name: string;
-    readonly type = ResourceType.Vpc;
+export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
 
-    constructor(name?: string, vpcId?: string) {
-        this.name = name ?? 'vpc';
+    constructor(vpcId?: string) {
         this.vpcId = vpcId;
     }
 
-    provide(context: ResourceContext): NamedResource<ec2.IVpc> {
+    provide(context: ResourceContext): ec2.IVpc {
         const id = context.scope.node.id;
         let vpc = undefined;
 
@@ -36,17 +33,14 @@ export class VpcProvider implements NamedResourceProvider<ec2.IVpc> {
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
         }
 
-        return {name: this.name, type: this.type, resource: vpc};
+        return vpc;
     }
 }
 
-export class DirectVpcProvider implements NamedResourceProvider<ec2.IVpc> {
-    readonly name  = 'vpc';
-    readonly type = ResourceType.Vpc;
+export class DirectVpcProvider implements ResourceProvider<ec2.IVpc> {
+     constructor(readonly vpc: ec2.IVpc) { }
 
-    constructor(readonly vpc: ec2.IVpc) { }
-
-    provide(context: ResourceContext): NamedResource<ec2.IVpc> {
-        return {name: this.name, type: this.type, resource: this.vpc }
+    provide(_context: ResourceContext): ec2.IVpc {
+        return this.vpc;
     }    
 }

@@ -1,12 +1,12 @@
-import { ClusterInfo, NamedResourceProvider } from "..";
+import { ResourceProvider } from "..";
 import * as r53 from '@aws-cdk/aws-route53';
 import { Role } from "@aws-cdk/aws-iam";
-import { ResourceContext, NamedResource, ResourceType } from "../spi";
+import { ResourceContext } from "../spi";
 
 /**
  * Simple lookup host zone provider
  */
-export class LookupHostedZoneProvider implements NamedResourceProvider<r53.IHostedZone> {
+export class LookupHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
 
     /**
      * @param hostedZoneName name of the host zone to lookup
@@ -14,23 +14,22 @@ export class LookupHostedZoneProvider implements NamedResourceProvider<r53.IHost
      */
     constructor(private hostedZoneName: string, private id?: string) { }
 
-    provide(context: ResourceContext): NamedResource<r53.IHostedZone> {
-        const hostedZone = r53.HostedZone.fromLookup(context.scope, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName });
-        return hostedZoneResource(this.hostedZoneName, hostedZone);
+    provide(context: ResourceContext): r53.IHostedZone {
+        return r53.HostedZone.fromLookup(context.scope, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName });
     }
 }
 /**
  * Direct import hosted zone provider, based on a known hosted zone ID. 
  * Recommended method if hosted zone id is known, as it avoids extra look-ups.
  */
-export class ImportHostedZoneProvider implements NamedResourceProvider<r53.IHostedZone> {
+export class ImportHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
 
     constructor(private hostedZoneId: string, private id?: string) { }
 
-    provide(context: ResourceContext): NamedResource<r53.IHostedZone> {
-        const hostedZone = r53.HostedZone.fromHostedZoneId(context.scope, this.id ?? `${this.hostedZoneId}-Import`, this.hostedZoneId);
-        return hostedZoneResource(hostedZone.zoneName, hostedZone);
+    provide(context: ResourceContext): r53.IHostedZone {
+        return r53.HostedZone.fromHostedZoneId(context.scope, this.id ?? `${this.hostedZoneId}-Import`, this.hostedZoneId);
     }
+
 }
 
 
@@ -68,10 +67,10 @@ export interface DelegatingHostedZoneProviderProps {
  * 
  * The delegation part allows routing subdomain entries to the child hosted zone in the workload account.
  */
-export class DelegatingHostedZoneProvider implements NamedResourceProvider<r53.IHostedZone> {
+export class DelegatingHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
     constructor(private options: DelegatingHostedZoneProviderProps) { }
 
-    provide(context: ResourceContext): NamedResource<r53.IHostedZone> {
+    provide(context: ResourceContext): r53.IHostedZone {
         const stack = context.scope;
 
         const subZone = new r53.PublicHostedZone(stack, `${this.options.subdomain}-SubZone`, {
@@ -108,14 +107,6 @@ export class DelegatingHostedZoneProvider implements NamedResourceProvider<r53.I
             delegationRole
         });
 
-        return hostedZoneResource(this.options.subdomain, subZone);
-    }
-}
-
-function hostedZoneResource(name: string, hostedZone: r53.IHostedZone) : NamedResource<r53.IHostedZone> {
-    return {
-        name: name,
-        type: ResourceType.HostedZone,
-        resource: hostedZone
+        return subZone;
     }
 }

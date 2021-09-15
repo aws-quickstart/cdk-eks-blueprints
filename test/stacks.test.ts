@@ -2,7 +2,7 @@ import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
-import { ExternalDnsAddon, ImportHostedZoneProvider, NestedStackAddOn, NginxAddOn } from '../lib';
+import { ApplicationTeam, AwsLoadBalancerControllerAddOn, ExternalDnsAddon, GlobalResources, ImportHostedZoneProvider, NestedStackAddOn, NginxAddOn } from '../lib';
 import { CreateCertificateProvider } from '../lib/resource-providers/certificate';
 import { MyVpcStack } from './test-support';
 
@@ -33,16 +33,16 @@ test('Blueprint builder creates correct stack', async () => {
         .clusterProvider(new ssp.MngClusterProvider( {
             version: KubernetesVersion.V1_20,
         }))
-        .addons(new ssp.ArgoCDAddOn)
-        .addons(new ssp.AwsLoadBalancerControllerAddOn)
-        .addons(new ssp.NginxAddOn)
+        .addOns(new ssp.ArgoCDAddOn)
+        .addOns(new ssp.AwsLoadBalancerControllerAddOn)
+        .addOns(new ssp.NginxAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
     const stack1 = await blueprint.buildAsync(app, "stack-1");
 
     assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
 
-    const blueprint2 = blueprint.clone('us-west-2', '1234567891').addons(new ssp.CalicoAddOn);
+    const blueprint2 = blueprint.clone('us-west-2', '1234567891').addOns(new ssp.CalicoAddOn);
     const stack2 = await blueprint2.buildAsync(app, 'stack-2');
 
     assertBlueprint(stack2, 'nginx-ingress', 'argo-cd', 'aws-calico');
@@ -64,9 +64,9 @@ test('Pipeline Builder Creates correct pipeline', () => {
     const blueprint = ssp.EksBlueprint.builder()
         .account("123567891")
         .region('us-west-1')
-        .addons(new ssp.ArgoCDAddOn)
-        .addons(new ssp.AwsLoadBalancerControllerAddOn)
-        .addons(new ssp.NginxAddOn)
+        .addOns(new ssp.ArgoCDAddOn)
+        .addOns(new ssp.AwsLoadBalancerControllerAddOn)
+        .addOns(new ssp.NginxAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
     const pipeline = ssp.CodePipelineStack.builder()
@@ -107,7 +107,7 @@ test("Nested stack add-on creates correct nested stack", async () => {
     const blueprint = ssp.EksBlueprint.builder();
 
     blueprint.account("123567891").region('us-west-1')
-        .addons(vpcAddOn)
+        .addOns(vpcAddOn)
         .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
     const parentStack =  await blueprint.buildAsync(app, "stack-with-nested");
@@ -116,22 +116,27 @@ test("Nested stack add-on creates correct nested stack", async () => {
     
 });
 
-test("Named resource providers are correctly registered and discovered", () => {
+test("Named resource providers are correctly registered and discovered", async () => {
     const app = new cdk.App();
 
-    const blueprint = ssp.EksBlueprint.builder()
+    const blueprint =  await ssp.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
-        .namedResourceProviders(new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
-        .namedResourceProviders(new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', 'my.domain.com'))
-        .addons(new ExternalDnsAddon({hostedZoneResources: ['my.domain.com']}))
-        .addons(new NginxAddOn({
-            certificateResourceName: 'domain-wildcard-cert',
+        .resourceProvider(GlobalResources.HostedZone ,new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+        .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
+        .addOns(new AwsLoadBalancerControllerAddOn())
+        .addOns(new ExternalDnsAddon({hostedZoneResources: [GlobalResources.HostedZone]}))
+        .addOns(new NginxAddOn({
+            certificateResourceName: GlobalResources.Certificate,
             externalDnsHostname: 'my.domain.com'
         }))
-        .build(app, 'stack-with-resource-providers');
+        .teams(new ApplicationTeam({
+            name: "appteam", namespace: "appteam-ns"
+        }))
+        .buildAsync(app, 'stack-with-resource-providers');
     
-    expect(blueprint.getClusterInfo().getNamedResource('domain-wildcard-cert')).toBeDefined();
-    expect(blueprint.getClusterInfo().getNamedResource('my.domain.com')).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(GlobalResources.Vpc)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(GlobalResources.HostedZone)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(GlobalResources.Certificate)).toBeDefined();
     expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
 });
 

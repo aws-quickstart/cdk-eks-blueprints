@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import { EksBlueprintProps } from '../stacks';
-import { NamedResourceProvider } from '.';
+import { ResourceProvider } from '.';
 
 /**
  * Data type defining an application repository (git). 
@@ -48,54 +48,28 @@ export interface ApplicationRepository {
 
 }
 
-/**
- * General type for any named resource such as VPC, hosted zone, certificate. 
- */
-export interface NamedResource<Type extends cdk.IResource = cdk.IResource> {
-    /**
-     * Name of the resource
-     */
-    readonly name: string,
-
-    /**
-     * Resource type. See {@link ResourceType} for an example of common resource types.
-     */
-    readonly type: string,
-
-    /**
-     * CDK Resource / construct.
-     */
-    readonly resource: Type
-}
-
-export enum ResourceType {
-    Vpc = 'Vpc',
-    HostedZone = 'HostedZone',
-    Certificate = 'Certificate'    
-}
-
 export class ResourceContext {
 
-    private readonly resources: Map<string, NamedResource> = new Map();
-    private readonly resourcesByType: Map<string, NamedResource> = new Map();
+    private readonly resources: Map<string, cdk.IResource> = new Map();
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
     
-    public add<T extends cdk.IResource = cdk.IResource>(provider: NamedResourceProvider<T>) : NamedResource<T> {
+    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
         const resource = provider.provide(this);
-        console.assert(!this.resources.has(resource.name), `Overwriting ${resource.name} resource during execution is not allowed.`);
-        this.resources.set(resource.name, resource);
-        this.resourcesByType.set(resource.type, resource);
+        console.assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
+        this.resources.set(name, resource);
         return resource;
     }
 
-    public get<T extends cdk.IResource = cdk.IResource>(name: string) : NamedResource<T> | undefined {
-        return <NamedResource<T>>this.resources.get(name);
+    public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
+        return <T>this.resources.get(name);
     }
+}
 
-    public byType<T extends cdk.IResource = cdk.IResource>(type: string) : NamedResource<T> | undefined {
-        return <NamedResource<T>>this.resourcesByType.get(type);
-    }
+export enum GlobalResources {
+    Vpc = 'vpc',
+    HostedZone = 'hosted-zone',
+    Certificate = 'certificate'
 }
 
 
@@ -123,6 +97,10 @@ export class ClusterInfo {
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
+    }
+
+    public getResourceContext(): ResourceContext {
+        return this.resourceContext;
     }
 
     /**
@@ -178,12 +156,13 @@ export class ClusterInfo {
         return this.scheduledAddOns;
     }
 
-    public getNamedResource<T extends cdk.IResource>(name: string): T | undefined {
-        return this.resourceContext.get<T>(name)?.resource;
+    public getResource<T extends cdk.IResource>(name: string): T | undefined {
+        return this.resourceContext.get<T>(name);
     }
 
-    public getResourceByType<T extends cdk.IResource>(type: string): T | undefined {
-        return this.resourceContext.get<T>(type)?.resource;
+    public getRequiredResource<T extends cdk.IResource>(name: string): T {
+        const result = this.resourceContext.get<T>(name);
+        console.assert(result, `Required resource ${name} is missing.`);
+        return result!;
     }
-
 }

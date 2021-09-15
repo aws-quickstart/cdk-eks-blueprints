@@ -29,6 +29,9 @@ export declare interface ClusterPostDeploy {
     postDeploy(clusterInfo: types.ClusterInfo, teams: Team[]): void;
 }
 
-export declare interface NamedResourceProvider<T extends IResource = IResource> {
-    provide(context: types.ResourceContext): types.NamedResource<T>;
+/** 
+ * Generic resource provider interface. 
+ **/
+export declare interface ResourceProvider<T extends IResource = IResource> {
+    provide(context: types.ResourceContext): T;
 }

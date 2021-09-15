@@ -1,8 +1,7 @@
 
 import * as cdk from '@aws-cdk/core';
-import * as ec2 from "@aws-cdk/aws-ec2";
 import { StackProps } from '@aws-cdk/core';
-import { IVpc, Vpc } from '@aws-cdk/aws-ec2';
+import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import * as spi from '../spi';
@@ -47,7 +46,7 @@ export class EksBlueprintProps {
      * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
      * VPC for the cluster can be registed under the name of 'vpc' or as a single provider of type 
      */
-    readonly namedResourceProviders?: Array<spi.NamedResourceProvider> = [];
+    readonly resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
 }
 
@@ -66,7 +65,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     constructor() {
-        this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>() };
+        this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
         this.env = {};
     }
 
@@ -90,7 +89,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public addons(...addOns: spi.ClusterAddOn[]): this {
+    public addOns(...addOns: spi.ClusterAddOn[]): this {
         this.props = { ...this.props, ...{ addOns: this.props.addOns?.concat(addOns) } };
         return this;
     }
@@ -110,8 +109,8 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public namedResourceProviders(...resourceProviders: spi.NamedResourceProvider[]): this {
-        this.props = { ...this.props, ...{ namedResourceProviders: this.props.namedResourceProviders?.concat(resourceProviders) } };
+    public resourceProvider(name: string, provider: spi.ResourceProvider): this {
+        this.props.resourceProviders?.set(name, provider);
         return this;
     }
 
@@ -156,18 +155,18 @@ export class EksBlueprint extends cdk.Stack {
 
         const resourceContext = this.provideNamedResources(blueprintProps);
 
-        let vpcResource : spi.NamedResource<IVpc> | undefined = resourceContext.get('vpc') ?? resourceContext.byType(spi.ResourceType.Vpc);
+        let vpcResource : IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
         if(!vpcResource) {
-            vpcResource = resourceContext.add(new VpcProvider());
+            vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_20;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource.resource);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
-        
+
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
@@ -231,8 +230,8 @@ export class EksBlueprint extends cdk.Stack {
     private provideNamedResources(blueprintProps: EksBlueprintProps) : spi.ResourceContext {
         const result = new spi.ResourceContext(this, blueprintProps);
 
-        for(let resourceProvider of blueprintProps.namedResourceProviders ?? []) {
-            result.add(resourceProvider);
+        for(let [key, value] of blueprintProps.resourceProviders ?? []) {
+            result.add(key, value);
         }
 
         return result;

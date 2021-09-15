@@ -59,8 +59,8 @@ export class ExternalDnsAddon implements ClusterAddOn {
 
         const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
 
-        const hostedZones = this.options.hostedZoneResources.map(e => clusterInfo.getNamedResource<IHostedZone>(e));
-
+        const hostedZones = this.options.hostedZoneResources.map(e => clusterInfo.getRequiredResource<IHostedZone>(e));
+    
         sa.addToPrincipalPolicy(
             new PolicyStatement({
                 effect: Effect.ALLOW,

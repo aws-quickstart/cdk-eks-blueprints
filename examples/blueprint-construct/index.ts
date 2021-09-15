@@ -59,6 +59,13 @@ export default class BlueprintConstruct extends cdk.Construct {
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
-        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, namedResourceProviders: [new DirectVpcProvider(blueprintProps.vpc)]} , props);
+
+        const resourceProviders = new Map<string, ssp.ResourceProvider>();
+
+        if(blueprintProps.vpc) {
+            resourceProviders.set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
+        } 
+
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, resourceProviders }, props);
     }
 }

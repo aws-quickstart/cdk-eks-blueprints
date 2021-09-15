@@ -1,4 +1,3 @@
-import { TagType } from '@aws-cdk/core'
 
 export * from './appmesh'
 export * from './argocd'

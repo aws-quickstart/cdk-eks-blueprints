@@ -1,8 +1,6 @@
 import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import {ImportCertificateProvider, CreateCertificateProvider}  from "../../resource-providers/certificate";
-import { AcmCertificateArn } from "aws-sdk/clients/iot";
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 
 
@@ -87,7 +85,7 @@ export class NginxAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const props = this.options;
         const dependencies = Array<Promise<Construct>>();
         const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
@@ -112,7 +110,7 @@ export class NginxAddOn implements ClusterAddOn {
 
         if(props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
-            const certificate = clusterInfo.getNamedResource<ICertificate>(props.certificateResourceName);
+            const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
         }
 
@@ -139,5 +137,7 @@ export class NginxAddOn implements ClusterAddOn {
                 nginxHelmChart.node.addDependency(construct);
             });
         }).catch(err => { throw new Error(err) });
+
+        return Promise.resolve(nginxHelmChart);
     }
 }
