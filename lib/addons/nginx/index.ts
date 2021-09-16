@@ -90,7 +90,7 @@ export class NginxAddOn implements ClusterAddOn {
         const dependencies = Array<Promise<Construct>>();
         const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
         
-        console.assert(awsLoadBalancerControllerAddOnPromise, 'NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn');
+        console.assert(awsLoadBalancerControllerAddOnPromise, `NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn for stack ${clusterInfo.cluster.stack.stackName}`);
         dependencies.push(awsLoadBalancerControllerAddOnPromise!);
 
         if (props.externalDnsHostname) {
