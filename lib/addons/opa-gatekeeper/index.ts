@@ -10,7 +10,7 @@ export interface OpaGatekeeperAddOnProps {
     namespace?: string;
     /**
      * Helm chart version to use to install.
-     * @default 3.6.0-beta.3
+     * @default 3.6.0
      */
     version?: string;
     /**
@@ -25,14 +25,18 @@ export interface OpaGatekeeperAddOnProps {
  */
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'kube-system',
-    version: '3.6.0-beta.3',
+    version: '3.6.0',
     values: {}
 };
-export class OpaGatekeeperAddOn implements OpaGatekeeperAddOn {
+
+export class OpaGatekeeperAddOn implements ClusterAddOn {
+    
     readonly options: OpaGatekeeperAddOnProps;
+    
     constructor(props?: OpaGatekeeperAddOnProps) {
         this.options = { ...defaultProps, ...props };
     }
+
     deploy(clusterInfo: ClusterInfo): void {
         const props = this.options;
         const values = props.values ?? {}
