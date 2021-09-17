@@ -57,7 +57,7 @@ export interface NginxAddOnProps {
     certificateResourceName? : string,
 
     /**
-     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
+     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#:
      */
     values?: {
         [key: string]: any;
@@ -74,6 +74,7 @@ const defaultProps: NginxAddOnProps = {
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
+    namespace: "kube-system",
     values: {}
 };
 

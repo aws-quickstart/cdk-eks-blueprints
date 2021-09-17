@@ -116,7 +116,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps({ ...this.props })
-            .account(account).region(region);
+            .account(account?? this.env.account).region(region?? this.env.region);
     }
 
     public build(scope: cdk.Construct, id: string, stackProps?: StackProps): EksBlueprint {
