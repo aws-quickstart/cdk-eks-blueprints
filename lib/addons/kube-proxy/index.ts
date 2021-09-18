@@ -1,7 +1,10 @@
 import { CfnAddon } from "@aws-cdk/aws-eks";
 import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterInfo } from "../../spi";
 
+/**
+ * Implementation of KubeProxy EKS add-on.
+ */
 export class KubeProxyAddOn implements ClusterAddOn {
 
     version: string;

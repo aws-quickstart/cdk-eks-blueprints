@@ -1,8 +1,10 @@
-Kube-proxy Amazon EKS Add-on
+# Kube-proxy Amazon EKS Add-on
 
 The `Kube-proxy Amazon EKS Add-on` adds support for [kube-proxy](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy).
 
-Kube-proxy maintains network rules on each Amazon EC2 node. Installing Kube-proxy as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update add-ons. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazn EKS clusters are secure and stable.
+Kube-proxy maintains network rules on each Amazon EC2 node. It enables network communication to your pods. Kube-proxy is not deployed to Fargate nodes. For more information, see [ kube-proxy ](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy) in the Kubernetes documentation.
+
+Installing Kube-proxy as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update add-ons. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazon EKS clusters are secure and stable.
 
 Amazon EKS automatically installs Kube-proxy as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
@@ -61,4 +63,4 @@ v1.19.6-eksbuild.2
 ```
 ## Functionality
 
-Applies Kube-proxy add-on to Amazon EKS cluster. Kube-proxy maintains network rules on each Amazon EC2 node. It enables network communication to your pods. Kube-proxy is not deployed to Fargate nodes. For more information, see [ kube-proxy ](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy) in the Kubernetes documentation.
+Applies Kube-proxy add-on to Amazon EKS cluster.

@@ -128,8 +128,8 @@ This will provision the following:
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
 - [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
-- [x] [VPCCni] | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.
-- [x] [CoreDNS] | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
+- [x] [VpcCni] | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.
+- [x] [CoreDns] | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
 - [x] [KubeProxy] | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node
 
 ---

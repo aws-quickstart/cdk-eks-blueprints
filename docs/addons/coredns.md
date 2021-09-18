@@ -1,8 +1,10 @@
-CoreDNS Amazon EKS Add-on
+# CoreDNS Amazon EKS Add-on
 
 The `CoreDNS Amazon EKS Add-on` adds support for [CoreDNS](https://kubernetes.io/docs/tasks/administer-cluster/coredns/).
 
-CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS. Installing CoreDNS as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update add-ons. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazn EKS clusters are secure and stable.
+CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS. The CoreDNS Pods provide name resolution for all Pods in the cluster. For more information about CoreDNS, see [ Using CoreDNS for Service Discovery](https://kubernetes.io/docs/tasks/administer-cluster/coredns/) in the Kubernetes documentation.
+
+Installing CoreDNS as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update CoreDNS. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazon EKS clusters are secure and stable.
 
 Amazon EKS automatically installs CoreDNS as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
@@ -45,7 +47,7 @@ v1.7.0-eksbuild.1
 False
 ```
 # Validation
-To validate that coredns add-on is running, ensure that both the coredns pods are in Running state
+To validate that coredns add-on is running, ensure that both the coredns pods are in Running state.
 ```bash
 $ kubectl get pods  -n kube-system|grep coredns
 NAME                           READY    STATUS    RESTARTS     AGE
@@ -65,4 +67,4 @@ v1.8.0-eksbuild.1
 
 ## Functionality
 
-Applies CoreDNS add-on to Amazon EKS cluster. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS. The CoreDNS Pods provide name resolution for all Pods in the cluster. For more information about CoreDNS, see [ Using CoreDNS for Service Discovery](https://kubernetes.io/docs/tasks/administer-cluster/coredns/) in the Kubernetes documentation.
+Applies CoreDNS add-on to an Amazon EKS cluster. 

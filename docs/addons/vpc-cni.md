@@ -1,8 +1,10 @@
-VPC CNI Amazon EKS Add-on
+# VPC CNI Amazon EKS Add-on
 
 The `VPC CNI Amazon EKS Add-on` adds support for `Amazon VPC Container Network Interface (CNI)` plugin.
 
-Amazon EKS supports native VPC networking with the Amazon VPC Container Network Interface (CNI) plugin for Kubernetes. Using this plugin allows Kubernetes pods to have the same IP address inside the pod as they do on the VPC network.  Installing VPC CNI as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update add-ons. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazn EKS clusters are secure and stable.
+Amazon EKS supports native VPC networking with the Amazon VPC Container Network Interface (CNI) plugin for Kubernetes. Using this plugin allows Kubernetes pods to have the same IP address inside the pod as they do on the VPC network. For more information, see [Pod networking (CNI)](https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html).
+
+Installing VPC CNI as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html) will reduce the amount of work that is needed to do in order to install, configure, and update add-ons. It includes the latest security patches, bug fixes and is validated by AWS to work with Amazon EKS. This ensures that Amazon EKS clusters are secure and stable.
 
 Amazon EKS automatically installs VPC CNI as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
@@ -53,7 +55,7 @@ v1.6.3-eksbuild.2
 False
 ```  
 # Validation
-To validate that vpc-cni add-on is running, ensure that the pod is in Running state
+To validate that vpc-cni add-on is running, ensure that the pod is in Running state.
 
 ```
 $ kubectl get pods  -n kube-system|grep aws-node
@@ -74,4 +76,4 @@ v1.7.5-eksbuild.2
 
 ## Functionality
 
-Applies VPC CNI add-on to Amazon EKS cluster. Amazon EKS supports native VPC networking with the Amazon VPC Container Network Interface (CNI) plugin for Kubernetes. Using this plugin allows Kubernetes pods to have the same IP address inside the pod as they do on the VPC network. For more information, see [Pod networking (CNI)](https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html).
+Applies VPC CNI add-on to Amazon EKS cluster.

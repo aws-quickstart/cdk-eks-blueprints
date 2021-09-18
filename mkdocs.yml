@@ -18,7 +18,7 @@ nav:
     - ArgoCD: 'addons/argo-cd.md'
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - Calico: 'addons/calico.md'
-    - CoreDNS: 'addons/coredns.md'
+    - CoreDns: 'addons/coredns.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
     - External DNS: 'addons/external-dns.md'
@@ -27,7 +27,7 @@ nav:
     - Nginx: 'addons/nginx.md'
     - SSM Agent: 'addons/ssm-agent.md'
     - Secrets Store: 'addons/secrets-store.md'
-    - VPC Cni: 'addons/vpc-cni.md'
+    - Vpc Cni: 'addons/vpc-cni.md'
     - Weave GitOps: 'https://github.com/weaveworks/weave-gitops-ssp-addon'
     - AWS XRay: 'addons/xray.md'
   - Cluster Providers: 
