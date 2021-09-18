@@ -103,6 +103,22 @@ export class VeleroAddOn implements ClusterAddOn {
                 publicReadAccess: false,
                 versioned: false
             });
+
+            // S3 Bucket Policy for SSL Access
+            bucket.addToResourcePolicy(
+                new iam.PolicyStatement({
+                    sid: 'DenyHTTPTraffic',
+                    effect: iam.Effect.DENY,
+                    actions: ['s3:*'],
+                    resources: [bucket.arnForObjects('*')],
+                    principals: [new iam.AnyPrincipal()],
+                    conditions:{
+                        Bool:{
+                            'aws:SecureTransport': 'false',
+                        }
+                    }
+                })
+            );            
             // Create S3 VPC Endpoint for the Velero pod to access S3 via VPC Endpoint instead of going to internet
             cluster.vpc.addGatewayEndpoint('velero-backup-bucket-vpcEndPoint', {
                 service: GatewayVpcEndpointAwsService.S3
