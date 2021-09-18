@@ -3,9 +3,8 @@ import { Constants } from "..";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
 import * as kms from "@aws-cdk/aws-kms";
-import deepmerge = require('deepmerge');
 import { GatewayVpcEndpointAwsService } from "@aws-cdk/aws-ec2";
-
+import deepmerge = require('deepmerge');
 
 /**
  * Configuration options for the add-on.
@@ -81,6 +80,7 @@ export class VeleroAddOn implements ClusterAddOn {
     private options: VeleroAddOnProps;
     constructor(props?: VeleroAddOnProps) {
         if (props) {
+            // deepmerge the nested json files
             this.options = deepmerge(defaultProps, props);
         }
         else {
@@ -92,11 +92,11 @@ export class VeleroAddOn implements ClusterAddOn {
         const cluster = clusterInfo.cluster;
         const props = this.options;
         
-        let bucketName: string;
-        let veleroNamespace: string;
-        let kmsKeyId: null|string;
+        let bucketName: string; // AWS S3 Bucketname
+        let veleroNamespace: string; // K8s namespace that Velero get deployed onto
+        let kmsKeyId: null|string; // the KMS key id to access the AWS S3 Bucket
        
-        // Create S3 bucket if no existing bucket, create s3 bucket
+        // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
         if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
              const s3Key = new kms.Key(cluster, 'velero-backup-bucket-s3CMK',{
@@ -104,23 +104,16 @@ export class VeleroAddOn implements ClusterAddOn {
              });
              const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
                 encryption: s3.BucketEncryption.KMS,
-                blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+                blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
                 publicReadAccess: false,
                 encryptionKey: s3Key,
-                versioned: true,
-                //lifecycleRules:[{
-                //    expiration: Duration.days(365),
-                //    transitions:[{
-                //        storageClass:StorageClass.INFREQUENT_ACCESS,
-                //        transitionAfter: Duration.days(30)
-                //    }
-                //]
-                //}]
+                versioned: true
             });
-            // Create S3 VPC Endpoint
+            // Create S3 VPC Endpoint for the Velero pod to access S3 via VPC Endpoint instead of going to internet
             cluster.vpc.addGatewayEndpoint('velero-backup-bucket-vpcEndPoint', {
                 service: GatewayVpcEndpointAwsService.S3
             })
+            // S3 Bucket Policy for Encryption in Rest using CMK
             bucket.addToResourcePolicy(
                 new iam.PolicyStatement({
                     sid: 'ForceCMKAtUpload',
@@ -135,20 +128,21 @@ export class VeleroAddOn implements ClusterAddOn {
                     },
                 }),
             );
-            //bucket.addToResourcePolicy(
-            //    new iam.PolicyStatement({
-            //        sid: 'DenyHTTPTraffic',
-            //        effect: iam.Effect.DENY,
-            //        actions: ['s3:*'],
-            //        resources: [bucket.arnForObjects('*')],
-            //        principals: [new iam.AnyPrincipal()],
-            //        conditions:{
-            //            Bool:{
-            //                'aws:SecureTransport': 'false',
-            //            }
-            //        }
-            //    })
-            //)
+            // S3 Bucket Policy for SSL Access
+            bucket.addToResourcePolicy(
+                new iam.PolicyStatement({
+                    sid: 'DenyHTTPTraffic',
+                    effect: iam.Effect.DENY,
+                    actions: ['s3:*'],
+                    resources: [bucket.arnForObjects('*')],
+                    principals: [new iam.AnyPrincipal()],
+                    conditions:{
+                        Bool:{
+                            'aws:SecureTransport': 'false',
+                        }
+                    }
+                })
+            );
             bucketName = bucket.bucketName
             kmsKeyId = s3Key.keyId;
         }
@@ -159,6 +153,7 @@ export class VeleroAddOn implements ClusterAddOn {
 
         // Create Namespace if not specified
         if (props.namespace){
+            // Create Namespace if the 'create' option is false
             if (props.namespace.create) {
                 console.log ("namespace:" + props.namespace.name + " does not existed, creating")
                 cluster.addManifest('velero-namespace',
@@ -181,7 +176,7 @@ export class VeleroAddOn implements ClusterAddOn {
             veleroNamespace = 'velero'; // initial value of veleroNamespace
         }
 
-        // Setup IAM Role for Service Accounts (IRSA)
+        // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account
         const veleroServiceAccount = cluster.addServiceAccount (
             'velero-account',
             {
@@ -213,13 +208,7 @@ export class VeleroAddOn implements ClusterAddOn {
                     "s3:DeleteObject",
                     "s3:PutObject",
                     "s3:AbortMultipartUpload",
-                    "s3:ListMultipartUploadParts"
-                ],
-                "Resource": "*"
-              },
-              {
-                "Effect": "Allow",
-                "Action": [
+                    "s3:ListMultipartUploadParts",
                     "s3:ListBucket"
                 ],
                 "Resource": "*"
@@ -227,16 +216,10 @@ export class VeleroAddOn implements ClusterAddOn {
               {
                 "Effect": "Allow",
                 "Action": [
-                    "kms:*"
+                    "kms:Decrypt",
+                    "kms:GenerateDataKey"
                 ],
                 "Resource": "*"                  
-              },
-              {
-                  "Effect": "Allow",
-                  "Action":[
-                      "ec2:*VpcEndpoint*"
-                  ],
-                  "Resource": "*"
               }
             ]
         };
@@ -246,9 +229,6 @@ export class VeleroAddOn implements ClusterAddOn {
             document: veleroCustomPolicyDocument
         });
         veleroServiceAccount.role.addManagedPolicy(veleroPolicy);
-
-        
-        //const values:VeleroAddOnProps["values"] = props.values
 
         const valueVariable:VeleroAddOnProps = {
             values: {
