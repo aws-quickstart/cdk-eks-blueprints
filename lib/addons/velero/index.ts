@@ -2,6 +2,9 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Constants } from "..";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
+import * as kms from "@aws-cdk/aws-kms";
+import deepmerge = require('deepmerge');
+import { GatewayVpcEndpointAwsService } from "@aws-cdk/aws-ec2";
 
 
 /**
@@ -13,19 +16,7 @@ export interface VeleroAddOnProps {
      * @default 2.23.6
      */
     version?: string;
-
-    /**
-     * Velero requires AWS S3 bucket as the storage location. This option is checking whether an existing S3 bucket is provided
-     * @default ''
-     */
-    existingS3BucketName?: string;
-
-    /**
-     * Velero requires AWS S3 bucket as the storage location. This option is to specify which region the s3Bucket will be created
-     * Optional
-     */
-     s3BucketRegion?: string;    
-
+   
     /**
      * Namespace for the add-on. If the namespace does not exist, specify create to false
      * @default {namespace: 'velero', create: true}
@@ -33,12 +24,6 @@ export interface VeleroAddOnProps {
     namespace?:  {
         [key: string]: any;
     };
-
-    /**
-     * Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
-     * @default aws
-     */
-    initContainers?: Array<any>;
 
      /**
      * Values to pass to the chart as per https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml#
@@ -59,20 +44,20 @@ const defaultProps: VeleroAddOnProps = {
         name: 'velero',
         create: true
     },
-    initContainers:[
-        {
-            name: "velero-plugin-for-aws",
-            image: "velero/velero-plugin-for-aws:v1.2.0",
-            imagePullPolicy: "IfNotPresent",
-            volumeMounts:[
-                {
-                    mountPath: "/target",
-                    name: "plugins"
-                }
-            ]
-        }
-    ],
     values:{
+        initContainers:[
+            {
+                name: "velero-plugin-for-aws",
+                image: "velero/velero-plugin-for-aws:v1.2.0",
+                imagePullPolicy: "IfNotPresent",
+                volumeMounts:[
+                    {
+                        mountPath: "/target",
+                        name: "plugins"
+                    }
+                ]
+            }
+        ],
         configuration: {
             provider: "aws",
             backupStorageLocation:{
@@ -95,31 +80,84 @@ export class VeleroAddOn implements ClusterAddOn {
 
     private options: VeleroAddOnProps;
     constructor(props?: VeleroAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        if (props) {
+            this.options = deepmerge(defaultProps, props);
+        }
+        else {
+            this.options = defaultProps
+        }
     }
 
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         const props = this.options;
-
+        
         let bucketName: string;
-        let veleroNamespace = 'velero'; // initial value of veleroNamespace
-
+        let veleroNamespace: string;
+        let kmsKeyId: null|string;
+       
         // Create S3 bucket if no existing bucket, create s3 bucket
-        if ( !props.existingS3BucketName ){
+        if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
+             const s3Key = new kms.Key(cluster, 'velero-backup-bucket-s3CMK',{
+                 enableKeyRotation: true,
+             });
              const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
                 encryption: s3.BucketEncryption.KMS,
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+                publicReadAccess: false,
+                encryptionKey: s3Key,
                 versioned: true,
+                //lifecycleRules:[{
+                //    expiration: Duration.days(365),
+                //    transitions:[{
+                //        storageClass:StorageClass.INFREQUENT_ACCESS,
+                //        transitionAfter: Duration.days(30)
+                //    }
+                //]
+                //}]
             });
+            // Create S3 VPC Endpoint
+            cluster.vpc.addGatewayEndpoint('velero-backup-bucket-vpcEndPoint', {
+                service: GatewayVpcEndpointAwsService.S3
+            })
+            bucket.addToResourcePolicy(
+                new iam.PolicyStatement({
+                    sid: 'ForceCMKAtUpload',
+                    effect: iam.Effect.DENY,
+                    actions:['s3:PutObject'],
+                    resources: [bucket.arnForObjects('*')],
+                    principals: [new iam.AnyPrincipal()],
+                    conditions: {
+                        StringNotEquals: {
+                            's3:x-amz-server-side-encryption-aws-kms-key-id': bucket.encryptionKey?.keyArn
+                        },
+                    },
+                }),
+            );
+            //bucket.addToResourcePolicy(
+            //    new iam.PolicyStatement({
+            //        sid: 'DenyHTTPTraffic',
+            //        effect: iam.Effect.DENY,
+            //        actions: ['s3:*'],
+            //        resources: [bucket.arnForObjects('*')],
+            //        principals: [new iam.AnyPrincipal()],
+            //        conditions:{
+            //            Bool:{
+            //                'aws:SecureTransport': 'false',
+            //            }
+            //        }
+            //    })
+            //)
             bucketName = bucket.bucketName
+            kmsKeyId = s3Key.keyId;
         }
         else {
-            bucketName = props.existingS3BucketName
+            bucketName = props.values.configuration.backupStorageLocation.bucket
+            kmsKeyId = props.values.configuration.backupStorageLocation.config.kmsKeyId ?? {}
         }
 
-        // Create Namespace
+        // Create Namespace if not specified
         if (props.namespace){
             if (props.namespace.create) {
                 console.log ("namespace:" + props.namespace.name + " does not existed, creating")
@@ -138,6 +176,9 @@ export class VeleroAddOn implements ClusterAddOn {
                 console.log ("namespace:" + props.namespace.name + " exists, not creating new namespace")
                 veleroNamespace = props.namespace.name;
             }
+        }
+        else{
+            veleroNamespace = 'velero'; // initial value of veleroNamespace
         }
 
         // Setup IAM Role for Service Accounts (IRSA)
@@ -174,18 +215,28 @@ export class VeleroAddOn implements ClusterAddOn {
                     "s3:AbortMultipartUpload",
                     "s3:ListMultipartUploadParts"
                 ],
-                "Resource": [
-                    "arn:aws:s3:::velero-*/*"
-                ]
+                "Resource": "*"
               },
               {
                 "Effect": "Allow",
                 "Action": [
                     "s3:ListBucket"
                 ],
-                "Resource": [
-                    "arn:aws:s3:::velero-*"
-                ]
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                    "kms:*"
+                ],
+                "Resource": "*"                  
+              },
+              {
+                  "Effect": "Allow",
+                  "Action":[
+                      "ec2:*VpcEndpoint*"
+                  ],
+                  "Resource": "*"
               }
             ]
         };
@@ -195,26 +246,28 @@ export class VeleroAddOn implements ClusterAddOn {
             document: veleroCustomPolicyDocument
         });
         veleroServiceAccount.role.addManagedPolicy(veleroPolicy);
-   
-        const values:VeleroAddOnProps["values"] = props.values
-        /*************************************************  
-         * Assigning below values to valueVariable
-        {
+
+        
+        //const values:VeleroAddOnProps["values"] = props.values
+
+        const valueVariable:VeleroAddOnProps = {
             values: {
                 configuration: {
                     backupStorageLocation: {
                         prefix: props.values.configuration.backupStorageLocation.prefix ?? "velero/" + cluster.clusterName,
                         bucket: bucketName,
                         config:{
-                           region: props.s3BucketRegion ?? cluster.stack.region,
+                           region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region,
+                           kmsKeyId: kmsKeyId ?? {}
                         }
                     },
                     volumeSnapshotLocation:{
                         config:{
-                            region: props.s3BucketRegion ?? cluster.stack.region
+                            region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region
                         }
                     }
                 },
+                // IAM role for Service Account
                 serviceAccount: {
                     server: {
                         create: false,
@@ -223,15 +276,8 @@ export class VeleroAddOn implements ClusterAddOn {
                 }             
             }
         };
-        ******************************************************************************************************************************/
-        values["configuration"]["backupStorageLocation"]["prefix"] = props.values.configuration.backupStorageLocation.prefix ?? "velero/" + cluster.clusterName;
-        values["configuration"]["backupStorageLocation"]["bucket"] = bucketName;
-        values["configuration"]["backupStorageLocation"]["config"]["region"] = props.s3BucketRegion ?? cluster.stack.region;
-        values["configuration"]["volumeSnapshotLocation"]["config"]["region"] = props.s3BucketRegion ?? cluster.stack.region;
-        values["serviceAccount"]["server"]["create"] = false;
-        values["serviceAccount"]["server"]["name"] = veleroServiceAccount.serviceAccountName;
 
-        //const values = { ...props.values, ...valueVaraible.values } ?? {}; //
+        const values = deepmerge(props.values, valueVariable.values) ?? {}; 
  
         cluster.addHelmChart("velero-addon", {
             chart: "velero",

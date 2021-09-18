@@ -14,7 +14,7 @@ const addOns: Array<ssp.ClusterAddOn> = [
 ];
 
 const account = '<AWS Account Number>'
-const region = 'ap-southeast-2'
+const region = '<Region>'
 
 const props = { env: { account, region } }
 new ssp.EksBlueprint(

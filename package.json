@@ -46,10 +46,14 @@
         "@aws-cdk/pipelines": "1.119.0",
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "^2.952.0",
+        "deepmerge": "^4.2.2",
         "bcrypt": "^5.0.1",
         "js-yaml": "3.13.1",
         "sync-request": "6.1.0",
         "user": "^0.0.0",
         "yaml": "^1.10.2"
-    }
+    },
+    "bundledDependencies": [
+        "deepmerge"
+    ]
 }
