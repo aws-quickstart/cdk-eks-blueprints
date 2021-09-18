@@ -99,6 +99,7 @@ export class VeleroAddOn implements ClusterAddOn {
         if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
              const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
+                encryption: s3.BucketEncryption.S3_MANAGED,
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
                 publicReadAccess: false,
                 versioned: false
