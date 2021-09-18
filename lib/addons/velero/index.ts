@@ -94,61 +94,23 @@ export class VeleroAddOn implements ClusterAddOn {
         
         let bucketName: string; // AWS S3 Bucketname
         let veleroNamespace: string; // K8s namespace that Velero get deployed onto
-        let kmsKeyId: null|string; // the KMS key id to access the AWS S3 Bucket
        
         // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
         if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
-             const s3Key = new kms.Key(cluster, 'velero-backup-bucket-s3CMK',{
-                 enableKeyRotation: true,
-             });
              const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
-                encryption: s3.BucketEncryption.KMS,
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
                 publicReadAccess: false,
-                encryptionKey: s3Key,
-                versioned: true
+                versioned: false
             });
             // Create S3 VPC Endpoint for the Velero pod to access S3 via VPC Endpoint instead of going to internet
             cluster.vpc.addGatewayEndpoint('velero-backup-bucket-vpcEndPoint', {
                 service: GatewayVpcEndpointAwsService.S3
             })
-            // S3 Bucket Policy for Encryption in Rest using CMK
-            bucket.addToResourcePolicy(
-                new iam.PolicyStatement({
-                    sid: 'ForceCMKAtUpload',
-                    effect: iam.Effect.DENY,
-                    actions:['s3:PutObject'],
-                    resources: [bucket.arnForObjects('*')],
-                    principals: [new iam.AnyPrincipal()],
-                    conditions: {
-                        StringNotEquals: {
-                            's3:x-amz-server-side-encryption-aws-kms-key-id': bucket.encryptionKey?.keyArn
-                        },
-                    },
-                }),
-            );
-            // S3 Bucket Policy for SSL Access
-            bucket.addToResourcePolicy(
-                new iam.PolicyStatement({
-                    sid: 'DenyHTTPTraffic',
-                    effect: iam.Effect.DENY,
-                    actions: ['s3:*'],
-                    resources: [bucket.arnForObjects('*')],
-                    principals: [new iam.AnyPrincipal()],
-                    conditions:{
-                        Bool:{
-                            'aws:SecureTransport': 'false',
-                        }
-                    }
-                })
-            );
             bucketName = bucket.bucketName
-            kmsKeyId = s3Key.keyId;
         }
         else {
             bucketName = props.values.configuration.backupStorageLocation.bucket
-            kmsKeyId = props.values.configuration.backupStorageLocation.config.kmsKeyId ?? {}
         }
 
         // Create Namespace if not specified
@@ -238,7 +200,6 @@ export class VeleroAddOn implements ClusterAddOn {
                         bucket: bucketName,
                         config:{
                            region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region,
-                           kmsKeyId: kmsKeyId ?? {}
                         }
                     },
                     volumeSnapshotLocation:{
