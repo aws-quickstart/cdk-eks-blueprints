@@ -2,7 +2,6 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Constants } from "..";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
-import * as kms from "@aws-cdk/aws-kms";
 import { GatewayVpcEndpointAwsService } from "@aws-cdk/aws-ec2";
 import deepmerge = require('deepmerge');
 
