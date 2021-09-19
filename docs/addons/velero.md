@@ -144,7 +144,10 @@ Run `velero backup describe nginx-backup` or `velero backup logs nginx-backup` f
 $ velero backup get
 NAME           STATUS      ERRORS   WARNINGS   CREATED                          EXPIRES   STORAGE LOCATION   SELECTOR
 nginx-backup   Completed   0        0          2021-09-20 12:37:36 +1000 AEST   29d       default            <none>
+
+# Screenshot of the S3 bucket folder for the backup nginx-backup (with PV)
 ```
+![Velero_Backup_withPV](../assets/images/velero_backup_S3_bucket_withpv.png)
  
 
 ### Delete the sample app namespace
