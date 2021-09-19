@@ -24,3 +24,4 @@ The framework currently supports the following add-ons.
 | [`NginxAddOn`](./nginx.md) | Adds NGINX ingress controller |
 | [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-ssp-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn |
 | [`XrayAddOn`](./xray) | Adds XRay Daemon to the EKS Cluster |
+| [`VeleroAddOn`](./velero.md) | Adds [Velero](https://velero.io/) to the EKS Cluster |

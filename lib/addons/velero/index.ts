@@ -98,7 +98,7 @@ export class VeleroAddOn implements ClusterAddOn {
         if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
              const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
-                encryption: s3.BucketEncryption.KMS_MANAGED,
+                encryption: s3.BucketEncryption.KMS_MANAGED, // Velero Known bug for support with S3 with SSE-KMS with CMK, thus it does not support S3 Bucket Key: https://github.com/vmware-tanzu/helm-charts/issues/83
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
                 publicReadAccess: false
             });

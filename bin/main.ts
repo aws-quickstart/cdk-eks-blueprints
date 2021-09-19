@@ -13,7 +13,7 @@ const addOns: Array<ssp.ClusterAddOn> = [
   new ssp.addons.VeleroAddOn(),
 ];
 
-const account = '<AWS Account Number>'
+const account = '<AWS_Account_Name>'
 const region = '<region>'
 
 const props = { env: { account, region } }
