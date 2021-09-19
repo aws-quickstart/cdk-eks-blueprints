@@ -25,7 +25,6 @@ const addOns: Array<ssp.ClusterAddOn> = [
   new ssp.addons.VeleroAddOn(),
 ];
 
-const props = { env: { account, region } }
 new ssp.EksBlueprint(
     app, 
     {
@@ -72,9 +71,11 @@ The following steps will help test the backup and restore Kuberenetes resources 
 ```bash
 # Create the test01 namespace
 $ kubectl create ns test01
+namespace/test01 created
 
 # Deploy the Nginx applications on to namespace test01
 $ kubectl apply -f https://k8s.io/examples/application/deployment.yaml -n test01
+deployment.apps/nginx-deployment created
 
 # Check the nginx pods
 $ kubectl get pods -n test01
@@ -105,7 +106,16 @@ time="2021-09-19T02:40:37Z" level=info msg="Setting up backup temp file" backup=
 time="2021-09-19T02:40:37Z" level=info msg="Setting up plugin manager" backup=velero/test01 logSource="pkg/controller/backup_controller.go:563"
 time="2021-09-19T02:40:37Z" level=info msg="Getting backup item actions" backup=velero/test01 logSource="pkg/controller/backup_controller.go:567"
 ...
+
+# Check the backup location, the Access mode shows the S3 bucket name and its folders.
+$ velero backup-location get
+NAME      PROVIDER   BUCKET/PREFIX                                                                         PHASE       LAST VALIDATED                   ACCESS MODE   DEFAULT
+default   aws        my-stack-name-mystacknamevelerobackupxxx/velero/my-stack-name   Available   2021-09-20 12:29:35 +1000 AEST   ReadWrite     true
+
+# Screenshot of the S3 bucket folder for the backup test01
 ```
+![VeleroBackupScreenshot](../assets/images/velero_backup_S3_bucket.png)
+
 
 ### Delete the sample app namespace
 
@@ -118,7 +128,7 @@ $ kubectl delete ns test01
 
 ```bash
 # Restore from the backup of test01
-$ velero restore create test02 --from-backup test01
+$ velero restore create test01 --from-backup test01
 
 Restore request "test01" submitted successfully.
 Run `velero restore describe test01` or `velero restore logs test01` for more details.

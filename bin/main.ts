@@ -16,12 +16,15 @@ const addOns: Array<ssp.ClusterAddOn> = [
 const account = '<AWS_Account_Name>'
 const region = '<region>'
 
-const props = { env: { account, region } }
 new ssp.EksBlueprint(
   app, 
-  { 
-    id: 'haofei-ssp-blueprint', 
-    addOns,
-  }, 
-  props
-);
+  {
+      id: 'my-stack-name', 
+      addOns,
+  },
+  {
+      env:{
+        account: account,
+        region: region, 
+      }       
+  });
