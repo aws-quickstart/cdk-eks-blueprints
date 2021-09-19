@@ -42,7 +42,7 @@ ssp.EksBlueprint.builder()
     .clusterProvider(new ssp.MngClusterProvider({
       version: KubernetesVersion.V1_20,
       customAmi: {
-        machineImage: ec2.MachineImage.genericLinux({'ap-southeast-2': 'ami-0be34337b485b2609'}),
+        machineImage: ec2.MachineImage.genericLinux({'us-west-2': 'ami-06a8c459c01f55c7b'}),
         userData: userData,
       }
     }))
