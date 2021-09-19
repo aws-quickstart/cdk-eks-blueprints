@@ -73,7 +73,7 @@ The following steps will help test the backup and restore Kuberenetes resources 
 $ kubectl create ns test01
 namespace/test01 created
 
-# Deploy the Nginx applications on to namespace test01
+# Deploy the Nginx Stateless applications on to namespace test01
 $ kubectl apply -f https://k8s.io/examples/application/deployment.yaml -n test01
 deployment.apps/nginx-deployment created
 
@@ -82,7 +82,25 @@ $ kubectl get pods -n test01
 NAME                                READY   STATUS    RESTARTS   AGE
 nginx-deployment-66b6c48dd5-qf7lc   1/1     Running   0          53s
 nginx-deployment-66b6c48dd5-wvxjx   1/1     Running   0          53s
+
+# Deploy the Stateful Nginx Application with PV to namespace nginx-example
+$ kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/velero/main/examples/nginx-app/with-pv.yaml
+namespace/nginx-example created
+persistentvolumeclaim/nginx-logs created
+deployment.apps/nginx-deployment created
+service/my-nginx created
+
+# Check the application and PV
+$ kubectl get pods -n nginx-example
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-66689547d-4mqsd   2/2     Running   0          106s
+haofeif@a483e70791e6 ~ $ kubectl get pv -n nginx-example
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                      STORAGECLASS   REASON   AGE
+pvc-73498192-6571-4e31-b455-e7e7efbf2fb7   1Gi        RWO            Delete           Bound    nginx-example/nginx-logs   gp2                     110s
+
+## EBS Volume got created 
 ```
+![EBS_Volume_Screenshot](../assets/images/velero_ebs_volume.png)
 
 ### Backup the sample app from the namespace
 
@@ -90,7 +108,7 @@ nginx-deployment-66b6c48dd5-wvxjx   1/1     Running   0          53s
 - The backup will be created into the S3 bucket created or specified by the users. 
 
 ```bash
-# Create the backup
+# Create the backup for stateless app at namespace test01
 $ velero backup create test01 --include-namespaces test01
 Backup request "test01" submitted successfully.
 Run `velero backup describe test01` or `velero backup logs test01` for more details.
@@ -116,12 +134,29 @@ default   aws        my-stack-name-mystacknamevelerobackupxxx/velero/my-stack-na
 ```
 ![VeleroBackupScreenshot](../assets/images/velero_backup_S3_bucket.png)
 
+```bash
+# Create the Backup with the PV at namespace nginx-example
+$ velero backup create nginx-backup --include-namespaces nginx-example
+Backup request "nginx-backup" submitted successfully.
+Run `velero backup describe nginx-backup` or `velero backup logs nginx-backup` for more details.
+
+## Check the backup status
+$ velero backup get
+NAME           STATUS      ERRORS   WARNINGS   CREATED                          EXPIRES   STORAGE LOCATION   SELECTOR
+nginx-backup   Completed   0        0          2021-09-20 12:37:36 +1000 AEST   29d       default            <none>
+```
+ 
 
 ### Delete the sample app namespace
 
 ```bash
 # Delete the namespace test01
 $ kubectl delete ns test01
+
+# Delete the namespace nginx-example
+$ kubectl delete ns nginx-example
+
+# Note: Because the default reclaim policy for dynamically-provisioned PVs is “Delete”, these commands should trigger AWS to delete the EBS Volume that backs the PV. Deletion is asynchronous, so this may take some time. 
 ```
 
 ### Restore the sample app
@@ -133,14 +168,34 @@ $ velero restore create test01 --from-backup test01
 Restore request "test01" submitted successfully.
 Run `velero restore describe test01` or `velero restore logs test01` for more details.
 
-# Check the restore status
+# Check the restore status of test01
 $ velero restore get
 NAME     BACKUP   STATUS       STARTED                          COMPLETED   ERRORS   WARNINGS   CREATED                          SELECTOR
 test01   test01   Completed   2021-09-20 12:41:38 +1000 AEST   <nil>       0        0          2021-09-20 12:41:36 +1000 AEST   <none>
 
-# Check the application restore completed
+# Check the stateless application restore completed
 $ kubectl get pods -n test01
 NAME                                READY   STATUS    RESTARTS   AGE
 nginx-deployment-66b6c48dd5-qf7lc   1/1     Running   0          53s
 nginx-deployment-66b6c48dd5-wvxjx   1/1     Running   0          53s
+
+# Restore from the backup of nginx-backup (With PV) after confirming EBS volume has been deleted successfully
+$ velero restore create --from-backup nginx-backup
+
+# Check the Restore status
+$ velero restore get
+NAME                          BACKUP         STATUS      STARTED                          COMPLETED                        ERRORS   WARNINGS   CREATED                          SELECTOR
+nginx-backup-20210920124336   nginx-backup   Completed   2021-09-20 12:43:42 +1000 AEST   2021-09-20 12:43:45 +1000 AEST   0        0          2021-09-20 12:43:40 +1000 AEST   <none>
+
+# Check the status of pod and PV in namespace nginx-example
+$ kubectl get pods -n nginx-example
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-66689547d-4mqsd   2/2     Running   0          2m12s
+
+$ kubectl get pv -n nginx-example
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                      STORAGECLASS   REASON   AGE
+pvc-73498192-6571-4e31-b455-e7e7efbf2fb7   1Gi        RWO            Delete           Bound    nginx-example/nginx-logs   gp2                     2m22s
+
+# EBS Volume is back
 ```
+![VeleroRestoreEBSScreenshot](../assets/images/velero_ebs_volume_afterrestore.png)
