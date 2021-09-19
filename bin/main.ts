@@ -1,30 +1,31 @@
+#!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
-import * as ssp from '../lib';
+import * as ec2 from '@aws-cdk/aws-ec2';
+import BlueprintConstruct from '../examples/blueprint-construct'
+
+// pre-create a VPC
+export class VPCStack extends cdk.Stack {
+  public readonly vpc: ec2.Vpc;
+
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    this.vpc = new ec2.Vpc(this, 'eks-blueprint-vpc');
+  }
+}
 
 const app = new cdk.App();
 
-// AddOns for the cluster.
-const addOns: Array<ssp.ClusterAddOn> = [
-  new ssp.addons.ArgoCDAddOn,
-  new ssp.addons.CalicoAddOn,
-  new ssp.addons.MetricsServerAddOn,
-  new ssp.addons.ContainerInsightsAddOn,
-  new ssp.addons.AwsLoadBalancerControllerAddOn(),
-  new ssp.addons.VeleroAddOn(),
-];
+const account = process.env.CDK_DEFAULT_ACCOUNT
+const region = process.env.CDK_DEFAULT_REGION
+const props = { env: { account, region } }
 
-const account = '<AWS_Account_Name>'
-const region = '<region>'
+const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', props);
 
-new ssp.EksBlueprint(
-  app, 
+new BlueprintConstruct(app,
   {
-      id: 'my-stack-name', 
-      addOns,
+    id: 'blueprint-construct',
+    vpc: vpcStack.vpc
   },
-  {
-      env:{
-        account: account,
-        region: region, 
-      }       
-  });
+  props
+);
