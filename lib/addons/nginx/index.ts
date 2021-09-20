@@ -2,6 +2,7 @@ import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
+import { setPath } from '../../utils/object-utils';
 
 
 /**
@@ -118,11 +119,7 @@ export class NginxAddOn implements ClusterAddOn {
         const values = props.values ?? {};
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
 
-        values['controller'] = {
-            service: {
-                annotations: serviceAnnotations
-            }
-        };
+        setPath(values, 'controller.service.annotations', serviceAnnotations);
 
         const nginxHelmChart = clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
