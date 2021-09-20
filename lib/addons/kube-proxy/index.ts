@@ -1,24 +1,14 @@
-import { CfnAddon } from "@aws-cdk/aws-eks";
-import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../spi";
+import { EksManagedCoreAddons } from "../eks-managed-core-addons";
 
 /**
  * Implementation of KubeProxy EKS add-on.
  */
-export class KubeProxyAddOn implements ClusterAddOn {
-
-    version: string;
+export class KubeProxyAddOn extends EksManagedCoreAddons {
 
     constructor(version?: string) {
-        this.version = version ?? "v1.19.6-eksbuild.2";
-    }
-    
-    deploy(clusterInfo: ClusterInfo): void {
-        new CfnAddon(clusterInfo.cluster.stack, "kube-proxy-addon", {
+        super({
             addonName: "kube-proxy",
-            addonVersion: this.version,
-            clusterName: clusterInfo.cluster.clusterName,
-            resolveConflicts:  "OVERWRITE"
+            version: version ?? "v1.19.6-eksbuild.2"
         });
     }
 }

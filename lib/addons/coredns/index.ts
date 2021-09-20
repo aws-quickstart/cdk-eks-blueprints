@@ -1,24 +1,14 @@
-import { CfnAddon } from "@aws-cdk/aws-eks";
-import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../spi";
+import { EksManagedCoreAddons } from "../eks-managed-core-addons";
 
 /**
  * Implementation of CoreDns EKS add-on.
  */
-export class CoreDnsAddOn implements ClusterAddOn {
-
-    version: string;
+export class CoreDnsAddOn extends EksManagedCoreAddons {
 
     constructor(version?: string) {
-        this.version = version ?? "v1.8.0-eksbuild.1";
-    }
-    
-    deploy(clusterInfo: ClusterInfo): void {
-        new CfnAddon(clusterInfo.cluster.stack, "coredns-addon", {
+        super({
             addonName: "coredns",
-            addonVersion: this.version,
-            clusterName: clusterInfo.cluster.clusterName,
-            resolveConflicts:  "OVERWRITE"
+            version: version ?? "v1.8.0-eksbuild.1"
         });
     }
 }
