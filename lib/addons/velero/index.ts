@@ -17,7 +17,7 @@ export interface VeleroAddOnProps {
    
     /**
      * Namespace for the add-on. If the namespace does not exist, specify create to false
-     * @default {namespace: 'velero', create: true}
+     * @default {namespace: "velero", create: true}
      */
     namespace?:  {
         [key: string]: any;
@@ -39,7 +39,7 @@ export interface VeleroAddOnProps {
 const defaultProps: VeleroAddOnProps = {
     version: "2.23.6",
     namespace: {
-        name: 'velero',
+        name: "velero",
         create: true
     },
     values:{
@@ -97,32 +97,18 @@ export class VeleroAddOn implements ClusterAddOn {
         // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
         if ( !props.values.configuration.backupStorageLocation.bucket ){
              console.log("existing S3 Bucket does not exists, creating S3 bucket");
-             const bucket = new s3.Bucket(cluster, 'velero-backup-bucket', {
+             const bucket = new s3.Bucket(cluster, "velero-backup-bucket", {
                 encryption: s3.BucketEncryption.KMS_MANAGED, // Velero Known bug for support with S3 with SSE-KMS with CMK, thus it does not support S3 Bucket Key: https://github.com/vmware-tanzu/helm-charts/issues/83
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
-                publicReadAccess: false
+                publicReadAccess: false,
+                enforceSSL: true // Encryption in Transit
             });
-
-            // S3 Bucket Policy for SSL Access
-            bucket.addToResourcePolicy(
-                new iam.PolicyStatement({
-                    sid: 'DenyHTTPTraffic',
-                    effect: iam.Effect.DENY,
-                    actions: ['s3:*'],
-                    resources: [bucket.arnForObjects('*')],
-                    principals: [new iam.AnyPrincipal()],
-                    conditions:{
-                        Bool:{
-                            'aws:SecureTransport': 'false',
-                        }
-                    }
-                })
-            );            
+           
             // Create S3 VPC Endpoint for the Velero pod to access S3 via VPC Endpoint instead of going to internet
-            cluster.vpc.addGatewayEndpoint('velero-backup-bucket-vpcEndPoint', {
+            cluster.vpc.addGatewayEndpoint("velero-backup-bucket-vpcEndPoint", {
                 service: GatewayVpcEndpointAwsService.S3
             })
-            bucketName = bucket.bucketName
+            bucketName = bucket.bucketName;
         }
         else {
             bucketName = props.values.configuration.backupStorageLocation.bucket
@@ -130,13 +116,13 @@ export class VeleroAddOn implements ClusterAddOn {
 
         // Create Namespace if not specified
         if (props.namespace){
-            // Create Namespace if the 'create' option is false
+            // Create Namespace if the "create" option is false
             if (props.namespace.create) {
                 console.log ("namespace:" + props.namespace.name + " does not existed, creating")
-                cluster.addManifest('velero-namespace',
+                cluster.addManifest("velero-namespace",
                 {
-                    apiVersion: 'v1',
-                    kind: 'Namespace',
+                    apiVersion: "v1",
+                    kind: "Namespace",
                     metadata: { 
                         name: props.namespace.name
                     }
@@ -150,18 +136,18 @@ export class VeleroAddOn implements ClusterAddOn {
             }
         }
         else{
-            veleroNamespace = 'velero'; // initial value of veleroNamespace
+            veleroNamespace = "velero"; // initial value of veleroNamespace
         }
 
         // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account
         const veleroServiceAccount = cluster.addServiceAccount (
-            'velero-account',
+            "velero-account",
             {
-                name: 'velero-account',
+                name: "velero-account",
                 namespace: veleroNamespace
             }
         );
-
+        const s3bucket = s3.Bucket.fromBucketName(cluster, "S3Bucket", bucketName);
         // IAM policy for Velero
         const veleroPolicyDocument = {
             "Version": "2012-10-17",
@@ -188,7 +174,10 @@ export class VeleroAddOn implements ClusterAddOn {
                     "s3:ListMultipartUploadParts",
                     "s3:ListBucket"
                 ],
-                "Resource": "*"
+                "Resource": [
+                    s3bucket.arnForObjects("*"),
+                    s3bucket.bucketArn                   
+                ]
               }
             ]
         };
@@ -198,8 +187,7 @@ export class VeleroAddOn implements ClusterAddOn {
             document: veleroCustomPolicyDocument
         });
         veleroServiceAccount.role.addManagedPolicy(veleroPolicy);
-
-        const valueVariable:VeleroAddOnProps = {
+        const valueVariable: VeleroAddOnProps = {
             values: {
                 configuration: {
                     backupStorageLocation: {
