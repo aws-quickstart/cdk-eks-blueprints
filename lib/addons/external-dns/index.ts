@@ -1,9 +1,10 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
+import { Construct } from '@aws-cdk/core';
 import { Constants } from '..';
+
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HostedZoneProvider } from './hosted-provider';
-
 
 /**
  * Configuration options for the external DNS add-on.
@@ -26,7 +27,6 @@ export interface ExternalDnsProps {
     readonly hostedZone: HostedZoneProvider;
 }
 
-
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
  * It is required to integrate with Route53 for external DNS resolution. 
@@ -35,10 +35,13 @@ export class ExternalDnsAddon implements ClusterAddOn {
 
     readonly name = 'external-dns';
 
-    constructor(private readonly options: ExternalDnsProps) {
+    private options: ExternalDnsProps;
+
+    constructor(props: ExternalDnsProps) {
+        this.options = props
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const region = clusterInfo.cluster.stack.region;
         const cluster = clusterInfo.cluster;
         const namespace = this.options.namespace ?? this.name;
@@ -95,5 +98,7 @@ export class ExternalDnsAddon implements ClusterAddOn {
         });
 
         chart.node.addDependency(namespaceManifest);
+        // return the Promise Construct for any teams that may depend on this
+        return Promise.resolve(chart);
     }
 }

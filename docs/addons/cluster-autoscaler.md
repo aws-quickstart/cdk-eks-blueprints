@@ -1,18 +1,17 @@
 # Cluster Autoscaler Add-on
 
-The `ClusterAutoscaler` addon adds support for [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler).
+The Cluster Autoscaler add-on adds support for [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler) to an EKS cluster. Cluster Autoscaler is a tool that automatically adjusts the number of nodes in your cluster when:
 
-Cluster Autoscaler is a tool that automatically adjusts the number of nodes in your cluster when:
 - pods fail due to insufficient resources, or 
 - pods are rescheduled onto other nodes due to being in nodes that are underutilized for an extended period of time.
 
 ## Usage
 
 ```typescript
-import { ClusterAutoScalerAddOn }  from '@shapirov/cdk-eks-blueprint';
+import { ClusterAutoScalerAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
 
-readonly myClusterAutoscaler = new ClusterAutoscalerAddOn("v1.19.1");// optionally specify image version to pull  or empty constructor
-const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];
+const addOn = new ClusterAutoscalerAddOn()
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
@@ -33,7 +32,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 
 ## Testing the scaling functionality
 
-These following steps will help test the functionality of the Cluster Autoscaler:
+The following steps will help test and validate Cluster Autoscaler functionality in your cluster.
 
 1. Deploy a sample app as a deployment.
 2. Create a Horizontal Pod Autoscaler (HPA) resource.
@@ -132,5 +131,4 @@ ip-10-0-187-70.us-west-2.compute.internal    Ready    <none>   73s   v1.19.6-eks
 ip-10-0-189-107.us-west-2.compute.internal   Ready    <none>   84m   v1.19.6-eks-49a6c0
 ip-10-0-224-226.us-west-2.compute.internal   Ready    <none>   46s   v1.19.6-eks-49a6c0
 ip-10-0-233-105.us-west-2.compute.internal   Ready    <none>   90s   v1.19.6-eks-49a6c0
-
 ```

@@ -1,10 +1,11 @@
 import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
-import request from 'sync-request';
+import request from "sync-request";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { Construct } from "@aws-cdk/core";
 
 /**
- * Configuration options for AWS Load Balancer controller
+ * Configuration options for the add-on.
  */
 export interface AwsLoadBalancerControllerProps {
 
@@ -40,9 +41,9 @@ export interface AwsLoadBalancerControllerProps {
 }
 
 /**
- * Defaults options for load balancer controller.
+ * Defaults options for the add-on
  */
-const awsLoadBalancerControllerDefaults: AwsLoadBalancerControllerProps = {
+const defaultProps: AwsLoadBalancerControllerProps = {
     namespace: 'kube-system',
     version: 'v2.2.1',
     chartVersion: '1.2.3',
@@ -58,13 +59,11 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
     private options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        this.options = { ...awsLoadBalancerControllerDefaults, ...props };
+        this.options = { ...defaultProps, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
-
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
             name: AWS_LOAD_BALANCER_CONTROLLER,
             namespace: this.options.namespace,
@@ -101,5 +100,7 @@ export class AwsLoadBalancerControllerAddOn implements ClusterAddOn {
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
+        // return the Promise Construct for any teams that may depend on this
+        return Promise.resolve(awsLoadBalancerControllerChart);
     }
 }
