@@ -1,9 +1,9 @@
-import { CoreAddOns } from "../core-addons";
+import { CoreAddOn } from "../core-addon";
 
 /**
  * Implementation of CoreDns EKS add-on.
  */
-export class CoreDnsAddOn extends CoreAddOns {
+export class CoreDnsAddOn extends CoreAddOn {
 
     constructor(version?: string) {
         super({

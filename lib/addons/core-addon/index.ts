@@ -11,7 +11,7 @@ export class CoreAddOnProps {
 /**
  * Implementation of EKS Managed add-ons.
  */
-export class CoreAddOns implements ClusterAddOn {
+export class CoreAddOn implements ClusterAddOn {
 
     readonly coreAddOnProps: CoreAddOnProps;
 
