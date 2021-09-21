@@ -1,13 +1,13 @@
-import { EksManagedCoreAddons } from "../eks-managed-core-addons";
+import { EksManagedCoreAddOns } from "../eks-managed-core-addOns";
 
 /**
  * Implementation of KubeProxy EKS add-on.
  */
-export class KubeProxyAddOn extends EksManagedCoreAddons {
+export class KubeProxyAddOn extends EksManagedCoreAddOns {
 
     constructor(version?: string) {
         super({
-            addonName: "kube-proxy",
+            addOnName: "kube-proxy",
             version: version ?? "v1.19.6-eksbuild.2"
         });
     }

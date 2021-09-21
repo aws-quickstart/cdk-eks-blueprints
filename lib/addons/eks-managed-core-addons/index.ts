@@ -2,27 +2,27 @@ import { CfnAddon } from "@aws-cdk/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 
-export class EksManagedCoreAddonProps {
+export class EksManagedCoreAddOnProps {
 
-    readonly addonName: string;
+    readonly addOnName: string;
     readonly version: string;
 }
 
 /**
  * Implementation of EKS Managed add-ons.
  */
-export class EksManagedCoreAddons implements ClusterAddOn {
+export class EksManagedCoreAddOns implements ClusterAddOn {
 
-    readonly managedAddonProps: EksManagedCoreAddonProps;
+    readonly managedAddOnProps: EksManagedCoreAddOnProps;
 
-    constructor(eksManagedCoreAddonProps: EksManagedCoreAddonProps) {
-        this.managedAddonProps = eksManagedCoreAddonProps;
+    constructor(eksManagedCoreAddOnProps: EksManagedCoreAddOnProps) {
+        this.managedAddOnProps = eksManagedCoreAddOnProps;
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        new CfnAddon(clusterInfo.cluster.stack, this.managedAddonProps.addonName + "-addon", {
-            addonName: this.managedAddonProps.addonName,
-            addonVersion: this.managedAddonProps.version,
+        new CfnAddon(clusterInfo.cluster.stack, this.managedAddOnProps.addOnName + "-addOn", {
+            addonName: this.managedAddOnProps.addOnName,
+            addonVersion: this.managedAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             resolveConflicts: "OVERWRITE"
         });

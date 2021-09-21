@@ -1,13 +1,13 @@
-import { EksManagedCoreAddons } from "../eks-managed-core-addons";
+import { EksManagedCoreAddOns } from "../eks-managed-core-addOns";
 
 /**
  * Implementation of CoreDns EKS add-on.
  */
-export class CoreDnsAddOn extends EksManagedCoreAddons {
+export class CoreDnsAddOn extends EksManagedCoreAddOns {
 
     constructor(version?: string) {
         super({
-            addonName: "coredns",
+            addOnName: "coredns",
             version: version ?? "v1.8.0-eksbuild.1"
         });
     }
