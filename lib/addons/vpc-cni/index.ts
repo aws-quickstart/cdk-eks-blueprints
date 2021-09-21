@@ -1,9 +1,9 @@
-import { EksManagedCoreAddOns } from "../eks-managed-core-addOns";
+import { CoreAddOns } from "../core-addons";
 
 /**
  * Implementation of VpcCni EKS add-on.
  */
-export class VpcCniAddOn extends EksManagedCoreAddOns {
+export class VpcCniAddOn extends CoreAddOns {
 
     constructor(version?: string) {
         super({

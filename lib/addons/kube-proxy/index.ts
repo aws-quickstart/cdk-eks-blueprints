@@ -1,9 +1,9 @@
-import { EksManagedCoreAddOns } from "../eks-managed-core-addOns";
+import { CoreAddOns } from "../core-addons";
 
 /**
  * Implementation of KubeProxy EKS add-on.
  */
-export class KubeProxyAddOn extends EksManagedCoreAddOns {
+export class KubeProxyAddOn extends CoreAddOns {
 
     constructor(version?: string) {
         super({
