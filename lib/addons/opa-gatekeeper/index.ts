@@ -1,4 +1,5 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+
 /**
  * Configuration options for the add-on.
  */
@@ -13,6 +14,10 @@ export interface OpaGatekeeperAddOnProps {
      * @default 3.7.0-beta.1
      */
     version?: string;
+    /**
+     * 	Whether or not Helm should wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state before marking the release as successful.
+     */
+    wait?: true;
     /**
      * Values for the Helm chart.
      */
@@ -46,6 +51,7 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
             version: props.version,
             namespace: props.namespace,
+            wait: props.wait,
             values
         });
     }
