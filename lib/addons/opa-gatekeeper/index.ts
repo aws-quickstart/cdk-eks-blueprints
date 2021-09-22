@@ -1,7 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-
 /**
- * Configuration options for the add-on.
+ * Properties available to configure opa gatekeeper
  */
 export interface OpaGatekeeperAddOnProps {
     /**
@@ -16,10 +15,19 @@ export interface OpaGatekeeperAddOnProps {
     version?: string;
     /**
      * 	Whether or not Helm should wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state before marking the release as successful.
+     * @default true
      */
-    wait?: true;
+    wait?: boolean;
+    /**
+     * Setting validatingWebhookFailurePolicy to True
+     * @default true 
+     */
+    disableValidatingWebhook?: boolean;
     /**
      * Values for the Helm chart.
+     */
+    /**
+     * Remove post install 
      */
      values?: {
         [key: string]: any;
@@ -31,12 +39,14 @@ export interface OpaGatekeeperAddOnProps {
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'kube-system',
     version: '3.7.0-beta.1',
+    wait: true,
+    disableValidatingWebhook: true,
     values: {}
 };
 
 export class OpaGatekeeperAddOn implements ClusterAddOn {
     
-    private options: OpaGatekeeperAddOnProps;
+    readonly options: OpaGatekeeperAddOnProps;
     
     constructor(props?: OpaGatekeeperAddOnProps) {
         this.options = { ...defaultProps, ...props };
@@ -49,9 +59,8 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             chart: "gatekeeper",
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
-            version: props.version,
-            namespace: props.namespace,
-            wait: props.wait,
+            version: this.options.version,
+            namespace: this.options.namespace,
             values
         });
     }
