@@ -46,14 +46,11 @@
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "^2.952.0",
         "bcrypt": "^5.0.1",
-        "deepmerge": "^4.2.2",
+        "ts-deepmerge": "^1.0.8",
         "js-yaml": "3.13.1",
         "lint": "^0.7.0",
         "sync-request": "6.1.0",
         "user": "^0.0.0",
         "yaml": "^1.10.2"
-    },
-    "bundledDependencies": [
-        "deepmerge"
-    ]
+    }
 }

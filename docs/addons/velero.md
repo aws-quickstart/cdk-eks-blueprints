@@ -51,8 +51,8 @@ new ssp.EksBlueprint(
 
 ## Limitations
 
-1. Velero has a known bug for support of S3 with SSE-KMS encryption with Custom Managed Key (CMK). Please refer to [Velero GitHub Issue #83](https://github.com/vmware-tanzu/helm-charts/issues/83).
-2. As a result of #1, Velero is unable to leverage the [S3 Bucket Key](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html) feature which requires using AWS CMK (Custom Managed Key) to achieve "reduce AWS KMS request costs by up to 99 percent by decreasing the request traffic from Amazon S3 to AWS KMS."
+1. Velero has a known bug for support of S3 with SSE-KMS encryption with Customer master key (CMK). Please refer to [Velero GitHub Issue #83](https://github.com/vmware-tanzu/helm-charts/issues/83).
+2. As a result of #1, Velero is unable to leverage the [S3 Bucket Key](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html) feature which requires using AWS CMK to achieve "reduce AWS KMS request costs by up to 99 percent by decreasing the request traffic from Amazon S3 to AWS KMS."
 
 ## Testing Velero Functionality
 

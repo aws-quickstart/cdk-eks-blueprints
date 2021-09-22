@@ -3,7 +3,8 @@ import { Constants } from "..";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
 import { GatewayVpcEndpointAwsService } from "@aws-cdk/aws-ec2";
-import deepmerge = require('deepmerge');
+import merge from "ts-deepmerge";
+import { createNamespace } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -16,11 +17,16 @@ export interface VeleroAddOnProps {
     version?: string;
    
     /**
-     * Namespace for the add-on. If the namespace does not exist, specify create to false
-     * @default {namespace: "velero", create: true}
+     * Namespace for the Velero add-on. If the namespace does not exist, it will be created by the addon with the default namespace value.
+     * @default 
+     *      namespace:{
+     *        name: "velero",
+     *        create: true    
+     *      }
      */
     namespace?:  {
-        [key: string]: any;
+        name: string,   // default value is "velero", if it is specified then it will be the namespace of where velero is deployed to.
+        create: boolean // default is true, if it is false, no new namespace will be created
     };
 
      /**
@@ -79,8 +85,8 @@ export class VeleroAddOn implements ClusterAddOn {
     private options: VeleroAddOnProps;
     constructor(props?: VeleroAddOnProps) {
         if (props) {
-            // deepmerge the nested json files
-            this.options = deepmerge(defaultProps, props);
+            // merge the nested json files
+            this.options = merge(defaultProps, props);
         }
         else {
             this.options = defaultProps
@@ -96,7 +102,6 @@ export class VeleroAddOn implements ClusterAddOn {
        
         // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
         if ( !props.values.configuration.backupStorageLocation.bucket ){
-             console.log("existing S3 Bucket does not exists, creating S3 bucket");
              const bucket = new s3.Bucket(cluster, "velero-backup-bucket", {
                 encryption: s3.BucketEncryption.KMS_MANAGED, // Velero Known bug for support with S3 with SSE-KMS with CMK, thus it does not support S3 Bucket Key: https://github.com/vmware-tanzu/helm-charts/issues/83
                 blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // Block Public Access for S3
@@ -114,24 +119,15 @@ export class VeleroAddOn implements ClusterAddOn {
             bucketName = props.values.configuration.backupStorageLocation.bucket
         }
 
-        // Create Namespace if not specified
+        // Create Namespace if namespace is not explicied defined.
         if (props.namespace){
-            // Create Namespace if the "create" option is false
+            // Create Namespace if the "create" option is true
             if (props.namespace.create) {
-                console.log ("namespace:" + props.namespace.name + " does not existed, creating")
-                cluster.addManifest("velero-namespace",
-                {
-                    apiVersion: "v1",
-                    kind: "Namespace",
-                    metadata: { 
-                        name: props.namespace.name
-                    }
-                }
-                )
+                createNamespace(props.namespace.name, cluster);
                 veleroNamespace = props.namespace.name;
             }
+            // If the "create" option if false, then namespace will not be created.
             else{
-                console.log ("namespace:" + props.namespace.name + " exists, not creating new namespace")
                 veleroNamespace = props.namespace.name;
             }
         }
@@ -147,6 +143,8 @@ export class VeleroAddOn implements ClusterAddOn {
                 namespace: veleroNamespace
             }
         );
+
+        // Extract S3 bucket object via the bucket name in order to use it in the IAM policy document. 
         const s3bucket = s3.Bucket.fromBucketName(cluster, "S3Bucket", bucketName);
         // IAM policy for Velero
         const veleroPolicyDocument = {
@@ -213,7 +211,7 @@ export class VeleroAddOn implements ClusterAddOn {
             }
         };
 
-        const values = deepmerge(props.values, valueVariable.values) ?? {}; 
+        const values = merge(props.values, valueVariable.values) ?? {}; 
  
         cluster.addHelmChart("velero-addon", {
             chart: "velero",
