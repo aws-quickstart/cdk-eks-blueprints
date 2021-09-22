@@ -1,6 +1,6 @@
 # Getting Started 
 
-This guide walks you through setting up a new CDK project that uses the `cdk-eks-blueprint` NPM module to deploy an SSP. 
+This guide walks you through setting up a new CDK project that uses the `cdk-eks-blueprint` Node Package Manager (NPM) module to deploy an SSP. 
 
 ## Project setup
 
@@ -30,7 +30,7 @@ Install the `cdk-eks-blueprint` NPM package.
 npm i @shapirov/cdk-eks-blueprint
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root directory) using the following code. This code deploys a new Amazon EKS Cluster and installs the `ArgoCD` add-on.
+Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root directory) using the following code. This code deploys a new Amazon EKS cluster and installs the Argo CD add-on.
 
 ```typescript
 import 'source-map-support/register';
@@ -58,21 +58,21 @@ new ssp.EksBlueprint(app, opts, {
 });
 ```
 
-Each combination of target account and Region must be bootstrapped prior to deploying stacks. Bootstrapping creates IAM roles and Lambda functions that can execute some of the common CDK constructs.
+Each combination of target account and Region must be bootstrapped prior to deploying stacks. Bootstrapping creates AWS Identity and Access Management (IAM) roles and Lambda functions that execute some of the common CDK constructs.
 
-[Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment with the following command. 
+[Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment using the following command: 
 
 ```bash
 cdk bootstrap
 ```
 
-Run the following command to deploy the stack, which takes about 20 minutes to complete.
+Run the following command to deploy the stack, which takes about 20 minutes to complete:
 
 ```
 cdk deploy
 ```
 
-When you deploy your first EKS cluster using `cdk-eks-blueprint`, AWS CDK provisions the following in your cluster:
+When you deploy your first EKS cluster using `cdk-eks-blueprint`, AWS CDK provisions the following:
 
 - [x] A well-architected virtual private cloud (VPC) with public and private subnets.
 - [x] A well-architected Amazon EKS cluster in the Region and account you specify.
@@ -99,13 +99,13 @@ Stack ARN:
 arn:aws:cloudformation:us-east-1:115717706081:stack/east-test-1/e1b9e6a0-d5f6-11eb-8498-0a374cd00e27
 ```
 
-To update your Kubernetes cluster configuration, run `east-test-1.easttest1ConfigCommand25ABB520`. 
+To update your Kubernetes cluster configuration, run `east-test-1.easttest1ConfigCommand25ABB520`:
 
 ```
 aws eks update-kubeconfig --name east-test-1 --region us-east-1 --role-arn <ROLE_ARN>
 ```
 
-Validate that you now have Kubectl access to your cluster.
+Validate that you now have Kubectl access to your cluster:
 
 ```
 kubectl get namespace
@@ -113,7 +113,7 @@ kubectl get namespace
 
 You should see an output that lists all of your cluster namespaces. 
 
-## Deploy workloads using Argo CD
+## Use Argo CD to deploy workloads
 
 Deploy your cluster workloads using Argo CD, which uses the [App of Apps Pattern](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) to deploy multiple workloads across multiple namespaces. For the sample App of Apps repository used here, see [SSP EKS Workloads](https://github.com/aws-samples/ssp-eks-workloads).
 
@@ -197,7 +197,7 @@ argocd app sync dev-apps
 
 ### Validate deployments 
 
-To validate your deployments, use `kubectl port-forwarding` to access the `guestbook-ui` service for `team-burnham`.
+To validate your deployments, use `kubectl port-forwarding` to access the `guestbook-ui` service for `team-burnham`:
 
 ```
 kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
@@ -207,10 +207,10 @@ In your browser, navigate to `localhost:4040`. You should see your application.
 
 ## Next steps
 
-For more information about onboarding teams to your clusters, see [`Team` documentation](../teams). 
+For more information about onboarding teams to your clusters, see [Team](../teams). 
 
-For more information about deploying CD pipelines for your infrastructure, see [`Pipelines` documentation](../ci-cd).
+For more information about deploying CD pipelines for your infrastructure, see [Pipelines](../ci-cd).
 
-For more information about supported add-ons, see [`Add-on` documentation](../addons).
+For more information about supported add-ons, see [Add-ons](../addons).
 
-For more information about onboarding and managing workloads in your clusters, see [`Workload` documentation](../workloads). 
+For more information about onboarding and managing workloads in your clusters, see [Workload](../workloads). 

@@ -35,7 +35,7 @@ The following section discusses how to use `kubectl` to apply standard Kubernete
 
 ### Pod-to-pod communications with no policies
 
-If you [Deploy workloads with ArgoCD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd), verify that there are no network policies in place:
+If you use Argo CD to deploy workloads, verify that there are no network policies in place. For more information, see [Deploy workloads with Argo CD](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks/blob/feature/calico/docs/getting-started.md#deploy-workloads-with-argocd).
 
 ```bash
 kubectl get networkpolicy -A
