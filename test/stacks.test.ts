@@ -61,6 +61,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const stack1 = await blueprint.buildAsync(app, "stack-1");
 
         assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
+        expect(console.assert).toHaveBeenLastCalledWith(true);
 
         const blueprint2 = blueprint.clone('us-west-2', '1234567891').addons(new ssp.CalicoAddOn);
         const stack2 = await blueprint2.buildAsync(app, 'stack-2');
@@ -133,7 +134,6 @@ describe('Unit tests for EKS Blueprint', () => {
         const parentStack =  await blueprint.buildAsync(app, "stack-with-nested");
         const clusterInfo = parentStack.getClusterInfo();
         expect(clusterInfo.getProvisionedAddOn("vpc-nested-stack")).toBeDefined();
-
     });
 });
 
@@ -146,4 +146,3 @@ function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
 
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 }
-
