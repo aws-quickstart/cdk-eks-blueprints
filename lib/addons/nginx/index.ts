@@ -75,8 +75,7 @@ const defaultProps: NginxAddOnProps = {
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
-    namespace: "kube-system",
-    values: {}
+    namespace: "kube-system"
 };
 
 export class NginxAddOn implements ClusterAddOn {
@@ -110,7 +109,7 @@ export class NginxAddOn implements ClusterAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
-        const values = props.values ?? {};
+        const values = { ...props.values ?? {}};
 
         if(props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
