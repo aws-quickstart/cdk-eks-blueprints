@@ -5,7 +5,11 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 export interface OpaGatekeeperAddOnProps {
     /**
      * Namespace where OPA Gatekeeper will be installed
-     * @default kube-system
+     * @default true
+     */
+    createNamespace?: boolean;
+    /** Default namespace
+     * @default gatekeeper-system
      */
     namespace?: string;
     /**
@@ -24,10 +28,8 @@ export interface OpaGatekeeperAddOnProps {
      */
     disableValidatingWebhook?: boolean;
     /**
-     * Values for the Helm chart.
-     */
-    /**
      * Remove post install 
+     * 
      */
      values?: {
         [key: string]: any;
@@ -37,7 +39,7 @@ export interface OpaGatekeeperAddOnProps {
  * Defaults options for the add-on
  */
 const defaultProps: OpaGatekeeperAddOnProps = {
-    namespace: 'kube-system',
+    namespace: 'gatekeeper-system',
     version: '3.7.0-beta.1',
     wait: true,
     disableValidatingWebhook: true,
