@@ -116,7 +116,7 @@ export class NginxAddOn implements ClusterAddOn {
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
             setPath(values, "controller.service.https.port.targetPort", "http");
-            setPath(values, "controller.service.http.port.targetPort", "tohttps");
+            setPath(values, "controller.service.http.port.enable", "false");
         }
 
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
