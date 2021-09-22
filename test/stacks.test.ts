@@ -1,7 +1,6 @@
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
-import { NestedStackAddOn, NginxAddOn } from '../lib';
 import { MyVpcStack } from './test-support';
 
 const consoleSpy = jest.spyOn(console, 'assert').mockImplementation();
@@ -36,7 +35,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = ssp.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addons(new NginxAddOn)
+            .addons(new ssp.NginxAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
         blueprint.build(app, 'stack-with-missing-deps');
@@ -120,7 +119,7 @@ describe('Unit tests for EKS Blueprint', () => {
     test("Nested stack add-on creates correct nested stack", async () => {
         const app = new cdk.App();
 
-        const vpcAddOn = new NestedStackAddOn( {
+        const vpcAddOn = new ssp.NestedStackAddOn( {
             builder: MyVpcStack.builder(),
             id: "vpc-nested-stack"
         });
