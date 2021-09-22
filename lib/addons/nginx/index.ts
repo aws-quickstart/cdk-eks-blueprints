@@ -77,7 +77,7 @@ export class NginxAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
-    @dependable(['AwsLoadBalancerControllerAddOn'])
+    @dependable('AwsLoadBalancerControllerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const props = this.options;

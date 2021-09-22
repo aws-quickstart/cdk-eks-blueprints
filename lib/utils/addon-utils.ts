@@ -18,7 +18,7 @@ export function getAddOnNameOrId(addOn: ClusterAddOn): string {
  * @param addOns 
  * @returns 
  */
-export function dependable(addOns: Array<string>) {
+export function dependable(...addOns: string[]) {
   // eslint-disable-next-line @typescript-eslint/ban-types
   return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
