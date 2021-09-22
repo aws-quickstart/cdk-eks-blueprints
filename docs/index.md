@@ -1,8 +1,6 @@
 # Overview
 
-Welcome to the [`Amazon EKS SSP Quick Start`](https://github.com/aws-quickstart/quickstart-ssp-amazon-eks) documentation site.
-
-`Amazon EKS SSP Quick Start` provides AWS customers with a framework and methodology for building a Shared Services Platform (SSP) on top of [Amazon Elastic Kubernetes Service (Amazon EKS)](https://aws.amazon.com/eks/).
+Welcome to the Amazon Elastic Kubernetes Service (Amazon EKS) Shared Services Platform (SSP) Quick Start documentation site. Amazon EKS SSP provides AWS customers with a framework and methodology for building an SSP on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## What is an SSP?
 

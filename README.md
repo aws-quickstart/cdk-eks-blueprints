@@ -6,65 +6,61 @@
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
-This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
-
-## Documentation
-
-For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
-
-## Examples
-
-To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns).
+This repository contains source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. The `cdk-eks-blueprint` module is a [CDK](https://aws.amazon.com/cdk/) construct for customers to build and deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## What is an SSP?
 
-A Shared Services Platform (SSP) is an internal development platform that abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. As SSP is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The SSP packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, SSPs allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
+An SSP is an internal development platform that helps remove the complexities of cloud infrastructure. An SSP typically has multiple AWS or open-source products and services, including services for running containers and continuous integration and continuous delivery (CI/CD) pipelines as well as monitoring logs, metrics, and security protocols. From an operational perspective, an SSP is a set of consolidated tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure from a central platform that can then be used as a service by developers. For more information, see the [SSP Amazon EKS](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/) guide.
 
-## What can I do with this QuickStart?
+## SSP Quick Start
 
-Customers can use this QuickStart to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
+Use this Quick Start to design and deploy a multitenant SSP on top of Amazon EKS. The `cdk-eks-blueprint` module can be used for the following:
 
-- [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
-- [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
-- [x] Define teams, namespaces, and their associated access permissions for your clusters.
-- [x] Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
-- [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams. 
+- [x] Deploy well-architected Amazon EKS clusters across accounts and Regions.
+- [x] Manage cluster configurations, including add-ons that run in each cluster, from a single Git repository.
+- [x] Define teams, namespaces, and their associated access permissions.
+- [x] Create CD pipelines that deploy your infrastructure.
+- [x] Use GitOps-based workflows for onboarding and managing workloads.
+
+## Why should I use this Quick Start?  
+
+The system of developer tools for Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to designing infrastructure. Determining the right mix of tools and services, however, in addition to how they integrate, can be a challenge. As your Kubernetes projects grow, managing your cluster's configuration can also become a challenge.
+
+AWS customers build internal platforms to reduce complexity, automate the management of Kubernetes environments, and onboard workloads. But these platforms require time investments and engineering resources to build. This Quick Start provides customers with a tool chain that can help them deploy a Well-Architected platform on top of Amazon EKS. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their platform initiatives.
 
 ## Examples
 
-To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
-
-You can also find a sample implementation that resides in this repository in `bin/main.ts`.
+For a library of `cdk-eks-blueprint` examples, see [SSP EKS Patterns](https://github.com/aws-samples/ssp-eks-patterns) and [EKS Shared Services Patterns](https://github.com/shapirov103/eks-ssp-patterns) (you can also find a sample implementation in `bin/main.ts`).
 
 ## Getting Started
 
-First, make sure you have the [`aws-cli`](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed. To verify your installation, run the following: 
+Install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html), and verify the installation by running the following command: 
 
 ```bash
 aws --version
 # output aws-cli/2.2.3 Python/3.9.5 Darwin/20.3.0 source/x86_64 prompt/off
 ```
 
-Install CDK matching the current version of the SSP QuickStart (which can be found in package.json).
+Install CDK by matching it to the current version of SSP, which can be found in `package.json`:
 
 ```bash
 npm install -g aws-cdk@1.113.0
 ```
 
-Verify the installation.
+Verify the installation:
 
 ```bash
 cdk --version
 # must output 1.113.0
 ```
 
-Create a new CDK project. We use `typescript` for this example. 
+Create a new CDK project. We use `typescript` in this example.
 
 ```bash
 cdk init app --language typescript
 ```
 
-[Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment.
+[Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment:
 
 ```bash
 cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
@@ -72,13 +68,13 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Run the following command to install the `cdk-eks-blueprint` dependency in your project.
+Run the following command to install the `cdk-eks-blueprint` dependency:
 
 ```
 npm i @shapirov/cdk-eks-blueprint
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
+Replace the contents of `bin/<your-main-file>.ts` (by default, `your-main-file` is the name of the root project directory) with the following:
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
@@ -101,51 +97,43 @@ const props = { env: { account, region } }
 new ssp.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
 ```
 
-Run the following command to confirm there are no issues with your code
+Run the following command to confirm there are no issues with your code:
 
 ```
 npm run build 
 ```
 
-If there are no errors you should see the following
+If there are no errors, you should see the following output:
+
 ```
 > eks-factory-test@0.1.0 build
 > tsc
 ```
 
-Deploy the stack using the following command
+Deploy the stack using the following command:
 
 ```
 cdk deploy
 ```
 
-This will provision the following:
+This provisions the following:
 
-- [x] A new Well-Architected VPC with both Public and Private subnets.
-- [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
-- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
-- [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
-- [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
-- [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
+- [x] A new well-architected VPC with both public and private subnets.
+- [x] A new well-architected EKS cluster in the Region and account you specify.
+- [x] [Argo CD](https://argoproj.github.io/argo-cd/) to support GitOps deployments.
+- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) to support network policies.
+- [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) to support metrics collection.
+- [x] AWS and Kubernetes resources to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
+- [x] AWS and Kubernetes resources to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
 
 ---
 
-## Why should I use this QuickStart?  
-
-The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge. 
-
-AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives. 
-
 ## Feedback
 
-For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/).
+For architectural details, step-by-step instructions, and customization options, see the [depoloyment guide](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks/). To post feedback, submit feature ideas, or report bugs, use the **Issues** section of the GitHub repository.
 
-To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo. 
-
-To submit code for this Quick Start, see the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/).
+To submit code for this Quick Start, see the [AWS Quick Start Contributor's Guide](https://aws-quickstart.github.io/).
 
 ## License
 
-This library is licensed under the Apache 2.0 License.
-
+The software included with this deployment is licensed under the Apache License, version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/ or in the accompanying "license" file. This code is distributed on an as-is basis, without warranties or conditions of any kind, either expressed or implied. See the License for specific language governing permissions and limitations.
