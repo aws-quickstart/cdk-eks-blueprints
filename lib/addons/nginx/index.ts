@@ -2,7 +2,7 @@ import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
-import { setPath } from '../../utils/object-utils';
+import { setPath } from "../../utils/object-utils";
 
 
 /**
@@ -110,13 +110,16 @@ export class NginxAddOn implements ClusterAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
+        const values = props.values ?? {};
+
         if(props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
+            setPath(values, "controller.service.https.port.targetPort", "http");
+            setPath(values, "controller.service.http.port.targetPort", "tohttps");
         }
 
-        const values = props.values ?? {};
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
 
         setPath(values, 'controller.service.annotations', serviceAnnotations);
