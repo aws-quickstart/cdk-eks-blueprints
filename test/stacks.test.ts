@@ -40,8 +40,7 @@ describe('Unit tests for EKS Blueprint', () => {
 
         blueprint.build(app, 'stack-with-missing-deps');
 
-        expect(console.assert).toBeCalledTimes(1);
-        expect(console.assert).toHaveBeenCalledWith(
+        expect(console.assert).toHaveBeenLastCalledWith(
             undefined,
             'Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps'
         );
