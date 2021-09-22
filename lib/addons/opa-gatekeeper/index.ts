@@ -56,13 +56,11 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
     
     constructor(props?: OpaGatekeeperAddOnProps) {
         this.options = { ...defaultProps, ...props };
-        //this.options = props ?? defaultProps;
     }
 
     deploy(clusterInfo: ClusterInfo): void {
 
         const props = this.options;
-       // const values = props.values ?? {}
 
         clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
@@ -73,7 +71,7 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             values: {
                 labelNamespace: 'false',
                 disableValidatingWebhook: 'true',
-                exemptNamespaces: 'kube-system'
+                exemptNamespaces: 'gatekeeper-system'
             }
         });
     }
