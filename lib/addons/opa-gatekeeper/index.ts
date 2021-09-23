@@ -22,12 +22,6 @@ export interface OpaGatekeeperAddOnProps {
     version?: string;
 
     /**
-     * 	Whether or not Helm should wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state before marking the release as successful.
-     * @default true
-     */
-    wait?: boolean;
-
-    /**
      * Setting validatingWebhookFailurePolicy to True
      * @default true 
      */
@@ -45,8 +39,7 @@ export interface OpaGatekeeperAddOnProps {
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'gatekeeper-system',
     version: '3.7.0-beta.1',
-    wait: true,
-    disableValidatingWebhook: true,
+    disableValidatingWebhook: false,
     values: {}
 };
 
@@ -69,9 +62,10 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             version: props.version,
             namespace: props.namespace,
             values: {
-                labelNamespace: 'false',
-                disableValidatingWebhook: 'true',
-                exemptNamespaces: 'gatekeeper-system'
+                labelNamespace: {
+                    "openpolicyagent.org/webhook" : "ignore"
+                },
+                disableValidatingWebhook: 'false',
             }
         });
     }
