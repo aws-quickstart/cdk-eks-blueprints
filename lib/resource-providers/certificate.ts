@@ -2,6 +2,9 @@ import * as spi from '../spi';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { IHostedZone } from '@aws-cdk/aws-route53';
 
+/**
+ * Certificate provider that imports certificate into the current stack by arn. 
+ */
 export class ImportCertificateProvider implements spi.ResourceProvider<acm.ICertificate> {
 
     constructor(private readonly certificateArn: string, private readonly id: string) {}
@@ -31,7 +34,6 @@ export class CreateCertificateProvider implements spi.ResourceProvider<acm.ICert
         return new acm.Certificate(context.scope, this.name, {
             domainName: this.domainName,
             validation: acm.CertificateValidation.fromDns(hostedZone),
-          });
-        
+          });       
     }
 }

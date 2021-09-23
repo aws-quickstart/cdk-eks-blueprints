@@ -121,7 +121,7 @@ test("Named resource providers are correctly registered and discovered", async (
 
     const blueprint =  await ssp.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
-        .resourceProvider(GlobalResources.HostedZone ,new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+        .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
         .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
         .addOns(new AwsLoadBalancerControllerAddOn())
         .addOns(new ExternalDnsAddon({hostedZoneResources: [GlobalResources.HostedZone]}))
