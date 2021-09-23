@@ -1,4 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { setPath } from "../../utils/object-utils";
+
 
 /**
  * Properties available to configure opa gatekeeper
@@ -27,7 +29,15 @@ export interface OpaGatekeeperAddOnProps {
      */
     disableValidatingWebhook?: boolean;
 
+    /**
+     * Label namespace so that webhook doesn't interfere with deployment of gatekeeper chart
+     * @default true
+     */
+    labelNamespace?: boolean;
 
+    /**
+     * values to pass to the helm chart per https://github.com/open-policy-agent/gatekeeper/tree/master/charts/gatekeeper
+     */
      values?: {
         [key: string]: any;
     };
@@ -40,8 +50,9 @@ const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'gatekeeper-system',
     version: '3.7.0-beta.1',
     disableValidatingWebhook: false,
-    values: {}
+    labelNamespace: true
 };
+
 
 export class OpaGatekeeperAddOn implements ClusterAddOn {
     
@@ -51,9 +62,16 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
+
     deploy(clusterInfo: ClusterInfo): void {
 
         const props = this.options;
+
+        const values = { ...props.values ?? {}};
+
+        setPath(values, 'disableValidatingWebhook', false)
+        setPath(values, 'labelNamespace', true)
+
 
         clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
@@ -61,12 +79,7 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
             version: props.version,
             namespace: props.namespace,
-            values: {
-                labelNamespace: {
-                    "openpolicyagent.org/webhook" : "ignore"
-                },
-                disableValidatingWebhook: 'false',
-            }
+            values
         });
     }
 }
