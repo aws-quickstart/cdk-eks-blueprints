@@ -2,7 +2,6 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Constants } from "..";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
-import { GatewayVpcEndpointAwsService } from "@aws-cdk/aws-ec2";
 import merge from "ts-deepmerge";
 import { createNamespace } from "../../utils";
 
@@ -109,10 +108,6 @@ export class VeleroAddOn implements ClusterAddOn {
                 enforceSSL: true // Encryption in Transit
             });
            
-            // Create S3 VPC Endpoint for the Velero pod to access S3 via VPC Endpoint instead of going to internet
-            cluster.vpc.addGatewayEndpoint("velero-backup-bucket-vpcEndPoint", {
-                service: GatewayVpcEndpointAwsService.S3
-            })
             bucketName = bucket.bucketName;
         }
         else {
