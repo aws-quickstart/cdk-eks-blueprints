@@ -62,7 +62,7 @@ In a production environment, it is common to have clusters that reside in differ
 ```typescript
 import * as cdk from '@aws-cdk/core';
 // SSP Lib
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 // Team implementations
 import * as team from '../teams'
 export default class MultiRegionConstruct extends cdk.Construct {

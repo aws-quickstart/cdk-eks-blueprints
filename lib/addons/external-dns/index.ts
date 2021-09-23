@@ -1,8 +1,8 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
+import { IHostedZone } from '@aws-cdk/aws-route53';
 import { Construct } from '@aws-cdk/core';
 import { Constants } from '..';
-import { IHostedZone } from '@aws-cdk/aws-route53';
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 
 
