@@ -1,10 +1,10 @@
+import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { setPath } from '../../utils/object-utils';
 
-
+ 
 /**
  * Properties available to configure the nginx ingress controller.
  */
@@ -55,7 +55,7 @@ export interface NginxAddOnProps {
      * Name of the certificate {@link NamedResourceProvider} to be used for certificate look up. 
      * @see {@link ImportCertificateProvider} and {@link CreateCertificateProvider} for examples of certificate providers.
      */
-    certificateResourceName? : string,
+    certificateResourceName?: string,
 
     /**
      * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#:
@@ -75,7 +75,7 @@ const defaultProps: NginxAddOnProps = {
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
-    namespace: "kube-system",
+    namespace: 'kube-system',
     values: {}
 };
 
@@ -91,7 +91,7 @@ export class NginxAddOn implements ClusterAddOn {
         const props = this.options;
         const dependencies = Array<Promise<Construct>>();
         const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
-        
+
         console.assert(awsLoadBalancerControllerAddOnPromise, `NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn for stack ${clusterInfo.cluster.stack.stackName}`);
         dependencies.push(awsLoadBalancerControllerAddOnPromise!);
 
@@ -110,10 +110,10 @@ export class NginxAddOn implements ClusterAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
-        if(props.certificateResourceName) {
+        if (props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificate?.certificateArn;
         }
 
         const values = props.values ?? {};

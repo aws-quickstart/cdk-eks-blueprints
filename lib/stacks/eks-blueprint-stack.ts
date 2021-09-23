@@ -149,10 +149,7 @@ export class EksBlueprint extends cdk.Stack {
     constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
-        /*
-        * Supported parameters
-        */
-
+       
         const resourceContext = this.provideNamedResources(blueprintProps);
 
         let vpcResource : IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);

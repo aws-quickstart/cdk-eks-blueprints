@@ -1,6 +1,5 @@
-import { ResourceProvider } from "..";
-import { ResourceContext } from "../spi";
 import * as ec2 from '@aws-cdk/aws-ec2';
+import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
  * VPC resource provider 

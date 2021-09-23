@@ -1,7 +1,6 @@
-import { ResourceProvider } from "..";
-import * as r53 from '@aws-cdk/aws-route53';
 import { Role } from "@aws-cdk/aws-iam";
-import { ResourceContext } from "../spi";
+import * as r53 from '@aws-cdk/aws-route53';
+import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
  * Simple lookup host zone provider

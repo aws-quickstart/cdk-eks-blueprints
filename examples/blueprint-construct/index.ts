@@ -21,7 +21,7 @@ export interface BlueprintConstructProps {
     /**
      * EC2 VPC
      */
-    vpc?: Vpc;
+    vpc: Vpc;
 }
 export default class BlueprintConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
@@ -60,11 +60,8 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         const blueprintID = `${blueprintProps.id}-dev`;
 
-        const resourceProviders = new Map<string, ssp.ResourceProvider>();
-
-        if(blueprintProps.vpc) {
-            resourceProviders.set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
-        } 
+        const resourceProviders = new Map<string, ssp.ResourceProvider>()
+            .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
         new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, resourceProviders }, props);
     }

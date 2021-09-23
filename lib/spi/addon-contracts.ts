@@ -1,6 +1,6 @@
-import * as types from './types';
-import { Construct, IResource } from '@aws-cdk/core';
+import { Construct } from '@aws-cdk/core';
 import { Team } from './team-contracts';
+import * as types from './types';
 
 /**
  * ClusterAddOn is the interface to which all Cluster addons should conform.
@@ -29,9 +29,3 @@ export declare interface ClusterPostDeploy {
     postDeploy(clusterInfo: types.ClusterInfo, teams: Team[]): void;
 }
 
-/** 
- * Generic resource provider interface. 
- **/
-export declare interface ResourceProvider<T extends IResource = IResource> {
-    provide(context: types.ResourceContext): T;
-}
