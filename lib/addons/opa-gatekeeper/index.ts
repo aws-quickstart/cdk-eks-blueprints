@@ -4,11 +4,6 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
  * Properties available to configure opa gatekeeper
  */
 export interface OpaGatekeeperAddOnProps {
-    /**
-     * Create namespace for Gatekeeper controller 
-     * @default true
-     */
-    createNamespace?: boolean;
 
     /** Default namespace
      * @default gatekeeper-system
@@ -20,18 +15,6 @@ export interface OpaGatekeeperAddOnProps {
      * @default 3.7.0-beta.1
      */
     version?: string;
-
-    /**
-     * Setting validatingWebhookFailurePolicy to True
-     * @default true 
-     */
-    disableValidatingWebhook?: boolean;
-
-    /**
-     * Label namespace so that webhook doesn't interfere with deployment of gatekeeper chart
-     * @default true
-     */
-    labelNamespace?: boolean;
 
     /**
      * values to pass to the helm chart per https://github.com/open-policy-agent/gatekeeper/tree/master/charts/gatekeeper
@@ -48,8 +31,6 @@ export interface OpaGatekeeperAddOnProps {
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'gatekeeper-system',
     version: '3.7.0-beta.1',
-    disableValidatingWebhook: false,
-    labelNamespace: true,
     values: {}
 };
 
@@ -63,25 +44,14 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-
-        const props = this.options;
-
-        const values = { ...props.values ?? {}};
-
-        values['gatekeeper-configurations'] = {
-            configurations: {
-                disableValidatingWebhook: false,
-                labelNamespace: true,               
-            }
-        }
-
+        
         clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
-            version: props.version,
-            namespace: props.namespace,
-            values
+            version: this.options.version,
+            namespace: this.options.namespace,
+            values: this.options.values,
         });
     }
 }
