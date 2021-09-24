@@ -12,7 +12,7 @@ A resource provider is a core SSP concept that enables customers to supply resou
 
 `ClusterAddOn` and `Team` implementations require AWS resources that can be shared across several constructs. For example, `ExternalDnsAddOn` requires an array of hosted zones that will be used for integration with Route53. `NginxAddOn` requires a certificate and hosted zone (for DNS validation) in order to use TLS termination. VPC may be used inside add-ons and team constructs to look up VPC CIDR and subnets. 
 
-The SSP Platform provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers. 
+The SSP framework provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers. 
 
 Resource providers may depend on resources provided by other resource providers. For example, `CertificateResourceProvider` relies on a hosted zone resource, which is expected to be supplied by another provider.
 
@@ -51,6 +51,74 @@ class DynamoDbTableResourceProvider implements ResourceProvider<ITable> {
 }
 
 ```
+
+Access to registered resources from other resource providers and/or add-ons and teams:
+
+```typescript
+/**
+ * Provides API to register resource providers and get access to the provided resources.
+ */
+export class ResourceContext {
+    
+    /**
+     * Adds a new resource provider and specifies the name under which the provided resource will be registered,
+     * @param name Specifies the name key under which the provided resources will be registered for subsequent look-ups.
+     * @param provider Implementation of the resource provider interface
+     * @returns the provided resource
+     */
+    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
+        ...
+    }
+
+    /**
+     * Gets the provided resource by the supplied name. 
+     * @param name under which the resource provider was registered
+     * @returns the resource or undefined if the specified resource was not found
+     */
+    public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
+        ...
+    }
+}
+```
+
+Convenience API to access registered resources from add-ons:
+
+```typescript
+/**
+ * Cluster info supplies all contextual information on the cluster configuration, registered resources and add-ons 
+ * which could be leveraged by the framework, add-on implementations and teams.
+ */
+export class ClusterInfo {
+    ...
+
+    /**
+     * Provides the resource context object associated with this instance of the EKS Blueprint.
+     * @returns resource context object
+     */
+    public getResourceContext(): ResourceContext {
+        return this.resourceContext;
+    }
+
+    /**
+     * Provides the resource registered under supplied name
+     * @param name of the resource to be returned
+     * @returns Resource object or undefined if no resource was found
+     */
+    public getResource<T extends cdk.IResource>(name: string): T | undefined {
+        ...
+    }
+
+    /**
+     * Same as {@link getResource} but will fail if the specified resource is not found
+     * @param name of the resource to be returned
+     * @returns Resource object (fails if not found)
+     */
+    public getRequiredResource<T extends cdk.IResource>(name: string): T {
+        ...
+    }
+}
+```
+
 
 ## Usage
 

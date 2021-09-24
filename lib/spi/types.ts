@@ -1,8 +1,8 @@
-import * as cdk from '@aws-cdk/core';
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
-import { EksBlueprintProps } from '../stacks';
+import * as cdk from '@aws-cdk/core';
 import { ResourceProvider } from '.';
+import { EksBlueprintProps } from '../stacks';
 
 /**
  * Data type defining an application repository (git). 
@@ -48,12 +48,21 @@ export interface ApplicationRepository {
 
 }
 
+/**
+ * Provides API to register resource providers and get access to the provided resources.
+ */
 export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
     
+    /**
+     * Adds a new resource provider and specifies the name under which the provided resource will be registered,
+     * @param name Specifies the name key under which the provided resources will be registered for subsequent look-ups.
+     * @param provider Implementation of the resource provider interface
+     * @returns the provided resource
+     */
     public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
         const resource = provider.provide(this);
         console.assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
@@ -61,6 +70,11 @@ export class ResourceContext {
         return resource;
     }
 
+    /**
+     * Gets the provided resource by the supplied name. 
+     * @param name under which the resource provider was registered
+     * @returns the resource or undefined if the specified resource was not found
+     */
     public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
         return <T>this.resources.get(name);
     }
@@ -73,6 +87,10 @@ export enum GlobalResources {
 }
 
 
+/**
+ * Cluster info supplies required information on the cluster configuration, registered resources and add-ons 
+ * which could be leveraged by the framework, add-on implementations and teams.
+ */
 export class ClusterInfo {
 
     readonly nodeGroup?: Nodegroup;
@@ -99,6 +117,10 @@ export class ClusterInfo {
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
+    /**
+     * Provides the resource context object associated with this instance of the EKS Blueprint.
+     * @returns resource context object
+     */
     public getResourceContext(): ResourceContext {
         return this.resourceContext;
     }
@@ -156,10 +178,20 @@ export class ClusterInfo {
         return this.scheduledAddOns;
     }
 
+    /**
+     * Provides the resource registered under supplied name
+     * @param name of the resource to be returned
+     * @returns Resource object or undefined if no resource was found
+     */
     public getResource<T extends cdk.IResource>(name: string): T | undefined {
         return this.resourceContext.get<T>(name);
     }
 
+    /**
+     * Same as {@link getResource} but will fail if the specified resource is not found
+     * @param name of the resource to be returned
+     * @returns Resource object (fails if not found)
+     */
     public getRequiredResource<T extends cdk.IResource>(name: string): T {
         const result = this.resourceContext.get<T>(name);
         console.assert(result, `Required resource ${name} is missing.`);

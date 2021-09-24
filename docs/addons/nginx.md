@@ -143,7 +143,7 @@ ssp.EksBlueprint.builder()
 
 **Create Certificate**
 
-This case is used when certificate should be created with the blueprint stack. In this case, DNS validation needs a Route53 hosted zone to be provisioned (either along with the stack or separately) and registered as a resource provider.
+This approach is used when certificate should be created with the blueprint stack. In this case, the new certificate requires DNS validation which can be accomplished automatically if the corresponding Route53 hosted zone is provisioned (either along with the stack or separately) and registered as a resource provider.
 
 ```typescript
 ssp.EksBlueprint.builder()

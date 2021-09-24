@@ -2,8 +2,6 @@ import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '../lib';
-import { ApplicationTeam, AwsLoadBalancerControllerAddOn, ExternalDnsAddon, GlobalResources, ImportHostedZoneProvider, NestedStackAddOn, NginxAddOn } from '../lib';
-import { CreateCertificateProvider } from '../lib/resource-providers/certificate';
 import { MyVpcStack } from './test-support';
 
 test('Usage tracking created', () => {
@@ -99,7 +97,7 @@ test('Pipeline Builder Creates correct pipeline', () => {
 test("Nested stack add-on creates correct nested stack", async () => {
     const app = new cdk.App();
 
-    const vpcAddOn = new NestedStackAddOn( {
+    const vpcAddOn = new ssp.NestedStackAddOn( {
         builder: MyVpcStack.builder(),
         id: "vpc-nested-stack"
     });
@@ -121,22 +119,22 @@ test("Named resource providers are correctly registered and discovered", async (
 
     const blueprint =  await ssp.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
-        .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
-        .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
-        .addOns(new AwsLoadBalancerControllerAddOn())
-        .addOns(new ExternalDnsAddon({hostedZoneResources: [GlobalResources.HostedZone]}))
-        .addOns(new NginxAddOn({
-            certificateResourceName: GlobalResources.Certificate,
+        .resourceProvider(ssp.GlobalResources.HostedZone, new ssp.ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+        .resourceProvider(ssp.GlobalResources.Certificate, new ssp.CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', ssp.GlobalResources.HostedZone))
+        .addOns(new ssp.AwsLoadBalancerControllerAddOn())
+        .addOns(new ssp.ExternalDnsAddon({hostedZoneResources: [ssp.GlobalResources.HostedZone]}))
+        .addOns(new ssp.NginxAddOn({
+            certificateResourceName: ssp.GlobalResources.Certificate,
             externalDnsHostname: 'my.domain.com'
         }))
-        .teams(new ApplicationTeam({
+        .teams(new ssp.ApplicationTeam({
             name: "appteam", namespace: "appteam-ns"
         }))
         .buildAsync(app, 'stack-with-resource-providers');
     
-    expect(blueprint.getClusterInfo().getResource(GlobalResources.Vpc)).toBeDefined();
-    expect(blueprint.getClusterInfo().getResource(GlobalResources.HostedZone)).toBeDefined();
-    expect(blueprint.getClusterInfo().getResource(GlobalResources.Certificate)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.Vpc)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.HostedZone)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.Certificate)).toBeDefined();
     expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
 });
 

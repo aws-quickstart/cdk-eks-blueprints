@@ -58,7 +58,7 @@ Note the `external-dns.alpha.kubernetes.io/hostname` annotation for the service 
 
 ## Hosted Zone Providers
 
-In order for external DNS to work, you need to supply one or more hosted zones. Hosted zones are expected to be supplied levering [resource providers](../resource-providers/index.md).
+In order for external DNS to work, you need to supply one or more hosted zones. Hosted zones are expected to be supplied leveraging [resource providers](../resource-providers/index.md).
 
 To help customers handle common use cases for Route 53 provisioning the framework provides a few convenience providers that can be registered with the EKS Blueprint Stack. 
 
