@@ -1,6 +1,4 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { setPath } from "../../utils/object-utils";
-
 
 /**
  * Properties available to configure opa gatekeeper
@@ -46,11 +44,13 @@ export interface OpaGatekeeperAddOnProps {
 /**
  * Defaults options for the add-on
  */
+
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'gatekeeper-system',
     version: '3.7.0-beta.1',
     disableValidatingWebhook: false,
-    labelNamespace: true
+    labelNamespace: true,
+    values: {}
 };
 
 
@@ -62,16 +62,18 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
-
     deploy(clusterInfo: ClusterInfo): void {
 
         const props = this.options;
 
         const values = { ...props.values ?? {}};
 
-        setPath(values, 'disableValidatingWebhook', false)
-        setPath(values, 'labelNamespace', true)
-
+        values['gatekeeper-configurations'] = {
+            configurations: {
+                disableValidatingWebhook: false,
+                labelNamespace: true,               
+            }
+        }
 
         clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
             chart: "gatekeeper",
