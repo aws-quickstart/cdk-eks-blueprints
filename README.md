@@ -6,7 +6,7 @@
 
 Welcome to the `Amazon EKS SSP Quickstart` repository.
 
-This repository contains the source code for the [`cdk-eks-blueprint`](https://www.npmjs.com/package/@shapirov/cdk-eks-blueprint) NPM module. `cdk-eks-blueprint` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`ssp-amazon-eks`](https://www.npmjs.com/package/@aws-quickstart/ssp-amazon-eks) NPM module. `ssp-amazon-eks` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy a Shared Services Platform (SSP) on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## Documentation
 
@@ -18,7 +18,7 @@ A Shared Services Platform (SSP) is an internal development platform that abstra
 
 ## What can I do with this QuickStart?
 
-Customers can use this QuickStart to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
+Customers can use this QuickStart to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `ssp-amazon-eks` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
 - [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
@@ -28,7 +28,7 @@ Customers can use this QuickStart to easily architect and deploy a multi-tenant 
 
 ## Examples
 
-To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
+To view a library of examples for how you can leverage the `ssp-amazon-eks`, please see our [SSP Patterns Repository](https://github.com/shapirov103/eks-ssp-patterns).
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
@@ -68,17 +68,17 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Run the following command to install the `cdk-eks-blueprint` dependency in your project.
+Run the following command to install the `ssp-amazon-eks` dependency in your project.
 
 ```sh
-npm i @shapirov/cdk-eks-blueprint
+npm i @aws-quickstart/ssp-amazon-eks
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 const app = new cdk.App();
 
@@ -138,7 +138,7 @@ This will provision the following:
 
 The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge.
 
-AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `cdk-eks-blueprint` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
+AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `ssp-amazon-eks` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
 
 ## Feedback
 

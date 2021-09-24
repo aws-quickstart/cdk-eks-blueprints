@@ -7,7 +7,7 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ## Usage
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 const hostedZoneName = ...
 const hostedZone = new ssp.addons.LookupHostedZoneProvider(hostedZoneName)
@@ -58,27 +58,36 @@ Note the `external-dns.alpha.kubernetes.io/hostname` annotation for the service 
 
 ## Hosted Zone Providers
 
-In order for external DNS to work, you need to supply one or more hosted zones. You need a reference to the EKS stack in order to either create or look up the hosted zones. 
+In order for external DNS to work, you need to supply one or more hosted zones. Hosted zones are expected to be supplied leveraging [resource providers](../resource-providers/index.md).
 
-To help customers handle common use cases for Route 53 provisioning the framework provides a few convenience providers. 
+To help customers handle common use cases for Route 53 provisioning the framework provides a few convenience providers that can be registered with the EKS Blueprint Stack. 
 
 **Name look-up and direct import provider:**
 This provider will allow to bind to an existing hosted zone based on its name.
 
 ```typescript
-    const myDomainName = ""
-    new ssp.addons.ExternalDnsAddon({
-        hostedZone: new ssp.addons.LookupHostedZoneProvider(myDomainName);
+const myDomainName = "";
+
+ssp.EksBlueprint.builder()
+    //  Register hosted zone1 under the name of MyHostedZone1
+    .resourceProvider("MyHostedZone1", new ssp.LookupHostedZoneProvider(myDomainName))
+    .addOns(new ssp.addons.ExternalDnsAddon({
+        hostedZoneProviders: ["MyHostedZone1"];
     })
+    .build(...);
 ```
 
 If the hosted zone ID is known, then the recommended approach is to use a `ImportHostedZoneProvider` which bypasses any lookup calls.
 
 ```typescript
-    const myHostedZoneId = ""
-    new ssp.addons.ExternalDnsAddon({
-        hostedZone: new ssp.addons.ImportHostedZoneProvider(myDomainName);
+const myHostedZoneId = "";
+ssp.EksBlueprint.builder()
+    //  Register hosted zone1 under the name of MyHostedZone1
+    .resourceProvider("MyHostedZone1",  new ssp.addons.ImportHostedZoneProvider(myHostedZoneId))
+    .addOns(new ssp.addons.ExternalDnsAddon({
+        hostedZoneProviders: ["MyHostedZone1"];
     })
+    .build(...);
 ```
 
 **Delegating Hosted Zone Provider**
@@ -107,20 +116,23 @@ The setup will look the following way:
 3. Use the following configuration of the add-on:
 
 ```typescript
-const useWildcardDomain = true
-readonly externalDns = new ssp.addons.ExternalDnsAddon({
-    hostedZone: new ssp.addons.DelegatingHostedZoneProvider({
+
+ssp.EksBlueprint.builder()
+    //  Register hosted zone1 under the name of MyHostedZone1
+    .resourceProvider("MyHostedZone1",  new ssp.DelegatingHostedZoneProvider({
         parentDomain: 'myglobal-domain.com',
         subdomain: 'dev.myglobal-domain.com', 
         parentAccountId: parentDnsAccountId,
-        delegatingRoleName: 'DomainOperatorRole', 
-        wildcardSubdomain: useWildcardDomain
+        delegatingRoleName: 'DomainOperatorRole',
+        wildcardSubdomain: true
     })
-});
+    .addOns(new ssp.addons.ExternalDnsAddon({
+        hostedZoneProviders: ["MyHostedZone1"];
+    })
+
 ```
 
-The parameter `useWildcardDomain` above when set to true will also create a CNAME for `*.dev.myglobal-domain.com`. This is at the moment used for host based routing within EKS (e.g. with NGINX ingress).
-
+The parameter `wildcardSubdomain` above when set to true will also create a CNAME for `*.dev.myglobal-domain.com`. This is at the moment used for host based routing within EKS (e.g. with NGINX ingress).
 
 
 ## Configuration Options

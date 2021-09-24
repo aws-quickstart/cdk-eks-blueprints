@@ -1,10 +1,10 @@
 # Getting Started 
 
-This getting started guide will walk you through setting up a new CDK project which leverages the `cdk-eks-blueprint` NPM module to deploy a simple SSP. 
+This getting started guide will walk you through setting up a new CDK project which leverages the `ssp-amazon-eks` NPM module to deploy a simple SSP. 
 
 ## Project setup
 
-To use the `cdk-eks-blueprint` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
+To use the `ssp-amazon-eks` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
 
 ```bash
 npm install -g aws-cdk@1.119.0
@@ -24,10 +24,10 @@ cdk init app --language typescript
 
 ## Deploy a Blueprint EKS Cluster
 
-Install the `cdk-eks-blueprint` NPM package via the following.
+Install the `ssp-amazon-eks` NPM package via the following.
 
 ```bash
-npm i @shapirov/cdk-eks-blueprint
+npm i @aws-quickstart/ssp-amazon-eks
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
@@ -35,7 +35,7 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 const app = new cdk.App();
 
@@ -75,7 +75,7 @@ Deploy the stack using the following command. This command will take roughly 20 
 cdk deploy
 ```
 
-Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprint`. The above code will provision the following:
+Congratulations! You have deployed your first EKS cluster with `ssp-amazon-eks`. The above code will provision the following:
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
@@ -123,6 +123,8 @@ Next, let's walk you through how to deploy workloads to your cluster with ArgoCD
 You can leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
 
 ### Install ArgoCD CLI
+
+These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping).
 
 Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
 

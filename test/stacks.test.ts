@@ -26,8 +26,8 @@ describe('Unit tests for EKS Blueprint', () => {
         console.log(stack.templateOptions.description);
         // AND
         assertBlueprint(stack);
-
     });
+
 
     test("Stack creation fails due to missing add-on dependency", () => {
         const app = new cdk.App();
@@ -35,7 +35,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = ssp.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addons(new ssp.NginxAddOn)
+            .addOns(new ssp.NginxAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
         blueprint.build(app, 'stack-with-missing-deps');
@@ -52,9 +52,9 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = ssp.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addons(new ssp.ArgoCDAddOn)
-            .addons(new ssp.AwsLoadBalancerControllerAddOn)
-            .addons(new ssp.NginxAddOn)
+            .addOns(new ssp.ArgoCDAddOn)
+            .addOns(new ssp.AwsLoadBalancerControllerAddOn)
+            .addOns(new ssp.NginxAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
         const stack1 = await blueprint.buildAsync(app, "stack-1");
@@ -62,8 +62,9 @@ describe('Unit tests for EKS Blueprint', () => {
         assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
         expect(console.assert).toHaveBeenLastCalledWith(true);
 
-        const blueprint2 = blueprint.clone('us-west-2', '1234567891').addons(new ssp.CalicoAddOn);
+        const blueprint2 = blueprint.clone('us-west-2', '1234567891').addOns(new ssp.CalicoAddOn);
         const stack2 = await blueprint2.buildAsync(app, 'stack-2');
+
 
         assertBlueprint(stack2, 'nginx-ingress', 'argo-cd', 'aws-calico');
 
@@ -84,9 +85,9 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = ssp.EksBlueprint.builder()
             .account("123567891")
             .region('us-west-1')
-            .addons(new ssp.ArgoCDAddOn)
-            .addons(new ssp.AwsLoadBalancerControllerAddOn)
-            .addons(new ssp.NginxAddOn)
+            .addOns(new ssp.ArgoCDAddOn)
+            .addOns(new ssp.AwsLoadBalancerControllerAddOn)
+            .addOns(new ssp.NginxAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
         const pipeline = ssp.CodePipelineStack.builder()
@@ -118,7 +119,6 @@ describe('Unit tests for EKS Blueprint', () => {
 
     test("Nested stack add-on creates correct nested stack", async () => {
         const app = new cdk.App();
-
         const vpcAddOn = new ssp.NestedStackAddOn( {
             builder: MyVpcStack.builder(),
             id: "vpc-nested-stack"
@@ -127,13 +127,37 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = ssp.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addons(vpcAddOn)
+            .addOns(vpcAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
         const parentStack =  await blueprint.buildAsync(app, "stack-with-nested");
         const clusterInfo = parentStack.getClusterInfo();
         expect(clusterInfo.getProvisionedAddOn("vpc-nested-stack")).toBeDefined();
     });
+});
+
+test("Named resource providers are correctly registered and discovered", async () => {
+    const app = new cdk.App();
+
+    const blueprint =  await ssp.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .resourceProvider(ssp.GlobalResources.HostedZone, new ssp.ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+        .resourceProvider(ssp.GlobalResources.Certificate, new ssp.CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', ssp.GlobalResources.HostedZone))
+        .addOns(new ssp.AwsLoadBalancerControllerAddOn())
+        .addOns(new ssp.ExternalDnsAddon({hostedZoneResources: [ssp.GlobalResources.HostedZone]}))
+        .addOns(new ssp.NginxAddOn({
+            certificateResourceName: ssp.GlobalResources.Certificate,
+            externalDnsHostname: 'my.domain.com'
+        }))
+        .teams(new ssp.ApplicationTeam({
+            name: "appteam", namespace: "appteam-ns"
+        }))
+        .buildAsync(app, 'stack-with-resource-providers');
+    
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.Vpc)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.HostedZone)).toBeDefined();
+    expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.Certificate)).toBeDefined();
+    expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
 });
 
 function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
