@@ -42,7 +42,7 @@ export interface OpaGatekeeperAddOnProps {
 }
 
 /**
- * Defaults options for the add-on
+ * Defaults options for the gatekeeper add-on
  */
 
 const defaultProps: OpaGatekeeperAddOnProps = {
