@@ -46,7 +46,10 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.MetricsServerAddOn,
     new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
-    new ssp.addons.AwsLoadBalancerControllerAddOn()
+    new ssp.addons.AwsLoadBalancerControllerAddOn(),
+    new ssp.addons.VpcCniAddOn(),
+    new ssp.addons.CoreDnsAddOn(),
+    new ssp.addons.KubeProxyAddOn()
 ];
 
 const opts = { id: 'east-test-1', addOns }

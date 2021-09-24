@@ -2,6 +2,7 @@ import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
 
  
@@ -86,19 +87,11 @@ export class NginxAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
+
+    @dependable('AwsLoadBalancerControllerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+
         const props = this.options;
-        const dependencies = Array<Promise<Construct>>();
-        const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
-
-        console.assert(awsLoadBalancerControllerAddOnPromise, `NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn for stack ${clusterInfo.cluster.stack.stackName}`);
-        dependencies.push(awsLoadBalancerControllerAddOnPromise!);
-
-        if (props.externalDnsHostname) {
-            const externalDnsAddOnPromise = clusterInfo.getScheduledAddOn('ExternalDnsAddon');
-            console.assert(externalDnsAddOnPromise, 'NginxAddOn has a dependency on ExternalDnsAddOn');
-            dependencies.push(externalDnsAddOnPromise!);
-        }
 
         const presetAnnotations: any = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
@@ -131,13 +124,6 @@ export class NginxAddOn implements ClusterAddOn {
             version: props.version,
             values
         });
-
-        Promise.all(dependencies.values()).then((constructs) => {
-            constructs.forEach((construct) => {
-                nginxHelmChart.node.addDependency(construct);
-            });
-        }).catch(err => { throw new Error(err) });
-
         return Promise.resolve(nginxHelmChart);
     }
 }
