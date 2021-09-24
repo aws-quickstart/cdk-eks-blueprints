@@ -76,7 +76,7 @@ const defaultProps: NginxAddOnProps = {
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
-    namespace: "kube-system"
+    namespace: 'kube-system'
 };
 
 export class NginxAddOn implements ClusterAddOn {
@@ -86,6 +86,7 @@ export class NginxAddOn implements ClusterAddOn {
     constructor(props?: NginxAddOnProps) {
         this.options = { ...defaultProps, ...props };
     }
+
 
     @dependable('AwsLoadBalancerControllerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
