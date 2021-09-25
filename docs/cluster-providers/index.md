@@ -1,7 +1,7 @@
-# Cluster Providers
+# Cluster providers
 
-Cluster Providers allow you to do specify advanced options and configuration for your EKS clusters. The framework currently supports the following cluster providers. 
+Cluster providers allow you to configure and set advanced options for your Amazon EKS clusters. The framework currently supports the following cluster providers:
 
-| Cluster Provider      | Description                                                           |
+| Cluster provider      | Description                                                           |
 |-----------------------|-----------------------------------------------------------------------|
-| EC2ClusterProvider    | Provision a EKS cluster which leverages EKS Managed Node Groups (MNGs)|
+| EC2ClusterProvider    | Provision an EKS cluster that uses EKS Managed Node Groups (MNGs).|

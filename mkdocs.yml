@@ -8,29 +8,29 @@ theme:
     - tabs
 nav:
   - Overview: 'index.md'
-  - Getting Started: 'getting-started.md'
-  - Core Concepts: 'core-concepts.md'
+  - Getting started: 'getting-started.md'
+  - Core concepts: 'core-concepts.md'
   - Teams: 'teams.md'
   - Pipelines: 'pipelines.md'
-  - AddOns:
+  - Add-ons:
     - Overview: 'addons/index.md'
     - AWS App Mesh: 'addons/app-mesh.md'
-    - ArgoCD: 'addons/argo-cd.md'
+    - Argo CD: 'addons/argo-cd.md'
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - Calico: 'addons/calico.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
-    - External DNS: 'addons/external-dns.md'
+    - ExternalDNS: 'addons/external-dns.md'
     - Metrics Server: 'addons/metrics-server.md'
-    - Nginx: 'addons/nginx.md'
+    - NGINX: 'addons/nginx.md'
     - SSM Agent: 'addons/ssm-agent.md'
     - Weave GitOps: 'https://github.com/weaveworks/weave-gitops-ssp-addon'
-    - AWS XRay: 'addons/xray.md'
-  - Cluster Providers: 
+    - AWS X-Ray: 'addons/xray.md'
+  - Cluster providers: 
     - Overview: 'cluster-providers/index.md'
-    - EC2 Cluster Provider: 'cluster-providers/ec2-cluster-provider.md'
+    - EC2 cluster provider: 'cluster-providers/ec2-cluster-provider.md'
   - Advanced:
-    - Multi Cluster Management: 'advanced/multi-cluster-management.md'
+    - Multicluster management: 'advanced/multi-cluster-management.md'
 markdown_extensions:
   - def_list
   - pymdownx.highlight  

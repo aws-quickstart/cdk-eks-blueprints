@@ -38,7 +38,7 @@ metrics-server                                                1/1     1         
 
 ## Testing with Kubernetes dashboard
 
-To view CPU and memory metrics of your cluster, use [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
+To view your cluster's CPU and memory metrics, use [Kubernetes Dashboard](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html):
 
 ```sh
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.5/aio/deploy/recommended.yaml
@@ -59,7 +59,7 @@ service/dashboard-metrics-scraper created
 deployment.apps/dashboard-metrics-scraper created
 ```
 
-Use the following commands to create a file called `eks-admin-service-account.yaml`. This manifest defines a service account and cluster role binding called `eks-admin`.
+Use the following commands to create a file called `eks-admin-service-account.yaml`. This manifest defines a service account and cluster-role binding called `eks-admin`.
 
 ```sh
 $ cat << 'EOF' >> eks-admin-service-account.yaml
@@ -85,7 +85,7 @@ subjects:
 EOF
 ```
 
-Apply the service account and cluster role binding to your cluster.
+Apply the service account and cluster-role binding:
 
 ```sh
 $ kubectl apply -f eks-admin-service-account.yaml
@@ -114,7 +114,7 @@ namespace:  11 bytes
 token:      XXXXXXXXXXXXXXXXXXXXXX
 ```
 
-Start the kubectl proxy.
+Start the Kubectl proxy:
 
 ```sh
 $ kubectl proxy

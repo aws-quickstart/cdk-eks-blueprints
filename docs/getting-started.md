@@ -1,4 +1,4 @@
-# Getting Started 
+# Getting started 
 
 This guide walks you through setting up a new CDK project that uses the `cdk-eks-blueprint` Node Package Manager (NPM) module to deploy an SSP. 
 
@@ -10,27 +10,27 @@ To use the `cdk-eks-blueprint` module, you must have the [AWS Cloud Development 
 npm install -g aws-cdk@1.113.0
 ```
 
-Verify the installation.
+Verify the installation:
 
 ```bash
 cdk --version
 ```
 
-Create a new `typescript` CDK project in an empty directory.
+Create a new `typescript` CDK project in an empty directory:
 
 ```bash
 cdk init app --language typescript
 ```
 
-## Deploy a Blueprint EKS Cluster
+## Deploy a Blueprint EKS cluster
 
-Install the `cdk-eks-blueprint` NPM package.
+Install the `cdk-eks-blueprint` NPM package:
 
 ```bash
 npm i @shapirov/cdk-eks-blueprint
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root directory) using the following code. This code deploys a new Amazon EKS cluster and installs the Argo CD add-on.
+Replace the contents of `bin/<your-main-file>.ts` (by default, `your-main-file` is the name of the root directory) using the following code. This code deploys a new Amazon EKS cluster and installs the Argo CD add-on.
 
 ```typescript
 import 'source-map-support/register';
@@ -139,13 +139,13 @@ To access Argo CD in your Kubernetes cluster, see [Use Port Forwarding to Access
 export ARGO_SERVER=$(kubectl get svc -n argocd -l app.kubernetes.io/name=argocd-server -o name) 
 ```
 
-In a new terminal, expose the service locally.
+In a new terminal, expose the service locally:
 
 ```
 kubectl port-forward $ARGO_SERVER -n argocd 8080:443
 ```
 
-In your browser, navigate to http://localhost:8080. You should see the Argo CD login screen.
+In your browser, navigate to `http://localhost:8080`. You should see the Argo CD login screen.
 
 ![ArgoCD](assets/images/argo-cd.png)
 
@@ -163,7 +163,7 @@ During port forwarding, log in using the following command:
 argocd login localhost:8080 --username admin --password $ARGO_PASSWORD
 ```
 
-Optionally, you can log in to the Argo CD UI using a generated password and the user name `admin`. 
+Optionally, log in to the Argo CD UI using a generated password and the user name `admin`:
 
 ```
 echo $ARGO_PASSWORD
@@ -171,7 +171,7 @@ echo $ARGO_PASSWORD
 
 ### Deploy workloads to your cluster
 
-Create a project in Argo CD by running the following command:
+Create a project in Argo CD:
 
 ```
 argocd proj create sample \
@@ -179,7 +179,7 @@ argocd proj create sample \
     -s https://github.com/aws-samples/ssp-eks-workloads.git
 ```
 
-Create the application within Argo CD by running the following command:
+Create the application within Argo CD:
 
 ```
 argocd app create dev-apps \
@@ -189,7 +189,7 @@ argocd app create dev-apps \
     --path "envs/dev"
 ```
 
-Synchronize your applications by running the following command:
+Synchronize your applications:
 
 ```
 argocd app sync dev-apps 
