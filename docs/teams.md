@@ -4,9 +4,9 @@ The `cdk-eks-blueprint` framework provides support for onboarding, managing, and
 
 You can create your own team implementations by creating classes that inherit from `ApplicationTeam`.
 
-### ApplicationTeam 
+### ApplicationTeam class
 
-To create an `ApplicationTeam` for your cluster, implement a class that extends `ApplicationTeam`. You must supply a team name and an array of users.  
+To create an application team, implement a class that extends `ApplicationTeam`. You must supply a team name and an array of users.
 
 ```typescript
 export class TeamAwesome extends ApplicationTeam {
@@ -14,7 +14,7 @@ export class TeamAwesome extends ApplicationTeam {
         super({
             name: "team-awesome",
             users: [
-                new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user1`),  
+                new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user1`),
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user2`)
             ]
 
@@ -25,16 +25,16 @@ export class TeamAwesome extends ApplicationTeam {
 
 The `ApplicationTeam` class does the following:
 
-- Create a namespace.
+- Creates a namespace.
 - Registers quotas.
 - Registers IAM users for cross-account access.
 - Creates a shared role for cluster access. Optionally, an existing role can be used.
 - Registers users and roles in the `awsAuth` map for Kubectl.
 - Provides console access to the cluster and namespace.
 
-### PlatformTeam 
+### PlatformTeam class
 
-To create a `PlatformTeam` class for your cluster, implement a class that extends `PlatformTeam`. You must supply a team name and an array of users.  
+To create a platform team, implement a class that extends `PlatformTeam`. You must supply a team name and an array of users.  
 
 ```typescript
 export class TeamAwesome extends PlatformTeam {
@@ -53,7 +53,7 @@ export class TeamAwesome extends PlatformTeam {
 The `PlatformTeam` class does the following:
 
  - Registers IAM users for administrator access to the cluster (Kubectl and console).
- - Registers an existing role (or creates a new role) for cluster access with trust a relationship with the provided or created role.
+ - Registers an existing role (or creates a new role) for cluster access.
  
 To reduce verbosity for some use cases, such as for platform teams, the following use case enables administrator cluster access for a specific role, and the blueprint provides add-hoc support for creating teams:
 
@@ -64,12 +64,12 @@ const adminTeam = new PlatformTeam( {
 })
 ```
 
-### DefaultTeamRoles 
+### DefaultTeamRoles class
 
 The `DefaultTeamRoles` class provides a default RBAC configuration for `ApplicationTeams`:
 
  - Cluster role, group identity, and cluster role bindings for viewing nodes and namespaces.
- - Namespace role and role binding for the group to view pods, deployments, daemonsets, and services.
+ - Namespace role and role binding for the group to view pods, deployments, DaemonSets, and services.
 
 ## Team benefits 
 
@@ -77,8 +77,8 @@ Managing teams using infrastrucutre as code provides the following benefits:
 
 1. Self-documenting code.
 2. Centralized logic related to the team.
-3. A location to add additional provisioning, such as adding Kubernetes service accounts and/or infrastructure (for example, S3 buckets).
-4. IDE support to locate a team (for example, `CTRL+T` in VSCode to look up a class name).
+3. A location to add additional provisioning, such as adding Kubernetes service accounts and/or infrastructure (for example, to an S3 bucket).
+4. IDE support to locate a team (for example, `CTRL+T` in VS Code to look up a class name).
 
 The previous example is intended for a platform team, but it can be applied to a team with restricted access. 
 

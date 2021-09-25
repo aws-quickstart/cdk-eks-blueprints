@@ -32,7 +32,7 @@ AWS customers build internal platforms to reduce complexity, automate the manage
 
 For a library of `cdk-eks-blueprint` examples, see [SSP EKS Patterns](https://github.com/aws-samples/ssp-eks-patterns) and [EKS Shared Services Patterns](https://github.com/shapirov103/eks-ssp-patterns) (you can also find a sample implementation in `bin/main.ts`).
 
-## Getting Started
+## Getting started
 
 Install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html), and verify the installation by running the following command: 
 

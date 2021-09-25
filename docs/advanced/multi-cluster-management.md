@@ -3,6 +3,7 @@
 Multicluster management refers to strategies associated with managing and updating your cluster configuration across Amazon EKS clusters. Infrastructure as code (IaC) tools, such as AWS CDK, provide automation and consistency when deploying clusters. You must have the ability to apply the same configurations to as many of your clusters as necessary. Using IaC to define your resources removes the problem of having to generate or apply custom YAML files for each cluster. Defining your cluster resources allows teams to focus on underlying workloads because the infrastructure components are handled by AWS CDK. 
 
 The benefits of using AWS CDK to manage Amazon EKS clusters include the following:
+
 - Consistency across clusters and environments.
 - Streamlining access control across an organization.
 - Management for multiple clusters.
@@ -46,7 +47,7 @@ Using AWS CDK, define the Region to deploy your clusters, and use environment va
 aws eks list-cluster --region <insert region>
 ```
 
-If for example you chose the region us-west-2, you would get a similar output:
+For example, if you choose Region `us-west-2`, you would get a similar output:
 ```json
 {
     "clusters": [
@@ -57,7 +58,9 @@ If for example you chose the region us-west-2, you would get a similar output:
 
 ## Multi-Region management 
 
-In a production environment, it is common to have clusters in different locations. Clusters can be in different Regions, on-premises, or part of a hybrid cloud model. Some common design patterns that come into play for managing multiple clusters across operational models include aspects such as high availability, data replication, networking, and traffic routing. In the `ssp-ek-patterns/lib/` multi-Region-construct directory, there is an `index.ts` file that demonstrates how to deploy multiple clusters to different Regions, as shown in the following example:
+In a production environment, it is common to have clusters in different locations. Clusters can be in different Regions, on-premises, or part of a hybrid cloud model. Some common design patterns that come into play for managing multiple clusters across operational models include aspects such as high availability, data replication, networking, and traffic routing.
+
+In the `ssp-ek-patterns/lib/` multi-Region-construct directory, there is an `index.ts` file that demonstrates how to deploy multiple clusters to different Regions, as shown in the following example:
 
 ```typescript
 import * as cdk from '@aws-cdk/core';

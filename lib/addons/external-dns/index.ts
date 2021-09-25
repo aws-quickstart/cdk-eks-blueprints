@@ -21,15 +21,15 @@ export interface ExternalDnsProps {
     readonly version?: string;
 
     /**
-     * Hosted zone provider (@see HostedZoneProvider) that can provide one or more hosted zones for external DNS.
+     * Hosted zone provider (@see HostedZoneProvider) that can provide one or more hosted zones for ExternalDNS.
      */
     readonly hostedZone: HostedZoneProvider;
 }
 
 
 /**
- * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
- * It is required to integrate with Route53 for external DNS resolution. 
+ * Implementation of the ExternalDNS service: https://github.com/kubernetes-sigs/external-dns/.
+ * It is required to integrate with Route53 for ExternalDNS resolution. 
  */
 export class ExternalDnsAddon implements ClusterAddOn {
 

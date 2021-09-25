@@ -1,11 +1,9 @@
 # Cluster Autoscaler add-on
 
-//TODO The order of this seems off, and the info seems recursive:
-The `ClusterAutoscaler` add-on provides support for [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler).
+The [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler) add-on is a tool that automatically adjusts the number of nodes in your cluster when either of the following conditions are met:
 
-Cluster Autoscaler is a tool that automatically adjusts the number of nodes in your cluster when either of the following conditions are met:
 - Pods fail due to insufficient resources. 
-- Pods are rescheduled onto other nodes due to being in nodes that are underutilized for an extended period.
+- Pods are transferred to other nodes due to being underutilized for an extended period.
 
 ## Usage
 
@@ -23,24 +21,23 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
   },
 });
 ```
-//TODO Functionality of what?:
 ## Functionality
 
 1. Adds IAM permissions, such as for modifying autoscaling groups or terminating instances, to the `NodeGroup` role. 
-2. Configures service accounts, cluster roles, roles, role bindings, and deployment.
+2. Configures service accounts, cluster roles, role bindings, and deployment.
 3. Resolves the proper certificate authority image to pull, based on the Kubernetes version.
 4. Allows for passing a specific version of the image to pull.
-5. Applies proper tags for discoverability to the Amazon EC2 instances.
+5. Applies proper tags for discoverability to Amazon EC2 instances.
 
 ## Testing the scaling functionality
 
 Follow these steps to test the functionality of Cluster Autoscaler:
 
-1. Deploy a sample app as a deployment.
+1. Deploy a sample application.
 2. Create a Horizontal Pod Autoscaler (HPA) resource.
 3. Generate a load to trigger scaling.
 
-### Deploy a sample app
+### Deploy a sample application
 
 Note the number of available nodes:
 
@@ -61,7 +58,7 @@ kubectl set resources deploy php-apache --requests=cpu=20m
 kubectl expose php-apache --port 80
 ```
 
-You should see that one pod is running:
+You should see one pod running:
 
 ```bash
 kubectl get pod -l app=php-apache
@@ -74,7 +71,7 @@ php-apache-55c4584468-vsbl7   1/1     Running   0          63s
 
 ### Create an HPA resource
 
-Create a Horizontal Pod Autoscaler (HPA) resource with 50% CPU target utilization. Set the minimum number of pods to 1 and the maximum to 20:
+Create an HPA resource with a 50% CPU target utilization. Set the minimum number of pods to 1 and the maximum to 20:
 ```bash
 kubectl autoscale deployment php-apache \
     --cpu-percent=50 \
@@ -95,13 +92,13 @@ php-apache   Deployment/php-apache   10%/50%   1         20        2          52
 
 ### Generate load
 
-After you create the resources, generate a load on the Apache server using Busybox:
+After you create the resources, use [Busybox](https://www.busybox.net/) to generate a load on the Apache server:
 
 ```bash
 kubectl --generator=run-pod/v1 run -i --tty load-generator --image=busybox /bin/sh
 ```
 
-Generate the actual load on the shell by running a `while` loop:
+Use a `while` loop to generate the load in the shell:
 
 ```bash
 while true; do wget -q -O - http://php-apache; done
@@ -115,7 +112,7 @@ While the load generates, use another terminal to verify that HPA works. The fol
 kubectl get pods -l app=php-apache -o wide --watch
 ```
 
-Expect it create more nodes as more pods are created. Review the Cluster Autoscaler logs for confirmation:
+Cluster Autoscaler creates more nodes as pods are added. For confirmation, review the logs:
 
 ```bash
 kubectl -n kube-system logs -f deployment/cluster-autoscaler

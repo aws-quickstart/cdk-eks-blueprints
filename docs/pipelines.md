@@ -1,8 +1,8 @@
 # Pipelines
 
-While it is convenient to use the CDK CLI to deploy your first cluster, we recommend setting up automated pipelines that deploy and update your Amazon EKS infrastructure. To accomplish this, use the [CDK Pipelines](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module, which uses AWS CodePipeline to create CI/CD pipelines that help to manage your infrastructure. 
+While it is convenient to use the CDK CLI to deploy your first cluster, we recommend setting up automated pipelines that deploy and update your Amazon EKS infrastructure. To accomplish this, use the [CDK Pipelines](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) module, which uses AWS CodePipeline to create CI/CD pipelines that help to manage your infrastructure. 
 
-Additionally, SSP uses a GitHub integration that the pipelines CDK module provides in order to integrate CI/CD pipelines with GitHub. The result is that new configurations pushed to a GitHub repository that contain the CDK are automatically deployed.
+To integrate CI/CD pipelines with GitHub, SSP uses a GitHub integration that the CDK Pipelines module provides. The result is automatic deployment of new configurations that are pushed to your GitHub repository.
 
 ## Creating a pipeline
 
@@ -23,7 +23,7 @@ const pipeline = ssp.CodePipeline.build({
 
 ## Creating stages 
 
-After you create a pipeline, define a stage for it by wrapping the `EksBlueprint` stack in a `cdk.Stage` object.  
+After you create a pipeline, define a stage for it by wrapping the `EksBlueprint` stack in a `cdk.Stage` object:
 
 ```typescript
 import * as ssp from '@shapirov/cdk-eks-blueprint'
@@ -55,7 +55,7 @@ export class ClusterStage extends cdk.Stage {
 
 ## Adding stages to the pipeline 
 
-Add a stage to your pipeline using the following commands: 
+Add a stage to your pipeline:
 
 ```typescript
 const dev = new ClusterStage(this, 'blueprint-stage-dev')
