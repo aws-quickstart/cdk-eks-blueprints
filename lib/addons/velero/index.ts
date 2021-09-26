@@ -3,7 +3,7 @@ import { Constants } from "..";
 import { Construct } from "@aws-cdk/core";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as iam from "@aws-cdk/aws-iam";
-import { HelmChart } from "@aws-cdk/aws-eks";
+import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import merge from "ts-deepmerge";
 import { createNamespace } from "../../utils";
 
@@ -103,13 +103,14 @@ export class VeleroAddOn implements ClusterAddOn {
         const props = this.options;
                
         // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
-        const bucketName = this.returnS3BucketName(clusterInfo, "backup-bucket", props.values.configuration.backupStorageLocation.bucket)
+        const s3Bucket = this.getOrCreateS3Bucket(clusterInfo, "backup-bucket", props.values.configuration.backupStorageLocation.bucket)
 
         // Create Namespace if namespace is not explicied defined.
         const veleroNamespace = this.createNamespaceIfNeeded(clusterInfo, "velero", props.namespace);
 
         // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account
-        const veleroServiceAccountName = this.createIRSA(clusterInfo, "velero-account", veleroNamespace, bucketName)
+        const veleroServiceAccount = this.createServiceAccountWithIamRoles(clusterInfo, "velero-account", veleroNamespace, s3Bucket);
+        //veleroServiceAccount.node.addDependency(veleroNamespace);
         
         // Setup the values for the helm chart
         const valueVariable: VeleroAddOnProps = {
@@ -117,7 +118,7 @@ export class VeleroAddOn implements ClusterAddOn {
                 configuration: {
                     backupStorageLocation: {
                         prefix: props.values.configuration.backupStorageLocation.prefix ?? "velero/" + cluster.clusterName,
-                        bucket: bucketName,
+                        bucket: s3Bucket.bucketName,
                         config:{
                            region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region,
                         }
@@ -132,7 +133,7 @@ export class VeleroAddOn implements ClusterAddOn {
                 serviceAccount: {
                     server: {
                         create: false,
-                        name: veleroServiceAccountName,    
+                        name: veleroServiceAccount.serviceAccountName,    
                     }
                 }             
             }
@@ -148,6 +149,7 @@ export class VeleroAddOn implements ClusterAddOn {
             version: props.version,
             values: values
         });
+        this.chartNode.node.addDependency(veleroServiceAccount);
         return this.chartNode;
     }
 
@@ -156,9 +158,9 @@ export class VeleroAddOn implements ClusterAddOn {
      * @param clusterInfo 
      * @param id S3-Bucket-Postfix 
      * @param existingBucketName exiting provided S3 BucketName if it exists 
-     * @returns the existing provided S3 bucket name or the newly created S3 bucket name
+     * @returns the existing provided S3 bucket  or the newly created S3 bucket as s3.IBucket
      */
-    protected returnS3BucketName(clusterInfo: ClusterInfo, id: string, existingBucketName: null|string ): string {
+    protected getOrCreateS3Bucket(clusterInfo: ClusterInfo, id: string, existingBucketName: null|string ): s3.IBucket {
         if (!existingBucketName){
             const bucket = new s3.Bucket(clusterInfo.cluster, "velero-${id}", {
                 encryption: s3.BucketEncryption.KMS_MANAGED, // Velero Known bug for support with S3 with SSE-KMS with CMK, thus it does not support S3 Bucket Key: https://github.com/vmware-tanzu/helm-charts/issues/83
@@ -166,10 +168,10 @@ export class VeleroAddOn implements ClusterAddOn {
                 publicReadAccess: false,
                 enforceSSL: true // Encryption in Transit
             });
-            return bucket.bucketName;
+            return s3.Bucket.fromBucketName(clusterInfo.cluster, 'getOrCreateS3Bucket', bucket.bucketName );
         }
         else {
-            return existingBucketName;
+            return s3.Bucket.fromBucketName(clusterInfo.cluster, 'getOrCreateS3Bucket', existingBucketName );
         }
     }
 
@@ -201,9 +203,9 @@ export class VeleroAddOn implements ClusterAddOn {
      * @param id
      * @param namespace Velero namespace name
      * @param s3BucketName the S3 BucketName where Velero will stores the backup onto
-     * @returns the service Account Name
+     * @returns the service Account
      */
-    protected createIRSA(clusterInfo: ClusterInfo, id: string, namespace: string, s3BucketName: string): string {
+    protected createServiceAccountWithIamRoles(clusterInfo: ClusterInfo, id: string, namespace: string, s3Bucket: s3.IBucket): ServiceAccount {
         // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account
         const veleroServiceAccount = clusterInfo.cluster.addServiceAccount (
             id,
@@ -213,8 +215,6 @@ export class VeleroAddOn implements ClusterAddOn {
             }
         );
 
-        // Extract S3 bucket object via the bucket name in order to use it in the IAM policy document. 
-        const s3bucket = s3.Bucket.fromBucketName(clusterInfo.cluster, "S3Bucket", s3BucketName);
         // IAM policy for Velero
         const veleroPolicyDocument = {
             "Version": "2012-10-17",
@@ -242,8 +242,8 @@ export class VeleroAddOn implements ClusterAddOn {
                     "s3:ListBucket"
                 ],
                 "Resource": [
-                    s3bucket.arnForObjects("*"),
-                    s3bucket.bucketArn                   
+                    s3Bucket.arnForObjects("*"),
+                    s3Bucket.bucketArn                   
                 ]
               }
             ]
@@ -254,6 +254,6 @@ export class VeleroAddOn implements ClusterAddOn {
             document: veleroCustomPolicyDocument
         });
         veleroServiceAccount.role.addManagedPolicy(veleroPolicy);
-        return veleroServiceAccount.serviceAccountName
+        return veleroServiceAccount
     }
 }
