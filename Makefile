@@ -41,6 +41,9 @@ deploy-all:
 	$(DEPS)
 	$(CDK) deploy --verbose --all --require-approval never
 
+deploy-all:
+	$(CDK) deploy 
+
 destroy-all:
 	$(CDK) destroy --verbose --all --force
 

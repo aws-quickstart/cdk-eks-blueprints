@@ -1,11 +1,11 @@
-import * as cdk from '@aws-cdk/core';
-import * as pipelines from '@aws-cdk/pipelines';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as actions from '@aws-cdk/aws-codepipeline-actions';
+import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
-import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
+import * as pipelines from '@aws-cdk/pipelines';
 import { AddStageOptions } from '@aws-cdk/pipelines';
-import { withUsageTracking } from '../utils/usage-utils'; 
+import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
+import { withUsageTracking } from '../utils/usage-utils';
 
 
 /**
@@ -174,7 +174,7 @@ class CodePipeline {
             installCommands: [
                 // Upgrade NPM to v7.
                 'npm install --global npm',
-                'npm install -g aws-cdk@1.119.0', 
+                'npm install -g aws-cdk@1.124.0', 
                 // Install deps
                 'npm install',
             ],
