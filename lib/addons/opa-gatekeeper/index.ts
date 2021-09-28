@@ -1,4 +1,6 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+// import { AppMeshAddOn } from '../appmesh/index';
+
 
 /**
  * Properties available to configure opa gatekeeper
@@ -12,7 +14,7 @@ export interface OpaGatekeeperAddOnProps {
 
     /**
      * Helm chart version to use to install.
-     * @default 3.7.0-beta.1
+     * @default 3.6.0
      */
     version?: string;
 
@@ -30,28 +32,26 @@ export interface OpaGatekeeperAddOnProps {
 
 const defaultProps: OpaGatekeeperAddOnProps = {
     namespace: 'gatekeeper-system',
-    version: '3.7.0-beta.1',
+    version: '3.6.0',
     values: {}
 };
 
-
 export class OpaGatekeeperAddOn implements ClusterAddOn {
-    
-    readonly options: OpaGatekeeperAddOnProps;
+    private options: OpaGatekeeperAddOnProps;
+    static node: any;
     
     constructor(props?: OpaGatekeeperAddOnProps) {
         this.options = { ...defaultProps, ...props };
     }
-
     deploy(clusterInfo: ClusterInfo): void {
-        
-        clusterInfo.cluster.addHelmChart("opagatekeeper-addon", {
+        clusterInfo.cluster.addHelmChart("OpaGatekeeperAddOn", {
             chart: "gatekeeper",
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
             version: this.options.version,
             namespace: this.options.namespace,
-            values: this.options.values,
+            values: this.options.values
         });
+        // OpaGatekeeperAddOn.node.addDependency(AppMeshAddOn)
     }
 }
