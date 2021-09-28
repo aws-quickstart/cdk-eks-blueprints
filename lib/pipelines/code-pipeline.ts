@@ -3,7 +3,6 @@ import * as actions from '@aws-cdk/aws-codepipeline-actions';
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
 import * as pipelines from '@aws-cdk/pipelines';
-import { AddStageOptions } from '@aws-cdk/pipelines';
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
@@ -57,7 +56,7 @@ export interface StackStage {
     /**
      * Optional stage properties, such as {manualApprovals: true} which can control stage transitions.
      */
-    stageProps?: AddStageOptions
+    stageProps?: pipelines.AddStageOptions;
 }
 
 /**
