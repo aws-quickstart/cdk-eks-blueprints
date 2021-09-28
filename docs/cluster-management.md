@@ -62,7 +62,7 @@ In a production environment, it is common to have clusters that reside in differ
 ```typescript
 import * as cdk from '@aws-cdk/core';
 // SSP Lib
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 // Team implementations
 import * as team from '../teams'
 export default class MultiRegionConstruct extends cdk.Construct {
@@ -74,12 +74,15 @@ export default class MultiRegionConstruct extends cdk.Construct {
         const teams: Array<ssp.Team> = [platformTeam];
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
+            new ssp.addons.NginxAddOn,
+            new ssp.addons.ArgoCDAddOn,
+            new ssp.addons.CalicoAddOn,
+            new ssp.addons.MetricsServerAddOn,
+            new ssp.addons.ClusterAutoScalerAddOn,
+            new ssp.addons.ContainerInsightsAddOn,
+            new ssp.addons.VpcCniAddOn(),
+            new ssp.addons.CoreDnsAddOn(),
+            new ssp.addons.KubeProxyAddOn()
         ];
         const east = 'blueprint-us-east-2'
         new ssp.EksBlueprint(scope, { id: `${id}-${east}`, addOns, teams }, {

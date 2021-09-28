@@ -7,7 +7,7 @@ By default, the native [VPC-CNI plugin](https://docs.aws.amazon.com/eks/latest/u
 ## Usage
 
 ```typescript
-import { CalicoAddon, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { CalicoAddon, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new CalicoAddon();
 const addOns: Array<ClusterAddOn> = [ addOn ];

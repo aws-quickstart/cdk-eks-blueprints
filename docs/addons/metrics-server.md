@@ -8,7 +8,7 @@
 
 #### **`index.ts`**
 ```typescript
-import { MetricsServerAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { MetricsServerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 # Deploy Metrics Server v0.5.0
 const addOn = new MetricsServerAddOn('v0.5.0');

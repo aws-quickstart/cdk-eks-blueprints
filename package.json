@@ -1,6 +1,6 @@
 {
-    "name": "@shapirov/cdk-eks-blueprint",
-    "version": "0.12.0",
+    "name": "@aws-quickstart/ssp-amazon-eks",
+    "version": "0.12.1",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@aws-cdk/aws-autoscaling": "1.119.0",
+        "@aws-cdk/aws-certificatemanager": "1.119.0", 
         "@aws-cdk/aws-codebuild": "1.119.0",
         "@aws-cdk/aws-codecommit": "1.119.0",
         "@aws-cdk/aws-codepipeline": "1.119.0",

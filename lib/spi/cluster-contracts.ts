@@ -9,3 +9,4 @@ import { IVpc } from '@aws-cdk/aws-ec2';
 export declare interface ClusterProvider {
     createCluster(scope: Construct, vpc: IVpc): ClusterInfo;
 }
+

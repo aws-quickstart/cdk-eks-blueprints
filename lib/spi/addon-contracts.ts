@@ -1,5 +1,6 @@
-import { Team, ClusterInfo } from '.';
 import { Construct } from '@aws-cdk/core';
+import { Team } from './team-contracts';
+import * as types from './types';
 
 /**
  * ClusterAddOn is the interface to which all Cluster addons should conform.
@@ -16,7 +17,7 @@ export declare interface ClusterAddOn {
     */
     id? : string;
 
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> | void;
+    deploy(clusterInfo: types.ClusterInfo): Promise<Construct> | void;
 }
 
 /**
@@ -25,5 +26,6 @@ export declare interface ClusterAddOn {
  * ClusterAddOn implementation may implement this interface in order to get post deployment hook point.
  */
 export declare interface ClusterPostDeploy {
-    postDeploy(clusterInfo: ClusterInfo, teams: Team[]): void;
+    postDeploy(clusterInfo: types.ClusterInfo, teams: Team[]): void;
 }
+

@@ -7,7 +7,7 @@ For instructions on getting started with X-Ray on EKS refer to the [EKS Workshop
 ## Usage
 
 ```typescript
-import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new XrayAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];

@@ -13,7 +13,7 @@ Full Argo CD project documentation [can be found here](https://argoproj.github.i
 To provision and maintain ArgoCD components without any bootstrapping, the add-on provides a no-argument constructor to get started. 
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new ArgoCDAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];
@@ -67,7 +67,7 @@ In order to enable bootstrapping, the add-on allows passing an `ApplicationRepos
 An example is provided below, along with an approach that could use a separate app of apps to bootstrap workloads in different stages, which is important for a software delivery platform as it allows segregating workloads specific to each stage of the SDLC and defines clear promotion processes through GitOps.
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOns = ...;
 const repoUrl = 'https://github.com/aws-samples/ssp-eks-workloads.git'
