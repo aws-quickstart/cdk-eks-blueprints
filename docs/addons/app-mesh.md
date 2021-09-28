@@ -85,4 +85,4 @@ The above script will start producing load which will generate traces with XRay.
 
 You will see a screenshot similar to this:
 
-![App Mesh XRay Service Map](/assets/images/appmesh-xray.png)
+![App Mesh XRay Service Map](./../assets/images/appmesh-xray.png)
