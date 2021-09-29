@@ -1,22 +1,11 @@
-import { ClusterInfo } from "../..";
-import { IHostedZone, HostedZone, PublicHostedZone, CrossAccountZoneDelegationRecord, CnameRecord } from '@aws-cdk/aws-route53';
 import { Role } from "@aws-cdk/aws-iam";
-
-/**
- * Interface that abstracts how hosted zone(s) is obtained for external DNS. 
- * Implementations may either look up existing hosted zones or create new hosted zones in the context of the cluster life-cycle.
- * 
- * If hosted-zone life-cycle does not match the cluster life-cycle, the recommended approach is to create a separate CDK stack 
- * for hosted zone provisioning and leverage LookupHostedZoneProvider or ImportHostedZonewProvider. 
- */
-export interface HostedZoneProvider {
-    provide(clusterInfo: ClusterInfo): IHostedZone[];
-}
+import * as r53 from '@aws-cdk/aws-route53';
+import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
  * Simple lookup host zone provider
  */
-export class LookupHostedZoneProvider implements HostedZoneProvider {
+export class LookupHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
 
     /**
      * @param hostedZoneName name of the host zone to lookup
@@ -24,21 +13,22 @@ export class LookupHostedZoneProvider implements HostedZoneProvider {
      */
     constructor(private hostedZoneName: string, private id?: string) { }
 
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        return [HostedZone.fromLookup(clusterInfo.cluster.stack, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName })];
+    provide(context: ResourceContext): r53.IHostedZone {
+        return r53.HostedZone.fromLookup(context.scope, this.id ?? `${this.hostedZoneName}-Lookup`, { domainName: this.hostedZoneName });
     }
 }
 /**
  * Direct import hosted zone provider, based on a known hosted zone ID. 
  * Recommended method if hosted zone id is known, as it avoids extra look-ups.
  */
-export class ImportHostedZoneProvider implements HostedZoneProvider {
+export class ImportHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
 
     constructor(private hostedZoneId: string, private id?: string) { }
 
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        return [HostedZone.fromHostedZoneId(clusterInfo.cluster.stack, this.id ?? `${this.hostedZoneId}-Import`, this.hostedZoneId)];
+    provide(context: ResourceContext): r53.IHostedZone {
+        return r53.HostedZone.fromHostedZoneId(context.scope, this.id ?? `${this.hostedZoneId}-Import`, this.hostedZoneId);
     }
+
 }
 
 
@@ -76,18 +66,18 @@ export interface DelegatingHostedZoneProviderProps {
  * 
  * The delegation part allows routing subdomain entries to the child hosted zone in the workload account.
  */
-export class DelegatingHostedZoneProvider implements HostedZoneProvider {
+export class DelegatingHostedZoneProvider implements ResourceProvider<r53.IHostedZone> {
     constructor(private options: DelegatingHostedZoneProviderProps) { }
 
-    provide(clusterInfo: ClusterInfo): IHostedZone[] {
-        const stack = clusterInfo.cluster.stack;
+    provide(context: ResourceContext): r53.IHostedZone {
+        const stack = context.scope;
 
-        const subZone = new PublicHostedZone(stack, `${this.options.subdomain}-SubZone`, {
+        const subZone = new r53.PublicHostedZone(stack, `${this.options.subdomain}-SubZone`, {
             zoneName: this.options.subdomain
         });
 
         if (this.options.wildcardSubdomain) {
-            new CnameRecord(stack, `${this.options.subdomain}-cname`, {
+            new r53.CnameRecord(stack, `${this.options.subdomain}-cname`, {
                 zone: subZone,
                 domainName: `${this.options.subdomain}`,
                 recordName: `*.${this.options.subdomain}`
@@ -110,12 +100,12 @@ export class DelegatingHostedZoneProvider implements HostedZoneProvider {
         const delegationRole = Role.fromRoleArn(stack, 'DelegationRole', delegationRoleArn);
 
         // create the record
-        new CrossAccountZoneDelegationRecord(stack, `${this.options.subdomain}-delegate`, {
+        new r53.CrossAccountZoneDelegationRecord(stack, `${this.options.subdomain}-delegate`, {
             delegatedZone: subZone,
             parentHostedZoneName: this.options.parentDomain, // or you can use parentHostedZoneId
             delegationRole
         });
 
-        return [subZone];
+        return subZone;
     }
 }

@@ -1,6 +1,6 @@
 # Teams
 
-The `cdk-eks-blueprint` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two `Team` types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` represent teams managing workloads running in cluster namespaces and `PlatformTeam` represents platform administrators who have admin access (masters group) to clusters.
+The `ssp-amazon-eks` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two `Team` types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` represent teams managing workloads running in cluster namespaces and `PlatformTeam` represents platform administrators who have admin access (masters group) to clusters.
 
 You are also able to create your own team implementations by creating classes that inherits from `Team`.
 

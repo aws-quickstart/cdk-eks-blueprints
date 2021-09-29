@@ -1,6 +1,6 @@
 # Cluster Providers
 
-The `cdk-eks-blueprint` framework allows customers to easily configure the underlying EKS clusters that it provisions. This is done via Cluster Providers. Customers can leverage the Cluster Providers that the framework supports, or supply their own. 
+The `ssp-amazon-eks` framework allows customers to easily configure the underlying EKS clusters that it provisions. This is done via Cluster Providers. Customers can leverage the Cluster Providers that the framework supports, or supply their own. 
 
 The framework currently provides support for the following Cluster Providers:
 
