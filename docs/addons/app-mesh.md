@@ -7,7 +7,7 @@ Full documentation on using App Mesh with EKS [can be found here](https://docs.a
 ## Usage
 
 ```typescript
-import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new AppMeshAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];
@@ -85,4 +85,4 @@ The above script will start producing load which will generate traces with XRay.
 
 You will see a screenshot similar to this:
 
-![App Mesh XRay Service Map](/assets/images/appmesh-xray.png)
+![App Mesh XRay Service Map](./../assets/images/appmesh-xray.png)

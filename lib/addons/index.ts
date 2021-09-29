@@ -1,3 +1,4 @@
+
 export * from './appmesh'
 export * from './argocd'
 export * from './aws-loadbalancer-controller'
@@ -5,7 +6,6 @@ export * from './calico'
 export * from './container-insights'
 export * from './cluster-autoscaler'
 export * from './external-dns'
-export * from './external-dns/hosted-provider'
 export * from './metrics-server'
 export * from './nginx'
 export * from './xray'

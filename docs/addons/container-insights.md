@@ -15,7 +15,7 @@ Metrics collected by Container Insights are charged as custom metrics. For more 
 Add the following as an add-on to your main.ts file to add Containers Insights to your cluster
 
 ```typescript
-import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new ContainerInsightsAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];
@@ -111,7 +111,7 @@ Once the update is complete, you should see a similar output.
 
 Under Performance Monitoring, the Container Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance. 
 
-![CloudWatch](/screenshots/eks-blueprint-cwinsights-performance-monitoring.png)
+![CloudWatch](./../assets/images/eks-blueprint-cwinsights-performance-monitoring.png)
 
 ## View cluster level logs
 
@@ -131,7 +131,7 @@ Next in the console, click on Log groups under Logs.
 
 You will see under log streams all the log streams from your Amazon EKS control plane. 
 
-![CloudWatch](../../screenshots/eks-blueprint-cwlogs.png)
+![CloudWatch](./../assets/images/eks-blueprint-cwlogs.png)
 
 ## View workload level logs
 
@@ -151,7 +151,7 @@ STATS avg(node_cpu_utilization) as avg_node_cpu_utilization by NodeName
 `SORT avg_node_cpu_utilization DESC`
 This query shows a list of nodes, sorted by average node CPU utilization. Below is an example of what the visualization should look like.
 
-![CloudWatch](../../screenshots/eks-blueprint-cloudwatch-loginsights.png)
+![CloudWatch](./../assets/images/eks-blueprint-cloudwatch-loginsights.png)
 
 To try another example, replace that query with another query and choose Run query. More sample queries are listed later on this page.
 
@@ -159,7 +159,7 @@ STATS avg(number_of_container_restarts) as avg_number_of_container_restarts by P
 `SORT avg_number_of_container_restarts DESC`
 This query displays a list of your pods, sorted by average number of container restarts as shown below
 
-![CloudWatch](../../screenshots/eks-blueprint-cloudwatch-loginsights-2.png)
+![CloudWatch](./../assets/images/eks-blueprint-cloudwatch-loginsights-2.png)
 
 If you want to try another query, you can use include fields in the list at the right of the screen. For more information about query syntax, see CloudWatch Logs Insights Query Syntax.
 
@@ -167,4 +167,4 @@ If you want to try another query, you can use include fields in the list at the 
 
 In order to view a map of all of your containers running inside your cluster, click on `View your container map` in the Container Insights tab. You will then see a map of all of your namespaces and their associated pods and services.
 
-![CloudWatch](../../screenshots/eks-blueprint-container-insights.png)
+![CloudWatch](./../assets/images/eks-blueprint-container-insights.png)

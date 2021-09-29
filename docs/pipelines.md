@@ -11,7 +11,7 @@ Additionally, the EKS SSP - Reference Solution leverages the GitHub integration 
 We can create a new `CodePipeline` resource via the following. 
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 const pipeline = ssp.CodePipeline.build({
     name: 'blueprint-pipeline',
@@ -28,7 +28,7 @@ const pipeline = ssp.CodePipeline.build({
 Once our pipeline is created, we need to define a `stage` for the pipeline. To do so, we can wrap our `EksBlueprint` stack in a `cdk.Stage` object.  
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 import * as team from 'path/to/teams'
 
@@ -89,7 +89,7 @@ The below code block contains the complete implementation of a CodePipeline that
 import * as cdk from '@aws-cdk/core';
 
 // SSP Lib
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 // Team implementations
 import * as team from 'path/to/teams'

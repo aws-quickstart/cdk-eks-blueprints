@@ -1,10 +1,10 @@
 import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
+import { IHostedZone } from '@aws-cdk/aws-route53';
 import { Construct } from '@aws-cdk/core';
 import { Constants } from '..';
-
 import { ClusterAddOn, ClusterInfo } from '../../spi';
-import { HostedZoneProvider } from './hosted-provider';
+
 
 /**
  * Configuration options for the external DNS add-on.
@@ -22,9 +22,10 @@ export interface ExternalDnsProps {
     readonly version?: string;
 
     /**
-     * Hosted zone provider (@see HostedZoneProvider) that can provide one or more hosted zones for external DNS.
+     * Names of hosted zone provider named resources (@see LookupHostedZoneProvider) for external DNS.
+     * Hosted zone providers are registered as named resource providers with the EksBlueprintProps.
      */
-    readonly hostedZone: HostedZoneProvider;
+    readonly hostedZoneResources: string[];
 }
 
 /**
@@ -58,13 +59,13 @@ export class ExternalDnsAddon implements ClusterAddOn {
 
         const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
 
-        const hostedZones = this.options.hostedZone.provide(clusterInfo);
-
+        const hostedZones = this.options.hostedZoneResources.map(e => clusterInfo.getRequiredResource<IHostedZone>(e));
+    
         sa.addToPrincipalPolicy(
             new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ['route53:ChangeResourceRecordSets', 'route53:ListResourceRecordSets'],
-                resources: hostedZones.map(hostedZone => hostedZone.hostedZoneArn),
+                resources: hostedZones.map(hostedZone => hostedZone!.hostedZoneArn),
             }),
         );
 
@@ -86,7 +87,7 @@ export class ExternalDnsAddon implements ClusterAddOn {
             version: this.options.version ?? '5.1.3',
             values: {
                 provider: 'aws',
-                zoneIdFilters: hostedZones.map(hostedZone => hostedZone.hostedZoneId),
+                zoneIdFilters: hostedZones.map(hostedZone => hostedZone!.hostedZoneId),
                 aws: {
                     region,
                 },

@@ -10,7 +10,7 @@ A Shared Services Platform (SSP) is an internal development platform that abstra
 
 ## What can I do with this QuickStart?
 
-Customers can use this Quick Start to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `cdk-eks-blueprint` module to:
+Customers can use this Quick Start to easily architect and deploy a multi-tenant SSP built on EKS. Specifically, customers can leverage the `ssp-amazon-eks` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
 - [x] Manage cluster configuration, including add-ons that run in each cluster, from a single Git repository.
@@ -20,4 +20,4 @@ Customers can use this Quick Start to easily architect and deploy a multi-tenant
 
 ## Examples
 
-To view a library of examples for how you can leverage the `cdk-eks-blueprint`, please see our [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns).
+To view a library of examples for how you can leverage the `ssp-amazon-eks`, please see our [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns).

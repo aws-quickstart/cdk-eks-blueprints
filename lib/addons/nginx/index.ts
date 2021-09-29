@@ -1,7 +1,11 @@
+import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { dependable } from "../../utils";
+import { setPath } from "../../utils/object-utils";
 
+ 
 /**
  * Properties available to configure the nginx ingress controller.
  */
@@ -49,12 +53,19 @@ export interface NginxAddOnProps {
     externalDnsHostname?: string;
 
     /**
-     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
+     * Name of the certificate {@link NamedResourceProvider} to be used for certificate look up. 
+     * @see {@link ImportCertificateProvider} and {@link CreateCertificateProvider} for examples of certificate providers.
+     */
+    certificateResourceName?: string,
+
+    /**
+     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#:
      */
     values?: {
         [key: string]: any;
     };
 }
+
 
 /**
  * Defaults options for the add-on
@@ -65,7 +76,7 @@ const defaultProps: NginxAddOnProps = {
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
-    values: {}
+    namespace: 'kube-system'
 };
 
 export class NginxAddOn implements ClusterAddOn {
@@ -76,22 +87,13 @@ export class NginxAddOn implements ClusterAddOn {
         this.options = { ...defaultProps, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+
+    @dependable('AwsLoadBalancerControllerAddOn')
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const props = this.options;
 
-        const dependencies = Array<Promise<Construct>>();
-        const awsLoadBalancerControllerAddOnPromise = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn');
-        console.assert(awsLoadBalancerControllerAddOnPromise, 'NginxAddOn has a dependency on AwsLoadBalancerControllerAddOn');
-        dependencies.push(awsLoadBalancerControllerAddOnPromise!);
-
-        if (props.externalDnsHostname) {
-            const externalDnsAddOnPromise = clusterInfo.getScheduledAddOn('ExternalDnsAddon');
-            console.assert(externalDnsAddOnPromise, 'NginxAddOn has a dependency on ExternalDnsAddOn');
-            dependencies.push(externalDnsAddOnPromise!);
-        }
-
-        const presetAnnotations = {
+        const presetAnnotations: any = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
             'service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled': `${props.crossZoneEnabled}`,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
@@ -100,14 +102,19 @@ export class NginxAddOn implements ClusterAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
-        const values = props.values ?? {};
+        const values = { ...props.values ?? {}};
+
+        if(props.certificateResourceName) {
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
+            const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
+            setPath(values, "controller.service.https.port.targetPort", "http");
+            setPath(values, "controller.service.http.port.enable", "false");
+        }
+
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
 
-        values['controller'] = {
-            service: {
-                annotations: serviceAnnotations
-            }
-        };
+        setPath(values, 'controller.service.annotations', serviceAnnotations);
 
         const nginxHelmChart = clusterInfo.cluster.addHelmChart("nginx-addon", {
             chart: "nginx-ingress",
@@ -117,11 +124,6 @@ export class NginxAddOn implements ClusterAddOn {
             version: props.version,
             values
         });
-
-        Promise.all(dependencies.values()).then((constructs) => {
-            constructs.forEach((construct) => {
-                nginxHelmChart.node.addDependency(construct);
-            });
-        }).catch(err => { throw new Error(err) });
+        return Promise.resolve(nginxHelmChart);
     }
 }
