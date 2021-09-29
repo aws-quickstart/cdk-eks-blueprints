@@ -108,9 +108,13 @@ export class VeleroAddOn implements ClusterAddOn {
         // Create Namespace if namespace is not explicied defined.
         const veleroNamespace = this.createNamespaceIfNeeded(clusterInfo, "velero", props.namespace);
 
-        // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account
-        const veleroServiceAccount = this.createServiceAccountWithIamRoles(clusterInfo, "velero-account", veleroNamespace, s3Bucket);
-        //veleroServiceAccount.node.addDependency(veleroNamespace);
+        // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account    
+        const veleroServiceAccount = this.createServiceAccountWithIamRoles(clusterInfo, "velero-account", veleroNamespace.name, s3Bucket);
+        
+        // if veleroName space does not exist and needs creation, add the dependency
+        if (veleroNamespace.manifest) {
+            veleroServiceAccount.node.addDependency(veleroNamespace.manifest);
+        }
         
         // Setup the values for the helm chart
         const valueVariable: VeleroAddOnProps = {
@@ -145,7 +149,7 @@ export class VeleroAddOn implements ClusterAddOn {
             chart: "velero",
             repository: "https://vmware-tanzu.github.io/helm-charts/",
             release: Constants.SSP_ADDON,
-            namespace: veleroNamespace,
+            namespace: veleroNamespace.name,
             version: props.version,
             values: values
         });
@@ -182,18 +186,21 @@ export class VeleroAddOn implements ClusterAddOn {
      * @param namespace
      * @returns the namespace created or existed.
      */
-    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace?: {name: string, create: boolean}): string {
+    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace?: {name: string, create: boolean}): {name: string, manifest?: KubernetesManifest} {
         // Create Namespace if namespace is not explicied defined.
         if (namespace){
             // Create Namespace if the "create" option is true
             if (namespace.create) {
-                createNamespace(namespace.name, clusterInfo.cluster);
+                const namespaceManifest = createNamespace(namespace.name, clusterInfo.cluster);
+                return { name: namespace.name, manifest: namespaceManifest };
             }
             // If the "create" option if false, then namespace will not be created, return namespace.name
-            return namespace.name;
+            else{
+                return { name: namespace.name };
+            }
         }
         else{
-            return defaultName; // initial value of veleroNamespace
+            return { name: defaultName }; // initial value of veleroNamespace
         }
     }
 
