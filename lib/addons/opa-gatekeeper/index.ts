@@ -1,5 +1,4 @@
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-// import { AppMeshAddOn } from '../appmesh/index';
+import { ClusterAddOn, ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
 
 
 /**
@@ -36,15 +35,21 @@ const defaultProps: OpaGatekeeperAddOnProps = {
     values: {}
 };
 
-export class OpaGatekeeperAddOn implements ClusterAddOn {
+export class OpaGatekeeperAddOn implements ClusterAddOn, ClusterPostDeploy {
+
     private options: OpaGatekeeperAddOnProps;
-    static node: any;
-    
+
     constructor(props?: OpaGatekeeperAddOnProps) {
         this.options = { ...defaultProps, ...props };
     }
-    deploy(clusterInfo: ClusterInfo): void {
-        clusterInfo.cluster.addHelmChart("OpaGatekeeperAddOn", {
+
+    deploy(_clusterInfo: ClusterInfo): void {
+        return;
+    }
+
+    postDeploy(clusterInfo: ClusterInfo, _teams: Team[]): void {
+
+        const chart = clusterInfo.cluster.addHelmChart("OpaGatekeeperAddOn", {
             chart: "gatekeeper",
             release: "gatekeeper",
             repository: "https://open-policy-agent.github.io/gatekeeper/charts",
@@ -52,6 +57,10 @@ export class OpaGatekeeperAddOn implements ClusterAddOn {
             namespace: this.options.namespace,
             values: this.options.values
         });
-        // OpaGatekeeperAddOn.node.addDependency(AppMeshAddOn)
+
+        for (let provisioned of clusterInfo.getAllProvisionedAddons().values()) {
+            chart.node.addDependency(provisioned);
+        }
     }
+    
 }

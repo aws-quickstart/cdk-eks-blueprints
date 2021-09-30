@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ssp from '../lib'
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import BlueprintConstruct from '../examples/blueprint-construct'
+import * as cdk from '@aws-cdk/core';
+import BlueprintConstruct from '../examples/blueprint-construct';
+import * as ssp from '../lib';
 
 // pre-create a VPC
 export class VPCStack extends cdk.Stack {
@@ -33,7 +33,7 @@ new BlueprintConstruct(app,
 );
 
 // Added 2nd blueprint for testing custom AMI
-const clusterName = 'customAmi';
+const clusterName = 'custom-ami-blueprint';
 const userData = ec2.UserData.forLinux();
 userData.addCommands(`/etc/eks/bootstrap.sh ${clusterName}`);
 ssp.EksBlueprint.builder()

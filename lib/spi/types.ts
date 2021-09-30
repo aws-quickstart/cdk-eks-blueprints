@@ -151,6 +151,14 @@ export class ClusterInfo {
         return this.provisionedAddOns.get(addOn);
     }
 
+     /**
+     * Returns all provisioned addons
+     * @returns scheduledAddOns: Map<string, cdk.Construct>
+     */
+      public getAllProvisionedAddons(): Map<string, cdk.Construct> {
+        return this.provisionedAddOns;
+    }
+
     /**
      * Set the preProvisionedAddOn map with the promise for the construct
      * of the addon being provisioned
