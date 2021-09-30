@@ -27,3 +27,4 @@ The framework currently supports the following add-ons.
 | [`VpcCniAddOn`](./vpc-cni.md) | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS |
 | [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-ssp-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn |
 | [`XrayAddOn`](./xray) | Adds XRay Daemon to the EKS Cluster |
+| [`VeleroAddOn`](./velero.md) | Adds [Velero](https://velero.io/) to the EKS Cluster |

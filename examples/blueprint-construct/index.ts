@@ -58,6 +58,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn(),
+            new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn()
