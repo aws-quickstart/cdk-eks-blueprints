@@ -27,10 +27,10 @@
     },
     "exclude": [
         "cdk.out",
+        "dist",
         "node_modules",
         "test",
-        ".git",
-        "dist"
+        ".git"
     ],
     "include": [
         "lib"

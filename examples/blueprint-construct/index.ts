@@ -39,10 +39,12 @@ export default class BlueprintConstruct extends cdk.Construct {
             new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
-            bootstrapRepo: {
-                repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
-                path: 'envs/prod',
-            }
+            // TODO: enabling this cause stack deletion failure, known issue:
+            // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
+            // bootstrapRepo: {
+            //     repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+            //     path: 'envs/prod',
+            // }
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
@@ -56,6 +58,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn(),
+            new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
