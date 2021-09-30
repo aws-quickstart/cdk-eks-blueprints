@@ -1,12 +1,12 @@
-import * as cdk from '@aws-cdk/core';
 import { Vpc } from '@aws-cdk/aws-ec2';
-
+import * as cdk from '@aws-cdk/core';
 // SSP lib.
-import * as ssp from '../../lib'
-
-// Example teams.
-import * as team from '../teams'
+import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
+// Example teams.
+import * as team from '../teams';
+
+
 
 const burnhamManifestDir = './examples/teams/team-burnham/'
 const rikerManifestDir = './examples/teams/team-riker/'
@@ -57,7 +57,9 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
             new ssp.addons.SSMAgentAddOn(),
-            new ssp.addons.NginxAddOn(),
+            new ssp.addons.NginxAddOn({ values: {
+                controller: { service: { type: "ClusterIP"}}
+            }}),
             new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),

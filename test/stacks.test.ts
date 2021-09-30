@@ -149,6 +149,7 @@ test("Named resource providers are correctly registered and discovered", async (
             certificateResourceName: ssp.GlobalResources.Certificate,
             externalDnsHostname: 'my.domain.com'
         }))
+        .addOns(new ssp.OpaGatekeeperAddOn())
         .teams(new ssp.ApplicationTeam({
             name: "appteam", namespace: "appteam-ns"
         }))

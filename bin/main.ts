@@ -39,8 +39,10 @@ userData.addCommands(`/etc/eks/bootstrap.sh ${clusterName}`);
 ssp.EksBlueprint.builder()
   .account(process.env.CDK_DEFAULT_ACCOUNT)
   .region(process.env.CDK_DEFAULT_REGION)
+  .resourceProvider(ssp.GlobalResources.Vpc, new ssp.DirectVpcProvider(vpcStack.vpc))
   .clusterProvider(new ssp.MngClusterProvider({
     version: KubernetesVersion.V1_20,
+    maxSize: 1,
     customAmi: {
       machineImage: ec2.MachineImage.genericLinux({
         'us-east-1': 'ami-0b297a512e2852b89',
