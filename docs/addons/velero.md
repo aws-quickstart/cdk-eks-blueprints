@@ -11,7 +11,7 @@ Velero consists of:
 - A server that runs on your cluster
 - A command-line client that runs locally
 
-The Velero add-on installs Velero on Amazon EKS. By default it will create a private encrypted S3 Bucket and the S3 VPC endpoint to be the private Velero backup destination. It leverages [IAM Role for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) feature to enable Velero pod to make API calls with S3 and EC2 natively without the need to use kube2iam or AWS credentials. 
+The Velero add-on installs Velero on Amazon EKS. By default it will create a private encrypted S3 Bucket to be the Velero backup destination. It leverages [IAM Role for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) feature to enable Velero pod to make API calls with S3 and EC2 natively without the need to use kube2iam or AWS credentials. 
 
 ## Usage
 
@@ -42,11 +42,10 @@ new ssp.EksBlueprint(
 ## Functionality
 
 1. By default create a private S3 bucket (blocking all public access) with SSE-KMS encryption with AWS Managed Key from KMS(Encryption At Rest) for the Velero Backup destination.
-2. Create an S3 VPC endpoint to direct traffic to S3 within VPC.
-3. Configure S3 Bucket policy to enable encryption in transit.
-4. Create the IAM Role for Service Account for Velero pod to make API calls to AWS S3 and EC2 to backup and restore.
-5. Preset [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml).
-6. Allow users to pass in with [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml) for customisation purposes. 
+2. Configure S3 Bucket policy to enable encryption in transit.
+3. Create the IAM Role for Service Account for Velero pod to make API calls to AWS S3 and EC2 to backup and restore.
+4. Preset [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml).
+5. Allow users to pass in with [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml) for customisation purposes. 
 
 
 ## Limitations
