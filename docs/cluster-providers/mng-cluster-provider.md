@@ -32,6 +32,7 @@ THe `EC2ClusterProvider` supports the following configuration options.
 | instanceTypes         | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 | amiType               | The AMI type for the managed node group.
 | amiReleaseVersion     | The AMI Kuberenetes release version for the node group.
+| customAmi             | The custom AMI and the userData for the node group, `amiType` and `amiReleaseVersion` will be ignored if this is set.
 | nodeGroupCapacityType | The capacity type for the node group (on demand or spot).
 | vpcSubnets            | The subnets for the cluster.
 | privateCluster        | public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
@@ -51,7 +52,7 @@ Configuration of the EC2 parameters through context parameters makes sense if yo
 Upgrading Kubernetes versions via cluster configuration at present won't impact the kubelet version running on the worker nodes. To perform an in-place upgrade of the cluster, you must also update the `amiReleaseVersion` property. The following demonstrates how to do so.
 
 ```typescript
-const props: EC2ProviderClusterProps = {
+const props: MngClusterProviderProps = {
     version: KubernetesVersion.V1_20,
     amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
 }
@@ -64,7 +65,7 @@ Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/l
 To create clusters which leverage Spot capacity, set the `nodeGroupCapacityType` value to `CapacityType.SPOT`
 
 ```typescript
-const props: EC2ProviderClusterProps = {
+const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.SPOT,
     version: KubernetesVersion.V1_20,
     instanceTypes: [new InstanceType('t3.large'), new InstanceType('m5.large')],
@@ -73,3 +74,22 @@ const props: EC2ProviderClusterProps = {
 ```
 
 Note that two attributes in this configuration are relevant for Spot: `nodeGroupCapacityType` and `instaceTypes`. The latter indicates the types of instances which could be leveraged for Spot capacity and it makes sense to have a number of instance types to maximize availability.
+
+## Creating Clusters with custom AMI for the node group
+
+To create clusters using custom AMI for the worker nodes, set the `customAmi` to your custom image and provide your `userData` for node bootstrapping. 
+
+```typescript
+const userData = UserData.forLinux();
+userData.addCommands(`/etc/eks/bootstrap.sh ${cluster.clusterName}`);
+
+const props: MngClusterProviderProps = {
+    nodeGroupCapacityType: CapacityType.ON_DEMAND,
+    version: KubernetesVersion.V1_20,
+    instanceTypes: [new InstanceType('t3.large')],
+    customAmi: {
+        machineImage: MachineImage.genericLinux({'us-east-1': 'ami-0be34337b485b2609'}),
+        userData: userData,
+    },
+}
+```
