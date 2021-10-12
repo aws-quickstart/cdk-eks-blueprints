@@ -6,6 +6,33 @@ To accomplish this, the EKS SSP - Reference Solution leverages the [`Pipelines`]
 
 Additionally, the EKS SSP - Reference Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
 
+## Defining your blueprint to use with pipeline
+
+Creation of a pipeline starts with defining the blueprint that will be deployed across the pipeline stages.
+
+The framework allows defining a blueprint builder without instantiating the stack.
+
+```typescript
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+import * as team from 'path/to/teams'
+
+const blueprint = ssp.EksBlueprint.builder()
+    .account(account) // the supplied default will fail, but build and synth will pass
+    .region('us-west-1')
+    .addOns(
+        new ssp.AwsLoadBalancerControllerAddOn, 
+        new ssp.ExternalDnsAddOn,
+        new ssp.NginxAddOn,
+        new ssp.CalicoAddOn,
+        new ssp.MetricsServerAddOn,
+        new ssp.ClusterAutoScalerAddOn,
+        new ssp.ContainerInsightsAddOn)
+    .teams(new team.TeamRikerSetup);
+```
+
+The difference between the above code and a normal way of instantiating the stack is lack of `.build()` at the end of the blueprint definition.
+This code will produce a blueprint builder that can be instantiated inside the pipeline stages.
+
 ## Creating a pipeline
 
 We can create a new `CodePipeline` resource via the following. 
@@ -13,150 +40,77 @@ We can create a new `CodePipeline` resource via the following.
 ```typescript
 import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
-const pipeline = ssp.CodePipeline.build({
-    name: 'blueprint-pipeline',
-    owner: '<REPO_OWNER>',
-    repo: '<REPO_NAME>',
-    branch: 'main',
-    secretKey: '<SECRET_KEY>',
-    scope: scope
-})
+const blueprint = ssp.EksBlueprint.builder()
+    ...; // configure your blueprint builder
+
+ ssp.CodePipelineStack.builder()
+    .name("ssp-eks-pipeline")
+    .owner("aws-samples")
+    .repository({
+        repoUrl: 'ssp-eks-patterns',
+        credentialsSecretName: 'github-token',
+        branch: 'main'
+    })
 ```
+
+Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be fined in one main region, and replicated to all target regions. 
 
 ## Creating stages 
 
-Once our pipeline is created, we need to define a `stage` for the pipeline. To do so, we can wrap our `EksBlueprint` stack in a `cdk.Stage` object.  
+Once our pipeline is created, we need to define `stages` for the pipeline. To do so, we can leverage `ssp.StackStage` convenience class and builder support for it. Let's continue leveraging the pipeline builder defined in the previous step.  
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+const blueprint = ssp.EksBlueprint.builder()
+    ...; // configure your blueprint builder
 
-import * as team from 'path/to/teams'
-
-export class ClusterStage extends cdk.Stage {
-    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
-        super(scope, id, props);
-
-        // Setup platform team
-        const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(accountID!)
-        const teams: Array<ssp.Team> = [platformTeam];
-
-        // Add-ons for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
-        ];
-        new ssp.EksBlueprint(this, { id: 'blueprint-cluster', addOns, teams }, props);
-    }
-}
+ssp.CodePipelineStack.builder()
+    .name("ssp-eks-pipeline")
+    .owner("aws-samples")
+    .repository({
+        //  your repo info
+    }) 
+    .stage({
+        id: 'us-west-1-managed-ssp-test',
+        stackBuilder: blueprint.clone('us-west-1') // clone the blueprint to customize for the stage. You can add more add-ons, teams here. 
+    })
+    .stage({
+        id: 'us-east-2-managed-ssp-prod',
+        stackBuilder: blueprint.clone('us-east-2'), // clone the blueprint to customize for the stage. You can add more add-ons, team, here.
+        stageProps: {
+            manualApprovals: true
+        }
+    })
 ```
 
-## Adding stages to the pipeline. 
+Consider adding `ArgoCDAddOn` with your specific workload bootstrap repository to automatically bootstrap workloads in the provisioned clusters.
+See [Bootstrapping](./addons/argo-cd.md#Bootstrapping) for more details.
 
-Once a stage is created, we simply add it to the pipeline. 
+## Build the pipeline stack
 
-```typescript
-const dev = new ClusterStage(this, 'blueprint-stage-dev')
-pipeline.addApplicationStage(dev);
-```
-
-Adding stages to deploy multiple pipelines is trivial. 
+Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.
 
 ```typescript
-const dev = new ClusterStage(this, 'blueprint-stage-dev')
-pipeline.addApplicationStage(dev);
+const blueprint = ssp.EksBlueprint.builder()
+    ...; // configure your blueprint builder
 
-const test = new ClusterStage(this, 'blueprint-stage-test')
-pipeline.addApplicationStage(test);
-```
+ssp.CodePipelineStack.builder()
+    .name("ssp-eks-pipeline")
+    .owner("aws-samples") // owner of your repo
+    .repository({
+        //  your repo info
+    }) 
+    .stage({
+        id: 'dev',
+        stackBuilder: blueprint.clone('us-west-1') // clone the blueprint to customize for the stage. You can add more add-ons, teams here. 
+    })
+    .stage({
+        id: 'test',
+        stackBuilder: blueprint.clone('us-east-2'), // clone the blueprint to customize for the stage. You can add more add-ons, team, here.
+    })
+    .stage({
+        id: 'prod',
+        stackBuilder: blueprint.clone('us-west-2'), // clone the blueprint to customize for the stage. You can add more add-ons, team, here.
+    })
+    .build(scope, "ssp-pipeline-stack", props); // will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.
 
-We can also add manual approvals for production stages. 
-
-```typescript
-const prod = new ClusterStage(this, 'blueprint-stage-prod')
-pipeline.addApplicationStage(prod, {manualApprovals: true});
-```
-
-## Putting it all together
-
-The below code block contains the complete implementation of a CodePipeline that is responsible for deploying three different clusters across three different accounts by using three different pipeline stages. 
-
-```typescript
-import * as cdk from '@aws-cdk/core';
-
-// SSP Lib
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
-
-// Team implementations
-import * as team from 'path/to/teams'
-
-export class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id)
-
-        const pipeline = this.buildPipeline(scope)
-
-        const dev = new ClusterStage(this, 'dev-stage', {
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
-        })
-        pipeline.addApplicationStage(dev)
-
-        const test = new ClusterStage(this, 'test-stage', {
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
-        )
-        pipeline.addApplicationStage(test)  
-
-        // Manual approvals for Prod deploys.
-        const prod = new ClusterStage(this, 'prod-stage',{
-            env: {
-                account: 'XXXXXXXXXXX',
-                region: 'us-west-1',
-            }
-        })
-        pipeline.addApplicationStage(prod, { manualApprovals: true })
-    }
-
-    buildPipeline = (scope: cdk.Stack) => {
-        return ssp.CodePipeline.build({
-            name: 'blueprint-pipeline',
-            owner: '<REPO_OWNER>',
-            repo: '<REPO_NAME>',
-            branch: 'main',
-            secretKey: '<SECRET_KEY>',
-            scope: scope
-        })
-    }
-}
-
-export class ClusterStage extends cdk.Stage {
-    constructor(scope: cdk.Stack, id: string, props?: cdk.StageProps) {
-        super(scope, id, props);
-
-        // Setup platform team
-        const accountID = props?.env?.account
-        const platformTeam = new team.TeamPlatform(accountID!)
-        const teams: Array<ssp.Team> = [platformTeam];
-
-        // Add-ons for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.NginxAddOn,
-            new ssp.ArgoCDAddOn,
-            new ssp.CalicoAddOn,
-            new ssp.MetricsServerAddOn,
-            new ssp.ClusterAutoScalerAddOn,
-            new ssp.ContainerInsightsAddOn,
-        ];
-        new ssp.EksBlueprint(this, { id: 'blueprint-cluster', addOns, teams }, props);
-    }
-}
 ```
