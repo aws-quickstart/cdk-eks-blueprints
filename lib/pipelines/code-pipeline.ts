@@ -116,12 +116,19 @@ export class CodePipelineStack extends cdk.Stack {
     constructor(scope: Construct, pipelineProps: PipelineProps, id: string,  props?: StackProps) {
         super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
         const pipeline  = CodePipeline.build(this, pipelineProps);
+
+        const promises : Promise<ApplicationStage>[] = [];
+
         for(let stage of pipelineProps.stages) {
             const appStage = new ApplicationStage(this, stage.id, stage.stackBuilder);
-            appStage.waitForAsyncTasks().then( res => {
-                pipeline.addApplicationStage(res, stage.stageProps);
-            });
+            promises.push(appStage.waitForAsyncTasks());
         }
+
+        Promise.all(promises).then(stages => {
+            for(let i in stages) {
+                pipeline.addApplicationStage(stages[i], pipelineProps.stages[i].stageProps);
+            }
+        });
     }
 }
 

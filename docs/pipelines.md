@@ -31,7 +31,7 @@ const blueprint = ssp.EksBlueprint.builder()
 ```
 
 The difference between the above code and a normal way of instantiating the stack is lack of `.build()` at the end of the blueprint definition.
-This code will produce a bluepring builder that can be instantiated inside the pipeline stages.
+This code will produce a blueprint builder that can be instantiated inside the pipeline stages.
 
 ## Creating a pipeline
 
@@ -82,7 +82,7 @@ ssp.CodePipelineStack.builder()
     })
 ```
 
-Consider adding `ArgoCDAddOn` with specific workload bootstrap repository to automatically bootstrap workloads in the provisioned clusters.
+Consider adding `ArgoCDAddOn` with your specific workload bootstrap repository to automatically bootstrap workloads in the provisioned clusters.
 See [Bootstrapping](./addons/argo-cd.md#Bootstrapping) for more details.
 
 ## Build the pipeline stack

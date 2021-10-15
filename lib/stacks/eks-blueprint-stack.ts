@@ -1,12 +1,12 @@
 
-import * as cdk from '@aws-cdk/core';
-import { StackProps } from '@aws-cdk/core';
 import { IVpc } from '@aws-cdk/aws-ec2';
 import { KubernetesVersion } from '@aws-cdk/aws-eks';
+import * as cdk from '@aws-cdk/core';
+import { StackProps } from '@aws-cdk/core';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
-import * as spi from '../spi';
-import { withUsageTracking, getAddOnNameOrId } from '../utils';
 import { VpcProvider } from '../resource-providers/vpc';
+import * as spi from '../spi';
+import { getAddOnNameOrId, withUsageTracking } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -46,7 +46,7 @@ export class EksBlueprintProps {
      * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
      * VPC for the cluster can be registed under the name of 'vpc' or as a single provider of type 
      */
-    readonly resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
+    resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
 }
 
@@ -85,7 +85,11 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
+        const resourceProviders = this.props.resourceProviders!;
         this.props = { ...this.props, ...props };
+        if(props.resourceProviders) {
+            this.props.resourceProviders = new Map([...resourceProviders?.entries(), ...props.resourceProviders.entries()]);
+        }
         return this;
     }
 
