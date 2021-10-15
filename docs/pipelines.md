@@ -114,3 +114,26 @@ ssp.CodePipelineStack.builder()
     .build(scope, "ssp-pipeline-stack", props); // will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.
 
 ```
+
+## Troubleshooting
+
+SSP Build can fail with AccessDenied exception during build phase. Typical error messages:
+
+```
+Error: AccessDeniedException: User: arn:aws:sts::<account>:assumed-role/ssp-pipeline-stack-sspekspipelinePipelineBuildSynt-1NPFJRH6H7TB1/AWSCodeBuild-e95830ee-07f6-46f5-aaee-90e269c7eb5f is not authorized to perform:
+```
+
+```
+current credentials could not be used to assume 'arn:aws:iam::<account>:role/cdk-hnb659fds-lookup-role-,account>-eu-west-3', but are for the right account. Proceeding anyway.
+```
+
+```
+Error: you are not authorized to perform this operation. 
+```
+
+This can happen for a few reasons, but most typical is  related to the stack requiring elevated permissions at build time. Such permissions may be required to perform lookups, such as look up fo VPC, Hosted Zone, Certificate (if imported) and those are handled during stack synthesis. 
+
+**Resolution**
+
+To address this issue, you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `ssp-pipeline-stack-sspekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `ssp-pipeline-stack`. 
+If adding administrative access to the role solves the issue, you can the consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.
