@@ -4,16 +4,20 @@ This add-on installs [NGINX Ingress Controller](https://kubernetes.github.io/ing
 
 Other than handling Kubernetes ingress objects, this ingress controller can facilitate multi-tenancy and segregation of workload ingresses based on host name (host-based routing) and/or URL Path (path based routing). 
 
-This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controller.md) in order to enable NLB support. 
+***IMPORTANT***: 
+This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controller.md) in order to enable NLB support.
+
+***AWS Load Balancer Controller Add On must present in Add On array*** and ***must be in addon array before the NGINX ingress controller*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for AwsLoadBalancerControllerAddOn`.
 
 ## Usage
 
 ```typescript
-import { NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { AwsLoadBalancerControllerAddon, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const externalDnsHostname  = ...;
+const awsLBControllerAddOn = new AwsLoadBalancerControllerAddon();
 const addOn = new NginxAddOn({ externalDnsHostname });
-const addOns: Array<ClusterAddOn> = [ addOn ];
+const addOns: Array<ClusterAddOn> = [ awsLBControllerAddOn, addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {

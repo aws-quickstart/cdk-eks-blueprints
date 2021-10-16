@@ -77,6 +77,7 @@ npm i @aws-quickstart/ssp-amazon-eks
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
 
 ```typescript
+import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
@@ -87,17 +88,20 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.ArgoCDAddOn,
     new ssp.addons.CalicoAddOn,
     new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
     new ssp.addons.AwsLoadBalancerControllerAddOn(),
+    new ssp.addons.NginxAddOn,
     new ssp.addons.VpcCniAddOn(),
     new ssp.addons.CoreDnsAddOn(),
-    new ssp.addons.KubeProxyAddOn()
+    new ssp.addons.KubeProxyAddOn(),
+    new ssp.addons.XrayAddOn()
 ];
 
-const account = '<YOUR_ACCOUNT_ID'
-const region = 'us-east-2'
+const account = 'XXXXXXXXXXXXX'
+const region = 'us-east-1'
 const props = { env: { account, region } }
-new ssp.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
+new ssp.EksBlueprint(app, { id: 'blueprint', addOns}, props)
 ```
 
 Run the following command to confirm there are no issues with your code
@@ -112,6 +116,8 @@ If there are no errors you should see the following
 > eks-factory-test@0.1.0 build
 > tsc
 ```
+
+NOTE: If the above setting contains different account/region than initial `cdk bootstrap`, will then need to perfrorm `cdk bootstrap` again to avoid error. Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
 Deploy the stack using the following command
 

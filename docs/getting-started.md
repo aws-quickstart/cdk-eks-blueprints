@@ -40,25 +40,23 @@ import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 const app = new cdk.App();
 
 const addOns: Array<ssp.ClusterAddOn> = [
-    new ssp.addons.NginxAddOn,
     new ssp.addons.ArgoCDAddOn,
     new ssp.addons.CalicoAddOn,
     new ssp.addons.MetricsServerAddOn,
     new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
     new ssp.addons.AwsLoadBalancerControllerAddOn(),
+    new ssp.addons.NginxAddOn,
     new ssp.addons.VpcCniAddOn(),
     new ssp.addons.CoreDnsAddOn(),
-    new ssp.addons.KubeProxyAddOn()
+    new ssp.addons.KubeProxyAddOn(),
+    new ssp.addons.XrayAddOn()
 ];
 
-const opts = { id: 'east-test-1', addOns }
-new ssp.EksBlueprint(app, opts, {
-    env: {
-        account: 'XXXXXXXXXXXXX',
-        region: 'us-east-1'
-    },
-});
+const account = 'XXXXXXXXXXXXX'
+const region = 'us-east-1'
+const props = { env: { account, region } }
+new ssp.EksBlueprint(app, { id: 'blueprint', addOns}, props)
 ```
 
 Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
@@ -68,6 +66,14 @@ Each combination of target account and region must be bootstrapped prior to depl
 ```bash
 cdk bootstrap
 ```
+
+Run the following command to confirm there are no issues with your code
+
+```sh
+npm run build 
+```
+
+NOTE: If the above setting contains different account/region than initial `cdk bootstrap`, will then need to perfrorm `cdk bootstrap` again to avoid error. Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
 Deploy the stack using the following command. This command will take roughly 20 minutes to complete.
 
