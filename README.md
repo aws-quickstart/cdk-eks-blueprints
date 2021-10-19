@@ -104,19 +104,6 @@ const props = { env: { account, region } }
 new ssp.EksBlueprint(app, { id: 'east-test-1', addOns}, props)
 ```
 
-Run the following command to confirm there are no issues with your code
-
-```sh
-npm run build 
-```
-
-If there are no errors you should see the following
-
-```sh
-> eks-factory-test@0.1.0 build
-> tsc
-```
-
 Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.
 
 Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.

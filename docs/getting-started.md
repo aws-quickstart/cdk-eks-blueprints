@@ -67,13 +67,9 @@ Each combination of target account and region must be bootstrapped prior to depl
 cdk bootstrap
 ```
 
-Run the following command to confirm there are no issues with your code
+Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.
 
-```sh
-npm run build 
-```
-
-NOTE: If the above setting contains different account/region than initial `cdk bootstrap`, will then need to perfrorm `cdk bootstrap` again to avoid error. Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
+Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
 Deploy the stack using the following command. This command will take roughly 20 minutes to complete.
 
