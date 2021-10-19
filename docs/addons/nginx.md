@@ -12,18 +12,18 @@ This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controll
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddon, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { AwsLoadBalancerControllerAddOn, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const externalDnsHostname  = ...;
-const awsLBControllerAddOn = new AwsLoadBalancerControllerAddon();
-const addOn = new NginxAddOn({ externalDnsHostname });
-const addOns: Array<ClusterAddOn> = [ awsLBControllerAddOn, addOn ];
+const awsLbControllerAddOn = new AwsLoadBalancerControllerAddon();
+const nginxAddOn = new NginxAddOn({ externalDnsHostname });
+const addOns: Array<ClusterAddOn> = [ awsLbControllerAddOn, nginxAddOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
   env: {    
       account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
+      region: <AWS_REGION>
   },
 });
 ```

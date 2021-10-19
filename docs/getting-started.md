@@ -53,10 +53,10 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.XrayAddOn()
 ];
 
-const account = 'XXXXXXXXXXXXX'
-const region = 'us-east-1'
-const props = { env: { account, region } }
-new ssp.EksBlueprint(app, { id: 'blueprint', addOns}, props)
+const account = 'XXXXXXXXXXXXX';
+const region = 'us-east-2';
+const props = { env: { account, region } };
+new ssp.EksBlueprint(app, { id: 'east-test-1', addOns}, props);
 ```
 
 Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
@@ -92,6 +92,9 @@ Congratulations! You have deployed your first EKS cluster with `ssp-amazon-eks`.
 - [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
 - [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
+- [x] [Amazon VPC CNI add-on (VpcCni)](https://docs.aws.amazon.com/eks/latest/userguide/managing-vpc-cni.html) into your cluster to support native VPC networking for Amazon EKS.
+- [x] [CoreDNS Amazon EKS add-on (CoreDns)](https://docs.aws.amazon.com/eks/latest/userguide/managing-coredns.html) into your cluster. CoreDns is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
+- [x] [ kube-proxy Amazon EKS add-on (KubeProxy)](https://docs.aws.amazon.com/eks/latest/userguide/managing-kube-proxy.html) into your cluster to maintains network rules on each Amazon EC2 node
 - [x] AWS and Kubernetes resources needed to support [AWS X-Ray](https://aws.amazon.com/xray/).
 
 ## Cluster Access
