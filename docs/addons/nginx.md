@@ -7,7 +7,7 @@ Other than handling Kubernetes ingress objects, this ingress controller can faci
 ***IMPORTANT***: 
 This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controller.md) Add-on in order to enable NLB support.
 
-***AWS Load Balancer Controller Add-on must present in Add-on array*** and ***must be in Add-on array before the NGINX ingress controller*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for AwsLoadBalancerControllerAddOn`.
+***AWS Load Balancer Controller add-on must be present in add-on array*** and ***must be in add-on array before the NGINX ingress controller add-on*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for AwsLoadBalancerControllerAddOn`.
 
 ## Usage
 
