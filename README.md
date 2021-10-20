@@ -77,6 +77,7 @@ npm i @aws-quickstart/ssp-amazon-eks
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
 
 ```typescript
+import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
@@ -87,31 +88,25 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.ArgoCDAddOn,
     new ssp.addons.CalicoAddOn,
     new ssp.addons.MetricsServerAddOn,
+    new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
     new ssp.addons.AwsLoadBalancerControllerAddOn(),
+    new ssp.addons.NginxAddOn,
     new ssp.addons.VpcCniAddOn(),
     new ssp.addons.CoreDnsAddOn(),
-    new ssp.addons.KubeProxyAddOn()
+    new ssp.addons.KubeProxyAddOn(),
+    new ssp.addons.XrayAddOn()
 ];
 
-const account = '<YOUR_ACCOUNT_ID'
+const account = 'XXXXXXXXXXXXX'
 const region = 'us-east-2'
 const props = { env: { account, region } }
-new ssp.EksBlueprint(scope, { id: 'blueprint', addOns, teams }, props)
+new ssp.EksBlueprint(app, { id: 'east-test-1', addOns}, props)
 ```
 
-Run the following command to confirm there are no issues with your code
+Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.
 
-```sh
-npm run build 
-```
-
-If there are no errors you should see the following
-
-```sh
-> eks-factory-test@0.1.0 build
-> tsc
-```
+Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
 Deploy the stack using the following command
 
@@ -123,14 +118,17 @@ This will provision the following:
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments.
+- [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
+- [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
 - [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
+- [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
 - [x] AWS and Kubernetes resources needed to support [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html).
-- [x] [VpcCni] | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.
-- [x] [CoreDns] | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
-- [x] [KubeProxy] | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node
+- [x] [Amazon VPC CNI add-on (VpcCni)](https://docs.aws.amazon.com/eks/latest/userguide/managing-vpc-cni.html) into your cluster to support native VPC networking for Amazon EKS.
+- [x] [CoreDNS Amazon EKS add-on (CoreDns)](https://docs.aws.amazon.com/eks/latest/userguide/managing-coredns.html) into your cluster. CoreDns is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS
+- [x] [ kube-proxy Amazon EKS add-on (KubeProxy)](https://docs.aws.amazon.com/eks/latest/userguide/managing-kube-proxy.html) into your cluster to maintains network rules on each Amazon EC2 node
+- [x] AWS and Kubernetes resources needed to support [AWS X-Ray](https://aws.amazon.com/xray/).
 
 ---
 
