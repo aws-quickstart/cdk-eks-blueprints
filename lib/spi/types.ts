@@ -5,6 +5,16 @@ import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
 /**
+ * Data type defining helm repositories for GitOps bootstrapping.
+ */
+export interface HelmRepository {
+    repoUrl: string,
+    name: string,
+    username?: string,
+    password?: string
+}
+
+/**
  * Data type defining an application repository (git). 
  */
 export interface ApplicationRepository {
