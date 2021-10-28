@@ -3,16 +3,6 @@ import { Construct } from "@aws-cdk/core";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 
-export interface HelmAddOnProps {
-    repoUrl: string,
-    chart: string, 
-    release: string,
-    namespace: string
-}
-
-type Values = {
-    [key: string]: any;
-};
 
 export abstract class HelmAddOn implements ClusterAddOn {
 
@@ -29,6 +19,7 @@ export abstract class HelmAddOn implements ClusterAddOn {
     protected abstract getValues(namespaceNode ?: Construct) : Values;
 
 
+    @enableGitops
     protected addHelmChart(cluster: Cluster, values?: Values ) : Construct {
         return cluster.addHelmChart( this.id, {
             namespace: this.props.namespace,
