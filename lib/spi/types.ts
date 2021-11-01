@@ -1,7 +1,7 @@
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
-import { ResourceProvider } from '.';
+import { GitOpsAddOnDeploymentProps, ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
 /**
@@ -14,10 +14,8 @@ export interface HelmRepository {
     password?: string
 }
 
-/**
- * Data type defining an application repository (git). 
- */
-export interface ApplicationRepository {
+
+export interface GitRepositoryReference {
     /**
      * Expected to support helm style repo at the moment
      */
@@ -35,13 +33,18 @@ export interface ApplicationRepository {
 
     /**
      * Optional target revision for the repository.
+     * TargetRevision defines the revision of the source
+     * to sync the application to. In case of Git, this can be
+     * commit, tag, or branch. If omitted, will equal to HEAD.
+     * In case of Helm, this is a semver tag for the Chart's version.
      */
     targetRevision?: string
+}
 
-    /**
-     * Optional branch (defaults to main)
-     */
-    branch?: string,
+/**
+ * Data type defining an application repository (git). 
+ */
+export interface ApplicationRepository extends GitRepositoryReference {
 
     /**
      * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
@@ -107,6 +110,7 @@ export class ClusterInfo {
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
+    private readonly gitopsDeployments: Array<GitOpsAddOnDeploymentProps>;
     private resourceContext: ResourceContext;
 
     /**
@@ -127,6 +131,13 @@ export class ClusterInfo {
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
+    public getGitOpsDeployments() :  Array<GitOpsAddOnDeploymentProps> {
+        return this.gitopsDeployments;
+    }
+    
+    public addGitOpsDeployment(deployment: GitOpsAddOnDeploymentProps) {
+        this.gitopsDeployments.push(deployment);
+    }
     /**
      * Provides the resource context object associated with this instance of the EKS Blueprint.
      * @returns resource context object

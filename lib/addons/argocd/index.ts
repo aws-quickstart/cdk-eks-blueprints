@@ -1,12 +1,13 @@
 import bcrypt = require('bcrypt');
-import { Construct } from "@aws-cdk/core";
 import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-
-import * as spi from "../../spi";
-import { getSecretValue, btoa } from '../../utils';
-import { sshRepoRef, userNameRepoRef } from './manifest-utils';
+import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
+import * as spi from "../../spi";
+import { btoa, getSecretValue } from '../../utils';
+import { ArgoApplication } from './application';
+import { sshRepoRef, userNameRepoRef } from './manifest-utils';
+
 
 /**
  * Configuration options for add-on.
@@ -129,35 +130,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
         const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
             cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: "argoproj.io/v1alpha1",
-                kind: "Application",
-                metadata: {
-                    name: appRepo.name ?? "bootstrap-apps",
-                    namespace: this.options.namespace
-                },
-                spec: {
-                    destination: {
-                        namespace: this.options.namespace,
-                        server: "https://kubernetes.default.svc"
-                    },
-                    project: "default",
-                    source: {
-                        helm: {
-                            valueFiles: ["values.yaml"]
-                        },
-                        path: appRepo.path,
-                        repoURL: appRepo.repoUrl,
-                        targetRevision: appRepo.targetRevision ?? 'HEAD'
-                    },
-                    syncPolicy: {
-                        automated: {}
-                    }
-                }
-            }],
+            manifest: [new ArgoApplication(appRepo.name ?? "bootstrap-apps", this.options.namespace!, appRepo ).generate()],
             overwrite: true,
             prune: true
         });
+
         //
         // Make sure the bootstrap is only applied after successful ArgoCD installation.
         //

@@ -12,6 +12,7 @@
     },
     "devDependencies": {
         "@aws-cdk/assert": "1.124.0",
+        "@types/dot-object": "^2.1.2",
         "@types/jest": "^27.0.2",
         "@types/js-yaml": "^4.0.3",
         "@types/node": "^16.10.1",
@@ -46,6 +47,7 @@
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "2.996.0",
         "bcrypt": "^5.0.1",
+        "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
         "sync-request": "6.1.0",

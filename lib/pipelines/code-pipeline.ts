@@ -168,7 +168,7 @@ class CodePipeline {
             actionName: `${props.name}-github-action`,
             owner: props.owner,
             repo: props.repository.repoUrl,
-            branch: props.repository.branch ?? 'main',
+            branch: props.repository.targetRevision ?? 'main',
             output: sourceArtifact,
             oauthToken: oauthToken
         })
