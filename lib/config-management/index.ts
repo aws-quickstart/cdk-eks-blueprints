@@ -1,5 +1,5 @@
 import { Construct } from "@aws-cdk/core";
-import { ClusterInfo, GitOpsApplicationDeployment, GitOpsDeploymentGenerator, Values } from "..";
+import { ClusterInfo, GitOpsDeploymentGenerator, Values } from "..";
 import { HelmAddOn } from "../addons/helm-addon";
 
 
@@ -12,14 +12,19 @@ import { HelmAddOn } from "../addons/helm-addon";
 export function enableGitOps() {
     // eslint-disable-next-line @typescript-eslint/ban-types
     return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
-        const originalMethod = descriptor.value;
+        const _originalMethod = descriptor.value;
 
-        descriptor.value = function (clusterInfo: ClusterInfo, values: Values) {
-            const repo = (<HelmAddOn>target).props;
-            clusterInfo.addGitOpsDeployment({
-                application: repo,
-                values: values
+        descriptor.value = function (clusterInfo: ClusterInfo, values: Values): Construct {
+            const application = (<HelmAddOn>this).props;
+            const generator = GitOpsFactory.getApplicationGenerator(clusterInfo);
+            const result = generator.generate(clusterInfo, {
+                application: {
+                    name: application.name,
+                    namespace: application.namespace
+                },
+                values
             });
+            return result.manifest;
         };
 
         return descriptor;
@@ -29,13 +34,21 @@ export function enableGitOps() {
 
 
 export class GitOpsFactory {
-    public static getApplicationGenerator() : GitOpsDeploymentGenerator {
-        return new ArgoGitOpsGenerator();
+
+    public static gitOpsEngine: GitOpsDeploymentGenerator | undefined = undefined;
+
+    public static getApplicationGenerator(clusterInfo: ClusterInfo) : GitOpsDeploymentGenerator {
+        if(this.gitOpsEngine) {
+            return this.gitOpsEngine;
+        }
+        for (let addOn of clusterInfo.getResourceContext().blueprintProps.addOns?? []) {
+            const generator : any = addOn;
+            if((generator as GitOpsDeploymentGenerator).generate != undefined) {
+                return <GitOpsDeploymentGenerator>generator;
+            }
+        }
+        throw Error("GitOps Engine is not defined in the blueprint");
     }
 }
 
-export class ArgoGitOpsGenerator implements GitOpsDeploymentGenerator {
-    generate(clusterInfo: ClusterInfo, deployment: GitOpsApplicationDeployment): Construct {
-        throw new Error("Method not implemented.");
-    }
-}
+

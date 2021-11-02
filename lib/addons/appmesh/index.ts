@@ -1,8 +1,10 @@
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
+import merge from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
-
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
+import { HelmAddOn } from "../helm-addon";
+
 
 /**
  * Configuration options for the add-on.
@@ -40,15 +42,22 @@ const defaultProps: AppMeshAddOnProps = {
     tracingProvider: "x-ray"
 }
 
-export class AppMeshAddOn implements ClusterAddOn {
+export class AppMeshAddOn extends HelmAddOn {
 
     readonly options: AppMeshAddOnProps;
 
     constructor(props?: AppMeshAddOnProps) {
+        super({
+            name: "appmesh-controller",
+            namespace: "appmesh-system",
+            chart: "appmesh-controller",
+            release: "appmesh-release",
+            repository: "https://aws.github.io/eks-charts"
+        });
         this.options = { ...defaultProps, ...props };
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    override deploy(clusterInfo: ClusterInfo): void {
 
         const cluster = clusterInfo.cluster;
 
@@ -74,26 +83,24 @@ export class AppMeshAddOn implements ClusterAddOn {
         const namespace = createNamespace('appmesh-system', cluster)
         sa.node.addDependency(namespace);
 
-        // App Mesh Controller        
-        const chart = cluster.addHelmChart("appmesh-addon", {
-            chart: "appmesh-controller",
-            repository: "https://aws.github.io/eks-charts",
-            release: "appmesh-release",
-            namespace: "appmesh-system",
-            values: {
-                region: cluster.stack.region,
-                serviceAccount: {
-                    create: false,
-                    'name': 'appmesh-controller'
-                },
-                tracing: {
-                    enabled: this.options.enableTracing,
-                    provider: this.options.tracingProvider,
-                    address: this.options.tracingAddress,
-                    port: this.options.tracingPort
-                }
+        let values: Values = {
+            region: cluster.stack.region,
+            serviceAccount: {
+                create: false,
+                'name': 'appmesh-controller'
+            },
+            tracing: {
+                enabled: this.options.enableTracing,
+                provider: this.options.tracingProvider,
+                address: this.options.tracingAddress,
+                port: this.options.tracingPort
             }
-        });
+        };
+
+        values = merge(values, this.props.values ?? {});
+
+        // App Mesh Controller        
+        const chart = this.addHelmChart(clusterInfo, values);
 
         chart.node.addDependency(sa);
     }

@@ -110,7 +110,7 @@ export class ClusterInfo {
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
-    private readonly gitopsDeployments: Array<GitOpsApplicationDeployment>;
+    private readonly gitopsDeployments: Array<GitOpsApplicationDeployment> = [];
     private resourceContext: ResourceContext;
 
     /**

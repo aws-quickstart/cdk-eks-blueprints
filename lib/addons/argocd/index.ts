@@ -7,7 +7,6 @@ import * as spi from "../../spi";
 import { btoa, getSecretValue } from '../../utils';
 import { ArgoApplication } from './application';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
-import cluster from 'cluster';
 
 
 /**
@@ -60,7 +59,7 @@ const defaultProps: ArgoCDAddOnProps = {
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
-export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
+export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy, spi.GitOpsDeploymentGenerator {
 
     readonly options: ArgoCDAddOnProps;
 
@@ -68,6 +67,18 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     constructor(props?: ArgoCDAddOnProps) {
         this.options = { ...defaultProps, ...props };
+    }
+
+    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment): Required<spi.GitOpsApplicationDeployment> {
+        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, clusterInfo.getGitOpsDeployments().length);
+        const construct = clusterInfo.cluster.addManifest(deployment.application.name, manifest);
+        const result = {
+            application: deployment.application,
+            values: deployment.values,
+            manifest: construct
+        };
+        clusterInfo.addGitOpsDeployment(result); // required for dependency setup (on argo)
+        return result;
     }
 
     /**
@@ -124,9 +135,9 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     async postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
         console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
-        const cluster = clusterInfo.cluster;
+    
         if (appRepo) {
-            clusterInfo.addGitOpsDeployment({
+            this.generate(clusterInfo, {
                 application: {
                     name: appRepo.name ?? "bootstrap-apps",
                     namespace: this.options.namespace!,
@@ -137,14 +148,9 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         }
 
         //TODO: maybe pass as a single manifest array
-        clusterInfo.getGitOpsDeployments().forEach((e, index) => {
-            const manifest = new KubernetesManifest(cluster.stack, e.application.name, {
-                cluster,
-                manifest: [new ArgoApplication().generate(e, index)],
-                overwrite: true,
-                prune: true
-            });
-            manifest.node.addDependency(this.chartNode); 
+        clusterInfo.getGitOpsDeployments().forEach((e) => {
+            const manifest = e.manifest;
+            manifest!.node.addDependency(this.chartNode); 
         });
     }
 

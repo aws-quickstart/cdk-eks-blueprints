@@ -1,7 +1,9 @@
 import * as dot from 'dot-object';
-import { GitOpsApplicationDeployment } from '../../spi';
+import { GitOpsApplicationDeployment, GitRepositoryReference } from '../../spi';
 
 export class ArgoApplication {
+
+    constructor(private readonly bootstrapRepo: GitRepositoryReference | undefined) {}
 
     public generate(deployment: GitOpsApplicationDeployment, syncOrder?: number) {
 
@@ -12,13 +14,17 @@ export class ArgoApplication {
             nameValues.push({ name: key, value: flatValues[key]});
         }
 
+        const repository = deployment.application.repository ?? this.generateDefaultRepo(deployment.application.name);
+
         return {
             apiVersion: "argoproj.io/v1alpha1",
             kind: "Application",
             metadata: {
                 name: deployment.application.name,
                 namespace: deployment.application.namespace,
-                "argocd.argoproj.io/sync-wave": syncOrder ? `${syncOrder}` : "-1"
+                annotations: {
+                    "argocd.argoproj.io/sync-wave": syncOrder == undefined ? "-1" : `${syncOrder}`
+                }
             },
             spec: {
                 destination: {
@@ -31,14 +37,31 @@ export class ArgoApplication {
                         valueFiles: ["values.yaml"],
                         parameters: nameValues
                     },
-                    path: deployment.application.repository.path,
-                    repoURL: deployment.application.repository.repoUrl,
-                    targetRevision: deployment.application.repository.targetRevision ?? 'HEAD'
+                    path: repository.path,
+                    repoURL: repository.repoUrl,
+                    targetRevision: repository.targetRevision ?? 'HEAD'
                 },
                 syncPolicy: {
                     automated: {}
                 }
             }
         }
+    }
+
+    /**
+     * Creates an opinionated path.
+     * @param name 
+     * @returns 
+     */
+    generateDefaultRepo(name: string): GitRepositoryReference {
+        if(this.bootstrapRepo) {
+            return {
+                name: this.bootstrapRepo.name,
+                repoUrl: this.bootstrapRepo.repoUrl,
+                path: this.bootstrapRepo.path + `/addons/${name}`,
+                targetRevision: this.bootstrapRepo.targetRevision
+            }
+        }
+        throw new Error("With GitOps configuration management enabled either specify GitOps repository for each add-on or provide a bootstrap application to the ArgoCD add-on.");
     }
 }
