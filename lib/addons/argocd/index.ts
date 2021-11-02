@@ -7,6 +7,7 @@ import * as spi from "../../spi";
 import { btoa, getSecretValue } from '../../utils';
 import { ArgoApplication } from './application';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
+import cluster from 'cluster';
 
 
 /**
@@ -123,22 +124,28 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     async postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
         console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
-
-        if (!appRepo) {
-            return;
+        const cluster = clusterInfo.cluster;
+        if (appRepo) {
+            clusterInfo.addGitOpsDeployment({
+                application: {
+                    name: appRepo.name ?? "bootstrap-apps",
+                    namespace: this.options.namespace!,
+                    repository: appRepo
+                }, 
+                values: []
+            });    
         }
 
-        const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
-            cluster: clusterInfo.cluster,
-            manifest: [new ArgoApplication(appRepo.name ?? "bootstrap-apps", this.options.namespace!, appRepo ).generate()],
-            overwrite: true,
-            prune: true
+        //TODO: maybe pass as a single manifest array
+        clusterInfo.getGitOpsDeployments().forEach((e, index) => {
+            const manifest = new KubernetesManifest(cluster.stack, e.application.name, {
+                cluster,
+                manifest: [new ArgoApplication().generate(e, index)],
+                overwrite: true,
+                prune: true
+            });
+            manifest.node.addDependency(this.chartNode); 
         });
-
-        //
-        // Make sure the bootstrap is only applied after successful ArgoCD installation.
-        //
-        manifest.node.addDependency(this.chartNode);
     }
 
     /**

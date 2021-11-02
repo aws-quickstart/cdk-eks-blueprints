@@ -1,14 +1,12 @@
 import * as dot from 'dot-object';
-import { GitRepositoryReference, Values } from '../../spi';
+import { GitOpsApplicationDeployment } from '../../spi';
 
 export class ArgoApplication {
 
-    constructor(private name: string, private namespace: string, private repo: GitRepositoryReference) {}
+    public generate(deployment: GitOpsApplicationDeployment, syncOrder?: number) {
 
-    public generate(values?: Values) {
-
-        const flatValues = dot.dot(values);
-        const nameValues = new Array();
+        const flatValues = dot.dot(deployment.values);
+        const nameValues = [];
 
         for( let key in flatValues) {
             nameValues.push({ name: key, value: flatValues[key]});
@@ -18,12 +16,13 @@ export class ArgoApplication {
             apiVersion: "argoproj.io/v1alpha1",
             kind: "Application",
             metadata: {
-                name: this.name,
-                namespace: this.namespace
+                name: deployment.application.name,
+                namespace: deployment.application.namespace,
+                "argocd.argoproj.io/sync-wave": syncOrder ? `${syncOrder}` : "-1"
             },
             spec: {
                 destination: {
-                    namespace: this.namespace,
+                    namespace: deployment.application.namespace,
                     server: "https://kubernetes.default.svc"
                 },
                 project: "default", //TODO: make project configurable
@@ -32,9 +31,9 @@ export class ArgoApplication {
                         valueFiles: ["values.yaml"],
                         parameters: nameValues
                     },
-                    path: this.repo.path,
-                    repoURL: this.repo.repoUrl,
-                    targetRevision: this.repo.targetRevision ?? 'HEAD'
+                    path: deployment.application.repository.path,
+                    repoURL: deployment.application.repository.repoUrl,
+                    targetRevision: deployment.application.repository.targetRevision ?? 'HEAD'
                 },
                 syncPolicy: {
                     automated: {}
@@ -42,5 +41,4 @@ export class ArgoApplication {
             }
         }
     }
-
 }

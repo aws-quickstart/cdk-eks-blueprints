@@ -1,7 +1,7 @@
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
-import { GitOpsAddOnDeploymentProps, ResourceProvider } from '.';
+import { GitOpsApplicationDeployment, ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
 /**
@@ -110,7 +110,7 @@ export class ClusterInfo {
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
-    private readonly gitopsDeployments: Array<GitOpsAddOnDeploymentProps>;
+    private readonly gitopsDeployments: Array<GitOpsApplicationDeployment>;
     private resourceContext: ResourceContext;
 
     /**
@@ -131,11 +131,11 @@ export class ClusterInfo {
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
-    public getGitOpsDeployments() :  Array<GitOpsAddOnDeploymentProps> {
+    public getGitOpsDeployments() :  Array<GitOpsApplicationDeployment> {
         return this.gitopsDeployments;
     }
     
-    public addGitOpsDeployment(deployment: GitOpsAddOnDeploymentProps) {
+    public addGitOpsDeployment(deployment: GitOpsApplicationDeployment) {
         this.gitopsDeployments.push(deployment);
     }
     /**

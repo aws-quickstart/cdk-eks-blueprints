@@ -1,10 +1,9 @@
 import { Construct } from "@aws-cdk/core";
-import { ClusterInfo } from ".";
+import { ClusterInfo, GitRepositoryReference } from ".";
 
-export interface GitOpsAddOnProps {
-    repoUrl: string,
-    chart: string, 
-    release: string,
+export interface GitOpsApplication {
+    name: string,
+    repository: GitRepositoryReference,
     namespace: string
 }
 
@@ -13,11 +12,11 @@ export type Values = {
 };
 
 
-export interface GitOpsAddOnDeploymentProps {
-    addOnProps: GitOpsAddOnProps,
+export interface GitOpsApplicationDeployment {
+    application: GitOpsApplication,
     values: Values
 }
 
 export interface GitOpsDeploymentGenerator {
-    generate(clusterInfo: ClusterInfo, deployment: GitOpsAddOnDeploymentProps): Construct;
+    generate(clusterInfo: ClusterInfo, deployment: GitOpsApplicationDeployment): Construct;
 }

@@ -1,5 +1,5 @@
 import { Construct } from "@aws-cdk/core";
-import { ClusterInfo, GitOpsAddOnDeploymentProps, GitOpsDeploymentGenerator, Values } from "..";
+import { ClusterInfo, GitOpsApplicationDeployment, GitOpsDeploymentGenerator, Values } from "..";
 import { HelmAddOn } from "../addons/helm-addon";
 
 
@@ -16,15 +16,10 @@ export function enableGitOps() {
 
         descriptor.value = function (clusterInfo: ClusterInfo, values: Values) {
             const repo = (<HelmAddOn>target).props;
-            const stack = clusterInfo.cluster.stack.stackName;
-            
-            const gitopsGenerator = GitOpsFactory.getApplicationGenerator();
-
             clusterInfo.addGitOpsDeployment({
-                addOnProps: repo,
+                application: repo,
                 values: values
             });
-            
         };
 
         return descriptor;
@@ -40,7 +35,7 @@ export class GitOpsFactory {
 }
 
 export class ArgoGitOpsGenerator implements GitOpsDeploymentGenerator {
-    generate(clusterInfo: ClusterInfo, deployment: GitOpsAddOnDeploymentProps): Construct {
+    generate(clusterInfo: ClusterInfo, deployment: GitOpsApplicationDeployment): Construct {
         throw new Error("Method not implemented.");
     }
 }
