@@ -45,7 +45,8 @@ export default class BlueprintConstruct extends cdk.Construct {
                  repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
                  path: 'envs/dev',
                  targetRevision: "deployable"
-            }
+            },
+            adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [

@@ -11,7 +11,7 @@ export class ArgoApplication {
         const nameValues = [];
 
         for( let key in flatValues) {
-            nameValues.push({ name: key, value: flatValues[key]});
+            nameValues.push({ name: key, value: `${flatValues[key]}`});
         }
 
         const repository = deployment.application.repository ?? this.generateDefaultRepo(deployment.application.name);
@@ -21,7 +21,7 @@ export class ArgoApplication {
             kind: "Application",
             metadata: {
                 name: deployment.application.name,
-                namespace: deployment.application.namespace,
+                namespace: 'argocd',
                 annotations: {
                     "argocd.argoproj.io/sync-wave": syncOrder == undefined ? "-1" : `${syncOrder}`
                 }

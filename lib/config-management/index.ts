@@ -3,17 +3,13 @@ import { ClusterInfo, GitOpsDeploymentGenerator, Values } from "..";
 import { HelmAddOn } from "../addons/helm-addon";
 
 
-
-
 /**
- * Decorator function.
- * @returns intercept function
+ * Decorator factory function.
+ * @returns descriptor with overridden method definition
  */
 export function enableGitOps() {
     // eslint-disable-next-line @typescript-eslint/ban-types
-    return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
-        const _originalMethod = descriptor.value;
-
+    return function (_target: Object, _key: string | symbol, descriptor: PropertyDescriptor) {
         descriptor.value = function (clusterInfo: ClusterInfo, values: Values): Construct {
             const application = (<HelmAddOn>this).props;
             const generator = GitOpsFactory.getApplicationGenerator(clusterInfo);

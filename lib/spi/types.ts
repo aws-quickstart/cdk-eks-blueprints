@@ -14,7 +14,10 @@ export interface HelmRepository {
     password?: string
 }
 
-
+/**
+ * Interface that includes a reference to a Git repository for reuse, without credentials 
+ * and other access information.
+ */
 export interface GitRepositoryReference {
     /**
      * Expected to support helm style repo at the moment
