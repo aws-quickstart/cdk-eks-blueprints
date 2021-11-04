@@ -209,10 +209,10 @@ argocd app sync dev-apps
 
 ### Validate deployments. 
 
-To validate your deployments, leverage `kubectl port-forwarding` to access the `guestbook-ui` service for `team-burnham`.
+To validate your deployments, leverage `kubectl port-forwarding` to access the `guestbook-ui` service for `team-riker`.
 
 ```
-kubectl port-forward svc/guestbook-ui -n team-burnham 4040:80
+kubectl port-forward svc/guestbook-ui -n team-riker 4040:80
 ```
 
 Open up `localhost:4040` in your browser and you should see the application.
