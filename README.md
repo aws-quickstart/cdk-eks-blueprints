@@ -85,17 +85,17 @@ const app = new cdk.App();
 
 // AddOns for the cluster.
 const addOns: Array<ssp.ClusterAddOn> = [
-    new ssp.addons.ArgoCDAddOn,
-    new ssp.addons.CalicoAddOn,
-    new ssp.addons.MetricsServerAddOn,
-    new ssp.addons.ClusterAutoScalerAddOn,
-    new ssp.addons.ContainerInsightsAddOn,
-    new ssp.addons.AwsLoadBalancerControllerAddOn(),
-    new ssp.addons.NginxAddOn,
-    new ssp.addons.VpcCniAddOn(),
-    new ssp.addons.CoreDnsAddOn(),
-    new ssp.addons.KubeProxyAddOn(),
-    new ssp.addons.XrayAddOn()
+    new ssp.ArgoCDAddOn,
+    new ssp.CalicoAddOn,
+    new ssp.MetricsServerAddOn,
+    new ssp.ClusterAutoScalerAddOn,
+    new ssp.ContainerInsightsAddOn,
+    new ssp.AwsLoadBalancerControllerAddOn(),
+    new ssp.NginxAddOn,
+    new ssp.VpcCniAddOn(),
+    new ssp.CoreDnsAddOn(),
+    new ssp.KubeProxyAddOn(),
+    new ssp.XrayAddOn()
 ];
 
 const account = 'XXXXXXXXXXXXX'
