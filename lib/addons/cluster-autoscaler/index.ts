@@ -3,20 +3,39 @@ import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
 import { CfnJson, Tags } from "@aws-cdk/core";
 import { assertEC2NodeGroup } from "../../cluster-providers";
-import { ClusterAddOn, ClusterInfo } from "../../stacks/cluster-types";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
+
+/**
+ * Configuration options for the add-on.
+ */
+export interface ClusterAutoScalerAddOnProps {
+    /**
+     * Version of the Cluster Autoscaler
+     * @default v1.20.0
+     */
+    version?: string;
+}
+
+/**
+ * Defaults options for the add-on
+ */
+const defaultProps: ClusterAutoScalerAddOnProps = {
+    version: 'v1.20.0'
+};
 
 export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
-    private versionField?: string;
+    private options: ClusterAutoScalerAddOnProps;
 
-    constructor(version?: string) {
-        this.versionField = version;
+    constructor(props?: ClusterAutoScalerAddOnProps) {
+        this.options = { ...defaultProps, ...props };
     }
 
     /**
      * Version of the autoscaler, controls the image tag
      */
     readonly versionMap = new Map([
+        [KubernetesVersion.V1_20, "v1.20.0"],
         [KubernetesVersion.V1_19, "v1.19.1"],
         [KubernetesVersion.V1_18, "v1.18.3"],
         [KubernetesVersion.V1_17, "v1.17.4"]
@@ -24,9 +43,9 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
 
-        const version = this.versionField ?? this.versionMap.get(clusterInfo.version);
+        const version = this.options?.version ?? this.versionMap.get(clusterInfo.version);
         const cluster = clusterInfo.cluster;
-       
+
         const ng = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
 
         const autoscalerStmt = new iam.PolicyStatement();
@@ -254,11 +273,11 @@ export class ClusterAutoScalerAddOn implements ClusterAddOn {
                                         resources: {
                                             limits: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                             requests: {
                                                 cpu: "100m",
-                                                memory: "300Mi",
+                                                memory: "600Mi",
                                             },
                                         },
                                         command: [

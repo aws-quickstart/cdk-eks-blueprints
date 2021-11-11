@@ -1,15 +1,22 @@
-import { ClusterInfo } from '../../../lib/stacks/cluster-types';
-import { Team } from '../../../lib/teams';
+import { ArnPrincipal } from '@aws-cdk/aws-iam';
+import { Construct } from '@aws-cdk/core';
 
-export class TeamRiker implements Team {
+import { ApplicationTeam } from '../../../lib/teams';
 
-    readonly name = 'team-riker';
+function getUserArns(scope: Construct, key: string): ArnPrincipal[] {
+    const context: string = scope.node.tryGetContext(key);
+    if (context) {
+        return context.split(",").map(e => new ArnPrincipal(e));
+    }
+    return [];
+}
 
-    setup(clusterInfo: ClusterInfo) {
-        clusterInfo.cluster.addManifest(this.name, {
-            apiVersion: 'v1',
-            kind: 'Namespace',
-            metadata: { name: 'team-riker' }
+export class TeamRiker extends ApplicationTeam {
+    constructor(scope: Construct, teamManifestDir: string) {
+        super({
+            name: "riker",
+            users: getUserArns(scope, "team-riker.users"),
+            teamManifestDir: teamManifestDir
         });
     }
 }

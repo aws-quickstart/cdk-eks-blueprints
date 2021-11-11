@@ -7,14 +7,25 @@ phases:
     runtime-versions:
       nodejs: 14
     commands:
+      - |
+        if [ ! -z "${COMMIT_ID}" ]; then 
+          git fetch origin pull/${PR_NUMBER}/head:pr
+          git checkout main
+          # git merge needs user details, but we don't push anything, so the contents are unimportant
+          git -c "user.name=CI Bot" -c "user.email=dev@null" merge --no-edit ${COMMIT_ID}
+        fi
+      - | 
+        make deps
+      - >
+        make bootstrap-cdk
   pre_build:
     commands:
+      - | 
+        make run-test   
       - >
         [ -z "$CONTEXT_LOCATION" ] || aws s3 cp $CONTEXT_LOCATION .
   build:
     commands:
-      - npm install aws-cdk@1.113.0 -g
-      - npm install
-      - cdk deploy --verbose --all --require-approval never
+      - make deploy-all
     finally:
-      - cdk destroy --verbose --all --force
+      - make destroy-all

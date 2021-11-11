@@ -11,7 +11,6 @@ export * from './pipelines'
 export * as pipelines from './pipelines';
 
 export * from './cluster-providers'
-export * from './stacks/cluster-types';
+export * from './spi';
 
-
-
+export * from './resource-providers';

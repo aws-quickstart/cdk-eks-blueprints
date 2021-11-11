@@ -1,6 +1,18 @@
 *.ts
 !*.d.ts
-
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# Other files excluded from package
+.vscode
+.github
+ci
+Makefile
+mkdocs.yml
+jest.config.js
+test
+dist/lib
+lib
+examples
+

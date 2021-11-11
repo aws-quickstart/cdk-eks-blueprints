@@ -1,18 +1,11 @@
 import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo } from "../stacks/cluster-types";
-import { CfnOutput } from "@aws-cdk/core";
-import { DefaultTeamRoles } from "./default-team-roles";
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
-
-/**
- * Interface for a team. 
- */
-export interface Team {
-
-    name: string;
-
-    setup(clusterInfo: ClusterInfo): void;
-}
+import { ClusterInfo, Team } from '../spi';
+import { CfnOutput } from '@aws-cdk/core';
+import { DefaultTeamRoles } from './default-team-roles';
+import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
+import { TeamSecrets, TeamSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
+import { applyYamlFromDir } from '../utils/yaml-utils'
+import { IRole } from '@aws-cdk/aws-iam';
 
 /**
  * Team properties.
@@ -46,6 +39,11 @@ export class TeamProps {
     }
 
     /**
+     * Service Account Name
+     */
+    readonly serviceAccountName?: string;
+
+    /**
      *  Team members who need to get access to the cluster
      */
     readonly users?: Array<iam.ArnPrincipal>;
@@ -54,7 +52,17 @@ export class TeamProps {
      * Options existing role that should be used for cluster access. 
      * If userRole and users are not provided, then no IAM setup is performed. 
      */
-    readonly userRole?: iam.IRole;
+    readonly userRoleArn?: string;
+
+    /**
+     * Team Secrets
+     */
+    readonly teamSecrets?: TeamSecretsProps[];
+
+    /**
+     * Optional, directory where a team's manifests are stored
+     */
+     readonly teamManifestDir?: string;
 }
 
 export class ApplicationTeam implements Team {
@@ -62,6 +70,10 @@ export class ApplicationTeam implements Team {
     readonly teamProps: TeamProps;
 
     readonly name: string;
+
+    public namespaceManifest: KubernetesManifest;
+
+    public serviceAccount: ServiceAccount;
 
     constructor(teamProps: TeamProps) {
         this.name = teamProps.name;
@@ -71,13 +83,18 @@ export class ApplicationTeam implements Team {
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
-            userRole: teamProps.userRole
+            serviceAccountName: teamProps.serviceAccountName,
+            userRoleArn: teamProps.userRoleArn,
+            teamSecrets: teamProps.teamSecrets,
+            teamManifestDir: teamProps.teamManifestDir
         }
     }
 
     public setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAccess(clusterInfo);
         this.setupNamespace(clusterInfo);
+        this.setupServiceAccount(clusterInfo);
+        this.setupSecrets(clusterInfo);
     }
 
     protected defaultSetupAccess(clusterInfo: ClusterInfo) {
@@ -85,7 +102,7 @@ export class ApplicationTeam implements Team {
         const awsAuth = clusterInfo.cluster.awsAuth;
 
         const users = this.teamProps.users ?? [];
-        const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRole);
+        const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRoleArn);
 
         if (teamRole) {
             awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
@@ -101,7 +118,7 @@ export class ApplicationTeam implements Team {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.users ?? [];
-        const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRole);
+        const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRoleArn);
 
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" })
 
@@ -117,12 +134,15 @@ export class ApplicationTeam implements Team {
      * @param role may be null if both role and users were not provided
      * @returns 
      */
-    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.IRole): iam.IRole | undefined {
+    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, roleArn?: string): iam.IRole | undefined {
+        let role: IRole | undefined = undefined;
+
         if (users?.length == 0) {
             return role;
         }
 
-        if (role) {
+        if (roleArn) {
+            role = iam.Role.fromRoleArn(clusterInfo.cluster.stack, `${this.name}-team-role`, roleArn);
             users.forEach(user => role?.grant(user, "sts:assumeRole"));
         }
         else {
@@ -150,7 +170,7 @@ export class ApplicationTeam implements Team {
                 actions: [
                     "eks:ListClusters"
                 ]
-            })
+                })
             );
         }
 
@@ -158,14 +178,15 @@ export class ApplicationTeam implements Team {
     }
 
     /**
-     * Creates nmaespace and sets up policies.
+     * Creates namespace and sets up policies.
      * @param clusterInfo 
      */
     protected setupNamespace(clusterInfo: ClusterInfo) {
         const props = this.teamProps;
         const namespaceName = props.namespace!;
+        const teamManifestDir = props.teamManifestDir;
 
-        const namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
+        this.namespaceManifest = new KubernetesManifest(clusterInfo.cluster.stack, props.name, {
             cluster: clusterInfo.cluster,
             manifest: [{
                 apiVersion: 'v1',
@@ -178,7 +199,6 @@ export class ApplicationTeam implements Team {
             overwrite: true,
             prune: true
         });
-
 
         if (props.namespaceHardLimits) {
             this.setupNamespacePolicies(clusterInfo, namespaceName);
@@ -193,7 +213,11 @@ export class ApplicationTeam implements Team {
             prune: true
         });
 
-        rbacManifest.node.addDependency(namespaceManifest);
+        rbacManifest.node.addDependency(this.namespaceManifest);
+
+        if (teamManifestDir){
+            applyYamlFromDir(teamManifestDir, clusterInfo.cluster, this.namespaceManifest)
+        }
     }
 
     /**
@@ -203,7 +227,7 @@ export class ApplicationTeam implements Team {
      */
     protected setupNamespacePolicies(clusterInfo: ClusterInfo, namespaceName: string) {
         const quotaName = this.teamProps.name + "-quota";
-        clusterInfo.cluster.addManifest(quotaName, {
+        const quotaManifest = clusterInfo.cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
             metadata: {
@@ -214,6 +238,39 @@ export class ApplicationTeam implements Team {
                 hard: this.teamProps.namespaceHardLimits
             }
         });
+        quotaManifest.node.addDependency(this.namespaceManifest);
+    }
+    
+    /**
+     * Sets up ServiceAccount for the team namespace
+     * @param clusterInfo 
+     */
+    protected setupServiceAccount(clusterInfo: ClusterInfo) {
+        const serviceAccountName = this.teamProps.serviceAccountName? this.teamProps.serviceAccountName : `${this.teamProps.name}-sa`;
+        const cluster = clusterInfo.cluster;
+        
+        this.serviceAccount = cluster.addServiceAccount(`${this.teamProps.name}-service-account`, {
+            name: serviceAccountName,
+            namespace: this.teamProps.namespace
+        });
+        this.serviceAccount.node.addDependency(this.namespaceManifest);
+
+        const serviceAccountOutput = new CfnOutput(clusterInfo.cluster.stack, `${this.teamProps.name}-sa`, {
+            value: serviceAccountName
+        });
+        serviceAccountOutput.node.addDependency(this.namespaceManifest);
+    }
+
+    /**
+     * Sets up secrets
+     * @param clusterInfo
+     */
+    protected setupSecrets(clusterInfo: ClusterInfo) {
+        if (this.teamProps.teamSecrets) {
+            const secretsDriver = clusterInfo.getProvisionedAddOn('SecretsStoreAddOn');
+            console.assert(secretsDriver != null, 'SecretsStoreAddOn is not provided in addons');
+            new TeamSecrets(this.teamProps.teamSecrets).setupSecrets(clusterInfo, this, secretsDriver!);
+        }
     }
 }
 
@@ -225,7 +282,7 @@ export class PlatformTeam extends ApplicationTeam {
 
     /**
      * Override
-     * @param clusterInfo 
+     * @param clusterInfo
      */
     setup(clusterInfo: ClusterInfo): void {
         this.defaultSetupAdminAccess(clusterInfo);

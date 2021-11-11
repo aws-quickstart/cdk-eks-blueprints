@@ -5,10 +5,10 @@
 ## Usage
 
 ```typescript
-import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
-const xrayAddOn = new XrayAddOn();
-const addOns: Array<ClusterAddOn> = [ xrayAddOn ];
+const addOn = new XrayAddOn();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {

@@ -19,11 +19,10 @@ The IAM role `AmazonSSMManagedInstanceCore` provides the required permissions fo
 ## Usage
 
 ```typescript
-import { SSMAgentAddOn }  from '@shapirov/cdk-eks-blueprint';
+import { SSMAgentAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
-readonly ssmAgent = new SSMAgentAddon();
-
-const addOns: Array<ClusterAddOn> = [ ssmAgent ];
+const addOn = new SSMAgentAddon();
+const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
