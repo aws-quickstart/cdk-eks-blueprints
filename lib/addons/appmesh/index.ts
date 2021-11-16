@@ -95,6 +95,7 @@ export class AppMeshAddOn extends HelmAddOn {
                 port: this.options.tracingPort
             }
         };
+        
         values = merge(values, this.props.values ?? {});
         
         const chart = this.addHelmChart(clusterInfo, values);

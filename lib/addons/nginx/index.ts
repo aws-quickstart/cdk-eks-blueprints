@@ -71,7 +71,7 @@ export interface NginxAddOnProps {
  * Defaults options for the add-on
  */
 const defaultProps: NginxAddOnProps = {
-    version: "0.9.3",
+    version: "0.11.3",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
     internetFacing: true,

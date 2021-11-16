@@ -15,6 +15,13 @@ export interface HelmRepository {
 }
 
 /**
+ * Utility type for values passed to Helm or GitOps applications.
+ */
+ export type Values = {
+    [key: string]: any;
+};
+
+/**
  * Interface that includes a reference to a Git repository for reuse, without credentials 
  * and other access information.
  */
@@ -113,7 +120,6 @@ export class ClusterInfo {
     readonly autoScalingGroup?: AutoScalingGroup;
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
-    private readonly gitopsDeployments: Array<GitOpsApplicationDeployment> = [];
     private resourceContext: ResourceContext;
 
     /**
@@ -134,13 +140,6 @@ export class ClusterInfo {
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }
 
-    public getGitOpsDeployments() :  Array<GitOpsApplicationDeployment> {
-        return this.gitopsDeployments;
-    }
-    
-    public addGitOpsDeployment(deployment: GitOpsApplicationDeployment) {
-        this.gitopsDeployments.push(deployment);
-    }
     /**
      * Provides the resource context object associated with this instance of the EKS Blueprint.
      * @returns resource context object

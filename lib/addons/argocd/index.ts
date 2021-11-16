@@ -33,6 +33,11 @@ export interface ArgoCDAddOnProps {
     bootstrapRepo?: spi.ApplicationRepository;
 
     /**
+     * Optional values for the bootstrap application.
+     */
+    bootstrapValues?: spi.Values,
+
+    /**
      * Optional admin password secret (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
      * store as bcrypt hash. 
@@ -59,7 +64,7 @@ const defaultProps: ArgoCDAddOnProps = {
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
-export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy, spi.GitOpsDeploymentGenerator {
+export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
 
@@ -69,16 +74,9 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy, spi
         this.options = { ...defaultProps, ...props };
     }
 
-    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment): Required<spi.GitOpsApplicationDeployment> {
-        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, clusterInfo.getGitOpsDeployments().length);
-        const construct = clusterInfo.cluster.addManifest(deployment.application.name, manifest);
-        const result = {
-            application: deployment.application,
-            values: deployment.values,
-            manifest: construct
-        };
-        clusterInfo.addGitOpsDeployment(result); // required for dependency setup (on argo)
-        return result;
+    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment): Construct {
+        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, 0);
+        return clusterInfo.cluster.addManifest(deployment.name, manifest);
     }
 
     /**
@@ -125,7 +123,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy, spi
         return this.chartNode;
     }
 
-
     /**
      * Post deployment step is used to create a bootstrap repository if options are provided for the add-on.
      * @param clusterInfo 
@@ -135,23 +132,15 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy, spi
     async postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
         console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
-    
+
         if (appRepo) {
             this.generate(clusterInfo, {
-                application: {
-                    name: appRepo.name ?? "bootstrap-apps",
-                    namespace: this.options.namespace!,
-                    repository: appRepo
-                }, 
-                values: []
-            });    
-        }
-
-        //TODO: maybe pass as a single manifest array
-        clusterInfo.getGitOpsDeployments().forEach((e) => {
-            const manifest = e.manifest;
-            manifest!.node.addDependency(this.chartNode); 
-        });
+                name: appRepo.name ?? "bootstrap-apps",
+                namespace: this.options.namespace!,
+                repository: appRepo,
+                values: this.options.bootstrapValues ?? {}
+            });
+        }       
     }
 
     /**

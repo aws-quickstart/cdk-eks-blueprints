@@ -14,13 +14,13 @@ export class ArgoApplication {
             nameValues.push({ name: key, value: `${flatValues[key]}`});
         }
 
-        const repository = deployment.application.repository ?? this.generateDefaultRepo(deployment.application.name);
+        const repository = deployment.repository ?? this.generateDefaultRepo(deployment.name);
 
         return {
             apiVersion: "argoproj.io/v1alpha1",
             kind: "Application",
             metadata: {
-                name: deployment.application.name,
+                name: deployment.name,
                 namespace: 'argocd',
                 annotations: {
                     "argocd.argoproj.io/sync-wave": syncOrder == undefined ? "-1" : `${syncOrder}`
@@ -28,7 +28,7 @@ export class ArgoApplication {
             },
             spec: {
                 destination: {
-                    namespace: deployment.application.namespace,
+                    namespace: deployment.namespace,
                     server: "https://kubernetes.default.svc"
                 },
                 project: "default", //TODO: make project configurable
