@@ -1,8 +1,9 @@
 import { Construct } from "@aws-cdk/core";
 import * as spi from "../..";
-import { HelmChartConfiguration, KubectlProvider } from "../../kubectl-providers";
+import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 
 export type HelmAddOnProps = HelmChartConfiguration;
+export type HelmAddOnUserProps = Partial<HelmChartConfiguration>;
 
 export abstract class HelmAddOn implements spi.ClusterAddOn {
 

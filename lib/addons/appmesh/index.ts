@@ -3,13 +3,13 @@ import merge from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
-import { HelmAddOn, HelmAddOnProps } from "../helm-addon";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 
 /**
  * Configuration options for the add-on.
  */
-export interface AppMeshAddOnProps extends HelmAddOnProps {
+export interface AppMeshAddOnProps extends HelmAddOnUserProps {
     /**
      * If set to true, will enable tracing through App Mesh sidecars, such as X-Ray distributed tracing.
      * Note: support for X-Ray tracing does not depend on the XRay Daemon AddOn installed.
@@ -37,12 +37,13 @@ export interface AppMeshAddOnProps extends HelmAddOnProps {
 /**
  * Defaults options for the add-on
  */
-const defaultProps: AppMeshAddOnProps = {
+const defaultProps = {
     enableTracing: false,
     tracingProvider: "x-ray",
     name: "appmesh-controller",
     namespace: "appmesh-system",
     chart: "appmesh-controller",
+    version: "1.4.1",
     release: "appmesh-release",
     repository: "https://aws.github.io/eks-charts"
 }
@@ -95,7 +96,7 @@ export class AppMeshAddOn extends HelmAddOn {
                 port: this.options.tracingPort
             }
         };
-        
+
         values = merge(values, this.props.values ?? {});
         
         const chart = this.addHelmChart(clusterInfo, values);

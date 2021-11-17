@@ -7,7 +7,7 @@ This getting started guide will walk you through setting up a new CDK project wh
 To use the `ssp-amazon-eks` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
 
 ```bash
-npm install -g aws-cdk@1.124.0
+npm install -g aws-cdk@1.132.0
 ```
 
 Verify the installation.
