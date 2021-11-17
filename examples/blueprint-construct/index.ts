@@ -41,32 +41,32 @@ export default class BlueprintConstruct extends cdk.Construct {
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
-            bootstrapRepo: {
-                 repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
-                 path: 'envs/dev',
-                 targetRevision: "deployable"
-            },
-            adminPasswordSecretName: "argo-admin-secret"
+            // bootstrapRepo: {
+            //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+            //      path: 'envs/dev',
+            //      targetRevision: "deployable"
+            // },
+            // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
-            // new ssp.addons.CalicoAddOn(),
-            // new ssp.addons.MetricsServerAddOn(),
-            // new ssp.addons.ClusterAutoScalerAddOn(),
-            // new ssp.addons.ContainerInsightsAddOn(),
-            // new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            new ssp.addons.CalicoAddOn(),
+            new ssp.addons.MetricsServerAddOn(),
+            new ssp.addons.ClusterAutoScalerAddOn(),
+            new ssp.addons.ContainerInsightsAddOn(),
+            new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
-            // new ssp.addons.SSMAgentAddOn(),
-            // new ssp.addons.NginxAddOn({ values: {
-            //     controller: { service: { create: false }}
-            // }}),
-            // new ssp.addons.VeleroAddOn(),
-            // new ssp.addons.VpcCniAddOn(),
-            // new ssp.addons.CoreDnsAddOn(),
-            // new ssp.addons.KubeProxyAddOn(),
-            // new ssp.addons.OpaGatekeeperAddOn()
+            new ssp.addons.SSMAgentAddOn(),
+            new ssp.addons.NginxAddOn({ values: {
+                controller: { service: { create: false }}
+            }}),
+            new ssp.addons.VeleroAddOn(),
+            new ssp.addons.VpcCniAddOn(),
+            new ssp.addons.CoreDnsAddOn(),
+            new ssp.addons.KubeProxyAddOn(),
+            new ssp.addons.OpaGatekeeperAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
