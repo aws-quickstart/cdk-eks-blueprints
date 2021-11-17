@@ -1,4 +1,3 @@
-import { Constants } from "..";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 

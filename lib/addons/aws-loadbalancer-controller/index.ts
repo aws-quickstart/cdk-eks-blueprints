@@ -1,9 +1,8 @@
-import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
-import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Construct } from "@aws-cdk/core";
+import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
 
 /**
  * Configuration options for the add-on.

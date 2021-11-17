@@ -1,7 +1,7 @@
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
-import { GitOpsApplicationDeployment, ResourceProvider } from '.';
+import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
 /**
