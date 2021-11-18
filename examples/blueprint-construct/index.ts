@@ -23,6 +23,7 @@ export interface BlueprintConstructProps {
      */
     vpc: Vpc;
 }
+
 export default class BlueprintConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
         super(scope, blueprintProps.id);

@@ -31,7 +31,7 @@ const AWS_LOAD_BALANCER_CONTROLLER = 'aws-load-balancer-controller';
 /**
  * Defaults options for the add-on
  */
-const defaultProps = {
+const defaultProps: AwsLoadBalancerControllerProps = {
     name: AWS_LOAD_BALANCER_CONTROLLER,
     namespace: 'kube-system',
     chart: AWS_LOAD_BALANCER_CONTROLLER,
@@ -49,7 +49,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
     readonly options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        super( { ...defaultProps, ...props });
+        super({ ...defaultProps as any, ...props });
         this.options = this.props as AwsLoadBalancerControllerProps;
     }
 
