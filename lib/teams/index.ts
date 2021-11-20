@@ -5,6 +5,7 @@ import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
 import { TeamSecrets, TeamSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 import { applyYamlFromDir } from '../utils/yaml-utils'
+import { IRole } from '@aws-cdk/aws-iam';
 
 /**
  * Team properties.
@@ -51,7 +52,7 @@ export class TeamProps {
      * Options existing role that should be used for cluster access. 
      * If userRole and users are not provided, then no IAM setup is performed. 
      */
-    readonly userRole?: iam.IRole;
+    readonly userRoleArn?: string;
 
     /**
      * Team Secrets
@@ -83,7 +84,7 @@ export class ApplicationTeam implements Team {
             namespaceAnnotations: teamProps.namespaceAnnotations,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
-            userRole: teamProps.userRole,
+            userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
             teamManifestDir: teamProps.teamManifestDir
         }
@@ -101,7 +102,7 @@ export class ApplicationTeam implements Team {
         const awsAuth = clusterInfo.cluster.awsAuth;
 
         const users = this.teamProps.users ?? [];
-        const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRole);
+        const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRoleArn);
 
         if (teamRole) {
             awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
@@ -117,7 +118,7 @@ export class ApplicationTeam implements Team {
         const props = this.teamProps;
         const awsAuth = clusterInfo.cluster.awsAuth;
         const admins = this.teamProps.users ?? [];
-        const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRole);
+        const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRoleArn);
 
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" })
 
@@ -133,12 +134,15 @@ export class ApplicationTeam implements Team {
      * @param role may be null if both role and users were not provided
      * @returns 
      */
-    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, role?: iam.IRole): iam.IRole | undefined {
+    protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, roleArn?: string): iam.IRole | undefined {
+        let role: IRole | undefined = undefined;
+
         if (users?.length == 0) {
             return role;
         }
 
-        if (role) {
+        if (roleArn) {
+            role = iam.Role.fromRoleArn(clusterInfo.cluster.stack, `${this.name}-team-role`, roleArn);
             users.forEach(user => role?.grant(user, "sts:assumeRole"));
         }
         else {
@@ -166,7 +170,7 @@ export class ApplicationTeam implements Team {
                 actions: [
                     "eks:ListClusters"
                 ]
-            })
+                })
             );
         }
 

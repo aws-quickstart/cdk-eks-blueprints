@@ -10,7 +10,7 @@ For more information about AWS Load Balancer Controller please see the [official
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddon, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { AwsLoadBalancerControllerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const addOn = new AwsLoadBalancerControllerAddon();
 const addOns: Array<ClusterAddOn> = [ addOn ];
@@ -19,7 +19,7 @@ const app = new cdk.App();
 new EksBlueprint(app, 'my-stack-name', addOns, [], {
   env: {
       account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
+      region: <AWS_REGION>
   },
 });
 ```
