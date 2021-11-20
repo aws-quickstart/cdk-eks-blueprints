@@ -1,10 +1,9 @@
 import { Construct, Duration } from '@aws-cdk/core';
 import { ClusterAddOn, ClusterInfo } from '../../spi';
-import { AutoScalingGroup, LifecycleTransition, IAutoScalingGroup } from '@aws-cdk/aws-autoscaling';
+import { LifecycleTransition, LifecycleHook } from '@aws-cdk/aws-autoscaling';
 import { Queue } from '@aws-cdk/aws-sqs';
 import { QueueHook } from '@aws-cdk/aws-autoscaling-hooktargets';
 import * as iam from '@aws-cdk/aws-iam';
-import { CfnNodegroup, Cluster, Nodegroup } from '@aws-cdk/aws-eks';
 import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy, AwsSdkCall } from '@aws-cdk/custom-resources';
 import { Rule, EventPattern } from '@aws-cdk/aws-events';
 import { SqsQueue } from '@aws-cdk/aws-events-targets';
@@ -49,10 +48,9 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;    
     const asgCapacity = clusterInfo.autoScalingGroup;
-    const nodegroupCapacity = clusterInfo.nodeGroup;
 
     // No support for Fargate, lets catch that
-    console.assert(asgCapacity || nodegroupCapacity, "AWS Node Termination Handler is only supported for managed node groups or self-managed nodes");
+    console.assert(asgCapacity, "AWS Node Termination Handler is only supported for self-managed nodes");
 
     // Create an SQS Queue
     const queue = new Queue(cluster.stack, `${AWS_NODE_TERMINATION_HANDLER}-queue`, {
@@ -69,15 +67,15 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
     }));
 
     // Setup a Termination Lifecycle Hook on an ASG
-    const autoScalingGroup = this.getAutoScalingGroup(cluster, asgCapacity, nodegroupCapacity);
-    autoScalingGroup.addLifecycleHook(`${AWS_NODE_TERMINATION_HANDLER}-lifecycle-hook`, {
+    new LifecycleHook(cluster.stack, `${AWS_NODE_TERMINATION_HANDLER}-lifecycle-hook`, {
       lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
       heartbeatTimeout: Duration.minutes(15),
-      notificationTarget: new QueueHook(queue)
+      notificationTarget: new QueueHook(queue),
+      autoScalingGroup: asgCapacity!
     });
 
     // Tag the ASG
-    this.tagAsg(cluster.stack, autoScalingGroup.autoScalingGroupName);
+    this.tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
 
     // Create Amazon EventBridge Rules
     this.createEvents(cluster.stack, queue);
@@ -94,7 +92,7 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
         'autoscaling:DescribeAutoScalingInstances',
         'autoscaling:DescribeTags'
       ],
-      resources: [autoScalingGroup.autoScalingGroupArn]
+      resources: [asgCapacity!.autoScalingGroupArn]
     }));
     serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
@@ -123,40 +121,6 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
       },
     });
     awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
-  }
-
-  /**
-   * Gets AutoScalingGroup for the EKS Cluster either managed or self-managed.
-   * @param cluster 
-   * @param asgCapacity 
-   * @param nodegroupCapacity 
-   * @returns IAutoScalingGroup
-   */
-  private getAutoScalingGroup(cluster: Cluster, asgCapacity: AutoScalingGroup | undefined, nodegroupCapacity: Nodegroup | undefined): IAutoScalingGroup {
-    let autoScalingGroupName: string;
-
-    if (asgCapacity) {
-      autoScalingGroupName = asgCapacity.autoScalingGroupName;
-    }
-    else {
-      const cfnNodeGroup = nodegroupCapacity!.node.defaultChild as CfnNodegroup;
-      const nodeGroupName = cfnNodeGroup.getAtt('NodegroupName');
-      const callProps: AwsSdkCall = {
-        service: 'EKS',
-        action: 'describeNodegroup',
-        parameters: {
-          clusterName: cluster.clusterName,
-          nodegroupName: nodeGroupName
-        },
-        physicalResourceId: PhysicalResourceId.of(
-          `${nodeGroupName}-asg-name`
-        )
-      };
-      const response = this.AwsCustomResource(cluster.stack, 'asg-name', callProps);
-      response.node.addDependency(nodegroupCapacity!);
-      autoScalingGroupName = response.getResponseField('nodegroup.resources.autoScalingGroups.0.name');
-    }
-    return AutoScalingGroup.fromAutoScalingGroupName(cluster.stack, 'cluster-asg', autoScalingGroupName);
   }
 
   /**
