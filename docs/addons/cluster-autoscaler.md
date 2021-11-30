@@ -8,7 +8,7 @@ The [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cl
 ## Usage
 
 ```typescript
-import { ClusterAutoScalerAddOn }  from '@shapirov/cdk-eks-blueprint';
+import { ClusterAutoScalerAddOn }  from '@aws-quickstart/ssp-amazon-eks';
 
 readonly myClusterAutoscaler = new ClusterAutoscalerAddOn("v1.19.1");// optionally, specify image version to pull or empty constructor
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];

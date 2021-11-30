@@ -7,7 +7,7 @@ The [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy
 NGINX is a standard SSP add-on that is similar in usage to the other add-ons in this guide.
 
 ```typescript
-import { NginxAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { NginxAddOn, ClusterAddOn, EksBlueprint } from '@aws-quickstart/ssp-amazon-eks';
 
 const subdomain  = ...;
 const nginxAddOn = new NginxAddOn(({ 

@@ -11,7 +11,7 @@ The Container Insights add-on provides collects, aggregates, and summarizes metr
 Use `main.ts` to add Container Insights to your cluster: 
 
 ```typescript
-import { AddOns }  from '@shapirov/cdk-eks-blueprint';
+import { AddOns }  from '@aws-quickstart/ssp-amazon-eks';
 
 const myClusterAutoscaler = new AddOns.ContainerInsightsAddOn();
 const addOns: Array<ClusterAddOn> = [ myClusterAutoscaler ];

@@ -1,4 +1,4 @@
-site_name: Amazon EKS SSP Quick Start
+site_name: Amazon EKS SSP
 repo_name: "aws-quickstart/quickstart-ssp-amazon-eks"
 repo_url: "https://github.com/aws-quickstart/quickstart-ssp-amazon-eks"
 docs_dir: "docs"

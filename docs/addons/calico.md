@@ -2,10 +2,12 @@
 
 The Calico add-on provides support for Kubernetes network policies for Amazon EKS clusters. [Project Calico](https://www.projectcalico.org/) is an open-source networking and network-security solution for containers, virtual machines, and native host-based workloads. To secure workloads in Kubernetes, Calico uses network policies that are described in the following sections.
 
+By default, the [VPC CNI plugin](https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html) for Amazon EKS does not support Kubernetes [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/). Calico (or another CNI) allows you to define and apply network policies to your EKS cluster.
+
 ## Usage
 
 ```typescript
-import { addons }  from '@shapirov/cdk-eks-blueprint';
+import { addons }  from '@aws-quickstart/ssp-amazon-eks';
 
 const myCalicoCNI = new addon.CalicoAddon();
 const addOns: Array<ClusterAddOn> = [ myCalicoCNI ];

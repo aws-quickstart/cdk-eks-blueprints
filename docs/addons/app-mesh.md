@@ -5,7 +5,7 @@
 ## Usage
 
 ```typescript
-import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const appMeshAddOn = new AppMeshAddOn();
 const addOns: Array<ClusterAddOn> = [ appMeshAddOn ];

@@ -5,7 +5,7 @@ The ExternalDNS add-on is based on the [ExternalDNS](https://github.com/kubernet
 ## Usage
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 readonly externalDns = new ssp.addons.ExternalDnsAddon({
     hostedZone: new ssp.addons.LookupHostedZoneProvider(myHostedZoneName)

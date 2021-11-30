@@ -10,7 +10,7 @@ This controller is required for proper configuration of other inbound controller
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddon }  from '@shapirov/cdk-eks-blueprint';
+import { AwsLoadBalancerControllerAddon }  from '@aws-quickstart/ssp-amazon-eks';
 
 readonly awsLoadBalancerController = new AwsLoadBalancerControllerAddon({version: '2.2.0'});// optionally specify image version to pull  or empty constructor
 const addOns: Array<ClusterAddOn> = [ awsLoadBalancerController ];

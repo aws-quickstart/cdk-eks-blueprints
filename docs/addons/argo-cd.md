@@ -5,7 +5,7 @@
 ## Usage
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@shapirov/cdk-eks-blueprint';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
 
 const argoCDAddOn = new ArgoCDAddOn();
 const addOns: Array<ClusterAddOn> = [ argoCDAddOn ];

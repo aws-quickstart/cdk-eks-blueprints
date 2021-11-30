@@ -65,7 +65,7 @@ In the `ssp-ek-patterns/lib/` multi-Region-construct directory, there is an `ind
 ```typescript
 import * as cdk from '@aws-cdk/core';
 // SSP Lib
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 // Team implementations
 import * as team from '../teams'
 export default class MultiRegionConstruct extends cdk.Construct {

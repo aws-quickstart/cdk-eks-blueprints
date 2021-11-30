@@ -1,4 +1,4 @@
-# Amzon EC2 cluster provider
+# Amazon EC2 cluster provider
 
 To provision an Amazon EKS cluster, use `EC2ClusterProvider`, which uses [EKS managed node groups (MNGs)](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for compute capacity. MNGs automate the provisioning and lifecycle management of nodes (Amazon EC2 instances) for EKS clusters.
 

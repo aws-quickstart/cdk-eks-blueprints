@@ -27,7 +27,7 @@ cdk init app --language typescript
 Install the `cdk-eks-blueprint` NPM package:
 
 ```bash
-npm i @shapirov/cdk-eks-blueprint
+npm i @aws-quickstart/ssp-amazon-eks
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (by default, `your-main-file` is the name of the root directory) using the following code. This code deploys a new Amazon EKS cluster and installs the Argo CD add-on.
@@ -35,7 +35,7 @@ Replace the contents of `bin/<your-main-file>.ts` (by default, `your-main-file` 
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 const app = new cdk.App();
 

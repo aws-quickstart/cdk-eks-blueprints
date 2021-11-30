@@ -9,7 +9,7 @@ To integrate CI/CD pipelines with GitHub, SSP uses a GitHub integration that the
 Create a new `CodePipeline` resource using the following code: 
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 const pipeline = ssp.CodePipeline.build({
     name: 'blueprint-pipeline',
@@ -26,7 +26,7 @@ const pipeline = ssp.CodePipeline.build({
 After you create a pipeline, define a stage for it by wrapping the `EksBlueprint` stack in a `cdk.Stage` object:
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 import * as team from 'path/to/teams'
 
@@ -87,7 +87,7 @@ The following code block contains an AWS CodePipeline implementation that uses t
 import * as cdk from '@aws-cdk/core';
 
 // SSP Lib
-import * as ssp from '@shapirov/cdk-eks-blueprint'
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
 
 // Team implementations
 import * as team from 'path/to/teams'

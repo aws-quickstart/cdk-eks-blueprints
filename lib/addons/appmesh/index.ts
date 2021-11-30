@@ -10,7 +10,7 @@ import { createNamespace } from "../../utils/namespace-utils";
 export interface AppMeshAddOnProps {
     /**
      * If set to true, will enable tracing through App Mesh sidecars, such as X-Ray distributed tracing.
-     * Note: support for X-Ray tracing does not depend on the X-Ray Daemon AddOn installed.
+     * Note: support for X-Ray tracing does not depend on installing the X-Ray Daemon.
      */
     enableTracing?: boolean,
 

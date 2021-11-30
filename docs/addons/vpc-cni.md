@@ -14,7 +14,7 @@ Amazon EKS automatically installs VPC CNI as self-managed add-on for every clust
 ## Usage
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 readonly vpcCni = new ssp.addons.VpcCniAddOn("v1.7.5-eksbuild.2");// optionally specify image version to pull  or empty constructor
 
