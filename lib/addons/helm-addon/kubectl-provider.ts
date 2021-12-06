@@ -1,5 +1,5 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { Construct } from "@aws-cdk/core";
+import { Construct, Duration } from "@aws-cdk/core";
 import { ClusterInfo, Values } from "../..";
 
 
@@ -41,7 +41,20 @@ export interface HelmChartConfiguration {
     values?: Values
 }
 
-type HelmChartDeployment = Required<HelmChartConfiguration>;
+/**
+ * Extends helm chart configurtion (repo/chart) with deployment parameters: values, timeout and wait.
+ */
+export interface HelmChartDeployment extends Required<HelmChartConfiguration> {
+    /**
+     * Deployment will wait for all pods to come up.
+     */
+    wait?: boolean,
+
+    /**
+     * Time to wait. 
+     */
+    timeout?: Duration,
+}
 
 export interface ManifestConfiguration {
     name: string, 
@@ -58,7 +71,7 @@ export class KubectlProvider {
 
     constructor(private readonly clusterInfo : ClusterInfo) {}
 
-    public static helmProvider = function(clusterInfo: ClusterInfo, props: HelmChartDeployment) : Construct {
+    public static applyHelmDeployment = function(clusterInfo: ClusterInfo, props: HelmChartDeployment) : Construct {
         return clusterInfo.cluster.addHelmChart( props.name, {
             namespace: props.namespace,
             chart: props.chart,
@@ -75,7 +88,7 @@ export class KubectlProvider {
      * @param values values to replace (e.g. region will be passed as "region: us-west-1" and any occurrence of {{region}} will be replaced)
      * @returns 
      */
-    public static manifestTemplateProvider = function(document: any, values: Values) : any {
+    public static applyManifestTemplate = function(document: any, values: Values) : any {
         const valueMap = new Map(Object.entries(values));
         let data = JSON.stringify(document);
         valueMap.forEach((value: string, key: string) => {
@@ -84,8 +97,8 @@ export class KubectlProvider {
         return JSON.parse(data);
     }
 
-    public static manifestProvider = function(clusterInfo: ClusterInfo, props: ManifestDeployment) {
-        const manifestDoc = KubectlProvider.manifestTemplateProvider.call(undefined, props.manifest, props.values);
+    public static applyManifestDeployment = function(clusterInfo: ClusterInfo, props: ManifestDeployment) {
+        const manifestDoc = KubectlProvider.applyManifestTemplate(props.manifest, props.values);
         return  new KubernetesManifest(clusterInfo.cluster, props.name, {
           cluster: clusterInfo.cluster,
           manifest: manifestDoc,
@@ -94,11 +107,11 @@ export class KubectlProvider {
     };
 
     public addHelmChart(props: HelmChartDeployment) : Construct {
-        return KubectlProvider.helmProvider.call(this, this.clusterInfo, props);
+        return KubectlProvider.applyHelmDeployment(this.clusterInfo, props);
     }
 
     public addManfiest(props: ManifestDeployment) : Construct {
-        return KubectlProvider.manifestProvider.call(this, this.clusterInfo, props);
+        return KubectlProvider.applyManifestDeployment(this.clusterInfo, props);
     }
 }
 

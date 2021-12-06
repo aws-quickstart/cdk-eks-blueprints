@@ -1,4 +1,4 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct, Duration } from "@aws-cdk/core";
 import * as spi from "../..";
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 
@@ -11,9 +11,9 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
     
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
 
-    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values ) : Construct {
+    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, wait?: boolean, timeout?: Duration ) : Construct {
         const kubectlProvider = new KubectlProvider(clusterInfo);
-        const chart = {...this.props, ...{ values: values ?? {}} };
+        const chart = {...this.props, ...{ values: values ?? {}, wait, timeout} };
         return kubectlProvider.addHelmChart(chart);
     }
 }
