@@ -24,6 +24,7 @@ const props = { env: { account, region } }
 
 const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', props);
 
+
 new BlueprintConstruct(app,
   {
     id: 'blueprint-construct',

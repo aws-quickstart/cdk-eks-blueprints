@@ -124,12 +124,16 @@ export class ClusterInfo {
 
 **Registering Resource Providers for a Blueprint**
 
-Note: `GlobalResources.HostedZone` and `GlobalResources.Certificate` are provides for convenience as commonly referenced constants.
+Note: `GlobalResources.HostedZone` and `GlobalResources.Certificate` are provided for convenience as commonly referenced constants.
 
 ```typescript
+const myVpcId = ...;  // e.g. app.node.tryGetContext('my-vpc', 'default)  will look up property my-vpc in the cdk.json
+
 ssp.EksBlueprint.builder()
+    //  Specify VPC for the cluster (if not set, a new VPC will be provisioned as per EKS Best Practices)
+    .resourceProvider(GlobalResources.VPC, new VpcProvider(myVpcId)
     //  Register hosted zone and give it a name of GlobalResources.HostedZone
-    .resourceProvider(GlobalResources.HostedZone ,new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+    .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     // Register certificate GlobalResources.Certificate name and reference the hosted zone registered in the previous step
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
     .addOns(new AwsLoadBalancerControllerAddOn())
@@ -149,9 +153,9 @@ ssp.EksBlueprint.builder()
 ```typescript
 ssp.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1" ,new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+    .resourceProvider("MyHostedZone1", new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     // Register zone2 under the name of MyHostedZone2
-    .resourceProvider("MyHostedZone2" ,new ImportHostedZoneProvider('hosted-zone-id2', 'my.otherdomain.com'))
+    .resourceProvider("MyHostedZone2", new ImportHostedZoneProvider('hosted-zone-id2', 'my.otherdomain.com'))
     // Register certificate and reference the hosted zone1 registered in the previous steps
     .resourceProvider("MyCert", new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', "MyHostedZone1"))
     .addOns(new AwsLoadBalancerControllerAddOn())
