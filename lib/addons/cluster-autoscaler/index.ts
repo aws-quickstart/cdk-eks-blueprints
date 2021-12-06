@@ -87,7 +87,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         this.addHelmChart(clusterInfo, {
             cloudProvider: 'aws',
             autoDiscovery: {
-                clusterName
+                cluster: cluster.clusterName
             },
             awsRegion: clusterInfo.cluster.stack.region
         });

@@ -61,6 +61,7 @@ const defaultProps: ArgoCDAddOnProps = {
     chartVersion: '3.17.5'
 };
 
+
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
@@ -68,15 +69,24 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
 
-    private chartNode: HelmChart;
+    private chartNode?: HelmChart;
 
     constructor(props?: ArgoCDAddOnProps) {
         this.options = { ...defaultProps, ...props };
     }
 
-    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment): Construct {
-        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, 0);
-        return clusterInfo.cluster.addManifest(deployment.name, manifest);
+    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave: number = 0): Construct {
+        const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
+        if(promise === undefined) {
+            throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
+        }
+        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, wave);
+        const construct = clusterInfo.cluster.addManifest(deployment.name, manifest);
+        promise.then(chart => {
+            construct.node.addDependency(chart);
+        });
+        
+        return construct;
     }
 
     /**
@@ -141,6 +151,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
                 values: this.options.bootstrapValues ?? {}
             });
         }       
+        this.chartNode = undefined;
     }
 
     /**
