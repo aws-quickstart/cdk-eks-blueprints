@@ -75,7 +75,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         this.options = { ...defaultProps, ...props };
     }
 
-    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave: number = 0): Construct {
+    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
         const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
         if(promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
