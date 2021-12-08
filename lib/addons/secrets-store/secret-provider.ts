@@ -12,6 +12,24 @@ export interface SecretProvider {
 }
 
 /**
+ * Generate a new Secret on Secrets Manager
+ */
+ class GenerateSecretManagerProvider implements SecretProvider {
+
+  constructor(private id: string, private secretName: string) {}
+
+  provide(clusterInfo: ClusterInfo): ISecret {
+      const secret = new Secret(clusterInfo.cluster.stack, this.id, {
+          secretName: this.secretName
+      });
+
+      // create this secret first
+      clusterInfo.cluster.node.addDependency(secret);
+      return secret
+  }
+}
+
+/**
  * Lookup Secret in SecretsManager by Name
  */
 export class LookupSecretsManagerSecretByName implements SecretProvider {
