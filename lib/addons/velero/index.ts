@@ -3,7 +3,6 @@ import * as iam from "@aws-cdk/aws-iam";
 import * as s3 from "@aws-cdk/aws-s3";
 import { Construct } from "@aws-cdk/core";
 import merge from "ts-deepmerge";
-import { Constants } from "..";
 import { ClusterInfo } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -25,7 +24,7 @@ const defaultProps = {
     createNamespace: true,
     chart: "velero",
     repository: "https://vmware-tanzu.github.io/helm-charts/",
-    release: Constants.SSP_ADDON,
+    release: "ssp-addon",
     values:{
         initContainers:[
             {

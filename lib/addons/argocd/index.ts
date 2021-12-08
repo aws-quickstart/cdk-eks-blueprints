@@ -2,9 +2,8 @@ import bcrypt = require('bcrypt');
 import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
-import { Constants } from "..";
-import * as spi from "../../spi";
 import merge from "ts-deepmerge";
+import * as spi from "../../spi";
 import { btoa, getSecretValue } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
@@ -62,7 +61,7 @@ const defaultProps = {
     namespace: "argocd",
     version: '3.27.1',
     chart: "argo-cd",
-    release: Constants.SSP_ADDON,
+    release: "ssp-addon",
     repository: "https://argoproj.github.io/argo-helm"
 };
 
