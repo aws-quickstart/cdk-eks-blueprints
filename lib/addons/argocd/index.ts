@@ -4,7 +4,9 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
 import { Constants } from "..";
 import * as spi from "../../spi";
+import merge from "ts-deepmerge";
 import { btoa, getSecretValue } from '../../utils';
+import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
 
@@ -12,7 +14,7 @@ import { sshRepoRef, userNameRepoRef } from './manifest-utils';
 /**
  * Configuration options for add-on.
  */
-export interface ArgoCDAddOnProps {
+export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * Namespace where add-on will be deployed. 
      * @default argocd
@@ -21,9 +23,9 @@ export interface ArgoCDAddOnProps {
 
     /**
     * Helm chart version to use to install.
-    * @default 3.17.5
+    * @default 3.27.1
     */
-    chartVersion?: string;
+    version?: string;
 
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
@@ -56,9 +58,12 @@ export interface ArgoCDAddOnProps {
 /**
  * Defaults options for the add-on
  */
-const defaultProps: ArgoCDAddOnProps = {
+const defaultProps = {
     namespace: "argocd",
-    chartVersion: '3.17.5'
+    version: '3.27.1',
+    chart: "argo-cd",
+    release: Constants.SSP_ADDON,
+    repository: "https://argoproj.github.io/argo-helm"
 };
 
 
@@ -77,7 +82,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
         const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
-        if(promise === undefined) {
+        if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
         const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, wave);
@@ -85,7 +90,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         promise.then(chart => {
             construct.node.addDependency(chart);
         });
-        
+
         return construct;
     }
 
@@ -98,33 +103,38 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        const repo = await this.createSecretKey(clusterInfo, namespace);
+        const bootstrapRepo = await this.createSecretKey(clusterInfo, namespace);
 
-        const values = this.options.values ?? {
+        const defaultValues = {
             server: {
                 serviceAccount: {
                     create: false
                 },
                 config: {
-                    repositories: repo
+                    repositories: bootstrapRepo
                 }
             }
         };
 
+        let values = merge(defaultValues, this.options.values ?? {});
+
         if (this.options.adminPasswordSecretName) {
             const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
-            values['configs'] = {
-                secret: {
-                    argocdServerAdminPassword: adminSecret
-                }
-            };
+            values = merge(
+                {
+                    configs: {
+                        secret: {
+                            argocdServerAdminPassword: adminSecret
+                        }
+                    }
+                }, values);
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
-            chart: "argo-cd",
-            release: Constants.SSP_ADDON,
-            repository: "https://argoproj.github.io/argo-helm",
-            version: this.options.chartVersion,
+            chart: this.options.chart!,
+            release: this.options.release,
+            repository: this.options.repository,
+            version: this.options.version,
             namespace: this.options.namespace,
             values: values
         });
@@ -150,7 +160,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
                 repository: appRepo,
                 values: this.options.bootstrapValues ?? {}
             });
-        }       
+        }
         this.chartNode = undefined;
     }
 
