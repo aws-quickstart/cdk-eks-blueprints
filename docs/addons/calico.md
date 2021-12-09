@@ -4,6 +4,8 @@
 
 By default, the native [VPC-CNI plugin](https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html) for Kubernetes on EKS does not support Kubernetes Network Policies. Installing Calico (or alternate CNI provider) will enable customers to define and apply standard [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) to their EKS cluster. 
 
+Calico add-on supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+
 ## Usage
 
 ```typescript

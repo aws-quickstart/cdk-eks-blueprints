@@ -35,6 +35,7 @@ The above will create an `argocd` namespace and install all Argo CD components. 
 2. Deploys the [`argo-cd`](https://argoproj.github.io/argo-helm) Helm chart into the cluster.
 3. Allows to specify `ApplicationRepository` selecting the required authentication method as SSH Key, username/password or username/token. Credentials are expected to be set in AWS Secrets Manager and replicated to the desired region. If bootstrap repository is specified, creates the initial bootstrap application which may be leveraged to bootstrap workloads and/or other add-ons through GitOps.
 4. Allows setting the initial admin password through AWS Secrets Manager, replicating to the desired region. 
+5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ## Setting an Admin Password
 

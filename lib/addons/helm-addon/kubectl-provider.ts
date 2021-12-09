@@ -2,7 +2,9 @@ import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { Construct, Duration } from "@aws-cdk/core";
 import { ClusterInfo, Values } from "../..";
 
-
+/**
+ * Structure that defines properties for a generic Helm chart. 
+ */
 export interface HelmChartConfiguration {
     
     /**
@@ -56,27 +58,43 @@ export interface HelmChartDeployment extends Required<HelmChartConfiguration> {
     timeout?: Duration,
 }
 
+/**
+ * Data structure defines properties for kubernetes manifest deployment (non-helm).
+ */
 export interface ManifestConfiguration {
     name: string, 
     namespace: string, 
     manifestUrl: string
 }
 
+/**
+ * Data structure extends Kubernetes manifest configiuration and allows passing deployment parameters.
+ * Such parameters are expected to be templated within values inside the manifest as {{parameter-key}}.
+ * For example, if values contains {region: 'us-east-2'} then the manifest is expected to contain 
+ * { 'some-attribute' : {{region}}.
+ */
 export interface ManifestDeployment extends Omit<ManifestConfiguration, "manifestUrl"> {
     manifest: any,
     values: Values
 }
 
+/**
+ * Kubectl provider for the add-ons and teams that is capable of helm and generic manifest deployments.
+ * It exposes extenion mechanism and central points for logging, stack output, extension of functionality.
+ */
 export class KubectlProvider {
 
     constructor(private readonly clusterInfo : ClusterInfo) {}
 
     public static applyHelmDeployment = function(clusterInfo: ClusterInfo, props: HelmChartDeployment) : Construct {
         return clusterInfo.cluster.addHelmChart( props.name, {
+            repository: props.repository,
             namespace: props.namespace,
             chart: props.chart,
             version: props.version,
             release: props.release,
+            timeout: props.timeout,
+            wait: props.wait,
             values: props.values
         });
     };

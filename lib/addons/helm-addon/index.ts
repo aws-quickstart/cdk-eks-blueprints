@@ -13,7 +13,8 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
 
     protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, wait?: boolean, timeout?: Duration ) : Construct {
         const kubectlProvider = new KubectlProvider(clusterInfo);
-        const chart = {...this.props, ...{ values: values ?? {}, wait, timeout} };
+        values = values ?? {};
+        const chart = {...this.props, ...{ values, wait, timeout} };
         return kubectlProvider.addHelmChart(chart);
     }
 }

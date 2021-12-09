@@ -12,11 +12,10 @@ type MetricsServerAddOnProps = HelmAddOnUserProps;
 const defaultProps: HelmAddOnProps = {
     chart: "metrics-server",
     repository: "https://kubernetes-sigs.github.io/metrics-server",
-    version: "3.6.8",
+    version: "3.7.0",
     release: 'ssp-addon',
     name: 'metrics-server',
     namespace: 'kube-system'
-
 };
 
 export class MetricsServerAddOn extends HelmAddOn {

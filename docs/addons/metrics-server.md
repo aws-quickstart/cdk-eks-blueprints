@@ -34,7 +34,8 @@ metrics-server                                                1/1     1         
 
 ## Functionality
 
-1. Deploys the metrics-server for the given version using the [components.yaml](https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml) in `kube-system` namespace.
+1. Deploys the metrics-server helm chart in `kube-system` namespace by default.
+2. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ## Testing with Kubernetes Dashboard
 

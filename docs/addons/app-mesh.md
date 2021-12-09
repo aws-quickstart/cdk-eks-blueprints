@@ -28,6 +28,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 3. Adds `AWSXRayDaemonWriteAccess` to the instance role if XRay integration is enabled.
 4. Creates the `appmesh-system` namespace.
 5. Deploys the [`appmesh-controller`](https://github.com/aws/eks-charts/tree/master/stable/appmesh-controller) Helm chart into the cluster.
+6. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ## App Mesh Sidecar Injection
 

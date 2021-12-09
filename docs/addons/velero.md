@@ -45,7 +45,8 @@ new ssp.EksBlueprint(
 2. Configure S3 Bucket policy to enable encryption in transit.
 3. Create the IAM Role for Service Account for Velero pod to make API calls to AWS S3 and EC2 to backup and restore.
 4. Preset [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml).
-5. Allow users to pass in with [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml) for customisation purposes. 
+5. Allow users to pass [Velero Helm Chart Values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml) for customization purposes. 
+6. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 
 ## Limitations
