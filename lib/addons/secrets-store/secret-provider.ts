@@ -14,7 +14,7 @@ export interface SecretProvider {
 /**
  * Generate a new Secret on Secrets Manager
  */
- class GenerateSecretManagerProvider implements SecretProvider {
+export class GenerateSecretManagerProvider implements SecretProvider {
 
   constructor(private id: string, private secretName: string) {}
 
