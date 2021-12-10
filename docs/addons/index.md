@@ -72,4 +72,4 @@ Many add-ons leverage helm to provision and maintain deployments. All provided a
 
 Ability to set repository url may be leveraged for private repositories. 
 
-Version field can be modified from the default, e.g. if add-on should be upgraded to the desired version of the helm chart, however, since the helm chart version supplied by the customer may not have been tested as part of SSP release process, SSP community may not be able to reproduce/fix issues related to the helm chart version upgrade.
+Version field can be modified from the default chart version, e.g. if the add-on should be upgraded to the desired version, however, since the helm chart version supplied by the customer may not have been tested as part of the SSP release process, SSP community may not be able to reproduce/fix issues related to the helm chart version upgrade.
