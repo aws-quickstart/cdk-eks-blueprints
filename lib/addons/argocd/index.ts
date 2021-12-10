@@ -61,7 +61,7 @@ const defaultProps = {
     namespace: "argocd",
     version: '3.27.1',
     chart: "argo-cd",
-    release: "ssp-addon",
+    release: "ssp-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
 };
 

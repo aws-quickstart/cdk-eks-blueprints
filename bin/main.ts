@@ -52,6 +52,6 @@ ssp.EksBlueprint.builder()
       userData: userData,
     }
   }))
-  .addOns(new ssp.ArgoCDAddOn)
+  .addOns(new ssp.SSMAgentAddOn)
   .teams(new ssp.PlatformTeam({ name: 'platform' }))
   .build(app, clusterName);
