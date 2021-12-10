@@ -16,7 +16,7 @@ export type OpaGatekeeperAddOnProps = HelmAddOnUserProps;
 
 const defaultProps: HelmAddOnProps = {
     name: 'gatekeeper',
-    release: 'ssp-addon',
+    release: 'ssp-addon-opa-gatekeeper',
     namespace: 'gatekeeper-system',
     chart: 'gatekeeper',
     repository: "https://open-policy-agent.github.io/gatekeeper/charts",

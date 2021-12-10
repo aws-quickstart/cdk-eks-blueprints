@@ -35,9 +35,9 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            new team.TeamTroi,
-            new team.TeamRiker(scope, teamManifestDirList[1]),
-            new team.TeamBurnham(scope, teamManifestDirList[0])
+            // new team.TeamTroi,
+            // new team.TeamRiker(scope, teamManifestDirList[1]),
+            // new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
@@ -59,7 +59,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
-            new ssp.addons.SSMAgentAddOn(),
+            // new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}
             }}),

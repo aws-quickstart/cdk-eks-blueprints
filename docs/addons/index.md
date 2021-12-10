@@ -31,7 +31,7 @@ The framework currently supports the following add-ons.
 
 # Standard Helm Add-On Configuration Options
 
-Many add-ons leverage helm to provision and maintain deployments. Most of the provided add-ons that leverage helm allow specifying the following add-on attributes:
+Many add-ons leverage helm to provision and maintain deployments. All provided add-ons that leverage helm allow specifying the following add-on attributes:
 
 ```typescript
     /**

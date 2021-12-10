@@ -22,7 +22,7 @@ const defaultProps = {
     chart: 'external-dns',
     namespace: 'external-dns',
     repository: 'https://charts.bitnami.com/bitnami',
-    release: 'ssp-addon',
+    release: 'ssp-addon-external-dns',
     version: '5.1.3'
 };
 

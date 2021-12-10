@@ -13,7 +13,7 @@ const defaultProps: HelmAddOnProps = {
     chart: "metrics-server",
     repository: "https://kubernetes-sigs.github.io/metrics-server",
     version: "3.7.0",
-    release: 'ssp-addon',
+    release: 'ssp-addon-metrics-server',
     name: 'metrics-server',
     namespace: 'kube-system'
 };
