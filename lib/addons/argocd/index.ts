@@ -1,17 +1,19 @@
 import bcrypt = require('bcrypt');
-import { Construct } from "@aws-cdk/core";
 import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-
+import { Construct } from "@aws-cdk/core";
+import merge from "ts-deepmerge";
 import * as spi from "../../spi";
-import { getSecretValue, btoa } from '../../utils';
+import { btoa, getSecretValue } from '../../utils';
+import { HelmAddOnUserProps } from '../helm-addon';
+import { ArgoApplication } from './application';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
-import { Constants } from "..";
+
 
 /**
  * Configuration options for add-on.
  */
-export interface ArgoCDAddOnProps {
+export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * Namespace where add-on will be deployed. 
      * @default argocd
@@ -20,9 +22,9 @@ export interface ArgoCDAddOnProps {
 
     /**
     * Helm chart version to use to install.
-    * @default 3.17.5
+    * @default 3.27.1
     */
-    chartVersion?: string;
+    version?: string;
 
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
@@ -30,6 +32,11 @@ export interface ArgoCDAddOnProps {
      * after the infrastructure and team provisioning is complete. 
      */
     bootstrapRepo?: spi.ApplicationRepository;
+
+    /**
+     * Optional values for the bootstrap application.
+     */
+    bootstrapValues?: spi.Values,
 
     /**
      * Optional admin password secret (plaintext).
@@ -50,10 +57,14 @@ export interface ArgoCDAddOnProps {
 /**
  * Defaults options for the add-on
  */
-const defaultProps: ArgoCDAddOnProps = {
+const defaultProps = {
     namespace: "argocd",
-    chartVersion: '3.17.5'
+    version: '3.27.1',
+    chart: "argo-cd",
+    release: "ssp-addon-argocd",
+    repository: "https://argoproj.github.io/argo-helm"
 };
+
 
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
@@ -62,10 +73,24 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
 
-    private chartNode: HelmChart;
+    private chartNode?: HelmChart;
 
     constructor(props?: ArgoCDAddOnProps) {
         this.options = { ...defaultProps, ...props };
+    }
+
+    generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
+        const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
+        if (promise === undefined) {
+            throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
+        }
+        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, wave);
+        const construct = clusterInfo.cluster.addManifest(deployment.name, manifest);
+        promise.then(chart => {
+            construct.node.addDependency(chart);
+        });
+
+        return construct;
     }
 
     /**
@@ -77,33 +102,38 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        const repo = await this.createSecretKey(clusterInfo, namespace);
+        const bootstrapRepo = await this.createSecretKey(clusterInfo, namespace);
 
-        const values = this.options.values ?? {
+        const defaultValues = {
             server: {
                 serviceAccount: {
                     create: false
                 },
                 config: {
-                    repositories: repo
+                    repositories: bootstrapRepo
                 }
             }
         };
 
+        let values = merge(defaultValues, this.options.values ?? {});
+
         if (this.options.adminPasswordSecretName) {
             const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
-            values['configs'] = {
-                secret: {
-                    argocdServerAdminPassword: adminSecret
-                }
-            };
+            values = merge(
+                {
+                    configs: {
+                        secret: {
+                            argocdServerAdminPassword: adminSecret
+                        }
+                    }
+                }, values);
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
-            chart: "argo-cd",
-            release: Constants.SSP_ADDON,
-            repository: "https://argoproj.github.io/argo-helm",
-            version: this.options.chartVersion,
+            chart: this.options.chart!,
+            release: this.options.release,
+            repository: this.options.repository,
+            version: this.options.version,
             namespace: this.options.namespace,
             values: values
         });
@@ -111,7 +141,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         this.chartNode.node.addDependency(sa);
         return this.chartNode;
     }
-
 
     /**
      * Post deployment step is used to create a bootstrap repository if options are provided for the add-on.
@@ -123,45 +152,15 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         console.assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
 
-        if (!appRepo) {
-            return;
+        if (appRepo) {
+            this.generate(clusterInfo, {
+                name: appRepo.name ?? "bootstrap-apps",
+                namespace: this.options.namespace!,
+                repository: appRepo,
+                values: this.options.bootstrapValues ?? {}
+            });
         }
-
-        const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "bootstrap-app", {
-            cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: "argoproj.io/v1alpha1",
-                kind: "Application",
-                metadata: {
-                    name: appRepo.name ?? "bootstrap-apps",
-                    namespace: this.options.namespace
-                },
-                spec: {
-                    destination: {
-                        namespace: this.options.namespace,
-                        server: "https://kubernetes.default.svc"
-                    },
-                    project: "default",
-                    source: {
-                        helm: {
-                            valueFiles: ["values.yaml"]
-                        },
-                        path: appRepo.path,
-                        repoURL: appRepo.repoUrl,
-                        targetRevision: appRepo.targetRevision ?? 'HEAD'
-                    },
-                    syncPolicy: {
-                        automated: {}
-                    }
-                }
-            }],
-            overwrite: true,
-            prune: true
-        });
-        //
-        // Make sure the bootstrap is only applied after successful ArgoCD installation.
-        //
-        manifest.node.addDependency(this.chartNode);
+        this.chartNode = undefined;
     }
 
     /**

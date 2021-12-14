@@ -24,6 +24,7 @@ const props = { env: { account, region } }
 
 const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', props);
 
+
 new BlueprintConstruct(app,
   {
     id: 'blueprint-construct',
@@ -51,6 +52,6 @@ ssp.EksBlueprint.builder()
       userData: userData,
     }
   }))
-  .addOns(new ssp.ArgoCDAddOn)
+  .addOns(new ssp.SSMAgentAddOn)
   .teams(new ssp.PlatformTeam({ name: 'platform' }))
   .build(app, clusterName);

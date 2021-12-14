@@ -3,9 +3,7 @@ import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
-// Example teams.
 import * as team from '../teams';
-
 
 
 const burnhamManifestDir = './examples/teams/team-burnham/'
@@ -23,6 +21,7 @@ export interface BlueprintConstructProps {
      */
     vpc: Vpc;
 }
+
 export default class BlueprintConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
         super(scope, blueprintProps.id);
@@ -42,9 +41,11 @@ export default class BlueprintConstruct extends cdk.Construct {
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
             // bootstrapRepo: {
-            //     repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
-            //     path: 'envs/prod',
-            // }
+            //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+            //      path: 'envs/dev',
+            //      targetRevision: "deployable"
+            // },
+            // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [

@@ -1,13 +1,15 @@
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
+import merge from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
-
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+
 
 /**
  * Configuration options for the add-on.
  */
-export interface AppMeshAddOnProps {
+export interface AppMeshAddOnProps extends HelmAddOnUserProps {
     /**
      * If set to true, will enable tracing through App Mesh sidecars, such as X-Ray distributed tracing.
      * Note: support for X-Ray tracing does not depend on the XRay Daemon AddOn installed.
@@ -35,20 +37,27 @@ export interface AppMeshAddOnProps {
 /**
  * Defaults options for the add-on
  */
-const defaultProps: AppMeshAddOnProps = {
+const defaultProps = {
     enableTracing: false,
-    tracingProvider: "x-ray"
+    tracingProvider: "x-ray",
+    name: "appmesh-controller",
+    namespace: "appmesh-system",
+    chart: "appmesh-controller",
+    version: "1.4.1",
+    release: "appmesh-release",
+    repository: "https://aws.github.io/eks-charts"
 }
 
-export class AppMeshAddOn implements ClusterAddOn {
+export class AppMeshAddOn extends HelmAddOn {
 
     readonly options: AppMeshAddOnProps;
 
     constructor(props?: AppMeshAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        super({ ...defaultProps, ...props });
+        this.options = this.props;
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    override deploy(clusterInfo: ClusterInfo): void {
 
         const cluster = clusterInfo.cluster;
 
@@ -74,27 +83,23 @@ export class AppMeshAddOn implements ClusterAddOn {
         const namespace = createNamespace('appmesh-system', cluster)
         sa.node.addDependency(namespace);
 
-        // App Mesh Controller        
-        const chart = cluster.addHelmChart("appmesh-addon", {
-            chart: "appmesh-controller",
-            repository: "https://aws.github.io/eks-charts",
-            release: "appmesh-release",
-            namespace: "appmesh-system",
-            values: {
-                region: cluster.stack.region,
-                serviceAccount: {
-                    create: false,
-                    'name': 'appmesh-controller'
-                },
-                tracing: {
-                    enabled: this.options.enableTracing,
-                    provider: this.options.tracingProvider,
-                    address: this.options.tracingAddress,
-                    port: this.options.tracingPort
-                }
+        let values: Values = {
+            region: cluster.stack.region,
+            serviceAccount: {
+                create: false,
+                name: 'appmesh-controller'
+            },
+            tracing: {
+                enabled: this.options.enableTracing,
+                provider: this.options.tracingProvider,
+                address: this.options.tracingAddress,
+                port: this.options.tracingPort
             }
-        });
+        };
 
+        values = merge(values, this.props.values ?? {});
+        
+        const chart = this.addHelmChart(clusterInfo, values);
         chart.node.addDependency(sa);
     }
 }

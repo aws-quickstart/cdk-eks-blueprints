@@ -1,26 +1,17 @@
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
-import { Constants } from "..";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
  
 /**
  * Properties available to configure the nginx ingress controller.
+ * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
  */
-export interface NginxAddOnProps {
-    /**
-     * Version for the Nginx Helm chart.
-     * @default 0.9.3
-     */
-    version?: string;
-
-    /**
-     * Namespace for the add-on.
-     */
-    namespace?: string;
-
+export interface NginxAddOnProps extends HelmAddOnUserProps {
+ 
     /**
      * tcp, http
      * @default tcp
@@ -57,13 +48,6 @@ export interface NginxAddOnProps {
      * @see {@link ImportCertificateProvider} and {@link CreateCertificateProvider} for examples of certificate providers.
      */
     certificateResourceName?: string,
-
-    /**
-     * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#:
-     */
-    values?: {
-        [key: string]: any;
-    };
 }
 
 
@@ -71,7 +55,11 @@ export interface NginxAddOnProps {
  * Defaults options for the add-on
  */
 const defaultProps: NginxAddOnProps = {
-    version: "0.9.3",
+    name: "nginx-ingress",
+    chart: "nginx-ingress",
+    release: "ssp-addon-nginx",
+    version: "0.11.3",
+    repository: "https://helm.nginx.com/stable",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
     internetFacing: true,
@@ -79,14 +67,14 @@ const defaultProps: NginxAddOnProps = {
     namespace: 'kube-system'
 };
 
-export class NginxAddOn implements ClusterAddOn {
+export class NginxAddOn extends HelmAddOn {
 
     readonly options: NginxAddOnProps;
 
     constructor(props?: NginxAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        super({ ...defaultProps as any, ...props });
+        this.options = this.props;
     }
-
 
     @dependable('AwsLoadBalancerControllerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -113,17 +101,10 @@ export class NginxAddOn implements ClusterAddOn {
         }
 
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
-
         setPath(values, 'controller.service.annotations', serviceAnnotations);
 
-        const nginxHelmChart = clusterInfo.cluster.addHelmChart("nginx-addon", {
-            chart: "nginx-ingress",
-            repository: "https://helm.nginx.com/stable",
-            release: Constants.SSP_ADDON,
-            namespace: props.namespace,
-            version: props.version,
-            values
-        });
+        const nginxHelmChart = this.addHelmChart(clusterInfo, values);
+
         return Promise.resolve(nginxHelmChart);
     }
 }

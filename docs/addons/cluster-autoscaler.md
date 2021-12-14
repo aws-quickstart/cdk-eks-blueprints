@@ -29,6 +29,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 3. Resolves proper CA image to pull based on the Kubernetes version.
 4. Configuration allows passing a specific version of the image to pull.
 5. Applies proper tags for discoverability to the EC2 instances.
+6. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ## Testing the scaling functionality
 

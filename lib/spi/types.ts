@@ -5,9 +5,27 @@ import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
 /**
- * Data type defining an application repository (git). 
+ * Data type defining helm repositories for GitOps bootstrapping.
  */
-export interface ApplicationRepository {
+export interface HelmRepository {
+    repoUrl: string,
+    name: string,
+    username?: string,
+    password?: string
+}
+
+/**
+ * Utility type for values passed to Helm or GitOps applications.
+ */
+ export type Values = {
+    [key: string]: any;
+};
+
+/**
+ * Interface that includes a reference to a Git repository for reuse, without credentials 
+ * and other access information.
+ */
+export interface GitRepositoryReference {
     /**
      * Expected to support helm style repo at the moment
      */
@@ -25,13 +43,18 @@ export interface ApplicationRepository {
 
     /**
      * Optional target revision for the repository.
+     * TargetRevision defines the revision of the source
+     * to sync the application to. In case of Git, this can be
+     * commit, tag, or branch. If omitted, will equal to HEAD.
+     * In case of Helm, this is a semver tag for the Chart's version.
      */
     targetRevision?: string
+}
 
-    /**
-     * Optional branch (defaults to main)
-     */
-    branch?: string,
+/**
+ * Data type defining an application repository (git). 
+ */
+export interface ApplicationRepository extends GitRepositoryReference {
 
     /**
      * Secret from AWS Secrets Manager to import credentials to access the specified git repository.

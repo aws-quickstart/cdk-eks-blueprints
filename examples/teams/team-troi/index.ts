@@ -1,8 +1,8 @@
-import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
 import * as s3 from "@aws-cdk/aws-s3";
+import * as cdk from '@aws-cdk/core';
+import { ClusterInfo, Team } from '../../../lib';
 
-import { Team, ClusterInfo } from '../../../lib';
 
 export class TeamTroi implements Team {
     readonly name: string = 'team-troi';
@@ -33,7 +33,10 @@ export class TeamTroi implements Team {
         cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
-            metadata: { name: quotaName },
+            metadata: { 
+                name: quotaName,
+                namespace:  'team-troi' 
+            },
             spec: {
                 hard: {
                     'requests.cpu': '10',

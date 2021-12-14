@@ -1,36 +1,33 @@
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadExternalYaml } from "../../utils/yaml-utils";
+import { ClusterInfo } from "../../spi";
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
  */
-export interface MetricsServerAddOnProps {
-    /**
-     * Metrics Server version
-     * @default v0.5.0
-     */
-    version?: string;
-}
+type MetricsServerAddOnProps = HelmAddOnUserProps;
 
 /**
  * Defaults options for the add-on
  */
-const defaultProps: MetricsServerAddOnProps = {
-    version: "v0.5.0"
+const defaultProps: HelmAddOnProps = {
+    chart: "metrics-server",
+    repository: "https://kubernetes-sigs.github.io/metrics-server",
+    version: "3.7.0",
+    release: 'ssp-addon-metrics-server',
+    name: 'metrics-server',
+    namespace: 'kube-system'
 };
 
-export class MetricsServerAddOn implements ClusterAddOn {
+export class MetricsServerAddOn extends HelmAddOn {
 
     private options: MetricsServerAddOnProps;
 
     constructor(props?: MetricsServerAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        super({ ...defaultProps, ...props });
+        this.options = this.props;
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        const version = this.options.version;
-        const manifestUrl = `https://github.com/kubernetes-sigs/metrics-server/releases/download/${version}/components.yaml`;
-        const manifest = loadExternalYaml(manifestUrl);
-        clusterInfo.cluster.addManifest('my-resource', ...manifest);
+        this.addHelmChart(clusterInfo, this.options.values);
     }
 }

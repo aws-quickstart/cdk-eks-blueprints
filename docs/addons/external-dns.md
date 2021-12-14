@@ -143,4 +143,5 @@ The parameter `wildcardSubdomain` above when set to true will also create a CNAM
 
 ## Functionality
 
-Applies External-DNS configuration for AWS DNS provider. See [AWS Tutorial for External DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md) for more information.
+1. Applies External-DNS configuration for AWS DNS provider. See [AWS Tutorial for External DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md) for more information.
+2. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).

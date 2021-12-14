@@ -168,7 +168,7 @@ class CodePipeline {
             actionName: `${props.name}-github-action`,
             owner: props.owner,
             repo: props.repository.repoUrl,
-            branch: props.repository.branch ?? 'main',
+            branch: props.repository.targetRevision ?? 'main',
             output: sourceArtifact,
             oauthToken: oauthToken
         })
@@ -180,7 +180,7 @@ class CodePipeline {
             installCommands: [
                 // Upgrade NPM to v7.
                 'npm install --global npm',
-                'npm install -g aws-cdk@1.124.0', 
+                'npm install -g aws-cdk@1.132.0', 
                 // Install deps
                 'npm install',
             ],
