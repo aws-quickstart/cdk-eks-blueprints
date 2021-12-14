@@ -23,8 +23,6 @@ export class GenerateSecretManagerProvider implements SecretProvider {
           secretName: this.secretName
       });
 
-      // create this secret first
-      clusterInfo.cluster.node.addDependency(secret);
       return secret
   }
 }
