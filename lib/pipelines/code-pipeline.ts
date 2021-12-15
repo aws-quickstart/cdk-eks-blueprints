@@ -180,7 +180,7 @@ class CodePipeline {
             installCommands: [
                 // Upgrade NPM to v7.
                 'npm install --global npm',
-                'npm install -g aws-cdk@1.132.0', 
+                'npm install -g aws-cdk@1.135.0', 
                 // Install deps
                 'npm install',
             ],
