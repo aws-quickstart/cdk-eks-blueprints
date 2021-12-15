@@ -95,7 +95,7 @@ describe('Unit tests for EKS Blueprint', () => {
             .owner('shapirov103')
             .repository({
                 repoUrl: 'git@github',
-                credentialsSecretName: 'github-token',
+                //credentialsSecretName: 'github-token',
                 name: 'my-iac-pipeline'
             })
             .stage({
@@ -109,7 +109,7 @@ describe('Unit tests for EKS Blueprint', () => {
             .stage({
                 id: 'prod-ssp',
                 stackBuilder: blueprint.clone('us-west-2'),
-                stageProps: { manualApprovals: true }
+                stageProps: new AddStageOpts()
             });
 
         const stack = pipeline.build(app, "ssp-pipeline-id");

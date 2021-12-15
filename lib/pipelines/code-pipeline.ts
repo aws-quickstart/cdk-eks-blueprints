@@ -1,8 +1,8 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
-import * as actions from '@aws-cdk/aws-codepipeline-actions';
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
 import * as pipelines from '@aws-cdk/pipelines';
+import { GitHubSourceOptions } from '@aws-cdk/pipelines';
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
@@ -56,7 +56,7 @@ export interface StackStage {
     /**
      * Optional stage properties, such as {manualApprovals: true} which can control stage transitions.
      */
-    stageProps?: pipelines.AddStageOptions;
+    stageProps?: pipelines.AddStageOpts;
 }
 
 /**
@@ -86,15 +86,14 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-    public stage(stackStage: StackStage) : CodePipelineBuilder {
-        this.props.stages?.push(stackStage);
+    public stage(...stackStage: StackStage[]) : CodePipelineBuilder {
+        stackStage.forEach(stage => this.props.stages!.push(stage));
         return this;
     }
     
     build(scope: cdk.Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
         console.assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
         console.assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
-        console.assert(this.props.repository!.credentialsSecretName, "repository.credentialsSecretName is required for the pipeline stack. Please provide value.");
         console.assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
         const fullProps = this.props as PipelineProps;
         return new CodePipelineStack(scope, fullProps, id, stackProps);
@@ -126,7 +125,7 @@ export class CodePipelineStack extends cdk.Stack {
 
         Promise.all(promises).then(stages => {
             for(let i in stages) {
-                pipeline.addApplicationStage(stages[i], pipelineProps.stages[i].stageProps);
+                pipeline.addStage(stages[i], pipelineProps.stages[i].stageProps);
             }
         });
     }
@@ -161,38 +160,29 @@ export class ApplicationStage extends cdk.Stage {
  * CodePipeline deploys a new CodePipeline resource that is integrated with a GitHub repository.
  */
 class CodePipeline {
-    public static build(scope: Construct, props: PipelineProps) {
+    public static build(scope: Construct, props: PipelineProps) : pipelines.CodePipeline {
         const sourceArtifact = new codepipeline.Artifact();
-        const oauthToken = cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!);
-        const sourceAction = new actions.GitHubSourceAction({
-            actionName: `${props.name}-github-action`,
-            owner: props.owner,
-            repo: props.repository.repoUrl,
-            branch: props.repository.targetRevision ?? 'main',
-            output: sourceArtifact,
-            oauthToken: oauthToken
-        })
+        const branch = props.repository.targetRevision ?? 'main';
 
-        const cloudAssemblyArtifact = new codepipeline.Artifact();
-        const synthAction = new pipelines.SimpleSynthAction({
-            sourceArtifact,
-            cloudAssemblyArtifact,
-            installCommands: [
-                // Upgrade NPM to v7.
+        let githubProps : GitHubSourceOptions | undefined = undefined;
+
+        if(props.repository.credentialsSecretName) {
+            githubProps = {
+                authentication: cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!)
+            }
+        }
+
+        return new pipelines.CodePipeline(scope, props.name, {
+            pipelineName: props.name,
+            synth: new pipelines.ShellStep(`${props.name}-synth`, {
+              input: pipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
+              installCommands: [
                 'npm install --global npm',
                 'npm install -g aws-cdk@1.135.0', 
-                // Install deps
                 'npm install',
-            ],
-            buildCommands: ['npm run build'],
-            synthCommand: 'cdk synth'
-        })
-
-        return new pipelines.CdkPipeline(scope, props.name, {
-            pipelineName: props.name,
-            cloudAssemblyArtifact,
-            sourceAction,
-            synthAction
-        });
+              ],
+              commands: ['npm run build', 'npx cdk synth']
+            })
+          });
     }
 }
