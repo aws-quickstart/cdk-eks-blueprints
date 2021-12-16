@@ -1,10 +1,13 @@
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
-import * as pipelines from '@aws-cdk/pipelines';
+import * as cdkpipelines from '@aws-cdk/pipelines';
 import { GitHubSourceOptions } from '@aws-cdk/pipelines';
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
+export {
+    cdkpipelines
+};
 
 /**
  * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
@@ -71,7 +74,7 @@ export interface StackStage {
     /**
      * Optional stage properties, such as {manualApprovals: true} which can control stage transitions.
      */
-    stageProps?: pipelines.AddStageOpts;
+    stageProps?: cdkpipelines.AddStageOpts;
 }
 
 /**
@@ -175,7 +178,7 @@ export class ApplicationStage extends cdk.Stage {
  * CodePipeline deploys a new CodePipeline resource that is integrated with a GitHub repository.
  */
 class CodePipeline {
-    public static build(scope: Construct, props: PipelineProps) : pipelines.CodePipeline {
+    public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
         const branch = props.repository.targetRevision ?? 'main';
         let githubProps : GitHubSourceOptions | undefined = undefined;
 
@@ -185,10 +188,10 @@ class CodePipeline {
             }
         }
 
-        return new pipelines.CodePipeline(scope, props.name, {
+        return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
-            synth: new pipelines.ShellStep(`${props.name}-synth`, {
-              input: pipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
+            synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
+              input: cdkpipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
               installCommands: [
                 'npm install --global npm',
                 'npm install -g aws-cdk@1.135.0', 
