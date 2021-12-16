@@ -1,4 +1,3 @@
-import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
 import * as pipelines from '@aws-cdk/pipelines';
@@ -161,7 +160,6 @@ export class ApplicationStage extends cdk.Stage {
  */
 class CodePipeline {
     public static build(scope: Construct, props: PipelineProps) : pipelines.CodePipeline {
-        const sourceArtifact = new codepipeline.Artifact();
         const branch = props.repository.targetRevision ?? 'main';
 
         let githubProps : GitHubSourceOptions | undefined = undefined;
