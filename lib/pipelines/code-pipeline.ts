@@ -1,4 +1,3 @@
-import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
 import * as pipelines from '@aws-cdk/pipelines';
@@ -11,7 +10,23 @@ import { withUsageTracking } from '../utils/usage-utils';
  * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
  * repoUrl 
  */
-export type GitHubSourceRepository = Omit<ApplicationRepository, "credentialsType">;
+export interface GitHubSourceRepository extends Omit<ApplicationRepository, "credentialsType"> {
+    /**
+     * A GitHub OAuth token to use for authentication stored with AWS Secret Manager.
+     * The provided name will be looked up using the following:
+     * ```ts
+     * const credentials = cdk.SecretValue.secretsManager('my-github-token');
+     * ```
+     *
+     * The GitHub Personal Access Token should have these scopes:
+     *
+     * * **repo** - to read the repository
+     * * **admin:repo_hook** - if you plan to use webhooks (true by default)
+     *
+     * @see https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html
+     */
+    credentialsSecretName: string
+}
 
 /**
  * Props for the Pipeline.
@@ -161,9 +176,7 @@ export class ApplicationStage extends cdk.Stage {
  */
 class CodePipeline {
     public static build(scope: Construct, props: PipelineProps) : pipelines.CodePipeline {
-        const sourceArtifact = new codepipeline.Artifact();
         const branch = props.repository.targetRevision ?? 'main';
-
         let githubProps : GitHubSourceOptions | undefined = undefined;
 
         if(props.repository.credentialsSecretName) {
