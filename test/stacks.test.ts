@@ -1,5 +1,6 @@
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
+import { ManualApprovalStep } from '@aws-cdk/pipelines';
 import * as ssp from '../lib';
 import { MyVpcStack } from './test-support';
 
@@ -109,7 +110,9 @@ describe('Unit tests for EKS Blueprint', () => {
             .stage({
                 id: 'prod-ssp',
                 stackBuilder: blueprint.clone('us-west-2'),
-                stageProps: { manualApprovals: true }
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-ssp-approval", { comment: "Approval step for production deployment."})]
+                }
             });
 
         const stack = pipeline.build(app, "ssp-pipeline-id");

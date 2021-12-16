@@ -19,7 +19,9 @@ export class TeamTroi implements Team {
             }
         });
 
-        this.setupNamespacePolicies(cluster);
+        const policies = this.setupNamespacePolicies(cluster);
+
+        policies.node.addDependency(namespace);
 
         const sa = cluster.addServiceAccount('inf-backend', { name: 'inf-backend', namespace: this.name });
         sa.node.addDependency(namespace);
@@ -28,9 +30,9 @@ export class TeamTroi implements Team {
         new cdk.CfnOutput(stack, this.name + '-sa-iam-role', { value: sa.role.roleArn })
     }
 
-    setupNamespacePolicies(cluster: eks.Cluster) {
+    setupNamespacePolicies(cluster: eks.Cluster) : eks.KubernetesManifest {
         const quotaName = this.name + "-quota";
-        cluster.addManifest(quotaName, {
+        return cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
             metadata: { 
