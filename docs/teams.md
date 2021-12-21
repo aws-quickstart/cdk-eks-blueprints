@@ -34,7 +34,7 @@ The `ApplicationTeam` will do the following:
 
 ### PlatformTeam 
 
-To create an `PlatformTeam` for your cluster, simplye implement a class that extends `PlatformTeam`. You will need to supply a team name and an array of users.  
+To create an `PlatformTeam` for your cluster, simply implement a class that extends `PlatformTeam`. You will need to supply a team name and an array of users.  
 
 ```typescript
 export class TeamAwesome extends PlatformTeam {
@@ -60,7 +60,7 @@ To reduce verbosity for some of the use cases, such as for platform teams, when 
 ```typescript
 const adminTeam = new PlatformTeam( {
     name: "second-adminteam", // make sure this is unique within organization
-    userRole: Role.fromRoleArn(`${YOUR_ROLE_ARN}`);
+    userRoleArn: `${YOUR_ROLE_ARN}`;
 })
 ```
 

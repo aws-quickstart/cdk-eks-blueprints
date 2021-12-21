@@ -28,3 +28,48 @@ The framework currently supports the following add-ons.
 | [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-ssp-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn |
 | [`XrayAddOn`](./xray) | Adds XRay Daemon to the EKS Cluster |
 | [`VeleroAddOn`](./velero.md) | Adds [Velero](https://velero.io/) to the EKS Cluster |
+
+# Standard Helm Add-On Configuration Options
+
+Many add-ons leverage helm to provision and maintain deployments. All provided add-ons that leverage helm allow specifying the following add-on attributes:
+
+```typescript
+    /**
+     * Name of the helm chart (add-on)
+     */
+    name?: string,
+
+    /**
+     * Namespace where helm release will be installed
+     */
+    namespace?: string,
+
+    /**
+     * Chart name
+     */
+    chart?: string,
+
+    /**
+     * Helm chart version.
+     */
+    version?: string, 
+
+    /**
+     * Helm release
+     */
+    release?: string,
+
+    /**
+     * Helm repository
+     */
+    repository?: string,
+
+    /**
+     * Optional values for the helm chart. 
+     */
+    values?: Values
+```
+
+Ability to set repository url may be leveraged for private repositories. 
+
+Version field can be modified from the default chart version, e.g. if the add-on should be upgraded to the desired version, however, since the helm chart version supplied by the customer may not have been tested as part of the SSP release process, SSP community may not be able to reproduce/fix issues related to the helm chart version upgrade.

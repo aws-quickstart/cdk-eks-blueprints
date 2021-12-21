@@ -2,25 +2,14 @@ import { KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import { IHostedZone } from '@aws-cdk/aws-route53';
 import { Construct } from '@aws-cdk/core';
-import { Constants } from '..';
-import { ClusterAddOn, ClusterInfo } from '../../spi';
+import { ClusterInfo } from '../../spi';
+import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 
 
 /**
  * Configuration options for the external DNS add-on.
  */
-export interface ExternalDnsProps {
-
-    /**
-     * @default `external-dns`
-     */
-    readonly namespace?: string;
-
-    /**
-     * @default `5.1.3`
-     */
-    readonly version?: string;
-
+export interface ExternalDnsProps extends HelmAddOnUserProps {
     /**
      * Names of hosted zone provider named resources (@see LookupHostedZoneProvider) for external DNS.
      * Hosted zone providers are registered as named resource providers with the EksBlueprintProps.
@@ -28,24 +17,32 @@ export interface ExternalDnsProps {
     readonly hostedZoneResources: string[];
 }
 
+const defaultProps = {
+    name: 'external-dns',
+    chart: 'external-dns',
+    namespace: 'external-dns',
+    repository: 'https://charts.bitnami.com/bitnami',
+    release: 'ssp-addon-external-dns',
+    version: '5.1.3'
+};
+
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
  * It is required to integrate with Route53 for external DNS resolution. 
  */
-export class ExternalDnsAddon implements ClusterAddOn {
-
-    readonly name = 'external-dns';
+export class ExternalDnsAddon extends HelmAddOn {
 
     private options: ExternalDnsProps;
 
     constructor(props: ExternalDnsProps) {
-        this.options = props
+        super({ ...defaultProps, ...props });
+        this.options = this.props as ExternalDnsProps;
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const region = clusterInfo.cluster.stack.region;
         const cluster = clusterInfo.cluster;
-        const namespace = this.options.namespace ?? this.name;
+        const namespace = this.options.namespace ?? this.options.name;
 
         const namespaceManifest = new KubernetesManifest(cluster.stack, 'external-dns-ns', {
             cluster,
@@ -57,10 +54,10 @@ export class ExternalDnsAddon implements ClusterAddOn {
             overwrite: true
         });
 
-        const sa = cluster.addServiceAccount(this.name, { name: 'external-dns-sa', namespace });
+        const sa = cluster.addServiceAccount(this.props.name, { name: 'external-dns-sa', namespace });
 
         const hostedZones = this.options.hostedZoneResources.map(e => clusterInfo.getRequiredResource<IHostedZone>(e));
-    
+
         sa.addToPrincipalPolicy(
             new PolicyStatement({
                 effect: Effect.ALLOW,
@@ -79,22 +76,15 @@ export class ExternalDnsAddon implements ClusterAddOn {
 
         sa.node.addDependency(namespaceManifest);
 
-        const chart = cluster.addHelmChart('ExternalDnsAddonChart', {
-            namespace,
-            repository: 'https://charts.bitnami.com/bitnami',
-            chart: 'external-dns',
-            release: Constants.SSP_ADDON,
-            version: this.options.version ?? '5.1.3',
-            values: {
-                provider: 'aws',
-                zoneIdFilters: hostedZones.map(hostedZone => hostedZone!.hostedZoneId),
-                aws: {
-                    region,
-                },
-                serviceAccount: {
-                    create: false,
-                    name: sa.serviceAccountName,
-                },
+        const chart = this.addHelmChart(clusterInfo, {
+            provider: 'aws',
+            zoneIdFilters: hostedZones.map(hostedZone => hostedZone!.hostedZoneId),
+            aws: {
+                region,
+            },
+            serviceAccount: {
+                create: false,
+                name: sa.serviceAccountName,
             },
         });
 

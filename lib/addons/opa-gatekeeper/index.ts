@@ -1,46 +1,35 @@
-import { ClusterAddOn, ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
+import { ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 
 /**
- * Properties available to configure opa gatekeeper
+ * Properties available to configure opa gatekeeper.
+ * namespace default is gatekeeper-system
+ * version default is 3.6.0
+ * values as per https://github.com/open-policy-agent/gatekeeper/tree/master/charts/gatekeeper
  */
-export interface OpaGatekeeperAddOnProps {
-
-    /** Default namespace
-     * @default gatekeeper-system
-     */
-    namespace?: string;
-
-    /**
-     * Helm chart version to use to install.
-     * @default 3.6.0
-     */
-    version?: string;
-
-    /**
-     * values to pass to the helm chart per https://github.com/open-policy-agent/gatekeeper/tree/master/charts/gatekeeper
-     */
-     values?: {
-        [key: string]: any;
-    };
-}
+export type OpaGatekeeperAddOnProps = HelmAddOnUserProps;
 
 /**
  * Defaults options for the gatekeeper add-on
  */
 
-const defaultProps: OpaGatekeeperAddOnProps = {
+const defaultProps: HelmAddOnProps = {
+    name: 'gatekeeper',
+    release: 'ssp-addon-opa-gatekeeper',
     namespace: 'gatekeeper-system',
-    version: '3.6.0',
-    values: {}
-};
+    chart: 'gatekeeper',
+    repository: "https://open-policy-agent.github.io/gatekeeper/charts",
+    version: '3.6.0'
+}
 
-export class OpaGatekeeperAddOn implements ClusterAddOn, ClusterPostDeploy {
+export class OpaGatekeeperAddOn extends HelmAddOn implements ClusterPostDeploy {
 
     private options: OpaGatekeeperAddOnProps;
 
     constructor(props?: OpaGatekeeperAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        super({...defaultProps, ...props});
+        this.options = this.props;
     }
 
     deploy(_clusterInfo: ClusterInfo): void {
@@ -49,15 +38,8 @@ export class OpaGatekeeperAddOn implements ClusterAddOn, ClusterPostDeploy {
 
     postDeploy(clusterInfo: ClusterInfo, _teams: Team[]): void {
 
-        const chart = clusterInfo.cluster.addHelmChart("OpaGatekeeperAddOn", {
-            chart: "gatekeeper",
-            release: "gatekeeper",
-            repository: "https://open-policy-agent.github.io/gatekeeper/charts",
-            version: this.options.version,
-            namespace: this.options.namespace,
-            values: this.options.values
-        });
-
+        const chart = this.addHelmChart(clusterInfo, this.props.values ?? {});
+        
         for (let provisioned of clusterInfo.getAllProvisionedAddons().values()) {
             chart.node.addDependency(provisioned);
         }

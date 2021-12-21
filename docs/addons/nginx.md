@@ -170,3 +170,4 @@ ssp.EksBlueprint.builder()
 2. Provides convenience options to integrate with AWS Load Balancer controller to leverage NLB for the load balancer
 3. Provides convenience options to integrate with External DNS add-on for integration with Amazon Route 53. 
 4. Allows configuring TLS termination at the load balancer provisioned with the add-on. 
+5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).

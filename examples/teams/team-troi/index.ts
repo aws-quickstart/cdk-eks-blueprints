@@ -1,8 +1,8 @@
-import * as cdk from '@aws-cdk/core';
 import * as eks from "@aws-cdk/aws-eks";
 import * as s3 from "@aws-cdk/aws-s3";
+import * as cdk from '@aws-cdk/core';
+import { ClusterInfo, Team } from '../../../lib';
 
-import { Team, ClusterInfo } from '../../../lib';
 
 export class TeamTroi implements Team {
     readonly name: string = 'team-troi';
@@ -19,7 +19,9 @@ export class TeamTroi implements Team {
             }
         });
 
-        this.setupNamespacePolicies(cluster);
+        const policies = this.setupNamespacePolicies(cluster);
+
+        policies.node.addDependency(namespace);
 
         const sa = cluster.addServiceAccount('inf-backend', { name: 'inf-backend', namespace: this.name });
         sa.node.addDependency(namespace);
@@ -28,12 +30,15 @@ export class TeamTroi implements Team {
         new cdk.CfnOutput(stack, this.name + '-sa-iam-role', { value: sa.role.roleArn })
     }
 
-    setupNamespacePolicies(cluster: eks.Cluster) {
+    setupNamespacePolicies(cluster: eks.Cluster) : eks.KubernetesManifest {
         const quotaName = this.name + "-quota";
-        cluster.addManifest(quotaName, {
+        return cluster.addManifest(quotaName, {
             apiVersion: 'v1',
             kind: 'ResourceQuota',
-            metadata: { name: quotaName },
+            metadata: { 
+                name: quotaName,
+                namespace:  'team-troi' 
+            },
             spec: {
                 hard: {
                     'requests.cpu': '10',

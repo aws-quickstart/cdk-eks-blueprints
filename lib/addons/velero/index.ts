@@ -1,54 +1,30 @@
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { Constants } from "..";
-import { Construct } from "@aws-cdk/core";
-import * as s3 from "@aws-cdk/aws-s3";
+import { KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
-import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
+import * as s3 from "@aws-cdk/aws-s3";
+import { Construct } from "@aws-cdk/core";
 import merge from "ts-deepmerge";
+import { ClusterInfo } from "../../spi";
 import { createNamespace } from "../../utils";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
  */
-export interface VeleroAddOnProps {
-    /**
-     * Velero for the Velero Helm Chart.
-     * @default 2.23.6
-     */
-    version?: string;
-   
-    /**
-     * Namespace for the Velero add-on. If the namespace does not exist, it will be created by the addon with the default namespace value.
-     * @default 
-     *      namespace:{
-     *        name: "velero",
-     *        create: true    
-     *      }
-     */
-    namespace?: {
-        name: string,   // default value is "velero", if it is specified then it will be the namespace of where velero is deployed to.
-        create: boolean // default is true, if it is false, no new namespace will be created
-    };
-
-     /**
-     * Values to pass to the chart as per https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml#
-     * Required if provided.
-     */
-    values: {
-        [key: string]: any;
-    };
-
+export interface VeleroAddOnProps extends HelmAddOnUserProps {    
+    createNamespace: boolean;
 }
 
 /**
  * Defaults options for the add-on
  */
-const defaultProps: VeleroAddOnProps = {
+const defaultProps = {
+    name: 'velero',
     version: "2.23.6",
-    namespace: {
-        name: "velero",
-        create: true
-    },
+    namespace: "velero",
+    createNamespace: true,
+    chart: "velero",
+    repository: "https://vmware-tanzu.github.io/helm-charts/",
+    release: "ssp-addon-velero",
     values:{
         initContainers:[
             {
@@ -78,27 +54,21 @@ const defaultProps: VeleroAddOnProps = {
             server:{}
         }
     },
-
 };
 
-export class VeleroAddOn implements ClusterAddOn {
+export class VeleroAddOn extends HelmAddOn {
 
-    private options: VeleroAddOnProps;
-    private chartNode: HelmChart;
+    private options: Required<VeleroAddOnProps>;
+
     constructor(props?: VeleroAddOnProps) {
-        if (props) {
-            // merge the nested json files
-            this.options = merge(defaultProps, props);
-        }
-        else {
-            this.options = defaultProps
-        }
+        super(merge(defaultProps, props ?? {}));
+        this.options = this.props as Required<VeleroAddOnProps>;
     }
 
     /**
      * Implementation of the add-on contract deploy method.
     */
-    async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const props = this.options;
                
@@ -106,7 +76,7 @@ export class VeleroAddOn implements ClusterAddOn {
         const s3Bucket = this.getOrCreateS3Bucket(clusterInfo, "backup-bucket", props.values.configuration.backupStorageLocation.bucket)
 
         // Create Namespace if namespace is not explicied defined.
-        const veleroNamespace = this.createNamespaceIfNeeded(clusterInfo, "velero", props.namespace);
+        const veleroNamespace = this.createNamespaceIfNeeded(clusterInfo, "velero", props.namespace, props.createNamespace);
 
         // Setup IAM Role for Service Accounts (IRSA) for the Velero Service Account    
         const veleroServiceAccount = this.createServiceAccountWithIamRoles(clusterInfo, "velero-account", veleroNamespace.name, s3Bucket);
@@ -117,19 +87,19 @@ export class VeleroAddOn implements ClusterAddOn {
         }
         
         // Setup the values for the helm chart
-        const valueVariable: VeleroAddOnProps = {
+        const valueVariable = {
             values: {
                 configuration: {
                     backupStorageLocation: {
-                        prefix: props.values.configuration.backupStorageLocation.prefix ?? "velero/" + cluster.clusterName,
+                        prefix: props.values!.configuration.backupStorageLocation.prefix ?? "velero/" + cluster.clusterName,
                         bucket: s3Bucket.bucketName,
                         config:{
-                           region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region,
+                           region: props.values!.configuration.backupStorageLocation.config.region ?? cluster.stack.region,
                         }
                     },
                     volumeSnapshotLocation:{
                         config:{
-                            region: props.values.configuration.backupStorageLocation.config.region ?? cluster.stack.region
+                            region: props.values!.configuration.backupStorageLocation.config.region ?? cluster.stack.region
                         }
                     }
                 },
@@ -143,18 +113,11 @@ export class VeleroAddOn implements ClusterAddOn {
             }
         };
 
-        const values = merge(props.values, valueVariable.values) ?? {}; 
+        const values = merge(props.values!, valueVariable.values) ?? {}; 
  
-        this.chartNode = cluster.addHelmChart("velero-addon", {
-            chart: "velero",
-            repository: "https://vmware-tanzu.github.io/helm-charts/",
-            release: Constants.SSP_ADDON,
-            namespace: veleroNamespace.name,
-            version: props.version,
-            values: values
-        });
-        this.chartNode.node.addDependency(veleroServiceAccount);
-        return this.chartNode;
+        const chartNode = this.addHelmChart(clusterInfo, values);
+        chartNode.node.addDependency(veleroServiceAccount);
+        return Promise.resolve(chartNode);
     }
 
     /**
@@ -186,17 +149,17 @@ export class VeleroAddOn implements ClusterAddOn {
      * @param namespace
      * @returns the namespace created or existed.
      */
-    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace?: {name: string, create: boolean}): {name: string, manifest?: KubernetesManifest} {
+    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace: string, create: boolean): {name: string, manifest?: KubernetesManifest} {
         // Create Namespace if namespace is not explicied defined.
         if (namespace){
             // Create Namespace if the "create" option is true
-            if (namespace.create) {
-                const namespaceManifest = createNamespace(namespace.name, clusterInfo.cluster);
-                return { name: namespace.name, manifest: namespaceManifest };
+            if (create) {
+                const namespaceManifest = createNamespace(namespace, clusterInfo.cluster);
+                return { name: namespace, manifest: namespaceManifest };
             }
             // If the "create" option if false, then namespace will not be created, return namespace.name
             else{
-                return { name: namespace.name };
+                return { name: namespace };
             }
         }
         else{

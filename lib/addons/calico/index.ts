@@ -1,9 +1,10 @@
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterInfo } from "../../spi";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
  */
-export interface CalicoAddOnProps {
+export interface CalicoAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Namespace where Calico will be installed
@@ -13,9 +14,9 @@ export interface CalicoAddOnProps {
 
     /**
      * Helm chart version to use to install.
-     * @default 0.3.4
+     * @default 0.3.10
      */
-    chartVersion?: string;
+    version?: string;
 
     /**
      * Values for the Helm chart.
@@ -26,27 +27,25 @@ export interface CalicoAddOnProps {
 /**
  * Defaults options for the add-on
  */
-const defaultProps: CalicoAddOnProps = {
+const defaultProps = {
+    name: 'calico-addon',
     namespace: 'kube-system',
-    chartVersion: '0.3.4',
+    version: '0.3.10',
+    chart: "aws-calico",
+    release: "ssp-addon-calico",
+    repository: "https://aws.github.io/eks-charts"
 };
 
-export class CalicoAddOn implements ClusterAddOn {
+export class CalicoAddOn extends HelmAddOn {
 
     private options: CalicoAddOnProps;
 
     constructor(props?: CalicoAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        super({...defaultProps, ...props });
+        this.options = this.props;
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        clusterInfo.cluster.addHelmChart("calico-addon", {
-            chart: "aws-calico",
-            release: "aws-calico",
-            repository: "https://aws.github.io/eks-charts",
-            version: this.options.chartVersion,
-            namespace: this.options.namespace,
-            values: this.options.values
-        });
+        this.addHelmChart(clusterInfo, this.options.values);
     }
 }

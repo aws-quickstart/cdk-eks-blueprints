@@ -88,7 +88,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         const resourceProviders = this.props.resourceProviders!;
         this.props = { ...this.props, ...props };
         if(props.resourceProviders) {
-            this.props.resourceProviders = new Map([...resourceProviders?.entries(), ...props.resourceProviders.entries()]);
+            this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }
         return this;
     }

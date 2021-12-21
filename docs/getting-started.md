@@ -7,7 +7,7 @@ This getting started guide will walk you through setting up a new CDK project wh
 To use the `ssp-amazon-eks` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
 
 ```bash
-npm install -g aws-cdk@1.124.0
+npm install -g aws-cdk@1.135.0
 ```
 
 Verify the installation.
@@ -46,7 +46,6 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.ClusterAutoScalerAddOn,
     new ssp.addons.ContainerInsightsAddOn,
     new ssp.addons.AwsLoadBalancerControllerAddOn(),
-    new ssp.addons.NginxAddOn,
     new ssp.addons.VpcCniAddOn(),
     new ssp.addons.CoreDnsAddOn(),
     new ssp.addons.KubeProxyAddOn(),
