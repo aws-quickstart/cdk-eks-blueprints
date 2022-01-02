@@ -3,6 +3,7 @@ import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
+import { tagSubnets } from '../../lib/utils'
 import * as team from '../teams';
 
 
@@ -65,14 +66,16 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn()
+            new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.KarpenterAddOn(),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
 
+        tagSubnets(this,blueprintProps.vpc.privateSubnets,`kubernetes.io/cluster/${blueprintID}`,"1")
+
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
-
         new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, resourceProviders }, props);
     }
 }

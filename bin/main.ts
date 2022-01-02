@@ -21,13 +21,13 @@ const app = new cdk.App();
 const account = process.env.CDK_DEFAULT_ACCOUNT
 const region = process.env.CDK_DEFAULT_REGION
 const props = { env: { account, region } }
+const id = 'blueprint-construct'
 
 const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', props);
 
-
 new BlueprintConstruct(app,
   {
-    id: 'blueprint-construct',
+    id: id,
     vpc: vpcStack.vpc
   },
   props
@@ -48,6 +48,7 @@ ssp.EksBlueprint.builder()
       machineImage: ec2.MachineImage.genericLinux({
         'us-east-1': 'ami-0b297a512e2852b89',
         'us-west-2': 'ami-06a8c459c01f55c7b',
+        'us-east-2': 'ami-07639d39e45f1a48d',
       }),
       userData: userData,
     }
