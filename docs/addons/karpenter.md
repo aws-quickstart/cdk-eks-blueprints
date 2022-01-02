@@ -1,8 +1,14 @@
 # Karpenter Add-on
 
-External DNS add-on is based on the [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) open source project and allows integration of exposed Kubernetes services and Ingresses with DNS providers, in particular [Amazon Route 53](https://aws.amazon.com/route53/).
+Karpenter add-on is based on the [Karpenter](https://github.com/aws/karpenter) open source node provisioning project. It provides a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application. 
 
-The add-on provides functionality to configure IAM policies and Kubernetes service accounts for Route 53 integration support based on [AWS Tutorial for External DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md).
+Karpenter works by:
+
+* Watching for pods that the Kubernetes scheduler has marked as unschedulable,
+* Evaluating scheduling constraints (resource requests, nodeselectors, affinities, tolerations, and topology spread constraints) requested by the pods,
+* Provisioning nodes that meet the requirements of the pods,
+* Scheduling the pods to run on the new nodes, and
+* Removing the nodes when the nodes are no longer needed
 
 ## Prerequisite
 
@@ -42,8 +48,77 @@ karpenter-webhook-7bf684c676-52chv      1/1     Running   0          62m
 1. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy.
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
-4. Deploys Karpenter helm chart in the `karpenter` namespace.
+4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
 
 ## Using Karpenter
 
+To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://karpenter.sh/docs/provisioner/). A single provisioner is capable of handling many different pod shapes.
+
+Create a default provisioner using the command below:
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+name: default
+spec:
+requirements:
+  - key: karpenter.sh/capacity-type
+    operator: In
+    values: ["spot"]
+limits:
+  resources:
+    cpu: 1000
+provider:
+  instanceProfile: KarpenterNodeInstanceProfile-${CLUSTER_NAME}
+ttlSecondsAfterEmpty: 30
+EOF
+```
+
 ## Testing with a sample deployment
+
+Now that the provisioner is deployed, Karpenter is active and ready to provision nodes. Create some pods using a deployment:
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inflate
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: inflate
+  template:
+    metadata:
+      labels:
+        app: inflate
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: inflate
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: 1
+EOF
+```
+
+Now scale the deployment:
+
+```bash
+kubectl scale deployment inflate --replicas 10
+```
+
+The provisioner will then start deploying more nodes to deploy the scaled replicas. You can verify by either looking at the karpenter controller logs,
+
+```bash
+kubectl logs -f -n karpenter $(kubectl get pods -n karpenter -l karpenter=controller -o name)
+```
+
+or, by looking at the nodes being created:
+
+```bash
+kubectl get nodes
+```
