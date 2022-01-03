@@ -4,10 +4,10 @@ import { LifecycleTransition, LifecycleHook } from '@aws-cdk/aws-autoscaling';
 import { Queue } from '@aws-cdk/aws-sqs';
 import { QueueHook } from '@aws-cdk/aws-autoscaling-hooktargets';
 import * as iam from '@aws-cdk/aws-iam';
-import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy, AwsSdkCall } from '@aws-cdk/custom-resources';
 import { Rule, EventPattern } from '@aws-cdk/aws-events';
 import { SqsQueue } from '@aws-cdk/aws-events-targets';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
+import { tagAsg } from '../../utils';
 
 /**
  * Configuration for the add-on
@@ -70,7 +70,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
       });
 
       // Tag the ASG
-      this.tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
+      tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
 
       // Create Amazon EventBridge Rules
       this.createEvents(cluster.stack, queue);
@@ -108,50 +108,6 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
       });
       awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
     }
-  }
-
-  /**
-   * Creates the node termination tag for the ASG
-   * @param scope
-   * @param autoScalingGroup 
-   */
-  private tagAsg(scope: Construct, autoScalingGroup: string): void {
-    const callProps: AwsSdkCall = {
-      service: 'AutoScaling',
-      action: 'createOrUpdateTags',
-      parameters: {
-        Tags: [
-          {
-            Key: 'aws-node-termination-handler/managed',
-            Value: 'true',
-            PropagateAtLaunch : true,
-            ResourceId: autoScalingGroup,
-            ResourceType: 'auto-scaling-group'
-          }
-        ]
-      },
-      physicalResourceId: PhysicalResourceId.of(
-        `${autoScalingGroup}-asg-tag`
-      )
-    };
-    this.AwsCustomResource(scope, 'asg-tag', callProps);
-  }
-
-  /**
-   * Creates AWS Custom Resource
-   * @param scope 
-   * @param id 
-   * @param resourceProps 
-   * @returns AwsCustomResource
-   */
-  private AwsCustomResource(scope: Construct, id: string, callProps: AwsSdkCall): AwsCustomResource {
-    return new AwsCustomResource(scope, id, {
-      onCreate: callProps,
-      onUpdate: callProps,
-      policy: AwsCustomResourcePolicy.fromSdkCalls({
-        resources: AwsCustomResourcePolicy.ANY_RESOURCE
-      })
-    });
   }
 
   /**
