@@ -3,10 +3,10 @@ import * as customResource from '@aws-cdk/custom-resources';
 
 
 /**
-   * Creates the node termination tag for the ASG
-   * @param scope
-   * @param autoScalingGroup 
-   */
+ * Creates the node termination tag for the ASG
+ * @param scope
+ * @param autoScalingGroup 
+ */
  export function tagAsg(scope: Construct, autoScalingGroup: string): void {
   const callProps: customResource.AwsSdkCall = {
     service: 'AutoScaling',
