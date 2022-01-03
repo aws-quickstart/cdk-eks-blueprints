@@ -1,10 +1,8 @@
-import { ServiceAccount, KubernetesManifest, KubernetesPatch } from '@aws-cdk/aws-eks';
+import { ServiceAccount, KubernetesManifest } from '@aws-cdk/aws-eks';
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyStatement } from '@aws-cdk/aws-iam';
-
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { setPath } from '../../utils/object-utils'
-
 import { KarpenterControllerPolicy } from './iam'
 
 export type KarpenterAddOnProps = HelmAddOnUserProps
@@ -51,7 +49,7 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Set up Instance Profile
-        const karpenterInstanceProfile = new CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
+        new CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
             path: '/'
