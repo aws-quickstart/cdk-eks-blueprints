@@ -70,6 +70,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             "autoscaling:DescribeTags",
             "autoscaling:SetDesiredCapacity",
             "autoscaling:TerminateInstanceInAutoScalingGroup",
+            "ec2:DescribeInstanceTypes",
             "ec2:DescribeLaunchTemplateVersions"
         );
         const autoscalerPolicy = new iam.Policy(cluster.stack, "cluster-autoscaler-policy", {
@@ -87,7 +88,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         this.addHelmChart(clusterInfo, {
             cloudProvider: 'aws',
             autoDiscovery: {
-                cluster: cluster.clusterName
+                clusterName: cluster.clusterName
             },
             awsRegion: clusterInfo.cluster.stack.region
         });
