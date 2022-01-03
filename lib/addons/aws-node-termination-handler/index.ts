@@ -70,7 +70,13 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
       });
 
       // Tag the ASG
-      tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
+      const tags = [
+        {
+          Key: 'aws-node-termination-handler/managed',
+          Value: 'true'
+        }
+      ];
+      tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName, tags);
 
       // Create Amazon EventBridge Rules
       this.createEvents(cluster.stack, queue);
