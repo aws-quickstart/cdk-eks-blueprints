@@ -1,5 +1,5 @@
 import { Construct, Duration } from '@aws-cdk/core';
-import { ClusterAddOn, ClusterInfo } from '../../spi';
+import { ClusterInfo } from '../../spi';
 import { LifecycleTransition, LifecycleHook } from '@aws-cdk/aws-autoscaling';
 import { Queue } from '@aws-cdk/aws-sqs';
 import { QueueHook } from '@aws-cdk/aws-autoscaling-hooktargets';
@@ -7,38 +7,32 @@ import * as iam from '@aws-cdk/aws-iam';
 import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy, AwsSdkCall } from '@aws-cdk/custom-resources';
 import { Rule, EventPattern } from '@aws-cdk/aws-events';
 import { SqsQueue } from '@aws-cdk/aws-events-targets';
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
 /**
  * Configuration for the add-on
  */
-export interface AwsNodeTerminationHandlerProps {
-
-  /**
-   * Namespace where NTH will be installed
-   */
-  namespace?: string,
-
-  /**
-   * Chart Version for the NTH 
-   */
-  chartVersion?: string
-}
+type AwsNodeTerminationHandlerProps = HelmAddOnUserProps;
 
 /**
  * Default options for the add-on
  */
-const defaultProps: AwsNodeTerminationHandlerProps = {
-  namespace: 'kube-system',
-  chartVersion: '0.16.0'
-}
+const defaultProps: HelmAddOnProps = {
+  chart: 'aws-node-termination-handler',
+  repository: 'https://aws.github.io/eks-charts',
+  version: '0.16.0',
+  release: 'ssp-addon-aws-node-termination-handler',
+  name: 'aws-node-termination-handler',
+  namespace: 'kube-system'
+};
 
-const AWS_NODE_TERMINATION_HANDLER = 'aws-node-termination-handler';
+export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
 
-export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
   private options: AwsNodeTerminationHandlerProps;
 
   constructor(props?: AwsNodeTerminationHandlerProps) {
-    this.options = { ...defaultProps, ...props };
+    super({ ...defaultProps, ...props });
+    this.options = this.props;
   }
 
   /**
@@ -49,68 +43,61 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
     const cluster = clusterInfo.cluster;    
     const asgCapacity = clusterInfo.autoScalingGroup;
 
-    // No support for Fargate, lets catch that
-    console.assert(asgCapacity, "AWS Node Termination Handler is only supported for self-managed nodes");
+    // No support for Fargate and Managed Node Groups, lets catch that
+    console.assert(asgCapacity, 'AWS Node Termination Handler is only supported for self-managed nodes');
 
     // Create an SQS Queue
-    const queue = new Queue(cluster.stack, `${AWS_NODE_TERMINATION_HANDLER}-queue`, {
-      retentionPeriod: Duration.minutes(5)
-    });
-    queue.addToResourcePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      principals: [
-        new iam.ServicePrincipal('events.amazonaws.com'),
-        new iam.ServicePrincipal('sqs.amazonaws.com'),
-      ],
-      actions: ['sqs:SendMessage'],
-      resources: [queue.queueArn]
-    }));
+    if (asgCapacity) {
+      const queue = new Queue(cluster.stack, `aws-nth-queue`, {
+        retentionPeriod: Duration.minutes(5)
+      });
+      queue.addToResourcePolicy(new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        principals: [
+          new iam.ServicePrincipal('events.amazonaws.com'),
+          new iam.ServicePrincipal('sqs.amazonaws.com'),
+        ],
+        actions: ['sqs:SendMessage'],
+        resources: [queue.queueArn]
+      }));
 
-    // Setup a Termination Lifecycle Hook on an ASG
-    new LifecycleHook(cluster.stack, `${AWS_NODE_TERMINATION_HANDLER}-lifecycle-hook`, {
-      lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
-      heartbeatTimeout: Duration.minutes(15),
-      notificationTarget: new QueueHook(queue),
-      autoScalingGroup: asgCapacity!
-    });
+      // Setup a Termination Lifecycle Hook on an ASG
+      new LifecycleHook(cluster.stack, `aws-nth-lifecycle-hook`, {
+        lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
+        heartbeatTimeout: Duration.minutes(15),
+        notificationTarget: new QueueHook(queue),
+        autoScalingGroup: asgCapacity!
+      });
 
-    // Tag the ASG
-    this.tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
+      // Tag the ASG
+      this.tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName);
 
-    // Create Amazon EventBridge Rules
-    this.createEvents(cluster.stack, queue);
+      // Create Amazon EventBridge Rules
+      this.createEvents(cluster.stack, queue);
 
-    // Create Service Account
-    const serviceAccount = cluster.addServiceAccount(AWS_NODE_TERMINATION_HANDLER, {
-      name: AWS_NODE_TERMINATION_HANDLER,
-      namespace: this.options.namespace,
-    });
-    serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        'autoscaling:CompleteLifecycleAction',
-        'autoscaling:DescribeAutoScalingInstances',
-        'autoscaling:DescribeTags'
-      ],
-      resources: [asgCapacity!.autoScalingGroupArn]
-    }));
-    serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['ec2:DescribeInstances'],
-      resources: ['*']
-    }));
-    queue.grantConsumeMessages(serviceAccount);
+      // Create Service Account
+      const serviceAccount = cluster.addServiceAccount('aws-nth-sa', {
+        name: 'aws-node-termination-handler-sa',
+        namespace: this.options.namespace,
+      });
+      serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'autoscaling:CompleteLifecycleAction',
+          'autoscaling:DescribeAutoScalingInstances',
+          'autoscaling:DescribeTags'
+        ],
+        resources: [asgCapacity!.autoScalingGroupArn]
+      }));
+      serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['ec2:DescribeInstances'],
+        resources: ['*']
+      }));
+      queue.grantConsumeMessages(serviceAccount);
 
-    // Deploy the helm chart
-    const awsNodeTerminationHandlerChart = cluster.addHelmChart('AWSNodeTerminationHandler', {
-      chart: AWS_NODE_TERMINATION_HANDLER,
-      repository: 'https://aws.github.io/eks-charts',
-      namespace: this.options.namespace,
-      release: AWS_NODE_TERMINATION_HANDLER,
-      version: this.options.chartVersion,
-      wait: true,
-      timeout: Duration.minutes(15),
-      values: {
+      // Deploy the helm chart
+      const awsNodeTerminationHandlerChart = this.addHelmChart(clusterInfo, {
         enableSqsTerminationDraining: true,
         queueURL: queue.queueUrl,
         serviceAccount: {
@@ -118,9 +105,9 @@ export class AwsNodeTerminationHandlerAddOn implements ClusterAddOn {
           name: serviceAccount.serviceAccountName,
         },
         enablePrometheusServer: true
-      },
-    });
-    awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
+      });
+      awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
+    }
   }
 
   /**
