@@ -65,7 +65,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.OpaGatekeeperAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
