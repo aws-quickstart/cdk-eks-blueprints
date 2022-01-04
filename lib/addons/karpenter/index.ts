@@ -1,8 +1,9 @@
+import * as cdk from '@aws-cdk/core'
 import { ServiceAccount, KubernetesManifest } from '@aws-cdk/aws-eks';
-import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyStatement } from '@aws-cdk/aws-iam';
+import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyStatement, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { setPath } from '../../utils/object-utils'
+import { createNamespace, setPath, createServiceAccount, tagSubnets } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
 export type KarpenterAddOnProps = HelmAddOnUserProps
@@ -21,9 +22,6 @@ const defaultProps: HelmAddOnProps = {
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;
-
-    // Debug Logging for Karpenter
-    readonly debugLogging: boolean;
 
     constructor(props?: KarpenterAddOnProps) {
         super({...defaultProps, ...props});
@@ -62,8 +60,9 @@ export class KarpenterAddOn extends HelmAddOn {
         })
 
         // Create Namespace & SA
-        const ns = this.createNamespace(clusterInfo)
-        const sa = this.createServiceAccount(clusterInfo)
+        const ns = createNamespace(KARPENTER, cluster)
+        const karpenterPolicyDocument = PolicyDocument.fromJson(KarpenterControllerPolicy);
+        const sa = createServiceAccount(cluster, KARPENTER, KARPENTER, karpenterPolicyDocument)
         sa.node.addDependency(ns)
 
         // Add helm chart
@@ -74,43 +73,4 @@ export class KarpenterAddOn extends HelmAddOn {
 
         karpenterChart.node.addDependency(sa);
     }
-
-    /**
-     * Creates namespace, which is a prerequisite for service account creation and subsequent chart execution.
-     * @param clusterInfo 
-     * @returns 
-    */
-     protected createNamespace(clusterInfo: ClusterInfo): KubernetesManifest {
-        return new KubernetesManifest(clusterInfo.cluster.stack, "karpenter-namespace-struct", {
-            cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: 'v1',
-                kind: 'Namespace',
-                metadata: {
-                    name: this.options.namespace,
-                }
-            }],
-            overwrite: true,
-            prune: true
-        });
-    }
-
-    /**
-     * Creates a service account that can access secrets
-     * @param clusterInfo 
-     * @returns sa
-     */
-     protected createServiceAccount(clusterInfo: ClusterInfo): ServiceAccount {
-        // Setup IAM Role for Service Accounts (IRSA) for Karpenter Service Account    
-        const sa = clusterInfo.cluster.addServiceAccount('karpenter-sa', {
-            name: KARPENTER,
-            namespace: this.options.namespace,
-        });
-
-        KarpenterControllerPolicy.Statement.forEach((statement) => {
-            sa.addToPrincipalPolicy(PolicyStatement.fromJson(statement));
-        });
-        return sa
-    }
-
 }

@@ -34,9 +34,9 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            new team.TeamTroi,
-            new team.TeamRiker(scope, teamManifestDirList[1]),
-            new team.TeamBurnham(scope, teamManifestDirList[0])
+            // new team.TeamTroi,
+            // new team.TeamRiker(scope, teamManifestDirList[1]),
+            // new team.TeamBurnham(scope, teamManifestDirList[0])
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
@@ -52,27 +52,29 @@ export default class BlueprintConstruct extends cdk.Construct {
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
             prodBootstrapArgo,
-            new ssp.addons.CalicoAddOn(),
-            new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ClusterAutoScalerAddOn(),
-            new ssp.addons.ContainerInsightsAddOn(),
-            new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            new ssp.addons.SecretsStoreAddOn(),
-            new ssp.addons.SSMAgentAddOn(),
-            new ssp.addons.NginxAddOn({ values: {
-                controller: { service: { create: false }}
-            }}),
+            // new ssp.addons.CalicoAddOn(),
+            // new ssp.addons.MetricsServerAddOn(),
+            // new ssp.addons.ClusterAutoScalerAddOn(),
+            // new ssp.addons.ContainerInsightsAddOn(),
+            // new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            // new ssp.addons.SecretsStoreAddOn(),
+            // new ssp.addons.SSMAgentAddOn(),
+            // new ssp.addons.NginxAddOn({ values: {
+            //     controller: { service: { create: false }}
+            // }}),
             new ssp.addons.VeleroAddOn(),
-            new ssp.addons.VpcCniAddOn(),
-            new ssp.addons.CoreDnsAddOn(),
-            new ssp.addons.KubeProxyAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn(),
+            // new ssp.addons.VpcCniAddOn(),
+            // new ssp.addons.CoreDnsAddOn(),
+            // new ssp.addons.KubeProxyAddOn(),
+            // new ssp.addons.OpaGatekeeperAddOn(),
             new ssp.addons.KarpenterAddOn(),
+            new ssp.addons.XrayAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
 
-        tagSubnets(this,blueprintProps.vpc.privateSubnets,`kubernetes.io/cluster/${blueprintID}`,"1")
+        // Tag Subnets
+        tagSubnets(blueprintProps.vpc.privateSubnets,`kubernetes.io/cluster/${blueprintID}`,"1")
 
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
