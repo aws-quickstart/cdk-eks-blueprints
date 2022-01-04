@@ -8,15 +8,15 @@ import { PolicyDocument, ManagedPolicy } from "@aws-cdk/aws-iam";
  */
 export function createServiceAccount(cluster: Cluster, name: string, namespace: string, policyDocument: PolicyDocument): ServiceAccount {
     const sa = cluster.addServiceAccount(`${name}-sa`, {
-			  name: name,
+				name: name,
 				namespace: namespace,
-	  });
+		});
 	
-	  const policy = new ManagedPolicy(cluster, `${name}-managed-policy`, {
-		    document: policyDocument
-	  });
+		const policy = new ManagedPolicy(cluster, `${name}-managed-policy`, {
+				document: policyDocument
+		});
 
-	  sa.role.addManagedPolicy(policy)
+		sa.role.addManagedPolicy(policy)
 
-	  return sa
+		return sa
 }

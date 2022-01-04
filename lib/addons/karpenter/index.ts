@@ -1,9 +1,7 @@
-import * as cdk from '@aws-cdk/core'
-import { ServiceAccount, KubernetesManifest } from '@aws-cdk/aws-eks';
-import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyStatement, PolicyDocument } from '@aws-cdk/aws-iam';
+import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, tagSubnets } from '../../utils'
+import { createNamespace, setPath, createServiceAccount } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
 export type KarpenterAddOnProps = HelmAddOnUserProps
