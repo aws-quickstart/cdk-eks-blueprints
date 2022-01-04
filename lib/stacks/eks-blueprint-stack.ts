@@ -49,9 +49,10 @@ export class EksBlueprintProps {
     resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
     /**
-     * Enable Control Plane Logging (defaults to false)
+     * Control Plane log types to be enabled (if not passed, none)
+     * If wrong types are included, will throw an error.
      */
-    readonly controlPlaneLogging?: boolean;
+    readonly enableControlPlaneLogTypes?: string[];
 }
 
 
@@ -167,14 +168,14 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_20;
-        const controlPlaneLogging = blueprintProps.controlPlaneLogging ?? false;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
 
-        if (controlPlaneLogging) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster)
+        let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
+        if (enableLogTypes) {
+            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes)
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
