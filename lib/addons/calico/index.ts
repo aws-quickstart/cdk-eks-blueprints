@@ -1,3 +1,4 @@
+import * as dot from 'dot-object';
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
@@ -46,6 +47,11 @@ export class CalicoAddOn extends HelmAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        this.addHelmChart(clusterInfo, this.options.values);
+        const values = this.options.values ?? {};
+
+        dot.set("calico.node.requests.memory", "64Mi", values, true);
+        dot.set("calico.node.limits.memory", "100Mi", values, true);
+
+        this.addHelmChart(clusterInfo, values);
     }
 }
