@@ -187,7 +187,3 @@ function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
 
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 }
-
-function toThrow(arg0: string): any {
-    throw new Error('Function not implemented.');
-}
