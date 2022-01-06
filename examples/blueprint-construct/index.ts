@@ -62,7 +62,6 @@ export default class BlueprintConstruct extends cdk.Construct {
             prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ClusterAutoScalerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
