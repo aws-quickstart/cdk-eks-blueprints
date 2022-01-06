@@ -1,7 +1,8 @@
+import { Construct } from '@aws-cdk/core';
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, convertToSpec } from '../../utils'
+import { createNamespace, setPath, createServiceAccount, convertToSpec, conflictsWith } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
 /**
@@ -34,7 +35,8 @@ export class KarpenterAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    @conflictsWith('ClusterAutoScalerAddOn')
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const endpoint = clusterInfo.cluster.clusterEndpoint
         const name = clusterInfo.cluster.clusterName
         const cluster = clusterInfo.cluster
@@ -96,5 +98,7 @@ export class KarpenterAddOn extends HelmAddOn {
             })
             provisioner.node.addDependency(karpenterChart)
         }
+
+        return Promise.resolve(karpenterChart);
     }
 }

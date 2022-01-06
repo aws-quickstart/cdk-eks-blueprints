@@ -47,6 +47,20 @@ describe('Unit tests for EKS Blueprint', () => {
         );
     });
 
+    test("Stack creation fails due to conflicting add-ons", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.ClusterAutoScalerAddOn, new ssp.KarpenterAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
+    });
+
     test('Blueprint builder creates correct stack', async () => {
         const app = new cdk.App();
 
@@ -172,4 +186,8 @@ function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
     }
 
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
+}
+
+function toThrow(arg0: string): any {
+    throw new Error('Function not implemented.');
 }
