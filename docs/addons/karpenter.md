@@ -21,16 +21,16 @@ Here are the prerequisites:
 ```typescript
 import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
-const addOn = new ssp.addons.KarpenterAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
-
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
+
+const blueprint = ssp.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns( new ssp.addons.KarpenterAddOn() )
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 To validate that Karpenter add-on is running ensure that the add-on deployments for the controller and the webhook are in `RUNNING` state:
@@ -49,29 +49,51 @@ karpenter-webhook-7bf684c676-52chv      1/1     Running   0          62m
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
+5. (Optionally) provision a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements)
 
 ## Using Karpenter
 
 To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://karpenter.sh/docs/provisioner/). A single provisioner is capable of handling many different pod shapes.
 
-Create a default provisioner using the command below:
+This can be done in 2 ways (either will yield the same provisioner):
+
+1. Provide a sec of spec.requirements during add-on deployment:
+
+```typescript
+const provisionerSpecs = {
+    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
+    'topology.kubernetes.io/zone': ['us-east-1c'],
+    'kubernetes.io/arch': ['amd64','arm64'],
+    'karpenter.sh/capacity-type': ['spot','on-demand'],
+}
+
+const karpenterAddOn = new ssp.addons.KarpenterAddOn({defaultProvisionerSpecs: provisionerSpecs})
+```
+
+2. Use `kubectl` to apply a provisioner manifest:
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-name: default
+  name: default
 spec:
-requirements:
-  - key: karpenter.sh/capacity-type
-    operator: In
-    values: ["spot"]
-limits:
-  resources:
-    cpu: 1000
-provider:
-  instanceProfile: KarpenterNodeInstanceProfile-${CLUSTER_NAME}
-ttlSecondsAfterEmpty: 30
+  requirements:
+    - key: "node.kubernetes.io/instance-type" 
+      operator: In
+      values: ["m5.2xlarge"]
+    - key: "topology.kubernetes.io/zone" 
+      operator: In
+      values: ["us-east-1c"]
+    - key: "kubernetes.io/arch" 
+      operator: In
+      values: ["arm64", "amd64"]
+    - key: "karpenter.sh/capacity-type" 
+      operator: In
+      values: ["spot", "on-demand"]
+  provider:
+    instanceProfile: KarpenterNodeInstanceProfile-${CLUSTER_NAME}
+  ttlSecondsAfterEmpty: 30
 EOF
 ```
 

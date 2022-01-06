@@ -1,10 +1,18 @@
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount } from '../../utils'
+import { createNamespace, setPath, createServiceAccount, convertToSpec } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
-export type KarpenterAddOnProps = HelmAddOnUserProps
+/**
+ * Configuration options for the add-on
+ */
+interface KarpenterAddOnProps extends HelmAddOnUserProps {
+    /**
+     * Specs for Default Provisional (Optional)
+     */
+     defaultProvisionerSpecs?: { [key: string]: string[]; }
+}
 
 const KARPENTER = 'karpenter'
 
@@ -45,7 +53,7 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Set up Instance Profile
-        new CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
+        const karpenterInstanceProfile = new CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
             path: '/'
@@ -70,5 +78,23 @@ export class KarpenterAddOn extends HelmAddOn {
         const karpenterChart = this.addHelmChart(clusterInfo, values, true)
 
         karpenterChart.node.addDependency(sa);
+
+        // (Optional) default provisioner - defaults to 30 seconds for scale down for
+        // low utilization
+        if (this.options.defaultProvisionerSpecs){
+            const provisioner = cluster.addManifest('default-provisioner', {
+                apiVersion: 'karpenter.sh/v1alpha5',
+                kind: 'Provisioner',
+                metadata: { name: 'default' },
+                spec: {
+                    requirements: convertToSpec(this.options.defaultProvisionerSpecs),
+                    provider: {
+                        instanceProfile: `${karpenterInstanceProfile}`
+                    },
+                    ttlSecondsAfterEmpty: 30
+                }
+            })
+            provisioner.node.addDependency(karpenterChart)
+        }
     }
 }

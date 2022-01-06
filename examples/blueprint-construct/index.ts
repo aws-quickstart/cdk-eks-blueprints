@@ -11,6 +11,14 @@ const burnhamManifestDir = './examples/teams/team-burnham/'
 const rikerManifestDir = './examples/teams/team-riker/'
 const teamManifestDirList = [burnhamManifestDir,rikerManifestDir]
 
+// User-provided specs for a default Karpenter Provisioner
+const provisionerSpecs = {
+    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
+    'topology.kubernetes.io/zone': ['us-east-1c'],
+    'kubernetes.io/arch': ['amd64','arm64'],
+    'karpenter.sh/capacity-type': ['spot','on-demand'],
+}
+
 export interface BlueprintConstructProps {
     /**
      * Id
@@ -67,7 +75,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
             new ssp.addons.OpaGatekeeperAddOn(),
-            new ssp.addons.KarpenterAddOn(),
+            new ssp.addons.KarpenterAddOn({defaultProvisionerSpecs: provisionerSpecs}),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
