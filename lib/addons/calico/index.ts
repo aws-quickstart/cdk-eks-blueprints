@@ -1,3 +1,5 @@
+import * as dot from 'dot-object';
+import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
@@ -46,6 +48,14 @@ export class CalicoAddOn extends HelmAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): void {
-        this.addHelmChart(clusterInfo, this.options.values);
+        const values = this.options.values ?? {};
+        const defaultValues = {};
+
+        dot.set("calico.node.resources.requests.memory", "64Mi", defaultValues, true);
+        dot.set("calico.node.resources.limits.memory", "100Mi", defaultValues, true);
+
+        const merged = merge(defaultValues, values);
+
+        this.addHelmChart(clusterInfo, merged);
     }
 }
