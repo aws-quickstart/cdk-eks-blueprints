@@ -47,7 +47,7 @@ describe('Unit tests for EKS Blueprint', () => {
         );
     });
 
-    test("Stack creation fails due to conflicting add-ons", () => {
+    test("Stack creation fails due to adding Karpenter with Cluster Autoscaler", () => {
         const app = new cdk.App();
 
         const blueprint = ssp.EksBlueprint.builder();
@@ -59,6 +59,20 @@ describe('Unit tests for EKS Blueprint', () => {
         expect(()=> {
             blueprint.build(app, 'stack-with-conflicting-addons');
         }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
+    });
+
+    test("Stack creation fails due to adding Cluster Autoscaler with Karpenter", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.KarpenterAddOn, new ssp.ClusterAutoScalerAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
     });
 
     test('Blueprint builder creates correct stack', async () => {

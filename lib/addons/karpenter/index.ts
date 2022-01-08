@@ -2,7 +2,7 @@ import { Construct } from '@aws-cdk/core';
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, convertToSpec, conflictsWith } from '../../utils'
+import { createNamespace, setPath, createServiceAccount, convertToSpec, conflictsWith, tagSubnets } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
 /**
@@ -41,6 +41,9 @@ export class KarpenterAddOn extends HelmAddOn {
         const name = clusterInfo.cluster.clusterName
         const cluster = clusterInfo.cluster
         const values = { ...this.props.values ?? {} }
+
+        // Tag VPC Subnets
+        tagSubnets(cluster.stack, cluster.vpc.privateSubnets, `kubernetes.io/cluster/${clusterInfo.cluster.clusterName}`,"1")
 
         // Set up Node Role
         const karpenterNodeRole = new Role(cluster, 'karpenter-node-role', {
