@@ -22,8 +22,6 @@ export default class KubecostConstruct extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string) {
         super(scope, id);
         // AddOns for the cluster
-        // Include the Kubecost AddOn in your list
-        // Grab your token from kubecost.com/install (it's free)
         const stackId = `${id}-blueprint`;
 
         EksBlueprint.builder()
@@ -41,10 +39,6 @@ export default class KubecostConstruct extends cdk.Construct {
 
 The namespace where Kubecost will be installed. Defaults to `kubecost`.
 
-#### `kubecostToken: string` (optional)
-
-You may get one [here](https://kubecost.com/install).
-
 #### `version: string` (optional)
 
 The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.88.1` at the time of writing).
@@ -58,7 +52,7 @@ Custom values to pass to the chart. Config options: https://github.com/kubecost/
 Kubecost comes bundled with a Prometheus installation. However, if you wish to integrate with an external Prometheus deployment, provide your local Prometheus service address with this format `http://..svc`.
 Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/custom-prom.html
 
-#### `installPrometheusNodeExporter: string` (optional)
+#### `installPrometheusNodeExporter: boolean` (optional)
 
 Set to false to use an existing Node Exporter DaemonSet.
 Note: this requires your existing Node Exporter endpoint to be visible from the namespace where Kubecost is installed.
