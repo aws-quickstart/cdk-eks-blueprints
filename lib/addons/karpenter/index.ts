@@ -2,7 +2,7 @@ import { Construct } from '@aws-cdk/core';
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, convertToSpec, conflictsWith, tagSubnets } from '../../utils'
+import { createNamespace, setPath, createServiceAccount, conflictsWith, tagSubnets } from '../../utils'
 import { KarpenterControllerPolicy } from './iam'
 
 /**
@@ -12,7 +12,12 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Specs for Default Provisional (Optional)
      */
-     defaultProvisionerSpecs?: { [key: string]: string[]; }
+    defaultProvisionerSpecs?: { 
+        'node.kubernetes.io/instance-type': string[],
+        'topology.kubernetes.io/zone': string[],
+        'kubernetes.io/arch': string[],
+        'karpenter.sh/capacity-type': string[],
+    }
 }
 
 const KARPENTER = 'karpenter'
@@ -92,16 +97,35 @@ export class KarpenterAddOn extends HelmAddOn {
                 kind: 'Provisioner',
                 metadata: { name: 'default' },
                 spec: {
-                    requirements: convertToSpec(this.options.defaultProvisionerSpecs),
+                    requirements: this.convertToSpec(this.options.defaultProvisionerSpecs),
                     provider: {
                         instanceProfile: `${karpenterInstanceProfile}`
                     },
-                    ttlSecondsAfterEmpty: 30
                 }
             })
             provisioner.node.addDependency(karpenterChart)
         }
 
         return Promise.resolve(karpenterChart);
+    }
+
+    /**
+     * Helper function to convert a key-pair values of provisioner spec configurations
+     * To appropriate json format for addManifest function
+     * @param specs 
+     * @returns
+     * */
+    protected convertToSpec(specs: { [key: string]: string[]; }): any[] {
+        const newSpecs = []
+        for (const key in specs){
+            const value = specs[key]
+            const requirement = {
+                "key": key,
+                "operator": "In",
+                "values": value
+            }
+            newSpecs.push(requirement)
+        }
+        return newSpecs;
     }
 }

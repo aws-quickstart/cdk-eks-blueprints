@@ -9,18 +9,26 @@ import { AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall } from "@aws-cdk
  * @param tag 
  * @param value 
  */
-export function tagSubnets(stack: Stack, subnetArns: ec2.ISubnet[], tag: string, value: string): void {
+export function tagSubnets(stack: Stack, subnets: ec2.ISubnet[], tag: string, value: string): void {
+    for (const subnet of subnets){
+        if (!ec2.Subnet.isVpcSubnet(subnet)) {
+            throw new Error(
+                'This is not a valid subnet.'
+            )
+        } 
+    }
+    
     const tags = [{
         Key: tag,
         Value: value
     }]
 
-    const arns = subnetArns.map(function(val, _){
+    const arns = subnets.map(function(val, _){
         return `arn:aws:ec2:${stack.region}:${stack.account}:subnet/`+val.subnetId
     })
 
     const parameters = {
-        Resources: subnetArns.map((arn) => arn.subnetId),
+        Resources: subnets.map((arn) => arn.subnetId),
         Tags: tags
     }
     
