@@ -1,6 +1,6 @@
 export * from './addon-utils';
 export * from './context-utils';
-export * from './cluster-utils'
+export * from './cluster-utils';
 export * from './namespace-utils';
 export * from './secrets-manager-utils';
 export * from './string-utils';
