@@ -41,14 +41,14 @@ export function tagSubnets(stack: Stack, subnets: ec2.ISubnet[], tag: string, va
     
     new AwsCustomResource(stack, `${stack.stackName}-subnet-tags`, {
         policy: AwsCustomResourcePolicy.fromSdkCalls({
-			resources: arns,
-		}),
+            resources: arns,
+        }),
 
-		onCreate: sdkCall,
+        onCreate: sdkCall,
         onUpdate: sdkCall,
-		onDelete: { 
+        onDelete: { 
             ...sdkCall, 
             action: 'deleteTags',
-		},
+        },
     })
 }

@@ -12,7 +12,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Specs for Default Provisional (Optional)
      */
-    defaultProvisionerSpecs?: { 
+    ProvisionerSpecs?: { 
         'node.kubernetes.io/instance-type': string[],
         'topology.kubernetes.io/zone': string[],
         'kubernetes.io/arch': string[],
@@ -91,13 +91,13 @@ export class KarpenterAddOn extends HelmAddOn {
 
         // (Optional) default provisioner - defaults to 30 seconds for scale down for
         // low utilization
-        if (this.options.defaultProvisionerSpecs){
+        if (this.options.ProvisionerSpecs){
             const provisioner = cluster.addManifest('default-provisioner', {
                 apiVersion: 'karpenter.sh/v1alpha5',
                 kind: 'Provisioner',
                 metadata: { name: 'default' },
                 spec: {
-                    requirements: this.convertToSpec(this.options.defaultProvisionerSpecs),
+                    requirements: this.convertToSpec(this.options.ProvisionerSpecs),
                     provider: {
                         instanceProfile: `${karpenterInstanceProfile}`
                     },
