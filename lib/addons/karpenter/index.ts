@@ -10,7 +10,7 @@ import { KarpenterControllerPolicy } from './iam'
  */
 interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
-     * Specs for Default Provisional (Optional)
+     * Specs for a Provisioner (Optional)
      */
     ProvisionerSpecs?: { 
         'node.kubernetes.io/instance-type': string[],
@@ -22,6 +22,9 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
 
 const KARPENTER = 'karpenter'
 
+/**
+ * Defaults options for the add-on
+ */
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
@@ -31,6 +34,9 @@ const defaultProps: HelmAddOnProps = {
     repository: 'https://charts.karpenter.sh',
 }
 
+/**
+ * Implementation of the Karpenter add-on
+ */
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;

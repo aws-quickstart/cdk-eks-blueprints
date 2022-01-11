@@ -12,9 +12,7 @@ Karpenter works by:
 
 ## Prerequisite
 
-Here are the prerequisites:
-1. Karpenter discovers subnets tagged `kubernetes.io/cluster/$CLUSTER_NAME`. Private subnets where the EKS cluster is deployed shoule be tagged as such.
-2. (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
+(If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
 
 ## Usage
 
@@ -45,11 +43,12 @@ karpenter-webhook-7bf684c676-52chv      1/1     Running   0          62m
 
 ## Functionality
 
-1. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy.
-2. Creates `karpenter` namespace.
-3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
-4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provision a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements)
+1. EKS VPC subnets are tagged with the following (as required by Karpenter): `kubernetes.io/cluster/$CLUSTER_NAME`.
+2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy.
+3. Creates `karpenter` namespace.
+4. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
+5. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
+6. (Optionally) provision a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements)
 
 ## Using Karpenter
 
