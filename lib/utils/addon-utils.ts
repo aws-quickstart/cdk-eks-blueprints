@@ -75,9 +75,7 @@ export function conflictsWith(...addOns: string[]) {
         }
       });
 
-      const result: Promise<Construct> = originalMethod.apply(this, args);
-
-      return result;
+      return originalMethod.apply(this, args);
     };
 
     return descriptor;

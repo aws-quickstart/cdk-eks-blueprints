@@ -44,7 +44,7 @@ karpenter-webhook-7bf684c676-52chv      1/1     Running   0          62m
 ## Functionality
 
 1. EKS VPC subnets are tagged with the following (as required by Karpenter): `kubernetes.io/cluster/$CLUSTER_NAME`.
-2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy.
+2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why)
 3. Creates `karpenter` namespace.
 4. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 5. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
@@ -56,7 +56,7 @@ To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://ka
 
 This can be done in 2 ways (either will yield the same provisioner):
 
-1. Provide a sec of spec.requirements during add-on deployment:
+1. Provide a set of spec.requirements during add-on deployment.
 
 ```typescript
 const provisionerSpecs = {
@@ -66,8 +66,10 @@ const provisionerSpecs = {
     'karpenter.sh/capacity-type': ['spot','on-demand'],
 }
 
-const karpenterAddOn = new ssp.addons.KarpenterAddOn({defaultProvisionerSpecs: provisionerSpecs})
+const karpenterAddOn = new ssp.addons.KarpenterAddOn({provisionerSpecs: provisionerSpecs})
 ```
+
+If the provisionerSpecs
 
 2. Use `kubectl` to apply a provisioner manifest:
 ```bash
