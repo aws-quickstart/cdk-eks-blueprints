@@ -69,7 +69,7 @@ const provisionerSpecs = {
 const karpenterAddOn = new ssp.addons.KarpenterAddOn({provisionerSpecs: provisionerSpecs})
 ```
 
-If the provisionerSpecs
+If the `provisionerSpecs` is not provided at deploy time, the add-on will be installed without a Provisioner. 
 
 2. Use `kubectl` to apply a provisioner manifest:
 ```bash
