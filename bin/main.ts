@@ -18,10 +18,10 @@ export class VPCStack extends cdk.Stack {
 
 const app = new cdk.App();
 
-const account = process.env.CDK_DEFAULT_ACCOUNT
-const region = process.env.CDK_DEFAULT_REGION
-const props = { env: { account, region } }
-const id = 'blueprint-construct'
+const account = process.env.CDK_DEFAULT_ACCOUNT;
+const region = process.env.CDK_DEFAULT_REGION;
+const props = { env: { account, region } };
+const id = 'blueprint-construct';
 
 const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', props);
 

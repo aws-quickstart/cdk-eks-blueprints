@@ -62,7 +62,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     private env: {
         account?: string,
         region?: string
-    }
+    };
 
     constructor() {
         this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
@@ -202,7 +202,7 @@ export class EksBlueprint extends cdk.Stack {
             }
         });
 
-        this.asyncTasks.catch(err => { throw new Error(err) });
+        this.asyncTasks.catch(err => { throw new Error(err); });
     }
 
     /**

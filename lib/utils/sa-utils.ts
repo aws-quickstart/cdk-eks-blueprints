@@ -16,7 +16,7 @@ export function createServiceAccount(cluster: Cluster, name: string, namespace: 
         document: policyDocument
     });
 
-    sa.role.addManagedPolicy(policy)
+    sa.role.addManagedPolicy(policy);
     
-    return sa
+    return sa;
 }

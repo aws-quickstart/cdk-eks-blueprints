@@ -2,8 +2,8 @@ import { Construct } from '@aws-cdk/core';
 import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, conflictsWith, tagSubnets } from '../../utils'
-import { KarpenterControllerPolicy } from './iam'
+import { createNamespace, setPath, createServiceAccount, conflictsWith, tagSubnets } from '../../utils';
+import { KarpenterControllerPolicy } from './iam';
 
 /**
  * Configuration options for the add-on
@@ -21,7 +21,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     }
 }
 
-const KARPENTER = 'karpenter'
+const KARPENTER = 'karpenter';
 
 /**
  * Defaults options for the add-on
@@ -33,7 +33,7 @@ const defaultProps: HelmAddOnProps = {
     chart: KARPENTER,
     release: "ssp-addon-karpenter",
     repository: 'https://charts.karpenter.sh',
-}
+};
 
 /**
  * Implementation of the Karpenter add-on
@@ -123,15 +123,15 @@ export class KarpenterAddOn extends HelmAddOn {
      * @returns
      * */
     protected convertToSpec(specs: { [key: string]: string[]; }): any[] {
-        const newSpecs = []
+        const newSpecs = [];
         for (const key in specs){
-            const value = specs[key]
+            const value = specs[key];
             const requirement = {
                 "key": key,
                 "operator": "In",
                 "values": value
-            }
-            newSpecs.push(requirement)
+            };
+            newSpecs.push(requirement);
         }
         return newSpecs;
     }

@@ -5,7 +5,7 @@ import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { conflictsWith } from "../../utils"
+import { conflictsWith } from "../../utils";
 
 /**
  * Configuration options for the add-on.

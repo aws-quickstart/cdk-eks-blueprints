@@ -42,7 +42,7 @@ export function dependable(...addOns: string[]) {
               resource.node.addDependency(construct);
             });
         });
-      }).catch(err => { throw new Error(err) });
+      }).catch(err => { throw new Error(err); });
 
       return result;
     };
@@ -71,7 +71,7 @@ export function conflictsWith(...addOns: string[]) {
       addOns.forEach( (addOn) => {
         const dep = clusterInfo.getScheduledAddOn(addOn);
         if (dep){
-          throw new Error(`Deploying ${stack} failed due to conflicting add-on: ${addOn}.`)
+          throw new Error(`Deploying ${stack} failed due to conflicting add-on: ${addOn}.`);
         }
       });
 

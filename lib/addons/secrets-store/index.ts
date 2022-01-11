@@ -50,7 +50,7 @@ const defaultProps: SecretsStoreAddOnProps = {
     repository: 'https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts',
     rotationPollInterval: undefined,
     syncSecrets: true,
-}
+};
 
 export class SecretsStoreAddOn implements ClusterAddOn {
 

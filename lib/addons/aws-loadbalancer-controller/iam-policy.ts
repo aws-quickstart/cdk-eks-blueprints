@@ -214,4 +214,4 @@ export const AwsLoadbalancerControllerIamPolicy = {
             "Resource": "*"
         }
     ]
-}
+};
