@@ -18,7 +18,7 @@ export enum Mode {
    * IMDS Mode
    */
   IMDS,
-  
+
   /**
    * Queue Mode
    */
