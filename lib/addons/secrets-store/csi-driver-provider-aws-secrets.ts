@@ -1,5 +1,4 @@
 import { ClusterInfo } from '../../spi';
-import { ApplicationTeam } from '../../teams';
 import { CfnOutput, Construct } from '@aws-cdk/core';
 import { ISecret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter } from '@aws-cdk/aws-ssm';
@@ -8,7 +7,7 @@ import { ServiceAccount } from '@aws-cdk/aws-eks';
 import { SecretsStoreAddOn } from '../..';
 
 /**
- * TeamSecret Props
+ * CsiSecret Props
  */
 export interface CsiSecretsProps {
   secretProvider: SecretProvider;
@@ -83,23 +82,19 @@ export class CsiSecrets {
   private parameterObjects: ParameterObject[];
   private kubernetesSecrets: KubernetesSecret[];
 
-  constructor(private teamSecrets: CsiSecretsProps[], private serviceAccount: ServiceAccount) {
+  constructor(private csiSecrets: CsiSecretsProps[], private serviceAccount: ServiceAccount) {
     this.parameterObjects = [];
     this.kubernetesSecrets = [];
   }
 
   /**
-   * Setup Team secrets
+   * Setup CSI secrets
    * @param clusterInfo 
-   * @param team 
-   * @param csiDriver 
    */
   setupSecrets(clusterInfo: ClusterInfo): void {
-
     const secretsDriver = clusterInfo.getProvisionedAddOn(SecretsStoreAddOn.name);
     console.assert(secretsDriver != null, 'SecretsStoreAddOn is required to setup secrets but is not provided in the add-ons.');
 
-    // Create the service account for the team
     this.addPolicyToServiceAccount(clusterInfo, this.serviceAccount);
 
     // Create and apply SecretProviderClass manifest
@@ -110,14 +105,14 @@ export class CsiSecrets {
    * Creates Service Account for CSI Secrets driver and sets up the IAM Policies
    * needed to access the AWS Secrets
    * @param clusterInfo
-   * @param team
+   * @param serviceAccount
    */
   private addPolicyToServiceAccount(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount) {
-    this.teamSecrets.forEach( (teamSecret) => {
+    this.csiSecrets.forEach( (csiSecret) => {
       const data: KubernetesSecretObjectData[] = [];
       let kubernetesSecret: KubernetesSecret;
       let secretName: string;
-      const secret: ISecret | IStringParameter = teamSecret.secretProvider.provide(clusterInfo); 
+      const secret: ISecret | IStringParameter = csiSecret.secretProvider.provide(clusterInfo); 
 
       if (Object.hasOwnProperty.call(secret, 'secretArn')) {
         const secretManagerSecret = secret as ISecret;
@@ -138,9 +133,9 @@ export class CsiSecrets {
         ssmSecret.grantRead(serviceAccount);
       }
 
-      if (teamSecret.kubernetesSecret) {
-        if (teamSecret.kubernetesSecret.data) {
-          teamSecret.kubernetesSecret.data.forEach ( (item) => {
+      if (csiSecret.kubernetesSecret) {
+        if (csiSecret.kubernetesSecret.data) {
+          csiSecret.kubernetesSecret.data.forEach ( (item) => {
             const dataObject: KubernetesSecretObjectData = {
               objectName: item.objectName ?? secretName,
               key: item.key ?? secretName
@@ -156,9 +151,9 @@ export class CsiSecrets {
           data.push(dataObject);
         }
         kubernetesSecret = {
-          secretName: teamSecret.kubernetesSecret.secretName,
-          type: teamSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
-          labels: teamSecret.kubernetesSecret.labels ?? undefined,
+          secretName: csiSecret.kubernetesSecret.secretName,
+          type: csiSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
+          labels: csiSecret.kubernetesSecret.labels ?? undefined,
           data,
         }
         this.kubernetesSecrets.push(kubernetesSecret);
@@ -169,7 +164,7 @@ export class CsiSecrets {
   /**
    * Create and apply the SecretProviderClass manifest
    * @param clusterInfo
-   * @param team
+   * @param serviceAccount
    * @param csiDriver
    */
   private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, csiDriver: Construct) {
@@ -196,7 +191,7 @@ export class CsiSecrets {
       csiDriver
     );
 
-    new CfnOutput(clusterInfo.cluster.stack, `team-${serviceAccount.serviceAccountName}-secret-provider-class `, {
+    new CfnOutput(clusterInfo.cluster.stack, `${serviceAccount.serviceAccountName}-secret-provider-class `, {
       value: secretProviderClass
     });
   }
