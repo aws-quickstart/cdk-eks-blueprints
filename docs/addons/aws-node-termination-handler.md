@@ -1,24 +1,52 @@
 # AWS Node Termination Handler
 
-This project ensures that the Kubernetes control plane responds appropriately to events that can cause your EC2 instance to become unavailable, such as EC2 maintenance events, EC2 Spot interruptions, ASG Scale-In, ASG AZ Rebalance, and EC2 Instance Termination via the API or Console. If not handled, your application code may not stop gracefully, take longer to recover full availability, or accidentally schedule work to nodes that are going down. For more information see [README.md][https://github.com/aws/aws-node-termination-handler#readme].
+The AWS Node Termination Handler (NTH) project ensures that the Kubernetes control plane responds appropriately to events that can cause your EC2 instance to become unavailable, such as EC2 maintenance events, EC2 Spot interruptions, ASG Scale-In, ASG AZ Rebalance, and EC2 Instance Termination via the API or Console. If not handled, your application code may not stop gracefully, take longer to recover full availability, or accidentally schedule work to nodes that are going down. For more information see [README.md][https://github.com/aws/aws-node-termination-handler#readme].
 
-The aws-node-termination-handler (NTH) can operate in two different modes: Instance Metadata Service (IMDS) or the Queue Processor. In the SSP, we provision the NTH in Queue Processor mode. This means that NTH will monitor an SQS queue of events from Amazon EventBridge for ASG lifecycle events, EC2 status change events, Spot Interruption Termination Notice events, and Spot Rebalance Recommendation events. When NTH detects an instance is going down, NTH uses the Kubernetes API to cordon the node to ensure no new work is scheduled there, then drain it, removing any existing work.
+NTH can operate in two different modes: Instance Metadata Service (IMDS) or the Queue Processor. To choose the operating mode refer to this [table](https://github.com/aws/aws-node-termination-handler#which-one-should-i-use).
+
+> **Best Practice** NTH should only be used when you are using **self-managed** node groups and self-managed node groups with Spot instances. For more information on why you do not need NTH on managed node groups see this [issue](https://github.com/aws/aws-node-termination-handler/issues/186) and [EKS Workshop](https://www.eksworkshop.com/beginner/150_spotnodegroups/spotlifecycle/#interruption-handling-in-spot-managed-node-groups) for detailed explanation.
+
+> **Best Practice** Use NTH in Queue Processor option to add every AWS Node Termination Handler feature to the self-managed node group.
+
+>**Note** With AWS Fargate, you no longer have to provision, configure, or scale clusters of virtual machines to run containers. This removes the need to use AWS Node Termination Handler.
 
 ## Usage
 
 ```typescript
-import { AwsNodeTerminationHandlerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import * as cdk from '@aws-cdk/core';
 
-const addOn = new AwsNodeTerminationHandlerAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+// SSP Lib
+import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+import * as eks from '@aws-cdk/aws-eks';
 
-const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+export default class BottlerocketConstruct extends cdk.Construct {
+    constructor(scope: cdk.Construct, id: string) {
+        super(scope, id);
+
+        // AddOns for the cluster.
+        const addOns: Array<ssp.ClusterAddOn> = [
+            new ssp.AwsNodeTerminationHandlerAddOn,
+        ];
+
+        const stackID = `${id}-blueprint`;
+        const clusterProvider = new ssp.AsgClusterProvider({
+            version: eks.KubernetesVersion.V1_20,
+            machineImageType:  eks.MachineImageType.BOTTLEROCKET
+         });
+        new ssp.EksBlueprint(scope,
+          {
+            id: stackID,
+            addOns,
+            clusterProvider
+          },
+          {
+            env: {
+                region: 'us-east-1'
+            }
+          }
+        );
+    }
+}
 ```
 
 To validate that controller is running, ensure that controller deployment is in `RUNNING` state:
@@ -31,6 +59,13 @@ aws-node-termination-handler         1/1     1            1           23m
 ```
 
 ## Functionality
+
+### IMDSv2 Mode (default)
+
+1. Node group ASG tagged with `key=aws-node-termination-handler/managed`
+2. Deploy the AWS Node Termination Handler helm chart
+
+### Queue Mode
 
 1. Node group ASG tagged with `key=aws-node-termination-handler/managed`
 2. AutoScaling Group Termination Lifecycle Hook

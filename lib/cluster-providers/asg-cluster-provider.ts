@@ -109,7 +109,7 @@ export class AsgClusterProvider implements ClusterProvider {
         const updatePolicy = UpdatePolicy.rollingUpdate()
 
         // Create an autoscaling group
-        const asg = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
+        const asg = cluster.addAutoScalingGroupCapacity('SelfManagedNodes', {
             machineImageType,
             instanceType,
             minCapacity: minSize,
