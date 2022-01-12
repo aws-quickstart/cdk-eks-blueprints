@@ -4,11 +4,13 @@ import { CfnOutput, Construct } from '@aws-cdk/core';
 import { ISecret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter } from '@aws-cdk/aws-ssm';
 import { SecretProvider } from './secret-provider';
+import { ServiceAccount } from '@aws-cdk/aws-eks';
+import { SecretsStoreAddOn } from '../..';
 
 /**
  * TeamSecret Props
  */
-export interface TeamSecretsProps {
+export interface CsiSecretsProps {
   secretProvider: SecretProvider;
   kubernetesSecret?: KubernetesSecret;
 }
@@ -76,12 +78,12 @@ interface ParameterObject {
     objectType: string;
 }
 
-export class TeamSecrets {
+export class CsiSecrets {
 
   private parameterObjects: ParameterObject[];
   private kubernetesSecrets: KubernetesSecret[];
 
-  constructor(private teamSecrets: TeamSecretsProps[]) {
+  constructor(private teamSecrets: CsiSecretsProps[], private serviceAccount: ServiceAccount) {
     this.parameterObjects = [];
     this.kubernetesSecrets = [];
   }
@@ -92,12 +94,16 @@ export class TeamSecrets {
    * @param team 
    * @param csiDriver 
    */
-  setupSecrets(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct): void {
+  setupSecrets(clusterInfo: ClusterInfo): void {
+
+    const secretsDriver = clusterInfo.getProvisionedAddOn(SecretsStoreAddOn.name);
+    console.assert(secretsDriver != null, 'SecretsStoreAddOn is required to setup secrets but is not provided in the add-ons.');
+
     // Create the service account for the team
-    this.addPolicyToServiceAccount(clusterInfo, team);
+    this.addPolicyToServiceAccount(clusterInfo, this.serviceAccount);
 
     // Create and apply SecretProviderClass manifest
-    this.createSecretProviderClass(clusterInfo, team, csiDriver);
+    this.createSecretProviderClass(clusterInfo, this.serviceAccount, secretsDriver!);
   }
 
   /**
@@ -106,9 +112,7 @@ export class TeamSecrets {
    * @param clusterInfo
    * @param team
    */
-  private addPolicyToServiceAccount(clusterInfo: ClusterInfo, team: ApplicationTeam) {
-    const serviceAccount = team.serviceAccount;
-
+  private addPolicyToServiceAccount(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount) {
     this.teamSecrets.forEach( (teamSecret) => {
       const data: KubernetesSecretObjectData[] = [];
       let kubernetesSecret: KubernetesSecret;
@@ -168,15 +172,15 @@ export class TeamSecrets {
    * @param team
    * @param csiDriver
    */
-  private createSecretProviderClass(clusterInfo: ClusterInfo, team: ApplicationTeam, csiDriver: Construct) {
+  private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, csiDriver: Construct) {
     const cluster = clusterInfo.cluster;
-    const secretProviderClass = team.teamProps.name + '-aws-secrets';
+    const secretProviderClass = serviceAccount.serviceAccountName + '-aws-secrets';
     const secretProviderClassManifest = cluster.addManifest(secretProviderClass, {
       apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
       kind: 'SecretProviderClass',
       metadata: {
         name: secretProviderClass,
-        namespace: team.teamProps.namespace
+        namespace: serviceAccount.serviceAccountNamespace
       },
       spec: {
         provider: 'aws',
@@ -188,11 +192,11 @@ export class TeamSecrets {
     });
 
     secretProviderClassManifest.node.addDependency(
-      team.serviceAccount,
+      serviceAccount,
       csiDriver
     );
 
-    new CfnOutput(clusterInfo.cluster.stack, `team-${team.teamProps.name}-secret-provider-class `, {
+    new CfnOutput(clusterInfo.cluster.stack, `team-${serviceAccount.serviceAccountName}-secret-provider-class `, {
       value: secretProviderClass
     });
   }
