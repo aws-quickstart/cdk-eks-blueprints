@@ -60,7 +60,7 @@ aws-node-termination-handler         1/1     1            1           23m
 
 ## Functionality
 
-### IMDSv2 Mode (default)
+### IMDS Mode (default)
 
 1. Node group ASG tagged with `key=aws-node-termination-handler/managed`
 2. Deploy the AWS Node Termination Handler helm chart

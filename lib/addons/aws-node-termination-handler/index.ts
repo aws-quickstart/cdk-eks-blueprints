@@ -13,8 +13,15 @@ import { Cluster, ServiceAccount } from '@aws-cdk/aws-eks';
 /**
  * Supported Modes
  */
-enum Mode {
+export enum Mode {
+  /**
+   * IMDS Mode
+   */
   IMDS,
+  
+  /**
+   * Queue Mode
+   */
   QUEUE
 }
 
