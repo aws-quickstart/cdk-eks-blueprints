@@ -186,7 +186,7 @@ class CodePipeline {
         if(props.repository.credentialsSecretName) {
             githubProps = {
                 authentication: cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!)
-            }
+            };
         }
 
         return new cdkpipelines.CodePipeline(scope, props.name, {

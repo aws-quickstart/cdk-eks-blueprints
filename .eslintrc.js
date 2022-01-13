@@ -13,6 +13,7 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": [1, {"argsIgnorePattern": "^_"}],
-        "prefer-const": "off"
+        "prefer-const": "off",
+        "semi": [1,"always"]
     },
 };

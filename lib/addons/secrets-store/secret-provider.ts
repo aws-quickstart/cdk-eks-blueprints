@@ -23,7 +23,7 @@ export class GenerateSecretManagerProvider implements SecretProvider {
           secretName: this.secretName
       });
 
-      return secret
+      return secret;
   }
 }
 
