@@ -35,6 +35,7 @@ nav:
     - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
+  - Extensibility: 'extensibility.md'
 markdown_extensions:
   - def_list
   - pymdownx.highlight  
