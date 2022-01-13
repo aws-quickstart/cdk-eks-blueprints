@@ -8,4 +8,5 @@ export * from './secrets-manager-utils';
 export * from './string-utils';
 export * from './usage-utils';
 export * from './yaml-utils';
+export * from './cluster-utils';
 export * from './vpc-utils';

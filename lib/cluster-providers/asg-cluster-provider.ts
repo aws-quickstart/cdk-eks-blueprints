@@ -87,7 +87,7 @@ export class AsgClusterProvider implements ClusterProvider {
         const outputClusterName = true;
         const version = this.props.version;
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
-        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE }] : this.props.vpcSubnets;
+        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : this.props.vpcSubnets;
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
 
         const cluster = new eks.Cluster(scope, scope.node.id, {
@@ -109,7 +109,7 @@ export class AsgClusterProvider implements ClusterProvider {
         const updatePolicy = UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
-        const asg = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
+        const asg = cluster.addAutoScalingGroupCapacity('SelfManagedNodes', {
             machineImageType,
             instanceType,
             minCapacity: minSize,
