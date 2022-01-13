@@ -7,6 +7,6 @@ export class TeamPlatform extends PlatformTeam {
         super({
             name: "platform",
             users: [new ArnPrincipal(`arn:aws:iam::${accountID}:user/superadmin`)]
-        })
+        });
     }
 }

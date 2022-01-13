@@ -44,7 +44,7 @@ export class CsiDriverProviderAws {
     if (this.props.syncSecrets === true) {
       values.syncSecret = {
         enabled: 'true'
-      }
+      };
     }
 
     values = merge(values, this.props.values ?? {});

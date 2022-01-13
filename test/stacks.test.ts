@@ -47,13 +47,41 @@ describe('Unit tests for EKS Blueprint', () => {
         );
     });
 
+    test("Stack creation fails due to adding Karpenter with Cluster Autoscaler", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.ClusterAutoScalerAddOn, new ssp.KarpenterAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
+    });
+
+    test("Stack creation fails due to adding Cluster Autoscaler with Karpenter", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.KarpenterAddOn, new ssp.ClusterAutoScalerAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
+    });
+
     test("Stack creation fails due to wrong node group type for NTH addon", () => {
         const app = new cdk.App();
 
         const blueprint = ssp.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new ssp.AwsNodeTerminationHandlerAddOn)
+            .addOns(new ssp.AwsNodeTerminationHandlerAddOn);
 
         blueprint.build(app, 'stack-with-missing-deps');
 
