@@ -175,7 +175,7 @@ export class EksBlueprint extends cdk.Stack {
 
         let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes)
+            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
