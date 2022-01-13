@@ -41,7 +41,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     enableShield: false,
     enableWaf: false,
     enableWafv2: false
-}
+};
 
 
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {

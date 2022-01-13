@@ -49,7 +49,7 @@ export class ArgoApplication {
                     automated: {}
                 }
             }
-        }
+        };
     }
 
     /**
@@ -64,7 +64,7 @@ export class ArgoApplication {
                 repoUrl: this.bootstrapRepo.repoUrl,
                 path: this.bootstrapRepo.path + `/addons/${name}`,
                 targetRevision: this.bootstrapRepo.targetRevision
-            }
+            };
         }
         throw new Error("With GitOps configuration management enabled either specify GitOps repository for each add-on or provide a bootstrap application to the ArgoCD add-on.");
     }

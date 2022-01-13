@@ -7,10 +7,10 @@ import { UpdatePolicy } from "@aws-cdk/aws-autoscaling";
 import { ClusterInfo, ClusterProvider } from "..";
 
 // Utils 
-import { valueFromContext } from '../utils/context-utils'
+import { valueFromContext } from '../utils/context-utils';
 
 // Constants
-import * as constants from './constants'
+import * as constants from './constants';
 
 /**
  * Configuration options for the cluster provider.
@@ -83,9 +83,9 @@ export class AsgClusterProvider implements ClusterProvider {
         const id = scope.node.id;
 
         // Cluster options.
-        const clusterName = this.props.name ?? id
-        const outputClusterName = true
-        const version = this.props.version
+        const clusterName = this.props.name ?? id;
+        const outputClusterName = true;
+        const version = this.props.version;
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE }] : this.props.vpcSubnets;
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
@@ -98,15 +98,15 @@ export class AsgClusterProvider implements ClusterProvider {
             vpcSubnets,
             endpointAccess,
             defaultCapacity: 0, // we want to manage capacity ourselves
-        })
+        });
 
         // Props for the auto scaling group.
-        const machineImageType = this.props.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2
+        const machineImageType = this.props.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
         const instanceType = this.props.instanceType ?? valueFromContext(scope, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
         const minSize = this.props.minSize ?? valueFromContext(scope, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = this.props.maxSize ?? valueFromContext(scope, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = this.props.desiredSize ?? valueFromContext(scope, constants.DESIRED_SIZE_KEY, minSize);
-        const updatePolicy = UpdatePolicy.rollingUpdate()
+        const updatePolicy = UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
         const asg = cluster.addAutoScalingGroupCapacity('BottlerocketNodes', {
@@ -117,6 +117,6 @@ export class AsgClusterProvider implements ClusterProvider {
             desiredCapacity: desiredSize,
             updatePolicy,
         });
-        return new ClusterInfo(cluster, version, asg)
+        return new ClusterInfo(cluster, version, asg);
     }
 }

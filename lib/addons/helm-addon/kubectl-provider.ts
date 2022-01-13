@@ -113,7 +113,7 @@ export class KubectlProvider {
             data.replace(`{{${key}}}`, value);
         });
         return JSON.parse(data);
-    }
+    };
 
     public static applyManifestDeployment = function(clusterInfo: ClusterInfo, props: ManifestDeployment) {
         const manifestDoc = KubectlProvider.applyManifestTemplate(props.manifest, props.values);
@@ -121,7 +121,7 @@ export class KubectlProvider {
           cluster: clusterInfo.cluster,
           manifest: manifestDoc,
           overwrite: true  
-        })
+        });
     };
 
     public addHelmChart(props: HelmChartDeployment) : Construct {
