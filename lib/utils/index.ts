@@ -1,5 +1,6 @@
 export * from './addon-utils';
 export * from './context-utils';
+export * from './cluster-utils';
 export * from './namespace-utils';
 export * from './object-utils';
 export * from './sa-utils';

@@ -6,7 +6,7 @@ import { StackProps } from '@aws-cdk/core';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import { getAddOnNameOrId, withUsageTracking } from '../utils';
+import { getAddOnNameOrId, withUsageTracking, setupClusterLogging } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -48,6 +48,11 @@ export class EksBlueprintProps {
      */
     resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
+    /**
+     * Control Plane log types to be enabled (if not passed, none)
+     * If wrong types are included, will throw an error.
+     */
+    readonly enableControlPlaneLogTypes?: string[];
 }
 
 
@@ -167,6 +172,11 @@ export class EksBlueprint extends cdk.Stack {
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
+
+        let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
+        if (enableLogTypes) {
+            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+        }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
