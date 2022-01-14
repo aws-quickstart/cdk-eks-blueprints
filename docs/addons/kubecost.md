@@ -39,6 +39,10 @@ export default class KubecostConstruct extends cdk.Construct {
 
 The namespace where Kubecost will be installed. Defaults to `kubecost`.
 
+#### `kubecostToken: string` (optional)
+
+You may get one [here](https://kubecost.com/install).
+
 #### `version: string` (optional)
 
 The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.88.1` at the time of writing).
