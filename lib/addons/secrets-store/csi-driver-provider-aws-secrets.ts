@@ -140,7 +140,7 @@ export class TeamSecrets {
             const dataObject: KubernetesSecretObjectData = {
               objectName: item.objectName ?? secretName,
               key: item.key ?? secretName
-            }
+            };
             data.push(dataObject);
           });
         }
@@ -148,7 +148,7 @@ export class TeamSecrets {
           const dataObject: KubernetesSecretObjectData = {
             objectName: secretName,
             key: secretName
-          }
+          };
           data.push(dataObject);
         }
         kubernetesSecret = {
@@ -156,7 +156,7 @@ export class TeamSecrets {
           type: teamSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
           labels: teamSecret.kubernetesSecret.labels ?? undefined,
           data,
-        }
+        };
         this.kubernetesSecrets.push(kubernetesSecret);
       }
     });

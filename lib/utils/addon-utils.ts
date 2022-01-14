@@ -42,9 +42,40 @@ export function dependable(...addOns: string[]) {
               resource.node.addDependency(construct);
             });
         });
-      }).catch(err => { throw new Error(err) });
+      }).catch(err => { throw new Error(err); });
 
       return result;
+    };
+
+    return descriptor;
+  };
+}
+
+/**
+ * Decorator function that accepts a list of AddOns and
+ * throws error if those addons are scheduled to be added as well
+ * As they should not be deployed with
+ * @param addOns 
+ * @returns 
+ */
+export function conflictsWith(...addOns: string[]) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function( ...args: any[]) {
+      // const dependencies: (Promise<Construct> | undefined)[] = [];
+      const clusterInfo: ClusterInfo = args[0];
+      const stack = clusterInfo.cluster.stack.stackName;
+
+      addOns.forEach( (addOn) => {
+        const dep = clusterInfo.getScheduledAddOn(addOn);
+        if (dep){
+          throw new Error(`Deploying ${stack} failed due to conflicting add-on: ${addOn}.`);
+        }
+      });
+
+      return originalMethod.apply(this, args);
     };
 
     return descriptor;

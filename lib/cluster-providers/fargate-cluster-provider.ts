@@ -6,10 +6,10 @@ import * as eks from "@aws-cdk/aws-eks";
 import { ClusterInfo, ClusterProvider } from "..";
 
 // Utils 
-import { valueFromContext } from '../utils/context-utils'
+import { valueFromContext } from '../utils/context-utils';
 
 // Constants 
-import * as constants from './constants'
+import * as constants from './constants';
 
 /**
  * Configuration options for the cluster provider.
@@ -56,12 +56,12 @@ export class FargateClusterProvider implements ClusterProvider {
         const id = scope.node.id;
 
         // Props for the cluster.
-        const clusterName = this.props.name ?? id
-        const outputClusterName = true
-        const version = this.props.version
+        const clusterName = this.props.name ?? id;
+        const outputClusterName = true;
+        const version = this.props.version;
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE }] : this.props.vpcSubnets;
+        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : this.props.vpcSubnets;
 
         const cluster = new eks.FargateCluster(scope, id, {
             vpc,
@@ -77,6 +77,6 @@ export class FargateClusterProvider implements ClusterProvider {
             cluster.addFargateProfile(id, options);
         }
 
-        return new ClusterInfo(cluster, version)
+        return new ClusterInfo(cluster, version);
     }
 }

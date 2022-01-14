@@ -18,7 +18,7 @@ export class NestedStackAddOnProps {
     /**
      * Optional properties for the nested stack.
      */
-    nestedStackProps?: NestedStackProps
+    nestedStackProps?: NestedStackProps;
 }
 
 export class NestedStackAddOn  implements ClusterAddOn {

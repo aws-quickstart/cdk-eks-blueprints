@@ -6,9 +6,9 @@ import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
 
 
-const burnhamManifestDir = './examples/teams/team-burnham/'
-const rikerManifestDir = './examples/teams/team-riker/'
-const teamManifestDirList = [burnhamManifestDir,rikerManifestDir]
+const burnhamManifestDir = './examples/teams/team-burnham/';
+const rikerManifestDir = './examples/teams/team-riker/';
+const teamManifestDirList = [burnhamManifestDir,rikerManifestDir];
 
 export interface BlueprintConstructProps {
     /**
@@ -53,7 +53,6 @@ export default class BlueprintConstruct extends cdk.Construct {
             prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ClusterAutoScalerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
@@ -65,7 +64,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn()
+            //new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.KarpenterAddOn(),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
@@ -73,6 +73,7 @@ export default class BlueprintConstruct extends cdk.Construct {
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
-        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, resourceProviders }, props);
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, 
+            resourceProviders, enableControlPlaneLogTypes: ['api']}, props);
     }
 }
