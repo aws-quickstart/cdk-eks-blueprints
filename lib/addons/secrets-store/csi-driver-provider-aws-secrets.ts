@@ -10,8 +10,26 @@ import { SecretsStoreAddOn } from '../..';
  * CsiSecret Props
  */
 export interface CsiSecretsProps {
+    /**
+     * Implementation of the secret provider that returns a reference to an Secrets Manager entry or SSP Parameter.
+     */
     secretProvider: SecretProvider;
+    
+    /**
+     * For secrets containing JSON structure, an optional JMES Path (https://jmespath.org/) object to decompose individual keys as separate 
+     * secret object data. 
+     */
+    jmesPath?: JmesPathObject[];
+    
+    /**
+     * Kubernetes secret for cases when CSI secret should create a standard Kubernetes Secret object.
+     */
     kubernetesSecret?: KubernetesSecret;
+}
+
+export interface JmesPathObject {
+    objectAlias: string,
+    path: string
 }
 
 /**
@@ -75,30 +93,45 @@ export enum KubernetesSecretType {
 interface ParameterObject {
     objectName: string;
     objectType: string;
+    jmesPath?: JmesPathObject[];
 }
+
+function createParameterObject(csiSecret: CsiSecretsProps, secretName: string, secretType: AwsSecretType) {
+    const result: ParameterObject = {
+        objectName: secretName,
+        objectType: secretType,
+    };
+    if(csiSecret.jmesPath) {
+        result.jmesPath = csiSecret.jmesPath;
+    }
+    return result;
+}
+
 
 export class CsiSecrets {
 
     private parameterObjects: ParameterObject[];
     private kubernetesSecrets: KubernetesSecret[];
+    private secretProviderClassName: string;
 
-    constructor(private csiSecrets: CsiSecretsProps[], private serviceAccount: ServiceAccount) {
+    constructor(private csiSecrets: CsiSecretsProps[], private serviceAccount: ServiceAccount, secretProviderClassName?: string) {
         this.parameterObjects = [];
         this.kubernetesSecrets = [];
+        this.secretProviderClassName = secretProviderClassName ?? serviceAccount.serviceAccountName + '-secret-provider';
     }
 
     /**
      * Setup CSI secrets
      * @param clusterInfo 
      */
-    setupSecrets(clusterInfo: ClusterInfo): void {
+    setupSecrets(clusterInfo: ClusterInfo): Promise<Construct> {
         const secretsDriverPromise = clusterInfo.getScheduledAddOn(SecretsStoreAddOn.name);
         console.assert(secretsDriverPromise != null, 'SecretsStoreAddOn is required to setup secrets but is not provided in the add-ons.');
 
         this.addPolicyToServiceAccount(clusterInfo, this.serviceAccount);
 
         // Create and apply SecretProviderClass manifest
-        secretsDriverPromise?.then(secretsDriver =>
+        return secretsDriverPromise!.then(secretsDriver =>
             this.createSecretProviderClass(clusterInfo, this.serviceAccount, secretsDriver!)
         );
     }
@@ -119,19 +152,15 @@ export class CsiSecrets {
             if (Object.hasOwnProperty.call(secret, 'secretArn')) {
                 const secretManagerSecret = secret as ISecret;
                 secretName = secretManagerSecret.secretName;
-                this.parameterObjects.push({
-                    objectName: secretManagerSecret.secretName,
-                    objectType: AwsSecretType.SECRETSMANAGER
-                });
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SECRETSMANAGER); 
+                this.parameterObjects.push(parameterObject);
                 secretManagerSecret.grantRead(serviceAccount);
             }
             else {
                 const ssmSecret = secret as IStringParameter;
                 secretName = ssmSecret.parameterName;
-                this.parameterObjects.push({
-                    objectName: ssmSecret.parameterName,
-                    objectType: AwsSecretType.SSMPARAMETER
-                });
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SSMPARAMETER); 
+                this.parameterObjects.push(parameterObject);
                 ssmSecret.grantRead(serviceAccount);
             }
 
@@ -169,9 +198,9 @@ export class CsiSecrets {
      * @param serviceAccount
      * @param csiDriver
      */
-    private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, csiDriver: Construct) {
+    private createSecretProviderClass(clusterInfo: ClusterInfo, serviceAccount: ServiceAccount, csiDriver: Construct): Construct {
         const cluster = clusterInfo.cluster;
-        const secretProviderClass = serviceAccount.serviceAccountName + '-aws-secrets';
+        const secretProviderClass = this.secretProviderClassName;
         const secretProviderClassManifest = cluster.addManifest(secretProviderClass, {
             apiVersion: 'secrets-store.csi.x-k8s.io/v1alpha1',
             kind: 'SecretProviderClass',
@@ -196,5 +225,7 @@ export class CsiSecrets {
         new CfnOutput(clusterInfo.cluster.stack, `${serviceAccount.serviceAccountName}-secret-provider-class `, {
             value: secretProviderClass
         });
+
+        return secretProviderClassManifest;
     }
 }
