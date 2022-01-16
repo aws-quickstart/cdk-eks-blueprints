@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps = {
     chart: 'gatekeeper',
     repository: "https://open-policy-agent.github.io/gatekeeper/charts",
     version: '3.6.0'
-}
+};
 
 export class OpaGatekeeperAddOn extends HelmAddOn implements ClusterPostDeploy {
 

@@ -97,8 +97,8 @@ export class NginxAddOn extends HelmAddOn {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
-            setPath(values, "controller.service.https.port.targetPort", "http");
-            setPath(values, "controller.service.http.port.enable", "false");
+            setPath(values, "controller.service.httpsPort.targetPort", "http");
+            setPath(values, "controller.service.httpPort.enable", "false");
         }
 
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };

@@ -73,7 +73,7 @@ export class VeleroAddOn extends HelmAddOn {
         const props = this.options;
                
         // Create S3 bucket if no existing bucket, create s3 bucket and corresponding KMS key
-        const s3Bucket = this.getOrCreateS3Bucket(clusterInfo, "backup-bucket", props.values.configuration.backupStorageLocation.bucket)
+        const s3Bucket = this.getOrCreateS3Bucket(clusterInfo, "backup-bucket", props.values.configuration.backupStorageLocation.bucket);
 
         // Create Namespace if namespace is not explicied defined.
         const veleroNamespace = this.createNamespaceIfNeeded(clusterInfo, "velero", props.namespace, props.createNamespace);
@@ -224,6 +224,6 @@ export class VeleroAddOn extends HelmAddOn {
             document: veleroCustomPolicyDocument
         });
         veleroServiceAccount.role.addManagedPolicy(veleroPolicy);
-        return veleroServiceAccount
+        return veleroServiceAccount;
     }
 }

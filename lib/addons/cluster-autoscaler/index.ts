@@ -1,10 +1,11 @@
 import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
-import { CfnJson, Tags } from "@aws-cdk/core";
+import { CfnJson, Tags, Construct } from "@aws-cdk/core";
 import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { conflictsWith } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -50,8 +51,8 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         super({ ...defaultProps, ...props });
         this.options = this.props;
     }
-
-    deploy(clusterInfo: ClusterInfo): void {
+    @conflictsWith('KarpenterAddOn')
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         if(this.options.version?.trim() === 'auto') {
             this.options.version = versionMap.get(clusterInfo.version);
@@ -70,6 +71,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             "autoscaling:DescribeTags",
             "autoscaling:SetDesiredCapacity",
             "autoscaling:TerminateInstanceInAutoScalingGroup",
+            "ec2:DescribeInstanceTypes",
             "ec2:DescribeLaunchTemplateVersions"
         );
         const autoscalerPolicy = new iam.Policy(cluster.stack, "cluster-autoscaler-policy", {
@@ -84,12 +86,14 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
         Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
 
-        this.addHelmChart(clusterInfo, {
+        const clusterAutoscalerChart = this.addHelmChart(clusterInfo, {
             cloudProvider: 'aws',
             autoDiscovery: {
-                cluster: cluster.clusterName
+                clusterName: cluster.clusterName
             },
             awsRegion: clusterInfo.cluster.stack.region
         });
+
+        return Promise.resolve(clusterAutoscalerChart);
     }
 }

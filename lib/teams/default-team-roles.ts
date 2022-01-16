@@ -112,7 +112,7 @@ export class DefaultTeamRoles {
                     apiGroup: "rbac.authorization.k8s.io"
                 }
             }
-        ]
+        ];
 
     }
 }

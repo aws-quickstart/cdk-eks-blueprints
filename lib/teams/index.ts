@@ -4,7 +4,7 @@ import { CfnOutput } from '@aws-cdk/core';
 import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
 import { CsiSecrets, CsiSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
-import { applyYamlFromDir } from '../utils/yaml-utils'
+import { applyYamlFromDir } from '../utils/yaml-utils';
 import { IRole } from '@aws-cdk/aws-iam';
 
 /**
@@ -36,7 +36,7 @@ export class TeamProps {
         'requests.memory': '10Gi',
         'limits.cpu': '20',
         'limits.memory': '20Gi'
-    }
+    };
 
     /**
      * Service Account Name
@@ -87,7 +87,7 @@ export class ApplicationTeam implements Team {
             userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
             teamManifestDir: teamProps.teamManifestDir
-        }
+        };
     }
 
     public setup(clusterInfo: ClusterInfo): void {
@@ -106,7 +106,7 @@ export class ApplicationTeam implements Team {
 
         if (teamRole) {
             awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
-            new CfnOutput(clusterInfo.cluster.stack, props.name + ' team role ', { value: teamRole ? teamRole.roleArn : "none" })
+            new CfnOutput(clusterInfo.cluster.stack, props.name + ' team role ', { value: teamRole ? teamRole.roleArn : "none" });
         }
     }
 
@@ -120,7 +120,7 @@ export class ApplicationTeam implements Team {
         const admins = this.teamProps.users ?? [];
         const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRoleArn);
 
-        new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" })
+        new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" });
 
         if (adminRole) {
             awsAuth.addMastersRole(adminRole);
@@ -216,7 +216,7 @@ export class ApplicationTeam implements Team {
         rbacManifest.node.addDependency(this.namespaceManifest);
 
         if (teamManifestDir){
-            applyYamlFromDir(teamManifestDir, clusterInfo.cluster, this.namespaceManifest)
+            applyYamlFromDir(teamManifestDir, clusterInfo.cluster, this.namespaceManifest);
         }
     }
 

@@ -170,7 +170,7 @@ export class CsiSecrets {
                         const dataObject: KubernetesSecretObjectData = {
                             objectName: item.objectName ?? secretName,
                             key: item.key ?? secretName
-                        }
+                        };
                         data.push(dataObject);
                     });
                 }
@@ -178,7 +178,7 @@ export class CsiSecrets {
                     const dataObject: KubernetesSecretObjectData = {
                         objectName: secretName,
                         key: secretName
-                    }
+                    };
                     data.push(dataObject);
                 }
                 kubernetesSecret = {
@@ -186,7 +186,7 @@ export class CsiSecrets {
                     type: csiSecret.kubernetesSecret.type ?? KubernetesSecretType.OPAQUE,
                     labels: csiSecret.kubernetesSecret.labels ?? undefined,
                     data,
-                }
+                };
                 this.kubernetesSecrets.push(kubernetesSecret);
             }
         });

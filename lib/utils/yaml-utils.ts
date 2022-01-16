@@ -21,17 +21,17 @@ export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceMan
                             let i = 0;
                             yaml.loadAll(data, function(item) {
                                 const resources = cluster.addManifest(file.substring(0, file.length - 5) + i, <Record<string, any>[]>item);
-                                resources.node.addDependency(namespaceManifest)
+                                resources.node.addDependency(namespaceManifest);
                                 i++;
                             });
                         }
-                    })
+                    });
                 }
-            })
+            });
         } else {
             console.log(`${dir} is empty`);
         }
-    })
+    });
 }
 
 export function readYamlDocument(path: string): string {
