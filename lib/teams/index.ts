@@ -3,7 +3,7 @@ import { ClusterInfo, Team } from '../spi';
 import { CfnOutput } from '@aws-cdk/core';
 import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
-import { CsiSecrets, CsiSecretsProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
+import { SecretProviderClass, CsiSecretProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 import { applyYamlFromDir } from '../utils/yaml-utils';
 import { IRole } from '@aws-cdk/aws-iam';
 
@@ -57,7 +57,7 @@ export class TeamProps {
     /**
      * Team Secrets
      */
-    readonly teamSecrets?: CsiSecretsProps[];
+    readonly teamSecrets?: CsiSecretProps[];
 
     /**
      * Optional, directory where a team's manifests are stored
@@ -267,7 +267,8 @@ export class ApplicationTeam implements Team {
      */
     protected setupSecrets(clusterInfo: ClusterInfo) {
         if (this.teamProps.teamSecrets) {
-            new CsiSecrets(this.teamProps.teamSecrets, this.serviceAccount).setupSecrets(clusterInfo);
+            const secretProviderClassName = this.teamProps.name + '-aws-secrets';
+            new SecretProviderClass(clusterInfo, this.serviceAccount, secretProviderClassName, ...this.teamProps.teamSecrets);
         }
     }
 }
