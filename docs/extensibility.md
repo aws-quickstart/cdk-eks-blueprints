@@ -128,14 +128,14 @@ export class MyAddOn extends ssp.addons.HelmAddOn {
 
 ```
 
-In order to  propagate the secret from the secret manager to the Kuberentes cluster, the add-on should create a `SecretProviderClass` Kubernetes object by leveraging the `ssp.addons.SecretProviderClass` object. The framework will take care of wiring the Kubernetes service account with the correct IAM permissions to pull the secret:
+In order to  propagate the secret from the secret manager to the Kubernetes cluster, the add-on should create a `SecretProviderClass` Kubernetes object by leveraging the `ssp.addons.SecretProviderClass` object. The framework will take care of wiring the Kubernetes service account with the correct IAM permissions to pull the secret:
 
 ```typescript
 
 const sa = clusterInfo.cluster.addServiceAccount(...);
 
 const csiSecret: ssp.addons.CsiSecretProps = {
-    secretProvider: new ssp.LookupSecretsManagerSecretByName(this.options.licenseKeySecret!),
+    secretProvider: new ssp.LookupSecretsManagerSecretByName(licenseKeySecret),
     kubernetesSecret: {
         secretName: 'my-addon-license-secret',
         data: [
@@ -180,7 +180,7 @@ Here is an example of a secret volume and volume mount passed as values to a Hel
         });
 ```
 
-After secret provider class is mounted to any pod, you will see that a Kubernetes secret (for example `my-addon-license-secret`) is also created in the target namespace. See the supplied [code example](#example-extension) for more details.
+After the secret volume is mounted (on any pod), you will see that a Kubernetes secret (for example `my-addon-license-secret`) is also created in the target namespace. See the supplied [code example](#example-extension) for more details.
 
 ## Private Extensions
 
