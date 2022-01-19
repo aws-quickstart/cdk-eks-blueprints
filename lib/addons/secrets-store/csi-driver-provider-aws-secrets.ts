@@ -118,6 +118,7 @@ export class SecretProviderClass {
     constructor(private clusterInfo: ClusterInfo, private serviceAccount: ServiceAccount, private secretProviderClassName: string, ...csiSecrets: CsiSecretProps[]) {
         this.parameterObjects = [];
         this.kubernetesSecrets = [];
+        this.csiSecrets = csiSecrets;
         this.secretProviderClassPromise = this.setupSecrets();
     }
 
