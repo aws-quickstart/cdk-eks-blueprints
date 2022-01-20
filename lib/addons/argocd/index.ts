@@ -8,6 +8,8 @@ import { btoa, getSecretValue } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { sshRepoRef, userNameRepoRef } from './manifest-utils';
+import { SecretProviderClass } from '..';
+import cluster from 'cluster';
 
 
 /**
@@ -102,15 +104,16 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        const bootstrapRepo = await this.createSecretKey(clusterInfo, namespace);
+        if(this.options.bootstrapRepo?.credentialsSecretName) {
+            
+            const secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-app-bootsrap-secret');
+        }
+        //const bootstrapRepo = await this.createSecretKey(clusterInfo, namespace);
 
         const defaultValues = {
             server: {
                 serviceAccount: {
                     create: false
-                },
-                config: {
-                    repositories: bootstrapRepo
                 }
             }
         };
