@@ -1,5 +1,6 @@
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
+import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
@@ -76,7 +77,7 @@ export class NginxAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @dependable('AwsLoadBalancerControllerAddOn')
+    @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const props = this.options;

@@ -14,3 +14,5 @@ export * from './cluster-providers';
 export * from './spi';
 
 export * from './resource-providers';
+
+export * as utils from './utils';

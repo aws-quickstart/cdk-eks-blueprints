@@ -108,6 +108,81 @@ export class MyProductAddOn extends HelmAddOn {
     }
 ```
 
+## Passing Secrets to Add-ons
+
+Secrets from the AWS Secrets Manager or AWS Systems Manager Parameter Store can be made available as files mounted in Amazon EKS pods. It can be achieved with the help of AWS Secrets and Configuration Provider (ASCP) for the [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/). The ASCP works with Amazon Elastic Kubernetes Service (Amazon EKS) 1.17+. More information on general concepts for leveraging ASCP can be found [here](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html).
+
+SSP Framework provides support for both Secrets Store CSI Driver as well as ASCP with the [Secrets Store Add-on](addons/secrets-store.md).
+
+Add-ons requiring support for secrets can declare dependency on the secret store add-on:
+
+```typescript
+export class MyAddOn extends ssp.addons.HelmAddOn {
+...
+    // Declares dependency on secret store add-on if secrets are needed. 
+    // Customers will have to explicitly add this add-on to the blueprint.
+    @ssp.utils.dependable(ssp.SecretsStoreAddOn.name) 
+    deploy(clusterInfo: ssp.ClusterInfo): Promise<Construct> {
+        ...
+    }
+
+```
+
+In order to propagate the secret from the Secrets Manager to the Kubernetes cluster, the add-on should create a `SecretProviderClass` Kubernetes object.  leveraging the `ssp.addons.SecretProviderClass`. The framework will take care of wiring the Kubernetes service account with the correct IAM permissions to pull the secret:
+
+```typescript
+
+const sa = clusterInfo.cluster.addServiceAccount(...);
+
+const csiSecret: ssp.addons.CsiSecretProps = {
+    secretProvider: new ssp.LookupSecretsManagerSecretByName(licenseKeySecret), // the secret must be defined upfront and available in the region with the name specified in the licenseKeySecret
+    kubernetesSecret: {
+        secretName: 'my-addon-license-secret',
+        data: [
+            {
+                key: 'licenseKey'
+            }
+        ]
+    }
+};
+
+const secretProviderClass = new ssp.addons.SecretProviderClass(clusterInfo, sa, "my-addon-license-secret-class", csiSecret);
+```
+**Note:** you can also leverage `LookupSecretsManagerSecretByArn`, `LookupSsmSecretByAttrs` or a custom implementation of the secret provider interface `ssp.addons.SecretProvider`. 
+
+After the secret provider class is created, it should be mounted on any pod in the namespace to make the secret accessible. Mounting the secret volume also creates a regular Kubernetes `Secret` object based on the supplied description (`my-addon-license-secret`). This capability is controlled by the configuration of the SSP Secret Store add-on and is enabled by default.
+
+Many Helm charts provide options to mount additional volumes and mounts to the provisioned product. For example, a Helm chart (ArgoCD, FluentBit) allows specifying `volumes` and `volumeMounts` as the helm chart values. Mounting the secret in such cases is simple and does not require an additional pod for secrets. 
+
+Here is an example of a secret volume and volume mount passed as values to a Helm chart:
+
+```typescript
+const chart = this.addHelmChart(clusterInfo, {
+    ... // standard values
+    ,
+    volumes: [
+        {
+            name: "secrets-store-inline",
+            csi: {
+                driver: "secrets-store.csi.k8s.io",
+                readOnly: true,
+                volumeAttributes: {
+                    secretProviderClass: "my-addon-license-secret-class"
+        }
+            }
+        }
+    ],
+    volumeMounts: [
+        {
+            name: "secrets-store-inline",
+            mountPath: "/mnt/secret-store"
+        }
+    ]
+});
+```
+
+After the secret volume is mounted (on any pod), you will see that a Kubernetes secret (for example `my-addon-license-secret`) is also created in the target namespace. See the supplied [code example](#example-extension) for more details.
+
 ## Private Extensions
 
 Extensions specific to a customer instance of SSPs can be implemented inline with the blueprint in the same codebase. Such extensions are scoped to the customer base and cannot be reused. 
@@ -159,7 +234,8 @@ Partner extensions (APN Partner) are expected to comply with the public extensio
 3. Example blueprint (can be found in ./bin/main.ts) that references the add-on.
 4. Example of configuring a Kubernetes service account with IRSA (IAM roles for service accounts) and required IAM policies. 
 5. Example of the helm chart provisioning. 
-6. Outlines support to build, package and publish the add-on in an NPM repository. 
+6. Example of passing secret values to the add-on (such as credentials and/or licenseKeys) by leveraging CSI Secret Store Driver.
+7. Outlines support to build, package and publish the add-on in an NPM repository. 
 
 
 
