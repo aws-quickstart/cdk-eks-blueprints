@@ -1,15 +1,16 @@
 import bcrypt = require('bcrypt');
-import { HelmChart, KubernetesManifest, ServiceAccount } from "@aws-cdk/aws-eks";
+import { SecretProviderClass } from '..';
+import { SecretsStoreAddOn } from '../secrets-store';
+import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
 import merge from "ts-deepmerge";
 import * as spi from "../../spi";
-import { btoa, getSecretValue } from '../../utils';
+import { createNamespace, dependable, getSecretValue, setPath } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
-import { sshRepoRef, userNameRepoRef } from './manifest-utils';
-import { SecretProviderClass } from '..';
-import cluster from 'cluster';
+import { createSecretRef } from './manifest-utils';
+
 
 
 /**
@@ -51,9 +52,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
      */
-    values?: {
-        [key: string]: any;
-    };
+    values?: spi.Values;
 }
 
 /**
@@ -83,6 +82,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
         const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
+        
         if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
@@ -98,38 +98,34 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     /**
      * Implementation of the add-on contract deploy method.
     */
+    @dependable(SecretsStoreAddOn.name)
     async deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
-        const namespace = this.createNamespace(clusterInfo);
+        const namespace = createNamespace(this.options.namespace!, clusterInfo.cluster, true);
 
         const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        if(this.options.bootstrapRepo?.credentialsSecretName) {
-            
-            const secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-app-bootsrap-secret');
-        }
-        //const bootstrapRepo = await this.createSecretKey(clusterInfo, namespace);
+        let secretProviderClass: SecretProviderClass | undefined;
 
-        const defaultValues = {
-            server: {
-                serviceAccount: {
-                    create: false
-                }
-            }
-        };
+        if (this.options.bootstrapRepo?.credentialsSecretName) {
+            const repo = this.options.bootstrapRepo;
+            const secretProps = createSecretRef(repo.credentialsType!, repo.credentialsSecretName!);
+            secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-app-bootsrap-secret', secretProps);
+        }
+
+        const defaultValues: spi.Values = {};
+        setPath(defaultValues, "server.serviceAccount.create", false);
+
+        if (this.options.bootstrapRepo) {
+            const repo = this.options.bootstrapRepo!;
+            setPath(defaultValues, "configs.repositories.bootstrap", { url: repo.repoUrl });
+        }
 
         let values = merge(defaultValues, this.options.values ?? {});
 
         if (this.options.adminPasswordSecretName) {
             const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
-            values = merge(
-                {
-                    configs: {
-                        secret: {
-                            argocdServerAdminPassword: adminSecret
-                        }
-                    }
-                }, values);
+            setPath(values, "configs.secret.argocdServerAdminPassword", adminSecret);
         }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -142,6 +138,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         });
 
         this.chartNode.node.addDependency(sa);
+
+        if (secretProviderClass) {
+            secretProviderClass.addDependent(this.chartNode);
+        }
+
         return this.chartNode;
     }
 
@@ -172,87 +173,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     protected async createAdminSecret(region: string): Promise<string> {
         const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
         return bcrypt.hash(secretValue, 10);
-    }
-
-    /**
-     * Creates namespace, which is a prerequisite for service account creation and subsequent chart execution.
-     * @param clusterInfo 
-     * @returns 
-    */
-    protected createNamespace(clusterInfo: spi.ClusterInfo): KubernetesManifest {
-        return new KubernetesManifest(clusterInfo.cluster.stack, "argo-namespace-struct", {
-            cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: 'v1',
-                kind: 'Namespace',
-                metadata: {
-                    name: this.options.namespace,
-                }
-            }],
-            overwrite: true,
-            prune: true
-        });
-    }
-
-    /**
-     * Creates a secret key 
-     * @param clusterInfo 
-     * @param secretName 
-     * @param dependency dependency for the created secret to control order of execution 
-     * @returns reference to the secret to add to the ArgoCD config map
-     */
-    protected async createSecretKey(clusterInfo: spi.ClusterInfo, dependency: KubernetesManifest): Promise<string> {
-
-        const secretName = this.options.bootstrapRepo?.credentialsSecretName;
-        if (!secretName) {
-            return "";
-        }
-
-        const appRepo = this.options.bootstrapRepo!;
-        let credentials = { url: btoa(appRepo.repoUrl) };
-
-        const secretValue = await getSecretValue(secretName, clusterInfo.cluster.stack.region);
-
-        let result = "";
-
-        switch (appRepo?.credentialsType) {
-            case "SSH":
-                credentials = { ...credentials, ...{ sshPrivateKey: btoa(secretValue) } };
-                result = sshRepoRef(appRepo.repoUrl, secretName);
-                break;
-            case "USERNAME":
-            case "TOKEN":
-                // eslint-disable-next-line no-case-declarations
-                const secretJson: any = JSON.parse(secretValue);
-                credentials = {
-                    ...credentials, ...{
-                        username: btoa(secretJson["username"]),
-                        password: btoa(secretJson["password"])
-                    }
-                };
-                result = userNameRepoRef(appRepo.repoUrl, secretName);
-                break;
-        }
-
-        const manifest = new KubernetesManifest(clusterInfo.cluster.stack, "argo-bootstrap-secret", {
-            cluster: clusterInfo.cluster,
-            manifest: [{
-                apiVersion: "v1",
-                kind: "Secret",
-                metadata: {
-                    name: secretName,
-                    namespace: this.options.namespace,
-                    labels: {
-                        "argocd.argoproj.io/secret-type": "repo-creds"
-                    }
-                },
-                data: credentials,
-            }],
-            overwrite: true,
-        });
-
-        manifest.node.addDependency(dependency);
-        return result;
     }
 
     /**
