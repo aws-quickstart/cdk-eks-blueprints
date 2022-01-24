@@ -24,6 +24,7 @@ The framework currently supports the following add-ons.
 | [`ExternalDnsAddOn`](./external-dns) | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53
 | [`MetricsServerAddOn`](./metrics-server) | Adds metrics server (pre-req for HPA and other monitoring tools)|
 | [`NginxAddOn`](./nginx.md) | Adds NGINX ingress controller |
+| [`RezilionAddon`](./rezilion.md) | Adds Rezilion Validate instrumentation to cluster |
 | [`SecretsStoreAddOn`](./secrets-store.md) |  Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster |
 | [`SSMAgentAddOn`](./ssm-agent.md) | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes |
 | [`VpcCniAddOn`](./vpc-cni.md) | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS |
