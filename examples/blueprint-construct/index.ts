@@ -45,17 +45,17 @@ export default class BlueprintConstruct extends cdk.Construct {
             //      path: 'envs/dev',
             //      targetRevision: "deployable"
             // },
-            // adminPasswordSecretName: "argo-admin-secret"
+            adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
-            prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
+            prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}

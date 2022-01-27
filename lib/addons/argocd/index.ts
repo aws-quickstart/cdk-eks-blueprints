@@ -1,14 +1,15 @@
-import { SecretProviderClass } from '..';
-import { SecretsStoreAddOn } from '../secrets-store';
 import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
+import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
+import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { createNamespace, dependable, setPath } from '../../utils';
+import { createNamespace, dependable } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
+import { SecretsStoreAddOn } from '../secrets-store';
 import { ArgoApplication } from './application';
-import { createSecretRef, createAdminSecretRef } from './manifest-utils';
+import { createAdminSecretRef, createSecretRef } from './manifest-utils';
 
 
 /**
@@ -104,7 +105,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         sa.node.addDependency(namespace);
 
         const defaultValues: spi.Values = {};
-        setPath(defaultValues, "server.serviceAccount.create", false);
+        dot.set("server.serviceAccount.create", false, defaultValues);
 
 
         const secrets = [];
@@ -115,19 +116,19 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         }
         if (this.options.adminPasswordSecretName) {
             secrets.push(createAdminSecretRef(this.options.adminPasswordSecretName!));
-            setPath(defaultValues, "configs.secret.createSecret", false);
+            dot.set("configs.secret.createSecret", false, defaultValues);
         }
 
         let secretProviderClass: SecretProviderClass | undefined;
 
         if (secrets.length > 0) {
             secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-secret', ...secrets);
-            merge(defaultValues, secretProviderClass.getVolumeMounts('ssp-secret-inline'));
+            dot.set('server', secretProviderClass.getVolumeMounts('ssp-secret-inline'), defaultValues, true);
         }
 
         if (this.options.bootstrapRepo) {
             const repo = this.options.bootstrapRepo!;
-            setPath(defaultValues, "configs.repositories.bootstrap", { url: repo.repoUrl });
+            dot.set("configs.repositories.bootstrap", { url: repo.repoUrl }, defaultValues, true);
         }
 
         let values = merge(defaultValues, this.options.values ?? {});
