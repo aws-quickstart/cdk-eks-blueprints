@@ -3,7 +3,7 @@ import { ISecret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter } from '@aws-cdk/aws-ssm';
 import { CfnOutput, Construct } from '@aws-cdk/core';
 import { SecretsStoreAddOn } from '../..';
-import { ClusterInfo } from '../../spi';
+import { ClusterInfo, Values } from '../../spi';
 import { SecretProvider } from './secret-provider';
 
 /**
@@ -14,13 +14,13 @@ export interface CsiSecretProps {
      * Implementation of the secret provider that returns a reference to an Secrets Manager entry or SSP Parameter.
      */
     secretProvider: SecretProvider;
-    
+
     /**
      * For secrets containing JSON structure, an optional JMES Path (https://jmespath.org/) object to decompose individual keys as separate 
      * secret object data. 
      */
     jmesPath?: JmesPathObject[];
-    
+
     /**
      * Kubernetes secret for cases when CSI secret should create a standard Kubernetes Secret object.
      */
@@ -101,7 +101,7 @@ function createParameterObject(csiSecret: CsiSecretProps, secretName: string, se
         objectName: secretName,
         objectType: secretType,
     };
-    if(csiSecret.jmesPath) {
+    if (csiSecret.jmesPath) {
         result.jmesPath = csiSecret.jmesPath;
     }
     return result;
@@ -123,9 +123,35 @@ export class SecretProviderClass {
     }
 
     public addDependent(...constructs: Construct[]) {
-        this.secretProviderClassPromise.then( secretProviderClass => {
-            constructs.forEach( dependent => secretProviderClass.node.addDependency(dependent));
+        this.secretProviderClassPromise.then(secretProviderClass => {
+            constructs.forEach(dependent => secretProviderClass.node.addDependency(dependent));
         });
+    }
+
+    /**
+     * Optionally returns volume mounts for a pod or helm chart that supports volume mounts.
+     */
+    public getVolumeMounts(volumeName: string, mountPath? : string): Values {
+        return {
+            "volumes": [
+                {
+                    name: volumeName,
+                    csi: {
+                        driver: "secrets-store.csi.k8s.io",
+                        readOnly: true,
+                        volumeAttributes: {
+                            secretProviderClass: this.secretProviderClassName
+                        }
+                    }
+                }
+            ],
+            "volumeMounts": [
+                {
+                    name: volumeName,
+                    mountPath: mountPath ?? "/mnt/secret-store"
+                }
+            ]
+        };
     }
 
     /**
@@ -160,14 +186,14 @@ export class SecretProviderClass {
             if (Object.hasOwnProperty.call(secret, 'secretArn')) {
                 const secretManagerSecret = secret as ISecret;
                 secretName = secretManagerSecret.secretName;
-                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SECRETSMANAGER); 
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SECRETSMANAGER);
                 this.parameterObjects.push(parameterObject);
                 secretManagerSecret.grantRead(this.serviceAccount);
             }
             else {
                 const ssmSecret = secret as IStringParameter;
                 secretName = ssmSecret.parameterName;
-                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SSMPARAMETER); 
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SSMPARAMETER);
                 this.parameterObjects.push(parameterObject);
                 ssmSecret.grantRead(this.serviceAccount);
             }

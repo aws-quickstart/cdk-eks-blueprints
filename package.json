@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/ssp-amazon-eks",
-    "version": "0.12.7",
+    "version": "0.12.8",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -47,7 +47,6 @@
         "@aws-cdk/pipelines": "1.135.0",
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "2.1046.0",
-        "bcrypt": "^5.0.1",
         "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",

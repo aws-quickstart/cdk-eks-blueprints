@@ -1,4 +1,3 @@
-import bcrypt = require('bcrypt');
 import { SecretProviderClass } from '..';
 import { SecretsStoreAddOn } from '../secrets-store';
 import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
@@ -6,11 +5,10 @@ import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
 import merge from "ts-deepmerge";
 import * as spi from "../../spi";
-import { createNamespace, dependable, getSecretValue, setPath } from '../../utils';
+import { createNamespace, dependable, setPath } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
-import { createSecretRef } from './manifest-utils';
-
+import { createSecretRef, createAdminSecretRef } from './manifest-utils';
 
 
 /**
@@ -82,7 +80,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
         const promise = clusterInfo.getScheduledAddOn('ArgoCDAddOn');
-        
+
         if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
@@ -105,16 +103,27 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const sa = this.createServiceAccount(clusterInfo);
         sa.node.addDependency(namespace);
 
-        let secretProviderClass: SecretProviderClass | undefined;
+        const defaultValues: spi.Values = {};
+        setPath(defaultValues, "server.serviceAccount.create", false);
+
+
+        const secrets = [];
 
         if (this.options.bootstrapRepo?.credentialsSecretName) {
             const repo = this.options.bootstrapRepo;
-            const secretProps = createSecretRef(repo.credentialsType!, repo.credentialsSecretName!);
-            secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-app-bootsrap-secret', secretProps);
+            secrets.push(createSecretRef(repo.credentialsType!, repo.credentialsSecretName!));
+        }
+        if (this.options.adminPasswordSecretName) {
+            secrets.push(createAdminSecretRef(this.options.adminPasswordSecretName!));
+            setPath(defaultValues, "configs.secret.createSecret", false);
         }
 
-        const defaultValues: spi.Values = {};
-        setPath(defaultValues, "server.serviceAccount.create", false);
+        let secretProviderClass: SecretProviderClass | undefined;
+
+        if (secrets.length > 0) {
+            secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-secret', ...secrets);
+            merge(defaultValues, secretProviderClass.getVolumeMounts('ssp-secret-inline'));
+        }
 
         if (this.options.bootstrapRepo) {
             const repo = this.options.bootstrapRepo!;
@@ -122,11 +131,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         }
 
         let values = merge(defaultValues, this.options.values ?? {});
-
-        if (this.options.adminPasswordSecretName) {
-            const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
-            setPath(values, "configs.secret.argocdServerAdminPassword", adminSecret);
-        }
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
             chart: this.options.chart!,
@@ -165,14 +169,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             });
         }
         this.chartNode = undefined;
-    }
-
-    /**
-     * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
-     */
-    protected async createAdminSecret(region: string): Promise<string> {
-        const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
-        return bcrypt.hash(secretValue, 10);
     }
 
     /**
