@@ -40,22 +40,24 @@ export default class BlueprintConstruct extends cdk.Construct {
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
-            // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
-            //      path: 'envs/dev',
-            //      targetRevision: "deployable"
-            // },
+            bootstrapRepo: {
+                 repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+                 path: 'envs/dev',
+                 targetRevision: "deployable",
+                 credentialsSecretName: 'github-ssh',
+                 credentialsType: 'SSH'
+            },
             // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
-            prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
+            prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}

@@ -32,9 +32,7 @@ export function createSshSecretRef(secretName: string): CsiSecretProps {
         jmesPath: [{ path: "url", objectAlias: "url" }, { path: "sshPrivateKey", objectAlias: "sshPrivateKey" }],
         kubernetesSecret: {
             secretName: secretName,
-            labels: new Map([
-                [ "argocd.argoproj.io/secret-type", "repo-creds" ]
-            ]),
+            labels: { "argocd.argoproj.io/secret-type": "repo-creds" }, 
             data: [
                 { key: "url", objectName: "url" },
                 { key: "sshPrivateKey", objectName: "sshPrivateKey" }

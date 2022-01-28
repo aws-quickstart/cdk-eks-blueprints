@@ -50,7 +50,7 @@ export interface KubernetesSecret {
     /**
      * Secret Labels
      */
-    labels?: Map<string, string>;
+    labels?: Values;
 
     /**
      * Kubernetes SecretObject Data
