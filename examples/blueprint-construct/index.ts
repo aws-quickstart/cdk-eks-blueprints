@@ -47,7 +47,7 @@ export default class BlueprintConstruct extends cdk.Construct {
                  credentialsSecretName: 'github-ssh',
                  credentialsType: 'SSH'
             },
-            // adminPasswordSecretName: "argo-admin-secret"
+            adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
