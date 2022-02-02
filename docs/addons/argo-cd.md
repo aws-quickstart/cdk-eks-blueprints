@@ -175,13 +175,33 @@ A convenience script to create the JSON structure for SSH private key can be fou
 
 **Admin Secret**
 
-1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password. 
+1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the bcrypt hash of the desired ArgoCD admin password. The hash can be obtained with this command (Mac/Linux):
+```bash
+ARGO_PWD=
+htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'
+```
+Where the plaintext password is set in the `ARGO_PWD` variable.
+
 2. Replicate the secret to all the desired regions.
 3. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
 
+Alternatively the admin password hash can be set bypassing the AWS Secret by setting the following structure in the values properties of the add-on parameters:
+
+```json
+{
+    "configs": {
+        "secret" :{
+            "argocdServerAdminPassword": <your bcrypt hash>
+        }
+    }
+}
+```
+
+For more information, please refer to the [ArgoCD official documentation](https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd).
 ## Known Issues
 
 1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up applications that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 
+
 2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
 
 
