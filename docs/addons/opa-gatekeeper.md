@@ -2,11 +2,11 @@
 
 The Open Policy Agent (OPA, pronounced “oh-pa”) is an open source, general-purpose policy engine that unifies policy enforcement across the stack. OPA provides a high-level declarative language that lets you specify policy as code and simple APIs to offload policy decision-making from your software. You can use OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, and more. OPA uses a policy language known as Rego which is a query language which was purpose built to support structured document models such as JSON. To learn more about Rego check out this [link](https://www.openpolicyagent.org/docs/latest/policy-language/).
 
-OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. Gatekeeper also provides audit functionality as well. The diagram below shows how Gatekeeper interacts with the Kube API Server.
+OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. The Kubernetes API Server is configured to query OPA for admission control decisions when objects (e.g., Pods, Services, etc.) are created, updated, or deleted. The API Server sends the entire Kubernetes object in the webhook request to OPA. OPA evaluates the policies it has loaded using the admission review as input. Gatekeeper also provides audit functionality as well. The diagram below shows the flow between a user making a request to the Kube-API server and how AdmissionReview and AdmissionRequests are made through OPA Gatekeeper. 
 
 ![opa](https://d33wubrfki0l68.cloudfront.net/a5ed0c27ff2dda6abb18b9bc960f2ad4120d937a/a5939/docs/latest/images/kubernetes-admission-flow.png))
 
-In the context of a Shared Services Platform running on Amazon EKS, platform teams and administrators need a way of being able to set policies to adhere to governance and security requirements for all workloads and teams working on the same cluster. Examples of standard use cases for using policies via OPA Gatekeeper are shown below:
+In the context of a Shared Services Platform running on Amazon EKS, platform teams and administrators need a way of being able to set policies to adhere to governance and security requirements for all workloads and teams working on the same cluster. Examples of standard use cases for using policies via OPA Gatekeeper are listed below:
 
 - Which users can access which resources.
 - Which subnets egress traffic is allowed to.
@@ -15,181 +15,87 @@ In the context of a Shared Services Platform running on Amazon EKS, platform tea
 - Which OS capabilities a container can execute with.
 - Which times of day the system can be accessed at.
 
-## How does Gatekeeper work with OPA and Kube-mgmt?
+RBAC (role-based access control) can help with some of the scenarios above but **roles are nothing but a group of permissions that you then assign to users leveraging rolebindings.** If for example, a user tries to perform an operation (get, list, watch, create, etc...) that particular user may do so if they have the appropriate role. **Please note that RBAC should be used in conjunction with OPA Gatekeeper policies to fully secure your cluster.**
 
-The Kubernetes API Server is configured to query OPA for admission control decisions when objects (e.g., Pods, Services, etc.) are created, updated, or deleted. The API Server sends the entire Kubernetes object in the webhook request to OPA. OPA evaluates the policies it has loaded using the admission review as input. The diagram below shows the flow between a user making a request to the Kube-API server and how AdmissionReview and AdmissionRequests are made through OPA Gatekeeper.
+## Key Terminology
 
-## Example Policies
-The following policy denies objects that include container images referring to illegal registries:
+- OPA Constraint Framework - Framework that enforces CRD-based policies and allow declaratively configured policies to be reliably shareable
+- Constraint -  A Constraint is a declaration that its author wants a system to meet a given set of requirements. Each Constraint is written with Rego, a declarative query language used by OPA to enumerate instances of data that violate the expected state of the system. All Constraints are evaluated as a logical AND. If one Constraint is not satisfied, then the whole request is rejected.
+- Enforcement Point - Places where constraints can be enforced. Examples are Git hooks, Kubernetes admission controllers, and audit systems.
+- Constraint Template - Templates that allows users to declare new constraints 
+- Target - Represents a coherent set of objects sharing a common identification and/or selection scheme, generic purpose, and can be analyzed in the same validation context
 
-```rego
-package kubernetes.admission
+## Usage
 
-deny[reason] {
-  some container
-  input_containers[container]
-  not startswith(container.image, "hooli.com/")
-  reason := "container image refers to illegal registry (must be hooli.com)"
-}
+```typescript
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
-input_containers[container] {
-  container := input.request.object.spec.containers[_]
-}
+const app = new cdk.App();
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
 
-input_containers[container] {
-  container := input.request.object.spec.template.spec.containers[_]
-}
-```
-When deny is evaluated with the input defined below the answer is:
-```json
-[
-  "container image refers to illegal registry (must be hooli.com)"
-]
+const blueprint = ssp.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns( new ssp.addons.OpaGatekeeperAddOn() )
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
-The input document contains the following fields:
-
-- input.request.kind specifies the type of the object (e.g., Pod, Service, etc.)
-- input.request.operation specifies the type of the operation, i.e., CREATE, UPDATE, DELETE, CONNECT.
-- input.request.userInfo specifies the identity of the caller.
-- input.request.object contains the entire Kubernetes object.
-- input.request.oldObject specifies the previous version of the Kubernetes object on UPDATE and DELETE.
-
-The policies you give to OPA ultimately generate an admission review response that is sent back to the API Server. Gatekeeper 
-
-
-### What are Pod Security Policies (PSP's)?
-Pod Security Policies (PSP's) is a common use case you will see being defined by Gatekeeper within a Kubernetes cluster. A Pod Security Policy (PSP) is a cluster-level resource for managing security aspects of a pod specification. PSP's allow you to control things like the ability to run privileged containers or the ability to control access to host filesystems. The example below shows a policy that is assigned to all authenticated users in a cluster which limits volume types, denies running as root/escalating to root, requires a security profile, and a few other aspects.
-
-```yaml
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: restricted
-  annotations:
-    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
-    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
-    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
-    apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
-spec:
-  privileged: false
-  # Required to prevent escalations to root.
-  allowPrivilegeEscalation: false
-  # This is redundant with non-root + disallow privilege escalation,
-  # but we can provide it for defense in depth.
-  requiredDropCapabilities:
-    - ALL
-  # Allow core volume types.
-  volumes:
-    - 'configMap'
-    - 'emptyDir'
-    - 'projected'
-    - 'secret'
-    - 'downwardAPI'
-    # Assume that persistentVolumes set up by the cluster admin are safe to use.
-    - 'persistentVolumeClaim'
-  hostNetwork: false
-  hostIPC: false
-  hostPID: false
-  runAsUser:
-    # Require the container to run without root privileges.
-    rule: 'MustRunAsNonRoot'
-  seLinux:
-    # This policy assumes the nodes are using AppArmor rather than SELinux.
-    rule: 'RunAsAny'
-  supplementalGroups:
-    rule: 'MustRunAs'
-    ranges:
-      # Forbid adding the root group.
-      - min: 1
-        max: 65535
-  fsGroup:
-    rule: 'MustRunAs'
-    ranges:
-      # Forbid adding the root group.
-      - min: 1
-        max: 65535
-  readOnlyRootFilesystem: false
-```
-
-
-**Note: PSP's will be deprecated as of Kubernetes version 1.21 so please keep that in mind while you are evaluating this add on. To learn more please follow this [link](https://kubernetes.io/blog/2021/04/06/podsecuritypolicy-deprecation-past-present-and-future/)**
-
-## Getting Started with OPA Gatekeeper
-
-For the purposes of operating within a Shared Services Platform, we will be focusing on how to use a policy driven approach to secure our cluster using OPA Gatekeeper. You will see a directory with a set of example policies you can use to get started which can be found [here](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/general). In this example we will create a policy that limits what repositories containers can be pulled from. The policy that we will be using can be found [here](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/general/allowedrepos). 
-
-The policy should look like the following: 
-
-```yaml
-apiVersion: templates.gatekeeper.sh/v1beta1
-kind: ConstraintTemplate
-metadata:
-  name: k8sallowedrepos
-  annotations:
-    description: Requires container images to begin with a repo string from a specified
-      list.
-spec:
-  crd:
-    spec:
-      names:
-        kind: K8sAllowedRepos
-      validation:
-        # Schema for the `parameters` field
-        openAPIV3Schema:
-          type: object
-          properties:
-            repos:
-              type: array
-              items:
-                type: string
-  targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8sallowedrepos
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
-          not any(satisfied)
-          msg := sprintf("container <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
-        }
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.initContainers[_]
-          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
-          not any(satisfied)
-          msg := sprintf("container <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
-        }
-```
-
-All the Gatekeeper policy examples can be found under the examples directory in the SSP repository. If you go into the examples directory and go into the gatekeeper-library folder, we can apply this to our cluster by running the 
-```bash
-kubectl apply -f /examples/gatekeeper-library/library/general/allowedrepos/samples/repo-must-be-openpolicyagent command. If we run a 
+To validate that OPA Gatekeeper is running within your cluster run the following command:
 
 ```bash
-kubectl get pods
-``` 
+k get po -n gatekeeper-system
+```
 
-we should see the following output:
+You should see the following output:
 
 ```bash
-NAME                  READY   STATUS    RESTARTS   AGE
-opa-allowed           1/1     Running   0          76s
+NAME                                             READY   STATUS    RESTARTS   AGE
+gatekeeper-audit-7c5998d4c-b5n7j                 1/1     Running   0          1d
+gatekeeper-controller-manager-5894545cc9-b86zm   1/1     Running   0          1d
+gatekeeper-controller-manager-5894545cc9-bntdt   1/1     Running   0          1d
+gatekeeper-controller-manager-5894545cc9-tb7fz   1/1     Running   0          1d
+```
+You will notice the `gatekeeper-audit-7c5998d4c-b5n7j` pod that is created when we deploy the `OpaGatekeeperAddOn`. The audit functionality enables periodic evaluations of replicated resources against the Constraints enforced in the cluster to detect pre-existing misconfigurations. Gatekeeper stores audit results as violations listed in the status field of the relevant Constraint. The `gatekeeper-controller-manager` is simply there to manage the `OpaGatekeeperAddOn`. 
+
+## Example with OPA Gatekeeper
+
+For the purposes of operating within a Shared Services Platform, we will be focusing on how to use a policy driven approach to secure our cluster using OPA Gatekeeper. The OPA Gatekeeper community has created a library of example policies and constraint templates which can be found [here](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/general). In this example we will create a policy that enforces including labels for newly created namespaces and pods. The ConstraintTemplate can be found [here](https://github.com/open-policy-agent/gatekeeper-library/blob/master/library/general/requiredlabels/template.yaml).
+
+Run the following command to create the ConstraintTemplate:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/template.yaml
 ```
 
-If we inspect the pods and look at the containers.spec section of the pod we see the following:
+To verify that the ConstraintTemplate was created run the following command:
 
-```yaml
-Containers:
-  opa:
-    Container ID:  docker://1b2da3c7d7c41becac49613ed7db863c7b1365137bbfe1b108220d4ffba188b3
-    Image:         openpolicyagent/opa:0.9.2
-    Image ID:      docker-pullable://openpolicyagent/opa@sha256:04ff8fce2afd1a3bc26260348e5b290e8d945b1fad4b4c16d22834c2f3a1814a
-    Port:          <none>
-    Host Port:     <none>
-    Args:
-      run
-      --server
-      --addr=localhost:8080
+```bash
+kubectl get constrainttemplate
 ```
 
-This is exactly what is defined in our example_allowed.yaml file so we know that our policy was deployed successfully using OPA Gatekeeper. For more information on OPA Gatekeeper policies, check out the GitHub repo which can be found [here](https://github.com/open-policy-agent/gatekeeper-library)
+You should see the following output:
+
+```bash
+NAME                AGE
+k8srequiredlabels   45s
+```
+
+You will notice that if you create a new namespace without any labels that the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
+
+```bash
+k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml           
+```
+
+If we then try and create a namespace by running `kubectl create ns test` (notice that we are not adding any labels) you will get the following error message:
+
+```bash
+Error from server ([all-must-have-owner] All namespaces must have an `owner` label that points to your company username): admission webhook "validation.gatekeeper.sh" denied the request: [all-must-have-owner] All namespaces must have an `owner` label that points to your company username
+```
+
+For more information on OPA Gatekeeper please refer to the links below:
+
+- https://github.com/open-policy-agent
+- https://open-policy-agent.github.io/gatekeeper/website/docs/
+- https://github.com/open-policy-agent/gatekeeper-library 
