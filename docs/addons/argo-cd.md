@@ -125,7 +125,31 @@ The framework provides support to supply repository and administrator secrets in
 **SSH Key Authentication**
 
 1. Set `credentialsType` to `SSH` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
-2. Define the secret in AWS Secret Manager as "Plain Text" that contains the private SSH key and (**important**) replicate it to all the desired regions. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) on details on setting up SSH access.
+2. Define the secret in AWS Secret Manager as "Plain Text" that contains a json structure (for ArgoCD 2.x) with the fields `sshPrivateKey` and `url` defined. Note, that JSON does not allow line breaks characters, so all new line characters must be escaped with `\n`.
+
+Example Structure:
+```json
+{
+ "sshPrivateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rtdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn\nNhAAAAAwEAAQAAAgEAy82zTTDStK+s0dnaYzE7vLSAcwsiHM8gN\nhq2p5TfcjCcYUWetyu6e/xx5Rh+AwbVvDV5h9QyMw4NJobwuj5PBnhkc3QfwJAO5wOnl7R\nGbehIleWWZLs9qq`DufD8+ViQsa0fDwP6JCrqD14aIozg6sJ0Oqi7vQkV+jR0ht/\nuFO1ANXBn2ih0ZpXeHSbPDLeZQjlOBrbGytnCbdvLtfGEsV0WO2oIieWVXJj/zzpKuMmrr\nebPsfwr36nLprOQV6IhDDo\n-----END OPENSSH PRIVATE KEY-----\n",
+    "url": "git@github"`
+}
+```
+Note explicit `\n` characters in the `sshPrivateKey`.
+
+**url** attribute is required and must specify full or partial URL for credentials template. For example `git@github` will set the credentials for all GitHub repositories when SSH authentication is used.  For more information see [Repository Credentials](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials) and [SSH Repositories](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#ssh-repositories) from officiall ArgoCD documentation.
+
+To escape your SSH private key for storing it as a secret you can use the following command on Mac/Linux:
+
+```bash
+awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}'  <path-to-your-cert>
+```
+
+A convenience script to create the JSON structure for SSH private key can be found [here](https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/scripts/create-argocd-ssh-secret.sh). You will need to set the `PEM_FILE`(full path to the ssh private key file) and `URL_TEMPLATE` (part of the URL for credentials template) variables inside the script.
+
+3. (**important**) Replicate it to all the desired regions. 
+4. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) oou n details on setting up SSH access.
+
+
 
 **Username Password and Token Authentication** 
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
