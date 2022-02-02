@@ -158,7 +158,14 @@ A convenience script to create the JSON structure for SSH private key can be fou
 
 **Admin Secret**
 
-1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password. 
+1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password bcrypt hash.
+
+To get a bcrypt hash of the admin password you can use this command (Mac/Linux):
+```bash
+ARGO_PWD=<set in plain text>
+`htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+```
+
 2. Replicate the secret to all the desired regions.
 3. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
 
