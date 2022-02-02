@@ -122,9 +122,25 @@ The application promotion process in the above example is handled entirely throu
 
 The framework provides support to supply repository and administrator secrets in AWS Secrets Manager. This support is evolving and will be improved over time as ArgoCD itself matures. 
 
+### Private Repositories
+
 **SSH Key Authentication**
 
-1. Set `credentialsType` to `SSH` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
+1. Set `credentialsType` to `SSH` when defining bootstrap repository in the ArgoCD add-on configuration.
+
+```typescript
+.addOns(new ssp.addons.ArgoCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'git@github.com:aws-samples/ssp-eks-workloads.git',
+        path: 'envs/dev',
+        credentialsSecretName: 'github-ssh-json',
+        credentialsType: 'SSH'
+    }
+}))
+```
+
+*Note:* In this case the configuration assumes that there is a secret `github-ssh-json` define in the target account and all the regions where the blueprint will be deployed. 
+
 2. Define the secret in AWS Secret Manager as "Plain Text" that contains the private SSH key and (**important**) replicate it to all the desired regions. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) on details on setting up SSH access.
 
 **Username Password and Token Authentication** 
