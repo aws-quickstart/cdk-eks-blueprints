@@ -122,21 +122,38 @@ The application promotion process in the above example is handled entirely throu
 
 The framework provides support to supply repository and administrator secrets in AWS Secrets Manager. This support is evolving and will be improved over time as ArgoCD itself matures. 
 
+### Private Repositories
+
 **SSH Key Authentication**
 
-1. Set `credentialsType` to `SSH` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
-2. Define the secret in AWS Secret Manager as "Plain Text" that contains a json structure (for ArgoCD 2.x) with the fields `sshPrivateKey` and `url` defined. Note, that JSON does not allow line breaks characters, so all new line characters must be escaped with `\n`.
+1. Set `credentialsType` to `SSH` when defining bootstrap repository in the ArgoCD add-on configuration.
+
+```typescript
+.addOns(new ssp.addons.ArgoCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'git@github.com:aws-samples/ssp-eks-workloads.git',
+        path: 'envs/dev',
+        credentialsSecretName: 'github-ssh-json',
+        credentialsType: 'SSH'
+    }
+}))
+```
+
+*Note:* In this case the configuration assumes that there is a secret `github-ssh-json` define in the target account and all the regions where the blueprint will be deployed. 
+
+2. Define the secret in AWS Secret Manager as "Plain Text" that contains a JSON structure (as of ArgoCD 2.x) with the fields `sshPrivateKey` and `url` defined. Note, that JSON does not allow line break characters, so all new line characters must be escaped with `\n`.
 
 Example Structure:
 ```json
 {
- "sshPrivateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rtdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn\nNhAAAAAwEAAQAAAgEAy82zTTDStK+s0dnaYzE7vLSAcwsiHM8gN\nhq2p5TfcjCcYUWetyu6e/xx5Rh+AwbVvDV5h9QyMw4NJobwuj5PBnhkc3QfwJAO5wOnl7R\nGbehIleWWZLs9qq`DufD8+ViQsa0fDwP6JCrqD14aIozg6sJ0Oqi7vQkV+jR0ht/\nuFO1ANXBn2ih0ZpXeHSbPDLeZQjlOBrbGytnCbdvLtfGEsV0WO2oIieWVXJj/zzpKuMmrr\nebPsfwr36nLprOQV6IhDDo\n-----END OPENSSH PRIVATE KEY-----\n",
+    "sshPrivateKey": "-----BEGIN THIS IS NOT A REAL PRIVATE KEY-----\nb3BlbnNzaC1rtdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn\nNhAAAAAwEAAQAAAgEAy82zTTDStK+s0dnaYzE7vLSAcwsiHM8gN\nhq2p5TfcjCcYUWetyu6e/xx5Rh+AwbVvDV5h9QyMw4NJobwuj5PBnhkc3QfwJAO5wOnl7R\nGbehIleWWZLs9qq`DufViQsa0fDwP6JCrqD14aIozg6sJ0Oqi7vQkV+jR0ht/\nuFO1ANXBn2ih0ZpXeHSbPDLeZQjlOBrbGytnCbdvLtfGEsV0WO2oIieWVXJj/zzpKuMmrr\nebPsfwr36nLprOQV6IhDDo\n-----END NOT A REAL PRIVATE KEY-----\n",
+
     "url": "git@github"`
 }
 ```
 Note explicit `\n` characters in the `sshPrivateKey`.
 
-**url** attribute is required and must specify full or partial URL for credentials template. For example `git@github` will set the credentials for all GitHub repositories when SSH authentication is used.  For more information see [Repository Credentials](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials) and [SSH Repositories](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#ssh-repositories) from officiall ArgoCD documentation.
+**url** attribute is required and must specify full or partial URL for credentials template. For example `git@github` will set the credentials for all GitHub repositories when SSH authentication is used.  For more information see [Repository Credentials](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials) and [SSH Repositories](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#ssh-repositories) from official ArgoCD documentation.
 
 To escape your SSH private key for storing it as a secret you can use the following command on Mac/Linux:
 
@@ -146,32 +163,45 @@ awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}'  <path-to-your-cert>
 
 A convenience script to create the JSON structure for SSH private key can be found [here](https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/scripts/create-argocd-ssh-secret.sh). You will need to set the `PEM_FILE`(full path to the ssh private key file) and `URL_TEMPLATE` (part of the URL for credentials template) variables inside the script.
 
-3. (**important**) Replicate it to all the desired regions. 
+3. (**important**) Replicate the secret to all the desired regions. 
 4. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) oou n details on setting up SSH access.
 
 
-
 **Username Password and Token Authentication** 
+
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
 2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
 3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/ssp-eks-workloads.git.
 
 **Admin Secret**
 
-1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password bcrypt hash.
-
-To get a bcrypt hash of the admin password you can use this command (Mac/Linux):
+1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the bcrypt hash of the desired ArgoCD admin password. The hash can be obtained with this command (Mac/Linux):
 ```bash
 ARGO_PWD=<set in plain text>
-`htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'
+```
+Where the plaintext password is set in the `ARGO_PWD` variable.
+
+1. Replicate the secret to all the desired regions.
+2. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
+
+Alternatively the admin password hash can be set bypassing the AWS Secret by setting the following structure in the values properties of the add-on parameters:
+
+```json
+{
+    "configs": {
+        "secret" :{
+            "argocdServerAdminPassword": <your bcrypt hash>
+        }
+    }
+}
 ```
 
-2. Replicate the secret to all the desired regions.
-3. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
-
+For more information, please refer to the [ArgoCD official documentation](https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd).
 ## Known Issues
 
 1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up applications that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 
+
 2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
 
 

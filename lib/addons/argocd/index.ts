@@ -107,7 +107,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const defaultValues: spi.Values = {};
         dot.set("server.serviceAccount.create", false, defaultValues);
 
-
         const secrets = [];
 
         if (this.options.bootstrapRepo?.credentialsSecretName) {
