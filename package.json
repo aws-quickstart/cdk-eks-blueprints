@@ -22,7 +22,7 @@
         "aws-cdk": "1.135.0",
         "copyfiles": "^2.4.1",
         "eslint": "^8.4.1",
-        "jest": "^27.4.5",
+        "jest": "^27.4.7",
         "ts-jest": "^27.1.1",
         "ts-node": "^10.4.0",
         "typescript": "~4.5.4"
@@ -45,6 +45,7 @@
         "@aws-cdk/aws-secretsmanager": "1.135.0",
         "@aws-cdk/core": "1.135.0",
         "@aws-cdk/pipelines": "1.135.0",
+        "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "2.1046.0",
         "dot-object": "^2.1.4",

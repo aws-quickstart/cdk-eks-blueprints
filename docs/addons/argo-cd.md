@@ -151,7 +151,7 @@ Example Structure:
     "url": "git@github"`
 }
 ```
-Note explicit `\n` characters in the `sshPrivateKey`.
+**Note:**  You can notice explicit `\n` characters in the `sshPrivateKey`.
 
 **url** attribute is required and must specify full or partial URL for credentials template. For example `git@github` will set the credentials for all GitHub repositories when SSH authentication is used.  For more information see [Repository Credentials](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials) and [SSH Repositories](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#ssh-repositories) from official ArgoCD documentation.
 

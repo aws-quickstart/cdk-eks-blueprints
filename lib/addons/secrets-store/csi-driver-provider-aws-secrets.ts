@@ -2,6 +2,7 @@ import { ServiceAccount } from '@aws-cdk/aws-eks';
 import { ISecret } from '@aws-cdk/aws-secretsmanager';
 import { IStringParameter } from '@aws-cdk/aws-ssm';
 import { CfnOutput, Construct } from '@aws-cdk/core';
+import * as assert from "assert";
 import { SecretsStoreAddOn } from '../..';
 import { ClusterInfo, Values } from '../../spi';
 import { SecretProvider } from './secret-provider';
@@ -160,7 +161,7 @@ export class SecretProviderClass {
      */
     protected setupSecrets(): Promise<Construct> {
         const secretsDriverPromise = this.clusterInfo.getScheduledAddOn(SecretsStoreAddOn.name);
-        console.assert(secretsDriverPromise != null, 'SecretsStoreAddOn is required to setup secrets but is not provided in the add-ons.');
+        assert(secretsDriverPromise != null, 'SecretsStoreAddOn is required to setup secrets but is not provided in the add-ons.');
 
         this.addPolicyToServiceAccount();
 

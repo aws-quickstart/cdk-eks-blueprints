@@ -1,13 +1,12 @@
+import * as assert from "assert";
 import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
-import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { Construct } from "@aws-cdk/core";
 import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { createNamespace, dependable } from '../../utils';
+import { createNamespace } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
-import { SecretsStoreAddOn } from '../secrets-store';
 import { ArgoApplication } from './application';
 import { createAdminSecretRef, createSecretRef } from './manifest-utils';
 
@@ -97,8 +96,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     /**
      * Implementation of the add-on contract deploy method.
     */
-    @dependable(SecretsStoreAddOn.name)
-    async deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
+    deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
         const namespace = createNamespace(this.options.namespace!, clusterInfo.cluster, true);
 
         const sa = this.createServiceAccount(clusterInfo);
@@ -147,7 +145,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             secretProviderClass.addDependent(this.chartNode);
         }
 
-        return this.chartNode;
+        return Promise.resolve(this.chartNode);
     }
 
     /**
@@ -156,8 +154,8 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
      * @param teams 
      * @returns 
      */
-    async postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
-        console.assert(teams != null);
+    postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
+        assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
 
         if (appRepo) {
@@ -181,9 +179,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             name: "argocd-server",
             namespace: this.options.namespace
         });
-
-        const secretPolicy = ManagedPolicy.fromAwsManagedPolicyName("SecretsManagerReadWrite");
-        sa.role.addManagedPolicy(secretPolicy);
         return sa;
     }
 }

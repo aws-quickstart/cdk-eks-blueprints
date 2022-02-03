@@ -1,6 +1,7 @@
 import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
+import * as assert from "assert";
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
@@ -88,7 +89,7 @@ export class ResourceContext {
      */
     public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
         const resource = provider.provide(this);
-        console.assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
+        assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
         return resource;
     }
@@ -225,7 +226,7 @@ export class ClusterInfo {
      */
     public getRequiredResource<T extends cdk.IResource>(name: string): T {
         const result = this.resourceContext.get<T>(name);
-        console.assert(result, `Required resource ${name} is missing.`);
+        assert(result, `Required resource ${name} is missing.`);
         return result!;
     }
 }
