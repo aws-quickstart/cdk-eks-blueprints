@@ -40,14 +40,14 @@ export default class BlueprintConstruct extends cdk.Construct {
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
-            bootstrapRepo: {
-                 repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
-                 path: 'envs/dev',
-                 targetRevision: "deployable",
-                 credentialsSecretName: 'github-ssh',
-                 credentialsType: 'SSH'
-            },
-            adminPasswordSecretName: "argo-admin-secret"
+            // bootstrapRepo: {
+            //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+            //      path: 'envs/dev',
+            //      targetRevision: "deployable",
+            //      credentialsSecretName: 'github-ssh',
+            //      credentialsType: 'SSH'
+            // },
+            // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
@@ -62,6 +62,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}
             }}),
+            new ssp.addons.SecretsStoreAddOn(),
+            new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
@@ -71,7 +73,6 @@ export default class BlueprintConstruct extends cdk.Construct {
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
-
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
