@@ -52,7 +52,7 @@ The attribute `adminPasswordSecretName` is the logical name of the secret in [AW
 
 Inside ArgoCD, the admin password is stored as a `bcrypt` hash. This step will be performed by the framework and stored in the ArgoCD admin `secret`. 
 
-You can change the admin password through the Secrets Manager, but it will require rerunning the provisioning pipeline. 
+You can change the admin password through the Secrets Manager, but it will require rerunning the provisioning pipeline to apply the change. 
 
 ## Bootstrapping 
 
@@ -178,6 +178,7 @@ A convenience script to create the JSON structure for SSH private key can be fou
 1. Create a secret in the AWS Secrets Manager as "Plain Text" and set the value to the desired ArgoCD admin password. 
 2. Replicate the secret to all the desired regions.
 3. Set the secret name in `adminPasswordSecretName` in ArgoCD add-on configuration.
+4. You can change the secret value through AWS Secrets Manager, however, it will require to rerun `cdk deploy` with the minimal changeset to apply the change. 
 
 Alternatively to get started, the admin password hash can be set bypassing the AWS Secret by setting the following structure in the values properties of the add-on parameters:
 
