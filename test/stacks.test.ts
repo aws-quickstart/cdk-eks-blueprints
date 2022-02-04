@@ -91,7 +91,7 @@ describe('Unit tests for EKS Blueprint', () => {
         assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
         const blueprint2 = blueprint.clone('us-west-2', '1234567891').addOns(new ssp.CalicoAddOn);
         const stack2 = await blueprint2.buildAsync(app, 'stack-2');
-        
+
         assertBlueprint(stack2, 'nginx-ingress', 'argo-cd', 'aws-calico');
 
         const blueprint3 = ssp.EksBlueprint.builder().withBlueprintProps({
@@ -128,9 +128,23 @@ describe('Unit tests for EKS Blueprint', () => {
                 id: 'us-east-1-ssp',
                 stackBuilder: blueprint.clone('us-east-1'),
             })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
             .stage({
                 id: 'us-east-2-ssp',
                 stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
             })
             .stage({
                 id: 'prod-ssp',

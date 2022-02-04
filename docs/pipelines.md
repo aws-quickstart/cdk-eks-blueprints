@@ -85,6 +85,41 @@ ssp.CodePipelineStack.builder()
 Consider adding `ArgoCDAddOn` with your specific workload bootstrap repository to automatically bootstrap workloads in the provisioned clusters.
 See [Bootstrapping](./addons/argo-cd.md#Bootstrapping) for more details.
 
+## Adding Waves
+
+In many case, when enterprises configure their SDLC environments, such as dev/test/staging/prod, each environment may contain more than a single cluster. 
+It is convenient to provision and maintain (update/upgrade) such clusters in parallel within the limits on the environment. Such environments may be represented as waves of the pipeline. Of course, the wave concept is not limited to just a logical environment. It may represent any grouping of clusters that should be executed in parallel.
+
+Pipeline functionality provides wave support to express waves with blueprints. You can mix individual stages and waves together. An individual stage can be viewed as a wave with a single stage. 
+
+```typescript
+ssp.CodePipelineStack.builder()
+    .name("ssp-eks-pipeline")
+    .owner("aws-samples")
+    .repository({
+        //...
+    })
+    .stage({
+        id: 'us-west-1-managed-ssp',
+        stackBuilder: blueprint.clone('us-west-1')
+    })
+    .wave( {  // adding two clusters for dev env
+        id: "dev",
+        stages: [
+            { id: "dev-west-1", stackBuilder: blueprint.clone('us-west-1').account(DEV_ACCOUNT)}, // requires trust relationship with the code pipeline role
+            { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').account(DEV_ACCOUNT)}, // See https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping 
+                        
+        ]
+    })
+    .wave( {
+        id: "prod",
+        stages: [
+            { id: "prod-west-1", stackBuilder: blueprint.clone('us-west-1')},
+            { id: "prod-east-2", stackBuilder: blueprint.clone('us-east-2')},
+        ]
+    })
+```
+
 ## Build the pipeline stack
 
 Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.
@@ -113,6 +148,40 @@ ssp.CodePipelineStack.builder()
     })
     .build(scope, "ssp-pipeline-stack", props); // will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.
 
+```
+
+## Deploying Pipelines
+
+In order to deploy pipelines each account and region where pipeline will either be running or deploying should be bootstrapped based on Code Pipeline [documentation](https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping).
+
+Examples of bootstrapping (from the original documentation):
+
+To bootstrap an environment for provisioning the pipeline:
+
+```bash
+$ env CDK_NEW_BOOTSTRAP=1 npx cdk bootstrap \
+    [--profile admin-profile-1] \
+    --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess \
+    aws://111111111111/us-east-1
+```
+To bootstrap a different environment for deploying CDK applications into using a pipeline in account 111111111111:
+
+```bash
+$ env CDK_NEW_BOOTSTRAP=1 npx cdk bootstrap \
+    [--profile admin-profile-2] \
+    --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess \
+    --trust 11111111111 \
+    aws://222222222222/us-east-2
+```
+
+If you only want to trust an account to do lookups (e.g, when your CDK application has a Vpc.fromLookup() call), use the option --trust-for-lookup:
+
+```bash
+$ env CDK_NEW_BOOTSTRAP=1 npx cdk bootstrap \
+    [--profile admin-profile-2] \
+    --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess \
+    --trust-for-lookup 11111111111 \
+    aws://222222222222/us-east-2
 ```
 
 ## Troubleshooting
