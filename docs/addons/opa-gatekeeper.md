@@ -33,13 +33,12 @@ import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 const app = new cdk.App();
 const account = <AWS_ACCOUNT_ID>;
 const region = <AWS_REGION>;
-const env: { account, region },
 
 const blueprint = ssp.EksBlueprint.builder()
   .account(account) 
   .region(region)
   .addOns( new ssp.addons.OpaGatekeeperAddOn() )
-  .teams().build(app, 'my-stack-name', {env});
+  .teams().build(app, 'my-stack-name');
 ```
 
 To validate that OPA Gatekeeper is running within your cluster run the following command:
