@@ -1,5 +1,5 @@
-
 import { Construct } from '@aws-cdk/core';
+import * as assert from "assert";
 import { ClusterAddOn, ClusterInfo } from '../spi';
 
 /**
@@ -30,7 +30,7 @@ export function dependable(...addOns: string[]) {
 
       addOns.forEach( (addOn) => {
         const dep = clusterInfo.getScheduledAddOn(addOn);
-        console.assert(dep, `Missing a dependency for ${addOn} for ${stack}`);
+        assert(dep, `Missing a dependency for ${addOn} for ${stack}`); 
         dependencies.push(dep!);
       });
 

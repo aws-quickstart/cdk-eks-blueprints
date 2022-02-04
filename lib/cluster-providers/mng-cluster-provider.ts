@@ -1,7 +1,9 @@
+import * as assert from "assert";
 import { Construct } from "@aws-cdk/core";
 import * as eks from "@aws-cdk/aws-eks";
 import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
 import * as ec2 from "@aws-cdk/aws-ec2";
+
 
 // Cluster
 import { ClusterInfo, ClusterProvider } from "..";
@@ -178,6 +180,6 @@ export class MngClusterProvider implements ClusterProvider {
  * @returns 
  */
 export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): eks.Nodegroup | AutoScalingGroup {
-    console.assert(clusterInfo.nodeGroup, `${source} is supported with EKS EC2 only`);
+    assert(clusterInfo.nodeGroup, `${source} is supported with EKS EC2 only`);
     return clusterInfo.nodeGroup!;
 }

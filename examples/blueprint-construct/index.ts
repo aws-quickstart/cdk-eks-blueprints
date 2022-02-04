@@ -43,25 +43,25 @@ export default class BlueprintConstruct extends cdk.Construct {
             // bootstrapRepo: {
             //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
             //      path: 'envs/dev',
-            //      targetRevision: "deployable"
+            //      targetRevision: "deployable",
+            //      credentialsSecretName: 'github-ssh',
+            //      credentialsType: 'SSH'
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            prodBootstrapArgo,
             new ssp.addons.AppMeshAddOn(),
-            new ssp.addons.AwsForFluentBitAddOn(),
-            new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            new ssp.addons.CalicoAddOn(),   
-            new ssp.addons.ContainerInsightsAddOn(),
+            new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.ContainerInsightsAddOn(),
+            new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            new ssp.addons.SecretsStoreAddOn(),
+            prodBootstrapArgo,
+            new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}
             }}),
-            new ssp.addons.SecretsStoreAddOn(),
-            new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),

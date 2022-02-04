@@ -1,14 +1,15 @@
-import { Construct, Duration } from '@aws-cdk/core';
-import { ClusterInfo } from '../../spi';
-import { LifecycleTransition, LifecycleHook, AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Queue } from '@aws-cdk/aws-sqs';
+import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from '@aws-cdk/aws-autoscaling';
 import { QueueHook } from '@aws-cdk/aws-autoscaling-hooktargets';
-import * as iam from '@aws-cdk/aws-iam';
-import { Rule, EventPattern } from '@aws-cdk/aws-events';
-import { SqsQueue } from '@aws-cdk/aws-events-targets';
-import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
-import { tagAsg } from '../../utils';
 import { Cluster, ServiceAccount } from '@aws-cdk/aws-eks';
+import { EventPattern, Rule } from '@aws-cdk/aws-events';
+import { SqsQueue } from '@aws-cdk/aws-events-targets';
+import * as iam from '@aws-cdk/aws-iam';
+import { Queue } from '@aws-cdk/aws-sqs';
+import { Construct, Duration } from '@aws-cdk/core';
+import * as assert from "assert";
+import { ClusterInfo } from '../../spi';
+import { tagAsg } from '../../utils';
+import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 
 /**
  * Supported Modes
@@ -67,7 +68,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
     const asgCapacity = clusterInfo.autoScalingGroup;
 
     // No support for Fargate and Managed Node Groups, lets catch that
-    console.assert(asgCapacity, 'AWS Node Termination Handler is only supported for self-managed nodes');
+    assert(asgCapacity, 'AWS Node Termination Handler is only supported for self-managed nodes');
 
     // Create an SQS Queue
     if (asgCapacity) {
