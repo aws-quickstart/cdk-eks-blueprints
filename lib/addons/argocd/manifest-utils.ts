@@ -64,24 +64,3 @@ export function createUserNameSecretRef(secretName: string): CsiSecretProps {
         }
     };
 }
-
-/**
- * Creates argo admin secret
- * @param secretName 
- * @returns 
- */
-export function createAdminSecretRef(secretName: string): CsiSecretProps {
-    return {
-        secretProvider: new LookupSecretsManagerSecretByName(secretName),
-        kubernetesSecret: {
-            secretName: 'argocd-secret',
-            labels: new Map([
-                ["app.kubernetes.io/name", "argocd-secret"]
-            ]),
-            data: [
-                { key: "admin.password", objectName: secretName}
-            ]
-        }
-    };
-}
-

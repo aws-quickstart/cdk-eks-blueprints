@@ -48,6 +48,7 @@
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "aws-sdk": "2.1046.0",
+        "bcrypt": "^5.0.1",
         "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",

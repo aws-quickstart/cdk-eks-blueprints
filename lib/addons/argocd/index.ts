@@ -1,14 +1,15 @@
-import * as assert from "assert";
 import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
 import { Construct } from "@aws-cdk/core";
+import * as assert from "assert";
+import * as bcrypt from "bcrypt";
 import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { createNamespace } from '../../utils';
+import { createNamespace, getSecretValue } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
-import { createAdminSecretRef, createSecretRef } from './manifest-utils';
+import { createSecretRef } from './manifest-utils';
 
 
 /**
@@ -35,15 +36,16 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     bootstrapRepo?: spi.ApplicationRepository;
 
     /**
-     * Optional values for the bootstrap application.
+     * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certifcate, and other paramters to pass 
+     * to the applications. 
      */
     bootstrapValues?: spi.Values,
 
     /**
-     * Optional admin password secret (plaintext).
+     * Optional admin password secret name as defined in AWS Secrets Manager (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
-     * store as bcrypt hash. 
-     * Note: at present, change of password will require manual restart of argocd server. 
+     * stored as a non-reverisble bcrypt hash. 
+     * Note: at present, change of password may require manual restart of argocd server. 
      */
     adminPasswordSecretName?: string;
 
@@ -96,7 +98,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     /**
      * Implementation of the add-on contract deploy method.
     */
-    deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
+    async deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
         const namespace = createNamespace(this.options.namespace!, clusterInfo.cluster, true);
 
         const sa = this.createServiceAccount(clusterInfo);
@@ -112,8 +114,8 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             secrets.push(createSecretRef(repo.credentialsType!, repo.credentialsSecretName!));
         }
         if (this.options.adminPasswordSecretName) {
-            secrets.push(createAdminSecretRef(this.options.adminPasswordSecretName!));
-            dot.set("configs.secret.createSecret", false, defaultValues);
+            const adminSecret = await this.createAdminSecret(clusterInfo.cluster.stack.region);
+            dot.set("configs.secret.argocdServerAdminPassword", adminSecret, defaultValues, true);
         }
 
         let secretProviderClass: SecretProviderClass | undefined;
@@ -145,7 +147,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             secretProviderClass.addDependent(this.chartNode);
         }
 
-        return Promise.resolve(this.chartNode);
+        return this.chartNode;
     }
 
     /**
@@ -169,6 +171,14 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         this.chartNode = undefined;
     }
 
+    /**
+     * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
+     */
+     protected async createAdminSecret(region: string): Promise<string> {
+        const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
+        return bcrypt.hash(secretValue, 10);
+    }
+    
     /**
      * Creates a service account that can access secrets
      * @param clusterInfo 
