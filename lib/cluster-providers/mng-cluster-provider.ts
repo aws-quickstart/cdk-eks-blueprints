@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import { Construct } from "@aws-cdk/core";
 import * as eks from "@aws-cdk/aws-eks";
 import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
@@ -12,7 +13,6 @@ import { valueFromContext } from '../utils/context-utils';
 
 // Constants 
 import * as constants from './constants';
-import assert = require("node:assert");
 
 /**
  * Configuration options for the custom AMI.
