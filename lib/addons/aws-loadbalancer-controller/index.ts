@@ -22,7 +22,18 @@ export interface AwsLoadBalancerControllerProps extends HelmAddOnUserProps {
     /**
      * Enable WAFV2 (must be false for CN partition)
      */
-    enableWafv2?: boolean
+    enableWafv2?: boolean,
+
+    /**
+     * Create the ingressClass to be used by the ALB controller
+     */
+    createIngressClassResource?: boolean
+
+    /**
+     * Name of ingressClass to the ALB controller will satisfy. If not provided
+     * the value will be defaulted to "alb"
+     */
+    ingressClass?: string
 }
 
 
@@ -37,10 +48,12 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.2.3',
+    version: '1.3.3',
     enableShield: false,
     enableWaf: false,
-    enableWafv2: false
+    enableWafv2: false,
+    createIngressClassResource: true,
+    ingressClass: "alb"
 };
 
 
@@ -74,6 +87,8 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             enableShield: this.options.enableShield,
             enableWaf: this.options.enableWaf,
             enableWafv2: this.options.enableWafv2,
+            createIngressClassResource: this.options.createIngressClassResource,
+            ingressClass: this.options.ingressClass
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
