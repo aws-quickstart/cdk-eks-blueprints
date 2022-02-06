@@ -23,6 +23,8 @@ export * from './ssm-agent';
 export * from './velero';
 export * from './vpc-cni';
 export * from './xray';
+export * from './ebs-csi-driver';
+export * from './kubevious';
 
 export class Constants {
     public static readonly SSP_ADDON = "ssp-addon";
