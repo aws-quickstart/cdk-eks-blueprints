@@ -17,7 +17,7 @@ export class EbsCsiDriveAddOnProps {
 /**
  * Default values for the add-on
  */
-const DEFAULT_PROPS = {
+const defaultProps = {
     addOnName: 'aws-ebs-csi-driver',
     namespace: 'kube-system',
     version: 'v1.4.0-eksbuild.preview'
@@ -30,8 +30,8 @@ export class EbsCsiDriverAddOn implements ClusterAddOn {
 
     readonly options: EbsCsiDriveAddOnProps;
 
-    constructor(ebsCsiDriveAddOnProps: EbsCsiDriveAddOnProps) {
-        this.options = ebsCsiDriveAddOnProps;
+    constructor(ebsCsiDriveAddOnProps?: EbsCsiDriveAddOnProps) {
+        this.options = {...defaultProps, ...ebsCsiDriveAddOnProps };
     }
 
     deploy(clusterInfo: ClusterInfo): void {
@@ -39,9 +39,9 @@ export class EbsCsiDriverAddOn implements ClusterAddOn {
 
         // Permissions
 
-        const serviceAccount = cluster.addServiceAccount(DEFAULT_PROPS.addOnName, {
-            name: DEFAULT_PROPS.addOnName,
-            namespace: DEFAULT_PROPS.namespace,
+        const serviceAccount = cluster.addServiceAccount(defaultProps.addOnName, {
+            name: defaultProps.addOnName,
+            namespace: defaultProps.namespace,
         });
 
         AmazonEksEbsCsiDriverPolicy.Statement.forEach((statement) => {
@@ -50,9 +50,9 @@ export class EbsCsiDriverAddOn implements ClusterAddOn {
 
         // Add-on
 
-        new CfnAddon(cluster.stack,  DEFAULT_PROPS.addOnName + "-addOn", {
-            addonName: DEFAULT_PROPS.addOnName,
-            addonVersion: this.options.version ?? DEFAULT_PROPS.version,
+        new CfnAddon(cluster.stack,  defaultProps.addOnName + "-addOn", {
+            addonName: defaultProps.addOnName,
+            addonVersion: this.options.version ?? defaultProps.version,
             clusterName: cluster.clusterName,
             serviceAccountRoleArn: serviceAccount.role.roleArn,
             resolveConflicts: "OVERWRITE"
