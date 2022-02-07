@@ -57,7 +57,7 @@ export type PipelineProps = {
     stages: WaveStage[];
 
     /**
-     * Waves for the pipe;ine. Stages inside the wave are executed in parallel.
+     * Waves for the pipeline. Stages inside the wave are executed in parallel.
      */
     waves: PipelineWave[];
 }

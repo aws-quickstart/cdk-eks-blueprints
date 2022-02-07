@@ -88,7 +88,7 @@ See [Bootstrapping](./addons/argo-cd.md#Bootstrapping) for more details.
 ## Adding Waves
 
 In many case, when enterprises configure their SDLC environments, such as dev/test/staging/prod, each environment may contain more than a single cluster. 
-It is convenient to provision and maintain (update/upgrade) such clusters in parallel within the limits on the environment. Such environments may be represented as waves of the pipeline. Of course, the wave concept is not limited to just a logical environment. It may represent any grouping of clusters that should be executed in parallel.
+It is convenient to provision and maintain (update/upgrade) such clusters in parallel within the limits of the environment. Such environments may be represented as waves of the pipeline. The wave concept is not limited to just a logical environment. It may represent any grouping of clusters that should be executed in parallel. An important advantage of running stages in parallel is the time gain associated with it. Each stage may potentially take tens of minutes (e.g. initial provisioning, upgrade, etc.) and as the number of clusters increase, the overall pipeline run may become very lengthy and won't provide enough agility for the enterprise. Running parallel stages within a wave provides roughly the time performance equivalent to a single stage.
 
 Pipeline functionality provides wave support to express waves with blueprints. You can mix individual stages and waves together. An individual stage can be viewed as a wave with a single stage. 
 
@@ -152,7 +152,7 @@ ssp.CodePipelineStack.builder()
 
 ## Deploying Pipelines
 
-In order to deploy pipelines each account and region where pipeline will either be running or deploying should be bootstrapped based on Code Pipeline [documentation](https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping).
+In order to deploy pipelines, each environment (account and region) where pipeline will either be running and each environment to which it will be deploying should be bootstrapped based on CodePipeline [documentation](https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping).
 
 Examples of bootstrapping (from the original documentation):
 
