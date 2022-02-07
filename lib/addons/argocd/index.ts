@@ -24,7 +24,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
 
     /**
     * Helm chart version to use to install.
-    * @default 3.31.1
+    * @default 3.33.5
     */
     version?: string;
 
@@ -60,7 +60,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     namespace: "argocd",
-    version: '3.33.1',
+    version: '3.33.5',
     chart: "argo-cd",
     release: "ssp-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
