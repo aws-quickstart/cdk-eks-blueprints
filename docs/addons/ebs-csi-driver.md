@@ -25,7 +25,7 @@ ssp.EksBlueprint.builder()
 
 ## Configuration Options
 
-- `version`: Version fo the EBS CSI Driver add-on to be installed. The version must be compatible with kubernetes cluster version. 
+- `version`: Version of the EBS CSI Driver add-on to be installed. The version must be compatible with kubernetes cluster version. 
 
 ```bash
 # Command to show versions of the EBS CSI Driver add-on available for cluster version is 1.20
@@ -54,7 +54,7 @@ ebs-csi-node-c9xdf                   3/3     Running   0          5m8s
 
 ```
 
-Additionally, `eksctl` can be used to determine which version of the add-on is installed in the cluster
+Additionally, the `aws cli` can be used to determine which version of the add-on is installed in the cluster
 ```bash
 # Assuming cluster-name is my-cluster, below command shows the version of coredns installed. Check if it is same as the version installed via EKS add-on
 aws eks describe-addon \
