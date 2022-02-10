@@ -1,18 +1,6 @@
-import { CfnAddon } from "@aws-cdk/aws-eks";
-import {ClusterAddOn} from "../..";
-import { ClusterInfo } from "../../spi";
+import { CoreAddOn } from "../core-addon";
+import { PolicyDocument} from "@aws-cdk/aws-iam";
 import {AmazonEksEbsCsiDriverPolicy} from "./iam-policy";
-import * as iam from "@aws-cdk/aws-iam";
-
-/**
- * User provided overrides for the add-on
- */
-export class EbsCsiDriveAddOnProps {
-    /**
-     * Version of the Helm chart to be installed
-     */
-    readonly version?: string;
-}
 
 /**
  * Default values for the add-on
@@ -26,37 +14,14 @@ const defaultProps = {
 /**
  * Implementation of EBS CSI Driver EKS add-on.
  */
-export class EbsCsiDriverAddOn implements ClusterAddOn {
+export class EbsCsiDriverAddOn extends CoreAddOn {
 
-    readonly options: EbsCsiDriveAddOnProps;
-
-    constructor(ebsCsiDriveAddOnProps?: EbsCsiDriveAddOnProps) {
-        this.options = {...defaultProps, ...ebsCsiDriveAddOnProps };
-    }
-
-    deploy(clusterInfo: ClusterInfo): void {
-        const cluster = clusterInfo.cluster;
-
-        // Permissions
-
-        const serviceAccount = cluster.addServiceAccount(defaultProps.addOnName, {
-            name: defaultProps.addOnName,
-            namespace: defaultProps.namespace,
+    constructor(version?: string) {
+        super({
+            addOnName: defaultProps.addOnName,
+            version: version ?? defaultProps.version,
+            policyDocument: PolicyDocument.fromJson(AmazonEksEbsCsiDriverPolicy),
+            namespace: defaultProps.namespace
         });
-
-        AmazonEksEbsCsiDriverPolicy.Statement.forEach((statement) => {
-            serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
-        });
-
-        // Add-on
-
-        new CfnAddon(cluster.stack,  defaultProps.addOnName + "-addOn", {
-            addonName: defaultProps.addOnName,
-            addonVersion: this.options.version ?? defaultProps.version,
-            clusterName: cluster.clusterName,
-            serviceAccountRoleArn: serviceAccount.role.roleArn,
-            resolveConflicts: "OVERWRITE"
-        });
-
     }
 }
