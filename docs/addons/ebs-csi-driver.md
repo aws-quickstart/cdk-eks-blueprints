@@ -44,7 +44,7 @@ v1.4.0-eksbuild.preview
 To validate that EBS CSI Driver add-on is installed properly, ensure that the ebs pods are running in the cluster
 
 ```bash
-$ kubectl get pods -n kube-system | grep ebs
+kubectl get pods -n kube-system | grep ebs
 
 # Output
 ebs-csi-controller-95848f4d9-hlrzs   4/4     Running   0          5m8s
