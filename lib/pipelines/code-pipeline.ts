@@ -196,7 +196,7 @@ export class CodePipelineStack extends cdk.Stack {
                     if(currentWave == null || currentWave.id != stage.waveId) {
                         const waveProps = pipelineProps.waves.find(wave => wave.id === stage.waveId);
                         assert(waveProps, `Specified wave ${stage.waveId} is not found in the pipeline definition ${id}`);
-                        currentWave = pipeline.addWave(stage.id, { ...waveProps.props });
+                        currentWave = pipeline.addWave(stage.waveId, { ...waveProps.props });
                     }
                     currentWave.addStage(stages[i], stage.stageProps);
                 } 
