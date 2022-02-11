@@ -29,6 +29,11 @@ export class TeamProps {
     readonly namespaceAnnotations? : { [key: string]: any; } = { "argocd.argoproj.io/sync-wave": "-1" };
 
     /**
+     * Labels such as necessary for AWS AppMesh 
+     */
+    readonly namespaceLabels? : { [key: string]: any; } = {"appmesh.k8s.aws/sidecarInjectorWebhook": "enabled"}
+
+    /**
      * Optional, but highly recommended setting to ensure predictable demands.
      */
     readonly namespaceHardLimits?= {
@@ -82,6 +87,7 @@ export class ApplicationTeam implements Team {
             namespace: teamProps.namespace ?? "team-" + teamProps.name,
             users: teamProps.users,
             namespaceAnnotations: teamProps.namespaceAnnotations,
+            namespaceLabels: teamProps.namespaceLabels,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
             userRoleArn: teamProps.userRoleArn,
@@ -193,7 +199,8 @@ export class ApplicationTeam implements Team {
                 kind: 'Namespace',
                 metadata: {
                     name: namespaceName,
-                    annotations: props.namespaceAnnotations
+                    annotations: props.namespaceAnnotations,
+                    labels: props.namespaceLabels
                 }
             }],
             overwrite: true,
