@@ -40,6 +40,7 @@ ssp.EksBlueprint.builder()
     .build(app, 'my-test-cluster');
 ```
 
+
 #### Using deploy key stored in Secrets Manager:
 
 ```
