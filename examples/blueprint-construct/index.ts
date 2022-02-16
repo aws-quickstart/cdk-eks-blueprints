@@ -1,9 +1,10 @@
-import { Vpc } from '@aws-cdk/aws-ec2';
+import {InstanceType, Vpc} from '@aws-cdk/aws-ec2';
 import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
+import {KubernetesVersion} from '@aws-cdk/aws-eks';
 
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -75,7 +76,11 @@ export default class BlueprintConstruct extends cdk.Construct {
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
+        const clusterProvider = new ssp.MngClusterProvider({ desiredSize: 2, minSize: 2,
+            instanceTypes: [new InstanceType('m5.xlarge')],
+            version: KubernetesVersion.V1_20});
+
         new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, 
-            resourceProviders, enableControlPlaneLogTypes: ['api']}, props);
+            resourceProviders, enableControlPlaneLogTypes: ['api'], clusterProvider}, props);
     }
 }
