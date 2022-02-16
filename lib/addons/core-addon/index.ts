@@ -2,7 +2,7 @@ import { CfnAddon } from "@aws-cdk/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 import { PolicyDocument } from "@aws-cdk/aws-iam";
-import { createServiceAccount } from "../../utils";
+import { createServiceAccount, createNamespace } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -24,6 +24,11 @@ export class CoreAddOnProps {
      * Ignored if the policy document is not provided
      */
     readonly namespace?: string;
+    /**
+     * Indicates whether the namespace in which the add-on will be deployed needs to be created or not
+     * Defaults to false as most core add-ons are deployed an existing namespace like kube-system
+     */
+    readonly createNamespace?: boolean;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -43,9 +48,14 @@ export class CoreAddOn implements ClusterAddOn {
 
         // Create a service account if user provides namespace and service account
         let serviceAccountRoleArn: string | undefined = undefined;
+        let createNs: boolean = this.coreAddOnProps?.createNamespace ? this.coreAddOnProps.createNamespace : false;
         let namespace: string = this.coreAddOnProps?.namespace ? this.coreAddOnProps.namespace : DEFAULT_NAMESPACE;
 
         if (this.coreAddOnProps?.policyDocument) {
+            //Only create the namespace if the user requested it
+            if (createNs) {
+                createNamespace(namespace, clusterInfo.cluster, true);
+            }
             const serviceAccount = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.addOnName,
                 namespace, this.coreAddOnProps.policyDocument);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
