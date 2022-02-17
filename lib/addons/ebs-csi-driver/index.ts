@@ -7,7 +7,6 @@ import {AmazonEksEbsCsiDriverPolicy} from "./iam-policy";
  */
 const defaultProps = {
     addOnName: 'aws-ebs-csi-driver',
-    namespace: 'kube-system',
     version: 'v1.4.0-eksbuild.preview'
 };
 
@@ -20,8 +19,7 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         super({
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
-            policyDocument: PolicyDocument.fromJson(AmazonEksEbsCsiDriverPolicy),
-            namespace: defaultProps.namespace
+            policyDocument: PolicyDocument.fromJson(AmazonEksEbsCsiDriverPolicy)
         });
     }
 }
