@@ -76,9 +76,10 @@ export default class BlueprintConstruct extends cdk.Construct {
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
-        const clusterProvider = new ssp.MngClusterProvider({ desiredSize: 2, minSize: 2,
-            instanceTypes: [new InstanceType('m5.xlarge')],
-            version: KubernetesVersion.V1_20});
+        const clusterProvider = new ssp.MngClusterProvider({
+            instanceTypes: [new InstanceType('m5.2xlarge')],
+            version: KubernetesVersion.V1_20
+        });
 
         new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, 
             resourceProviders, enableControlPlaneLogTypes: ['api'], clusterProvider}, props);
