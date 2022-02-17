@@ -31,7 +31,7 @@ export class TeamProps {
     /**
      * Labels such as necessary for AWS AppMesh 
      */
-    readonly namespaceLabels? : { [key: string]: any; } = {"appmesh.k8s.aws/sidecarInjectorWebhook": "enabled"}
+    readonly namespaceLabels? : { [key: string]: any; } = {"appmesh.k8s.aws/sidecarInjectorWebhook": "enabled"};
 
     /**
      * Optional, but highly recommended setting to ensure predictable demands.
