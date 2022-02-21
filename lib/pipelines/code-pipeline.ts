@@ -1,7 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import { Construct, StackProps } from '@aws-cdk/core';
 import * as cdkpipelines from '@aws-cdk/pipelines';
-import { GitHubSourceOptions } from '@aws-cdk/pipelines';
+import * as assert from "assert";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
 
@@ -54,7 +54,12 @@ export type PipelineProps = {
     /**
      * Pipeline stages and options.
      */
-    stages: StackStage[];
+    stages: WaveStage[];
+
+    /**
+     * Waves for the pipeline. Stages inside the wave are executed in parallel.
+     */
+    waves: PipelineWave[];
 }
 
 /**
@@ -77,6 +82,28 @@ export interface StackStage {
     stageProps?: cdkpipelines.AddStageOpts;
 }
 
+/** 
+ * Internal interface for wave stages
+ */
+interface WaveStage extends StackStage {
+    /**
+     * Wave id if this stage is part of a wave. Not required if stage is supplied 
+     */
+    waveId?: string,
+}
+
+/**
+ * Represents wave configuration
+ */
+export interface PipelineWave {
+
+    id: string, 
+
+    stages: StackStage[],
+
+    props?: cdkpipelines.WaveProps
+}
+
 /**
  * Builder for CodePipeline.
  */
@@ -86,7 +113,7 @@ export class CodePipelineBuilder implements StackBuilder {
 
 
     constructor() {
-        this.props = { stages: []};
+        this.props = { stages: [], waves: []};
     }
 
     public name(name: string): CodePipelineBuilder {
@@ -104,19 +131,38 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-    public stage(...stackStage: StackStage[]) : CodePipelineBuilder {
-        stackStage.forEach(stage => this.props.stages!.push(stage));
+    /**
+     * Adds standalone pipeline stages (in the order of invocation and elements in the input array)
+     * @param stackStages 
+     * @returns 
+     */
+    public stage(...stackStages: StackStage[]) : CodePipelineBuilder {
+        stackStages.forEach(stage => this.props.stages!.push(stage));
+        return this;
+    }
+
+    /**
+     * Adds wave(s) in the order specified. All stages in the wave can be executed in parallel, while standalone stages are executed sequentially.
+     * @param waves 
+     * @returns 
+     */
+    public wave(...waves: PipelineWave[]) : CodePipelineBuilder {
+        waves.forEach(wave => { 
+            this.props.waves!.push(wave);
+            wave.stages.forEach(stage => this.props.stages?.push({...stage, ...{ waveId: wave.id}}));
+        });
         return this;
     }
     
     build(scope: cdk.Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
-        console.assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
-        console.assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
-        console.assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
+        assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
+        assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
+        assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
         const fullProps = this.props as PipelineProps;
         return new CodePipelineStack(scope, fullProps, id, stackProps);
     }
 }
+
 
 /**
  * Pipeline stack is generating a self-mutating pipeline to faciliate full CI/CD experience with the platform 
@@ -134,7 +180,7 @@ export class CodePipelineStack extends cdk.Stack {
         super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
         const pipeline  = CodePipeline.build(this, pipelineProps);
 
-        const promises : Promise<ApplicationStage>[] = [];
+        let promises : Promise<ApplicationStage>[] = [];
 
         for(let stage of pipelineProps.stages) {
             const appStage = new ApplicationStage(this, stage.id, stage.stackBuilder);
@@ -142,8 +188,21 @@ export class CodePipelineStack extends cdk.Stack {
         }
 
         Promise.all(promises).then(stages => {
+            let currentWave : cdkpipelines.Wave | undefined;
+            
             for(let i in stages) {
-                pipeline.addStage(stages[i], pipelineProps.stages[i].stageProps);
+                const stage = pipelineProps.stages[i];
+                if(stage.waveId) {
+                    if(currentWave == null || currentWave.id != stage.waveId) {
+                        const waveProps = pipelineProps.waves.find(wave => wave.id === stage.waveId);
+                        assert(waveProps, `Specified wave ${stage.waveId} is not found in the pipeline definition ${id}`);
+                        currentWave = pipeline.addWave(stage.waveId, { ...waveProps.props });
+                    }
+                    currentWave.addStage(stages[i], stage.stageProps);
+                } 
+                else {
+                    pipeline.addStage(stages[i], stage.stageProps);
+                }
             }
         });
     }
@@ -181,7 +240,7 @@ class CodePipeline {
 
     public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
         const branch = props.repository.targetRevision ?? 'main';
-        let githubProps : GitHubSourceOptions | undefined = undefined;
+        let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
 
         if(props.repository.credentialsSecretName) {
             githubProps = {
@@ -195,7 +254,7 @@ class CodePipeline {
               input: cdkpipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
               installCommands: [
                 'npm install --global npm',
-                'npm install -g aws-cdk@1.135.0', 
+                'npm install -g aws-cdk@1.143.0', 
                 'npm install',
               ],
               commands: ['npm run build', 'npx cdk synth']

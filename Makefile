@@ -19,6 +19,10 @@ build:
 	rm -rf dist && $(TSC)
 	$(COPY) lib/**/*.yaml dist/ -u 1
 
+compile:
+	$(TSC)
+	$(COPY) lib/**/*.yaml dist/ -u 1
+
 list:
 	$(DEPS)
 	$(CDK) list
