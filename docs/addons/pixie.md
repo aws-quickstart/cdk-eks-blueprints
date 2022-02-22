@@ -40,6 +40,24 @@ ssp.EksBlueprint.builder()
     .build(app, 'my-test-cluster');
 ```
 
+#### Using deploy key stored in Secrets Manager:
+
+```
+import { App } from '@aws-cdk/core';
+import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import { PixieAddOn } from '@pixie-labs/pixie-ssp-addon';
+
+const app = new App();
+
+ssp.EksBlueprint.builder()
+    .addOns(new ssp.addons.SecretsStoreAddOn)
+    .addOns(new PixieAddOn({
+        deployKeySecretName: "pixie-deploy-key-secret", // Name of secret in Secrets Manager.
+    }))
+    .region(process.env.AWS_REGION)
+    .account(process.env.AWS_ACCOUNT)
+    .build(app, 'my-test-cluster');
+```
 
 #### Using deploy key stored in Secrets Manager:
 
