@@ -23,6 +23,7 @@ export * from './ssm-agent';
 export * from './velero';
 export * from './vpc-cni';
 export * from './xray';
+export * from './kubevious';
 export * from './ebs-csi-driver';
 
 export class Constants {
