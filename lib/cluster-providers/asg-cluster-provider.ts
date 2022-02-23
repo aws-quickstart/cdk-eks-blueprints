@@ -1,7 +1,7 @@
 import { Construct } from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
-import { UpdatePolicy } from "@aws-cdk/aws-autoscaling";
+
 
 // Cluster
 import { ClusterInfo, ClusterProvider } from "..";
@@ -11,54 +11,17 @@ import { valueFromContext } from '../utils/context-utils';
 
 // Constants
 import * as constants from './constants';
+import { SelfManagedNodeGroup } from "./types";
+import { UpdatePolicy } from "@aws-cdk/aws-autoscaling";
 
 /**
  * Configuration options for the cluster provider.
  */
-export interface AsgClusterProviderProps extends eks.CommonClusterOptions {
+export interface AsgClusterProviderProps extends eks.CommonClusterOptions, SelfManagedNodeGroup {
     /**
      * The name for the cluster.
      */
     name?: string
-
-    /**
-     * Min size of the node group
-     * @default 1
-     */
-    minSize?: number;
-
-    /**
-     * Max size of the node group.
-     * @default 3
-     */
-    maxSize?: number;
-
-    /**
-     * Desired size, defaults to min size.
-     */
-    desiredSize?: number;
-
-    /**
-     * Instance types used for the node group.
-     * @default m5.large
-     */
-    instanceType?: ec2.InstanceType;
-
-    /**
-     * Machine Image Type for the Autoscaling Group.
-     * @default eks.MachineImageType.AMAZON_LINUX_2
-     */
-    machineImageType?: eks.MachineImageType
-
-    /**
-     * Update policy for the Autoscaling Group.
-     */
-    updatePolicy?: UpdatePolicy
-
-    /**
-     * Subnets are passed to the cluster configuration.
-     */
-    vpcSubnets?: ec2.SubnetSelection[];
 
     /**
      * Is it a private only EKS Cluster?
@@ -66,6 +29,11 @@ export interface AsgClusterProviderProps extends eks.CommonClusterOptions {
      * @default false
      */
     privateCluster?: boolean;
+
+    /**
+     * Affects both control plane and the managed node group.
+    */
+    vpcSubnets?: ec2.SubnetSelection[];
 }
 
 /**

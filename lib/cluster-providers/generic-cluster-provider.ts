@@ -1,54 +1,34 @@
-import * as assert from "assert";
 import { Construct } from "@aws-cdk/core";
+import { ClusterInfo, ClusterProvider } from "../spi";
 import * as eks from "@aws-cdk/aws-eks";
-import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
 import * as ec2 from "@aws-cdk/aws-ec2";
-
-
-// Cluster
-import { ClusterInfo, ClusterProvider } from "..";
-
-// Utils 
-import { valueFromContext } from '../utils/context-utils';
-
-// Constants 
+import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 import * as constants from './constants';
-import { ManagedNodeGroup } from "./types";
+import { valueFromContext } from "../utils";
 
 
+export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
+    name: string,
 
-/**
- * Configuration options for the cluster provider.
- */
-export interface MngClusterProviderProps extends eks.CommonClusterOptions, ManagedNodeGroup {
+    privateCluster: boolean,
     /**
-    * The name for the cluster.
-    */
-    name?: string
-
-    /**
-     * Is it a private only EKS Cluster?
-     * Defaults to private_and_public cluster, set to true for private cluster
-     * @default false
-     */
-    privateCluster?: boolean;
-
-    /**
-     * Affects both control plane and the managed node group.
+     * Subnets are passed to the cluster configuration.
+     * This will be used for ENI allocation for the control plane.
      */
     vpcSubnets?: ec2.SubnetSelection[];
+
+    managedNodeGroups?: ManagedNodeGroup[];
+
+    selfManagedNodeGroups: SelfManagedNodeGroup[];
+
+    fargateProfiles?: {
+        [key: string]: eks.FargateProfileOptions;
+    }
 }
 
-/**
- * MngClusterProvider provisions an EKS cluster with a managed node group for managed capacity.
- */
-export class MngClusterProvider implements ClusterProvider {
+export class GenericClusterProvider implements ClusterProvider {
 
-    readonly props: MngClusterProviderProps;
-
-    constructor(props?: MngClusterProviderProps) {
-        this.props = props ?? { version: eks.KubernetesVersion.V1_20 };
-    }
+    constructor(private readonly props: GenericClusterProviderProps){}
 
     createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
         const id = scope.node.id;
@@ -72,7 +52,9 @@ export class MngClusterProvider implements ClusterProvider {
             defaultCapacity: 0 // we want to manage capacity ourselves
         });
 
-        // Props for the managed node group.
+    }
+
+    public addManagedNodeGroups(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
         const amiType = this.props.amiType;
         const capacityType = this.props.nodeGroupCapacityType;
         const releaseVersion = this.props.amiReleaseVersion;
@@ -113,17 +95,7 @@ export class MngClusterProvider implements ClusterProvider {
         }
 
         const mng = cluster.addNodegroupCapacity(id + "-ng", nodegroupProps);
-        return new ClusterInfo(cluster, version, mng);
-    }
-}
 
-/**
- * Validates that cluster is backed by EC2 either through a managed node group or through a self-managed autoscaling group.
- * @param clusterInfo 
- * @param source Used for error message to identify the source of the check
- * @returns 
- */
-export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): eks.Nodegroup | AutoScalingGroup {
-    assert(clusterInfo.nodeGroup, `${source} is supported with EKS EC2 only`);
-    return clusterInfo.nodeGroup!;
+    }
+
 }
