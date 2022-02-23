@@ -24,7 +24,6 @@ ssp.EksBlueprint.builder()
 - `version`: Version fo the Helm Chart to be used to install Kubevious
 - `ingressEnabled`: Indicates whether to expose Kubevious using an ingress gateway. Set to false by default
 - `kubeviousServiceType`: Type of service used to expose Kubevious backend. Set to 'ClusterIP' by default
-- `mysqlRootPassword`: Default password for the root account in the MySql database. Set to 'kubevious' by default
 - `values`: Arbitrary values to pass to the chart. Refer to the Kubevious [Helm Chart documentation](https://github.com/kubevious/helm) for additional details
 
 ## Validation
@@ -48,7 +47,7 @@ After the port-forwarding has started, the application can be accessed by naviga
 
 Alternatively, Kubevious can be exposed by enabling the ingress by setting the `ingressEnabled` configuration option to true. 
 
-## MySql root password
+## MySQL root password
 
 Kubevious internally deploys and uses MySQL to persist data. The Kubevious add-on secures access to the database by generating a random password
 for the MySQL root user. While it is not usually necessary to access the Kubevious MySQL database externally, it is possible to retrieve the 
