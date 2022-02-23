@@ -29,7 +29,7 @@ const defaultProps: HelmAddOnProps & KubeviousAddOnProps = {
     name: "ssp-kubevious-addon",
     namespace: "kubevious",
     chart: "kubevious",
-    version: "0.8.15",
+    version: "0.9.13",
     release: "kubevious",
     repository:  "https://helm.kubevious.io",
     values: {},
