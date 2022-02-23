@@ -27,7 +27,9 @@ ssp.EksBlueprint.builder()
     .addOns(new ssp.addons.SSMAgentAddOn)
     .addOns(new ssp.addons.SecretsStoreAddOn)
     .addOns(new NewRelicAddOn({
-        nrLicenseKeySecretName: "newrelic-license-key", // Secret Name in AWS Secrets Manager
+        // Uncomment after you create the "newrelic-license-key" secret in
+        // AWS Secrets Manager.  Use Plaintext mode.
+        // nrLicenseKeySecretName: "newrelic-license-key",
         newRelicClusterName: "demo-cluster"
     }))
     .region(process.env.AWS_REGION)
