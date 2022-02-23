@@ -48,6 +48,16 @@ After the port-forwarding has started, the application can be accessed by naviga
 
 Alternatively, Kubevious can be exposed by enabling the ingress by setting the `ingressEnabled` configuration option to true. 
 
+## MySql root password
+
+Kubevious internally deploys and uses MySQL to persist data. The Kubevious add-on secures access to the database by generating a random password
+for the MySQL root user. While it is not usually necessary to access the Kubevious MySQL database externally, it is possible to retrieve the 
+generated value by executing the command below:
+
+```shell
+    echo $(kubectl get secret kubevious-mysql-secret-root  -o jsonpath='{.data.MYSQL_ROOT_PASSWORD}' -n kubevious) | base64 --decode
+```
+
 ## Functionality
 
 1. Installs Kubevious in the cluster
