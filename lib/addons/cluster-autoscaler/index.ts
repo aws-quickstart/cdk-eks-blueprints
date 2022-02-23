@@ -35,7 +35,7 @@ const defaultProps = {
  */
 const versionMap = new Map([
     [KubernetesVersion.V1_21, "9.10.8"],
-    [KubernetesVersion.V1_20, "9.9.1"],
+    [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],
     [KubernetesVersion.V1_17, "9.4.0"]
