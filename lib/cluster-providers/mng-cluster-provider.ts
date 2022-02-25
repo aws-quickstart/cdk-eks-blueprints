@@ -23,6 +23,7 @@ import { ManagedNodeGroup } from "./types";
 export interface MngClusterProviderProps extends eks.CommonClusterOptions, ManagedNodeGroup {
     /**
     * The name for the cluster.
+    * @deprecated use #clusterName
     */
     name?: string
 
@@ -54,7 +55,7 @@ export class MngClusterProvider implements ClusterProvider {
         const id = scope.node.id;
 
         // Props for the cluster.
-        const clusterName = this.props.name ?? id;
+        const clusterName = this.props.name ?? this.props.clusterName ?? id;
         const outputClusterName = true;
         const version = this.props.version;
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);

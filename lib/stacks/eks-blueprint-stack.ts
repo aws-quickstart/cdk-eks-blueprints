@@ -39,7 +39,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_21;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -167,7 +167,7 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_20;
+        const version = blueprintProps.version ?? KubernetesVersion.V1_21;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);

@@ -5,17 +5,16 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 import * as constants from './constants';
 import { valueFromContext } from "../utils";
+import cluster from "cluster";
+import { FargateProfile } from "@aws-cdk/aws-eks";
 
 
 export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
-    name: string,
 
-    privateCluster: boolean,
     /**
-     * Subnets are passed to the cluster configuration.
-     * This will be used for ENI allocation for the control plane.
+     * Whether API server is private.
      */
-    vpcSubnets?: ec2.SubnetSelection[];
+    privateCluster: boolean,
 
     managedNodeGroups?: ManagedNodeGroup[];
 
@@ -28,21 +27,22 @@ export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
 
 export class GenericClusterProvider implements ClusterProvider {
 
-    constructor(private readonly props: GenericClusterProviderProps){}
+    constructor(private readonly props: GenericClusterProviderProps){
+        this.props.managedNodeGroups
+    }
 
     createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
-        const clusterName = this.props.name ?? id;
+        const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
         const version = this.props.version;
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : this.props.vpcSubnets;
+        const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : undefined;
 
-        // Create an EKS Cluster
-        const cluster = new eks.Cluster(scope, id, {
+        const defaultOptions = {
             vpc,
             clusterName,
             outputClusterName,
@@ -50,8 +50,24 @@ export class GenericClusterProvider implements ClusterProvider {
             vpcSubnets,
             endpointAccess,
             defaultCapacity: 0 // we want to manage capacity ourselves
-        });
+        };
 
+        const clusterOptions = {...this.props, ...defaultOptions };
+        // Create an EKS Cluster
+        const cluster = new eks.Cluster(scope, id, clusterOptions);
+
+        this.props.managedNodeGroups?.forEach( n => this.addManagedNodeGroups(cluster, n));
+        this.props.selfManagedNodeGroups?.forEach( n => this.addSelfManagedNodeGroups(cluster, n));
+        this.props.fargateProfiles?.forEach((p: eks.FargateProfile, key: string) => this.addFargateProfile(cluster, key, p));
+    }
+
+
+    addFargateProfile(cluster: eks.Cluster, name: string, p: FargateProfile) {
+        throw new Error("Method not implemented.");
+    }
+    
+    addSelfManagedNodeGroups(cluster: eks.Cluster, n: SelfManagedNodeGroup): void {
+        throw new Error("Method not implemented.");
     }
 
     public addManagedNodeGroups(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
