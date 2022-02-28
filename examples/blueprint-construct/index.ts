@@ -1,14 +1,15 @@
-import { Vpc } from '@aws-cdk/aws-ec2';
+import {InstanceType, Vpc} from '@aws-cdk/aws-ec2';
 import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
+import {KubernetesVersion} from '@aws-cdk/aws-eks';
 
 
-const burnhamManifestDir = './examples/teams/team-burnham/'
-const rikerManifestDir = './examples/teams/team-riker/'
-const teamManifestDirList = [burnhamManifestDir,rikerManifestDir]
+const burnhamManifestDir = './examples/teams/team-burnham/';
+const rikerManifestDir = './examples/teams/team-riker/';
+const teamManifestDirList = [burnhamManifestDir,rikerManifestDir];
 
 export interface BlueprintConstructProps {
     /**
@@ -43,20 +44,21 @@ export default class BlueprintConstruct extends cdk.Construct {
             // bootstrapRepo: {
             //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
             //      path: 'envs/dev',
-            //      targetRevision: "deployable"
+            //      targetRevision: "deployable",
+            //      credentialsSecretName: 'github-ssh',
+            //      credentialsType: 'SSH'
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
             new ssp.addons.AppMeshAddOn(),
-            prodBootstrapArgo,
             new ssp.addons.CalicoAddOn(),
             new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ClusterAutoScalerAddOn(),
             new ssp.addons.ContainerInsightsAddOn(),
             new ssp.addons.AwsLoadBalancerControllerAddOn(),
             new ssp.addons.SecretsStoreAddOn(),
+            prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
             new ssp.addons.NginxAddOn({ values: {
                 controller: { service: { create: false }}
@@ -65,14 +67,22 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
             new ssp.addons.KubeProxyAddOn(),
-            new ssp.addons.OpaGatekeeperAddOn()
+            //new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.KarpenterAddOn(),
+            new ssp.addons.KubeviousAddOn(),
+            new ssp.addons.EbsCsiDriverAddOn(),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
-
         const resourceProviders = new Map<string, ssp.ResourceProvider>()
             .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
-        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, resourceProviders }, props);
+        const clusterProvider = new ssp.MngClusterProvider({
+            instanceTypes: [new InstanceType('m5.2xlarge')],
+            version: KubernetesVersion.V1_20
+        });
+
+        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, 
+            resourceProviders, enableControlPlaneLogTypes: ['api'], clusterProvider}, props);
     }
 }

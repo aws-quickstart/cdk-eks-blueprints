@@ -38,7 +38,10 @@ aws-load-balancer-controller                               2/2     2            
 1. Adds proper IAM permissions and creates a Kubernetes service account with IRSA integration. 
 2. Allows configuration options such as enabling WAF and Shield. 
 3. Allows to replace the helm chart version if a specific version of the controller is needed.
-4. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+4. Creates an IngressClass associated with the AWS Load Balance Controller when the createIngressClassResource prop is set to true
+5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+
+_Note_: An ingressClass must be created in the cluster, either using the createIngressClassResource prop or externally, to be able to create Ingresses associated with the AWS ALB.
 
 ## Creating a Load Balanced Service
 

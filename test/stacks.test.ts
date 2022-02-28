@@ -4,13 +4,7 @@ import { ManualApprovalStep } from '@aws-cdk/pipelines';
 import * as ssp from '../lib';
 import { MyVpcStack } from './test-support';
 
-const consoleSpy = jest.spyOn(console, 'assert').mockImplementation();
-
 describe('Unit tests for EKS Blueprint', () => {
-
-    beforeEach(() => {
-        consoleSpy.mockClear();
-    });
 
     test('Usage tracking created', () => {
         const app = new cdk.App();
@@ -39,12 +33,46 @@ describe('Unit tests for EKS Blueprint', () => {
             .addOns(new ssp.NginxAddOn)
             .teams(new ssp.PlatformTeam({ name: 'platform' }));
 
-        blueprint.build(app, 'stack-with-missing-deps');
+        expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
+    });
 
-        expect(console.assert).toHaveBeenLastCalledWith(
-            undefined,
-            'Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps'
-        );
+    test("Stack creation fails due to adding Karpenter with Cluster Autoscaler", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.ClusterAutoScalerAddOn, new ssp.KarpenterAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
+    });
+
+    test("Stack creation fails due to adding Cluster Autoscaler with Karpenter", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.KarpenterAddOn, new ssp.ClusterAutoScalerAddOn)
+            .teams(new ssp.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-conflicting-addons');
+        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
+    });
+
+    test("Stack creation fails due to wrong node group type for NTH addon", () => {
+        const app = new cdk.App();
+
+        const blueprint = ssp.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new ssp.AwsNodeTerminationHandlerAddOn);
+
+        expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow('AWS Node Termination Handler is only supported for self-managed nodes');
     });
 
     test('Blueprint builder creates correct stack', async () => {
@@ -61,11 +89,8 @@ describe('Unit tests for EKS Blueprint', () => {
         const stack1 = await blueprint.buildAsync(app, "stack-1");
 
         assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
-        expect(console.assert).toHaveBeenLastCalledWith(true);
-
         const blueprint2 = blueprint.clone('us-west-2', '1234567891').addOns(new ssp.CalicoAddOn);
         const stack2 = await blueprint2.buildAsync(app, 'stack-2');
-
 
         assertBlueprint(stack2, 'nginx-ingress', 'argo-cd', 'aws-calico');
 
@@ -103,9 +128,23 @@ describe('Unit tests for EKS Blueprint', () => {
                 id: 'us-east-1-ssp',
                 stackBuilder: blueprint.clone('us-east-1'),
             })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
             .stage({
                 id: 'us-east-2-ssp',
                 stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
             })
             .stage({
                 id: 'prod-ssp',
@@ -170,6 +209,5 @@ function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {
             Chart: chart
         }));
     }
-
     expect(stack.templateOptions.description).toContain("SSP tracking (qs");
 }

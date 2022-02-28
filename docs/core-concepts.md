@@ -38,9 +38,9 @@ See our [`Resource Providers`](resource-providers/index.md) documentation page f
 
 `Add-ons` allow you to configure the tools and services that you would like to run in order to support your EKS workloads. When you configure `add-ons` for a `blueprint`, the `add-ons` will be provisioned at deploy time. Add-ons can deploy both Kubernetes specific resources and AWS resources needed to support add-on functionality. 
 
-For examples, the `MetricsServerAddon` only deploys the Kubernetes manifests that are needed to run the Kubernetes Metrics Server. By contrast, the `AWSLoadBalancerControllerAddon` deploys Kubernetes YAML, in addition to creating resources via AWS APIs that are needed to support the AWS Load Balancer Controller. 
+For example, the `MetricsServerAddOn` only deploys the Kubernetes manifests that are needed to run the Kubernetes Metrics Server (as a Helm chart). By contrast, the `AWSLoadBalancerControllerAddon` deploys Kubernetes resources, in addition to creating resources via AWS APIs that are needed to support the AWS Load Balancer Controller. The most common case to address via an add-on is configuration of IAM roles and permissions and the Kubernetes service account, leveraging IRSA to access AWS resources.
 
-See our [`Add-ons`](add-ons) documentation page for detailed information. 
+See our [`Add-ons`](./addons/index.md) documentation page for detailed information. 
 
 ## Team 
 
@@ -58,4 +58,4 @@ See our [`Pipelines`](../pipelines) documentation page for detailed information.
 
 `Applications` represent the actual workloads that run within a Kubernetes cluster. The framework leverages a GitOps approach for deploying applications onto clusters. 
 
-See our [`Applications](../applications) documentation for detailed information.
+See our [Workload Bootstrapping](./addons/argo-cd.md#bootstrapping) documentation for detailed information.

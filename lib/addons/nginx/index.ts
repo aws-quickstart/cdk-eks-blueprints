@@ -1,11 +1,12 @@
 import { ICertificate } from "@aws-cdk/aws-certificatemanager";
 import { Construct } from "@aws-cdk/core";
+import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
- 
+
 /**
  * Properties available to configure the nginx ingress controller.
  * Values to pass to the chart as per https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#
@@ -76,7 +77,7 @@ export class NginxAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @dependable('AwsLoadBalancerControllerAddOn')
+    @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const props = this.options;
@@ -90,12 +91,12 @@ export class NginxAddOn extends HelmAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
-        const values = { ...props.values ?? {}};
+        const values = { ...props.values ?? {} };
 
-        if(props.certificateResourceName) {
+        if (props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] =  certificate?.certificateArn;
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificate?.certificateArn;
             setPath(values, "controller.service.httpsPort.targetPort", "http");
             setPath(values, "controller.service.httpPort.enable", "false");
         }

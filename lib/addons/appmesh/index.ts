@@ -46,7 +46,7 @@ const defaultProps = {
     version: "1.4.1",
     release: "appmesh-release",
     repository: "https://aws.github.io/eks-charts"
-}
+};
 
 export class AppMeshAddOn extends HelmAddOn {
 
@@ -62,7 +62,7 @@ export class AppMeshAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
 
         // App Mesh service account.
-        const opts = { name: 'appmesh-controller', namespace: "appmesh-system" }
+        const opts = { name: 'appmesh-controller', namespace: "appmesh-system" };
         const sa = cluster.addServiceAccount('appmesh-controller', opts);
 
         // Cloud Map Full Access policy.
@@ -80,7 +80,7 @@ export class AppMeshAddOn extends HelmAddOn {
         }
 
         // App Mesh Namespace
-        const namespace = createNamespace('appmesh-system', cluster)
+        const namespace = createNamespace('appmesh-system', cluster);
         sa.node.addDependency(namespace);
 
         let values: Values = {

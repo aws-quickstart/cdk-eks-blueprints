@@ -9,7 +9,7 @@ const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
-    instanceTypes: [ew InstanceType('m5.large')],
+    instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
     version: KubernetesVersion.V1_20,
