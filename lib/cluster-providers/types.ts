@@ -21,6 +21,11 @@ export interface CustomAmiProps {
 export interface ManagedNodeGroup {
 
     /**
+     * Id of this node group. Expected to be unique in cluster scope.
+     */
+    id: string, 
+
+    /**
      * Min size of the node group
      * @default 1
      */
@@ -73,9 +78,14 @@ export interface ManagedNodeGroup {
 export interface SelfManagedNodeGroup {
 
     /**
-    * Min size of the node group
-    * @default 1
-    */
+     * Id of this node group. Expected to be unique in cluster scope.
+     */
+    id: string, 
+
+    /**
+     * Min size of the node group
+     * @default 1
+     */
     minSize?: number;
 
     /**

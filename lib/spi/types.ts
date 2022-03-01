@@ -117,8 +117,8 @@ export enum GlobalResources {
  */
 export class ClusterInfo {
 
-    readonly nodeGroup?: Nodegroup;
-    readonly autoScalingGroup?: AutoScalingGroup;
+    readonly nodeGroups?: Nodegroup[];
+    readonly autoScalingGroups?: AutoScalingGroup[];
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
     private resourceContext: ResourceContext;
@@ -127,14 +127,14 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props 
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, nodeGroup?: Nodegroup | AutoScalingGroup) {
+    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, nodeGroups?: Nodegroup[] | AutoScalingGroup[]) {
         this.cluster = cluster;
-        if (nodeGroup) {
-            if (nodeGroup instanceof Nodegroup) {
-                this.nodeGroup = nodeGroup;
+        if (nodeGroups && nodeGroups.length > 0) {
+            if (nodeGroups[0] instanceof Nodegroup) {
+                this.nodeGroups = nodeGroups as Nodegroup[];
             }
             else {
-                this.autoScalingGroup = nodeGroup;
+                this.autoScalingGroups = nodeGroups as AutoScalingGroup[];
             }
         }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
