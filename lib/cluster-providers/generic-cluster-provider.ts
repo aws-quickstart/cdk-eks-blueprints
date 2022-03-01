@@ -1,3 +1,4 @@
+import * as autoscaling from '@aws-cdk/aws-autoscaling';
 import { Construct } from "@aws-cdk/core";
 import { ClusterInfo, ClusterProvider } from "../spi";
 import * as eks from "@aws-cdk/aws-eks";
@@ -6,7 +7,6 @@ import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 import * as constants from './constants';
 import { valueFromContext } from "../utils";
 import cluster from "cluster";
-import { FargateProfile } from "@aws-cdk/aws-eks";
 
 
 export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
@@ -42,6 +42,8 @@ export class GenericClusterProvider implements ClusterProvider {
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : undefined;
 
+        const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
+
         const defaultOptions = {
             vpc,
             clusterName,
@@ -56,28 +58,38 @@ export class GenericClusterProvider implements ClusterProvider {
         // Create an EKS Cluster
         const cluster = new eks.Cluster(scope, id, clusterOptions);
 
-        this.props.managedNodeGroups?.forEach( n => this.addManagedNodeGroups(cluster, n));
-        this.props.selfManagedNodeGroups?.forEach( n => this.addSelfManagedNodeGroups(cluster, n));
-        this.props.fargateProfiles?.forEach((p: eks.FargateProfile, key: string) => this.addFargateProfile(cluster, key, p));
+        const nodeGroups: eks.Nodegroup[] = [];
+        
+        this.props.managedNodeGroups?.forEach( n => {
+            const nodeGroup = this.addManagedNodeGroup(cluster, n);
+            nodeGroups.push(nodeGroup);
+        });
+
+        const autoscalingGroups: autoscaling.AutoScalingGroup[] = [];
+        this.props.selfManagedNodeGroups?.forEach( n => {
+            const autoscalingGroup = this.addAutoScalingGroup(cluster, n);
+            autoscalingGroups.push(autoscalingGroup);
+        });
+        fargateProfiles?.forEach(([key, options]) => this.addFargateProfile(cluster, key, options));
     }
 
 
-    addFargateProfile(cluster: eks.Cluster, name: string, p: FargateProfile) {
+    addFargateProfile(cluster: eks.Cluster, name: string, p: FargateProfileOptions) {
         throw new Error("Method not implemented.");
     }
-    
-    addSelfManagedNodeGroups(cluster: eks.Cluster, n: SelfManagedNodeGroup): void {
+
+    addAutoScalingGroup(cluster: eks.Cluster, n: SelfManagedNodeGroup): void {
         throw new Error("Method not implemented.");
     }
 
-    public addManagedNodeGroups(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
-        const amiType = this.props.amiType;
-        const capacityType = this.props.nodeGroupCapacityType;
-        const releaseVersion = this.props.amiReleaseVersion;
-        const instanceTypes = this.props.instanceTypes ?? [valueFromContext(scope, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
-        const minSize = this.props.minSize ?? valueFromContext(scope, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
-        const maxSize = this.props.maxSize ?? valueFromContext(scope, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
-        const desiredSize = this.props.desiredSize ?? valueFromContext(scope, constants.DESIRED_SIZE_KEY, minSize);
+    public addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
+        const amiType = nodeGroup.amiType;
+        const capacityType = nodeGroup.nodeGroupCapacityType;
+        const releaseVersion = nodeGroup.amiReleaseVersion;
+        const instanceTypes = nodeGroup.instanceTypes ?? [valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
+        const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
+        const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
+        const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
 
         // Create a managed node group.
         const commonNodegroupProps = {
@@ -89,11 +101,11 @@ export class GenericClusterProvider implements ClusterProvider {
         };
 
         let nodegroupProps: eks.NodegroupOptions;
-        if(this.props.customAmi) {
+        if(nodeGroup.customAmi) {
             // Create launch template if custom AMI is provided.
-            const lt = new ec2.LaunchTemplate(scope, `${id}-lt`, {
-                machineImage: this.props.customAmi?.machineImage,
-                userData: this.props.customAmi?.userData,
+            const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
+                machineImage: nodeGroup.customAmi?.machineImage,
+                userData: nodeGroup.customAmi?.userData,
             });
             nodegroupProps = {
                 ...commonNodegroupProps,
@@ -110,8 +122,6 @@ export class GenericClusterProvider implements ClusterProvider {
             };
         }
 
-        const mng = cluster.addNodegroupCapacity(id + "-ng", nodegroupProps);
-
+        return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupProps);
     }
-
 }
