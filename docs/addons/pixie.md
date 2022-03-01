@@ -22,6 +22,12 @@ You must have either:
 
 ## Usage
 
+Run the following command to install the pixie-ssp-addon dependency in your project.
+
+```
+npm i @pixie-labs/pixie-ssp-addon
+```
+
 #### Using deploy key:
 
 ```
