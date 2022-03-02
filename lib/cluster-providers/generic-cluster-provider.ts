@@ -1,12 +1,12 @@
 import * as autoscaling from '@aws-cdk/aws-autoscaling';
-import * as constants from './constants';
+import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
 import { Construct } from "@aws-cdk/core";
 import { ClusterInfo, ClusterProvider } from "../spi";
-import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 import { valueFromContext } from "../utils";
-import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
+import * as constants from './constants';
+import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 
 
 /**
@@ -88,7 +88,7 @@ export class GenericClusterProvider implements ClusterProvider {
     }
 
     /**
-     * Template method that may be overridden by subclasses (e.g. FargateCluster vs eks.Cluster)
+     * Template method that may be overridden by subclasses to create a specific cluster flavor (e.g. FargateCluster vs eks.Cluster)
      * @param scope 
      * @param id 
      * @param clusterOptions 

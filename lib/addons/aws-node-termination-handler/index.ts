@@ -65,33 +65,31 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    */
   deploy(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;    
-    const asgCapacity = clusterInfo.autoScalingGroup;
+    const asgCapacity = clusterInfo.autoscalingGroups;
 
     // No support for Fargate and Managed Node Groups, lets catch that
-    assert(asgCapacity, 'AWS Node Termination Handler is only supported for self-managed nodes');
+    assert(asgCapacity && asgCapacity.length > 0, 'AWS Node Termination Handler is only supported for self-managed nodes');
 
     // Create an SQS Queue
-    if (asgCapacity) {
-      let helmValues: any;
+    let helmValues: any;
 
-      // Create Service Account
-      const serviceAccount = cluster.addServiceAccount('aws-nth-sa', {
+    // Create Service Account
+    const serviceAccount = cluster.addServiceAccount('aws-nth-sa', {
         name: 'aws-node-termination-handler-sa',
         namespace: this.options.namespace,
-      });
+    });
 
-      // Get the appropriate Helm Values depending upon the Mode selected
-      if (this.options.mode === Mode.IMDS) {
+    // Get the appropriate Helm Values depending upon the Mode selected
+    if (this.options.mode === Mode.IMDS) {
         helmValues = this.configureImdsMode(serviceAccount);
-      }
-      else {
-        helmValues = this.configureQueueMode(cluster, serviceAccount, asgCapacity);
-      }
-
-      // Deploy the helm chart
-      const awsNodeTerminationHandlerChart = this.addHelmChart(clusterInfo, helmValues);
-      awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
     }
+    else {
+        helmValues = this.configureQueueMode(cluster, serviceAccount, asgCapacity);
+    }
+
+    // Deploy the helm chart
+    const awsNodeTerminationHandlerChart = this.addHelmChart(clusterInfo, helmValues);
+    awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
   }
 
   /**
@@ -99,17 +97,17 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param serviceAccount 
    * @returns Helm values
    */
-  private configureImdsMode(serviceAccount: ServiceAccount): any {
-    return {
-      enableSpotInterruptionDraining: true,
-      enableRebalanceMonitoring: true,
-      enableScheduledEventDraining: true,
-      serviceAccount: {
-        create: false,
-        name: serviceAccount.serviceAccountName,
-      }
-    };
-  }
+    private configureImdsMode(serviceAccount: ServiceAccount): any {
+        return {
+            enableSpotInterruptionDraining: true,
+            enableRebalanceMonitoring: true,
+            enableScheduledEventDraining: true,
+            serviceAccount: {
+                create: false,
+                name: serviceAccount.serviceAccountName,
+            }
+        };
+    }
 
   /**
    * Configures Queue Mode
@@ -118,66 +116,71 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param asgCapacity
    * @returns Helm values
    */
-  private configureQueueMode(cluster: Cluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup): any {
-    const queue = new Queue(cluster.stack, `aws-nth-queue`, {
-      retentionPeriod: Duration.minutes(5)
-    });
-    queue.addToResourcePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      principals: [
-        new iam.ServicePrincipal('events.amazonaws.com'),
-        new iam.ServicePrincipal('sqs.amazonaws.com'),
-      ],
-      actions: ['sqs:SendMessage'],
-      resources: [queue.queueArn]
-    }));
+    private configureQueueMode(cluster: Cluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup[]): any {
+        const queue = new Queue(cluster.stack, "aws-nth-queue", {
+            retentionPeriod: Duration.minutes(5)
+        });
+        queue.addToResourcePolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [
+                new iam.ServicePrincipal('events.amazonaws.com'),
+                new iam.ServicePrincipal('sqs.amazonaws.com'),
+            ],
+            actions: ['sqs:SendMessage'],
+            resources: [queue.queueArn]
+        }));
 
-    // Setup a Termination Lifecycle Hook on an ASG
-    new LifecycleHook(cluster.stack, `aws-nth-lifecycle-hook`, {
-      lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
-      heartbeatTimeout: Duration.minutes(15),
-      notificationTarget: new QueueHook(queue),
-      autoScalingGroup: asgCapacity!
-    });
+        const resources: string[] = [];
 
-    // Tag the ASG
-    const tags = [
-      {
-        Key: 'aws-node-termination-handler/managed',
-        Value: 'true'
-      }
-    ];
-    tagAsg(cluster.stack, asgCapacity!.autoScalingGroupName, tags);
+        for (let i = 0; i < asgCapacity.length; i++) {
+            const nodeGroup = asgCapacity[i];
+            // Setup a Termination Lifecycle Hook on an ASG
+            new LifecycleHook(cluster.stack, `aws-${nodeGroup.autoScalingGroupName}-nth-lifecycle-hook`, {
+                lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
+                heartbeatTimeout: Duration.minutes(5), // based on https://github.com/aws/aws-node-termination-handler docs
+                notificationTarget: new QueueHook(queue),
+                autoScalingGroup: nodeGroup
+            });
 
-    // Create Amazon EventBridge Rules
-    this.createEvents(cluster.stack, queue);
+            // Tag the ASG
+            const tags = [{
+                Key: 'aws-node-termination-handler/managed',
+                Value: 'true'
+            }];
+            tagAsg(cluster.stack, nodeGroup.autoScalingGroupName, tags);
+            resources.push(nodeGroup.autoScalingGroupArn);
+        }
 
-    // Service Account Policy
-    serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        'autoscaling:CompleteLifecycleAction',
-        'autoscaling:DescribeAutoScalingInstances',
-        'autoscaling:DescribeTags'
-      ],
-      resources: [asgCapacity!.autoScalingGroupArn]
-    }));
-    serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['ec2:DescribeInstances'],
-      resources: ['*']
-    }));
-    queue.grantConsumeMessages(serviceAccount);
+        // Create Amazon EventBridge Rules
+        this.createEvents(cluster.stack, queue);
 
-    return {
-      enableSqsTerminationDraining: true,
-      queueURL: queue.queueUrl,
-      serviceAccount: {
-        create: false,
-        name: serviceAccount.serviceAccountName,
-      }
-    };
-  }
+        // Service Account Policy
+        serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                'autoscaling:CompleteLifecycleAction',
+                'autoscaling:DescribeAutoScalingInstances',
+                'autoscaling:DescribeTags'
+            ],
+            resources
+        }));
+
+        serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: ['ec2:DescribeInstances'],
+            resources: ['*']
+        }));
+        queue.grantConsumeMessages(serviceAccount);
+
+        return {
+            enableSqsTerminationDraining: true,
+            queueURL: queue.queueUrl,
+            serviceAccount: {
+                create: false,
+                name: serviceAccount.serviceAccountName,
+            }
+        };
+    }
 
   /**
    * Create EventBridge rules with target as SQS queue

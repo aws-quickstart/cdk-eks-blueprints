@@ -3,7 +3,11 @@ import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
+import { HelmAddOnUserProps } from "../helm-addon";
 
+export interface ContainerInsightAddonProps extends HelmAddOnUserProps {
+    
+}
 export class ContainerInsightsAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
