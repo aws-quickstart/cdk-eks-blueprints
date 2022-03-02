@@ -116,9 +116,7 @@ export enum GlobalResources {
  * which could be leveraged by the framework, add-on implementations and teams.
  */
 export class ClusterInfo {
-
-    readonly nodeGroups?: Nodegroup[];
-    readonly autoScalingGroups?: AutoScalingGroup[];
+    
     private readonly provisionedAddOns: Map<string, cdk.Construct>;
     private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
     private resourceContext: ResourceContext;
@@ -127,16 +125,9 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props 
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, nodeGroups?: Nodegroup[] | AutoScalingGroup[]) {
+    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, 
+            readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) { 
         this.cluster = cluster;
-        if (nodeGroups && nodeGroups.length > 0) {
-            if (nodeGroups[0] instanceof Nodegroup) {
-                this.nodeGroups = nodeGroups as Nodegroup[];
-            }
-            else {
-                this.autoScalingGroups = nodeGroups as AutoScalingGroup[];
-            }
-        }
         this.provisionedAddOns = new Map<string, cdk.Construct>();
         this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
     }

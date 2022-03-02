@@ -1,36 +1,48 @@
 import * as autoscaling from '@aws-cdk/aws-autoscaling';
+import * as constants from './constants';
+import * as ec2 from "@aws-cdk/aws-ec2";
+import * as eks from "@aws-cdk/aws-eks";
 import { Construct } from "@aws-cdk/core";
 import { ClusterInfo, ClusterProvider } from "../spi";
-import * as eks from "@aws-cdk/aws-eks";
-import * as ec2 from "@aws-cdk/aws-ec2";
 import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
-import * as constants from './constants';
 import { valueFromContext } from "../utils";
-import cluster from "cluster";
+import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 
 
+/**
+ * Properties for the generic cluster provider, containing definitions of managed node groups, 
+ * auto-scaling groups, fargate profiles. 
+ */
 export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
 
     /**
      * Whether API server is private.
      */
-    privateCluster: boolean,
+    privateCluster?: boolean,
 
     managedNodeGroups?: ManagedNodeGroup[];
 
-    selfManagedNodeGroups: SelfManagedNodeGroup[];
+    selfManagedNodeGroups?: SelfManagedNodeGroup[];
 
     fargateProfiles?: {
         [key: string]: eks.FargateProfileOptions;
     }
 }
 
+export const defaultOptions = {
+    version: eks.KubernetesVersion.V1_21
+};
+
+/**
+ * Cluster provider implementation that supports multiple node groups. 
+ */
 export class GenericClusterProvider implements ClusterProvider {
 
-    constructor(private readonly props: GenericClusterProviderProps){
-        this.props.managedNodeGroups
-    }
+    constructor(private readonly props: GenericClusterProviderProps) {}
 
+    /** 
+     * @override 
+     */
     createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
         const id = scope.node.id;
 
@@ -41,8 +53,6 @@ export class GenericClusterProvider implements ClusterProvider {
         const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : undefined;
-
-        const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
 
         const defaultOptions = {
             vpc,
@@ -56,7 +66,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
         const clusterOptions = {...this.props, ...defaultOptions };
         // Create an EKS Cluster
-        const cluster = new eks.Cluster(scope, id, clusterOptions);
+        const cluster = this.internalCreateCluster(scope, id, clusterOptions);
 
         const nodeGroups: eks.Nodegroup[] = [];
         
@@ -70,19 +80,64 @@ export class GenericClusterProvider implements ClusterProvider {
             const autoscalingGroup = this.addAutoScalingGroup(cluster, n);
             autoscalingGroups.push(autoscalingGroup);
         });
+
+        const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
         fargateProfiles?.forEach(([key, options]) => this.addFargateProfile(cluster, key, options));
+
+        return new ClusterInfo(cluster, version, nodeGroups, autoscalingGroups);
+    }
+
+    /**
+     * Template method that may be overridden by subclasses (e.g. FargateCluster vs eks.Cluster)
+     * @param scope 
+     * @param id 
+     * @param clusterOptions 
+     * @returns 
+     */
+    protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any) : eks.Cluster {
+        return new eks.Cluster(scope, id, clusterOptions);
+    }
+
+    /**
+     * Adds an autoscaling group to the cluster.
+     * @param cluster 
+     * @param nodeGroup 
+     * @returns 
+     */
+    addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: SelfManagedNodeGroup): autoscaling.AutoScalingGroup {
+        const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
+        const instanceType = nodeGroup.instanceType ?? valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
+        const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
+        const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
+        const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+        const updatePolicy = UpdatePolicy.rollingUpdate();
+
+        // Create an autoscaling group
+        return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
+            machineImageType,
+            instanceType,
+            minCapacity: minSize,
+            maxCapacity: maxSize,
+            desiredCapacity: desiredSize,
+            updatePolicy,
+        });
+    }
+
+    /**
+     * Adds a fargate profile to the cluster
+     */
+    addFargateProfile(cluster: eks.Cluster, name: string, profileOptions: eks.FargateProfileOptions) {
+        cluster.addFargateProfile(name, profileOptions);
     }
 
 
-    addFargateProfile(cluster: eks.Cluster, name: string, p: FargateProfileOptions) {
-        throw new Error("Method not implemented.");
-    }
-
-    addAutoScalingGroup(cluster: eks.Cluster, n: SelfManagedNodeGroup): void {
-        throw new Error("Method not implemented.");
-    }
-
-    public addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
+    /**
+     * Adds a managed node group to the cluster.
+     * @param cluster 
+     * @param nodeGroup 
+     * @returns 
+     */
+    addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
         const amiType = nodeGroup.amiType;
         const capacityType = nodeGroup.nodeGroupCapacityType;
         const releaseVersion = nodeGroup.amiReleaseVersion;
