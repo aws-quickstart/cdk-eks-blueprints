@@ -1,14 +1,14 @@
-import * as eks from "@aws-cdk/aws-eks";
 import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
 import * as ec2 from "@aws-cdk/aws-ec2";
-
-
+import * as eks from "@aws-cdk/aws-eks";
 // Cluster
 import { ClusterInfo } from "..";
-
+import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 // Constants 
 import { ManagedNodeGroup } from "./types";
-import { GenericClusterProvider, defaultOptions } from "./generic-cluster-provider";
+
+
+
 
 
 
@@ -20,7 +20,12 @@ export interface MngClusterProviderProps extends eks.CommonClusterOptions, Manag
     * The name for the cluster.
     * @deprecated use #clusterName
     */
-    name?: string
+    name?: string;
+
+    /**
+     * In this case id is optional and defaults tp the cluster name
+     */
+    id?: string,
 
     /**
      * Is it a private only EKS Cluster?
