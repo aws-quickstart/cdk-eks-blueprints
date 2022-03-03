@@ -1,32 +1,49 @@
-import * as assert from "assert";
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
-import { HelmAddOnUserProps } from "../helm-addon";
+import { ClusterInfo } from "../../spi";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { ValuesSchema } from "./values";
+import { assertEC2NodeGroup } from "../..";
+import { createServiceAccountWithPolicy } from "../../utils";
+import merge from "ts-deepmerge";
 
 export interface ContainerInsightAddonProps extends HelmAddOnUserProps {
-    
+    values?: ValuesSchema
 }
-export class ContainerInsightsAddOn implements ClusterAddOn {
+
+const defaultProps = {
+    name: "adot-exporter-for-eks-on-ec2",
+    namespace: "amazon-cloudwatch",
+    chart: "adot-exporter-for-eks-on-ec2",
+    version: "0.0.1",
+    release: "adot-eks-release",
+    repository: "https://aws-observability.github.io/aws-otel-helm-charts"
+};
+
+
+export class ContainerInsightsAddOn extends HelmAddOn {
+
+    constructor(props: ContainerInsightAddonProps) {
+        super({ ...defaultProps, ...props });
+    }
+
     deploy(clusterInfo: ClusterInfo): void {
-        const cluster = clusterInfo.cluster;
-        assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, "ContainerInsightsAddon can only be used with EKS EC2 at the moment. "
-            + "If using custom cluster provider, make sure you return the node group");
-
-        // Setup managed policy.
-        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoScalingGroup;
+        const cluster = clusterInfo.cluster;        
+        assertEC2NodeGroup(clusterInfo, ContainerInsightsAddOn.name);
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');
-        nodeGroup!.role.addManagedPolicy(policy);
+        const sa = createServiceAccountWithPolicy(cluster, "adot-eks-sa", this.props.namespace, policy);
+        
+        let values: ValuesSchema = {
+            region: cluster.stack.region,
+            clusterName: cluster.clusterName,
+            serviceAccount: {
+                create: false,
+                name: sa.serviceAccountName
+            }
+        };
 
-        // Apply manifest
-        const doc = readYamlDocument(__dirname + '/cwagent-fluentd-quickstart.yaml');
-        const docArray = doc.replace(/{{cluster_name}}/g, cluster.clusterName).replace(/{{region_name}}/g, cluster.stack.region);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        new KubernetesManifest(cluster.stack, "cluster-insights", {
-            cluster,
-            manifest,
-            overwrite: true
-        });
+        values = merge(values, this.props.values ?? {});
+        
+        const chart = this.addHelmChart(clusterInfo, values);
+        chart.node.addDependency(sa);
     }
 }

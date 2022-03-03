@@ -168,7 +168,10 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_21;
-        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
+        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ 
+            id: `${blueprintProps.name}-ng`,
+            version
+        });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
