@@ -22,7 +22,7 @@ const defaultProps = {
 
 export class ContainerInsightsAddOn extends HelmAddOn {
 
-    constructor(props: ContainerInsightAddonProps) {
+    constructor(props?: ContainerInsightAddonProps) {
         super({ ...defaultProps, ...props });
     }
 

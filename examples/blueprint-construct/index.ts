@@ -5,6 +5,7 @@ import * as ssp from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
 import {KubernetesVersion} from '@aws-cdk/aws-eks';
+import { EksBlueprint } from '../../lib';
 
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -52,37 +53,40 @@ export default class BlueprintConstruct extends cdk.Construct {
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.addons.AppMeshAddOn(),
-            new ssp.addons.CalicoAddOn(),
-            new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ContainerInsightsAddOn(),
-            new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            new ssp.addons.SecretsStoreAddOn(),
-            prodBootstrapArgo,
+            // new ssp.addons.AppMeshAddOn(),
+            // new ssp.addons.CalicoAddOn(),
+            // new ssp.addons.MetricsServerAddOn(),
+            // new ssp.addons.ContainerInsightsAddOn(),
+            // new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            // new ssp.addons.SecretsStoreAddOn(),
+            // prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
-            new ssp.addons.NginxAddOn({ values: {
-                controller: { service: { create: false }}
-            }}),
-            new ssp.addons.VeleroAddOn(),
-            new ssp.addons.VpcCniAddOn(),
-            new ssp.addons.CoreDnsAddOn(),
-            new ssp.addons.KubeProxyAddOn(),
-            //new ssp.addons.OpaGatekeeperAddOn(),
-            new ssp.addons.KarpenterAddOn(),
-            new ssp.addons.KubeviousAddOn(),
-            new ssp.addons.EbsCsiDriverAddOn(),
+            // new ssp.addons.NginxAddOn({ values: {
+            //     controller: { service: { create: false }}
+            // }}),
+            // new ssp.addons.VeleroAddOn(),
+            // new ssp.addons.VpcCniAddOn(),
+            // new ssp.addons.CoreDnsAddOn(),
+            // new ssp.addons.KubeProxyAddOn(),
+            // //new ssp.addons.OpaGatekeeperAddOn(),
+            // new ssp.addons.KarpenterAddOn(),
+            // new ssp.addons.KubeviousAddOn(),
+            // new ssp.addons.EbsCsiDriverAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
-        const resourceProviders = new Map<string, ssp.ResourceProvider>()
-            .set(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc));
 
         const clusterProvider = new ssp.MngClusterProvider({
             instanceTypes: [new InstanceType('m5.2xlarge')],
-            version: KubernetesVersion.V1_20
+            version: KubernetesVersion.V1_21
         });
 
-        new ssp.EksBlueprint(scope, { id: blueprintID, addOns, teams, 
-            resourceProviders, enableControlPlaneLogTypes: ['api'], clusterProvider}, props);
+        EksBlueprint.builder()
+            .addOns(...addOns)
+            .clusterProvider(clusterProvider)
+            .resourceProvider(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc))
+            //.teams(...teams)
+            .enableControlPlaneLogTypes('api')
+            .build(scope, blueprintID, props);
     }
 }
