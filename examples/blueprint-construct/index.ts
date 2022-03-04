@@ -1,11 +1,11 @@
-import {InstanceType, Vpc} from '@aws-cdk/aws-ec2';
+import { InstanceType, Vpc } from '@aws-cdk/aws-ec2';
+import { KubernetesVersion } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
+import { EksBlueprint } from '../../lib';
 import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
-import {KubernetesVersion} from '@aws-cdk/aws-eks';
-import { EksBlueprint } from '../../lib';
 
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -53,25 +53,25 @@ export default class BlueprintConstruct extends cdk.Construct {
         });
         // AddOns for the cluster.
         const addOns: Array<ssp.ClusterAddOn> = [
-            // new ssp.addons.AppMeshAddOn(),
-            // new ssp.addons.CalicoAddOn(),
-            // new ssp.addons.MetricsServerAddOn(),
-            // new ssp.addons.ContainerInsightsAddOn(),
-            // new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            // new ssp.addons.SecretsStoreAddOn(),
-            // prodBootstrapArgo,
+            new ssp.addons.AppMeshAddOn(),
+            new ssp.addons.CalicoAddOn(),
+            new ssp.addons.MetricsServerAddOn(),
+            new ssp.addons.ContainerInsightsAddOn(),
+            new ssp.addons.AwsLoadBalancerControllerAddOn(),
+            new ssp.addons.SecretsStoreAddOn(),
+            prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
-            // new ssp.addons.NginxAddOn({ values: {
-            //     controller: { service: { create: false }}
-            // }}),
-            // new ssp.addons.VeleroAddOn(),
-            // new ssp.addons.VpcCniAddOn(),
-            // new ssp.addons.CoreDnsAddOn(),
-            // new ssp.addons.KubeProxyAddOn(),
-            // //new ssp.addons.OpaGatekeeperAddOn(),
-            // new ssp.addons.KarpenterAddOn(),
-            // new ssp.addons.KubeviousAddOn(),
-            // new ssp.addons.EbsCsiDriverAddOn()
+            new ssp.addons.NginxAddOn({ values: {
+                controller: { service: { create: false }}
+            }}),
+            new ssp.addons.VeleroAddOn(),
+            new ssp.addons.VpcCniAddOn(),
+            new ssp.addons.CoreDnsAddOn(),
+            new ssp.addons.KubeProxyAddOn(),
+            // new ssp.addons.OpaGatekeeperAddOn(),
+            new ssp.addons.KarpenterAddOn(),
+            new ssp.addons.KubeviousAddOn(),
+            new ssp.addons.EbsCsiDriverAddOn()
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
