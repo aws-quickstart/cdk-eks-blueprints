@@ -48,7 +48,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
 
         let values: ValuesSchema = {
             awsRegion: cluster.stack.region,
-            clusterName: cluster.clusterName,            
+            clusterName: cluster.clusterName,   
             // serviceAccount: {
             //     create: false,
             //     name: sa.serviceAccountName

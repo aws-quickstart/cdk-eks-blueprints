@@ -1,11 +1,11 @@
-import * as iam from '@aws-cdk/aws-iam';
-import { ClusterInfo, Team } from '../spi';
-import { CfnOutput } from '@aws-cdk/core';
-import { DefaultTeamRoles } from './default-team-roles';
 import { KubernetesManifest, ServiceAccount } from '@aws-cdk/aws-eks';
-import { SecretProviderClass, CsiSecretProps } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
-import { applyYamlFromDir } from '../utils/yaml-utils';
+import * as iam from '@aws-cdk/aws-iam';
 import { IRole } from '@aws-cdk/aws-iam';
+import { CfnOutput } from '@aws-cdk/core';
+import { CsiSecretProps, SecretProviderClass } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
+import { ClusterInfo, Team, Values } from '../spi';
+import { applyYamlFromDir } from '../utils/yaml-utils';
+import { DefaultTeamRoles } from './default-team-roles';
 
 /**
  * Team properties.
@@ -36,7 +36,7 @@ export class TeamProps {
     /**
      * Optional, but highly recommended setting to ensure predictable demands.
      */
-    readonly namespaceHardLimits?= {
+    readonly namespaceHardLimits?: Values = {
         'requests.cpu': '10', // TODO verify sane defaults
         'requests.memory': '10Gi',
         'limits.cpu': '20',
@@ -129,7 +129,7 @@ export class ApplicationTeam implements Team {
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" });
 
         if (adminRole) {
-            awsAuth.addMastersRole(adminRole);
+            awsAuth.addMastersRole(adminRole, this.teamProps.name);
         }
     }
 
@@ -142,11 +142,7 @@ export class ApplicationTeam implements Team {
      */
     protected getOrCreateRole(clusterInfo: ClusterInfo, users: Array<iam.ArnPrincipal>, roleArn?: string): iam.IRole | undefined {
         let role: IRole | undefined = undefined;
-
-        if (users?.length == 0) {
-            return role;
-        }
-
+        
         if (roleArn) {
             role = iam.Role.fromRoleArn(clusterInfo.cluster.stack, `${this.name}-team-role`, roleArn);
             users.forEach(user => role?.grant(user, "sts:assumeRole"));
@@ -175,7 +171,7 @@ export class ApplicationTeam implements Team {
                 resources: ["*"],
                 actions: [
                     "eks:ListClusters"
-                ]
+                    ]
                 })
             );
         }
@@ -285,6 +281,10 @@ export class ApplicationTeam implements Team {
  * The setup skips namespace/quota configuration.
  */
 export class PlatformTeam extends ApplicationTeam {
+
+    constructor(teamProps: TeamProps) {
+        super(teamProps);
+    }
 
     /**
      * Override

@@ -35,9 +35,10 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            new team.TeamTroi,
-            new team.TeamRiker(scope, teamManifestDirList[1]),
-            new team.TeamBurnham(scope, teamManifestDirList[0])
+            // new team.TeamTroi,
+            // new team.TeamRiker(scope, teamManifestDirList[1]),
+            // new team.TeamBurnham(scope, teamManifestDirList[0]),
+            new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
@@ -85,7 +86,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .resourceProvider(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc))
-            //.teams(...teams)
+            .teams(...teams)
             .enableControlPlaneLogTypes('api')
             .build(scope, blueprintID, props);
     }
