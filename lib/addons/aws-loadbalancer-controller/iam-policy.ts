@@ -216,4 +216,4 @@ export const AwsLoadbalancerControllerIamPolicy = (partition: string) => {
             }
         ]
     };
-}
+};
