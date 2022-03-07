@@ -114,6 +114,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
+            autoScalingGroupName: nodeGroup.id,
             machineImageType,
             instanceType,
             minCapacity: minSize,
@@ -148,6 +149,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
         // Create a managed node group.
         const commonNodegroupProps = {
+            nodegroupName: nodeGroup.id,
             capacityType,
             instanceTypes,
             minSize,

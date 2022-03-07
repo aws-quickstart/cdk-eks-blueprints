@@ -1,5 +1,6 @@
+import * as ec2 from "@aws-cdk/aws-ec2";
 import { InstanceType, Vpc } from '@aws-cdk/aws-ec2';
-import { KubernetesVersion } from '@aws-cdk/aws-eks';
+import { CapacityType, KubernetesVersion, NodegroupAmiType } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
@@ -10,7 +11,7 @@ import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
-const teamManifestDirList = [burnhamManifestDir,rikerManifestDir];
+const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
 
 export interface BlueprintConstructProps {
     /**
@@ -62,9 +63,11 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.SecretsStoreAddOn(),
             prodBootstrapArgo,
             new ssp.addons.SSMAgentAddOn(),
-            new ssp.addons.NginxAddOn({ values: {
-                controller: { service: { create: false }}
-            }}),
+            new ssp.addons.NginxAddOn({
+                values: {
+                    controller: { service: { create: false } }
+                }
+            }),
             new ssp.addons.VeleroAddOn(),
             new ssp.addons.VpcCniAddOn(),
             new ssp.addons.CoreDnsAddOn(),
@@ -77,10 +80,33 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         const blueprintID = `${blueprintProps.id}-dev`;
 
-        const clusterProvider = new ssp.MngClusterProvider({
-            instanceTypes: [new InstanceType('m5.2xlarge')],
-            version: KubernetesVersion.V1_21
+        const userData = ec2.UserData.forLinux();
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
+
+        const clusterProvider = new ssp.GenericClusterProvider({
+            version: KubernetesVersion.V1_21,
+            managedNodeGroups: [
+                {
+                    id: "mng1",
+                    amiType: NodegroupAmiType.AL2_X86_64,
+                    instanceTypes: [new InstanceType('m5.2xlarge')]
+                },
+                {
+                    id: "mng2-custom",
+                    instanceTypes: [new InstanceType('m5.2xlarge')],
+                    nodeGroupCapacityType: CapacityType.SPOT,
+                    customAmi: {
+                        machineImage: ec2.MachineImage.genericLinux({
+                            'us-east-1': 'ami-0b297a512e2852b89',
+                            'us-west-2': 'ami-06a8c459c01f55c7b',
+                            'us-east-2': 'ami-093d9796e55a5b860'
+                        }),
+                        userData: userData,
+                    }
+                }
+            ]
         });
+
 
         EksBlueprint.builder()
             .addOns(...addOns)
