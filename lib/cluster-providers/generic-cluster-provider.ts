@@ -2,12 +2,18 @@ import * as autoscaling from '@aws-cdk/aws-autoscaling';
 import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
+import { CommonClusterOptions, FargateProfileOptions } from '@aws-cdk/aws-eks';
 import { Construct } from "@aws-cdk/core";
+import assert = require('assert');
 import { ClusterInfo, ClusterProvider } from "../spi";
 import { valueFromContext } from "../utils";
 import * as constants from './constants';
 import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
 
+
+export function clusterBuilder(options: CommonClusterOptions) {
+    return new ClusterBuilder(options);
+}
 
 /**
  * Properties for the generic cluster provider, containing definitions of managed node groups, 
@@ -32,6 +38,52 @@ export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
 export const defaultOptions = {
     version: eks.KubernetesVersion.V1_21
 };
+
+export class ClusterBuilder {
+
+    private props: Partial<GenericClusterProviderProps> = {};
+    private privateCluster = false;
+    private managedNodeGroups: ManagedNodeGroup[] = [];
+    private selfManagedNodeGroups: SelfManagedNodeGroup[] = [];
+    private fargateProfiles: {
+        [key: string]: eks.FargateProfileOptions;
+    } = {};
+
+    constructor(options: CommonClusterOptions) {
+        this.props = {...this.props, ...options};
+    }
+
+    withCommonOptions(options: Partial<CommonClusterOptions>): this {
+        this.props = {...this.props, ...options};
+        return this;
+    }
+
+    managedNodeGroup(...nodeGroups: ManagedNodeGroup[]): this {
+        this.managedNodeGroups.concat(nodeGroups);
+        return this;
+    }
+
+    autoscalingGroup(...nodeGroups: SelfManagedNodeGroup[]): this {
+        this.selfManagedNodeGroups.concat(nodeGroups);
+        return this;
+    }
+
+    fargateProfile(name: string, options: FargateProfileOptions): this {
+        this.fargateProfiles[name] = options;
+        return this;
+    }
+
+    build() {
+        return new GenericClusterProvider({
+            ...this.props,
+            version: this.props.version!, 
+            privateCluster: this.privateCluster,
+            managedNodeGroups: this.managedNodeGroups, 
+            selfManagedNodeGroups: this.selfManagedNodeGroups, 
+            fargateProfiles: this.fargateProfiles
+        });
+    }
+}
 
 /**
  * Cluster provider implementation that supports multiple node groups. 

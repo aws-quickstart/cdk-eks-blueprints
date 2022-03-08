@@ -147,7 +147,7 @@ export class ApplicationTeam implements Team {
             role = iam.Role.fromRoleArn(clusterInfo.cluster.stack, `${this.name}-team-role`, roleArn);
             users.forEach(user => role?.grant(user, "sts:assumeRole"));
         }
-        else {
+        else if(users && users.length > 0){
             role = new iam.Role(clusterInfo.cluster.stack, this.teamProps.namespace + 'AccessRole', {
                 assumedBy: new iam.CompositePrincipal(...users)
             });

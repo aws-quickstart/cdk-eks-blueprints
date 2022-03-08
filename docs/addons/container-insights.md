@@ -34,7 +34,8 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 Once the Container Insights add-on has been installed in your cluster, validate that the CloudWatch Agent and the FluentD daemons are running. 
 
 ```bash
-`kubectl get all -n amazon-cloudwatch`
+kubectl get all -n amazon-cloudwatch 
+kubectl get all-n amzn-cloudwatch-metrics
 ```
 
 You should see output similar to the following: 
@@ -42,7 +43,7 @@ You should see output similar to the following:
 ```
 NAME                           READY   STATUS    RESTARTS   AGE
 pod/cloudwatch-agent-k8wxl     1/1     Running   0          105s
-pod/fluentd-cloudwatch-78zv4   1/1     Running   0          105s
+pod/fluent-bit-78zv4           1/1     Running   0          105s
 
 NAME                                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 daemonset.apps/cloudwatch-agent     1         1         1       1            1           <none>          107s

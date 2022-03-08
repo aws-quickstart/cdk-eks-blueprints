@@ -225,7 +225,10 @@ export class EksBlueprint extends cdk.Stack {
             }
         });
 
-        this.asyncTasks.catch(err => { throw new Error(err); });
+        this.asyncTasks.catch(err => {
+            console.error(err); 
+            throw new Error(err); 
+        });
     }
 
     /**

@@ -36,9 +36,9 @@ export default class BlueprintConstruct extends cdk.Construct {
 
         // Teams for the cluster.
         const teams: Array<ssp.Team> = [
-            // new team.TeamTroi,
-            // new team.TeamRiker(scope, teamManifestDirList[1]),
-            // new team.TeamBurnham(scope, teamManifestDirList[0]),
+            new team.TeamTroi,
+            new team.TeamRiker(scope, teamManifestDirList[1]),
+            new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
         const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
