@@ -2,17 +2,17 @@ import * as autoscaling from '@aws-cdk/aws-autoscaling';
 import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
-import { CommonClusterOptions, FargateProfileOptions } from '@aws-cdk/aws-eks';
+import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from '@aws-cdk/aws-eks';
 import { Construct } from "@aws-cdk/core";
-import assert = require('assert');
 import { ClusterInfo, ClusterProvider } from "../spi";
 import { valueFromContext } from "../utils";
 import * as constants from './constants';
-import { ManagedNodeGroup, SelfManagedNodeGroup } from "./types";
+import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
+import assert = require('assert');
 
 
-export function clusterBuilder(options: CommonClusterOptions) {
-    return new ClusterBuilder(options);
+export function clusterBuilder() {
+    return new ClusterBuilder();
 }
 
 /**
@@ -26,10 +26,19 @@ export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
      */
     privateCluster?: boolean,
 
+    /**
+     * Array of managed nide groups.
+     */
     managedNodeGroups?: ManagedNodeGroup[];
 
-    selfManagedNodeGroups?: SelfManagedNodeGroup[];
+    /**
+     * Array of autoscaling node groups.
+     */
+    autoscalingNodeGroups?: AutoscalingNodeGroup[];
 
+    /**
+     * Fargate profiles
+     */
     fargateProfiles?: {
         [key: string]: eks.FargateProfileOptions;
     }
@@ -44,13 +53,13 @@ export class ClusterBuilder {
     private props: Partial<GenericClusterProviderProps> = {};
     private privateCluster = false;
     private managedNodeGroups: ManagedNodeGroup[] = [];
-    private selfManagedNodeGroups: SelfManagedNodeGroup[] = [];
+    private autoscalingNodeGroups: AutoscalingNodeGroup[] = [];
     private fargateProfiles: {
         [key: string]: eks.FargateProfileOptions;
     } = {};
 
-    constructor(options: CommonClusterOptions) {
-        this.props = {...this.props, ...options};
+    constructor() {
+        this.props = {...this.props, ...{version: KubernetesVersion.V1_21}};
     }
 
     withCommonOptions(options: Partial<CommonClusterOptions>): this {
@@ -59,12 +68,12 @@ export class ClusterBuilder {
     }
 
     managedNodeGroup(...nodeGroups: ManagedNodeGroup[]): this {
-        this.managedNodeGroups.concat(nodeGroups);
+        this.managedNodeGroups = this.managedNodeGroups.concat(nodeGroups);
         return this;
     }
 
-    autoscalingGroup(...nodeGroups: SelfManagedNodeGroup[]): this {
-        this.selfManagedNodeGroups.concat(nodeGroups);
+    autoscalingGroup(...nodeGroups: AutoscalingNodeGroup[]): this {
+        this.autoscalingNodeGroups = this.autoscalingNodeGroups.concat(nodeGroups);
         return this;
     }
 
@@ -79,7 +88,7 @@ export class ClusterBuilder {
             version: this.props.version!, 
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups, 
-            selfManagedNodeGroups: this.selfManagedNodeGroups, 
+            autoscalingNodeGroups: this.autoscalingNodeGroups, 
             fargateProfiles: this.fargateProfiles
         });
     }
@@ -90,7 +99,11 @@ export class ClusterBuilder {
  */
 export class GenericClusterProvider implements ClusterProvider {
 
-    constructor(private readonly props: GenericClusterProviderProps) {}
+    constructor(private readonly props: GenericClusterProviderProps) {
+        assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0 
+            && props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0),
+            "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
+    }
 
     /** 
      * @override 
@@ -128,7 +141,7 @@ export class GenericClusterProvider implements ClusterProvider {
         });
 
         const autoscalingGroups: autoscaling.AutoScalingGroup[] = [];
-        this.props.selfManagedNodeGroups?.forEach( n => {
+        this.props.autoscalingNodeGroups?.forEach( n => {
             const autoscalingGroup = this.addAutoScalingGroup(cluster, n);
             autoscalingGroups.push(autoscalingGroup);
         });
@@ -156,7 +169,7 @@ export class GenericClusterProvider implements ClusterProvider {
      * @param nodeGroup 
      * @returns 
      */
-    addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: SelfManagedNodeGroup): autoscaling.AutoScalingGroup {
+    addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: AutoscalingNodeGroup): autoscaling.AutoScalingGroup {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
         const instanceType = nodeGroup.instanceType ?? valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
         const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);

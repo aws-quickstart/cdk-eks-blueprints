@@ -1,12 +1,13 @@
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
-import { SelfManagedNodeGroup } from "./types";
-import { GenericClusterProvider, defaultOptions } from "./generic-cluster-provider";
+import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
+import { AutoscalingNodeGroup } from "./types";
 
 /**
  * Configuration options for the cluster provider.
  */
-export interface AsgClusterProviderProps extends eks.CommonClusterOptions, SelfManagedNodeGroup {
+export interface AsgClusterProviderProps extends eks.CommonClusterOptions, AutoscalingNodeGroup {
+    
     /**
      * The name for the cluster.
      */
@@ -32,7 +33,7 @@ export class AsgClusterProvider extends GenericClusterProvider {
 
     constructor(props?: AsgClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
-            selfManagedNodeGroups: [{
+            autoscalingNodeGroups: [{
                 id: props?.id ?? props?.clusterName ?? "eks-ssp-asg",
                 desiredSize: props?.desiredSize,
                 maxSize: props?.maxSize,

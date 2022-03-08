@@ -21,21 +21,24 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 
 ## Configuration
 
-THe `EC2ClusterProvider` supports the following configuration options. 
+THe `MngClusterProvider` supports the following configuration options. 
 
 | Prop                  | Description |
 |-----------------------|-------------|
-| name                  | The name for the cluster.
+| name                  | The name for the cluster. @Deprecated
+| clusterName           | Cluster name
 | minSize               | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize               | Max cluster size, must be greater than minSize (default 3).
 | desiredSize           | Desired cluster size, must be greater or equal to minSize (default `min-size`).
 | instanceTypes         | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 | amiType               | The AMI type for the managed node group.
-| amiReleaseVersion     | The AMI Kuberenetes release version for the node group.
+| amiReleaseVersion     | The AMI Kubernetes release version for the node group.
 | customAmi             | The custom AMI and the userData for the node group, `amiType` and `amiReleaseVersion` will be ignored if this is set.
 | nodeGroupCapacityType | The capacity type for the node group (on demand or spot).
 | vpcSubnets            | The subnets for the cluster.
-| privateCluster        | public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
+| privateCluster        | If `true` Kubernetes API server is private. 
+
+There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
 Configuration can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 

@@ -75,7 +75,12 @@ export interface ManagedNodeGroup {
     vpcSubnets?: ec2.SubnetSelection[];
 }
 
-export interface SelfManagedNodeGroup {
+/**
+ * A node groups for EKS that leverage EC2 Autoscaling Groups.
+ * Also referred to as "self-managed" node group, implying that maintenance of the group
+ * is performed by the customer (as oppposed to AWS as in case of a ManagedNodeGroup).
+ */
+export interface AutoscalingNodeGroup {
 
     /**
      * Id of this node group. Expected to be unique in cluster scope.
