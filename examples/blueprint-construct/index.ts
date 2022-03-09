@@ -1,11 +1,10 @@
 import * as ec2 from "@aws-cdk/aws-ec2";
-import { InstanceType, Vpc } from '@aws-cdk/aws-ec2';
+import { InstanceType } from '@aws-cdk/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 // SSP lib.
 import * as ssp from '../../lib';
 import { EksBlueprint } from '../../lib';
-import { DirectVpcProvider } from '../../lib/resource-providers/vpc';
 import * as team from '../teams';
 
 
@@ -17,12 +16,7 @@ export interface BlueprintConstructProps {
     /**
      * Id
      */
-    id: string;
-
-    /**
-     * EC2 VPC
-     */
-    vpc: Vpc;
+    id: string
 }
 
 export default class BlueprintConstruct extends cdk.Construct {
@@ -107,11 +101,9 @@ export default class BlueprintConstruct extends cdk.Construct {
             ]
         });
 
-
         EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .resourceProvider(ssp.GlobalResources.Vpc, new DirectVpcProvider(blueprintProps.vpc))
             .teams(...teams)
             .enableControlPlaneLogTypes('api')
             .build(scope, blueprintID, props);
