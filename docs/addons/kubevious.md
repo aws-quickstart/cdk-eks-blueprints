@@ -57,6 +57,16 @@ generated value by executing the command below:
     echo $(kubectl get secret kubevious-mysql-secret-root  -o jsonpath='{.data.MYSQL_ROOT_PASSWORD}' -n kubevious) | base64 --decode
 ```
 
+## Persistent Volume usage
+
+Kubevious automatically creates a Persistent Volume (PV) to store the MySQL database data. However, per the [Kubevious
+documentation](https://github.com/kubevious/helm#uninstalling-the-chart), the PV is not removed when Kubevious is 
+uninstalled and must be removed manually:
+
+```shell
+    kubectl delete pvc data-kubevious-mysql-0 -n kubevious
+```
+
 ## Functionality
 
 1. Installs Kubevious in the cluster
