@@ -1,5 +1,5 @@
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import * as eks from "@aws-cdk/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks";
 import { Values } from "../spi";
 
 /**

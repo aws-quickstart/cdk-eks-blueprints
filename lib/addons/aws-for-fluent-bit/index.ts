@@ -1,5 +1,5 @@
-import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { Construct } from "@aws-cdk/core";
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Construct } from "constructs";
 
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from "../../spi/types";

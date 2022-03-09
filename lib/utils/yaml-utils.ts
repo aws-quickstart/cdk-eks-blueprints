@@ -1,5 +1,5 @@
-import * as eks from '@aws-cdk/aws-eks';
-import { KubernetesManifest } from '@aws-cdk/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import request from 'sync-request';

@@ -1,5 +1,5 @@
-import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
-import { Construct } from "@aws-cdk/core";
+import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { Construct } from "constructs";
 import * as assert from "assert";
 import * as bcrypt from "bcrypt";
 import * as dot from 'dot-object';

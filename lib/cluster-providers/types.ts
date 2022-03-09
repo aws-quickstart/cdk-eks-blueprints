@@ -1,6 +1,6 @@
-import * as eks from "@aws-cdk/aws-eks";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import { UpdatePolicy } from "@aws-cdk/aws-autoscaling";
+import * as eks from "aws-cdk-lib/aws-eks";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { UpdatePolicy } from "aws-cdk-lib/aws-autoscaling";
 
 /**
  * Configuration options for the custom AMI.

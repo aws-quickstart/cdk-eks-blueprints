@@ -1,7 +1,8 @@
-import { ServiceAccount } from '@aws-cdk/aws-eks';
-import { ISecret } from '@aws-cdk/aws-secretsmanager';
-import { IStringParameter } from '@aws-cdk/aws-ssm';
-import { CfnOutput, Construct } from '@aws-cdk/core';
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
+import { IStringParameter } from 'aws-cdk-lib/aws-ssm';
+import { CfnOutput } from 'aws-cdk-lib/core';
+import { Construct } from "constructs";
 import * as assert from "assert";
 import { SecretsStoreAddOn } from '../..';
 import { ClusterInfo, Values } from '../../spi';

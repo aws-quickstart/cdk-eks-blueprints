@@ -1,4 +1,4 @@
-import { Construct } from '@aws-cdk/core';
+import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';

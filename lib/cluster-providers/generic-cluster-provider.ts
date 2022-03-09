@@ -1,9 +1,9 @@
-import * as autoscaling from '@aws-cdk/aws-autoscaling';
-import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as eks from "@aws-cdk/aws-eks";
-import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Construct } from "@aws-cdk/core";
+import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
+import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as eks from "aws-cdk-lib/aws-eks";
+import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
 import { valueFromContext } from "../utils";
 import * as constants from './constants';

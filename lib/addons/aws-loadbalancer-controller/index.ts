@@ -1,5 +1,5 @@
-import * as iam from "@aws-cdk/aws-iam";
-import { Construct } from "@aws-cdk/core";
+import * as iam from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";

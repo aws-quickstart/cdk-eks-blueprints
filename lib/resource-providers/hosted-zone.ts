@@ -1,5 +1,5 @@
-import { Role } from "@aws-cdk/aws-iam";
-import * as r53 from '@aws-cdk/aws-route53';
+import { Role } from "aws-cdk-lib/aws-iam";
+import * as r53 from 'aws-cdk-lib/aws-route53';
 import { ResourceContext, ResourceProvider } from "../spi";
 
 /**

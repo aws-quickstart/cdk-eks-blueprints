@@ -1,4 +1,4 @@
-import { PolicyDocument } from "@aws-cdk/aws-iam";
+import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { CoreAddOn } from "../core-addon";
 import { AmazonEksEbsCsiDriverPolicy } from "./iam-policy";
 

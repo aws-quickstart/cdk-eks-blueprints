@@ -1,8 +1,8 @@
-import * as eks from "@aws-cdk/aws-eks";
-import { Stack } from "@aws-cdk/core";
-import { AwsCustomResource, AwsCustomResourcePolicy } from "@aws-cdk/custom-resources";
-import { Construct } from "@aws-cdk/core";
-import * as customResource from '@aws-cdk/custom-resources';
+import * as eks from "aws-cdk-lib/aws-eks";
+import { Stack } from "aws-cdk-lib/core";
+import { AwsCustomResource, AwsCustomResourcePolicy } from "aws-cdk-lib/custom-resources";
+import { Construct } from "constructs";
+import * as customResource from 'aws-cdk-lib/custom-resources';
 
 // Available Control Plane logging types
 const CONTROL_PLANE_LOG_TYPES = ['api','audit','authenticator','controllerManager','scheduler'];

@@ -1,5 +1,6 @@
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { Construct, Duration } from "@aws-cdk/core";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { Duration } from "aws-cdk-lib/core";
+import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../..";
 
 /**

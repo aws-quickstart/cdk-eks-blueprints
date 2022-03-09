@@ -1,5 +1,5 @@
-import { ICertificate } from "@aws-cdk/aws-certificatemanager";
-import { Construct } from "@aws-cdk/core";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Construct } from "constructs";
 import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";

@@ -1,7 +1,7 @@
-import { CfnAddon } from "@aws-cdk/aws-eks";
+import { CfnAddon } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
-import { PolicyDocument } from "@aws-cdk/aws-iam";
+import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
 
 export class CoreAddOnProps {

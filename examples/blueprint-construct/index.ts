@@ -1,7 +1,8 @@
-import * as ec2 from "@aws-cdk/aws-ec2";
-import { InstanceType, Vpc } from '@aws-cdk/aws-ec2';
-import { CapacityType, KubernetesVersion, NodegroupAmiType } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import * as cdk from 'aws-cdk-lib/core';
+import { Construct } from "constructs";
 // SSP lib.
 import * as ssp from '../../lib';
 import { EksBlueprint } from '../../lib';
@@ -25,8 +26,8 @@ export interface BlueprintConstructProps {
     vpc: Vpc;
 }
 
-export default class BlueprintConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
+export default class BlueprintConstruct extends Construct {
+    constructor(scope: Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
         super(scope, blueprintProps.id);
 
         // TODO: fix IAM user provisioning for admin user

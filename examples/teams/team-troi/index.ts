@@ -1,6 +1,6 @@
-import * as eks from "@aws-cdk/aws-eks";
-import * as s3 from "@aws-cdk/aws-s3";
-import * as cdk from '@aws-cdk/core';
+import * as eks from "aws-cdk-lib/aws-eks";
+import * as s3 from "aws-cdk-lib/aws-s3";
+import * as cdk from 'aws-cdk-lib';
 import { ClusterInfo, Team } from '../../../lib';
 
 

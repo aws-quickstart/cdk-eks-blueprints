@@ -1,5 +1,5 @@
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as eks from "@aws-cdk/aws-eks";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as eks from "aws-cdk-lib/aws-eks";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 import { AutoscalingNodeGroup } from "./types";
 

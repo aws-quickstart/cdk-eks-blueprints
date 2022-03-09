@@ -1,6 +1,7 @@
-import { AutoScalingGroup } from '@aws-cdk/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
+import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
+import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import * as assert from "assert";
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
@@ -117,8 +118,8 @@ export enum GlobalResources {
  */
 export class ClusterInfo {
     
-    private readonly provisionedAddOns: Map<string, cdk.Construct>;
-    private readonly scheduledAddOns: Map<string, Promise<cdk.Construct>>;
+    private readonly provisionedAddOns: Map<string, Construct>;
+    private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private resourceContext: ResourceContext;
 
     /**
@@ -128,8 +129,8 @@ export class ClusterInfo {
     constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, 
             readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) { 
         this.cluster = cluster;
-        this.provisionedAddOns = new Map<string, cdk.Construct>();
-        this.scheduledAddOns = new Map<string, Promise<cdk.Construct>>();
+        this.provisionedAddOns = new Map<string, Construct>();
+        this.scheduledAddOns = new Map<string, Promise<Construct>>();
     }
 
     /**
@@ -153,7 +154,7 @@ export class ClusterInfo {
      * @param addOn 
      * @param construct 
      */
-    public addProvisionedAddOn(addOn: string, construct: cdk.Construct) {
+    public addProvisionedAddOn(addOn: string, construct: Construct) {
         this.provisionedAddOns.set(addOn, construct);
     }
 
@@ -162,7 +163,7 @@ export class ClusterInfo {
      * @param addOn 
      * @returns undefined
      */
-    public getProvisionedAddOn(addOn: string): cdk.Construct | undefined {
+    public getProvisionedAddOn(addOn: string): Construct | undefined {
         return this.provisionedAddOns.get(addOn);
     }
 
@@ -170,7 +171,7 @@ export class ClusterInfo {
      * Returns all provisioned addons
      * @returns scheduledAddOns: Map<string, cdk.Construct>
      */
-      public getAllProvisionedAddons(): Map<string, cdk.Construct> {
+      public getAllProvisionedAddons(): Map<string, Construct> {
         return this.provisionedAddOns;
     }
 
@@ -180,7 +181,7 @@ export class ClusterInfo {
      * @param addOn
      * @param promise
      */
-     public addScheduledAddOn(addOn: string, promise: Promise<cdk.Construct>) {
+     public addScheduledAddOn(addOn: string, promise: Promise<Construct>) {
         this.scheduledAddOns.set(addOn, promise);
     }
 
@@ -189,7 +190,7 @@ export class ClusterInfo {
      * @param addOn
      * @returns Promise<cdk.Construct>
      */
-    public getScheduledAddOn(addOn: string): Promise<cdk.Construct> | undefined {
+    public getScheduledAddOn(addOn: string): Promise<Construct> | undefined {
         return this.scheduledAddOns.get(addOn);
     }
 
@@ -197,7 +198,7 @@ export class ClusterInfo {
      * Returns all scheduled addons
      * @returns scheduledAddOns: Map<string, Promise<cdk.Construct>>
      */
-    public getAllScheduledAddons(): Map<string, Promise<cdk.Construct>> {
+    public getAllScheduledAddons(): Map<string, Promise<Construct>> {
         return this.scheduledAddOns;
     }
 

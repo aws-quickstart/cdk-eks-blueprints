@@ -1,4 +1,4 @@
-import { StackProps } from "@aws-cdk/core";
+import { StackProps } from "aws-cdk-lib/core";
 
 /**
  * Adds usage tracking info to the stack props
