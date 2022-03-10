@@ -77,10 +77,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
-        // console.log(clusterInfo.cluster.stack.region);
-        // console.log(registries.get(clusterInfo.cluster.stack.region) );
         const repo = registries.get(clusterInfo.cluster.stack.region) + "amazon/aws-load-balancer-controller";
-        console.log(repo);
         const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
             serviceAccount: {
