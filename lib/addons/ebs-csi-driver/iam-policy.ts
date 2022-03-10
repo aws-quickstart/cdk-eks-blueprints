@@ -1,5 +1,7 @@
-export const AmazonEksEbsCsiDriverPolicy = (partition: string): object => {
-    return {
+import { PolicyDocument } from "@aws-cdk/aws-iam";
+
+export function getEbsDriverPolicyDocument(partition: string) : PolicyDocument {
+    return PolicyDocument.fromJson({
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -143,5 +145,5 @@ export const AmazonEksEbsCsiDriverPolicy = (partition: string): object => {
                 }
             }
         ]
-    };
-};
+    });
+}
