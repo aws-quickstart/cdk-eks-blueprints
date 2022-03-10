@@ -15,9 +15,9 @@ export class CoreAddOnProps {
      */
     readonly version: string;
     /**
-     * Policy document required by the add-on to allow it to interact with AWS resources
+     * Policy document provider returns the policy required by the add-on to allow it to interact with AWS resources
      */
-    readonly policyDocument?: {(partition: string): object};
+    readonly policyDocumentProvider?: (partition: string) => PolicyDocument;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -38,8 +38,8 @@ export class CoreAddOn implements ClusterAddOn {
         // Create a service account if user provides namespace and service account
         let serviceAccountRoleArn: string | undefined = undefined;
 
-        if (this.coreAddOnProps?.policyDocument) {
-            const policyDoc = PolicyDocument.fromJson(this.coreAddOnProps.policyDocument(clusterInfo.cluster.stack.partition));
+        if (this.coreAddOnProps?.policyDocumentProvider) {
+            const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
             const serviceAccount = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.addOnName,
                 DEFAULT_NAMESPACE, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
