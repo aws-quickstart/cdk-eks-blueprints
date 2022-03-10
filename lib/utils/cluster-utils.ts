@@ -1,5 +1,5 @@
 import * as eks from "aws-cdk-lib/aws-eks";
-import { Stack } from "aws-cdk-lib/core";
+import { Stack } from "aws-cdk-lib";
 import { AwsCustomResource, AwsCustomResourcePolicy } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import * as customResource from 'aws-cdk-lib/custom-resources';

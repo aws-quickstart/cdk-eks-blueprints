@@ -1,7 +1,7 @@
 import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { IStringParameter } from 'aws-cdk-lib/aws-ssm';
-import { CfnOutput } from 'aws-cdk-lib/core';
+import { CfnOutput } from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import * as assert from "assert";
 import { SecretsStoreAddOn } from '../..';

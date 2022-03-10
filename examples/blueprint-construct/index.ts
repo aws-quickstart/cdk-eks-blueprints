@@ -1,7 +1,7 @@
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import * as cdk from 'aws-cdk-lib/core';
+import * as cdk from 'aws-cdk-lib';
 import { Construct } from "constructs";
 // SSP lib.
 import * as ssp from '../../lib';

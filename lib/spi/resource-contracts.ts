@@ -1,4 +1,4 @@
-import { IResource } from 'aws-cdk-lib/core';
+import { IResource } from 'aws-cdk-lib';
 import { ResourceContext } from './types';
 
 /** 

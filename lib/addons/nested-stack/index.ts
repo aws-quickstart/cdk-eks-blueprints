@@ -1,4 +1,4 @@
-import { NestedStackProps } from "aws-cdk-lib/core";
+import { NestedStackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo, NestedStackBuilder } from "../../spi";
 

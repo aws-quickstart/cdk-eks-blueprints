@@ -1,5 +1,5 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { Stack } from 'aws-cdk-lib/core';
+import { Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall } from "aws-cdk-lib/custom-resources";
 
 /**

@@ -1,5 +1,5 @@
-import * as cdk from 'aws-cdk-lib/core';
-import { StackProps } from 'aws-cdk-lib/core';
+import * as cdk from 'aws-cdk-lib';
+import { StackProps } from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import * as cdkpipelines from 'aws-cdk-lib/pipelines';
 import * as assert from "assert";

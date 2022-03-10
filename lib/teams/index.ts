@@ -1,7 +1,7 @@
 import { KubernetesManifest, ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { IRole } from 'aws-cdk-lib/aws-iam';
-import { CfnOutput } from 'aws-cdk-lib/core';
+import { CfnOutput } from 'aws-cdk-lib';
 import { CsiSecretProps, SecretProviderClass } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 import { ClusterInfo, Team, Values } from '../spi';
 import { applyYamlFromDir } from '../utils/yaml-utils';

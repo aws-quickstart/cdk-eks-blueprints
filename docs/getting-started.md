@@ -2,9 +2,23 @@
 
 This getting started guide will walk you through setting up a new CDK project which leverages the `ssp-amazon-eks` NPM module to deploy a simple SSP. 
 
-## Project setup
+## Project Setup
 
-To use the `ssp-amazon-eks` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
+To use the `ssp-amazon-eks` module, you must have [Node.js](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed. We will also use `make` to simplify build and other common actions. You can do it using the following instructions:
+
+=== "Mac"
+```bash
+sudo brew install make
+sudo brew install node
+
+```
+
+=== "Ubuntu"
+```bash
+sudo apt install make
+sudo apt install nodejs
+```
+
 
 ```bash
 npm install -g aws-cdk@1.143.0

@@ -5,7 +5,7 @@ import { EventPattern, Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { Duration } from 'aws-cdk-lib/core';
+import { Duration } from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import * as assert from "assert";
 import { ClusterInfo } from '../../spi';

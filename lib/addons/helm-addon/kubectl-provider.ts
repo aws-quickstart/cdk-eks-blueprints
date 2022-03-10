@@ -1,5 +1,5 @@
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
-import { Duration } from "aws-cdk-lib/core";
+import { Duration } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../..";
 
