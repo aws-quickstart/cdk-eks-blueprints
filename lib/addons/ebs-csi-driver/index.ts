@@ -1,5 +1,5 @@
 import { CoreAddOn } from "../core-addon";
-import {AmazonEksEbsCsiDriverPolicy} from "./iam-policy";
+import { getEbsDriverPolicyDocument } from "./iam-policy";
 
 
 /**
@@ -20,7 +20,7 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
 
-            policyDocument: AmazonEksEbsCsiDriverPolicy
+            policyDocumentProvider: getEbsDriverPolicyDocument
         });
     }
 }
