@@ -16,7 +16,7 @@ const K10_SA = 'k10-sa-ssp';
 /**
  * Properties available to configure Kasten K10.
  * namespace default is kasten-io
- * version default is 4.5.6
+ * version default is 4.5.10
  * values as per https://docs.kasten.io
  */
 const defaultProps = {
@@ -26,7 +26,7 @@ const defaultProps = {
     createNamespace: true,
     chart: 'k10',
     repository: "https://charts.kasten.io/",
-    version: '4.5.6'
+    version: '4.5.10'
 }
 
 export class KastenK10AddOn extends HelmAddOn  {
@@ -56,8 +56,6 @@ export class KastenK10AddOn extends HelmAddOn  {
         KastenEC2IamPolicy.Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
-
-        //const chart = this.addHelmChart(clusterInfo, values);
         
         const KastenK10Chart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
