@@ -20,9 +20,9 @@ The Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster.
 
 ## Architecture
 Deploying this Quick Start for a new virtual private cloud (VPC) with default parameters builds the following K10 platform in the AWS Cloud. The diagram shows three Availability Zones, leveraging multiple AWS services.
-![Kasten-K10 Architecture ](./../assets/images/kastenk10_image3.png)
-
-
+![Kasten-K10 Architecture](./../assets/images/kastenk10_image3.png)
+More detailed K10 architecture diagram is shown below.
+![Kasten-K10 Architecture](./../assets/images/kastenk10_image4.png)
 ## Usage
 
 ```typescript
