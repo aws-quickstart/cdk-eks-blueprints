@@ -19,9 +19,10 @@ The framework currently supports the following add-ons.
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage                 |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53 |
-| [`Keptn`](https://github.com/keptn-sandbox/keptn-ssp-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
+| [`KastenK10AddOn`](./kasten-k10.md)									 | Adds [Kasten-K10] (https://kasten.io) #1 Kubernetes backup, DR, and application mobility to EKS cluster								 |
+| [`Keptn`](https://github.com/keptn-sandbox/keptn-ssp-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn 																	 |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster                                                                |
-| [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster                           |                  |
+| [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster                           |
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        | 
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node                                         |
 | [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools)                                                                      |
