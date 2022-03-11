@@ -4,36 +4,30 @@ This getting started guide will walk you through setting up a new CDK project wh
 
 ## Project Setup
 
+Before proceeding, make sure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) is installed on your machine.
+
 To use the `ssp-amazon-eks` module, you must have [Node.js](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed. We will also use `make` to simplify build and other common actions. You can do it using the following instructions:
 
-=== "Mac"
-```bash
-sudo brew install make
-sudo brew install node
 
-```
+=== "Mac"
+    ```bash
+    sudo brew install make
+    sudo brew install node
+    ```
 
 === "Ubuntu"
-```bash
-sudo apt install make
-sudo apt install nodejs
-```
+    ```bash
+    sudo apt install make
+    sudo apt install nodejs
+    ```
 
-
-```bash
-npm install -g aws-cdk@1.143.0
-```
-
-Verify the installation.
+Create a directory that represent you project (e.g. `my-blueprints`) and then create a new `typescript` CDK project in that directory.
 
 ```bash
-cdk --version
-```
-
-Create a new `typescript` CDK project in an empty directory.
-
-```bash
-cdk init app --language typescript
+mkdir my-blueprints
+cd my-blueprints
+npm install aws-cdk@2.15.0
+npx cdk init app --language typescript
 ```
 
 ## Deploy a Blueprint EKS Cluster
@@ -48,10 +42,12 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 
 ```typescript
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import * as ssp from '@aws-quickstart/ssp-amazon-eks';
 
 const app = new cdk.App();
+const account = 'XXXXXXXXXXXXX';
+const region = 'us-east-2';
 
 const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.ArgoCDAddOn,
@@ -66,10 +62,11 @@ const addOns: Array<ssp.ClusterAddOn> = [
     new ssp.addons.XrayAddOn()
 ];
 
-const account = 'XXXXXXXXXXXXX';
-const region = 'us-east-2';
-const props = { env: { account, region } };
-new ssp.EksBlueprint(app, { id: 'east-test-1', addOns}, props);
+ssp.EksBlueprint.builder()
+    .account(account)
+    .region(region)
+    .addOns(addOns)
+    .build(app, 'eks-blueprint');
 ```
 
 Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
