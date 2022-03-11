@@ -52,7 +52,7 @@ export class KastenK10AddOn extends HelmAddOn  {
             namespace: this.options.namespace,
         });
 
-        //Populate Service Account with Infput from iam-policy.ts
+        //Populate Service Account with Input from iam-policy.ts
         KastenEC2IamPolicy.Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
