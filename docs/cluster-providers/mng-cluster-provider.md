@@ -21,7 +21,7 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 
 ## Configuration
 
-THe `MngClusterProvider` supports the following configuration options. 
+The `MngClusterProvider` supports the following configuration options. 
 
 | Prop                  | Description |
 |-----------------------|-------------|

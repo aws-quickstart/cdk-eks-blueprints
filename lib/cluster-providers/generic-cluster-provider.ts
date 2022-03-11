@@ -219,7 +219,7 @@ export class GenericClusterProvider implements ClusterProvider {
             instanceTypes,
             minSize,
             maxSize,
-            desiredSize,
+            desiredSize
         };
 
         let nodegroupProps: eks.NodegroupOptions;
@@ -240,6 +240,7 @@ export class GenericClusterProvider implements ClusterProvider {
             nodegroupProps = {
                 ...commonNodegroupProps,
                 amiType,
+                
                 releaseVersion,
             };
         }
