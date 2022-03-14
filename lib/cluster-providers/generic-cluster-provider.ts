@@ -27,7 +27,7 @@ export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
     privateCluster?: boolean,
 
     /**
-     * Array of managed nide groups.
+     * Array of managed node groups.
      */
     managedNodeGroups?: ManagedNodeGroup[];
 
@@ -240,7 +240,7 @@ export class GenericClusterProvider implements ClusterProvider {
             nodegroupProps = {
                 ...commonNodegroupProps,
                 amiType,
-                
+
                 releaseVersion,
             };
         }
