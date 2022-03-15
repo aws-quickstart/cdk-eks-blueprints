@@ -39,7 +39,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_20;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_21;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -89,6 +89,16 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
+    public version(version: KubernetesVersion): this {
+        this.props = { ...this.props, ...{ version } };
+        return this;
+    }
+
+    public enableControlPlaneLogTypes(...types: string[]): this {
+        this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
+        return this;
+    }
+
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
         this.props = { ...this.props, ...props };
@@ -130,7 +140,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public build(scope: cdk.Construct, id: string, stackProps?: StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
-            { ...stackProps, ...{ env: this.env } });
+            { ...{ env: this.env }, ...stackProps });
     }
 
     public async buildAsync(scope: cdk.Construct, id: string, stackProps?: StackProps): Promise<EksBlueprint> {
@@ -167,8 +177,11 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_20;
-        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ version });
+        const version = blueprintProps.version ?? KubernetesVersion.V1_21;
+        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ 
+            id: `${blueprintProps.name}-ng`,
+            version
+        });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
@@ -212,7 +225,10 @@ export class EksBlueprint extends cdk.Stack {
             }
         });
 
-        this.asyncTasks.catch(err => { throw new Error(err); });
+        this.asyncTasks.catch(err => {
+            console.error(err); 
+            throw new Error(err); 
+        });
     }
 
     /**

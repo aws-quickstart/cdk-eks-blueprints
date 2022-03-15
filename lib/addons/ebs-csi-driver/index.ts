@@ -1,6 +1,6 @@
+import { PolicyDocument } from "@aws-cdk/aws-iam";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
-
 
 /**
  * Default values for the add-on

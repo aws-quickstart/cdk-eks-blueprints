@@ -8,7 +8,7 @@ export class CoreDnsAddOn extends CoreAddOn {
     constructor(version?: string) {
         super({
             addOnName: "coredns",
-            version: version ?? "v1.8.0-eksbuild.1"
+            version: version ?? "v1.8.4-eksbuild.1"
         });
     }
 }

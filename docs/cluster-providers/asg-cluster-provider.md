@@ -31,7 +31,9 @@ new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 | machineImageType  | Machine Image Type for the Autoscaling Group.
 | updatePolicy      | Update policy for the Autoscaling Group.
 | vpcSubnets        | The subnets for the cluster.
-| privateCluster    | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
+| privateCluster    | If `true` Kubernetes API server is private. 
+
+There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
 Configuration can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 

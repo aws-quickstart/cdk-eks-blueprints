@@ -8,7 +8,7 @@ export class KubeProxyAddOn extends CoreAddOn {
     constructor(version?: string) {
         super({
             addOnName: "kube-proxy",
-            version: version ?? "v1.19.6-eksbuild.2"
+            version: version ?? "v1.21.2-eksbuild.2"
         });
     }
 }
