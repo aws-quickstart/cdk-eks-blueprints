@@ -71,6 +71,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             new ssp.addons.KarpenterAddOn(),
             new ssp.addons.KubeviousAddOn(),
             new ssp.addons.EbsCsiDriverAddOn(),
+            new ssp.addons.EfsCsiDriverAddOn({replicaCount: 1}),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
