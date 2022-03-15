@@ -1,18 +1,16 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import * as assert from "assert";
+import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 
 export class SSMAgentAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
-        assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, "SSMAgentAddon can only be used with EKS EC2 at the moment. "
-            + "If using customer cluster provider, make sure you return the node group");
+        const nodeGroups = assertEC2NodeGroup(clusterInfo, SSMAgentAddOn.name);
 
-        // Setup managed policy.
-        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoScalingGroup;
         // Add AWS Managed Policy for SSM
-        nodeGroup!.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
+        nodeGroups.forEach(nodeGroup => 
+            nodeGroup.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')));
 
         // Apply manifest.
         // See APG Pattern https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/install-ssm-agent-on-amazon-eks-worker-nodes-by-using-kubernetes-daemonset.html

@@ -1,20 +1,13 @@
 import { Construct } from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as eks from "@aws-cdk/aws-eks";
-
-// Cluster
-import { ClusterInfo, ClusterProvider } from "..";
-
-// Utils 
-import { valueFromContext } from '../utils/context-utils';
-
-// Constants 
-import * as constants from './constants';
+import { defaultOptions, GenericClusterProvider } from './generic-cluster-provider';
 
 /**
  * Configuration options for the cluster provider.
  */
 export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
+
     /**
     * The name for the cluster.
     */
@@ -39,44 +32,21 @@ export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
 }
 
 /**
- * FargateClusterProvider provisions an EKS cluster with Fargate capacity.
+ * FargateClusterProvider provisions an EKS cluster with Fargate capacity only.
  */
-export class FargateClusterProvider implements ClusterProvider {
-
-    readonly props: FargateClusterProviderProps;
+export class FargateClusterProvider extends GenericClusterProvider {
 
     constructor(props?: FargateClusterProviderProps) {
-        this.props = props ?? {
-            version: eks.KubernetesVersion.V1_20,
-            fargateProfiles: new Map<string, eks.FargateProfileOptions>()
-        };
-    }
-
-    createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
-        const id = scope.node.id;
-
-        // Props for the cluster.
-        const clusterName = this.props.name ?? id;
-        const outputClusterName = true;
-        const version = this.props.version;
-        const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
-        const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = (privateCluster === true) ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : this.props.vpcSubnets;
-
-        const cluster = new eks.FargateCluster(scope, id, {
-            vpc,
-            clusterName,
-            outputClusterName,
-            version: version,
-            vpcSubnets,
-            endpointAccess,
+        super({...defaultOptions, ...props, ...{
+                fargateProfiles: Object.fromEntries(props?.fargateProfiles ?? new Map())
+            }
         });
-
-        // Provision our Fargate profiles.
-        for (const [id, options] of this.props.fargateProfiles) {
-            cluster.addFargateProfile(id, options);
-        }
-
-        return new ClusterInfo(cluster, version);
     }
+
+    /**
+     * @override
+     */
+    internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
+        return new eks.FargateCluster(scope, id, clusterOptions);
+    }    
 }

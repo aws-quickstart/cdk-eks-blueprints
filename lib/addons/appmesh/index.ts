@@ -43,7 +43,7 @@ const defaultProps = {
     name: "appmesh-controller",
     namespace: "appmesh-system",
     chart: "appmesh-controller",
-    version: "1.4.1",
+    version: "1.4.4",
     release: "appmesh-release",
     repository: "https://aws.github.io/eks-charts"
 };
@@ -74,9 +74,9 @@ export class AppMeshAddOn extends HelmAddOn {
         sa.role.addManagedPolicy(appMeshPolicy);
 
         if (this.options.enableTracing && this.options.tracingProvider === "x-ray") {
-            const ng = assertEC2NodeGroup(clusterInfo, "App Mesh X-Ray integration");
             const xrayPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess");
-            ng.role.addManagedPolicy(xrayPolicy);
+            const nodeGroups = assertEC2NodeGroup(clusterInfo, "App Mesh X-Ray integration");
+            nodeGroups.forEach(ng => ng.role.addManagedPolicy(xrayPolicy));
         }
 
         // App Mesh Namespace

@@ -1,11 +1,11 @@
 import { KubernetesVersion } from "@aws-cdk/aws-eks";
 import * as iam from "@aws-cdk/aws-iam";
-import { CfnJson, Tags, Construct } from "@aws-cdk/core";
+import { CfnJson, Construct, Tags } from "@aws-cdk/core";
 import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
-import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { conflictsWith } from "../../utils";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
@@ -35,13 +35,11 @@ const defaultProps = {
  */
 const versionMap = new Map([
     [KubernetesVersion.V1_21, "9.10.8"],
-    [KubernetesVersion.V1_20, "9.9.1"],
+    [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],
     [KubernetesVersion.V1_17, "9.4.0"]
 ]);
-
-
 
 export class ClusterAutoScalerAddOn extends HelmAddOn {
 
@@ -51,6 +49,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         super({ ...defaultProps, ...props });
         this.options = this.props;
     }
+    
     @conflictsWith('KarpenterAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
@@ -60,7 +59,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         } 
 
         const cluster = clusterInfo.cluster;
-        const ng = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
+        const nodeGroups = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
         const autoscalerStmt = new iam.PolicyStatement();
 
         autoscalerStmt.addResources("*");
@@ -78,13 +77,15 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             policyName: "ClusterAutoscalerPolicy",
             statements: [autoscalerStmt],
         });
-        autoscalerPolicy.attachToRole(ng.role);
-
         const clusterName = new CfnJson(cluster.stack, "clusterName", {
             value: cluster.clusterName,
         });
-        Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
-        Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
+        
+        for(let ng of nodeGroups) {
+            autoscalerPolicy.attachToRole(ng.role);
+            Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
+            Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
+        }
 
         const clusterAutoscalerChart = this.addHelmChart(clusterInfo, {
             cloudProvider: 'aws',
