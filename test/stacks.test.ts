@@ -1,4 +1,5 @@
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
+import { CapacityType } from '@aws-cdk/aws-eks';
 import * as cdk from '@aws-cdk/core';
 import { ManualApprovalStep } from '@aws-cdk/pipelines';
 import * as ssp from '../lib';
@@ -201,6 +202,37 @@ test("Named resource providers are correctly registered and discovered", async (
     expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.HostedZone)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(ssp.GlobalResources.Certificate)).toBeDefined();
     expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
+});
+
+test("Generic cluster provider correctly registers managed node groups", async () => {
+    const app = new cdk.App();
+
+    const clusterProvider = ssp.clusterBuilder()
+    .managedNodeGroup({
+        id: "mng1",
+        maxSize: 2,
+        nodeGroupCapacityType: CapacityType.SPOT
+    })
+    .managedNodeGroup({
+        id: "mng2",
+        maxSize:1
+    })
+    .fargateProfile("fp1", {
+        selectors: [
+            {
+                namespace: "default"
+            }
+        ]
+    }).build();
+
+    const blueprint =  await ssp.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .clusterProvider(clusterProvider)
+        .addOns(new ssp.ClusterAutoScalerAddOn)
+        .buildAsync(app, 'stack-with-resource-providers');
+    
+    expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
+    expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
 });
 
 function assertBlueprint(stack: ssp.EksBlueprint, ...charts: string[]) {

@@ -1,28 +1,52 @@
-import * as assert from "assert";
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import { ManagedPolicy } from "@aws-cdk/aws-iam";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
+import { Construct } from "@aws-cdk/core";
+import merge from "ts-deepmerge";
+import { assertEC2NodeGroup } from "../..";
+import { ClusterInfo } from "../../spi";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { ValuesSchema } from "./values";
 
-export class ContainerInsightsAddOn implements ClusterAddOn {
-    deploy(clusterInfo: ClusterInfo): void {
-        const cluster = clusterInfo.cluster;
-        assert(clusterInfo.nodeGroup || clusterInfo.autoScalingGroup, "ContainerInsightsAddon can only be used with EKS EC2 at the moment. "
-            + "If using custom cluster provider, make sure you return the node group");
+export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
+    values?: ValuesSchema
+}
 
-        // Setup managed policy.
-        const nodeGroup = clusterInfo.nodeGroup || clusterInfo.autoScalingGroup;
+const defaultProps = {
+    name: "adot-exporter-for-eks-on-ec2",
+    namespace: undefined, // the chart will choke if this value is set
+    chart: "adot-exporter-for-eks-on-ec2",
+    version: "0.1.0",
+    release: "adot-eks-addon",
+    repository: "https://aws-observability.github.io/aws-otel-helm-charts"
+};
+
+
+export class ContainerInsightsAddOn extends HelmAddOn {
+
+    constructor(props?: ContainerInsightAddonProps) {
+        super({ ...defaultProps, ...props });
+    }
+
+    /**
+     * @override
+     */
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        const cluster = clusterInfo.cluster;        
+        const nodeGroups = assertEC2NodeGroup(clusterInfo, ContainerInsightsAddOn.name);
+
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');
-        nodeGroup!.role.addManagedPolicy(policy);
-
-        // Apply manifest
-        const doc = readYamlDocument(__dirname + '/cwagent-fluentd-quickstart.yaml');
-        const docArray = doc.replace(/{{cluster_name}}/g, cluster.clusterName).replace(/{{region_name}}/g, cluster.stack.region);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        new KubernetesManifest(cluster.stack, "cluster-insights", {
-            cluster,
-            manifest,
-            overwrite: true
+        
+        nodeGroups.forEach(nodeGroup => {
+            nodeGroup.role.addManagedPolicy(policy);
         });
+
+        let values: ValuesSchema = {
+            awsRegion: cluster.stack.region,
+            clusterName: cluster.clusterName,   
+        };
+
+        values = merge(values, this.props.values ?? {});
+        
+        const chart = this.addHelmChart(clusterInfo, values, true, false);
+        return Promise.resolve(chart);
     }
 }

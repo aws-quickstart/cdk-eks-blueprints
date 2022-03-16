@@ -1,5 +1,6 @@
 import { KubernetesManifest } from "@aws-cdk/aws-eks";
 import * as eks from "@aws-cdk/aws-eks";
+import { Values } from "../spi";
 
 /**
   * Creates namespace
@@ -10,7 +11,7 @@ import * as eks from "@aws-cdk/aws-eks";
   * @param prune 
   * @returns KubernetesManifest
   */
-export function createNamespace(name: string, cluster: eks.Cluster, overwrite?: boolean, prune?: boolean) {
+export function createNamespace(name: string, cluster: eks.Cluster, overwrite?: boolean, prune?: boolean, annotations?: Values, labels? : Values) {
     return new KubernetesManifest(cluster.stack, `${name}-namespace-struct`, {
         cluster: cluster,
         manifest: [{
@@ -18,6 +19,8 @@ export function createNamespace(name: string, cluster: eks.Cluster, overwrite?: 
             kind: 'Namespace',
             metadata: {
                 name: name,
+                annotations,
+                labels
             }
         }],
         overwrite: overwrite ?? true,

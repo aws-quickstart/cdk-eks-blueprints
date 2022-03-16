@@ -125,7 +125,7 @@ export class SecretProviderClass {
 
     public addDependent(...constructs: Construct[]) {
         this.secretProviderClassPromise.then(secretProviderClass => {
-            constructs.forEach(dependent => secretProviderClass.node.addDependency(dependent));
+            constructs.forEach(dependent => dependent.node.addDependency(secretProviderClass));
         });
     }
 

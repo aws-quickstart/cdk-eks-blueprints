@@ -15,7 +15,7 @@ export interface HelmChartConfiguration {
     /**
      * Namespace where helm release will be installed
      */
-    namespace: string,
+    namespace: string | undefined,
 
     /**
      * Chart name
@@ -59,12 +59,18 @@ export interface HelmChartDeployment extends Required<HelmChartConfiguration> {
     /**
      * Deployment will wait for all pods to come up.
      */
-    wait?: boolean,
+    wait?: boolean;
 
     /**
      * Time to wait. 
      */
-    timeout?: Duration,
+    timeout?: Duration;
+
+    /**
+     * Creates namespace if does not exist
+     */
+    createNamespace?: boolean;
+
 }
 
 /**
@@ -99,6 +105,7 @@ export class KubectlProvider {
         return clusterInfo.cluster.addHelmChart(props.name, {
             repository: props.repository,
             namespace: props.namespace,
+            createNamespace: props.createNamespace,
             chart: props.chart,
             version: props.version,
             release: props.release,

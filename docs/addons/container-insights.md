@@ -31,22 +31,29 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 
 ## Prerequisites
 
-Once the Container Insights add-on has been installed in your cluster, validate that the CloudWatch Agent and the FluentD daemons are running. 
+Once the Container Insights add-on has been installed in your cluster, validate that the [AWS Distro for Open Telemetry](https://aws.amazon.com/otel) (ADOT) and the FluentBit daemons are running. 
 
 ```bash
-`kubectl get all -n amazon-cloudwatch`
+kubectl get all -n amazon-cloudwatch 
+kubectl get all -n amzn-cloudwatch-metrics
 ```
 
-You should see output similar to the following: 
+You should see output similar to the following respectively (assuming two node cluster): 
 
 ```
-NAME                           READY   STATUS    RESTARTS   AGE
-pod/cloudwatch-agent-k8wxl     1/1     Running   0          105s
-pod/fluentd-cloudwatch-78zv4   1/1     Running   0          105s
+NAME                   READY   STATUS    RESTARTS   AGE
+pod/fluent-bit-5chvg   1/1     Running   2          100s
+pod/fluent-bit-px7r6   1/1     Running   0          101s
 
-NAME                                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-daemonset.apps/cloudwatch-agent     1         1         1       1            1           <none>          107s
-daemonset.apps/fluentd-cloudwatch   1         1         1       1            1           <none>          106s
+NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+daemonset.apps/fluent-bit   2         2         2       2            2           <none>          100s
+
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/adot-collector-daemonset-b2rpc   1/1     Running   0          106s
+pod/adot-collector-daemonset-k6tfw   1/1     Running   2          106s
+
+NAME                                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+daemonset.apps/adot-collector-daemonset   2         2         2       2            2           <none>          106s
 ```
 
 To enable or disable control plane logs with the console, run the following command in your terminal.
