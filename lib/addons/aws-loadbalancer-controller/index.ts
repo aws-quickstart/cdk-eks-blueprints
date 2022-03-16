@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
+import { registries } from "./registryMap";
 
 /**
  * Configuration options for the add-on.
@@ -73,10 +74,10 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             namespace: this.options.namespace,
         });
 
-        AwsLoadbalancerControllerIamPolicy.Statement.forEach((statement) => {
+        AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
-
+        const repo = registries.get(clusterInfo.cluster.stack.region) + "amazon/aws-load-balancer-controller";
         const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
             serviceAccount: {
@@ -88,7 +89,10 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             enableWaf: this.options.enableWaf,
             enableWafv2: this.options.enableWafv2,
             createIngressClassResource: this.options.createIngressClassResource,
-            ingressClass: this.options.ingressClass
+            ingressClass: this.options.ingressClass,
+            region: clusterInfo.cluster.stack.region,
+            image: {repository: repo}
+
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
