@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h| --help)
       echo "Usage: ./create-build-and-push.sh --repo <public_ecr_repo_name> --ssm-version-tag <ssm_agent_version>"
-      echo "E.g: ./create-build-and-push.sh --repo eks-ssp-test/addon-ssm-agent --ssm-version-tag 3.0.1390.0"
+      echo "E.g: ./create-build-and-push.sh --repo eks-blueprints-test/addon-ssm-agent --ssm-version-tag 3.0.1390.0"
       exit 0
       ;;
     *)    # unknown option

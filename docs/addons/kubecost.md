@@ -7,15 +7,15 @@
 Using [npm](https://npmjs.org):
 
 ```sh
-$ npm install @kubecost/kubecost-ssp-addon
+$ npm install @kubecost/kubecost-blueprints-addon
 ```
 
 ## Usage
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
-import { EksBlueprint } from '@aws-quickstart/ssp-amazon-eks';
-import { KubecostAddOn } from '@kubecost/kubecost-ssp-addon';
+import { EksBlueprint } from '@aws-quickstart/cdk-eks-blueprints';
+import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
 
 
 export default class KubecostConstruct extends cdk.Construct {
@@ -72,4 +72,4 @@ If you have any questions about Kubecost, get in touch with the team [on Slack](
 
 ## License
 
-The Kubecost SSP AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-ssp-addon)
+The Kubecost Blueprints AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-blueprints-addon)

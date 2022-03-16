@@ -45,7 +45,7 @@ const defaultProps: AwsNodeTerminationHandlerProps = {
   chart: 'aws-node-termination-handler',
   repository: 'https://aws.github.io/eks-charts',
   version: '0.16.0',
-  release: 'ssp-addon-aws-node-termination-handler',
+  release: 'blueprints-addon-aws-node-termination-handler',
   name: 'aws-node-termination-handler',
   namespace: 'kube-system',
   mode: Mode.IMDS

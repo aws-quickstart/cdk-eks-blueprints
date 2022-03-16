@@ -46,7 +46,7 @@ const defaultProps: SecretsStoreAddOnProps = {
     name: 'secrets-store-csi-driver',
     namespace: 'kube-system',
     version: 'v0.0.23',
-    release: 'ssp-addon-secret-store-csi-driver',
+    release: 'blueprints-addon-secret-store-csi-driver',
     repository: 'https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts',
     rotationPollInterval: undefined,
     syncSecrets: true,

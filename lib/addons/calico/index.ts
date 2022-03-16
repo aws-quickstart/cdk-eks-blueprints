@@ -34,7 +34,7 @@ const defaultProps = {
     namespace: 'kube-system',
     version: '0.3.10',
     chart: "aws-calico",
-    release: "ssp-addon-calico",
+    release: "blueprints-addon-calico",
     repository: "https://aws.github.io/eks-charts"
 };
 

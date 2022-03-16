@@ -44,7 +44,7 @@ export class MngClusterProvider extends GenericClusterProvider {
     constructor(props?: MngClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
-                id: props?.id ?? props?.clusterName ?? "eks-ssp-mng",
+                id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
                 amiReleaseVersion: props?.amiReleaseVersion,
                 customAmi: props?.customAmi,
                 amiType: props?.amiType,

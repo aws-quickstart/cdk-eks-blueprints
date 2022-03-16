@@ -14,12 +14,12 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ```typescript
 import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
 
 const app = new App();
 
-ssp.EksBlueprint.builder()
-    .addOns(new ssp.EbsCsiDriverAddOn() )
+blueprints.EksBlueprint.builder()
+    .addOns(new blueprints.EbsCsiDriverAddOn() )
     .build(app, 'my-cluster');
 ```
 

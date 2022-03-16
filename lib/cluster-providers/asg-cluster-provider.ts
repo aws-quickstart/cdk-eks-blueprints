@@ -34,7 +34,7 @@ export class AsgClusterProvider extends GenericClusterProvider {
     constructor(props?: AsgClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             autoscalingNodeGroups: [{
-                id: props?.id ?? props?.clusterName ?? "eks-ssp-asg",
+                id: props?.id ?? props?.clusterName ?? "eks-blueprints-asg",
                 desiredSize: props?.desiredSize,
                 maxSize: props?.maxSize,
                 minSize: props?.minSize,

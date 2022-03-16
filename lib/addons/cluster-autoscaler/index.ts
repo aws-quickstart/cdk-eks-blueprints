@@ -26,7 +26,7 @@ const defaultProps = {
     chart: 'cluster-autoscaler',
     name: 'cluster-autoscaler',
     namespace: 'kube-system',
-    release: 'ssp-addon-cluster-autoscaler',
+    release: 'blueprints-addon-cluster-autoscaler',
     repository: 'https://kubernetes.github.io/autoscaler',
     version: 'auto'
 };

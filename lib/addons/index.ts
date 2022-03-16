@@ -27,5 +27,5 @@ export * from './kubevious';
 export * from './ebs-csi-driver';
 
 export class Constants {
-    public static readonly SSP_ADDON = "ssp-addon";
+    public static readonly Blueprints_ADDON = "blueprints-addon";
 }

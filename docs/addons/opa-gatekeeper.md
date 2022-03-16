@@ -28,16 +28,16 @@ RBAC (role-based access control) can help with some of the scenarios above but *
 ## Usage
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
 
 const app = new cdk.App();
 const account = <AWS_ACCOUNT_ID>;
 const region = <AWS_REGION>;
 
-const blueprint = ssp.EksBlueprint.builder()
+const blueprint = blueprints.EksBlueprint.builder()
   .account(account) 
   .region(region)
-  .addOns( new ssp.addons.OpaGatekeeperAddOn() )
+  .addOns( new blueprints.addons.OpaGatekeeperAddOn() )
   .teams().build(app, 'my-stack-name');
 ```
 

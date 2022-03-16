@@ -1,6 +1,6 @@
 # CodeBuild CI
 
-This example shows how to enable a CodeBuild based Continuous Integration process for the SSP blueprint. The CodeBuild project is provisioned using a CDK application.
+This example shows how to enable a CodeBuild based Continuous Integration process for the Blueprints blueprint. The CodeBuild project is provisioned using a CDK application.
 
 The [buildspec.yml](../../ci/buildspec.yml) provided deploys the sample blueprint stacks provided in [examples](../../bin/main.ts). The buildspec can be used directly if you wish to setup the CodeBuild project manually through the console or via the CLI.
 
@@ -11,9 +11,9 @@ Optionally, you can also provide an S3 bucket location for a `cdk.context.json` 
 First, clone this project.
 
 ```sh
-git clone https://github.com/aws-quickstart/quickstart-ssp-amazon-eks.git
+git clone https://github.com/aws-quickstart/cdk-eks-blueprints.git
 
-cd quickstart-ssp-amazon-eks
+cd cdk-eks-blueprints
 ```
 
 Install CDK (please review and install any missing [pre-requisites](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) for your environment)

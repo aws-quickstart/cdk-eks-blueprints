@@ -13,7 +13,7 @@ Full Argo CD project documentation [can be found here](https://argoproj.github.i
 To provision and maintain ArgoCD components without any bootstrapping, the add-on provides a no-argument constructor to get started. 
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
 
 const addOn = new ArgoCDAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];
@@ -56,7 +56,7 @@ You can change the admin password through the Secrets Manager, but it will requi
 
 ## Bootstrapping 
 
-The SSP framework provides an approach to bootstrap workloads and/or additional add-ons from a customer GitOps repository. In a general case, the bootstrap GitOps repository may contains an [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) that points to all workloads and add-ons.  
+The Blueprints framework provides an approach to bootstrap workloads and/or additional add-ons from a customer GitOps repository. In a general case, the bootstrap GitOps repository may contains an [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) that points to all workloads and add-ons.  
 
 In order to enable bootstrapping, the add-on allows passing an `ApplicationRepository` at construction time. The following repository types are supported at present:
 
@@ -68,10 +68,10 @@ In order to enable bootstrapping, the add-on allows passing an `ApplicationRepos
 An example is provided below, along with an approach that could use a separate app of apps to bootstrap workloads in different stages, which is important for a software delivery platform as it allows segregating workloads specific to each stage of the SDLC and defines clear promotion processes through GitOps.
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
 
 const addOns = ...;
-const repoUrl = 'https://github.com/aws-samples/ssp-eks-workloads.git'
+const repoUrl = 'https://github.com/aws-samples/blueprints-eks-workloads.git'
 
 const bootstrapRepo = {
     repoUrl,
@@ -101,17 +101,17 @@ const prodBootstrapArgo = new ArgoCDAddOn({
 });
 
 const east1 = 'us-east-1';
-new ssp.EksBlueprint(scope, { id: `${id}-${east1}`, addOns: addOns.concat(devBootstrapArgo), teams }, {
+new blueprints.EksBlueprint(scope, { id: `${id}-${east1}`, addOns: addOns.concat(devBootstrapArgo), teams }, {
     env: { region: east1 }
 });
 
 const east2 = 'us-east-2';
-new ssp.EksBlueprint(scope, { id: `${id}-${east2}`, addOns: addOns.concat(testBootstrapArgo), teams }, {
+new blueprints.EksBlueprint(scope, { id: `${id}-${east2}`, addOns: addOns.concat(testBootstrapArgo), teams }, {
     env: { region: east2 }
 });
 
 const west2 = 'us-west-2'
-new ssp.EksBlueprint(scope, { id: `${id}-${west2}`, addOns: addOns.concat(prodBootstrapArgo), teams }, {
+new blueprints.EksBlueprint(scope, { id: `${id}-${west2}`, addOns: addOns.concat(prodBootstrapArgo), teams }, {
     env: { region: west2 }
 });
 ```
@@ -129,9 +129,9 @@ The framework provides support to supply repository and administrator secrets in
 1. Set `credentialsType` to `SSH` when defining bootstrap repository in the ArgoCD add-on configuration.
 
 ```typescript
-.addOns(new ssp.addons.ArgoCDAddOn({
+.addOns(new blueprints.addons.ArgoCDAddOn({
     bootstrapRepo: {
-        repoUrl: 'git@github.com:aws-samples/ssp-eks-workloads.git',
+        repoUrl: 'git@github.com:aws-samples/blueprints-eks-workloads.git',
         path: 'envs/dev',
         credentialsSecretName: 'github-ssh-json',
         credentialsType: 'SSH'
@@ -161,7 +161,7 @@ To escape your SSH private key for storing it as a secret you can use the follow
 awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}'  <path-to-your-cert>
 ```
 
-A convenience script to create the JSON structure for SSH private key can be found [here](https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/scripts/create-argocd-ssh-secret.sh). You will need to set the `PEM_FILE`(full path to the ssh private key file) and `URL_TEMPLATE` (part of the URL for credentials template) variables inside the script.
+A convenience script to create the JSON structure for SSH private key can be found [here](https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/scripts/create-argocd-ssh-secret.sh). You will need to set the `PEM_FILE`(full path to the ssh private key file) and `URL_TEMPLATE` (part of the URL for credentials template) variables inside the script.
 
 3. (**important**) Replicate the secret to all the desired regions. 
 4. Please see [instructions for GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) oou n details on setting up SSH access.
@@ -171,7 +171,7 @@ A convenience script to create the JSON structure for SSH private key can be fou
 
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
 2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
-3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/ssp-eks-workloads.git.
+3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/blueprints-eks-workloads.git.
 
 **Admin Secret**
 
@@ -185,7 +185,7 @@ Alternatively to get started, the admin password hash can be set bypassing the A
 ```typescript
 import * as bcrypt from "bcrypt";
 
-.addOns(new ssp.addons.ArgoCDAddOn({
+.addOns(new blueprints.addons.ArgoCDAddOn({
          ... // other settings
          values: {
            "configs": {

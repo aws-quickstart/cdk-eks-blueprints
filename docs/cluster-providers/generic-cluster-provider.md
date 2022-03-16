@@ -5,7 +5,7 @@ The `GenericClusterProvider` allows you to provision an EKS cluster which levera
 ## Usage 
 
 ```typescript
-const clusterProvider = new ssp.GenericClusterProvider({
+const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_21,
     managedNodeGroups: [
         {
@@ -67,7 +67,7 @@ Configuration of the EC2 parameters through context parameters makes sense if yo
 Upgrading Kubernetes versions via cluster configuration at present won't impact the kubelet version running on the worker nodes. Worker nodes in-place upgrade requires explicit update of the individual node groups. The property that controls it for managed node groups is `amiReleaseVersion`. The following demonstrates how to do so.
 
 ```typescript
-const clusterProvider = new ssp.GenericClusterProvider({
+const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_20,
     managedNodeGroups: [
         {

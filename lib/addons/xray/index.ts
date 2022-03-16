@@ -6,7 +6,7 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { loadYaml, readYamlDocument, createNamespace } from "../../utils";
 
 /**
- * Implementation of AWS X-Ray add-on for EKS SSP. Installs xray daemonset and exposes 
+ * Implementation of AWS X-Ray add-on for EKS Blueprints. Installs xray daemonset and exposes 
  * an internal ClusterIP service for tracing on port 2000 (UDP).
  */
 export class XrayAddOn implements ClusterAddOn {
