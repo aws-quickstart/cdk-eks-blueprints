@@ -7,17 +7,18 @@ import { GitOpsApplicationDeployment, GitRepositoryReference } from '../../spi';
  */
 export class ArgoApplication {
 
-    constructor(private readonly bootstrapRepo: GitRepositoryReference | undefined) {}
+    constructor(private readonly bootstrapRepo: GitRepositoryReference | undefined) { }
 
     public generate(deployment: GitOpsApplicationDeployment, syncOrder?: number) {
 
         const flatValues = dot.dot(deployment.values);
         const nameValues = [];
 
-        for( let key in flatValues) {
-            nameValues.push({ name: key, value: `${flatValues[key]}`});
+        for (let key in flatValues) {
+            // Avoid passing the undefined values and empty objects
+            if (flatValues[key] !== undefined && Object.keys(flatValues[key]).length != 0)
+                nameValues.push({ name: key, value: `${flatValues[key]}` });
         }
-
         const repository = deployment.repository ?? this.generateDefaultRepo(deployment.name);
 
         return {
@@ -58,11 +59,11 @@ export class ArgoApplication {
      * @returns 
      */
     generateDefaultRepo(name: string): GitRepositoryReference {
-        if(this.bootstrapRepo) {
+        if (this.bootstrapRepo) {
             return {
                 name: this.bootstrapRepo.name,
                 repoUrl: this.bootstrapRepo.repoUrl,
-                path: this.bootstrapRepo.path + `/addons/${name}`,
+                path: this.bootstrapRepo.path + `/${name}`,
                 targetRevision: this.bootstrapRepo.targetRevision
             };
         }

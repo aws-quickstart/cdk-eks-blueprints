@@ -6,12 +6,12 @@ import { ClusterInfo, Values } from "../..";
  * Structure that defines properties for a generic Helm chart. 
  */
 export interface HelmChartConfiguration {
-    
+
     /**
      * Name of the helm chart (add-on)
      */
     name: string,
-    
+
     /**
      * Namespace where helm release will be installed
      */
@@ -25,7 +25,7 @@ export interface HelmChartConfiguration {
     /**
      * Helm chart version.
      */
-    version: string, 
+    version: string,
 
     /**
      * Helm release
@@ -41,6 +41,15 @@ export interface HelmChartConfiguration {
      * Optional values for the helm chart. 
      */
     values?: Values
+
+    /**
+     * Indicate the helm chart provided uses dependency mode (https://helm.sh/docs/helm/helm_dependency/).
+     * Dependency mode is widely used in `aws-samples/ssp-eks-add-ons` repository, for example:
+     * https://github.com/aws-samples/ssp-eks-add-ons/blob/main/add-ons/appmesh-controller/Chart.yaml
+     * Dependency mode requires the chart values to be wrapped within the chart name.
+     * This value is only used when AddOns are deployed via GitOps way: `ArgoGitOpsFactory.enableGitOps()`
+     */
+    dependencyMode?: boolean
 }
 
 /**
@@ -62,8 +71,8 @@ export interface HelmChartDeployment extends Required<HelmChartConfiguration> {
  * Data structure defines properties for kubernetes manifest deployment (non-helm).
  */
 export interface ManifestConfiguration {
-    name: string, 
-    namespace: string, 
+    name: string,
+    namespace: string,
     manifestUrl: string
 }
 
@@ -84,10 +93,10 @@ export interface ManifestDeployment extends Omit<ManifestConfiguration, "manifes
  */
 export class KubectlProvider {
 
-    constructor(private readonly clusterInfo : ClusterInfo) {}
+    constructor(private readonly clusterInfo: ClusterInfo) { }
 
-    public static applyHelmDeployment = function(clusterInfo: ClusterInfo, props: HelmChartDeployment) : Construct {
-        return clusterInfo.cluster.addHelmChart( props.name, {
+    public static applyHelmDeployment = function (clusterInfo: ClusterInfo, props: HelmChartDeployment): Construct {
+        return clusterInfo.cluster.addHelmChart(props.name, {
             repository: props.repository,
             namespace: props.namespace,
             chart: props.chart,
@@ -106,7 +115,7 @@ export class KubectlProvider {
      * @param values values to replace (e.g. region will be passed as "region: us-west-1" and any occurrence of {{region}} will be replaced)
      * @returns 
      */
-    public static applyManifestTemplate = function(document: any, values: Values) : any {
+    public static applyManifestTemplate = function (document: any, values: Values): any {
         const valueMap = new Map(Object.entries(values));
         let data = JSON.stringify(document);
         valueMap.forEach((value: string, key: string) => {
@@ -115,20 +124,20 @@ export class KubectlProvider {
         return JSON.parse(data);
     };
 
-    public static applyManifestDeployment = function(clusterInfo: ClusterInfo, props: ManifestDeployment) {
+    public static applyManifestDeployment = function (clusterInfo: ClusterInfo, props: ManifestDeployment) {
         const manifestDoc = KubectlProvider.applyManifestTemplate(props.manifest, props.values);
-        return  new KubernetesManifest(clusterInfo.cluster, props.name, {
-          cluster: clusterInfo.cluster,
-          manifest: manifestDoc,
-          overwrite: true  
+        return new KubernetesManifest(clusterInfo.cluster, props.name, {
+            cluster: clusterInfo.cluster,
+            manifest: manifestDoc,
+            overwrite: true
         });
     };
 
-    public addHelmChart(props: HelmChartDeployment) : Construct {
+    public addHelmChart(props: HelmChartDeployment): Construct {
         return KubectlProvider.applyHelmDeployment(this.clusterInfo, props);
     }
 
-    public addManfiest(props: ManifestDeployment) : Construct {
+    public addManfiest(props: ManifestDeployment): Construct {
         return KubectlProvider.applyManifestDeployment(this.clusterInfo, props);
     }
 }

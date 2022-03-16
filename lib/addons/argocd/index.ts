@@ -1,5 +1,5 @@
 import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
-import { Construct } from "@aws-cdk/core";
+import { Construct, Stack } from "@aws-cdk/core";
 import * as assert from "assert";
 import * as bcrypt from "bcrypt";
 import * as dot from 'dot-object';
@@ -31,12 +31,14 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
-     * after the infrastructure and team provisioning is complete. 
+     * after the infrastructure and team provisioning is complete.
+     * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
+     * repository will be used for provisioning all `HelmAddOn` based AddOns.
      */
     bootstrapRepo?: spi.ApplicationRepository;
 
     /**
-     * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certifcate, and other paramters to pass 
+     * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
      * to the applications. 
      */
     bootstrapValues?: spi.Values,
@@ -44,7 +46,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * Optional admin password secret name as defined in AWS Secrets Manager (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
-     * stored as a non-reverisble bcrypt hash. 
+     * stored as a non-reversible bcrypt hash. 
      * Note: at present, change of password may require manual restart of argocd server. 
      */
     adminPasswordSecretName?: string;
@@ -161,11 +163,15 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const appRepo = this.options.bootstrapRepo;
 
         if (appRepo) {
+            // merge with custom bootstrapValues with executionContext and common values
+            const shared = { clusterName: clusterInfo.cluster.clusterName, region: Stack.of(clusterInfo.cluster).region };
+            const merged = { ...shared, ...Object.fromEntries(clusterInfo.getAllExecutionContext().entries()), ...this.options.bootstrapValues };
+
             this.generate(clusterInfo, {
                 name: appRepo.name ?? "bootstrap-apps",
                 namespace: this.options.namespace!,
                 repository: appRepo,
-                values: this.options.bootstrapValues ?? {}
+                values: merged,
             });
         }
         this.chartNode = undefined;
@@ -174,11 +180,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     /**
      * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
      */
-     protected async createAdminSecret(region: string): Promise<string> {
+    protected async createAdminSecret(region: string): Promise<string> {
         const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
         return bcrypt.hash(secretValue, 10);
     }
-    
+
     /**
      * Creates a service account that can access secrets
      * @param clusterInfo 

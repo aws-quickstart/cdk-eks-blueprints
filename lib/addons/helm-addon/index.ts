@@ -7,14 +7,15 @@ export type HelmAddOnUserProps = Partial<HelmChartConfiguration>;
 
 export abstract class HelmAddOn implements spi.ClusterAddOn {
 
-    constructor(readonly props: HelmAddOnProps) {}
-    
+    constructor(readonly props: HelmAddOnProps) { }
+
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
 
-    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, wait?: boolean, timeout?: Duration ) : Construct {
+    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, wait?: boolean, timeout?: Duration): Construct {
         const kubectlProvider = new KubectlProvider(clusterInfo);
         values = values ?? {};
-        const chart = {...this.props, ...{ values, wait, timeout} };
+        const dependencyMode = this.props.dependencyMode ?? true;
+        const chart = { ...this.props, ...{ values, dependencyMode, wait, timeout } };
         return kubectlProvider.addHelmChart(chart);
     }
 }

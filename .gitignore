@@ -21,3 +21,6 @@ yarn.lock
 
 # mkdocs artifact
 site
+
+examples/**/*.js
+lib/**/*.js
