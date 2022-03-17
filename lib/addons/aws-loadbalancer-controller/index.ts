@@ -91,8 +91,8 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
             region: clusterInfo.cluster.stack.region,
-            image: {repository: repo}
-
+            image: { repository: repo },
+            vpcId: clusterInfo.cluster.vpc.vpcId,
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
