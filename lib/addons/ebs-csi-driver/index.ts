@@ -1,4 +1,3 @@
-import { PolicyDocument } from "@aws-cdk/aws-iam";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 
@@ -19,7 +18,6 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         super({
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
-
             policyDocumentProvider: getEbsDriverPolicyDocument
         });
     }
