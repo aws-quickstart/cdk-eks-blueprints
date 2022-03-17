@@ -7,7 +7,7 @@ AWS provides a Fluent Bit image with plugins for both CloudWatch Logs and Kinesi
 ## Usage
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn();
 const addOns: Array<ClusterAddOn> = [ awsForFluentBit ];
@@ -28,7 +28,7 @@ AWS for FluentBit can be configured to forward logs to multiple AWS destinations
 Sample configuration can be found below:
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn({ 
 	values: {
@@ -56,7 +56,7 @@ const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn({
 When leveraging AWS for FluentBit to forward logs to various AWS destinations, you will need to supply an IAM role that grants privileges to the namespace in which FluentBit runs. For example, in order to forward logs to Amazon Elasticsearch Service, you would supply the following IAMPolicyStatement. 
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const domain = es.Domain()
 const domainWritePolicy = new iam.PolicyStatement({

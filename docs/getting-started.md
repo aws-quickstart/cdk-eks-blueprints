@@ -1,12 +1,12 @@
 # Getting Started 
 
-This getting started guide will walk you through setting up a new CDK project which leverages the `cdk-eks-blueprints` NPM module to deploy a simple Blueprints. 
+This getting started guide will walk you through setting up a new CDK project which leverages the `eks-blueprints` NPM module to deploy a simple Blueprints. 
 
 ## Project Setup
 
 Before proceeding, make sure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) is installed on your machine.
 
-To use the `cdk-eks-blueprints` module, you must have [Node.js](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed. We will also use `make` to simplify build and other common actions. You can do it using the following instructions:
+To use the `eks-blueprints` module, you must have [Node.js](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed. We will also use `make` to simplify build and other common actions. You can do it using the following instructions:
 
 
 === "Mac"
@@ -32,10 +32,10 @@ npx cdk init app --language typescript
 
 ## Deploy a Blueprint EKS Cluster
 
-Install the `cdk-eks-blueprints` NPM package via the following.
+Install the `eks-blueprints` NPM package via the following.
 
 ```bash
-npm i @aws-quickstart/cdk-eks-blueprints
+npm i @aws-quickstart/eks-blueprints
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
@@ -43,7 +43,7 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 const account = 'XXXXXXXXXXXXX';
@@ -87,7 +87,7 @@ Deploy the stack using the following command. This command will take roughly 20 
 cdk deploy
 ```
 
-Congratulations! You have deployed your first EKS cluster with `cdk-eks-blueprints`. The above code will provision the following:
+Congratulations! You have deployed your first EKS cluster with `eks-blueprints`. The above code will provision the following:
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.

@@ -14,7 +14,7 @@ $ npm install @kubecost/kubecost-blueprints-addon
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
-import { EksBlueprint } from '@aws-quickstart/cdk-eks-blueprints';
+import { EksBlueprint } from '@aws-quickstart/eks-blueprints';
 import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
 
 

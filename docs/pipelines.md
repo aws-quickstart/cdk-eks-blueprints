@@ -24,7 +24,7 @@ Creation of a pipeline starts with defining the blueprint that will be deployed 
 The framework allows defining a blueprint builder without instantiating the stack.
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints'
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 import * as team from 'path/to/teams'
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -49,7 +49,7 @@ This code will produce a blueprint builder that can be instantiated inside the p
 We can create a new `CodePipeline` resource via the following. 
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints'
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 
 const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder

@@ -10,7 +10,7 @@ Welcome to the [`Amazon EKS Blueprints Quick Start`](https://github.com/aws-quic
 
 ## What can I do with this QuickStart?
 
-Customers can use this Quick Start to easily architect and deploy a multi-tenant Blueprints built on EKS. Specifically, customers can leverage the `cdk-eks-blueprints` module to:
+Customers can use this Quick Start to easily architect and deploy a multi-tenant Blueprints built on EKS. Specifically, customers can leverage the `eks-blueprints` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
 - [x] Manage cluster configuration, including add-ons that run in each cluster, from a single Git repository.
@@ -20,4 +20,4 @@ Customers can use this Quick Start to easily architect and deploy a multi-tenant
 
 ## Examples
 
-To view a library of examples for how you can leverage the `cdk-eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).
+To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).

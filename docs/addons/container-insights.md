@@ -15,7 +15,7 @@ Metrics collected by Container Insights are charged as custom metrics. For more 
 Add the following as an add-on to your main.ts file to add Containers Insights to your cluster
 
 ```typescript
-import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
+import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new ContainerInsightsAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];

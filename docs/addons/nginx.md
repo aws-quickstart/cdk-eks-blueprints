@@ -12,7 +12,7 @@ This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controll
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddOn, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
+import { AwsLoadBalancerControllerAddOn, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const externalDnsHostname  = ...;
 const awsLbControllerAddOn = new AwsLoadBalancerControllerAddon();

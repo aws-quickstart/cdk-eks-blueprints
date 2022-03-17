@@ -7,7 +7,7 @@ Full documentation on using App Mesh with EKS [can be found here](https://docs.a
 ## Usage
 
 ```typescript
-import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
+import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new AppMeshAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];

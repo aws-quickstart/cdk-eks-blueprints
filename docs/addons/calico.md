@@ -9,7 +9,7 @@ Calico add-on supports [standard helm configuration options](./index.md#standard
 ## Usage
 
 ```typescript
-import { CalicoAddon, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/cdk-eks-blueprints';
+import { CalicoAddon, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new CalicoAddon();
 const addOns: Array<ClusterAddOn> = [ addOn ];

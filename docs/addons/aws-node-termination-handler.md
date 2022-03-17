@@ -16,7 +16,7 @@ NTH can operate in two different modes: Instance Metadata Service (IMDS) or the 
 import * as cdk from '@aws-cdk/core';
 
 // Blueprints Lib
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints'
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 import * as eks from '@aws-cdk/aws-eks';
 
 export default class BottlerocketConstruct extends cdk.Construct {

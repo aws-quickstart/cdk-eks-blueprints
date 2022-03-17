@@ -28,7 +28,7 @@ RBAC (role-based access control) can help with some of the scenarios above but *
 ## Usage
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 const account = <AWS_ACCOUNT_ID>;

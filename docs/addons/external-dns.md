@@ -7,7 +7,7 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ## Usage
 
 ```typescript
-import * as blueprints from '@aws-quickstart/cdk-eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const hostedZoneName = ...
 const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
