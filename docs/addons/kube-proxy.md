@@ -14,9 +14,9 @@ Amazon EKS automatically installs Kube-proxy as self-managed add-on for every cl
 ## Usage
 
 ```typescript
-import * as ssp from '@shapirov/cdk-eks-blueprint';
+import * as blueprints from '@shapirov/cdk-eks-blueprint';
 
-readonly kubeProxy = new ssp.addons.KubeProxyAddOn("v1.19.6-eksbuild.2");// optionally specify image version to pull  or empty constructor
+readonly kubeProxy = new blueprints.addons.KubeProxyAddOn("v1.19.6-eksbuild.2");// optionally specify image version to pull  or empty constructor
 
 const addOns: Array<ClusterAddOn> = [ kubeProxy ];
 

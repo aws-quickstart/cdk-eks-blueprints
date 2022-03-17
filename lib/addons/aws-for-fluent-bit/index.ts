@@ -20,7 +20,7 @@ export interface AwsForFluentBitAddOnProps extends HelmAddOnUserProps {
 const defaultProps: AwsForFluentBitAddOnProps = {
     name: 'fluent-bit',
     chart: 'aws-for-fluent-bit',
-    release: "ssp-addon-aws-for-fluent-bit",
+    release: "blueprints-addon-aws-for-fluent-bit",
     version: '0.1.11',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'kube-system',

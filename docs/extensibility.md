@@ -1,7 +1,7 @@
 # Extensibility
 This guide provides an overview of extensibility options focusing on add-on extensions as the primary mechanism for the partners and customers. 
 ## Overview
-SSP Framework is designed to be extensible. In the context of this guide, extensibility refers to the ability of customers and partners to both add new capabilities to the framework or platforms based on SSP as well as customize existing behavior, including the ability to modify or override existing behavior.
+Blueprints Framework is designed to be extensible. In the context of this guide, extensibility refers to the ability of customers and partners to both add new capabilities to the framework or platforms based on Blueprints as well as customize existing behavior, including the ability to modify or override existing behavior.
 
 The following abstractions can be leveraged to add new features to the framework:
 
@@ -23,7 +23,7 @@ export declare interface ClusterAddOn {
 
 **Note**: The add-on implementation can optionally supply the `id` attribute if the target add-on can be added to a blueprint more than once. 
 
-Implementation of the add-on is expected to be an exported class that implements the interface and supplies the implementation of the `deploy` method. In order for the add-on to receive the deployment contextual information about the provisioned cluster, region, resource providers and/or other add-ons, the `deploy` method takes the `ClusterInfo` parameter (see [types](https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/lib/spi/types.ts)), which represents a structure defined in the SPI (service provider interface) contracts. The API for the cluster info structure is stable and provides access to the provisioned EKS cluster, scheduled add-ons (that have not been installed yet but are part of the blueprint) or provisioned add-ons and other contexts.
+Implementation of the add-on is expected to be an exported class that implements the interface and supplies the implementation of the `deploy` method. In order for the add-on to receive the deployment contextual information about the provisioned cluster, region, resource providers and/or other add-ons, the `deploy` method takes the `ClusterInfo` parameter (see [types](https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/lib/spi/types.ts)), which represents a structure defined in the SPI (service provider interface) contracts. The API for the cluster info structure is stable and provides access to the provisioned EKS cluster, scheduled add-ons (that have not been installed yet but are part of the blueprint) or provisioned add-ons and other contexts.
 
 ### Post Deployment Hooks
 
@@ -46,13 +46,13 @@ This capability is leveraged for example in ArgoCD add-on to bootstrap workloads
 
 Helm add-ons are the most common case that generally combines provisioning of a helm chart as well as supporting infrastructure such as wiring of proper IAM policies for the Kubernetes service account, provisioning or configuring other AWS resources (VPC, subnets, node groups). 
 
-In order to provide consistency across all Helm add-ons supplied by the SSP framework all Helm add-ons are implemented as derivatives of the `HelmAddOn` base class and support properties based on `HelmAddOnUserProps`. See the [example extension section](#example-extension) below for more details.
+In order to provide consistency across all Helm add-ons supplied by the Blueprints framework all Helm add-ons are implemented as derivatives of the `HelmAddOn` base class and support properties based on `HelmAddOnUserProps`. See the [example extension section](#example-extension) below for more details.
 
 Use cases that are enabled by leveraging the base `HelmAddOn` class:
 
 1. Consistency across all helm based add-on will reduce effort to understand how to apply and configure standard add-on options.
 2. Ability to override helm chart repository can enable leveraging private helm chart repository by the customer and facilitate add-on usage for private EKS clusters.
-3. Extensibility mechanisms available in the SSP framework can allow to intercept helm deployments and leverage GitOps driven add-on configuration.
+3. Extensibility mechanisms available in the Blueprints framework can allow to intercept helm deployments and leverage GitOps driven add-on configuration.
 
 ### Non-helm Add-ons
 
@@ -112,30 +112,30 @@ export class MyProductAddOn extends HelmAddOn {
 
 Secrets from the AWS Secrets Manager or AWS Systems Manager Parameter Store can be made available as files mounted in Amazon EKS pods. It can be achieved with the help of AWS Secrets and Configuration Provider (ASCP) for the [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/). The ASCP works with Amazon Elastic Kubernetes Service (Amazon EKS) 1.17+. More information on general concepts for leveraging ASCP can be found [here](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html).
 
-SSP Framework provides support for both Secrets Store CSI Driver as well as ASCP with the [Secrets Store Add-on](addons/secrets-store.md).
+Blueprints Framework provides support for both Secrets Store CSI Driver as well as ASCP with the [Secrets Store Add-on](addons/secrets-store.md).
 
 Add-ons requiring support for secrets can declare dependency on the secret store add-on:
 
 ```typescript
-export class MyAddOn extends ssp.addons.HelmAddOn {
+export class MyAddOn extends blueprints.addons.HelmAddOn {
 ...
     // Declares dependency on secret store add-on if secrets are needed. 
     // Customers will have to explicitly add this add-on to the blueprint.
-    @ssp.utils.dependable(ssp.SecretsStoreAddOn.name) 
-    deploy(clusterInfo: ssp.ClusterInfo): Promise<Construct> {
+    @blueprints.utils.dependable(blueprints.SecretsStoreAddOn.name) 
+    deploy(clusterInfo: blueprints.ClusterInfo): Promise<Construct> {
         ...
     }
 
 ```
 
-In order to propagate the secret from the Secrets Manager to the Kubernetes cluster, the add-on should create a `SecretProviderClass` Kubernetes object.  leveraging the `ssp.addons.SecretProviderClass`. The framework will take care of wiring the Kubernetes service account with the correct IAM permissions to pull the secret:
+In order to propagate the secret from the Secrets Manager to the Kubernetes cluster, the add-on should create a `SecretProviderClass` Kubernetes object.  leveraging the `blueprints.addons.SecretProviderClass`. The framework will take care of wiring the Kubernetes service account with the correct IAM permissions to pull the secret:
 
 ```typescript
 
 const sa = clusterInfo.cluster.addServiceAccount(...);
 
-const csiSecret: ssp.addons.CsiSecretProps = {
-    secretProvider: new ssp.LookupSecretsManagerSecretByName(licenseKeySecret), // the secret must be defined upfront and available in the region with the name specified in the licenseKeySecret
+const csiSecret: blueprints.addons.CsiSecretProps = {
+    secretProvider: new blueprints.LookupSecretsManagerSecretByName(licenseKeySecret), // the secret must be defined upfront and available in the region with the name specified in the licenseKeySecret
     kubernetesSecret: {
         secretName: 'my-addon-license-secret',
         data: [
@@ -146,11 +146,11 @@ const csiSecret: ssp.addons.CsiSecretProps = {
     }
 };
 
-const secretProviderClass = new ssp.addons.SecretProviderClass(clusterInfo, sa, "my-addon-license-secret-class", csiSecret);
+const secretProviderClass = new blueprints.addons.SecretProviderClass(clusterInfo, sa, "my-addon-license-secret-class", csiSecret);
 ```
-**Note:** you can also leverage `LookupSecretsManagerSecretByArn`, `LookupSsmSecretByAttrs` or a custom implementation of the secret provider interface `ssp.addons.SecretProvider`. 
+**Note:** you can also leverage `LookupSecretsManagerSecretByArn`, `LookupSsmSecretByAttrs` or a custom implementation of the secret provider interface `blueprints.addons.SecretProvider`. 
 
-After the secret provider class is created, it should be mounted on any pod in the namespace to make the secret accessible. Mounting the secret volume also creates a regular Kubernetes `Secret` object based on the supplied description (`my-addon-license-secret`). This capability is controlled by the configuration of the SSP Secret Store add-on and is enabled by default.
+After the secret provider class is created, it should be mounted on any pod in the namespace to make the secret accessible. Mounting the secret volume also creates a regular Kubernetes `Secret` object based on the supplied description (`my-addon-license-secret`). This capability is controlled by the configuration of the Blueprints Secret Store add-on and is enabled by default.
 
 Many Helm charts provide options to mount additional volumes and mounts to the provisioned product. For example, a Helm chart (ArgoCD, FluentBit) allows specifying `volumes` and `volumeMounts` as the helm chart values. Mounting the secret in such cases is simple and does not require an additional pod for secrets. 
 
@@ -185,7 +185,7 @@ After the secret volume is mounted (on any pod), you will see that a Kubernetes 
 
 ## Private Extensions
 
-Extensions specific to a customer instance of SSPs can be implemented inline with the blueprint in the same codebase. Such extensions are scoped to the customer base and cannot be reused. 
+Extensions specific to a customer instance of Blueprintss can be implemented inline with the blueprint in the same codebase. Such extensions are scoped to the customer base and cannot be reused. 
 Example of a private extension:
 
 ```typescript
@@ -198,36 +198,36 @@ class MyAddOn extends HelmAddOn {
         });
     }
 
-    deploy(clusterInfo: ssp.ClusterInfo): Promise<Construct> {
+    deploy(clusterInfo: blueprints.ClusterInfo): Promise<Construct> {
         return Promise.resolve(this.addHelmChart(clusterInfo, {}));
     }
 }
 
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     .addOns(new MyAddOn())
     .build(app, 'my-extension-test-blueprint');
 ```
 ## Public Extensions
 
-The life-cycle of a public extension should be decoupled from the life-cycle of the [SSP Quickstart main repository](https://github.com/aws-quickstart/ssp-amazon-eks). When decoupled, extensions can be released at any arbitrary cadence specific to the extension, enabling better agility when it comes to new features or bug fixes. 
+The life-cycle of a public extension should be decoupled from the life-cycle of the [Blueprints Quickstart main repository](https://github.com/aws-quickstart/cdk-eks-blueprints). When decoupled, extensions can be released at any arbitrary cadence specific to the extension, enabling better agility when it comes to new features or bug fixes. 
 
 In order to enable this model the following workflow outline steps required to create and release a public extension:
 
 1. Public extensions are created in a separate repository. Public GitHub repository is preferred as it aligns with the open-source spirit of the framework and enables external reviews/feedback.
 2. Extensions are released and consumed as distinct public NPM packages. 
 3. Public Extensions are expected to have sufficient documentation to allow customers to consume them independently. Documentation can reside in GitHub or external resources referenced in the documentation bundled with the extension.
-4. Public extensions are expected to be tested and validated against released SSP versions, e.g. with a CICD pipeline. Pipeline can be created with the [pipelines](./pipelines.md) support from the SSP framework or leveraging customer/partner specific tools. 
+4. Public extensions are expected to be tested and validated against released Blueprints versions, e.g. with a CICD pipeline. Pipeline can be created with the [pipelines](./pipelines.md) support from the Blueprints framework or leveraging customer/partner specific tools. 
 
 ## Partner Extensions
 
 Partner extensions (APN Partner) are expected to comply with the public extension workflow and additional items required to ensure proper validation and documentation support for a partner extension. 
 
-1. Documentation PR should be created to the main [SSP Quickstart repository](https://github.com/aws-quickstart/ssp-amazon-eks) to update the AddOns section. Example of add-on documentation can be found [here](https://aws-quickstart.github.io/ssp-amazon-eks/addons/container-insights/) along with the list of other add-ons.
-2. An example that shows a ready to use pattern leveraging the add-on should be submitted to the [SSP Patterns Repository](https://github.com/aws-samples/ssp-eks-patterns). This step will enable AWS PSAs to validate the add-on as well as provide a ready to use pattern to the customers, that could be copied/cloned in their SSP implementation. 
+1. Documentation PR should be created to the main [Blueprints Quickstart repository](https://github.com/aws-quickstart/cdk-eks-blueprints) to update the AddOns section. Example of add-on documentation can be found [here](https://aws-quickstart.github.io/cdk-eks-blueprints/addons/container-insights/) along with the list of other add-ons.
+2. An example that shows a ready to use pattern leveraging the add-on should be submitted to the [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns). This step will enable AWS PSAs to validate the add-on as well as provide a ready to use pattern to the customers, that could be copied/cloned in their Blueprints implementation. 
 
 ## Example Extension
 
-[Example extension](https://github.com/shapirov103/ssp-eks-extension) contains a sample implementation of a FluentBit log forwarder add-on and covers the following aspects of an extension workflow:
+[Example extension](https://github.com/shapirov103/blueprints-eks-extension) contains a sample implementation of a FluentBit log forwarder add-on and covers the following aspects of an extension workflow:
 
 1. Pre-requisite configuration related to nodejs, npm, typescript.
 2. Project template with support to build, test and run the extension.

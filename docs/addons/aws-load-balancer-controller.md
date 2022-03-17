@@ -10,7 +10,7 @@ For more information about AWS Load Balancer Controller please see the [official
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { AwsLoadBalancerControllerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new AwsLoadBalancerControllerAddon();
 const addOns: Array<ClusterAddOn> = [ addOn ];

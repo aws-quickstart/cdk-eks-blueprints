@@ -11,8 +11,8 @@ const fargateProfiles: Map<string, eks.FargateProfileOptions> = new Map([
     ["dynatrace", { selectors: [{ namespace: "dynatrace" }] }]
 ]);
 
-const clusterProvider = new ssp.FargateClusterProvider({ fargateProfiles });
-new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
+const clusterProvider = new blueprints.FargateClusterProvider({ fargateProfiles });
+new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 ```
 
 ## Configuration

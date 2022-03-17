@@ -27,7 +27,7 @@ export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
     privateCluster?: boolean,
 
     /**
-     * Array of managed nide groups.
+     * Array of managed node groups.
      */
     managedNodeGroups?: ManagedNodeGroup[];
 
@@ -175,7 +175,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
-        const updatePolicy = UpdatePolicy.rollingUpdate();
+        const updatePolicy = nodeGroup.updatePolicy ?? UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
@@ -219,7 +219,7 @@ export class GenericClusterProvider implements ClusterProvider {
             instanceTypes,
             minSize,
             maxSize,
-            desiredSize,
+            desiredSize
         };
 
         let nodegroupProps: eks.NodegroupOptions;
@@ -240,6 +240,7 @@ export class GenericClusterProvider implements ClusterProvider {
             nodegroupProps = {
                 ...commonNodegroupProps,
                 amiType,
+
                 releaseVersion,
             };
         }

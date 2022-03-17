@@ -13,7 +13,7 @@ import { SecretProvider } from './secret-provider';
  */
 export interface CsiSecretProps {
     /**
-     * Implementation of the secret provider that returns a reference to an Secrets Manager entry or SSP Parameter.
+     * Implementation of the secret provider that returns a reference to an Secrets Manager entry or Blueprints Parameter.
      */
     secretProvider: SecretProvider;
 

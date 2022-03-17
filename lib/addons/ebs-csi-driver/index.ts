@@ -1,6 +1,5 @@
-import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { CoreAddOn } from "../core-addon";
-import { AmazonEksEbsCsiDriverPolicy } from "./iam-policy";
+import { getEbsDriverPolicyDocument } from "./iam-policy";
 
 /**
  * Default values for the add-on
@@ -19,7 +18,8 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         super({
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
-            policyDocument: PolicyDocument.fromJson(AmazonEksEbsCsiDriverPolicy)
+
+            policyDocumentProvider: getEbsDriverPolicyDocument
         });
     }
 }

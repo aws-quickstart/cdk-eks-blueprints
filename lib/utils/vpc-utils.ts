@@ -24,7 +24,7 @@ export function tagSubnets(stack: Stack, subnets: ec2.ISubnet[], tag: string, va
     }];
 
     const arns = subnets.map(function(val, _){
-        return `arn:aws:ec2:${stack.region}:${stack.account}:subnet/`+val.subnetId;
+        return `arn:${stack.partition}:ec2:${stack.region}:${stack.account}:subnet/`+val.subnetId;
     });
 
     const parameters = {

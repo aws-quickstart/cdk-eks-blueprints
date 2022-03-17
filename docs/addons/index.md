@@ -1,8 +1,8 @@
 # Add-ons
 
-The `ssp-amazon-eks` framework leverages a modular approach to managing [Add-ons](https://kubernetes.io/docs/concepts/cluster-administration/addons/) that run within the context of a Kubernetes cluster. Customers are free to select the add-ons that run in each of their blueprint clusters.
+The `eks-blueprints` framework leverages a modular approach to managing [Add-ons](https://kubernetes.io/docs/concepts/cluster-administration/addons/) that run within the context of a Kubernetes cluster. Customers are free to select the add-ons that run in each of their blueprint clusters.
 
-Within the context of the `ssp-amazon-eks` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources. 
+Within the context of the `eks-blueprints` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources. 
 
 ## Supported Add-ons
 
@@ -19,7 +19,7 @@ The framework currently supports the following add-ons.
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage                 |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53 |
-| [`Keptn`](https://github.com/keptn-sandbox/keptn-ssp-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
+| [`Keptn`](https://github.com/keptn-sandbox/keptn-blueprints-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster                                                                |
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster                           |                  |
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        | 
@@ -29,7 +29,7 @@ The framework currently supports the following add-ons.
 | [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster                                           |
 | [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes                  |
 | [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS                                              |
-| [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-ssp-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn                                                               |
+| [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-blueprints-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn                                                               |
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster                                                                                  |
 | [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster                                                                                                   |
 
@@ -76,4 +76,4 @@ Many add-ons leverage helm to provision and maintain deployments. All provided a
 
 Ability to set repository url may be leveraged for private repositories. 
 
-Version field can be modified from the default chart version, e.g. if the add-on should be upgraded to the desired version, however, since the helm chart version supplied by the customer may not have been tested as part of the SSP release process, SSP community may not be able to reproduce/fix issues related to the helm chart version upgrade.
+Version field can be modified from the default chart version, e.g. if the add-on should be upgraded to the desired version, however, since the helm chart version supplied by the customer may not have been tested as part of the Blueprints release process, Blueprints community may not be able to reproduce/fix issues related to the helm chart version upgrade.

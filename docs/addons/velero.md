@@ -17,15 +17,15 @@ The Velero add-on installs Velero on Amazon EKS. By default it will create a pri
 
 ```typescript
 import * as cdk from '@aws-cdk/core';
-import * as ssp from '../lib';
+import * as blueprints from '../lib';
 
 const app = new cdk.App();
 
-const addOns: Array<ssp.ClusterAddOn> = [
-  new ssp.addons.VeleroAddOn(),
+const addOns: Array<blueprints.ClusterAddOn> = [
+  new blueprints.addons.VeleroAddOn(),
 ];
 
-new ssp.EksBlueprint(
+new blueprints.EksBlueprint(
     app, 
     {
         id: 'my-stack-name', 

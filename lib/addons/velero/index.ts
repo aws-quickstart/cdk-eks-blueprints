@@ -24,7 +24,7 @@ const defaultProps = {
     createNamespace: true,
     chart: "velero",
     repository: "https://vmware-tanzu.github.io/helm-charts/",
-    release: "ssp-addon-velero",
+    release: "blueprints-addon-velero",
     values:{
         initContainers:[
             {

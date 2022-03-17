@@ -31,7 +31,7 @@ const defaultProps: HelmAddOnProps = {
     namespace: KARPENTER,
     version: '0.5.3',
     chart: KARPENTER,
-    release: "ssp-addon-karpenter",
+    release: "blueprints-addon-karpenter",
     repository: 'https://charts.karpenter.sh',
 };
 
