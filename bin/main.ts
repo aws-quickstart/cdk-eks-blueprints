@@ -2,7 +2,6 @@
 import * as cdk from 'aws-cdk-lib';
 
 import BlueprintConstruct from '../examples/blueprint-construct';
-import { EksBlueprint } from '../lib';
 
 const app = new cdk.App();
 
