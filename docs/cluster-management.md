@@ -99,4 +99,4 @@ export default class MultiRegionConstruct extends cdk.Construct {
     }
 }
 ```
-This construct imports all of the core components of the Shared Services Platform library, Teams construct, and Addons as modules which then deploys our clusters to different regions. The main point to take away from this is that we are adding automation and consistency to our clusters as we deploy multiple clusters to multiple regions since all of our components have already been defined in the Shared Services Platform library along with Teams and Addons. 
+This construct imports all of the core components of the `EKS Blueprints` framework, Teams construct, and Addons as modules which then deploys our clusters to different regions. The main point to take away from this is that we are adding automation and consistency to our clusters as we deploy multiple clusters to multiple regions since all of our components have already been defined in the `EKS Blueprints` library along with Teams and Addons. 

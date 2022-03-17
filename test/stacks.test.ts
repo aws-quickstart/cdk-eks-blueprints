@@ -1,20 +1,21 @@
-import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
-import { CapacityType } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
-import { ManualApprovalStep } from '@aws-cdk/pipelines';
+import { CapacityType } from 'aws-cdk-lib/aws-eks';
+import * as cdk from 'aws-cdk-lib';
+import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
+import { Template } from 'aws-cdk-lib/assertions';
 
 describe('Unit tests for EKS Blueprint', () => {
 
     test('Usage tracking created', () => {
-        const app = new cdk.App();
+        let app = new cdk.App();
         // WHEN
         let stack = new blueprints.EksBlueprint(app, { id: 'MyTestStack' });
         console.log(stack.templateOptions.description);
         // THEN
         assertBlueprint(stack);
 
+        app = new cdk.App();
         stack = new blueprints.EksBlueprint(app, { id: 'MyOtherTestStack' }, {
             description: "My awesome description"
         });
@@ -77,7 +78,7 @@ describe('Unit tests for EKS Blueprint', () => {
     });
 
     test('Blueprint builder creates correct stack', async () => {
-        const app = new cdk.App();
+        let app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
@@ -91,7 +92,8 @@ describe('Unit tests for EKS Blueprint', () => {
 
         assertBlueprint(stack1, 'nginx-ingress', 'argo-cd');
         const blueprint2 = blueprint.clone('us-west-2', '1234567891').addOns(new blueprints.CalicoAddOn);
-        const stack2 = await blueprint2.buildAsync(app, 'stack-2');
+
+        const stack2 = await blueprint2.buildAsync(new cdk.App(), 'stack-2');
 
         assertBlueprint(stack2, 'nginx-ingress', 'argo-cd', 'aws-calico');
 
@@ -101,7 +103,7 @@ describe('Unit tests for EKS Blueprint', () => {
             id: 'my-blueprint3-id'
         });
 
-        const stack3 = await blueprint3.buildAsync(app, 'stack-3');
+        const stack3 = await blueprint3.buildAsync(new cdk.App(), 'stack-3');
         assertBlueprint(stack3, 'argo-cd');
     });
 
@@ -236,10 +238,11 @@ test("Generic cluster provider correctly registers managed node groups", async (
 });
 
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {
+    const template = Template.fromStack(stack);
     for (let chart of charts) {
-        expectCDK(stack).to(haveResourceLike('Custom::AWSCDK-EKS-HelmChart', {
+        template.hasResourceProperties('Custom::AWSCDK-EKS-HelmChart', {
             Chart: chart
-        }));
+        });
     }
     expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
 }

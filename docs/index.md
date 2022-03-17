@@ -2,11 +2,11 @@
 
 Welcome to the [`Amazon EKS Blueprints Quick Start`](https://github.com/aws-quickstart/cdk-eks-blueprints) documentation site.
 
-`Amazon EKS Blueprints Quick Start` provides AWS customers with a framework and methodology that makes it easy to build a Shared Services Platform (Blueprints) on top of [Amazon EKS](https://aws.amazon.com/eks/).
+`Amazon EKS Blueprints Quick Start` provides AWS customers with a framework and methodology that makes it easy to build an internal development platform on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
-## What is an Blueprints?
+## What is EKS Blueprints?
 
-A Shared Services Platform (Blueprints) is an internal development platform that abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. As Blueprints is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The Blueprints packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, Blueprintss allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
+`EKS Blueprints` is a framework that allows customers to create internal development platforms. It abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. Such platforms are typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The `EKS Blueprints` packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, `EKS Blueprints` allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
 
 ## What can I do with this QuickStart?
 

@@ -2,6 +2,7 @@
 import * as cdk from 'aws-cdk-lib';
 
 import BlueprintConstruct from '../examples/blueprint-construct';
+import { EksBlueprint } from '../lib';
 
 const app = new cdk.App();
 
@@ -11,4 +12,3 @@ const props = { env: { account, region } };
 const id = 'blueprint-construct';
 
 new BlueprintConstruct(app, { id }, props);
-
