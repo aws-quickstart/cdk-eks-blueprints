@@ -18,7 +18,6 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         super({
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
-
             policyDocumentProvider: getEbsDriverPolicyDocument
         });
     }
