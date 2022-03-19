@@ -1,9 +1,11 @@
 import { Construct } from "@aws-cdk/core";
-import { ClusterInfo } from "../../spi";
+import {ClusterInfo, Values} from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { EfsDriverPolicyDocument } from "./iam-policy";
 import { registries }  from "../../utils/registry-utils";
 import * as iam from "@aws-cdk/aws-iam";
+import {setPath} from "../../utils";
+
 
 const EFS_CSI_DRIVER = "aws-efs-csi-driver";
 const EFS_CSI_CONTROLLER_SA = "efs-csi-controller-sa";
@@ -58,25 +60,37 @@ export class EfsCsiDriverAddOn extends HelmAddOn {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
 
+
         // Lookup appropriate image repo
         const repo = registries.get(clusterInfo.cluster.stack.region) + EFS_REGISTRY_SUFFIX;
+        // setup value for helm chart
+        const chartValues = populateValues(this.options, cluster.clusterName, serviceAccount.serviceAccountName, repo);
 
         // Define chart
-        const efsCsiDriverChart = this.addHelmChart(clusterInfo, {
-            clusterName: cluster.clusterName,
-            controller: {
-                serviceAccount: {
-                    create: false,
-                    name: serviceAccount.serviceAccountName,
-                }
-            },
-            replicaCount: this.options.replicaCount,
-            image: {repository: repo}
-
-        });
+        const efsCsiDriverChart = this.addHelmChart(clusterInfo, chartValues);
 
         efsCsiDriverChart.node.addDependency(serviceAccount);
         // return the Promise Construct for any teams that may depend on this
         return Promise.resolve(efsCsiDriverChart);
     }
+}
+
+/**
+ * populateValues populates the appropriate values used to customize the Helm chart
+ * @param helmOptions User provided values to customize the chart
+ * @param clusterName Name of the cluster where to deploy the add-on
+ * @param serviceAccountName Name of the service account used by the add-on
+ * @param repository Repository to pull image for Add_on
+ */
+function populateValues(helmOptions: EfsCsiDriverProps, clusterName: string,
+                        serviceAccountName: string, repository: string): Values {
+    const values = helmOptions.values ?? {};
+
+    setPath(values, "clusterName",  clusterName);
+    setPath(values, "controller.serviceAccount.create",  false);
+    setPath(values, "controller.serviceAccount.name",  serviceAccountName);
+    setPath(values, "replicaCount",  helmOptions.replicaCount);
+    setPath(values, "image.repository",  repository);
+
+    return values;
 }
