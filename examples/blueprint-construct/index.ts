@@ -69,7 +69,8 @@ export default class BlueprintConstruct extends cdk.Construct {
             // new ssp.addons.OpaGatekeeperAddOn(),
             new ssp.addons.KarpenterAddOn(),
             new ssp.addons.KubeviousAddOn(),
-            new ssp.addons.EbsCsiDriverAddOn()
+            new ssp.addons.EbsCsiDriverAddOn(),
+            new ssp.addons.EfsCsiDriverAddOn({replicaCount: 1}),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
@@ -93,7 +94,9 @@ export default class BlueprintConstruct extends cdk.Construct {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-0b297a512e2852b89',
                             'us-west-2': 'ami-06a8c459c01f55c7b',
-                            'us-east-2': 'ami-093d9796e55a5b860'
+                            'us-east-2': 'ami-093d9796e55a5b860',
+                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
                         userData: userData,
                     }

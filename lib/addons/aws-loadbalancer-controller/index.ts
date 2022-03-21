@@ -3,7 +3,7 @@ import { Construct } from "@aws-cdk/core";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { registries } from "./registryMap";
+import { registries } from "../../utils/registry-utils";
 
 /**
  * Configuration options for the add-on.
