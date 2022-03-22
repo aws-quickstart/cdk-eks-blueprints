@@ -170,8 +170,19 @@ A convenience script to create the JSON structure for SSH private key can be fou
 **Username Password and Token Authentication** 
 
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
-2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
+2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `url`, `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
 3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/blueprints-eks-workloads.git.
+
+Example Structure for `USERNAME` and `TOKEN` authentication type:
+```json
+{
+    "username": "YOUR_GIT_USERNAME", 
+    "password": "YOUR PASSWORD OR TOKEN",
+    "url": "https://github.com/aws-samples"
+}
+```
+
+Note: `url` value can be a path to the org, rather than an actual repository.  
 
 **Admin Secret**
 
@@ -204,5 +215,13 @@ For more information, please refer to the [ArgoCD official documentation](https:
 
 2. Changing the administrator password in the AWS Secrets Manager and rerunning the stack causes login error on ArgoCD UI. This happens due to the fact that Argo Helm rewrites the secret containing the Dex server API Key (OIDC component of ArgoCD). The workaround at present is to restart the `argocd-server` pod, which repopulates the token. Secret management aspect of ArgoCD will be improved in the future to not require this step after password change. 
 
+## Troubleshooting
 
+1. Dex Server crashing on startup with `server.secretkey is missing`. 
+
+It may be a byproduct of another failure. As a rule (unless ArgoCD secret is configured separately) the initial start of the ArgoCD server should populate a few fields in the in [ArgoCD secret](https://argo-cd.readthedocs.io/en/stable/operator-manual/argocd-secret.yaml). If ArgoCD server fails to start or is waiting on some condition to become ready, these fields are not populated, causing cascading failures. 
+
+Make sure that all the secrets are mounted properly onto the ArgoCD server pod. It can be caused by an incorrect shape of the secret for private repositories (see "Private Repositories" section above). SSH secret is expected to have two fields (`url` and `sshPrivateKey`) and USERNAME/TOKEN is expected to have three fields (`username`, `password`, `url`).
+
+Make sure your secret name (as defined in AWS Secrets Manager) does not conflict with ArgoCD reserved secret names, such as `argocd-secret`.
 
