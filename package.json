@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -27,9 +27,10 @@
         "typescript": "~4.5.4"
     },
     "dependencies": {
-        "aws-cdk-lib": "2.16.0",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
+        "@types/lodash": "^4.14.180",
+        "aws-cdk-lib": "2.16.0",
         "aws-sdk": "2.1069.0",
         "bcrypt": "^5.0.1",
         "dot-object": "^2.1.4",

@@ -2,6 +2,7 @@ import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';
+import * as lodash from "lodash";
 
 /**
  * Configuration options for Secrets Store AddOn
@@ -57,7 +58,7 @@ export class SecretsStoreAddOn implements ClusterAddOn {
     private options: SecretsStoreAddOnProps;
 
     constructor(props?: SecretsStoreAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        this.options = lodash.cloneDeep({ ...defaultProps, ...props });
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
