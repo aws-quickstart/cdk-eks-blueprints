@@ -55,7 +55,7 @@ const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder
 
  blueprints.CodePipelineStack.builder()
-    .name("blueprints-eks-pipeline")
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples")
     .repository({
         repoUrl: 'cdk-eks-blueprints-patterns',
@@ -105,7 +105,7 @@ Pipeline functionality provides wave support to express waves with blueprints. Y
 
 ```typescript
 blueprints.CodePipelineStack.builder()
-    .name("blueprints-eks-pipeline")
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples")
     .repository({
         //...
@@ -140,7 +140,7 @@ const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder
 
 blueprints.CodePipelineStack.builder()
-    .name("blueprints-eks-pipeline")
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples") // owner of your repo
     .repository({
         //  your repo info

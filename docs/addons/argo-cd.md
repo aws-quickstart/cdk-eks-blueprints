@@ -71,7 +71,7 @@ An example is provided below, along with an approach that could use a separate a
 import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOns = ...;
-const repoUrl = 'https://github.com/aws-samples/blueprints-eks-workloads.git'
+const repoUrl = 'https://github.com/aws-samples/eks-blueprints-workloads.git'
 
 const bootstrapRepo = {
     repoUrl,
@@ -131,7 +131,7 @@ The framework provides support to supply repository and administrator secrets in
 ```typescript
 .addOns(new blueprints.addons.ArgoCDAddOn({
     bootstrapRepo: {
-        repoUrl: 'git@github.com:aws-samples/blueprints-eks-workloads.git',
+        repoUrl: 'git@github.com:aws-samples/eks-blueprints-workloads.git',
         path: 'envs/dev',
         credentialsSecretName: 'github-ssh-json',
         credentialsType: 'SSH'

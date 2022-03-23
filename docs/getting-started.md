@@ -133,7 +133,7 @@ You should see output that lists all namespaces in your cluster.
 
 ## Deploy workloads with ArgoCD
 
-Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/blueprints-eks-workloads).
+Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/eks-blueprints-workloads).
 
 You can leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
 
@@ -198,7 +198,7 @@ Create a project in Argo by running the following command
 ```
 argocd proj create sample \
     -d https://kubernetes.default.svc,argocd \
-    -s https://github.com/aws-samples/blueprints-eks-workloads.git
+    -s https://github.com/aws-samples/eks-blueprints-workloads.git
 ```
 
 Create the application within Argo by running the following command
@@ -207,7 +207,7 @@ Create the application within Argo by running the following command
 argocd app create dev-apps \
     --dest-namespace argocd  \
     --dest-server https://kubernetes.default.svc  \
-    --repo https://github.com/aws-samples/blueprints-eks-workloads.git \
+    --repo https://github.com/aws-samples/eks-blueprints-workloads.git \
     --path "envs/dev"
 ```
 

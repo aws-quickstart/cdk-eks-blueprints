@@ -185,7 +185,7 @@ After the secret volume is mounted (on any pod), you will see that a Kubernetes 
 
 ## Private Extensions
 
-Extensions specific to a customer instance of Blueprintss can be implemented inline with the blueprint in the same codebase. Such extensions are scoped to the customer base and cannot be reused. 
+Extensions specific to a customer instance of Blueprints can be implemented inline with the blueprint in the same codebase. Such extensions are scoped to the customer base and cannot be reused. 
 Example of a private extension:
 
 ```typescript

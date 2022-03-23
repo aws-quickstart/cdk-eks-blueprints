@@ -9,7 +9,7 @@ The main benefits organizations can see using the AWS CDK to manage their Amazon
 - Access to GitOps methodologies and best practices
 - Automated lifecycle management for cluster deployment
 
-The Amazon EKS Blueprints Quick Start references the [blueprints-eks-patterns repository](https://github.com/aws-samples/blueprints-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
+The Amazon EKS Blueprints Quick Start references the [`eks-blueprints-patterns` repository](https://github.com/aws-samples/blueprints-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
 
 ```typescript
 #!/usr/bin/env node
@@ -57,7 +57,7 @@ If for example you chose the region us-west-2, you would get a similar output:
 
 ## Multi-Region Management 
 
-In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the blueprints-ek-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
+In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the eks-blueprints-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
 
 ```typescript
 import * as cdk from '@aws-cdk/core';

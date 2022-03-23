@@ -1,16 +1,16 @@
 
 # Amazon EKS Blueprints Quick Start
 
-![GitHub](https://img.shields.io/github/license/aws-quickstart/)
+![GitHub](https://img.shields.io/github/license/aws-quickstart/cdk-eks-blueprints)
 ![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSsvbE9mR0ZWeTJjbi96OUpBREorSG51UjMzQ1UyNXdmUzZ2dUJoTkhIODFJWjN2QjRGcnhWS0pYLzFQRU5uOThiUEp1WjEzS0htbUpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlRkUFRoTWtjdElBMkR5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 Welcome to the `Amazon EKS Blueprints Quickstart` repository.
 
-This repository contains the source code for the [``](https://www.npmjs.com/package/@aws-quickstart/) NPM module. `eks-blueprints` is a framework that leverages [CDK](https://aws.amazon.com/cdk/) and makes it easy for customers to build and deploy internal development platforms  on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. `eks-blueprints` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy internal development platforms  on top of [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## Documentation
 
-For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io//).
+For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/cdk-eks-blueprints/).
 
 ## What is EKS Blueprints?
 
@@ -18,7 +18,7 @@ EKS Blueprints is a framework that helps customers create internal development p
 
 ## What can I do with this QuickStart?
 
-Customers can use this QuickStart to easily architect and deploy a multi-tenant Blueprints built on EKS. Specifically, customers can leverage the `` module to:
+Customers can use this QuickStart to easily architect and deploy a multi-tenant Blueprints built on EKS. Specifically, customers can leverage the `eks-blueprints` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
 - [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
@@ -28,7 +28,7 @@ Customers can use this QuickStart to easily architect and deploy a multi-tenant 
 
 ## Examples
 
-To view a library of examples for how you can leverage the ``, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/eks-blueprints-patterns).
+To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/eks-blueprints-patterns).
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
@@ -44,7 +44,7 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@1.143.0
+npm install -g aws-cdk@2.17.0
 ```
 
 Verify the installation.
@@ -68,10 +68,10 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 
 ### Usage
 
-Run the following command to install the `` dependency in your project.
+Run the following command to install the `eks-blueprints` dependency in your project.
 
 ```sh
-npm i @aws-quickstart/
+npm i @aws-quickstart/eks-blueprints
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following:
@@ -79,7 +79,7 @@ Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by def
 ```typescript
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import * as blueprints from '@aws-quickstart/';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
@@ -139,7 +139,7 @@ AWS customers are building internal platforms to tame this complexity, automate 
 
 ## Feedback
 
-For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io//).
+For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/cdk-eks-blueprints/).
 
 To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo.
 
