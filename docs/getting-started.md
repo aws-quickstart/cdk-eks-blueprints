@@ -26,7 +26,7 @@ Create a directory that represent you project (e.g. `my-blueprints`) and then cr
 ```bash
 mkdir my-blueprints
 cd my-blueprints
-npm install aws-cdk@2.16.0
+npm install aws-cdk@2.17.0
 npx cdk init app --language typescript
 ```
 
