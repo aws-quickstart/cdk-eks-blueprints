@@ -28,5 +28,5 @@ export * from './ebs-csi-driver';
 export * from './efs-csi-driver';
 
 export class Constants {
-    public static readonly Blueprints_ADDON = "blueprints-addon";
+    public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
 }

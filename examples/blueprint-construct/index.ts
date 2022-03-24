@@ -39,7 +39,7 @@ export default class BlueprintConstruct extends Construct {
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
             // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/blueprints-eks-workloads.git',
+            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
             //      path: 'envs/dev',
             //      targetRevision: "deployable",
             //      credentialsSecretName: 'github-ssh',
@@ -47,7 +47,6 @@ export default class BlueprintConstruct extends Construct {
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
-        // AddOns for the cluster.
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CalicoAddOn(),

@@ -25,7 +25,7 @@ new EksBlueprint(app, 'my-stack-name', addOns, [], {
 
 ### Applying Network Policies
 
-In the [Getting Started]() guide, we bootstrapped an EKS cluster with the workloads contained in the blueprints-workloads repository. Below, we will demonstrate how we can apply network policies to govern traffic between the workloads once Calico is installed.
+In the [Getting Started]() guide, we bootstrapped an EKS cluster with the workloads contained in the [`eks-blueprints-workloads` repository](https://github.com/aws-samples/eks-blueprints-workloads). Below, we will demonstrate how we can apply network policies to govern traffic between the workloads once Calico is installed.
 
 To start, we can verify that there are no network policies in place in your EKS cluster.
 
