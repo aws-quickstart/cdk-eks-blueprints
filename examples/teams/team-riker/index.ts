@@ -1,5 +1,5 @@
-import { ArnPrincipal } from '@aws-cdk/aws-iam';
-import { Construct } from '@aws-cdk/core';
+import { ArnPrincipal } from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
 
 import { ApplicationTeam } from '../../../lib/teams';
 

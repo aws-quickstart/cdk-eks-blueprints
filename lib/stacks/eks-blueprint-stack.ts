@@ -1,8 +1,10 @@
 
-import { IVpc } from '@aws-cdk/aws-ec2';
-import { KubernetesVersion } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
-import { StackProps } from '@aws-cdk/core';
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import * as cdk from 'aws-cdk-lib';
+import * as lodash from "lodash";
+import { Construct } from 'constructs';
+import { StackProps } from 'aws-cdk-lib';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
@@ -101,7 +103,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
-        this.props = { ...this.props, ...props };
+        this.props = lodash.cloneDeep(props);
         if(props.resourceProviders) {
             this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }
@@ -138,12 +140,12 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             .account(account?? this.env.account).region(region?? this.env.region);
     }
 
-    public build(scope: cdk.Construct, id: string, stackProps?: StackProps): EksBlueprint {
+    public build(scope: Construct, id: string, stackProps?: StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
 
-    public async buildAsync(scope: cdk.Construct, id: string, stackProps?: StackProps): Promise<EksBlueprint> {
+    public async buildAsync(scope: Construct, id: string, stackProps?: StackProps): Promise<EksBlueprint> {
         return this.build(scope, id, stackProps).waitForAsyncTasks();
     }
 }
@@ -157,7 +159,7 @@ export class EksBlueprint extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465hk";
 
-    private asyncTasks: Promise<void | cdk.Construct[]>;
+    private asyncTasks: Promise<void | Construct[]>;
 
     private clusterInfo: spi.ClusterInfo;
 
@@ -165,7 +167,7 @@ export class EksBlueprint extends cdk.Stack {
         return new BlueprintBuilder();
     }
 
-    constructor(scope: cdk.Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
        

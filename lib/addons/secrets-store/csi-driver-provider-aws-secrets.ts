@@ -1,7 +1,8 @@
-import { ServiceAccount } from '@aws-cdk/aws-eks';
-import { ISecret } from '@aws-cdk/aws-secretsmanager';
-import { IStringParameter } from '@aws-cdk/aws-ssm';
-import { CfnOutput, Construct } from '@aws-cdk/core';
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
+import { IStringParameter } from 'aws-cdk-lib/aws-ssm';
+import { CfnOutput } from 'aws-cdk-lib';
+import { Construct } from "constructs";
 import * as assert from "assert";
 import { SecretsStoreAddOn } from '../..';
 import { ClusterInfo, Values } from '../../spi';
@@ -12,7 +13,7 @@ import { SecretProvider } from './secret-provider';
  */
 export interface CsiSecretProps {
     /**
-     * Implementation of the secret provider that returns a reference to an Secrets Manager entry or SSP Parameter.
+     * Implementation of the secret provider that returns a reference to an Secrets Manager entry or Blueprints Parameter.
      */
     secretProvider: SecretProvider;
 

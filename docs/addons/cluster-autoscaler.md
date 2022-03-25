@@ -8,7 +8,7 @@ The Cluster Autoscaler add-on adds support for [Cluster Autoscaler](https://gith
 ## Usage
 
 ```typescript
-import { ClusterAutoScalerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { ClusterAutoScalerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new ClusterAutoscalerAddOn()
 const addOns: Array<ClusterAddOn> = [ addOn ];

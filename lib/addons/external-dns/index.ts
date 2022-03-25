@@ -1,7 +1,7 @@
-import { KubernetesManifest } from '@aws-cdk/aws-eks';
-import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
-import { IHostedZone } from '@aws-cdk/aws-route53';
-import { Construct } from '@aws-cdk/core';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { IHostedZone } from 'aws-cdk-lib/aws-route53';
+import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 
@@ -22,7 +22,7 @@ const defaultProps = {
     chart: 'external-dns',
     namespace: 'external-dns',
     repository: 'https://charts.bitnami.com/bitnami',
-    release: 'ssp-addon-external-dns',
+    release: 'blueprints-addon-external-dns',
     version: '5.1.3'
 };
 

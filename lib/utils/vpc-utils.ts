@@ -1,6 +1,6 @@
-import * as ec2 from '@aws-cdk/aws-ec2';
-import { Stack } from '@aws-cdk/core';
-import { AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall } from "@aws-cdk/custom-resources";
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { Stack } from 'aws-cdk-lib';
+import { AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall } from "aws-cdk-lib/custom-resources";
 
 /**
  * Tags VPC Subnets with given tag and value.

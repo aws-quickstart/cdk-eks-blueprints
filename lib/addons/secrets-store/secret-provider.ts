@@ -1,7 +1,7 @@
 import { ClusterInfo } from '../../spi';
-import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
-import { IStringParameter, StringParameter } from '@aws-cdk/aws-ssm';
-import { IKey } from '@aws-cdk/aws-kms';
+import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import { IStringParameter, StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { IKey } from 'aws-cdk-lib/aws-kms';
 
 /**
  * Secret Provider Interface

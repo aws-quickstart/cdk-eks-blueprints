@@ -27,7 +27,7 @@ export class CiStack extends cdk.Stack {
     // Setup the CodeBuild project for our GitHub repo
     const source = codebuild.Source.gitHub({
       owner: ghOwner.valueAsString,
-      repo: 'quickstart-ssp-amazon-eks',
+      repo: 'cdk-eks-blueprints',
       reportBuildStatus: true,
       webhook: true,
       branchOrRef: "main",

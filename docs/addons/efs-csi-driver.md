@@ -17,13 +17,13 @@ For more information on the driver, please review the [user guide](https://docs.
 ## Usage
 
 ```typescript
-import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import { App } from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new App();
 
-ssp.EksBlueprint.builder()
-    .addOns(new ssp.EfsCsiDriverAddOn() )
+blueprints.EksBlueprint.builder()
+    .addOns(new blueprints.EfsCsiDriverAddOn() )
     .build(app, 'my-cluster');
 ```
 

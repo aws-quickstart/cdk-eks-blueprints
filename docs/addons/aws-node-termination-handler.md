@@ -15,8 +15,8 @@ NTH can operate in two different modes: Instance Metadata Service (IMDS) or the 
 ```typescript
 import * as cdk from '@aws-cdk/core';
 
-// SSP Lib
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+// Blueprints Lib
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 import * as eks from '@aws-cdk/aws-eks';
 
 export default class BottlerocketConstruct extends cdk.Construct {
@@ -24,16 +24,16 @@ export default class BottlerocketConstruct extends cdk.Construct {
         super(scope, id);
 
         // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.AwsNodeTerminationHandlerAddOn,
+        const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.AwsNodeTerminationHandlerAddOn,
         ];
 
         const stackID = `${id}-blueprint`;
-        const clusterProvider = new ssp.AsgClusterProvider({
+        const clusterProvider = new blueprints.AsgClusterProvider({
             version: eks.KubernetesVersion.V1_20,
             machineImageType:  eks.MachineImageType.BOTTLEROCKET
          });
-        new ssp.EksBlueprint(scope,
+        new blueprints.EksBlueprint(scope,
           {
             id: stackID,
             addOns,

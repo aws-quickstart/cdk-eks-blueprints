@@ -1,4 +1,4 @@
-import { Construct } from '@aws-cdk/core';
+import { Construct } from "constructs";
 import * as assert from "assert";
 import { ClusterAddOn, ClusterInfo } from '../spi';
 

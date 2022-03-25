@@ -1,6 +1,7 @@
-import * as cdk from '@aws-cdk/core';
-import { Construct, StackProps } from '@aws-cdk/core';
-import * as cdkpipelines from '@aws-cdk/pipelines';
+import * as cdk from 'aws-cdk-lib';
+import { StackProps } from 'aws-cdk-lib';
+import { Construct } from "constructs";
+import * as cdkpipelines from 'aws-cdk-lib/pipelines';
 import * as assert from "assert";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
@@ -154,7 +155,7 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
     
-    build(scope: cdk.Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
+    build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
         assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
         assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
         assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");

@@ -1,6 +1,6 @@
 # Core Concepts
 
-This document provides a high level overview of the Core Concepts that are embedded in the `ssp-amazon-eks` framework. For the purposes of this document, we will assume the reader is familiar with Git, Docker, Kubernetes and AWS. 
+This document provides a high level overview of the Core Concepts that are embedded in the `eks-blueprints` framework. For the purposes of this document, we will assume the reader is familiar with Git, Docker, Kubernetes and AWS. 
 
 | Concept       | Description                                                           |     
 |---------------|-----------------------------------------------------------------------|
@@ -14,13 +14,13 @@ This document provides a high level overview of the Core Concepts that are embed
 
 ## Blueprint 
 
-The `ssp-amazon-eks` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS cluster, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. `Blueprints` also leverage GitOps tooling to facilitate cluster bootstrapping and workload onboarding. 
+The `eks-blueprints` framework allows you to configure and deploy what we call `blueprint` clusters. A `blueprint` consists of an EKS cluster, a set of `add-ons` that will be deployed into the cluster, and a set of `teams` who will have access to a cluster. Once a `blueprint` is configured, it can be easily deployed across any number of AWS accounts and regions. `Blueprints` also leverage GitOps tooling to facilitate cluster bootstrapping and workload onboarding. 
 
-To view sample `blueprint` implementations, please see our [patterns repository](https://github.com/aws-samples/ssp-eks-patterns). 
+To view sample `blueprint` implementations, please see our [patterns repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns). 
 
 ## Cluster
 
-A `cluster` is simply an EKS cluster. The `ssp-amazon-eks` framework provides for customizing the compute options you leverage with your `clusters`. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `EC2ClusterProvider`.
+A `cluster` is simply an EKS cluster. The `eks-blueprints` framework provides for customizing the compute options you leverage with your `clusters`. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `EC2ClusterProvider`.
 
 Each `ClusterProvider` provides additional configuration options as well. For example, the `MngClusterProvider` allows you to configure instance types, min and max instance counts, and amiType, among other options. 
 

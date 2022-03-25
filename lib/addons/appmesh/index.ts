@@ -1,4 +1,4 @@
-import { ManagedPolicy } from "@aws-cdk/aws-iam";
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";

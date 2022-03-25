@@ -6,13 +6,13 @@
 A resource is a CDK construct that implements `IResource` interface from `@aws-cdk/core` which is a generic interface for any AWS resource. An example of a resource could be a hosted zone in Route53 [`IHostedZone`](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-route53.HostedZone.html), an ACM certificate [`ICertificate`](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-certificatemanager.ICertificate.html), a VPC or even a DynamoDB table which could be leveraged either in add-ons or teams.
 
 **ResourceProvider**
-A resource provider is a core SSP concept that enables customers to supply resources for add-ons, teams and/or post-deployment steps. Resources may be imported (e.g., if created outside of the platform) or created with the blueprint. 
+A resource provider is a core Blueprints concept that enables customers to supply resources for add-ons, teams and/or post-deployment steps. Resources may be imported (e.g., if created outside of the platform) or created with the blueprint. 
 
 ## Use Cases
 
 `ClusterAddOn` and `Team` implementations require AWS resources that can be shared across several constructs. For example, `ExternalDnsAddOn` requires an array of hosted zones that will be used for integration with Route53. `NginxAddOn` requires a certificate and hosted zone (for DNS validation) in order to use TLS termination. VPC may be used inside add-ons and team constructs to look up VPC CIDR and subnets. 
 
-The SSP framework provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers. 
+The Blueprints framework provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers. 
 
 Resource providers may depend on resources provided by other resource providers. For example, `CertificateResourceProvider` relies on a hosted zone resource, which is expected to be supplied by another provider.
 
@@ -129,7 +129,7 @@ Note: `GlobalResources.HostedZone` and `GlobalResources.Certificate` are provide
 ```typescript
 const myVpcId = ...;  // e.g. app.node.tryGetContext('my-vpc', 'default)  will look up property my-vpc in the cdk.json
 
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Specify VPC for the cluster (if not set, a new VPC will be provisioned as per EKS Best Practices)
     .resourceProvider(GlobalResources.VPC, new VpcProvider(myVpcId)
     //  Register hosted zone and give it a name of GlobalResources.HostedZone
@@ -151,7 +151,7 @@ ssp.EksBlueprint.builder()
 **Registering Multiple Hosted Zones**
 
 ```typescript
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1", new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     // Register zone2 under the name of MyHostedZone2
@@ -176,8 +176,8 @@ ssp.EksBlueprint.builder()
 2. Implement ResourceProvider interface:
 
 ```typescript
-class MyResourceProvider implements ssp.ResourceProvider<s3.IBucket> {
-    provide(context: ssp.ResourceContext): s3.IBucket {
+class MyResourceProvider implements blueprints.ResourceProvider<s3.IBucket> {
+    provide(context: blueprints.ResourceContext): s3.IBucket {
         return new s3.Bucket(context.scope, "mybucket");
     }
 }
@@ -186,7 +186,7 @@ class MyResourceProvider implements ssp.ResourceProvider<s3.IBucket> {
 3. Register your resource provider under an arbitrary name which must be unique in the current scope across all resource providers:
 
 ```typescript
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     .resourceProvider("mybucket" ,new MyResourceProvider())
     .addOns(...)
     .teams(...)
@@ -195,7 +195,7 @@ ssp.EksBlueprint.builder()
 
 4. Use the resource inside a custom add-on:
 ```typescript
-class MyCustomAddOn implements ssp.ClusterAddOn {
+class MyCustomAddOn implements blueprints.ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void | Promise<cdk.Construct> {
         const myBucket: s3.IBucket = clusterInfo.getRequiredResource('mybucket'); // will fail if mybucket does not exist
         // do something with the bucket

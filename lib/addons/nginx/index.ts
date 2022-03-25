@@ -1,5 +1,5 @@
-import { ICertificate } from "@aws-cdk/aws-certificatemanager";
-import { Construct } from "@aws-cdk/core";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Construct } from "constructs";
 import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";
@@ -58,7 +58,7 @@ export interface NginxAddOnProps extends HelmAddOnUserProps {
 const defaultProps: NginxAddOnProps = {
     name: "nginx-ingress",
     chart: "nginx-ingress",
-    release: "ssp-addon-nginx",
+    release: "blueprints-addon-nginx",
     version: "0.11.3",
     repository: "https://helm.nginx.com/stable",
     backendProtocol: 'tcp',

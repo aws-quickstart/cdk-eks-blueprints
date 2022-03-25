@@ -7,11 +7,11 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ## Usage
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const hostedZoneName = ...
-const hostedZone = new ssp.addons.LookupHostedZoneProvider(hostedZoneName)
-const addOn = new ssp.addons.ExternalDnsAddon({ hostedZone });
+const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
+const addOn = new blueprints.addons.ExternalDnsAddon({ hostedZone });
 const addOns: Array<ClusterAddOn> = [ addOn ];
 
 const app = new cdk.App();
@@ -68,10 +68,10 @@ This provider will allow to bind to an existing hosted zone based on its name.
 ```typescript
 const myDomainName = "";
 
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1", new ssp.LookupHostedZoneProvider(myDomainName))
-    .addOns(new ssp.addons.ExternalDnsAddon({
+    .resourceProvider("MyHostedZone1", new blueprints.LookupHostedZoneProvider(myDomainName))
+    .addOns(new blueprints.addons.ExternalDnsAddon({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -81,10 +81,10 @@ If the hosted zone ID is known, then the recommended approach is to use a `Impor
 
 ```typescript
 const myHostedZoneId = "";
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1",  new ssp.addons.ImportHostedZoneProvider(myHostedZoneId))
-    .addOns(new ssp.addons.ExternalDnsAddon({
+    .resourceProvider("MyHostedZone1",  new blueprints.addons.ImportHostedZoneProvider(myHostedZoneId))
+    .addOns(new blueprints.addons.ExternalDnsAddon({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -107,26 +107,26 @@ Prerequisites:
 
 Example:
 
-Let's assume that parent DNS account `parentAccountId` has domain named `myglobal-domain.com`. Now when provisioned an SSP EKS cluster you would like to use a stage specific name like `dev.myglobal-domain.com` or `test.myglobal-domain.com`. In addition to these requirements, you would like to enable tenant specific access to those domains such as `my-tenant1.dev.myglobal-domain.com` or team specific access `team-riker.dev.myglobal-domain.com`. 
+Let's assume that parent DNS account `parentAccountId` has domain named `myglobal-domain.com`. Now when provisioned an EKS Blueprints cluster you would like to use a stage specific name like `dev.myglobal-domain.com` or `test.myglobal-domain.com`. In addition to these requirements, you would like to enable tenant specific access to those domains such as `my-tenant1.dev.myglobal-domain.com` or team specific access `team-riker.dev.myglobal-domain.com`. 
 
 The setup will look the following way:
 
-1. In the `parentAccountId` account you create a role for delegation (`DomainOperatorRole` in this example) and a trust relationship to the child account in which SSP EKS blueprint will be provisioned. In a general case, the number of child accounts can be large, so each of them will have to be listed in the trust relationship.
+1. In the `parentAccountId` account you create a role for delegation (`DomainOperatorRole` in this example) and a trust relationship to the child account in which EKS Blueprints will be provisioned. In a general case, the number of child accounts can be large, so each of them will have to be listed in the trust relationship.
 2. In the `parentAccountId` you create a public hosted zone for `myglobal-domain.com`. With that the setup that may require separate automation (or a manual process) is complete. 
 3. Use the following configuration of the add-on:
 
 ```typescript
 
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1",  new ssp.DelegatingHostedZoneProvider({
+    .resourceProvider("MyHostedZone1",  new blueprints.DelegatingHostedZoneProvider({
         parentDomain: 'myglobal-domain.com',
         subdomain: 'dev.myglobal-domain.com', 
         parentAccountId: parentDnsAccountId,
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
     })
-    .addOns(new ssp.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddon({
         hostedZoneProviders: ["MyHostedZone1"];
     })
 

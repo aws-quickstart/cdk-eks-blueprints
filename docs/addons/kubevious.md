@@ -10,12 +10,12 @@ monitor the cluster
 
 ```typescript
 import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new App();
 
-ssp.EksBlueprint.builder()
-    .addOns(new ssp.KubeviousAddOn() )
+blueprints.EksBlueprint.builder()
+    .addOns(new blueprints.KubeviousAddOn() )
     .build(app, 'my-cluster');
 ```
 

@@ -1,5 +1,5 @@
-import { Construct } from '@aws-cdk/core';
-import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from '@aws-cdk/aws-iam';
+import { Construct } from "constructs";
+import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { createNamespace, setPath, createServiceAccount, conflictsWith, tagSubnets } from '../../utils';
@@ -31,7 +31,7 @@ const defaultProps: HelmAddOnProps = {
     namespace: KARPENTER,
     version: '0.5.3',
     chart: KARPENTER,
-    release: "ssp-addon-karpenter",
+    release: "blueprints-addon-karpenter",
     repository: 'https://charts.karpenter.sh',
 };
 

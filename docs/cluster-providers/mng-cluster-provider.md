@@ -15,8 +15,8 @@ const props: MngClusterProviderProps = {
     version: KubernetesVersion.V1_20,
     amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
 }
-const clusterProvider = new ssp.MngClusterProvider(props);
-new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
+const clusterProvider = new blueprints.MngClusterProvider(props);
+new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 ```
 
 ## Configuration

@@ -1,4 +1,4 @@
-import * as ec2 from "@aws-cdk/aws-ec2";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 
 /**
  * Default instance type for managed node group provisioning

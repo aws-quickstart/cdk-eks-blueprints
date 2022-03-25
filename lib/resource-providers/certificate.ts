@@ -1,6 +1,6 @@
 import * as spi from '../spi';
-import * as acm from '@aws-cdk/aws-certificatemanager';
-import { IHostedZone } from '@aws-cdk/aws-route53';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 
 /**
  * Certificate provider that imports certificate into the current stack by arn. 

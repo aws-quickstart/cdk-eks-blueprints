@@ -19,7 +19,7 @@ The AWS Identity and Access Management (IAM) managed role **AmazonSSMManagedInst
 ## Usage
 
 ```typescript
-import { SSMAgentAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { SSMAgentAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const addOn = new SSMAgentAddon();
 const addOns: Array<ClusterAddOn> = [ addOn ];

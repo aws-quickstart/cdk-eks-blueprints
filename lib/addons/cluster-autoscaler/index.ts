@@ -1,6 +1,7 @@
-import { KubernetesVersion } from "@aws-cdk/aws-eks";
-import * as iam from "@aws-cdk/aws-iam";
-import { CfnJson, Construct, Tags } from "@aws-cdk/core";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import * as iam from "aws-cdk-lib/aws-iam";
+import { CfnJson, Tags } from "aws-cdk-lib";
+import { Construct } from "constructs";
 import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
@@ -25,7 +26,7 @@ const defaultProps = {
     chart: 'cluster-autoscaler',
     name: 'cluster-autoscaler',
     namespace: 'kube-system',
-    release: 'ssp-addon-cluster-autoscaler',
+    release: 'blueprints-addon-cluster-autoscaler',
     repository: 'https://kubernetes.github.io/autoscaler',
     version: 'auto'
 };

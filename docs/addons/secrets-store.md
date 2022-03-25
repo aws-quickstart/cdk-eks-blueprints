@@ -15,7 +15,7 @@ import {
   ClusterAddOn,
   EksBlueprint,
   ApplicationTeam
-} from '@aws-quickstart/ssp-amazon-eks';
+} from '@aws-quickstart/eks-blueprints';
 import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
 
 const addOn = new SecretsStoreAddOn();

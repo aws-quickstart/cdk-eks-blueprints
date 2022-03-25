@@ -1,5 +1,7 @@
-import { Construct, Duration } from "@aws-cdk/core";
+import { Duration } from "aws-cdk-lib";
+import { Construct } from "constructs";
 import * as spi from "../..";
+import * as lodash from "lodash";
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 
 export type HelmAddOnProps = HelmChartConfiguration;
@@ -7,7 +9,11 @@ export type HelmAddOnUserProps = Partial<HelmChartConfiguration>;
 
 export abstract class HelmAddOn implements spi.ClusterAddOn {
 
-    constructor(readonly props: HelmAddOnProps) {}
+    props: HelmAddOnProps;
+
+    constructor(props: HelmAddOnProps) {
+        this.props = lodash.cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
+    }
     
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
 

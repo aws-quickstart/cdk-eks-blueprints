@@ -12,7 +12,7 @@ This add-on depends on [AWS Load Balancer Controller](aws-load-balancer-controll
 ## Usage
 
 ```typescript
-import { AwsLoadBalancerControllerAddOn, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
+import { AwsLoadBalancerControllerAddOn, NginxAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
 
 const externalDnsHostname  = ...;
 const awsLbControllerAddOn = new AwsLoadBalancerControllerAddon();
@@ -33,7 +33,7 @@ To validate that installation is successful run the following command:
 ```bash
 $ kubectl get po -n kube-system
 NAME                                                              READY   STATUS    RESTARTS   AGE
-ssp-addon-nginx-ingress-78b8567p4q6   1/1     Running   0          4d10h
+blueprints-addon-nginx-ingress-78b8567p4q6   1/1     Running   0          4d10h
 ```
 
 Note that the ingress controller is deployed in the `kube-system` namespace.
@@ -56,19 +56,19 @@ If [External DNS Add-on](../addons/external-dns.md) is installed, it is possible
 The following example provides support for AWS Load Balancer controller, External DNS and NGINX add-ons to enable such routing:
 
 ```typescript
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1",  new ssp.DelegatingHostedZoneProvider({
+    .resourceProvider("MyHostedZone1",  new blueprints.DelegatingHostedZoneProvider({
         parentDomain: 'myglobal-domain.com',
         subdomain: 'dev.myglobal-domain.com', 
         parentAccountId: parentDnsAccountId,
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
     })
-    .addOns(new ssp.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddon({
         hostedZoneProviders: ["MyHostedZone1"];
     })
-    .addOns(new ssp.NginxAddOn({ internetFacing: true, backendProtocol: "tcp", externaDnsHostname: subdomain, crossZoneEnabled: false })
+    .addOns(new blueprints.NginxAddOn({ internetFacing: true, backendProtocol: "tcp", externaDnsHostname: subdomain, crossZoneEnabled: false })
     .build(...);
 ```
 
@@ -135,7 +135,7 @@ This case is used when certificate is already created and you just need to refer
 
 ```typescript
 const myCertArn = "";
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.Certificate, new ImportCertificateProvider(myCertArn, "cert1-id"))
     .addOns(new NginxAddOn({
         certificateResourceName: GlobalResources.Certificate,
@@ -150,7 +150,7 @@ ssp.EksBlueprint.builder()
 This approach is used when certificate should be created with the blueprint stack. In this case, the new certificate requires DNS validation which can be accomplished automatically if the corresponding Route53 hosted zone is provisioned (either along with the stack or separately) and registered as a resource provider.
 
 ```typescript
-ssp.EksBlueprint.builder()
+blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.HostedZone ,new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone)) // referencing hosted zone for automatic DNS validation
     .addOns(new AwsLoadBalancerControllerAddOn())

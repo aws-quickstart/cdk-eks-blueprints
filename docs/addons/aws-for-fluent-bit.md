@@ -7,9 +7,9 @@ AWS provides a Fluent Bit image with plugins for both CloudWatch Logs and Kinesi
 ## Usage
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const awsForFluentBit = new ssp.addons.AwsForFluentBitAddOn();
+const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn();
 const addOns: Array<ClusterAddOn> = [ awsForFluentBit ];
 
 const app = new cdk.App();
@@ -28,9 +28,9 @@ AWS for FluentBit can be configured to forward logs to multiple AWS destinations
 Sample configuration can be found below:
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const awsForFluentBit = new ssp.addons.AwsForFluentBitAddOn({ 
+const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn({ 
 	values: {
 		cloudWatch: {
 			enabled: true,
@@ -56,7 +56,7 @@ const awsForFluentBit = new ssp.addons.AwsForFluentBitAddOn({
 When leveraging AWS for FluentBit to forward logs to various AWS destinations, you will need to supply an IAM role that grants privileges to the namespace in which FluentBit runs. For example, in order to forward logs to Amazon Elasticsearch Service, you would supply the following IAMPolicyStatement. 
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const domain = es.Domain()
 const domainWritePolicy = new iam.PolicyStatement({
@@ -69,7 +69,7 @@ const domainWritePolicy = new iam.PolicyStatement({
 	resources: [domain.arn],
 })
 
-const awsForFluentBit = new ssp.addons.AwsForFluentBitAddOn({ 
+const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn({ 
 	iamPolicies: [domainWritePolicy]
 	values: {
 		elasticSearch: {
