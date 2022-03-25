@@ -51,7 +51,7 @@ Verify the installation.
 
 ```bash
 cdk --version
-# must output 1.143.0
+# must output 2.17.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.

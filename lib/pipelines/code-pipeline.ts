@@ -255,7 +255,7 @@ class CodePipeline {
               input: cdkpipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
               installCommands: [
                 'npm install --global npm',
-                'npm install -g aws-cdk@1.143.0', 
+                'npm install -g aws-cdk@2.17.0',
                 'npm install',
               ],
               commands: ['npm run build', 'npx cdk synth']
