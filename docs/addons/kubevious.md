@@ -9,7 +9,7 @@ monitor the cluster
 ## Usage
 
 ```typescript
-import { App } from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new App();

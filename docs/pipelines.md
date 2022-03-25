@@ -8,16 +8,7 @@ Additionally, the EKS Blueprints - Reference Solution leverages the GitHub integ
 
 ## Defining your blueprint to use with pipeline
 
-Pipeline support requires enabling a setting for *modern* stack synthesis. This setting should be enabled for blueprints that leverage CDKv1 explicitly. 
-To enable this setting set the following in the `cdk.json` file in the project root directory:
-
-```json
-{
-  "context": {
-    "@aws-cdk/core:newStyleStackSynthesis": true
-  }
-}
-```
+Pipeline support requires enabling a setting for *modern* stack synthesis. This setting should be enabled for blueprints that leverage CDKv1 explicitly, for CDKv2 it is enabled by default. 
 
 Creation of a pipeline starts with defining the blueprint that will be deployed across the pipeline stages.
 
