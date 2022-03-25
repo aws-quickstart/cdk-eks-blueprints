@@ -13,7 +13,7 @@ The Amazon EKS Blueprints Quick Start references the [`eks-blueprints-patterns` 
 
 ```typescript
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 const app = new cdk.App();
 //-------------------------------------------
 // Single Cluster with multiple teams.
@@ -60,7 +60,7 @@ If for example you chose the region us-west-2, you would get a similar output:
 In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the eks-blueprints-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 // Blueprints Lib
 import * as blueprints from '@aws-quickstart/eks-blueprints'
 // Team implementations

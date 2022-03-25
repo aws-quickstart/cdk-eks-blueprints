@@ -60,7 +60,7 @@ Add-ons that don't leverage helm but require to install arbitrary Kubernetes man
 Deployment of arbitrary kubernetes manifests can leverage the following construct:
 
 ```typescript
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
@@ -91,7 +91,7 @@ Dependency management for direct hard dependency are implemented using a decorat
 Example:
 
 ```typescript
-import { Construct } from "@aws-cdk/core";
+import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { dependable } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -209,7 +209,7 @@ blueprints.EksBlueprint.builder()
 ```
 ## Public Extensions
 
-The life-cycle of a public extension should be decoupled from the life-cycle of the [Blueprints Quickstart main repository](https://github.com/aws-quickstart/cdk-eks-blueprints). When decoupled, extensions can be released at any arbitrary cadence specific to the extension, enabling better agility when it comes to new features or bug fixes. 
+The life-cycle of a public extension should be decoupled from the life-cycle of the [EKS Blueprints main repository](https://github.com/aws-quickstart/cdk-eks-blueprints). When decoupled, extensions can be released at any arbitrary cadence specific to the extension, enabling better agility when it comes to new features or bug fixes. 
 
 In order to enable this model the following workflow outline steps required to create and release a public extension:
 
@@ -227,7 +227,7 @@ Partner extensions (APN Partner) are expected to comply with the public extensio
 
 ## Example Extension
 
-[Example extension](https://github.com/shapirov103/blueprints-eks-extension) contains a sample implementation of a FluentBit log forwarder add-on and covers the following aspects of an extension workflow:
+[Example extension](https://github.com/shapirov103/eks-blueprints-extension) contains a sample implementation of a FluentBit log forwarder add-on and covers the following aspects of an extension workflow:
 
 1. Pre-requisite configuration related to nodejs, npm, typescript.
 2. Project template with support to build, test and run the extension.

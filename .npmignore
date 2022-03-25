@@ -7,6 +7,10 @@ cdk.out
 # Other files excluded from package
 .vscode
 .github
+.git
+.idea
+.vscode
+.site
 ci
 Makefile
 mkdocs.yml

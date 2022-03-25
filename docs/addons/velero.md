@@ -16,7 +16,7 @@ The Velero add-on installs Velero on Amazon EKS. By default it will create a pri
 ## Usage
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 
 const app = new cdk.App();

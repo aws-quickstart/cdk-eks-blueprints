@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
-import * as codebuild from '@aws-cdk/aws-codebuild';
-import { LogGroup } from '@aws-cdk/aws-logs';
-import { Bucket } from '@aws-cdk/aws-s3';
-import { PolicyStatement } from '@aws-cdk/aws-iam';
+import * as cdk from 'aws-cdk-lib';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import { Construct } from 'constructs';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 // Utils
 import { valueFromContext } from '../lib/utils/context-utils';
 
 const app = new cdk.App();
 
 export class CiStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // Parameters
@@ -57,7 +58,7 @@ export class CiStack extends cdk.Stack {
     });
 
     const qualifier = valueFromContext(this,
-      '@aws-cdk/core:bootstrapQualifier',
+      '@aws-cdk/core:bootstrapQualifier', // TODO: what is the significance of this?
       cdk.DefaultStackSynthesizer.DEFAULT_QUALIFIER
     );
 

@@ -1,10 +1,10 @@
 
-# Amazon EKS Blueprints for CDK
+# Amazon EKS Blueprints Quick Start
 
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/cdk-eks-blueprints)
 ![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSsvbE9mR0ZWeTJjbi96OUpBREorSG51UjMzQ1UyNXdmUzZ2dUJoTkhIODFJWjN2QjRGcnhWS0pYLzFQRU5uOThiUEp1WjEzS0htbUpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlRkUFRoTWtjdElBMkR5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
-Welcome to the `Amazon EKS Blueprints for CDK` repository.
+Welcome to the `Amazon EKS Blueprints Quickstart` repository.
 
 This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. `eks-blueprints` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy internal development platforms  on top of [Amazon EKS](https://aws.amazon.com/eks/).
 

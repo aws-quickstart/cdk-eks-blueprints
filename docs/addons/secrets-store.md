@@ -9,14 +9,14 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 ### **`index.ts`**
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import {
   SecretProvider
   ClusterAddOn,
   EksBlueprint,
   ApplicationTeam
 } from '@aws-quickstart/eks-blueprints';
-import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
+import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 
 const addOn = new SecretsStoreAddOn();
 const addOns: Array<ClusterAddOn> = [ addOn ];
