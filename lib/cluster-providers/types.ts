@@ -51,7 +51,7 @@ export interface ManagedNodeGroup {
     /**
      * Choose AMI type for the managed node group.
      */
-    amiType?: eks.NodegroupAmiType.AL2_X86_64;
+    amiType?: eks.NodegroupAmiType;
 
     /**
      * This property is used to upgrade node groups to the latest kubelet by upgrading node group AMI.
