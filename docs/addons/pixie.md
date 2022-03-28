@@ -1,6 +1,6 @@
 # Pixie Addon
 
-The `Pixie Addon` deploys [Pixie](https://px.dev) on Amazon EKS using the [ssp-amazon-eks](https://github.com/aws-quickstart/ssp-amazon-eks) [CDK](https://aws.amazon.com/cdk/). 
+The `Pixie Addon` deploys [Pixie](https://px.dev) on Amazon EKS using the EKS Blueprints [CDK](https://aws.amazon.com/cdk/). 
 
 Pixie is an open source observability tool for Kubernetes applications. Use Pixie to view the high-level state of your cluster (service maps, cluster resources, application traffic) and also drill-down into more detailed views (pod state, flame graphs, individual full-body application requests).
 
@@ -22,66 +22,69 @@ You must have either:
 
 ## Usage
 
-Run the following command to install the pixie-ssp-addon dependency in your project.
+Run the following command to install the pixie-eks-blueprints-addon dependency in your project.
 
 ```
-npm i @pixie-labs/pixie-ssp-addon
+npm i @pixie-labs/pixie-eks-blueprints-addon
 ```
 
 #### Using deploy key:
 
 ```
-import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { PixieAddOn } from '@pixie-labs/pixie-ssp-addon';
 
 const app = new App();
 
-ssp.EksBlueprint.builder()
-    .addOns(new PixieAddOn({
-        deployKey: "pixie-deploy-key", // Create and copy from Pixie Admin UI
-    }))
-    .region(process.env.AWS_REGION)
-    .account(process.env.AWS_ACCOUNT)
-    .build(app, 'my-test-cluster');
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new PixieAddOn({
+    	deployKey: 'pixie-deploy-key', // Create and copy from Pixie Admin UI
+    }),
+];
+
+new blueprints.EksBlueprint(
+    app, 
+    {
+        id: 'my-stack-name', 
+        addOns,
+    },
+    {
+        env:{
+          account: <AWS_ACCOUNT_ID>,
+          region: <AWS_REGION>, 
+        }       
+    });
 ```
 
 #### Using deploy key stored in Secrets Manager:
 
 ```
-import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { PixieAddOn } from '@pixie-labs/pixie-ssp-addon';
 
 const app = new App();
 
-ssp.EksBlueprint.builder()
-    .addOns(new ssp.addons.SecretsStoreAddOn)
-    .addOns(new PixieAddOn({
-        deployKeySecretName: "pixie-deploy-key-secret", // Name of secret in Secrets Manager.
-    }))
-    .region(process.env.AWS_REGION)
-    .account(process.env.AWS_ACCOUNT)
-    .build(app, 'my-test-cluster');
-```
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new blueprints.addons.SecretsStoreAddOn,
+    new PixieAddOn({
+        deployKeySecretName: "pixie-deploy-key-secret", // Name of secret in Secrets Manager. 
+    }),
+];
 
-#### Using deploy key stored in Secrets Manager:
-
-```
-import { App } from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
-import { PixieAddOn } from '@pixie-labs/pixie-ssp-addon';
-
-const app = new App();
-
-ssp.EksBlueprint.builder()
-    .addOns(new ssp.addons.SecretsStoreAddOn)
-    .addOns(new PixieAddOn({
-        deployKeySecretName: "pixie-deploy-key-secret", // Name of secret in Secrets Manager.
-    }))
-    .region(process.env.AWS_REGION)
-    .account(process.env.AWS_ACCOUNT)
-    .build(app, 'my-test-cluster');
+new blueprints.EksBlueprint(
+    app,
+    {
+        id: 'my-stack-name',
+        addOns,
+    },
+    {
+        env:{
+          account: <AWS_ACCOUNT_ID>,
+          region: <AWS_REGION>,
+        }
+    });
 ```
 
 ## Addon Options (props)
