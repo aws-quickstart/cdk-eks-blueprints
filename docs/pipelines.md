@@ -51,7 +51,7 @@ const blueprint = blueprints.EksBlueprint.builder()
     .repository({
         repoUrl: 'cdk-eks-blueprints-patterns',
         credentialsSecretName: 'github-token',
-        branch: 'main'
+        targetRevision: 'main'
     })
 ```
 

@@ -15,18 +15,17 @@ Metrics collected by Container Insights are charged as custom metrics. For more 
 Add the following as an add-on to your main.ts file to add Containers Insights to your cluster
 
 ```typescript
-import { ContainerInsightsAddOn, , ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new ContainerInsightsAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.ContainerInsightsAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## Prerequisites
