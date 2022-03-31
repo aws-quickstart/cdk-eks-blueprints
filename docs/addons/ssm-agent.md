@@ -19,18 +19,17 @@ The AWS Identity and Access Management (IAM) managed role **AmazonSSMManagedInst
 ## Usage
 
 ```typescript
-import { SSMAgentAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new SSMAgentAddon();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.SSMAgentAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 To validate that SSM Agent is running on worker node instance:

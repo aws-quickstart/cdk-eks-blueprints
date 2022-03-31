@@ -9,18 +9,17 @@ Calico add-on supports [standard helm configuration options](./index.md#standard
 ## Usage
 
 ```typescript
-import { CalicoAddon, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new CalicoAddon();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.CalicoAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ### Applying Network Policies

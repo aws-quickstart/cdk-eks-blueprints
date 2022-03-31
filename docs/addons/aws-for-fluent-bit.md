@@ -7,18 +7,17 @@ AWS provides a Fluent Bit image with plugins for both CloudWatch Logs and Kinesi
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn();
-const addOns: Array<ClusterAddOn> = [ awsForFluentBit ];
-
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.AwsForFluentBitAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## Configuration 

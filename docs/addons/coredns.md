@@ -15,19 +15,17 @@ Amazon EKS automatically installs CoreDNS as self-managed add-on for every clust
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-readonly coreDNS = new blueprints.addons.CoreDnsAddOn("v1.8.0-eksbuild.1");// optionally specify image version to pull  or empty constructor
-
-const addOns: Array<ClusterAddOn> = [ coreDNS ];
-
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.CoreDnsAddOn("v1.8.0-eksbuild.1"); // optionally specify image version to pull or empty constructor
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 ## Configuration Options
 
