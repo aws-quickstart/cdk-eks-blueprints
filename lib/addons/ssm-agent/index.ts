@@ -21,6 +21,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
             kind: "DaemonSet",
             metadata: {
                 name: "ssm-installer",
+                namespace: "kube-system"
             },
             spec: {
                 selector: { matchLabels: appLabel },
