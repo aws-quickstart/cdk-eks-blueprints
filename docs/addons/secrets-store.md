@@ -14,13 +14,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-const account = <AWS_ACCOUNT_ID>;
-const region = <AWS_REGION>;
-const env: { account, region },
 
 const addOn = new blueprints.addons.SecretsStoreAddOn();
-const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
-
 
 /* Setup application team with secrets
  * Here we are generating a new SecretManager secret for AuthPassword
@@ -34,7 +29,7 @@ export class TeamBurnham extends ApplicationTeam {
             users: getUserArns(scope, "team-burnham.users"),
             teamSecrets: [
                 {
-                    secretProvider: new GenerateSecretManagerProvider('AuthPassword'),
+                    secretProvider: new blueprints.GenerateSecretManagerProvider('AuthPassword'),
                     kubernetesSecret: {
                         secretName: 'auth-password',
                         data: [
@@ -56,11 +51,9 @@ export class TeamBurnham extends ApplicationTeam {
 }
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .account(account) 
-  .region(region)
-  .addOns(addOns)
+  .addOns(addOn)
   .teams(new TeamBurnham(app))
-  .build(app, 'my-stack-name', {env});
+  .build(app, 'my-stack-name');
 ```
 
 ## Functionality

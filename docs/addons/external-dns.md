@@ -12,20 +12,14 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-const account = <AWS_ACCOUNT_ID>;
-const region = <AWS_REGION>;
-const env: { account, region },
 
 const hostedZoneName = ...
 const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
 const addOn = new blueprints.addons.ExternalDnsAddOn({ hostedZone });
-const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .account(account) 
-  .region(region)
-  .addOns(addOns)
-  .teams().build(app, 'my-stack-name', {env});
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 To validate that external DNS add-on is running ensure that the add-on deployment is in `RUNNING` state:

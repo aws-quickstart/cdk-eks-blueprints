@@ -17,9 +17,6 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-const account = <AWS_ACCOUNT_ID>;
-const region = <AWS_REGION>;
-const env: { account, region },
 
 const externalDnsHostname = ...;
 const awsLbControllerAddOn = new blueprints.addons.AwsLoadBalancerControllerAddOn();
@@ -27,10 +24,8 @@ const nginxAddOn = new blueprints.addons.NginxAddOn({ externalDnsHostname })
 const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, nginxAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .account(account) 
-  .region(region)
   .addOns(addOns)
-  .teams().build(app, 'my-stack-name', {env});
+  .build(app, 'my-stack-name');
 ```
 
 To validate that installation is successful run the following command:
