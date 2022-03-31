@@ -24,7 +24,7 @@ const nginxAddOn = new blueprints.addons.NginxAddOn({ externalDnsHostname })
 const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, nginxAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(addOns)
+  .addOns(...addOns)
   .build(app, 'my-stack-name');
 ```
 
