@@ -6,7 +6,7 @@ import { SecretsManager } from "aws-sdk";
  * @returns 
 */
  export async function getSecretValue(secretName: string, region: string): Promise<string> {
-    const secretManager = new SecretsManager({ region: region });
+    const secretManager = new SecretsManager({ region });
     let secretString = "";
     try {
         let response = await secretManager.getSecretValue({ SecretId: secretName }).promise();
@@ -21,6 +21,22 @@ import { SecretsManager } from "aws-sdk";
     }
     catch (error) {
         console.log(`error getting secret ${secretName}: `  + error);
+        throw error;
+    }
+}
+
+/**
+ * Throws an error if secret is undefined in the target region.
+ * @returns ARN of the secret if exists.
+ */
+export async function validateSecret(secretName: string, region: string): Promise<string> {
+    const secretManager = new SecretsManager({ region });
+    try {
+        const response = await secretManager.describeSecret({ SecretId: secretName }).promise();
+        return response.ARN!;
+    }
+    catch (error) {
+        console.log(`Secret ${secretName} is not defined: `  + error);
         throw error;
     }
 }

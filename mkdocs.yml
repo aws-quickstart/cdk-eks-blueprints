@@ -32,6 +32,7 @@ nav:
     - AWS XRay: 'addons/xray.md'
   - Cluster Providers: 
     - Overview: 'cluster-providers/index.md'
+    - Generic Cluster Provider: 'cluster-providers/generic-cluster-provider.md'
     - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'

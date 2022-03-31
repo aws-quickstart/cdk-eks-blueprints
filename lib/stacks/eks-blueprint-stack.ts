@@ -1,14 +1,14 @@
 
+import * as cdk from 'aws-cdk-lib';
+import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
-import * as cdk from 'aws-cdk-lib';
-import * as lodash from "lodash";
 import { Construct } from 'constructs';
-import { StackProps } from 'aws-cdk-lib';
+import * as lodash from "lodash";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import { getAddOnNameOrId, withUsageTracking, setupClusterLogging } from '../utils';
+import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
 
 export class EksBlueprintProps {
 
@@ -181,7 +181,7 @@ export class EksBlueprint extends cdk.Stack {
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_21;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ 
-            id: `${blueprintProps.name}-ng`,
+            id: `${ blueprintProps.name ?? blueprintProps.id }-ng`,
             version
         });
 
