@@ -14,10 +14,14 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const hostedZoneName = ...
-const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
-const addOn = new blueprints.addons.ExternalDnsAddOn({ hostedZone });
+
+const addOn = new blueprints.addons.ExternalDnsAddOn({
+    hostedZoneProviders: [hostedZoneName]; // can be multiple
+});
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .resourceProvider(hostedZoneName, new blueprints.addons.LookupHostedZoneProvider(hostedZoneName))
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
