@@ -7,20 +7,25 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
 
 const hostedZoneName = ...
 const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
-const addOn = new blueprints.addons.ExternalDnsAddon({ hostedZone });
-const addOns: Array<ClusterAddOn> = [ addOn ];
+const addOn = new blueprints.addons.ExternalDnsAddOn({ hostedZone });
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
 
-const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 To validate that external DNS add-on is running ensure that the add-on deployment is in `RUNNING` state:

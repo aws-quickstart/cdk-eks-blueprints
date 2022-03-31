@@ -13,20 +13,24 @@ $ npm install @kubecost/kubecost-blueprints-addon
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { EksBlueprint } from '@aws-quickstart/eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
 
-
 const app = new cdk.App();
-const stackId = `${id}-blueprint`;
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
 
-EksBlueprint.builder()
-    .account(process.env.CDK_DEFAULT_ACCOUNT!)
-    .region(process.env.CDK_DEFAULT_REGION)
-    .addOns(new KubecostAddOn())
-    .build(app, stackId);
+const addOn = new KubecostAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
 
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 ## `KubecostAddOn` Options (props)

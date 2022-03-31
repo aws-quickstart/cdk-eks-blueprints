@@ -13,18 +13,23 @@ Full Argo CD project documentation [can be found here](https://argoproj.github.i
 To provision and maintain ArgoCD components without any bootstrapping, the add-on provides a no-argument constructor to get started. 
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new ArgoCDAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {    
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
+
+const addOn = new blueprints.addons.ArgoCDAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 The above will create an `argocd` namespace and install all Argo CD components. In order to bootstrap workloads you will need to change the default ArgoCD admin password and add repositories as specified in the [Getting Started](https://argoproj.github.io/argo-cd/getting_started/#port-forwarding) documentation.

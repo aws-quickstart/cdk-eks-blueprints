@@ -30,7 +30,7 @@ const defaultProps = {
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
  * It is required to integrate with Route53 for external DNS resolution. 
  */
-export class ExternalDnsAddon extends HelmAddOn {
+export class ExternalDnsAddOn extends HelmAddOn {
 
     private options: ExternalDnsProps;
 

@@ -8,19 +8,23 @@
 
 #### **`index.ts`**
 ```typescript
-import { MetricsServerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-# Deploy Metrics Server v0.5.0
-const addOn = new MetricsServerAddOn('v0.5.0');
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
+
+const addOn = new blueprints.addons.MetricsServerAddOn('v0.5.0');
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 Once deployed, you can see metrics-server pod in the `kube-system` namespace.
@@ -29,7 +33,7 @@ Once deployed, you can see metrics-server pod in the `kube-system` namespace.
 $ kubectl get deployments -n kube-system
 
 NAME                                                          READY   UP-TO-DATE   AVAILABLE   AGE
-metrics-server                                                1/1     1            1           20m
+blueprints-addon-metrics-server                               1/1     1            1           20m
 ```
 
 ## Functionality

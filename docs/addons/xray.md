@@ -7,18 +7,23 @@ For instructions on getting started with X-Ray on EKS refer to the [EKS Workshop
 ## Usage
 
 ```typescript
-import { XrayAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new XrayAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {    
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
+
+const addOn = new blueprints.addons.XrayAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 Once deployed, it allows applications to be instrumented with X-Ray by leveraging the X-Ray SDK.  Examples of such integration can be found on [GitHub](https://github.com/aws-samples/aws-xray-kubernetes).

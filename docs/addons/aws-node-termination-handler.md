@@ -13,42 +13,29 @@ NTH can operate in two different modes: Instance Metadata Service (IMDS) or the 
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-// Blueprints Lib
-import * as blueprints from '@aws-quickstart/eks-blueprints'
-import * as eks from 'aws-cdk-lib/aws-eks';
+const app = new cdk.App();
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
 
-export default class BottlerocketConstruct extends Construct {
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
+const addOn = new blueprints.addons.AwsNodeTerminationHandlerAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
 
-        // AddOns for the cluster.
-        const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.AwsNodeTerminationHandlerAddOn,
-        ];
+const clusterProvider = new blueprints.AsgClusterProvider({
+  version: eks.KubernetesVersion.V1_21,
+  machineImageType:  eks.MachineImageType.BOTTLEROCKET
+});
 
-        const stackID = `${id}-blueprint`;
-        const clusterProvider = new blueprints.AsgClusterProvider({
-            version: eks.KubernetesVersion.V1_21,
-            machineImageType:  eks.MachineImageType.BOTTLEROCKET
-         });
-
-        new blueprints.EksBlueprint(scope,
-          {
-            id: stackID,
-            addOns,
-            clusterProvider
-          },
-          {
-            env: {
-                region: 'us-east-1'
-            }
-          }
-        );
-    }
-}
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .clusterProvider(clusterProvider)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 To validate that controller is running, ensure that controller deployment is in `RUNNING` state:

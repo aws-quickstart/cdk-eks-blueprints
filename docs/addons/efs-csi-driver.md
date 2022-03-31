@@ -17,14 +17,23 @@ For more information on the driver, please review the [user guide](https://docs.
 ## Usage
 
 ```typescript
-import { App } from 'aws-cdk-lib';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const app = new App();
+const app = new cdk.App();
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
 
-blueprints.EksBlueprint.builder()
-    .addOns(new blueprints.EfsCsiDriverAddOn() )
-    .build(app, 'my-cluster');
+const addOn = new blueprints.addons.EfsCsiDriverAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 ## Configuration Options

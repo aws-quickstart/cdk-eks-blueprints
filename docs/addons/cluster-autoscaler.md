@@ -8,18 +8,23 @@ The Cluster Autoscaler add-on adds support for [Cluster Autoscaler](https://gith
 ## Usage
 
 ```typescript
-import { ClusterAutoScalerAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new ClusterAutoscalerAddOn()
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
+const env: { account, region },
+
+const addOn = new blueprints.addons.ClusterAutoscalerAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ addOn ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .account(account) 
+  .region(region)
+  .addOns(addOns)
+  .teams().build(app, 'my-stack-name', {env});
 ```
 
 ## Functionality
@@ -57,7 +62,7 @@ The first step is to create a sample application via deployment and request 20m 
 ```bash
 kubectl create deployment php-apache --image=us.gcr.io/k8s-artifacts-prod/hpa-example
 kubectl set resources deploy php-apache --requests=cpu=20m 
-kubectl expose php-apache --port 80
+kubectl expose deployment php-apache --port 80
 ```
 
 You can see that there's 1 pod currently running:
@@ -78,7 +83,7 @@ Now we can create Horizontal Pod Autoscaler resource with 50% CPU target utiliza
 kubectl autoscale deployment php-apache \
     --cpu-percent=50 \
     --min=1 \
-    --max=20
+    --max=50
 ```
 
 You can verify by looking at the hpa resource:
@@ -89,7 +94,7 @@ kubectl get hpa
 
 ```
 NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-php-apache   Deployment/php-apache   10%/50%   1         20        2          52s
+php-apache   Deployment/php-apache   10%/50%   1         50        2          52s
 ```
 
 ### Generate load
@@ -117,7 +122,7 @@ kubectl get pods -l app=php-apache -o wide --watch
 With more pods being created, you would expect more nodes to be created; you can access the Cluster Autoscaler logs to confirm:
 
 ```bash
-kubectl -n kube-system logs -f deployment/cluster-autoscaler
+kubectl -n kube-system logs -f deployment/blueprints-addon-cluster-autoscaler-aws-cluster-autoscaler
 ```
 
 Lastly, you can list all the nodes and see that there are now multiple nodes:
