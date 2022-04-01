@@ -138,7 +138,7 @@ blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
-    .addOns(new ExternalDnsAddon({hostedZoneResources: [GlobalResources.HostedZone]}))
+    .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
     // Use certificate registered before with NginxAddon
     .addOns(new NginxAddOn({
         certificateResourceName: GlobalResources.Certificate,
@@ -160,7 +160,7 @@ blueprints.EksBlueprint.builder()
     .resourceProvider("MyCert", new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', "MyHostedZone1"))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zones for External DNS
-    .addOns(new ExternalDnsAddon({hostedZoneResources: ["MyHostedZone1", "MyHostedZone2"]}))
+    .addOns(new ExternalDnsAddOn({hostedZoneResources: ["MyHostedZone1", "MyHostedZone2"]}))
     // Use certificate registered before with NginxAddon
     .addOns(new NginxAddOn({
         certificateResourceName: "MyCert",

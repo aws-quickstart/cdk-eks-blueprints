@@ -65,7 +65,7 @@ blueprints.EksBlueprint.builder()
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
     })
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .addOns(new blueprints.NginxAddOn({ internetFacing: true, backendProtocol: "tcp", externaDnsHostname: subdomain, crossZoneEnabled: false })
@@ -155,7 +155,7 @@ blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone)) // referencing hosted zone for automatic DNS validation
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
-    .addOns(new ExternalDnsAddon({hostedZoneResources: [GlobalResources.HostedZone]}))
+    .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
     // Use certificate registered before with NginxAddon
     .addOns(new NginxAddOn({
         certificateResourceName: GlobalResources.Certificate,
