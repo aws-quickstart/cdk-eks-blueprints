@@ -27,6 +27,7 @@ nav:
     - EFS CSI Driver: 'addons/efs-csi-driver.md'
     - External DNS: 'addons/external-dns.md'
     - Karpenter: 'addons/karpenter.md'
+    - Keptn: 'https://github.com/keptn-sandbox/keptn-blueprints-addons'
     - Kube Proxy: 'addons/kube-proxy.md'
     - Kubecost: 'addons/kubecost.md'
     - Kubevious: 'addons/kubevious.md'
