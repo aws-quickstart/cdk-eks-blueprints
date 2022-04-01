@@ -74,7 +74,7 @@ const myDomainName = "";
 blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1", new blueprints.LookupHostedZoneProvider(myDomainName))
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -87,7 +87,7 @@ const myHostedZoneId = "";
 blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1",  new blueprints.addons.ImportHostedZoneProvider(myHostedZoneId))
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -129,7 +129,7 @@ blueprints.EksBlueprint.builder()
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
     })
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
 

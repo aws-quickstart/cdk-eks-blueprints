@@ -189,7 +189,7 @@ test("Named resource providers are correctly registered and discovered", async (
         .resourceProvider(blueprints.GlobalResources.HostedZone, new blueprints.ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
         .resourceProvider(blueprints.GlobalResources.Certificate, new blueprints.CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', blueprints.GlobalResources.HostedZone))
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
-        .addOns(new blueprints.ExternalDnsAddon({hostedZoneResources: [blueprints.GlobalResources.HostedZone]}))
+        .addOns(new blueprints.ExternalDnsAddOn({hostedZoneResources: [blueprints.GlobalResources.HostedZone]}))
         .addOns(new blueprints.NginxAddOn({
             certificateResourceName: blueprints.GlobalResources.Certificate,
             externalDnsHostname: 'my.domain.com'
