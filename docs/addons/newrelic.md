@@ -14,7 +14,21 @@ npm install @newrelic/newrelic-eks-blueprints-addon
 
 For a quick tutorial on EKS Blueprints, visit the [Getting Started guide](https://aws-quickstart.github.io/cdk-eks-blueprints/getting-started/).
 
-## Usage
+## Retrieving keys
+
+The New Relic and Pixie keys can be obtained from the New Relic [Guided Install for Kubernetes](https://docs.newrelic.com/docs/kubernetes-pixie/kubernetes-integration/installation/kubernetes-integration-install-configure#installer).
+
+## AWS Secrets Manager key format
+
+```
+{
+  "nrLicenseKey": "xxxxNRAL",
+  "pixieDeployKey": "px-dep-xxxx",
+  "pixieApiKey": "px-api-xxxx"
+}
+```
+
+## Using keys stored in Secrets Manager:
 
 ```
 import * as cdk from 'aws-cdk-lib';
@@ -34,6 +48,34 @@ blueprints.EksBlueprint.builder()
         awsSecretName: "newrelic-pixie-combined", // Secret Name in AWS Secrets Manager
         installPixie: true,
         installPixieIntegration: true,
+    }))
+    .region(process.env.AWS_REGION)
+    .account(process.env.AWS_ACCOUNT)
+    .build(app, 'demo-cluster');
+```
+
+## Using keys
+
+```
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { NewRelicAddOn } from '@newrelic/newrelic-eks-blueprints-addon';
+
+const app = new cdk.App();
+
+blueprints.EksBlueprint.builder()
+    .addOns(new blueprints.MetricsServerAddOn)
+    .addOns(new blueprints.ClusterAutoScalerAddOn)
+    .addOns(new blueprints.addons.SSMAgentAddOn)
+    .addOns(new blueprints.addons.SecretsStoreAddOn)
+    .addOns(new NewRelicAddOn({
+        version: "4.2.0-beta",
+        newRelicClusterName: "demo-cluster",
+        newRelicLicenseKey: "NEW RELIC LICENSE KEY",
+        installPixie: true,
+        installPixieIntegration: true,
+        pixieApiKey: "PIXIE API KEY",
+        pixieDeployKey: "PIXIE DEPLOY KEY"
     }))
     .region(process.env.AWS_REGION)
     .account(process.env.AWS_ACCOUNT)
@@ -60,17 +102,17 @@ After installing the New Relic add-on, you can validate a successful installatio
 
 ![New Relic Entity Explorer](https://p191.p3.n0.cdn.getcloudapp.com/items/WnuqL0A9/87e8d7ff-1dbc-4f7d-85c6-879373976c3a.jpg?v=8aa90eeecf7963fc5107e46a24b55188)
 
-## AddOn Variables
+## Variables
 
 | Variable                | Type                   | Required | Description                                                                                                                                                                                                                                                                                                                                                                                        |
 |-------------------------|------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | newRelicLicenseKey      | string                 | True     | New Relic License Key (plain text). Use `awsSecretName` instead for AWS Secrets Manager support and added security.                                                                                                                                                                                                                                                                     |
-| awsSecretName           | string                 | True     | AWS Secret name containing the New Relic and Pixie keys in AWS Secrets Manager. Define secret in JSON format with the following keys:  ``` {   "nrLicenseKey": "REPLACE WITH YOUR NEW RELIC LICENSE KEY",   "pixieDeployKey": "REPLACE WITH YOUR PIXIE LICENSE KEY",   "pixieApiKey": "REPLACE WITH YOUR PIXIE API KEY" } ```  Keys can be obtained in the New Relic Guided Install for Kubernetes |
+| awsSecretName           | string                 | True     | AWS Secret name containing the New Relic and Pixie keys in AWS Secrets Manager. Define secret in JSON format with the following keys:  ``` {   "nrLicenseKey": "REPLACE WITH YOUR NEW RELIC LICENSE KEY",   "pixieDeployKey": "REPLACE WITH YOUR PIXIE LICENSE KEY",   "pixieApiKey": "REPLACE WITH YOUR PIXIE API KEY" } ```  Keys can be obtained in the [New Relic Guided Install for Kubernetes](https://docs.newrelic.com/docs/kubernetes-pixie/kubernetes-integration/installation/kubernetes-integration-install-configure#installer) |
 | newRelicClusterName     | string                 | True     | Name for the cluster in the New Relic UI.                                                                                                                                                                                                                                                                                                                                                          |
 | pixieApiKey             | string                 |          | Pixie Api Key can be obtained in New Relic's Guided Install for Kubernetes (plaintext).  Use `awsSecretName` instead for AWS Secrets Manager support and added security.                                                                                                                                                                                                                                                                                                              |
 | pixieDeployKey          | string                 |          | Pixie Deploy Key can be obtained in New Relic's Guided Install for Kubernetes -  (plaintext).  Use `awsSecretName` instead for AWS Secrets Manager support and added security.                                                                                                                                                                                                                                                                                                          |
 | namespace               | string                 |          | The namespace where New Relic components will be installed. Defaults to  `newrelic`.                                                                                                                                                                                                                                                                                                               |
-| lowDataMode             | boolean                |          | Default  `true`.  Set to  `false`  to disable  `lowDataMode` .  For more details, visit https://docs.newrelic.com/docs/kubernetes-pixie/kubernetes-integration/installation/install-kubernetes-integration-using-helm/#reducedataingest                                                                                                                                                            |
+| lowDataMode             | boolean                |          | Default  `true`.  Set to  `false`  to disable  `lowDataMode` .  For more details, visit the [Reducing Data Ingest Docs](https://docs.newrelic.com/docs/kubernetes-pixie/kubernetes-integration/installation/install-kubernetes-integration-using-helm/#reducedataingest)                                                                                                                                                            |
 | installInfrastructure   | boolean                |          | Default  `true` .  Set to  `false`  to disable installation of the New Relic Infrastructure Daemonset.                                                                                                                                                                                                                                                                                             |
 | installKSM              | boolean                |          | Default  `true` .  Set to  `false`  to disable installation of Kube State Metrics.  An instance of KSM is required in the cluster for the New Relic Infrastructure Daemonset to function properly.                                                                                                                                                                                                 |
 | installKubeEvents       | boolean                |          | Default  `true` .  Set to  `false`  to disable installation of the New Relic Kubernetes Events integration.                                                                                                                                                                                                                                                                                        |
