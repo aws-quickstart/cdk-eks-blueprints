@@ -94,13 +94,11 @@ Almost immediately after the New Relic pods enter a `Running` state in the clust
 
 ```FROM K8sClusterSample, K8sNodeSample select latest(clusterK8sVersion), latest(agentVersion) as 'NR Agent Ver.', uniqueCount(nodeName) as 'Node Count' facet clusterName limit max```
 
-Click [here](https://onenr.io/0BQ1A6k6VQx) for a shortcut to New Relic's Query Builder.
-
 ![New Relic Query Builder](https://p191.p3.n0.cdn.getcloudapp.com/items/7Kuq7ELA/e841897d-afa0-42fe-a1df-1b08be4cb750.jpg?v=7a446451520f80b5713fec32ff909f43)
 
 ### New Relic One UI
 ---
-After installing the New Relic add-on, you can validate a successful installation by visiting New Relic's Entity Explorer filtered to Kubernetes Clusters.  Click [here](https://onenr.io/0dQeVvWyZwe) to go there directly.
+After installing the New Relic add-on, you can validate a successful installation by visiting New Relic's Entity Explorer filtered to Kubernetes Clusters.
 
 ![New Relic Entity Explorer](https://p191.p3.n0.cdn.getcloudapp.com/items/WnuqL0A9/87e8d7ff-1dbc-4f7d-85c6-879373976c3a.jpg?v=8aa90eeecf7963fc5107e46a24b55188)
 
