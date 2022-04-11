@@ -1,4 +1,4 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct } from "constructs";
 import { ArgoCDAddOn } from "../../../lib";
 import { HelmChartDeployment } from "../helm-addon/kubectl-provider";
 import { ClusterInfo } from "../../../lib/spi";
