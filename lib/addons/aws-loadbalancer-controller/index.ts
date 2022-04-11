@@ -1,9 +1,9 @@
-import * as iam from "@aws-cdk/aws-iam";
-import { Construct } from "@aws-cdk/core";
+import * as iam from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { registries } from "./registryMap";
+import { registries } from "../../utils/registry-utils";
 
 /**
  * Configuration options for the add-on.
@@ -91,8 +91,8 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
             region: clusterInfo.cluster.stack.region,
-            image: {repository: repo}
-
+            image: { repository: repo },
+            vpcId: clusterInfo.cluster.vpc.vpcId,
         });
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);

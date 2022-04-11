@@ -1,7 +1,8 @@
-import { Construct } from '@aws-cdk/core';
+import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';
+import * as lodash from "lodash";
 
 /**
  * Configuration options for Secrets Store AddOn
@@ -46,7 +47,7 @@ const defaultProps: SecretsStoreAddOnProps = {
     name: 'secrets-store-csi-driver',
     namespace: 'kube-system',
     version: 'v0.0.23',
-    release: 'ssp-addon-secret-store-csi-driver',
+    release: 'blueprints-addon-secret-store-csi-driver',
     repository: 'https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts',
     rotationPollInterval: undefined,
     syncSecrets: true,
@@ -57,7 +58,7 @@ export class SecretsStoreAddOn implements ClusterAddOn {
     private options: SecretsStoreAddOnProps;
 
     constructor(props?: SecretsStoreAddOnProps) {
-        this.options = { ...defaultProps, ...props };
+        this.options = lodash.cloneDeep({ ...defaultProps, ...props });
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {

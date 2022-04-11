@@ -13,40 +13,23 @@ NTH can operate in two different modes: Instance Metadata Service (IMDS) or the 
 ## Usage
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-// SSP Lib
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
-import * as eks from '@aws-cdk/aws-eks';
+const app = new cdk.App();
 
-export default class BottlerocketConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
+const addOn = new blueprints.addons.AwsNodeTerminationHandlerAddOn();
 
-        // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.AwsNodeTerminationHandlerAddOn,
-        ];
+const clusterProvider = new blueprints.AsgClusterProvider({
+  version: eks.KubernetesVersion.V1_21,
+  machineImageType:  eks.MachineImageType.BOTTLEROCKET
+});
 
-        const stackID = `${id}-blueprint`;
-        const clusterProvider = new ssp.AsgClusterProvider({
-            version: eks.KubernetesVersion.V1_20,
-            machineImageType:  eks.MachineImageType.BOTTLEROCKET
-         });
-        new ssp.EksBlueprint(scope,
-          {
-            id: stackID,
-            addOns,
-            clusterProvider
-          },
-          {
-            env: {
-                region: 'us-east-1'
-            }
-          }
-        );
-    }
-}
+const blueprint = blueprints.EksBlueprint.builder()
+  .clusterProvider(clusterProvider)
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 To validate that controller is running, ensure that controller deployment is in `RUNNING` state:

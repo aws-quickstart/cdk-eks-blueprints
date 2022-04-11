@@ -1,4 +1,4 @@
-import { Construct } from '@aws-cdk/core';
+import { Construct } from "constructs";
 import { Team } from './team-contracts';
 import * as types from './types';
 

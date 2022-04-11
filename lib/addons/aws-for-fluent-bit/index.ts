@@ -1,5 +1,5 @@
-import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { Construct } from "@aws-cdk/core";
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Construct } from "constructs";
 
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from "../../spi/types";
@@ -20,7 +20,7 @@ export interface AwsForFluentBitAddOnProps extends HelmAddOnUserProps {
 const defaultProps: AwsForFluentBitAddOnProps = {
     name: 'fluent-bit',
     chart: 'aws-for-fluent-bit',
-    release: "ssp-addon-aws-for-fluent-bit",
+    release: "blueprints-addon-aws-for-fluent-bit",
     version: '0.1.11',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'kube-system',
@@ -32,7 +32,7 @@ const defaultProps: AwsForFluentBitAddOnProps = {
  * https://github.com/aws/eks-charts/tree/master/stable/aws-for-fluent-bit
  * 
  * For information on how to configure the `aws-for-fluent-bit` Helm chart to forward logs and metrics to AWS services like CloudWatch or Kinesis, please view the values.yaml spec provided by the chart.
- * https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml#L54
+ * https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml
  */
 export class AwsForFluentBitAddOn extends HelmAddOn {
 

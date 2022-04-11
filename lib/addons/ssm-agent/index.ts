@@ -1,5 +1,5 @@
-import { KubernetesManifest } from "@aws-cdk/aws-eks";
-import { ManagedPolicy } from "@aws-cdk/aws-iam";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 
@@ -21,6 +21,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
             kind: "DaemonSet",
             metadata: {
                 name: "ssm-installer",
+                namespace: "kube-system"
             },
             spec: {
                 selector: { matchLabels: appLabel },
@@ -46,7 +47,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
                         ],
                         initContainers: [
                             {
-                                image: "public.ecr.aws/y9z4e3w0/eks-ssp-test/addon-ssm-agent:3.0.1390.0",
+                                image: "public.ecr.aws/amazon-ssm-agent/amazon-ssm-agent:3.1.90.0",
                                 imagePullPolicy: "Always",
                                 name: "ssm-install",
                                 securityContext: {

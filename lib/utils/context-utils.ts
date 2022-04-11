@@ -1,4 +1,4 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct } from "constructs";
 
 /**
  * Looks up default value from context (cdk.json, cdk.context.json and ~/.cdk.json)

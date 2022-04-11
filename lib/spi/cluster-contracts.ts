@@ -1,6 +1,6 @@
 import { ClusterInfo } from '.';
-import { Construct } from '@aws-cdk/core';
-import { IVpc } from '@aws-cdk/aws-ec2';
+import { Construct } from "constructs";
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 
 
 /**

@@ -9,11 +9,11 @@ The main benefits organizations can see using the AWS CDK to manage their Amazon
 - Access to GitOps methodologies and best practices
 - Automated lifecycle management for cluster deployment
 
-The Amazon EKS SSP Quick Start references the [ssp-eks-patterns repository](https://github.com/aws-samples/ssp-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
+The Amazon EKS Blueprints Quick Start references the [`eks-blueprints-patterns` repository](https://github.com/aws-samples/blueprints-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
 
 ```typescript
 #!/usr/bin/env node
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 const app = new cdk.App();
 //-------------------------------------------
 // Single Cluster with multiple teams.
@@ -57,12 +57,12 @@ If for example you chose the region us-west-2, you would get a similar output:
 
 ## Multi-Region Management 
 
-In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the ssp-ek-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
+In a production environment, it is common to have clusters that reside in different locations. This could be in different regions, on-prem, or follow a hybrid cloud model. Some of the common design patterns that come in to play when it comes to multi-cluster management across these different operational models include things like high availability, data replication, networking, traffic routing, and the underlying management of those clusters. In the eks-blueprints-patterns/lib/multi-region-construct directory, you will find the index.ts file which shows a concrete example of how to deploy multiple clusters to different regions as shown below
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
-// SSP Lib
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+import * as cdk from 'aws-cdk-lib';
+// Blueprints Lib
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 // Team implementations
 import * as team from '../teams'
 export default class MultiRegionConstruct extends cdk.Construct {
@@ -71,32 +71,32 @@ export default class MultiRegionConstruct extends cdk.Construct {
         // Setup platform team
         const accountID = process.env.CDK_DEFAULT_ACCOUNT!
         const platformTeam = new team.TeamPlatform(accountID)
-        const teams: Array<ssp.Team> = [platformTeam];
+        const teams: Array<blueprints.Team> = [platformTeam];
         // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.addons.NginxAddOn,
-            new ssp.addons.ArgoCDAddOn,
-            new ssp.addons.CalicoAddOn,
-            new ssp.addons.MetricsServerAddOn,
-            new ssp.addons.ClusterAutoScalerAddOn,
-            new ssp.addons.ContainerInsightsAddOn,
-            new ssp.addons.VpcCniAddOn(),
-            new ssp.addons.CoreDnsAddOn(),
-            new ssp.addons.KubeProxyAddOn()
+        const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.addons.NginxAddOn,
+            new blueprints.addons.ArgoCDAddOn,
+            new blueprints.addons.CalicoAddOn,
+            new blueprints.addons.MetricsServerAddOn,
+            new blueprints.addons.ClusterAutoScalerAddOn,
+            new blueprints.addons.ContainerInsightsAddOn,
+            new blueprints.addons.VpcCniAddOn(),
+            new blueprints.addons.CoreDnsAddOn(),
+            new blueprints.addons.KubeProxyAddOn()
         ];
         const east = 'blueprint-us-east-2'
-        new ssp.EksBlueprint(scope, { id: `${id}-${east}`, addOns, teams }, {
+        new blueprints.EksBlueprint(scope, { id: `${id}-${east}`, addOns, teams }, {
             env: { region: east }
         });
         const central = 'blueprint-us-central-2'
-        new ssp.EksBlueprint(scope, { id: `${id}-${central}`, addOns, teams }, {
+        new blueprints.EksBlueprint(scope, { id: `${id}-${central}`, addOns, teams }, {
             env: { region: central }
         });
         const west = 'blueprint-us-west-2'
-        new ssp.EksBlueprint(scope, { id: `${id}-${west}`, addOns, teams }, {
+        new blueprints.EksBlueprint(scope, { id: `${id}-${west}`, addOns, teams }, {
             env: { region: west }
         });
     }
 }
 ```
-This construct imports all of the core components of the Shared Services Platform library, Teams construct, and Addons as modules which then deploys our clusters to different regions. The main point to take away from this is that we are adding automation and consistency to our clusters as we deploy multiple clusters to multiple regions since all of our components have already been defined in the Shared Services Platform library along with Teams and Addons. 
+This construct imports all of the core components of the `EKS Blueprints` framework, Teams construct, and Addons as modules which then deploys our clusters to different regions. The main point to take away from this is that we are adding automation and consistency to our clusters as we deploy multiple clusters to multiple regions since all of our components have already been defined in the `EKS Blueprints` library along with Teams and Addons. 

@@ -1,4 +1,4 @@
-import { PolicyDocument } from "@aws-cdk/aws-iam";
+import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 
 export function getEbsDriverPolicyDocument(partition: string) : PolicyDocument {
     return PolicyDocument.fromJson({

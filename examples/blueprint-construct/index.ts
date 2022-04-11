@@ -1,10 +1,10 @@
-import * as ec2 from "@aws-cdk/aws-ec2";
-import { InstanceType } from '@aws-cdk/aws-ec2';
-import { CapacityType, KubernetesVersion, NodegroupAmiType } from '@aws-cdk/aws-eks';
-import * as cdk from '@aws-cdk/core';
-// SSP lib.
-import * as ssp from '../../lib';
-import { EksBlueprint } from '../../lib';
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { InstanceType } from 'aws-cdk-lib/aws-ec2';
+import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from "constructs";
+
+import * as blueprints from '../../lib';
 import * as team from '../teams';
 
 
@@ -19,8 +19,8 @@ export interface BlueprintConstructProps {
     id: string
 }
 
-export default class BlueprintConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
+export default class BlueprintConstruct extends Construct {
+    constructor(scope: Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
         super(scope, blueprintProps.id);
 
         // TODO: fix IAM user provisioning for admin user
@@ -29,17 +29,17 @@ export default class BlueprintConstruct extends cdk.Construct {
         // const platformTeam = new team.TeamPlatform(account)
 
         // Teams for the cluster.
-        const teams: Array<ssp.Team> = [
+        const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
             new team.TeamRiker(scope, teamManifestDirList[1]),
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
-        const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
+        const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
-            // https://github.com/aws-quickstart/ssp-amazon-eks/blob/main/docs/addons/argo-cd.md#known-issues
+            // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
             // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/ssp-eks-workloads.git',
+            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
             //      path: 'envs/dev',
             //      targetRevision: "deployable",
             //      credentialsSecretName: 'github-ssh',
@@ -47,29 +47,29 @@ export default class BlueprintConstruct extends cdk.Construct {
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
-        // AddOns for the cluster.
-        const addOns: Array<ssp.ClusterAddOn> = [
-            new ssp.addons.AppMeshAddOn(),
-            new ssp.addons.CalicoAddOn(),
-            new ssp.addons.MetricsServerAddOn(),
-            new ssp.addons.ContainerInsightsAddOn(),
-            new ssp.addons.AwsLoadBalancerControllerAddOn(),
-            new ssp.addons.SecretsStoreAddOn(),
+        const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.addons.AppMeshAddOn(),
+            new blueprints.addons.CalicoAddOn(),
+            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.ContainerInsightsAddOn(),
+            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+            new blueprints.addons.SecretsStoreAddOn(),
             prodBootstrapArgo,
-            new ssp.addons.SSMAgentAddOn(),
-            new ssp.addons.NginxAddOn({
+            new blueprints.addons.SSMAgentAddOn(),
+            new blueprints.addons.NginxAddOn({
                 values: {
                     controller: { service: { create: false } }
                 }
             }),
-            new ssp.addons.VeleroAddOn(),
-            new ssp.addons.VpcCniAddOn(),
-            new ssp.addons.CoreDnsAddOn(),
-            new ssp.addons.KubeProxyAddOn(),
-            // new ssp.addons.OpaGatekeeperAddOn(),
-            new ssp.addons.KarpenterAddOn(),
-            new ssp.addons.KubeviousAddOn(),
-            new ssp.addons.EbsCsiDriverAddOn()
+            new blueprints.addons.VeleroAddOn(),
+            new blueprints.addons.VpcCniAddOn(),
+            new blueprints.addons.CoreDnsAddOn(),
+            new blueprints.addons.KubeProxyAddOn(),
+            // ssp.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.KarpenterAddOn(),
+            new blueprints.addons.KubeviousAddOn(),
+            new blueprints.addons.EbsCsiDriverAddOn(),
+            new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
@@ -77,7 +77,7 @@ export default class BlueprintConstruct extends cdk.Construct {
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
-        const clusterProvider = new ssp.GenericClusterProvider({
+        const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_21,
             managedNodeGroups: [
                 {
@@ -93,7 +93,9 @@ export default class BlueprintConstruct extends cdk.Construct {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-0b297a512e2852b89',
                             'us-west-2': 'ami-06a8c459c01f55c7b',
-                            'us-east-2': 'ami-093d9796e55a5b860'
+                            'us-east-2': 'ami-093d9796e55a5b860',
+                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
                         userData: userData,
                     }
@@ -101,7 +103,7 @@ export default class BlueprintConstruct extends cdk.Construct {
             ]
         });
 
-        EksBlueprint.builder()
+        blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams)

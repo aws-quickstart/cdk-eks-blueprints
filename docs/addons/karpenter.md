@@ -1,4 +1,4 @@
-# Karpenter Add-on
+# Karpenter Add-on (Not Currently Supported, In Progress)
 
 Karpenter add-on is based on the [Karpenter](https://github.com/aws/karpenter) open source node provisioning project. It provides a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application. 
 
@@ -17,18 +17,17 @@ Karpenter works by:
 ## Usage
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-const account = <AWS_ACCOUNT_ID>;
-const region = <AWS_REGION>;
-const env: { account, region },
 
-const blueprint = ssp.EksBlueprint.builder()
-  .account(account) 
-  .region(region)
-  .addOns( new ssp.addons.KarpenterAddOn() )
-  .teams().build(app, 'my-stack-name', {env});
+const addOn = new blueprints.addons.KarpenterAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 To validate that Karpenter add-on is running ensure that the add-on deployments for the controller and the webhook are in `RUNNING` state:
@@ -66,7 +65,7 @@ const provisionerSpecs = {
     'karpenter.sh/capacity-type': ['spot','on-demand'],
 }
 
-const karpenterAddOn = new ssp.addons.KarpenterAddOn({provisionerSpecs: provisionerSpecs})
+const karpenterAddOn = new blueprints.addons.KarpenterAddOn({provisionerSpecs: provisionerSpecs})
 ```
 
 If the `provisionerSpecs` is not provided at deploy time, the add-on will be installed without a Provisioner. 

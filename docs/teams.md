@@ -1,6 +1,6 @@
 # Teams
 
-The `ssp-amazon-eks` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two `Team` types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` represent teams managing workloads running in cluster namespaces and `PlatformTeam` represents platform administrators who have admin access (masters group) to clusters.
+The `eks-blueprints` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two `Team` types: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` represent teams managing workloads running in cluster namespaces and `PlatformTeam` represents platform administrators who have admin access (masters group) to clusters.
 
 You are also able to create your own team implementations by creating classes that inherits from `Team`.
 
@@ -16,8 +16,8 @@ export class TeamAwesome extends ApplicationTeam {
             users: [
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user1`),  
                 new ArnPrincipal(`arn:aws:iam::${YOUR_IAM_ACCOUNT}:user/user2`)
-            ]
-        teamManifestDir: './examples/teams/team-awesome/'
+            ],
+            teamManifestDir: './examples/teams/team-awesome/'
         });
     }
 }

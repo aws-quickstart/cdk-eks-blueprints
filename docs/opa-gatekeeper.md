@@ -1,4 +1,4 @@
-# What is OPA Gatekeeper? (Not Currently Supported, In Progress)
+# What is OPA Gatekeeper?
 
 The Open Policy Agent (OPA, pronounced “oh-pa”) is an open source, general-purpose policy engine that unifies policy enforcement across the stack. OPA provides a high-level declarative language that lets you specify policy as code and simple APIs to offload policy decision-making from your software. You can use OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, and more. OPA uses a policy language known as Rego which is a query language which was purpose built to support structured document models such as JSON. To learn more about Rego check out this [link](https://www.openpolicyagent.org/docs/latest/policy-language/).
 
@@ -28,17 +28,17 @@ RBAC (role-based access control) can help with some of the scenarios above but *
 ## Usage
 
 ```typescript
-import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-
-const addOn = new blueprints.addons.OpaGatekeeperAddOn();
+const account = <AWS_ACCOUNT_ID>;
+const region = <AWS_REGION>;
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(addOn)
-  .build(app, 'my-stack-name');
+  .account(account) 
+  .region(region)
+  .addOns( new blueprints.addons.OpaGatekeeperAddOn() )
+  .teams().build(app, 'my-stack-name');
 ```
 
 To validate that OPA Gatekeeper is running within your cluster run the following command:

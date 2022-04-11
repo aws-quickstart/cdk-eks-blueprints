@@ -7,30 +7,24 @@
 Using [npm](https://npmjs.org):
 
 ```sh
-$ npm install @kubecost/kubecost-ssp-addon
+$ npm install @kubecost/kubecost-blueprints-addon
 ```
 
 ## Usage
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
-import { EksBlueprint } from '@aws-quickstart/ssp-amazon-eks';
-import { KubecostAddOn } from '@kubecost/kubecost-ssp-addon';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
 
+const app = new cdk.App();
 
-export default class KubecostConstruct extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string) {
-        super(scope, id);
-        // AddOns for the cluster
-        const stackId = `${id}-blueprint`;
+const addOn = new KubecostAddOn();
 
-        EksBlueprint.builder()
-            .account(process.env.CDK_DEFAULT_ACCOUNT!)
-            .region(process.env.CDK_DEFAULT_REGION)
-            .addOns(new KubecostAddOn())
-            .build(scope, stackId);
-    }
-}
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## `KubecostAddOn` Options (props)
@@ -72,4 +66,4 @@ If you have any questions about Kubecost, get in touch with the team [on Slack](
 
 ## License
 
-The Kubecost SSP AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-ssp-addon)
+The Kubecost Blueprints AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-blueprints-addon)

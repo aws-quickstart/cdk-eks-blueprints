@@ -13,8 +13,8 @@ const props: AsgClusterProviderProps = {
     machineImageType: eks.MachineImageType.AMAZON_LINUX_2,
     updatePolicy: UpdatePolicy.Rolling
 }
-const clusterProvider = new ssp.AsgClusterProvider(props);
-new ssp.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
+const clusterProvider = new blueprints.AsgClusterProvider(props);
+new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 ```
 
 ## Configuration
@@ -58,7 +58,7 @@ const props: AsgClusterProviderProps = {
     machineImageType: eks.MachineImageType.BOTTLEROCKET,
     updatePolicy: UpdatePolicy.Rolling
 }
-const clusterProvider = new ssp.AsgClusterProvider(props);
-new ssp.EksBlueprint(scope, { id: 'blueprint', teams, addOns, clusterProvider });
+const clusterProvider = new blueprints.AsgClusterProvider(props);
+new blueprints.EksBlueprint(scope, { id: 'blueprint', teams, addOns, clusterProvider });
 ```
 

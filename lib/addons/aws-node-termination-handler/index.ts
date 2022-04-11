@@ -1,11 +1,12 @@
-import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from '@aws-cdk/aws-autoscaling';
-import { QueueHook } from '@aws-cdk/aws-autoscaling-hooktargets';
-import { Cluster, ServiceAccount } from '@aws-cdk/aws-eks';
-import { EventPattern, Rule } from '@aws-cdk/aws-events';
-import { SqsQueue } from '@aws-cdk/aws-events-targets';
-import * as iam from '@aws-cdk/aws-iam';
-import { Queue } from '@aws-cdk/aws-sqs';
-import { Construct, Duration } from '@aws-cdk/core';
+import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
+import { QueueHook } from 'aws-cdk-lib/aws-autoscaling-hooktargets';
+import { Cluster, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { EventPattern, Rule } from 'aws-cdk-lib/aws-events';
+import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
+import { Duration } from 'aws-cdk-lib';
+import { Construct } from "constructs";
 import * as assert from "assert";
 import { ClusterInfo } from '../../spi';
 import { tagAsg } from '../../utils';
@@ -44,7 +45,7 @@ const defaultProps: AwsNodeTerminationHandlerProps = {
   chart: 'aws-node-termination-handler',
   repository: 'https://aws.github.io/eks-charts',
   version: '0.16.0',
-  release: 'ssp-addon-aws-node-termination-handler',
+  release: 'blueprints-addon-aws-node-termination-handler',
   name: 'aws-node-termination-handler',
   namespace: 'kube-system',
   mode: Mode.IMDS

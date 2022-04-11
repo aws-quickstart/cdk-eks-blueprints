@@ -30,7 +30,9 @@
         "dist",
         "node_modules",
         "test",
-        ".git"
+        ".git",
+        ".idea",
+        ".vscode"
     ],
     "include": [
         "lib"

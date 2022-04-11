@@ -1,5 +1,6 @@
-import { Construct, NestedStack, NestedStackProps } from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
+import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { NestedStackBuilder } from '../lib';
 
 

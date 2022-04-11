@@ -7,18 +7,17 @@ Full documentation on using App Mesh with EKS [can be found here](https://docs.a
 ## Usage
 
 ```typescript
-import { AppMeshAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/ssp-amazon-eks';
-
-const addOn = new AppMeshAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {    
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.AppMeshAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## Functionality
@@ -58,16 +57,19 @@ The X-Ray integration at present requires either a managed node group or a self-
 Enabling integration:
 
 ```typescript
-const appMeshAddOn = new ssp.AppMeshAddOn({enableTracing: true, tracingProvider: "x-ray"}),
+const appMeshAddOn = new blueprints.AppMeshAddOn({
+  enableTracing: true, 
+  tracingProvider: "x-ray"
+}),
 ```
 
 When configured, App Mesh will automatically inject an XRay sidecar to handle tracing which enables troubleshooting latency issues.
 
 ## App Mesh and XRay Integration Example
 
-`team-burnham` sample workload repository is configured with an [example workload](https://github.com/aws-samples/ssp-eks-workloads/tree/master/teams/team-burnham/dev) that demonstrates a "meshified" workload.
+`team-burnham` sample workload repository is configured with an [example workload](https://github.com/aws-samples/eks-blueprints-workloads/tree/main/teams/team-burnham/dev) that demonstrates a "meshified" workload.
 
-After the workload is deployed with ArgoCD or applied directly to the cluster, a [DJ application](https://github.com/aws/aws-app-mesh-examples/tree/main/examples/apps/djapp) will be created in the `team-burnham` namespace, similar to the one used for the [EKS Workshop](https://www.eksworkshop.com/intermediate/330_app_mesh/). It was adapted for GitOps integration with SSP and relies on automatic sidecar injection as well as tracing integration with App Mesh.
+After the workload is deployed with ArgoCD or applied directly to the cluster, a [DJ application](https://github.com/aws/aws-app-mesh-examples/tree/main/examples/apps/djapp) will be created in the `team-burnham` namespace, similar to the one used for the [EKS Workshop](https://www.eksworkshop.com/intermediate/330_app_mesh/). It was adapted for GitOps integration with Blueprints and relies on automatic sidecar injection as well as tracing integration with App Mesh.
 
 After the workload is deployed you can generate some traffic to populated traces:
 

@@ -1,5 +1,5 @@
-import { Cluster, ServiceAccount } from "@aws-cdk/aws-eks";
-import { PolicyDocument, ManagedPolicy, IManagedPolicy } from "@aws-cdk/aws-iam";
+import { Cluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { PolicyDocument, ManagedPolicy, IManagedPolicy } from "aws-cdk-lib/aws-iam";
 
 /**
  * Creates a service account that can access secrets

@@ -1,9 +1,9 @@
-import * as autoscaling from '@aws-cdk/aws-autoscaling';
-import { UpdatePolicy } from '@aws-cdk/aws-autoscaling';
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as eks from "@aws-cdk/aws-eks";
-import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from '@aws-cdk/aws-eks';
-import { Construct } from "@aws-cdk/core";
+import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
+import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as eks from "aws-cdk-lib/aws-eks";
+import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
 import { valueFromContext } from "../utils";
 import * as constants from './constants';
@@ -132,6 +132,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const clusterOptions = {...this.props, ...defaultOptions };
         // Create an EKS Cluster
         const cluster = this.internalCreateCluster(scope, id, clusterOptions);
+        cluster.node.addDependency(vpc);
 
         const nodeGroups: eks.Nodegroup[] = [];
         
@@ -213,7 +214,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
 
         // Create a managed node group.
-        const commonNodegroupProps = {
+        const commonNodegroupProps: Partial<eks.NodegroupOptions> = {
             nodegroupName: nodeGroup.id,
             capacityType,
             instanceTypes,
@@ -222,14 +223,14 @@ export class GenericClusterProvider implements ClusterProvider {
             desiredSize
         };
 
-        let nodegroupProps: eks.NodegroupOptions;
+        let nodegroupOptions: eks.NodegroupOptions;
         if(nodeGroup.customAmi) {
             // Create launch template if custom AMI is provided.
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
                 machineImage: nodeGroup.customAmi?.machineImage,
                 userData: nodeGroup.customAmi?.userData,
             });
-            nodegroupProps = {
+            nodegroupOptions = {
                 ...commonNodegroupProps,
                 launchTemplateSpec: {
                     id: lt.launchTemplateId!,
@@ -237,14 +238,13 @@ export class GenericClusterProvider implements ClusterProvider {
                 },
             };
         } else {
-            nodegroupProps = {
+            nodegroupOptions = {
                 ...commonNodegroupProps,
                 amiType,
-
                 releaseVersion,
             };
         }
 
-        return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupProps);
+        return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
     }
 }

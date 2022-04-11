@@ -2,42 +2,33 @@
 
 While it is convenient to leverage the CDK command line tool to deploy your first cluster, we recommend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure. 
 
-To accomplish this, the EKS SSP - Reference Solution leverages the [`Pipelines`](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module. This module makes it trivial to create Continuous Delivery (CD) pipelines via CodePipeline that are responsible for deploying and updating your infrastructure. 
+To accomplish this, the EKS Blueprints - Reference Solution leverages the [`Pipelines`](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) CDK module. This module makes it trivial to create Continuous Delivery (CD) pipelines via CodePipeline that are responsible for deploying and updating your infrastructure. 
 
-Additionally, the EKS SSP - Reference Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
+Additionally, the EKS Blueprints - Reference Solution leverages the GitHub integration that the `Pipelines` CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.
 
 ## Defining your blueprint to use with pipeline
 
-Pipeline support requires enabling a setting for *modern* stack synthesis. This setting should be enabled for blueprints that leverage CDKv1 explicitly. 
-To enable this setting set the following in the `cdk.json` file in the project root directory:
-
-```json
-{
-  "context": {
-    "@aws-cdk/core:newStyleStackSynthesis": true
-  }
-}
-```
+Pipeline support requires enabling a setting for *modern* stack synthesis. This setting should be enabled for blueprints that leverage CDKv1 explicitly, for CDKv2 it is enabled by default. 
 
 Creation of a pipeline starts with defining the blueprint that will be deployed across the pipeline stages.
 
 The framework allows defining a blueprint builder without instantiating the stack.
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 import * as team from 'path/to/teams'
 
-const blueprint = ssp.EksBlueprint.builder()
+const blueprint = blueprints.EksBlueprint.builder()
     .account(account) // the supplied default will fail, but build and synth will pass
     .region('us-west-1')
     .addOns(
-        new ssp.AwsLoadBalancerControllerAddOn, 
-        new ssp.ExternalDnsAddOn,
-        new ssp.NginxAddOn,
-        new ssp.CalicoAddOn,
-        new ssp.MetricsServerAddOn,
-        new ssp.ClusterAutoScalerAddOn,
-        new ssp.ContainerInsightsAddOn)
+        new blueprints.AwsLoadBalancerControllerAddOn, 
+        new blueprints.ExternalDnsAddOn,
+        new blueprints.NginxAddOn,
+        new blueprints.CalicoAddOn,
+        new blueprints.MetricsServerAddOn,
+        new blueprints.ClusterAutoScalerAddOn,
+        new blueprints.ContainerInsightsAddOn)
     .teams(new team.TeamRikerSetup);
 ```
 
@@ -49,18 +40,18 @@ This code will produce a blueprint builder that can be instantiated inside the p
 We can create a new `CodePipeline` resource via the following. 
 
 ```typescript
-import * as ssp from '@aws-quickstart/ssp-amazon-eks'
+import * as blueprints from '@aws-quickstart/eks-blueprints'
 
-const blueprint = ssp.EksBlueprint.builder()
+const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder
 
- ssp.CodePipelineStack.builder()
-    .name("ssp-eks-pipeline")
+ blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples")
     .repository({
-        repoUrl: 'ssp-eks-patterns',
+        repoUrl: 'cdk-eks-blueprints-patterns',
         credentialsSecretName: 'github-token',
-        branch: 'main'
+        targetRevision: 'main'
     })
 ```
 
@@ -68,24 +59,24 @@ Note: the above code depends on the AWS secret `github-token` defined in the tar
 
 ## Creating stages 
 
-Once our pipeline is created, we need to define `stages` for the pipeline. To do so, we can leverage `ssp.StackStage` convenience class and builder support for it. Let's continue leveraging the pipeline builder defined in the previous step.  
+Once our pipeline is created, we need to define `stages` for the pipeline. To do so, we can leverage `blueprints.StackStage` convenience class and builder support for it. Let's continue leveraging the pipeline builder defined in the previous step.  
 
 ```typescript
-const blueprint = ssp.EksBlueprint.builder()
+const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder
 
-ssp.CodePipelineStack.builder()
-    .name("ssp-eks-pipeline")
+blueprints.CodePipelineStack.builder()
+    .name("blueprints-eks-pipeline")
     .owner("aws-samples")
     .repository({
         //  your repo info
     }) 
     .stage({
-        id: 'us-west-1-managed-ssp-test',
+        id: 'us-west-1-managed-blueprints-test',
         stackBuilder: blueprint.clone('us-west-1') // clone the blueprint to customize for the stage. You can add more add-ons, teams here. 
     })
     .stage({
-        id: 'us-east-2-managed-ssp-prod',
+        id: 'us-east-2-managed-blueprints-prod',
         stackBuilder: blueprint.clone('us-east-2'), // clone the blueprint to customize for the stage. You can add more add-ons, team, here.
         stageProps: {
             manualApprovals: true
@@ -104,14 +95,14 @@ It is convenient to provision and maintain (update/upgrade) such clusters in par
 Pipeline functionality provides wave support to express waves with blueprints. You can mix individual stages and waves together. An individual stage can be viewed as a wave with a single stage. 
 
 ```typescript
-ssp.CodePipelineStack.builder()
-    .name("ssp-eks-pipeline")
+blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples")
     .repository({
         //...
     })
     .stage({
-        id: 'us-west-1-managed-ssp',
+        id: 'us-west-1-managed-blueprints',
         stackBuilder: blueprint.clone('us-west-1')
     })
     .wave( {  // adding two clusters for dev env
@@ -136,11 +127,11 @@ ssp.CodePipelineStack.builder()
 Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.
 
 ```typescript
-const blueprint = ssp.EksBlueprint.builder()
+const blueprint = blueprints.EksBlueprint.builder()
     ...; // configure your blueprint builder
 
-ssp.CodePipelineStack.builder()
-    .name("ssp-eks-pipeline")
+blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
     .owner("aws-samples") // owner of your repo
     .repository({
         //  your repo info
@@ -157,7 +148,7 @@ ssp.CodePipelineStack.builder()
         id: 'prod',
         stackBuilder: blueprint.clone('us-west-2'), // clone the blueprint to customize for the stage. You can add more add-ons, team, here.
     })
-    .build(scope, "ssp-pipeline-stack", props); // will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.
+    .build(scope, "blueprints-pipeline-stack", props); // will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.
 
 ```
 
@@ -197,10 +188,10 @@ $ env CDK_NEW_BOOTSTRAP=1 npx cdk bootstrap \
 
 ## Troubleshooting
 
-SSP Build can fail with AccessDenied exception during build phase. Typical error messages:
+Blueprints Build can fail with AccessDenied exception during build phase. Typical error messages:
 
 ```
-Error: AccessDeniedException: User: arn:aws:sts::<account>:assumed-role/ssp-pipeline-stack-sspekspipelinePipelineBuildSynt-1NPFJRH6H7TB1/AWSCodeBuild-e95830ee-07f6-46f5-aaee-90e269c7eb5f is not authorized to perform:
+Error: AccessDeniedException: User: arn:aws:sts::<account>:assumed-role/blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1/AWSCodeBuild-e95830ee-07f6-46f5-aaee-90e269c7eb5f is not authorized to perform:
 ```
 
 ```
@@ -215,5 +206,5 @@ This can happen for a few reasons, but most typical is  related to the stack req
 
 **Resolution**
 
-To address this issue, you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `ssp-pipeline-stack-sspekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `ssp-pipeline-stack`. 
+To address this issue, you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`. 
 If adding administrative access to the role solves the issue, you can the consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.

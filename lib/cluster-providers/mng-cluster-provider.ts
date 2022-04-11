@@ -1,15 +1,11 @@
-import { AutoScalingGroup } from "@aws-cdk/aws-autoscaling";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as eks from "@aws-cdk/aws-eks";
+import { aws_autoscaling as asg } from "aws-cdk-lib";
+import { aws_ec2 as ec2 } from "aws-cdk-lib";
+import { aws_eks as eks } from "aws-cdk-lib";
 // Cluster
 import { ClusterInfo } from "..";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 // Constants 
 import { ManagedNodeGroup } from "./types";
-
-
-
-
 
 
 /**
@@ -48,7 +44,7 @@ export class MngClusterProvider extends GenericClusterProvider {
     constructor(props?: MngClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
-                id: props?.id ?? props?.clusterName ?? "eks-ssp-mng",
+                id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
                 amiReleaseVersion: props?.amiReleaseVersion,
                 customAmi: props?.customAmi,
                 amiType: props?.amiType,
@@ -69,7 +65,8 @@ export class MngClusterProvider extends GenericClusterProvider {
  * @param source Used for error message to identify the source of the check
  * @returns 
  */
-export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): eks.Nodegroup[] | AutoScalingGroup[] {
+//TODO: move to clusterInfo
+export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): eks.Nodegroup[] | asg.AutoScalingGroup[] {
     if(clusterInfo.nodeGroups != undefined && clusterInfo.nodeGroups.length > 0) {
         return clusterInfo.nodeGroups;
     }

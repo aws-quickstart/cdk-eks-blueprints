@@ -1,5 +1,6 @@
-import { HelmChart, ServiceAccount } from "@aws-cdk/aws-eks";
-import { Construct, Stack } from "@aws-cdk/core";
+import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { Stack } from 'aws-cdk-lib';
+import { Construct } from "constructs";
 import * as assert from "assert";
 import * as bcrypt from "bcrypt";
 import * as dot from 'dot-object';
@@ -64,7 +65,7 @@ const defaultProps = {
     namespace: "argocd",
     version: '3.33.5',
     chart: "argo-cd",
-    release: "ssp-addon-argocd",
+    release: "blueprints-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
 };
 
@@ -123,8 +124,8 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         let secretProviderClass: SecretProviderClass | undefined;
 
         if (secrets.length > 0) {
-            secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'ssp-secret', ...secrets);
-            dot.set('server', secretProviderClass.getVolumeMounts('ssp-secret-inline'), defaultValues, true);
+            secretProviderClass = new SecretProviderClass(clusterInfo, sa, 'blueprints-secret', ...secrets);
+            dot.set('server', secretProviderClass.getVolumeMounts('blueprints-secret-inline'), defaultValues, true);
         }
 
         if (this.options.bootstrapRepo) {

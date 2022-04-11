@@ -9,17 +9,13 @@ With ASCP, you can securely store and manage your secrets in [AWS Secrets Manage
 ### **`index.ts`**
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
-import {
-  SecretProvider
-  ClusterAddOn,
-  EksBlueprint,
-  ApplicationTeam
-} from '@aws-quickstart/ssp-amazon-eks';
-import { ISecret, Secret } from '@aws-cdk/aws-secretsmanager';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const addOn = new SecretsStoreAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.SecretsStoreAddOn();
 
 /* Setup application team with secrets
  * Here we are generating a new SecretManager secret for AuthPassword
@@ -33,7 +29,7 @@ export class TeamBurnham extends ApplicationTeam {
             users: getUserArns(scope, "team-burnham.users"),
             teamSecrets: [
                 {
-                    secretProvider: new GenerateSecretManagerProvider('AuthPassword),
+                    secretProvider: new blueprints.GenerateSecretManagerProvider('AuthPassword'),
                     kubernetesSecret: {
                         secretName: 'auth-password',
                         data: [
@@ -44,7 +40,7 @@ export class TeamBurnham extends ApplicationTeam {
                     }
                 },
                 {
-                    secretProvider: new LookupSsmSecretByAttrs('GITHUB_TOKEN', 1),
+                    secretProvider: new blueprints.LookupSsmSecretByAttrs('GITHUB_TOKEN', 1),
                     kubernetesSecret: {
                         secretName: 'github'
                     }
@@ -54,24 +50,10 @@ export class TeamBurnham extends ApplicationTeam {
     }
 }
 
-class GenerateSecretManagerProvider implements SecretProvider {
-
-    construct(private secretName: string) {}
-
-    provide(clusterInfo: ClusterInfo): ISecret {
-        const secret = new Secret(clusterInfo.cluster.stack, 'AuthPassword', {
-          secretName: this.secretName
-        });
-
-        // create this secret first
-        clusterInfo.cluster.node.addDependency(secret);
-        return secret
-    }
-}
-
-const app = new cdk.App();
-const teams: Array<ApplicationTeam> = [ new TeamBurnham(app) ];
-new EksBlueprint(app, 'my-stack-name', addOns, teams});
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .teams(new TeamBurnham(app))
+  .build(app, 'my-stack-name');
 ```
 
 ## Functionality

@@ -1,64 +1,77 @@
 # Getting Started 
 
-This getting started guide will walk you through setting up a new CDK project which leverages the `ssp-amazon-eks` NPM module to deploy a simple SSP. 
+This getting started guide will walk you through setting up a new CDK project which leverages the `eks-blueprints` NPM module to deploy a simple Blueprints. 
 
-## Project setup
+## Project Setup
 
-To use the `ssp-amazon-eks` module, you must have the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) installed. Install CDK via the following.
+Before proceeding, make sure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) is installed on your machine.
+
+To use the `eks-blueprints` module, you must have [Node.js](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed. We will also use `make` to simplify build and other common actions. You can do it using the following instructions:
+
+
+=== "Mac"
+    ```bash
+    brew install make
+    brew install node
+    ```
+
+=== "Ubuntu"
+    ```bash
+    sudo apt install make
+    sudo apt install nodejs
+    ```
+
+Create a directory that represents you project (e.g. `my-blueprints`) and then create a new `typescript` CDK project in that directory.
 
 ```bash
-npm install -g aws-cdk@1.143.0
-```
-
-Verify the installation.
-
-```bash
-cdk --version
-```
-
-Create a new `typescript` CDK project in an empty directory.
-
-```bash
+npm install -g aws-cdk@2.17.0 # may require sudo (Ubuntu) depending on configuration
+cdk --verson # must produce 2.17.0
+mkdir my-blueprints
+cd my-blueprints
 cdk init app --language typescript
 ```
 
-## Deploy a Blueprint EKS Cluster
-
-Install the `ssp-amazon-eks` NPM package via the following.
+## Configure and Deploy EKS Clusters
+Install the `eks-blueprints` NPM package via the following.
 
 ```bash
-npm i @aws-quickstart/ssp-amazon-eks
+npm i @aws-quickstart/eks-blueprints
 ```
 
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
 
 ```typescript
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
-import * as ssp from '@aws-quickstart/ssp-amazon-eks';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-
-const addOns: Array<ssp.ClusterAddOn> = [
-    new ssp.addons.ArgoCDAddOn,
-    new ssp.addons.CalicoAddOn,
-    new ssp.addons.MetricsServerAddOn,
-    new ssp.addons.ClusterAutoScalerAddOn,
-    new ssp.addons.ContainerInsightsAddOn,
-    new ssp.addons.AwsLoadBalancerControllerAddOn(),
-    new ssp.addons.VpcCniAddOn(),
-    new ssp.addons.CoreDnsAddOn(),
-    new ssp.addons.KubeProxyAddOn(),
-    new ssp.addons.XrayAddOn()
-];
-
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
-const props = { env: { account, region } };
-new ssp.EksBlueprint(app, { id: 'east-test-1', addOns}, props);
+
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new blueprints.addons.ArgoCDAddOn,
+    new blueprints.addons.CalicoAddOn,
+    new blueprints.addons.MetricsServerAddOn,
+    new blueprints.addons.ClusterAutoScalerAddOn,
+    new blueprints.addons.ContainerInsightsAddOn,
+    new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+    new blueprints.addons.VpcCniAddOn(),
+    new blueprints.addons.CoreDnsAddOn(),
+    new blueprints.addons.KubeProxyAddOn(),
+    new blueprints.addons.XrayAddOn()
+];
+
+blueprints.EksBlueprint.builder()
+    .account(account)
+    .region(region)
+    .addOns(...addOns)
+    .build(app, 'eks-blueprint');
 ```
 
-Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
+Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is a process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
+
+For application of the EKS Blueprints Framework with [AWS Organizations](https://aws.amazon.com/organizations/), [Multi-account framework and Control Tower](https://docs.aws.amazon.com/controltower/latest/userguide/aws-multi-account-landing-zone.html) consider a process to automatically or manually CDK-bootstrapping new (workload/environment) accounts when they are added to the organization. More info on account bootstrapping [here](https://aws.amazon.com/blogs/mt/how-to-automate-the-creation-of-multiple-accounts-in-aws-control-tower/).
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment with the following command. 
 
@@ -76,7 +89,7 @@ Deploy the stack using the following command. This command will take roughly 20 
 cdk deploy
 ```
 
-Congratulations! You have deployed your first EKS cluster with `ssp-amazon-eks`. The above code will provision the following:
+Congratulations! You have deployed your first EKS cluster with `eks-blueprints`. The above code will provision the following:
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
@@ -122,13 +135,13 @@ You should see output that lists all namespaces in your cluster.
 
 ## Deploy workloads with ArgoCD
 
-Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/ssp-eks-workloads).
+Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/eks-blueprints-workloads).
 
-You can leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
+You can leverage [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
 
 ### Install ArgoCD CLI
 
-These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping).
+These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping).
 
 Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
 
@@ -187,7 +200,7 @@ Create a project in Argo by running the following command
 ```
 argocd proj create sample \
     -d https://kubernetes.default.svc,argocd \
-    -s https://github.com/aws-samples/ssp-eks-workloads.git
+    -s https://github.com/aws-samples/eks-blueprints-workloads.git
 ```
 
 Create the application within Argo by running the following command
@@ -196,7 +209,7 @@ Create the application within Argo by running the following command
 argocd app create dev-apps \
     --dest-namespace argocd  \
     --dest-server https://kubernetes.default.svc  \
-    --repo https://github.com/aws-samples/ssp-eks-workloads.git \
+    --repo https://github.com/aws-samples/eks-blueprints-workloads.git \
     --path "envs/dev"
 ```
 
@@ -220,8 +233,8 @@ Open up `localhost:4040` in your browser and you should see the application.
 
 For information on onboarding teams to your clusters, see [`Team` documentation](../teams). 
 
-For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../ci-cd).
+For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../pipelines).
 
 For information on supported add-ons, see [`Add-on` documentation](../addons)
 
-For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](../workloads). 
+For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](https://github.com/aws-samples/eks-blueprints-workloads). 
