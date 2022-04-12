@@ -32,6 +32,7 @@ nav:
     - Kubecost: 'addons/kubecost.md'
     - Kubevious: 'addons/kubevious.md'
     - Metrics Server: 'addons/metrics-server.md'
+    - New Relic: 'addons/newrelic.md'
     - Nginx: 'addons/nginx.md'
     - OPA Gatekeeper: 'addons/opa-gatekeeper.md'
     - Secrets Store: 'addons/secrets-store.md'
