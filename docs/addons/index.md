@@ -2,7 +2,7 @@
 
 The `eks-blueprints` framework leverages a modular approach to managing [Add-ons](https://kubernetes.io/docs/concepts/cluster-administration/addons/) that run within the context of a Kubernetes cluster. Customers are free to select the add-ons that run in each of their blueprint clusters.
 
-Within the context of the `eks-blueprints` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources. 
+Within the context of the `eks-blueprints` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources.
 
 ## Supported Add-ons
 
@@ -25,9 +25,10 @@ The framework currently supports the following add-ons.
 | [`Keptn`](https://github.com/keptn-sandbox/keptn-blueprints-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster                                                                |
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster                           |                  |
-| [`KarpenterAddOn (Currently Not Supported, In Progress)`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        | 
+| [`KarpenterAddOn (Currently Not Supported, In Progress)`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        |
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node                                         |
 | [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools)                                                                      |
+| [`NewRelicAddOn`](./newrelic.md)                                             | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.|
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller                                                                                                         |
 | [`OpaGatekeeperAddOn (Currently Not Supported, In Progress)`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                        |
 | [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more. |
@@ -61,7 +62,7 @@ Many add-ons leverage helm to provision and maintain deployments. All provided a
     /**
      * Helm chart version.
      */
-    version?: string, 
+    version?: string,
 
     /**
      * Helm release
@@ -74,11 +75,11 @@ Many add-ons leverage helm to provision and maintain deployments. All provided a
     repository?: string,
 
     /**
-     * Optional values for the helm chart. 
+     * Optional values for the helm chart.
      */
     values?: Values
 ```
 
-Ability to set repository url may be leveraged for private repositories. 
+Ability to set repository url may be leveraged for private repositories.
 
 Version field can be modified from the default chart version, e.g. if the add-on should be upgraded to the desired version, however, since the helm chart version supplied by the customer may not have been tested as part of the Blueprints release process, Blueprints community may not be able to reproduce/fix issues related to the helm chart version upgrade.
