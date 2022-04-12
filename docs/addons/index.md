@@ -19,10 +19,11 @@ The framework currently supports the following add-ons.
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler                                                                                                  |
 | [`ContainerInsightsAddOn`](./container-insights)                       | Adds Container Insights support integrating monitoring with CloudWatch                                                                |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
+| [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator) |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage                 |
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage                 |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53 |
-| [`Keptn`](https://github.com/keptn-sandbox/keptn-blueprints-addons)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
+| [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster                                                                |
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster                           |                  |
 | [`KarpenterAddOn (Currently Not Supported, In Progress)`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        |

@@ -23,6 +23,7 @@ nav:
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
     - CoreDns: 'addons/coredns.md'
+    - Dynatrace: 'https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon'
     - EBS CSI Driver: 'addons/ebs-csi-driver.md'
     - EFS CSI Driver: 'addons/efs-csi-driver.md'
     - External DNS: 'addons/external-dns.md'
