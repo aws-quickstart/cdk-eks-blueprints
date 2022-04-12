@@ -1,4 +1,4 @@
-import { CapacityType } from 'aws-cdk-lib/aws-eks';
+import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as cdk from 'aws-cdk-lib';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
@@ -235,6 +235,25 @@ test("Generic cluster provider correctly registers managed node groups", async (
     
     expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
     expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
+});
+
+test("Building blueprint with builder properly clones properties", () => {
+    const blueprint = blueprints.EksBlueprint.builder().name("builer-test1")
+        .addOns(new blueprints.AppMeshAddOn);
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    blueprint.withBlueprintProps({
+        version: KubernetesVersion.V1_21
+    });
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    const blueprint1 = blueprint.clone();
+    blueprint1.addOns(new blueprints.ArgoCDAddOn);
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+    expect(blueprint1.props.addOns).toHaveLength(2);
+
 });
 
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {

@@ -65,8 +65,8 @@ export class EksBlueprintProps {
  */
 export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
-    private props: Partial<EksBlueprintProps>;
-    private env: {
+    props: Partial<EksBlueprintProps>;
+    env: {
         account?: string,
         region?: string
     };
@@ -80,7 +80,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         this.props = { ...this.props, ...{ name } };
         return this;
     }
-
+    
     public account(account?: string): this {
         this.env.account = account;
         return this;
@@ -103,7 +103,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
-        this.props = lodash.cloneDeep(props);
+        this.props = { ...this.props, ...lodash.cloneDeep(props)};
         if(props.resourceProviders) {
             this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }
