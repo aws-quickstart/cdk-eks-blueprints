@@ -142,4 +142,4 @@ The K10 dashboard will be available at  [http://127.0.0.1:8080/k10/#/](http://12
 
 For a complete list of options for accessing the Kasten K10 dashboard through a LoadBalancer, Ingress or OpenShift Route you can use the instructions [here](https://docs.kasten.io/latest/access/dashboard.html#dashboard).
 
-For full project documentation visit the [KastenHQ Github Repo] (https://github.com/kastenhq/kasten-eks-blueprints-addon)
+For full project documentation visit the KastenHQ Github Repo at (https://github.com/kastenhq/kasten-eks-blueprints-addon).
