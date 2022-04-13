@@ -68,11 +68,11 @@ new blueprints.EksBlueprint(app, { id: '<eks cluster name>', addOns}, props)
 | `appKeyExistingSecret`  | Existing k8s Secret storing the APP key             | ""                            |
 | `apiKeyAWSSecret`       | Secret in AWS Secrets Manager storing the API key    | ""                            |
 | `appKeyAWSSecret`       | Secret in AWS Secrets Manager storing the APP key    | ""                            |
-| `namespace`             | Namespace where to install the Datadog Agent    | "default"                     |
+| `namespace`             | Namespace to install the Datadog Agent    | "default"                     |
 | `version`               | Version of the Datadog Helm chart               | "2.28.13"                     |
 | `release`               | Name of the Helm release                        | "datadog"                     |
 | `repository`            | Repository of the Helm chart                    | "https://helm.datadoghq.com"  |
-| `values`                | Configuration values passed to the chart, options are documented [here](https://github.com/DataDog/helm-charts/tree/main/charts/datadog#all-configuration-options) | {}                            |
+| `values`                | Configuration values passed to the chart. [See options](https://github.com/DataDog/helm-charts/tree/main/charts/datadog#all-configuration-options). | {}                            |
 
 ## Support
 
