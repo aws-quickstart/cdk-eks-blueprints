@@ -2,6 +2,12 @@
 
 The Datadog Blueprints AddOn deploys the Datadog Agent on Amazon EKS using the [eks-blueprints](https://github.com/aws-quickstart/cdk-eks-blueprints) [CDK](https://aws.amazon.com/cdk/) construct.
 
+## Installation
+
+```
+npm install @datadog/datadog-eks-blueprints-addon
+```
+
 ## Usage
 
 ### Using an existing Kubernetes secret
