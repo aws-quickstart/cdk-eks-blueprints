@@ -36,7 +36,6 @@ The framework currently supports the following add-ons.
 | [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster                                           |
 | [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes                  |
 | [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS                                              |
-| [`Weave GitOps`](https://github.com/weaveworks/weave-gitops-blueprints-addon) | [Weave GitOps Core](https://www.weave.works/product/gitops-core/) AddOn                                                               |
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster                                                                                  |
 | [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster                                                                                                   |
 

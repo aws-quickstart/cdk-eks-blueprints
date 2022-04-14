@@ -9,7 +9,7 @@ The main benefits organizations can see using the AWS CDK to manage their Amazon
 - Access to GitOps methodologies and best practices
 - Automated lifecycle management for cluster deployment
 
-The Amazon EKS Blueprints Quick Start references the [`eks-blueprints-patterns` repository](https://github.com/aws-samples/blueprints-eks-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
+The Amazon EKS Blueprints Quick Start references the [`eks-blueprints-patterns` repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns) repository that includes examples of different deployment patterns and options which includes patterns for multi-cluster that can be deployed across multiple regions. If you take a look at the main.ts file in the patterns repository, you will notice that the stacks that define our Amazon EKS clusters and associated pipelines that are deployed to different regions as shown in the snippet below:
 
 ```typescript
 #!/usr/bin/env node

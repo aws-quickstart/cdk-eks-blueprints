@@ -28,7 +28,7 @@ Customers can use this QuickStart to easily architect and deploy a multi-tenant 
 
 ## Examples
 
-To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/eks-blueprints-patterns).
+To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 

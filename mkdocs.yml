@@ -40,7 +40,6 @@ nav:
     - SSM Agent: 'addons/ssm-agent.md'
     - Velero: 'addons/velero.md'
     - Vpc Cni: 'addons/vpc-cni.md'
-    - Weave GitOps: 'https://github.com/weaveworks/weave-gitops-ssp-addon'
     - AWS XRay: 'addons/xray.md'
   - Cluster Providers: 
     - Overview: 'cluster-providers/index.md'
