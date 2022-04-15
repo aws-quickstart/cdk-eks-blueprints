@@ -9,6 +9,7 @@ export * from './cluster-autoscaler';
 export * from './container-insights';
 export * from './coredns';
 export * from './external-dns';
+export * from './falco';
 export * from './helm-addon';
 export * from './karpenter';
 export * from './kube-proxy';
