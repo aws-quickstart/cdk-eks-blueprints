@@ -24,7 +24,12 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const karpenterAddonProps = {
-  ProvisionerSpecs: {},
+  ProvisionerSpecs: {
+    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
+    'topology.kubernetes.io/zone': ['us-east-1c'],
+    'kubernetes.io/arch': ['amd64','arm64'],
+    'karpenter.sh/capacity-type': ['spot','on-demand'],
+  },
   SubnetTags: {
     'karpenter.sh/discovery/MyCluster': 'Name',
     'karpenter.sh/discovery/Tag1': 'tag1value',
@@ -52,12 +57,16 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 ## Functionality
 
-1. EKS VPC subnets and security group are tagged with user-provided tags (optional)
-2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why)
+1. (Optionally) tag EKS VPC subnets and security group with user-provided tags.
+2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why).
 3. Creates `karpenter` namespace.
 4. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 5. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-6. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements) and tags. **NOTE: It is provisioned only if both the subnet tags and the security group tags are provided.**
+6. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements) and tags. 
+
+**NOTE:**
+1. The default provisioner is created only if both the subnet tags and the security group tags are provided. 
+2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
 
 ## Using Karpenter
 
@@ -94,7 +103,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
 
 If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner. 
 
-1. Use `kubectl` to apply a provisioner manifest:
+2. Use `kubectl` to apply a provisioner manifest:
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: karpenter.sh/v1alpha5
@@ -126,6 +135,8 @@ spec:
   ttlSecondsAfterEmpty: 30
 EOF
 ```
+
+If you choose to create a provisioner manually, you **MUST** tag the subnets and the EKS Security Group with the tags matching what is listed in the provisioner manifest.
 
 ## Testing with a sample deployment
 
