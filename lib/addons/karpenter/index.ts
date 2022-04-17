@@ -111,8 +111,8 @@ export class KarpenterAddOn extends HelmAddOn {
             "karpenterControllerRole",
             {
               assumedBy: principal,
-              description: `This is the karpenterControllerRole role Karpenter uses to allocate compute for ${cluster.clusterName}`,
-              roleName: `KarpenterControllerRole-${cluster.clusterName}`,
+              description: `This is the karpenterControllerRole role Karpenter uses to allocate compute for ${name}`,
+              roleName: `${name}-karpenter`,
             }
         );
         karpenterControllerRole.attachInlinePolicy(karpenterPolicy);
@@ -146,10 +146,11 @@ export class KarpenterAddOn extends HelmAddOn {
         const ns = createNamespace(KARPENTER, cluster, true, true);
 
         // Add helm chart
-        setPath(values, "serviceAccount.create", true);
-        setPath(values, "controller.clusterEndpoint", endpoint);
-        setPath(values, "controller.clusterName", name);
+        setPath(values, "clusterEndpoint", endpoint);
+        setPath(values, "clusterName", name);
         values['serviceAccount'] = {
+            create: true,
+            name: KARPENTER,
             annotations: {
                 "eks.amazonaws.com/role-arn": karpenterControllerRole.roleArn,
             }};
