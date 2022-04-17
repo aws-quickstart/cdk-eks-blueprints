@@ -11,8 +11,8 @@ To use the `eks-blueprints` module, you must have [Node.js](https://nodejs.org/e
 
 === "Mac"
     ```bash
-    sudo brew install make
-    sudo brew install node
+    brew install make
+    brew install node
     ```
 
 === "Ubuntu"
@@ -21,17 +21,17 @@ To use the `eks-blueprints` module, you must have [Node.js](https://nodejs.org/e
     sudo apt install nodejs
     ```
 
-Create a directory that represent you project (e.g. `my-blueprints`) and then create a new `typescript` CDK project in that directory.
+Create a directory that represents you project (e.g. `my-blueprints`) and then create a new `typescript` CDK project in that directory.
 
 ```bash
+npm install -g aws-cdk@2.20.0 # may require sudo (Ubuntu) depending on configuration
+cdk --verson # must produce 2.20.0
 mkdir my-blueprints
 cd my-blueprints
-npm install aws-cdk@2.17.0
-npx cdk init app --language typescript
+cdk init app --language typescript
 ```
 
-## Deploy a Blueprint EKS Cluster
-
+## Configure and Deploy EKS Clusters
 Install the `eks-blueprints` NPM package via the following.
 
 ```bash
@@ -65,11 +65,13 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
-    .addOns(addOns)
+    .addOns(...addOns)
     .build(app, 'eks-blueprint');
 ```
 
-Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is an process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
+Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is a process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.
+
+For application of the EKS Blueprints Framework with [AWS Organizations](https://aws.amazon.com/organizations/), [Multi-account framework and Control Tower](https://docs.aws.amazon.com/controltower/latest/userguide/aws-multi-account-landing-zone.html) consider a process to automatically or manually CDK-bootstrapping new (workload/environment) accounts when they are added to the organization. More info on account bootstrapping [here](https://aws.amazon.com/blogs/mt/how-to-automate-the-creation-of-multiple-accounts-in-aws-control-tower/).
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment with the following command. 
 
@@ -135,11 +137,11 @@ You should see output that lists all namespaces in your cluster.
 
 Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/eks-blueprints-workloads).
 
-You can leverage [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
+You can leverage [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
 
 ### Install ArgoCD CLI
 
-These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#Bootstrapping).
+These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping).
 
 Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
 
@@ -231,8 +233,8 @@ Open up `localhost:4040` in your browser and you should see the application.
 
 For information on onboarding teams to your clusters, see [`Team` documentation](../teams). 
 
-For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../ci-cd).
+For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../pipelines).
 
 For information on supported add-ons, see [`Add-on` documentation](../addons)
 
-For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](../workloads). 
+For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](https://github.com/aws-samples/eks-blueprints-workloads). 

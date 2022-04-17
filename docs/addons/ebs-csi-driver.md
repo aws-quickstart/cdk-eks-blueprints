@@ -13,14 +13,17 @@ For more information on the driver, please review the [user guide](https://docs.
 ## Usage
 
 ```typescript
-import { App } from 'aws-cdk-lib';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const app = new App();
+const app = new cdk.App();
 
-blueprints.EksBlueprint.builder()
-    .addOns(new blueprints.EbsCsiDriverAddOn() )
-    .build(app, 'my-cluster');
+const addOn = new blueprints.addons.EbsCsiDriverAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## Configuration Options

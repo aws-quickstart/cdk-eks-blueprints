@@ -1,4 +1,4 @@
-import { CapacityType } from 'aws-cdk-lib/aws-eks';
+import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as cdk from 'aws-cdk-lib';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
@@ -189,7 +189,7 @@ test("Named resource providers are correctly registered and discovered", async (
         .resourceProvider(blueprints.GlobalResources.HostedZone, new blueprints.ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
         .resourceProvider(blueprints.GlobalResources.Certificate, new blueprints.CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', blueprints.GlobalResources.HostedZone))
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
-        .addOns(new blueprints.ExternalDnsAddon({hostedZoneResources: [blueprints.GlobalResources.HostedZone]}))
+        .addOns(new blueprints.ExternalDnsAddOn({hostedZoneResources: [blueprints.GlobalResources.HostedZone]}))
         .addOns(new blueprints.NginxAddOn({
             certificateResourceName: blueprints.GlobalResources.Certificate,
             externalDnsHostname: 'my.domain.com'
@@ -235,6 +235,25 @@ test("Generic cluster provider correctly registers managed node groups", async (
     
     expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
     expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
+});
+
+test("Building blueprint with builder properly clones properties", () => {
+    const blueprint = blueprints.EksBlueprint.builder().name("builer-test1")
+        .addOns(new blueprints.AppMeshAddOn);
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    blueprint.withBlueprintProps({
+        version: KubernetesVersion.V1_21
+    });
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    const blueprint1 = blueprint.clone();
+    blueprint1.addOns(new blueprints.ArgoCDAddOn);
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+    expect(blueprint1.props.addOns).toHaveLength(2);
+
 });
 
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {

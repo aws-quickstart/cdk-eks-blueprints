@@ -7,20 +7,23 @@ The add-on provides functionality to configure IAM policies and Kubernetes servi
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const hostedZoneName = ...
-const hostedZone = new blueprints.addons.LookupHostedZoneProvider(hostedZoneName)
-const addOn = new blueprints.addons.ExternalDnsAddon({ hostedZone });
-const addOns: Array<ClusterAddOn> = [ addOn ];
-
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
+
+const hostedZoneName = ...
+
+const addOn = new blueprints.addons.ExternalDnsAddOn({
+    hostedZoneProviders: [hostedZoneName]; // can be multiple
 });
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .resourceProvider(hostedZoneName, new blueprints.addons.LookupHostedZoneProvider(hostedZoneName))
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 To validate that external DNS add-on is running ensure that the add-on deployment is in `RUNNING` state:
@@ -71,7 +74,7 @@ const myDomainName = "";
 blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1", new blueprints.LookupHostedZoneProvider(myDomainName))
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -84,7 +87,7 @@ const myHostedZoneId = "";
 blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1",  new blueprints.addons.ImportHostedZoneProvider(myHostedZoneId))
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .build(...);
@@ -126,7 +129,7 @@ blueprints.EksBlueprint.builder()
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
     })
-    .addOns(new blueprints.addons.ExternalDnsAddon({
+    .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"];
     })
 

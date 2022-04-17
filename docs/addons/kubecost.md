@@ -7,26 +7,24 @@
 Using [npm](https://npmjs.org):
 
 ```sh
-$ npm install @kubecost/kubecost-blueprints-addon
+$ npm install @kubecost/kubecost-eks-blueprints-addon
 ```
 
 ## Usage
 
 ```typescript
+import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { EksBlueprint } from '@aws-quickstart/eks-blueprints';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
 
-
 const app = new cdk.App();
-const stackId = `${id}-blueprint`;
 
-EksBlueprint.builder()
-    .account(process.env.CDK_DEFAULT_ACCOUNT!)
-    .region(process.env.CDK_DEFAULT_REGION)
-    .addOns(new KubecostAddOn())
-    .build(app, stackId);
+const addOn = new KubecostAddOn();
 
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 ## `KubecostAddOn` Options (props)
@@ -41,7 +39,7 @@ You may get one [here](https://kubecost.com/install).
 
 #### `version: string` (optional)
 
-The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.88.1` at the time of writing).
+The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.92.0` at the time of writing).
 
 ####  `values?: { [key: string]: any }` (optional)
 

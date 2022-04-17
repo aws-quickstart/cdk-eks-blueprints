@@ -13,18 +13,17 @@ Full Argo CD project documentation [can be found here](https://argoproj.github.i
 To provision and maintain ArgoCD components without any bootstrapping, the add-on provides a no-argument constructor to get started. 
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
-
-const addOn = new ArgoCDAddOn();
-const addOns: Array<ClusterAddOn> = [ addOn ];
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-new EksBlueprint(app, 'my-stack-name', addOns, [], {
-  env: {    
-      account: <AWS_ACCOUNT_ID>,
-      region: <AWS_REGION>,
-  },
-});
+
+const addOn = new blueprints.addons.ArgoCDAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
 ```
 
 The above will create an `argocd` namespace and install all Argo CD components. In order to bootstrap workloads you will need to change the default ArgoCD admin password and add repositories as specified in the [Getting Started](https://argoproj.github.io/argo-cd/getting_started/#port-forwarding) documentation.
@@ -68,12 +67,14 @@ In order to enable bootstrapping, the add-on allows passing an `ApplicationRepos
 An example is provided below, along with an approach that could use a separate app of apps to bootstrap workloads in different stages, which is important for a software delivery platform as it allows segregating workloads specific to each stage of the SDLC and defines clear promotion processes through GitOps.
 
 ```typescript
-import { ArgoCDAddOn, ClusterAddOn, EksBlueprint }  from '@aws-quickstart/eks-blueprints';
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import { ArgoCDAddOn, ClusterAddOn, EksBlueprint, ApplicationRepository }  from '@aws-quickstart/eks-blueprints';
 
-const addOns = ...;
-const repoUrl = 'https://github.com/aws-samples/eks-blueprints-workloads.git'
+const secretStoreAddOn = new SecretsStoreAddOn();
+const repoUrl = 'git@github.com:aws-samples/eks-blueprints-workloads.git'
 
-const bootstrapRepo = {
+const bootstrapRepo: ApplicationRepository = {
     repoUrl,
     credentialsSecretName: 'github-ssh-test',
     credentialsType: 'SSH'
@@ -97,23 +98,24 @@ const prodBootstrapArgo = new ArgoCDAddOn({
         ...bootstrapRepo,
         path: 'envs/prod',
     },
-    adminPasswordSecretName: 'argo-admin-secret',
+    adminPasswordSecretName: 'ArgoCDAdmin',
 });
 
-const east1 = 'us-east-1';
-new blueprints.EksBlueprint(scope, { id: `${id}-${east1}`, addOns: addOns.concat(devBootstrapArgo), teams }, {
-    env: { region: east1 }
-});
+const blueprint = EksBlueprint.builder()
+    .addOns(secretStoreAddOn)
+    .account(account);
 
-const east2 = 'us-east-2';
-new blueprints.EksBlueprint(scope, { id: `${id}-${east2}`, addOns: addOns.concat(testBootstrapArgo), teams }, {
-    env: { region: east2 }
-});
+blueprint.clone('us-east-1')
+    .addOns(devBootstrapArgo)
+    .build(app, 'argo-us-east-1');
 
-const west2 = 'us-west-2'
-new blueprints.EksBlueprint(scope, { id: `${id}-${west2}`, addOns: addOns.concat(prodBootstrapArgo), teams }, {
-    env: { region: west2 }
-});
+blueprint.clone('us-east-2')
+    .addOns(testBootstrapArgo)
+    .build(app, 'argo-us-east-2');
+
+blueprint.clone('us-west-2')
+    .addOns(prodBootstrapArgo)
+    .build(app, 'argo-us-west-1');
 ```
 
 The application promotion process in the above example is handled entirely through GitOps. Each stage specific App of Apps contains references to respective application GitOps repository for each stage (e.g referencing the release vs work branches or path-based within individual app GitOps repository).
@@ -171,7 +173,7 @@ A convenience script to create the JSON structure for SSH private key can be fou
 
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
 2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `url`, `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
-3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/blueprints-eks-workloads.git.
+3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/eks-blueprints-workloads.git.
 
 Example Structure for `USERNAME` and `TOKEN` authentication type:
 ```json
