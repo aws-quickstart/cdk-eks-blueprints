@@ -97,7 +97,7 @@ export class KarpenterAddOn extends HelmAddOn {
             });
 
         const karpenterPolicy = new iam.Policy(cluster, 'karpenter-policy', {
-            statements: [iam.PolicyStatement.fromJson(KarpenterControllerPolicy)]
+            document: iam.PolicyDocument.fromJson(KarpenterControllerPolicy)
         });
         
         const karpenterControllerRole = new iam.Role(cluster,
