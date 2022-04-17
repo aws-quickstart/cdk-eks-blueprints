@@ -165,7 +165,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 spec: {
                     requirements: this.convertToSpec(provisionerSpecs),
                     provider: {
-                        instanceProfile: `${karpenterInstanceProfile}`,
+                        instanceProfile: karpenterInstanceProfile.instanceProfileName,
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
