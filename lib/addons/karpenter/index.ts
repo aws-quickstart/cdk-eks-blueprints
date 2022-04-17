@@ -1,8 +1,9 @@
 import { Construct } from "constructs";
-import { Role, ManagedPolicy, ServicePrincipal, CfnInstanceProfile, PolicyDocument } from 'aws-cdk-lib/aws-iam';
+import { Tags, CfnJson } from "aws-cdk-lib";
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, createServiceAccount, conflictsWith, tagSubnets } from '../../utils';
+import { createNamespace, setPath, conflictsWith, tagSubnets } from '../../utils';
 import { KarpenterControllerPolicy } from './iam';
 
 /**
@@ -11,13 +12,27 @@ import { KarpenterControllerPolicy } from './iam';
 interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Specs for a Provisioner (Optional) - If not provided, the add-on will
-     * deploy without a Provisioner.
+     * deploy a Provisioner with default values.
      */
     ProvisionerSpecs?: { 
-        'node.kubernetes.io/instance-type': string[],
-        'topology.kubernetes.io/zone': string[],
-        'kubernetes.io/arch': string[],
-        'karpenter.sh/capacity-type': string[],
+        'node.kubernetes.io/instance-type'?: string[],
+        'topology.kubernetes.io/zone'?: string[],
+        'kubernetes.io/arch'?: string[],
+        'karpenter.sh/capacity-type'?: string[],
+    }
+
+    /**
+     * Tags needed for subnets - If not provided, users will need to manually provide them.
+     */
+     subnetTags?: { 
+        [key: string]: string
+    }
+
+    /**
+     * Tags needed for security groups - If not provided, users will need to manually provide them.
+     */
+     securityGroupTags?: { 
+        [key: string]: string
     }
 }
 
@@ -29,7 +44,7 @@ const KARPENTER = 'karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.5.3',
+    version: '0.8.2',
     chart: KARPENTER,
     release: "blueprints-addon-karpenter",
     repository: 'https://charts.karpenter.sh',
@@ -54,23 +69,61 @@ export class KarpenterAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
         const values = { ...this.props.values ?? {} };
 
-        // Tag VPC Subnets
-        tagSubnets(cluster.stack, cluster.vpc.privateSubnets, `kubernetes.io/cluster/${clusterInfo.cluster.clusterName}`,"1");
+        const subnetTags = this.options.subnetTags || {};
+        const sgTags = this.options.securityGroupTags || {};
 
+        // Tag VPC Subnets
+        Object.entries(subnetTags).forEach(
+            ([key,value]) => {
+                tagSubnets(cluster.stack, cluster.vpc.privateSubnets, key, value);
+        });
+
+        // Tag VPC Security Group
+        Object.entries(sgTags).forEach(
+            ([key,value]) => {
+                Tags.of(cluster.clusterSecurityGroup).add(key,value);
+        });
+        
+        const conditions = new CfnJson(cluster, "ConditionPlainJson", {
+            value: {
+                [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:aud`]: "sts.amazonaws.com",
+                [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: `system:serviceaccount:karpenter:karpenter`,
+            },
+        });
+
+        const principal = new iam.OpenIdConnectPrincipal(
+            cluster.openIdConnectProvider).withConditions({
+                StringEquals: conditions,
+            });
+
+        const karpenterPolicy = new iam.Policy(cluster, 'karpenter-policy', {
+            statements: [iam.PolicyStatement.fromJson(KarpenterControllerPolicy)]
+        });
+        
+        const karpenterControllerRole = new iam.Role(cluster,
+            "karpenterControllerRole",
+            {
+              assumedBy: principal,
+              description: `This is the karpenterControllerRole role Karpenter uses to allocate compute for ${cluster.clusterName}`,
+              roleName: `KarpenterControllerRole-${cluster.clusterName}`,
+            }
+        );
+        karpenterControllerRole.attachInlinePolicy(karpenterPolicy);
+      
         // Set up Node Role
-        const karpenterNodeRole = new Role(cluster, 'karpenter-node-role', {
-            assumedBy: new ServicePrincipal(`ec2.${cluster.stack.urlSuffix}`),
+        const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
+            assumedBy: new iam.ServicePrincipal(`ec2.${cluster.stack.urlSuffix}`),
             managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
-                ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"),
-                ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
-                ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
             ],
             roleName: `KarpenterNodeRole-${name}`
         });
 
         // Set up Instance Profile
-        const karpenterInstanceProfile = new CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
+        const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
             path: '/'
@@ -82,11 +135,8 @@ export class KarpenterAddOn extends HelmAddOn {
             username: 'system:node:{{EC2PrivateDNSName}}'
         });
 
-        // Create Namespace & SA
+        // Create Namespace
         const ns = createNamespace(KARPENTER, cluster);
-        const karpenterPolicyDocument = PolicyDocument.fromJson(KarpenterControllerPolicy);
-        const sa = createServiceAccount(cluster, KARPENTER, KARPENTER, karpenterPolicyDocument);
-        sa.node.addDependency(ns);
 
         // Add helm chart
         setPath(values, "serviceAccount.create", false);
@@ -94,7 +144,7 @@ export class KarpenterAddOn extends HelmAddOn {
         setPath(values, "controller.clusterName", name);
         const karpenterChart = this.addHelmChart(clusterInfo, values, true);
 
-        karpenterChart.node.addDependency(sa);
+        karpenterChart.node.addDependency(ns);
 
         // (Optional) default provisioner - defaults to 30 seconds for scale down for
         // low utilization
