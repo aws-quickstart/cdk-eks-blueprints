@@ -1,9 +1,9 @@
 import { Construct } from "constructs";
-import { Tags, CfnJson } from "aws-cdk-lib";
+import { CfnJson } from "aws-cdk-lib";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, conflictsWith, tagSubnets } from '../../utils';
+import { createNamespace, setPath, conflictsWith, tagSubnets, tagSecurityGroup } from '../../utils';
 import { KarpenterControllerPolicy } from './iam';
 
 /**
@@ -87,7 +87,7 @@ export class KarpenterAddOn extends HelmAddOn {
         if (sgTags){
             Object.entries(sgTags).forEach(
                 ([key,value]) => {
-                    Tags.of(cluster.clusterSecurityGroup).add(key,value);
+                    tagSecurityGroup(cluster.stack, cluster.clusterSecurityGroupId, key,value);
             });
         }
         
