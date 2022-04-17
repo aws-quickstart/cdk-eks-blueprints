@@ -36,10 +36,10 @@ export function tagSubnets(stack: Stack, subnets: ec2.ISubnet[], tag: string, va
         service: 'EC2',
         action: 'createTags',
         parameters: parameters,
-        physicalResourceId: { id: `${stack.stackName}-subnetTagger`}
+        physicalResourceId: { id: `${tag}-subnetTagger`}
     };
     
-    new AwsCustomResource(stack, `${stack.stackName}-subnet-tags`, {
+    new AwsCustomResource(stack, `subnet-tags-${tag}`, {
         policy: AwsCustomResourcePolicy.fromSdkCalls({
             resources: arns,
         }),

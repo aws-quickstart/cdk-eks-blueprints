@@ -22,16 +22,18 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     }
 
     /**
-     * Tags needed for subnets - If not provided, users will need to manually provide them.
+     * Tags needed for subnets - if neither Subnet tags nor security group tags are provided,
+     * the provisioner will not be created
      */
-     subnetTags?: { 
+    SubnetTags?: { 
         [key: string]: string
     }
 
     /**
-     * Tags needed for security groups - If not provided, users will need to manually provide them.
+     * Tags needed for security groups - if neither Subnet tags nor security group tags are provided,
+     * the provisioner will not be created
      */
-     securityGroupTags?: { 
+    SecurityGroupTags?: { 
         [key: string]: string
     }
 }
@@ -69,20 +71,25 @@ export class KarpenterAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
         const values = { ...this.props.values ?? {} };
 
-        const subnetTags = this.options.subnetTags || {};
-        const sgTags = this.options.securityGroupTags || {};
+        const provisionerSpecs = this.options.ProvisionerSpecs || {};
+        const subnetTags = this.options.SubnetTags || {};
+        const sgTags = this.options.SecurityGroupTags || {};
 
         // Tag VPC Subnets
-        Object.entries(subnetTags).forEach(
-            ([key,value]) => {
-                tagSubnets(cluster.stack, cluster.vpc.privateSubnets, key, value);
-        });
-
+        if (subnetTags){
+            Object.entries(subnetTags).forEach(
+                ([key,value]) => {
+                    tagSubnets(cluster.stack, cluster.vpc.privateSubnets, key, value);
+            });
+        }
+        
         // Tag VPC Security Group
-        Object.entries(sgTags).forEach(
-            ([key,value]) => {
-                Tags.of(cluster.clusterSecurityGroup).add(key,value);
-        });
+        if (sgTags){
+            Object.entries(sgTags).forEach(
+                ([key,value]) => {
+                    Tags.of(cluster.clusterSecurityGroup).add(key,value);
+            });
+        }
         
         const conditions = new CfnJson(cluster, "ConditionPlainJson", {
             value: {
@@ -136,32 +143,39 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Create Namespace
-        const ns = createNamespace(KARPENTER, cluster);
+        const ns = createNamespace(KARPENTER, cluster, true, true);
 
         // Add helm chart
-        setPath(values, "serviceAccount.create", false);
+        setPath(values, "serviceAccount.create", true);
         setPath(values, "controller.clusterEndpoint", endpoint);
         setPath(values, "controller.clusterName", name);
-        const karpenterChart = this.addHelmChart(clusterInfo, values, true);
+        values['serviceAccount'] = {
+            annotations: {
+                "eks.amazonaws.com/role-arn": karpenterControllerRole.roleArn,
+            }};
+        const karpenterChart = this.addHelmChart(clusterInfo, values, false);
 
         karpenterChart.node.addDependency(ns);
 
-        // (Optional) default provisioner - defaults to 30 seconds for scale down for
-        // low utilization
-        if (this.options.ProvisionerSpecs){
-            const provisioner = cluster.addManifest('default-provisioner', {
-                apiVersion: 'karpenter.sh/v1alpha5',
-                kind: 'Provisioner',
-                metadata: { name: 'default' },
-                spec: {
-                    requirements: this.convertToSpec(this.options.ProvisionerSpecs),
-                    provider: {
-                        instanceProfile: `${karpenterInstanceProfile}`
-                    },
-                }
-            });
-            provisioner.node.addDependency(karpenterChart);
-        }
+        // (Optional) default provisioner
+        // if ((Object.keys(subnetTags).length > 0) && (Object.keys(sgTags).length > 0)){
+        //     const provisioner = cluster.addManifest('default-provisioner', {
+        //         apiVersion: 'karpenter.sh/v1alpha5',
+        //         kind: 'Provisioner',
+        //         metadata: { name: 'default' },
+        //         spec: {
+        //             requirements: this.convertToSpec(provisionerSpecs),
+        //             provider: {
+        //                 instanceProfile: `${karpenterInstanceProfile}`
+        //             },
+        //         },
+        //         provider: {
+        //             subnetSelector: subnetTags,
+        //             securityGroupSelector: sgTags,
+        //         }
+        //     });
+        //     provisioner.node.addDependency(karpenterChart);
+        // }
 
         return Promise.resolve(karpenterChart);
     }
