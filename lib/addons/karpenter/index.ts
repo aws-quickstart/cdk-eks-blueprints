@@ -135,7 +135,7 @@ export class KarpenterAddOn extends HelmAddOn {
         };
 
         values = merge(values, saValues);
-        const karpenterChart = this.addHelmChart(clusterInfo, values, false);
+        const karpenterChart = this.addHelmChart(clusterInfo, values, false, true);
 
         karpenterChart.node.addDependency(ns);
 
