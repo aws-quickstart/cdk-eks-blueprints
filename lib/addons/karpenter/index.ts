@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
-import { VpcCniAddOn } from '..';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { createNamespace, setPath, conflictsWith, dependable, tagSubnets, tagSecurityGroup, createServiceAccount } from '../../utils';
 import { KarpenterControllerPolicy } from './iam';
