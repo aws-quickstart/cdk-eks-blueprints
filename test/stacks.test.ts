@@ -38,27 +38,13 @@ describe('Unit tests for EKS Blueprint', () => {
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
     });
 
-    test("Stack creation fails due to adding Karpenter with Cluster Autoscaler", () => {
+    test("Stack creation fails due to conflicting add-ons", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.ClusterAutoScalerAddOn, new blueprints.KarpenterAddOn)
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-addons');
-        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
-    });
-
-    test("Stack creation fails due to adding Cluster Autoscaler with Karpenter", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
+            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {
