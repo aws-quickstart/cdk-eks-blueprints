@@ -1,4 +1,5 @@
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { cloneDeepWith } from 'lodash';
 
 export const setPath = (obj : any, path: string, val: any) => { 
     const keys = path.split('.');
@@ -9,18 +10,12 @@ export const setPath = (obj : any, path: string, val: any) => {
     lastObj[lastKey] = val;
 };
 
+
 export function cloneDeep<T>(source: T): T {
-    return Array.isArray(source)
-    ? source.map(item => cloneDeep(item))
-    : source instanceof Date
-    ? new Date(source.getTime())
-    : source instanceof KubernetesVersion
-    ? source
-    : source && typeof source === 'object'
-          ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-             Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop)!);
-             o[prop] = cloneDeep((source as { [key: string]: any })[prop]);
-             return o;
-          }, Object.create(Object.getPrototypeOf(source)))
-    : source as T;
-  }
+    return cloneDeepWith(source, (value) => {
+        if(value && value instanceof KubernetesVersion) {
+            return value;
+        }
+        return undefined;
+    });
+}
