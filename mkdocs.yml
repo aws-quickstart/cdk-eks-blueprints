@@ -38,6 +38,7 @@ nav:
     - Nginx: 'addons/nginx.md'
     - OPA Gatekeeper: 'addons/opa-gatekeeper.md'
     - Secrets Store: 'addons/secrets-store.md'
+    - Snyk: 'https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon'
     - SSM Agent: 'addons/ssm-agent.md'
     - Velero: 'addons/velero.md'
     - Vpc Cni: 'addons/vpc-cni.md'
