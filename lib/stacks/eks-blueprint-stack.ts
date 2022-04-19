@@ -4,7 +4,7 @@ import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import * as lodash from "lodash";
+import { cloneDeep } from "../utils";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
@@ -103,7 +103,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
-        this.props = { ...this.props, ...lodash.cloneDeep(props)};
+        this.props = { ...this.props, ...cloneDeep(props) };
         if(props.resourceProviders) {
             this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }

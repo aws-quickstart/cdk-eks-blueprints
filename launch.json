@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "jest",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs":[
+                "test"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "cdk-launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "-r",
+                "./node_modules/ts-node/register/transpile-only"
+            ],
+            "args": [
+                "./node_modules/aws-cdk/bin/cdk.js",
+                "-c", "config=cicd", "synth"
+            ]
+        }
+    ]
+}

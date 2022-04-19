@@ -29,7 +29,6 @@
     "dependencies": {
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
-        "@types/lodash": "^4.14.180",
         "aws-cdk-lib": "2.20.0",
         "aws-sdk": "2.1069.0",
         "bcrypt": "^5.0.1",
