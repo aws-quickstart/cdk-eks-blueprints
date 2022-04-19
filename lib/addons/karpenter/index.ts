@@ -1,8 +1,9 @@
 import { Construct } from "constructs";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
+import { VpcCniAddOn } from '..';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, conflictsWith, tagSubnets, tagSecurityGroup, createServiceAccount } from '../../utils';
+import { createNamespace, setPath, conflictsWith, dependable, tagSubnets, tagSecurityGroup, createServiceAccount } from '../../utils';
 import { KarpenterControllerPolicy } from './iam';
 import merge from 'ts-deepmerge';
 
@@ -63,6 +64,7 @@ export class KarpenterAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
+    @dependable('VpcCniAddOn')
     @conflictsWith('ClusterAutoScalerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const endpoint = clusterInfo.cluster.clusterEndpoint;
@@ -124,6 +126,7 @@ export class KarpenterAddOn extends HelmAddOn {
         // Add helm chart
         setPath(values, "clusterEndpoint", endpoint);
         setPath(values, "clusterName", name);
+        setPath(values, "aws.defaultInstanceProfile", karpenterInstanceProfile.instanceProfileName);
         const saValues = {
             serviceAccount: {
                 create: false,
@@ -148,10 +151,10 @@ export class KarpenterAddOn extends HelmAddOn {
                 spec: {
                     requirements: this.convertToSpec(provisionerSpecs),
                     provider: {
-                        instanceProfile: karpenterInstanceProfile.instanceProfileName,
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
+                    ttlSecondsAfterEmpty: 30,
                 }, 
             });
             provisioner.node.addDependency(karpenterChart);
