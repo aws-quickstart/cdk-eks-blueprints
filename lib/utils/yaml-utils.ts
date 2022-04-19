@@ -12,24 +12,15 @@ import request from 'sync-request';
  * @param namespaceManifest 
  */
 export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
-    fs.readdir(dir, 'utf8', (err, files) => {
-        if (files != undefined) {
-            files.forEach((file) => {
-                if (file.split('.').pop() == 'yaml') {
-                    fs.readFile(dir + file, 'utf8', (err, data) => {
-                        if (data != undefined) {
-                            let i = 0;
-                            yaml.loadAll(data, function(item) {
-                                const resources = cluster.addManifest(file.substring(0, file.length - 5) + i, <Record<string, any>[]>item);
-                                resources.node.addDependency(namespaceManifest);
-                                i++;
-                            });
-                        }
-                    });
-                }
-            });
-        } else {
-            console.log(`${dir} is empty`);
+    fs.readdirSync(dir, { encoding: 'utf8' }).forEach((file, index) => {
+        if (file.split('.').pop() == 'yaml') {
+            const data = fs.readFileSync(dir + file, 'utf8');
+            if (data != undefined) {  
+                yaml.loadAll(data, function (item) {
+                    const resources = cluster.addManifest(file.substring(0, file.length - 5) + index, <Record<string, any>[]>item);
+                    resources.node.addDependency(namespaceManifest);
+                });
+            }
         }
     });
 }
