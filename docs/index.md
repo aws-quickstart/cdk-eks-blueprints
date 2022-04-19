@@ -2,11 +2,13 @@
 
 Welcome to the [`Amazon EKS Blueprints Quick Start`](https://github.com/aws-quickstart/cdk-eks-blueprints) documentation site.
 
-`Amazon EKS Blueprints Quick Start` provides AWS customers with a framework and methodology that makes it easy to build an internal development platform on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. It can be used by AWS customers, partners, and internal AWS teams to configure and manage complete EKS clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. 
 
 ## What is EKS Blueprints?
 
-`EKS Blueprints` is a framework that allows customers to create internal development platforms. It abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. Such platforms are typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The `EKS Blueprints` packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, `EKS Blueprints` allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
+EKS Blueprints helps you compose complete EKS clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. With EKS Blueprints, you describe the configuration for the desired state of your EKS environment, such as the control plane, worker nodes, and Kubernetes add-ons, as an IaC blueprint. Once a blueprint is configured, you can use it to stamp out consistent environments across multiple AWS accounts and Regions using continuous deployment automation.
+
+You can use EKS Blueprints to easily bootstrap an EKS cluster with Amazon EKS add-ons as well as a wide range of popular open-source add-ons, including Prometheus, Karpenter, Nginx, Traefik, AWS Load Balancer Controller, Fluent Bit, Keda, ArgoCD, and more. EKS Blueprints also helps you implement relevant security controls needed to operate workloads from multiple teams in the same cluster.
 
 ## What can I do with this QuickStart?
 
