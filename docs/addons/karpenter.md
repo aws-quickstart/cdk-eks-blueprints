@@ -24,17 +24,17 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const karpenterAddonProps = {
-  ProvisionerSpecs: {
+  provisionerSpecs: {
     'node.kubernetes.io/instance-type': ['m5.2xlarge'],
     'topology.kubernetes.io/zone': ['us-east-1c'],
     'kubernetes.io/arch': ['amd64','arm64'],
     'karpenter.sh/capacity-type': ['spot','on-demand'],
   },
-  SubnetTags: {
+  subnetTags: {
     'karpenter.sh/discovery/MyCluster': 'Name',
     'karpenter.sh/discovery/Tag1': 'tag1value',
   },
-  SecurityGroupTags: {
+  securityGroupTags: {
     'karpenter.sh/discovery/MyCluster': 'Name',
     'karpenter.sh/discovery/Tag1': 'tag1value',
   },
@@ -45,6 +45,13 @@ const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
+
+The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
+- clusterEndpoint
+- clusterName
+- serviceAccount.create
+- serviceAccount.name
+- serviceAccount.annotations
 
 To validate that Karpenter add-on is running ensure that the add-on deployments for the controller and the webhook are in `RUNNING` state:
 
@@ -95,9 +102,9 @@ const sgTags = {
 }
 
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
-  ProvisionerSpecs: provisionerSpecs,
-  SubnetTags: subnetTags,
-  SecurityGroupTags: sgTags,
+  provisionerSpecs: provisionerSpecs,
+  subnetTags: subnetTags,
+  securityGroupTags: sgTags,
 });
 ```
 

@@ -1,5 +1,4 @@
 import { Construct } from "constructs";
-import { CfnJson } from "aws-cdk-lib";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
@@ -69,7 +68,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const endpoint = clusterInfo.cluster.clusterEndpoint;
         const name = clusterInfo.cluster.clusterName;
         const cluster = clusterInfo.cluster;
-        const values = { ...this.props.values ?? {} };
+        let values = this.options.values ?? {};
 
         const provisionerSpecs = this.options.provisionerSpecs || {};
         const subnetTags = this.options.subnetTags || {};
@@ -125,12 +124,17 @@ export class KarpenterAddOn extends HelmAddOn {
         // Add helm chart
         setPath(values, "clusterEndpoint", endpoint);
         setPath(values, "clusterName", name);
-        values['serviceAccount'] = {
-            create: false,
-            name: RELEASE,
-            annotations: {
-                "eks.amazonaws.com/role-arn": sa.role.roleArn,
-            }};
+        const saValues = {
+            serviceAccount: {
+                create: false,
+                name: RELEASE,
+                annotations: {
+                    "eks.amazonaws.com/role-arn": sa.role.roleArn,
+                }
+            }
+        };
+
+        values = merge(values, saValues);
         const karpenterChart = this.addHelmChart(clusterInfo, values, false);
 
         karpenterChart.node.addDependency(ns);
