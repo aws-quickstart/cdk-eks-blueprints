@@ -5,7 +5,7 @@ import { Construct } from "constructs";
 import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
-import { conflictsWith, createServiceAccount, setPath } from "../../utils";
+import { conflictsWith, createNamespace, createServiceAccount, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -65,6 +65,8 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
         const nodeGroups = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
         const values = this.options.values || {};
+        const namespace = this.options.namespace!;
+        const createANamespace = (this.options.namespace == "kube-system") ? false : true;
         
         // Create IAM Policy
         const autoscalerStmt = new iam.PolicyStatement();
@@ -91,21 +93,21 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
             Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
         }
-
-        // Create IRSA
-        const sa = createServiceAccount(cluster,
-            RELEASE, 
-            "kube-system",
-            autoscalerPolicyDocument
-        );
         
+        // Create namespace
+        if (createANamespace){
+            createNamespace(namespace, cluster, true, true);
+        }
+        
+        // Create IRSA
+        const sa = createServiceAccount(cluster, RELEASE, namespace, autoscalerPolicyDocument);
+
         // Create Helm Chart
         setPath(values, "cloudProvider", "aws");
         setPath(values, "autoDiscovery.clusterName", cluster.clusterName);
         setPath(values, "awsRegion", cluster.stack.region);
         setPath(values, "rbac.serviceAccount.create", false);
         setPath(values, "rbac.serviceAccount.name", RELEASE);
-        setPath(values, "rbac.serviceAccount.annotations", {"eks.amazonaws.com/role-arn": sa.role.roleArn});
         
         const clusterAutoscalerChart = this.addHelmChart(clusterInfo, values, false);
         clusterAutoscalerChart.node.addDependency(sa);

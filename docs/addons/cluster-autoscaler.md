@@ -35,7 +35,6 @@ The add-on automatically sets the following Helm Chart [values](https://github.c
 - awsRegion
 - rbac.serviceAccount.create
 - rbac.serviceAccount.name
-- rbac.serviceAccount.annotations
 
 ## Testing the scaling functionality
 
