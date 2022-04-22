@@ -19,6 +19,7 @@ The framework currently supports the following add-ons.
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler                                                                                                  |
 | [`ContainerInsightsAddOn`](./container-insights)                       | Adds Container Insights support integrating monitoring with CloudWatch                                                                |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
+| [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications. |
 | [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator) |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage                 |
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage                 |
@@ -34,6 +35,7 @@ The framework currently supports the following add-ons.
 | [`OpaGatekeeperAddOn (Currently Not Supported, In Progress)`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                        |
 | [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more. |
 | [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster                                           |
+| [`Snyk`](https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon)  | Adds the [Snyk Monitor](https://github.com/snyk/kubernetes-monitor) to the EKS Cluster                   |
 | [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes                  |
 | [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS                                              |
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster                                                                                  |

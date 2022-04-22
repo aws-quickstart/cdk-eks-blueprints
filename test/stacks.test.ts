@@ -242,6 +242,24 @@ test("Building blueprint with builder properly clones properties", () => {
 
 });
 
+test("Building blueprint with version correctly passes k8s version to the cluster", () => {
+
+    const app = new cdk.App();
+
+    const blueprint = blueprints.EksBlueprint.builder().name("builer-version-test1")
+        .addOns(new blueprints.ClusterAutoScalerAddOn);
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    blueprint.withBlueprintProps({
+        version: KubernetesVersion.V1_22
+    });
+
+    const stack = blueprint.build(app, "builder-version-test1");
+
+    expect(stack.getClusterInfo().version).toBeDefined();
+ 
+});
+
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {
     const template = Template.fromStack(stack);
     for (let chart of charts) {
