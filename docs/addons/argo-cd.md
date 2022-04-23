@@ -227,7 +227,7 @@ A convenience script to create the JSON structure for SSH private key can be fou
 
 1. Set `credentialsType` to `USERNAME` or `TOKEN` when defining `ApplicationRepository` in the ArgoCD add-on configuration.
 2. Define the secret in the AWS Secret Manager as "Key Value" and set fields `url`, `username` and `password` to the desired values (clear text). For `TOKEN` username could be set to any username and password field set to the GitHub token. Replicate to the desired regions.
-3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/blueprints-eks-workloads.git.
+3. Make sure that for this type of authentication your repository URL is set as `https`, e.g. https://github.com/aws-samples/eks-blueprints-workloads.git.
 
 Example Structure for `USERNAME` and `TOKEN` authentication type:
 ```json

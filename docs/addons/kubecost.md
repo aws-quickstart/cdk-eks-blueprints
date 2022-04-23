@@ -7,7 +7,7 @@
 Using [npm](https://npmjs.org):
 
 ```sh
-$ npm install @kubecost/kubecost-blueprints-addon
+$ npm install @kubecost/kubecost-eks-blueprints-addon
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ You may get one [here](https://kubecost.com/install).
 
 #### `version: string` (optional)
 
-The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.88.1` at the time of writing).
+The `cost-analyzer` helm chart version. Defaults to the latest stable version specified in this repo (`1.92.0` at the time of writing).
 
 ####  `values?: { [key: string]: any }` (optional)
 

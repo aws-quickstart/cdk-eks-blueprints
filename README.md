@@ -4,31 +4,31 @@
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/cdk-eks-blueprints)
 ![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSsvbE9mR0ZWeTJjbi96OUpBREorSG51UjMzQ1UyNXdmUzZ2dUJoTkhIODFJWjN2QjRGcnhWS0pYLzFQRU5uOThiUEp1WjEzS0htbUpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlRkUFRoTWtjdElBMkR5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
-Welcome to the `Amazon EKS Blueprints for CDK` repository.
+Welcome to `Amazon EKS Blueprints for CDK`.
 
-This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. `eks-blueprints` is a [CDK](https://aws.amazon.com/cdk/) construct that makes it easy for customers to build and deploy internal development platforms  on top of [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. It can be used by AWS customers, partners, and internal AWS teams to configure and manage complete EKS clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. 
+
+## Getting Started
+
+The easiest way to get started with EKS Blueprints is to follow our [Getting Started guide](https://aws-quickstart.github.io/cdk-eks-blueprints/getting-started/).
 
 ## Documentation
 
 For complete project documentation, please see our [official project documentation site](https://aws-quickstart.github.io/cdk-eks-blueprints/).
 
-## What is EKS Blueprints?
+## Examples
 
-EKS Blueprints is a framework that helps customers create internal development platforms. It abstracts the complexities of cloud infrastructure from developers, and allows them to deploy workloads with ease. As EKS Blueprints is typically composed of multiple AWS or open source products and services, including services for running containers, CI/CD pipelines, capturing logs/metrics, and security enforcement. The EKS Blueprints packages these tools into a cohesive whole and makes them available to development teams as a service. From an operational perspective, EKS Blueprints allow companies to consolidate tools and best practices for securing, scaling, monitoring, and operating containerized infrastructure into a central platform that can then be used by developers across an enterprise.
+To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).
 
 ## What can I do with this QuickStart?
 
-Customers can use this QuickStart to easily architect and deploy a multi-tenant Blueprints built on EKS. Specifically, customers can leverage the `eks-blueprints` module to:
+Customers can use this QuickStart to easily architect and deploy a multi-team Blueprints built on EKS. Specifically, customers can leverage the `eks-blueprints` module to:
 
 - [x] Deploy Well-Architected EKS clusters across any number of accounts and regions.
 - [x] Manage cluster configuration, including addons that run in each cluster, from a single Git repository.
 - [x] Define teams, namespaces, and their associated access permissions for your clusters.
 - [x] Create Continuous Delivery (CD) pipelines that are responsible for deploying your infrastructure.
 - [x] Leverage GitOps-based workflows for onboarding and managing workloads for your teams.
-
-## Examples
-
-To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/eks-blueprints-patterns).
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
@@ -44,14 +44,14 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.17.0
+npm install -g aws-cdk@2.20.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.17.0
+# must output 2.20.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.

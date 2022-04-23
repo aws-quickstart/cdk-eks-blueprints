@@ -1,4 +1,4 @@
-import { CapacityType } from 'aws-cdk-lib/aws-eks';
+import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as cdk from 'aws-cdk-lib';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
@@ -38,27 +38,13 @@ describe('Unit tests for EKS Blueprint', () => {
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
     });
 
-    test("Stack creation fails due to adding Karpenter with Cluster Autoscaler", () => {
+    test("Stack creation fails due to conflicting add-ons", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.ClusterAutoScalerAddOn, new blueprints.KarpenterAddOn)
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-addons');
-        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: ClusterAutoScalerAddOn.");
-    });
-
-    test("Stack creation fails due to adding Cluster Autoscaler with Karpenter", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
+            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {
@@ -235,6 +221,43 @@ test("Generic cluster provider correctly registers managed node groups", async (
     
     expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
     expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
+});
+
+test("Building blueprint with builder properly clones properties", () => {
+    const blueprint = blueprints.EksBlueprint.builder().name("builer-test1")
+        .addOns(new blueprints.AppMeshAddOn);
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    blueprint.withBlueprintProps({
+        version: KubernetesVersion.V1_21
+    });
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    const blueprint1 = blueprint.clone();
+    blueprint1.addOns(new blueprints.ArgoCDAddOn);
+
+    expect(blueprint.props.addOns).toHaveLength(1);
+    expect(blueprint1.props.addOns).toHaveLength(2);
+
+});
+
+test("Building blueprint with version correctly passes k8s version to the cluster", () => {
+
+    const app = new cdk.App();
+
+    const blueprint = blueprints.EksBlueprint.builder().name("builer-version-test1")
+        .addOns(new blueprints.ClusterAutoScalerAddOn);
+    expect(blueprint.props.addOns).toHaveLength(1);
+
+    blueprint.withBlueprintProps({
+        version: KubernetesVersion.V1_22
+    });
+
+    const stack = blueprint.build(app, "builder-version-test1");
+
+    expect(stack.getClusterInfo().version).toBeDefined();
+ 
 });
 
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {

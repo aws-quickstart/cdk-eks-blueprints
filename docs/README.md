@@ -28,7 +28,7 @@ Customers can use this QuickStart to easily architect and deploy a multi-tenant 
 
 ## Examples
 
-To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/eks-blueprints-patterns).
+To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
@@ -44,14 +44,14 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.17.0
+npm install -g aws-cdk@2.20.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.17.0
+# must output 2.20.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.
