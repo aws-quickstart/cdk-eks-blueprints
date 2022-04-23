@@ -121,7 +121,7 @@ export class ClusterInfo {
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private resourceContext: ResourceContext;
-    private executionContext: Map<string, Values>;
+    private addonContext: Map<string, Values>;
 
     /**
      * Constructor for ClusterInfo
@@ -132,7 +132,7 @@ export class ClusterInfo {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
-        this.executionContext = new Map<string, Values>();
+        this.addonContext = new Map<string, Values>();
     }
 
     /**
@@ -225,19 +225,19 @@ export class ClusterInfo {
     }
 
     /**
-     * Update executionContext map
+     * Update addonContext map
      * @param addOn
      * @param Values
      */
-    public addExecutionContext(addOn: string, values: Values) {
-        this.executionContext.set(addOn, values);
+    public addAddOnContext(addOn: string, values: Values) {
+        this.addonContext.set(addOn, values);
     }
 
     /**
-    * Returns all execution context
-    * @returns executionContext: Map<string, Values>
+    * Returns all addon contexts
+    * @returns addonContext: Map<string, Values>
     */
-    public getAllExecutionContext(): Map<string, Values> {
-        return this.executionContext;
+    public getAddOnContexts(): Map<string, Values> {
+        return this.addonContext;
     }
 }

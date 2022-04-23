@@ -12,7 +12,7 @@ export class ArgoGitOpsFactory {
     }
 
     public static enableGitOpsAppOfApps() {
-        KubectlProvider.applyHelmDeployment = returnArgoHelmApplicationValues;
+        KubectlProvider.applyHelmDeployment = generateArgoHelmApplicationValues;
     }
 
 }
@@ -37,10 +37,10 @@ function getArgoApplicationGenerator(clusterInfo: ClusterInfo): ArgoCDAddOn {
     throw Error("GitOps Engine is not defined in the blueprint");
 }
 
-export const returnArgoHelmApplicationValues = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
+export const generateArgoHelmApplicationValues = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
     // Add `enabled` property to each addon
     helmDeployment.values.enabled = true;
-    clusterInfo.addExecutionContext(
+    clusterInfo.addAddOnContext(
         kebabToCamel(helmDeployment.name),
         helmDeployment.values,
     );

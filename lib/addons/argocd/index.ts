@@ -164,9 +164,9 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         const appRepo = this.options.bootstrapRepo;
 
         if (appRepo) {
-            // merge with custom bootstrapValues with executionContext and common values
+            // merge with custom bootstrapValues with AddOnContexts and common values
             const shared = { clusterName: clusterInfo.cluster.clusterName, region: Stack.of(clusterInfo.cluster).region };
-            const merged = { ...shared, ...Object.fromEntries(clusterInfo.getAllExecutionContext().entries()), ...this.options.bootstrapValues };
+            const merged = { ...shared, ...Object.fromEntries(clusterInfo.getAddOnContexts().entries()), ...this.options.bootstrapValues };
 
             this.generate(clusterInfo, {
                 name: appRepo.name ?? "bootstrap-apps",
