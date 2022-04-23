@@ -120,51 +120,55 @@ blueprint.clone('us-west-2')
 
 The application promotion process in the above example is handled entirely through GitOps. Each stage specific App of Apps contains references to respective application GitOps repository for each stage (e.g referencing the release vs work branches or path-based within individual app GitOps repository).
 
-### GitOps for SSP AddOns
+### GitOps for EKS Blueprints AddOns
 
-By default all AddOns defined in SSP are deployed to the cluster via CDK. You can opt-in to deploy them following the GitOps model via ArgoCD. You will need a repository contains all the AddOns you would like to deploy via ArgoCD, such as, [ssp-eks-add-ons](https://github.com/aws-samples/ssp-eks-add-ons). You then configure ArgoCD bootstrapping with this repository as shown above.
+By default all AddOns defined in a blueprint are deployed to the cluster via CDK. You can opt-in to deploy them following the GitOps model via ArgoCD. You will need a repository contains all the AddOns you would like to deploy via ArgoCD, such as, [eks-blueprints-add-ons](https://github.com/aws-samples/eks-blueprints-add-ons). You then configure ArgoCD bootstrapping with this repository as shown above.
 
-There are two types of GitOps deployment via ArgoCD depends on whether you would like to adopt the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) strategy:
+There are two types of GitOps deployments via ArgoCD depending on whether you would like to adopt the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) strategy:
 
-- CDK deploys the `Application` resource for each AddOn enabled, and ArgoCD deploys the actual AddOn via GitOps based on the `Application` resource. Example code as following:
+- CDK deploys the `Application` resource for each AddOn enabled, and ArgoCD deploys the actual AddOn via GitOps based on the `Application` resource. Example:
 
 ```typescript
+    import * as blueprints from '@aws-quickstart/eks-blueprints';
+
     // enable gitops bootstrapping with argocd
-    const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
+    const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
         bootstrapRepo: {
-            repoUrl: 'https://github.com/aws-samples/ssp-eks-add-ons',
+            repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons',
             path: 'add-ons',
             targetRevision: "main",
         },
     });
     // addons
-    const addOns: Array<ssp.ClusterAddOn> = [
+    const addOns: Array<blueprints.ClusterAddOn> = [
         prodBootstrapArgo,
-        new ssp.addons.AppMeshAddOn(),
-        new ssp.addons.MetricsServerAddOn(),
-        new ssp.addons.AwsLoadBalancerControllerAddOn(),
+        new blueprints.addons.AppMeshAddOn(),
+        new blueprints.addons.MetricsServerAddOn(),
+        new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
     ArgoGitOpsFactory.enableGitOps();
 ```
 
-- CDK deploys the only `Application` resource for the App of Apps, aka App Zero, and ArgoCD deploys all the AddOns based on the App Zero. This requires the naming pattern between the AddOns and App of Apps matches. Example code as following:
+- CDK deploys the only `Application` resource for the App of Apps, aka App Zero, and ArgoCD deploys all the AddOns based on the App Zero. This requires the naming pattern between the AddOns and App of Apps matches. Example:
 
 ```typescript
+    import * as blueprints from '@aws-quickstart/eks-blueprints';
+
     // enable gitops bootstrapping with argocd app of apps
-    const prodBootstrapArgo = new ssp.addons.ArgoCDAddOn({
+    const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
         bootstrapRepo: {
-            repoUrl: 'https://github.com/aws-samples/ssp-eks-add-ons',
+            repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons',
             path: 'chart',
             targetRevision: "main",
         },
     });
     // addons
-    const addOns: Array<ssp.ClusterAddOn> = [
+    const addOns: Array<blueprints.ClusterAddOn> = [
         prodBootstrapArgo,
-        new ssp.addons.AppMeshAddOn(),
-        new ssp.addons.MetricsServerAddOn(),
-        new ssp.addons.AwsLoadBalancerControllerAddOn(),
+        new blueprints.addons.AppMeshAddOn(),
+        new blueprints.addons.MetricsServerAddOn(),
+        new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
     ArgoGitOpsFactory.enableGitOpsAppOfApps();
