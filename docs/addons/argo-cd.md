@@ -147,7 +147,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
         new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
-    ArgoGitOpsFactory.enableGitOps();
+    blueprints.addons.ArgoGitOpsFactory.enableGitOps();
 ```
 
 - CDK deploys the only `Application` resource for the App of Apps, aka App Zero, and ArgoCD deploys all the AddOns based on the App Zero. This requires the naming pattern between the AddOns and App of Apps matches. Example:
@@ -171,7 +171,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
         new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
-    ArgoGitOpsFactory.enableGitOpsAppOfApps();
+    blueprints.addons.ArgoGitOpsFactory.enableGitOpsAppOfApps();
 ```
 
 ## Secrets Support
