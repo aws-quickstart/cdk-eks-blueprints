@@ -35,9 +35,9 @@ export interface FalcoAddOnProps extends HelmAddOnUserProps {
     name: "blueprints-falco-addon",
     namespace: "falco",
     chart: "falco",
-    version: "1.17.4",
+    version: "1.18.2",
     release: "falco",
-    repository:  "https://github.com/falcosecurity/charts",
+    repository:  "https://falcosecurity.github.io/charts",
     createNamespace: true,
     values: {}
 };
