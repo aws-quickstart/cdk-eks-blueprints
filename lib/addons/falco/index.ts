@@ -5,9 +5,6 @@ import { Construct } from "constructs";
 import { setPath } from "../../utils";
 import { Values } from "@aws-quickstart/eks-blueprints/dist/spi/types";
 
-
-
-
 /**
  * User provided options for the Helm Chart
  */
@@ -42,11 +39,7 @@ export interface FalcoAddOnProps extends HelmAddOnUserProps {
     release: "falco",
     repository:  "https://github.com/falcosecurity/charts",
     createNamespace: true,
-    values: {
-        kubernetesSupportEnabled: true,
-        falcoSidekickEnabled: true,
-        createNamespace: true 
-    }
+    values: {}
 };
 
 export class FalcoAddOn extends HelmAddOn {
@@ -73,8 +66,8 @@ export class FalcoAddOn extends HelmAddOn {
 function populateValues(helmOptions: FalcoAddOnProps): Values {
     const values = helmOptions.values ?? {};
 
-    setPath(values, "kubernetes.support.enabled",  helmOptions.kubernetesSupportEnabled);
-    setPath(values, "falco.sidekick.enabled",  helmOptions.falcoSidekickEnabled);
+    setPath(values, "kubernetes.support.enabled", helmOptions.kubernetesSupportEnabled ?? true);
+    setPath(values, "falco.sidekick.enabled",  helmOptions.falcoSidekickEnabled ?? true);
 
     return values;
 }
