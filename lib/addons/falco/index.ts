@@ -22,6 +22,14 @@ export interface FalcoAddOnProps extends HelmAddOnUserProps {
      */
     falcoSidekickEnabled?: string,
     /**
+     * Enable falcosidekick webui which provides a simple WebUI for displaying latest events from Falco. It works as output for Falcosidekick.
+     */
+    falcoSidekickWebuiEnabled?: string,
+    /**
+     * Enable audit logs for Falco 
+     */
+    auditLogsEnabled?: string,
+    /**
      * Create namespace for Falco
      * @default falco
      */
@@ -68,6 +76,8 @@ function populateValues(helmOptions: FalcoAddOnProps): Values {
 
     setPath(values, "kubernetes.support.enabled",  helmOptions.kubernetesSupportEnabled ?? true);
     setPath(values, "falco.sidekick.enabled",  helmOptions.falcoSidekickEnabled ?? true);
+    setPath(values, "falco.sidekick.webui.enabled",  helmOptions.falcoSidekickWebuiEnabled ?? true);
+    setPath(values, "audit.logs.enabled",  helmOptions.auditLogsEnabled ?? true);
 
     return values;
 }
