@@ -1,6 +1,7 @@
 import { CfnAddon } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
+import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
 
@@ -33,7 +34,7 @@ export class CoreAddOn implements ClusterAddOn {
         this.coreAddOnProps = coreAddOnProps;
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         // Create a service account if user provides namespace and service account
         let serviceAccountRoleArn: string | undefined = undefined;
@@ -47,12 +48,13 @@ export class CoreAddOn implements ClusterAddOn {
 
 
         // Instantiate the Add-on
-        new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
+        return Promise.resolve(
+            new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
-        });
+        }));
     }
 }
