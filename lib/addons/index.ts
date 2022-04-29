@@ -26,8 +26,6 @@ export * from './xray';
 export * from './kubevious';
 export * from './ebs-csi-driver';
 export * from './efs-csi-driver';
-export * from './istio';
-
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
