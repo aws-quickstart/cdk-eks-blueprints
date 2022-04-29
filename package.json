@@ -1,6 +1,6 @@
 {
-    "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.0.0",
+    "name": "@edgarsilva948/eks-blueprints",
+    "version": "1.0.6",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -27,12 +27,15 @@
         "typescript": "~4.5.4"
     },
     "dependencies": {
+        "@aws-cdk/assets": "^1.154.0",
+        "@aws-cdk/region-info": "^2.22.0",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
         "aws-cdk-lib": "2.20.0",
         "aws-sdk": "2.1069.0",
         "bcrypt": "^5.0.1",
+        "constructs": "^10.0.127",
         "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
