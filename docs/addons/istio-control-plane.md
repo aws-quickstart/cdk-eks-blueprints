@@ -44,4 +44,3 @@ istiod-5797797b4b-fjrq2   1/1     Running   0          28m
 ## Functionality
 
 1. Installs Istio Control Plane deployment
-5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
