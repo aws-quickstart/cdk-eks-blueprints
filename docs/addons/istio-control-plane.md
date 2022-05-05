@@ -41,6 +41,42 @@ istiod-5797797b4b-fjrq2   1/1     Running   0          28m
 
  - `values`: Arbitrary values to pass to the chart as per https://istio.io/v1.4/docs/reference/config/installation-options/
 
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@edgarsilva948/eks-blueprints';
+
+const app = new cdk.App();
+
+const IstioControlPlaneAddOnProps = {
+  values: {
+    pilot: {
+      autoscaleEnabled: true,
+      autoscaleMin: 1,
+      autoscaleMax: 5,
+      replicaCount: 1,
+      rollingMaxSurge: "100%",
+      rollingMaxUnavailable: "25%",
+      resources: {
+        requests: {
+          cpu: "500m",
+          memory: "2048Mi",
+        }
+      }
+    }    
+  }
+}
+
+const istioBase = new blueprints.addons.IstioBaseAddOn();
+const istioControlPlane = new blueprints.addons.IstioControlPlaneAddOn(IstioControlPlaneAddOnProps)
+const addOns: Array<blueprints.ClusterAddOn> = [ istioBase, istioControlPlane ];
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(...addOns)
+  .build(app, 'my-stack-name');
+
+```
+
 ## Functionality
 
 1. Installs Istio Control Plane deployment
