@@ -18,7 +18,6 @@ const defaultProps = {
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
-
 export class IstioControlPlaneAddOn extends HelmAddOn {
 
     constructor(props?: IstioControlPlaneAddOnProps) {

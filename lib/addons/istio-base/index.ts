@@ -69,7 +69,6 @@ export class IstioBaseAddOn extends HelmAddOn {
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
       
-
         const cluster = clusterInfo.cluster;
 
         // Istio Namespace
