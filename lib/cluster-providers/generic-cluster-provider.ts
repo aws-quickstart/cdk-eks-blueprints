@@ -1,11 +1,9 @@
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
-import { UpdatePolicy } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
-import { CommonClusterOptions, FargateProfileOptions, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
-import { valueFromContext } from "../utils";
+import { setPath, valueFromContext, Writeable } from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
@@ -59,10 +57,10 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = {...this.props, ...{version: KubernetesVersion.V1_21}};
+        this.props = {...this.props, ...{version: eks.KubernetesVersion.V1_21}};
     }
 
-    withCommonOptions(options: Partial<CommonClusterOptions>): this {
+    withCommonOptions(options: Partial<eks.CommonClusterOptions>): this {
         this.props = {...this.props, ...options};
         return this;
     }
@@ -77,7 +75,7 @@ export class ClusterBuilder {
         return this;
     }
 
-    fargateProfile(name: string, options: FargateProfileOptions): this {
+    fargateProfile(name: string, options: eks.FargateProfileOptions): this {
         this.fargateProfiles[name] = options;
         return this;
     }
@@ -176,7 +174,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
-        const updatePolicy = nodeGroup.updatePolicy ?? UpdatePolicy.rollingUpdate();
+        const updatePolicy = nodeGroup.updatePolicy ?? autoscaling.UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
@@ -187,6 +185,7 @@ export class GenericClusterProvider implements ClusterProvider {
             maxCapacity: maxSize,
             desiredCapacity: desiredSize,
             updatePolicy,
+            ...nodeGroup
         });
     }
 
@@ -205,7 +204,6 @@ export class GenericClusterProvider implements ClusterProvider {
      * @returns 
      */
     addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
-        const amiType = nodeGroup.amiType;
         const capacityType = nodeGroup.nodeGroupCapacityType;
         const releaseVersion = nodeGroup.amiReleaseVersion;
         const instanceTypes = nodeGroup.instanceTypes ?? [valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
@@ -214,35 +212,30 @@ export class GenericClusterProvider implements ClusterProvider {
         const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
 
         // Create a managed node group.
-        const commonNodegroupProps: Partial<eks.NodegroupOptions> = {
-            nodegroupName: nodeGroup.id,
+        const nodegroupOptions: Writeable<eks.NodegroupOptions> = {
+            nodegroupName: nodeGroup.nodegroupName ?? nodeGroup.id,
             capacityType,
             instanceTypes,
             minSize,
             maxSize,
-            desiredSize
+            desiredSize,
+            releaseVersion,
+            subnets: nodeGroup.nodeGroupSubnets,
+            ...nodeGroup
         };
 
-        let nodegroupOptions: eks.NodegroupOptions;
         if(nodeGroup.customAmi) {
             // Create launch template if custom AMI is provided.
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
                 machineImage: nodeGroup.customAmi?.machineImage,
                 userData: nodeGroup.customAmi?.userData,
             });
-            nodegroupOptions = {
-                ...commonNodegroupProps,
-                launchTemplateSpec: {
-                    id: lt.launchTemplateId!,
-                    version: lt.latestVersionNumber,
-                },
-            };
-        } else {
-            nodegroupOptions = {
-                ...commonNodegroupProps,
-                amiType,
-                releaseVersion,
-            };
+            setPath(nodegroupOptions, "launchTemplateSpec", {
+                id: lt.launchTemplateId!,
+                version: lt.latestVersionNumber,
+            });
+            delete nodegroupOptions.amiType;
+            delete nodegroupOptions.releaseVersion;
         }
 
         return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);

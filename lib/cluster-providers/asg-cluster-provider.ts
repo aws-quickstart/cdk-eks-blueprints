@@ -20,10 +20,6 @@ export interface AsgClusterProviderProps extends eks.CommonClusterOptions, Autos
      */
     privateCluster?: boolean;
 
-    /**
-     * Affects both control plane and the managed node group.
-    */
-    vpcSubnets?: ec2.SubnetSelection[];
 }
 
 /**
