@@ -44,6 +44,13 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
      */
     bootstrapValues?: spi.Values,
 
+
+    /**
+     * Additional application deployment repositories. If there is a split between infra and application repositories then
+     * bootstrap repo is expected to be leveraged for infrastructure and application deployments will contain additional applications.
+     */
+    applicationRepos?: spi.GitOpsApplicationDeployment[],
+
     /**
      * Optional admin password secret name as defined in AWS Secrets Manager (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
@@ -89,7 +96,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
-        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, wave);
+        const manifest = new ArgoApplication(deployment.repository).generate(deployment, wave);
         const construct = clusterInfo.cluster.addManifest(deployment.name, manifest);
         promise.then(chart => {
             construct.node.addDependency(chart);
