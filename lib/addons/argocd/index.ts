@@ -11,6 +11,7 @@ import { createNamespace, getSecretValue } from '../../utils';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
+import { GitRepositoryReference } from "../../spi";
 
 
 /**
@@ -46,10 +47,10 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
 
 
     /**
-     * Additional application deployment repositories. If there is a split between infra and application repositories then
+     * Additional GitOps applications and repositories. If there is a split between infra and application repositories then
      * bootstrap repo is expected to be leveraged for infrastructure and application deployments will contain additional applications.
      */
-    applicationRepos?: spi.GitOpsApplicationDeployment[],
+    workloadApplications?: spi.GitOpsApplicationDeployment[],
 
     /**
      * Optional admin password secret name as defined in AWS Secrets Manager (plaintext).
@@ -135,11 +136,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             dot.set('server', secretProviderClass.getVolumeMounts('blueprints-secret-inline'), defaultValues, true);
         }
 
-        if (this.options.bootstrapRepo) {
-            const repo = this.options.bootstrapRepo!;
-            dot.set("configs.repositories.bootstrap", { url: repo.repoUrl }, defaultValues, true);
-        }
-
+        this.getAllRepositories().forEach((repo, index) => {
+            const repoName = repo.name ?? index == 0 ? "bootstrap" : `bootstrap-${index}`;
+            dot.set(`configs.repositories.${repoName}`, { url: repo.repoUrl }, defaultValues, true);
+        });
+        
         let values = merge(defaultValues, this.options.values ?? {});
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -169,10 +170,10 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
         assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
+        const shared = { clusterName: clusterInfo.cluster.clusterName, region: Stack.of(clusterInfo.cluster).region };
 
         if (appRepo) {
             // merge with custom bootstrapValues with AddOnContexts and common values
-            const shared = { clusterName: clusterInfo.cluster.clusterName, region: Stack.of(clusterInfo.cluster).region };
             const merged = { ...shared, ...Object.fromEntries(clusterInfo.getAddOnContexts().entries()), ...this.options.bootstrapValues };
 
             this.generate(clusterInfo, {
@@ -182,6 +183,16 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
                 values: merged,
             });
         }
+
+        const workloadApps = this.options.workloadApplications;
+
+        if(workloadApps) {
+            workloadApps.forEach(app => {
+                const values =  { ...shared, ...app.values };
+                this.generate(clusterInfo, { ...app, ...{ values } });
+            }); 
+        }
+
         this.chartNode = undefined;
     }
 
@@ -204,5 +215,31 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             namespace: this.options.namespace
         });
         return sa;
+    }
+
+    /**
+     * Returns all repositories defined in the options.
+     */
+    protected getAllRepositories(): GitRepositoryReference[] {
+        let result: GitRepositoryReference[] = [];
+        
+        const urls = new Set<string>();
+        const bootstrapRepo = this.options.bootstrapRepo;
+
+        if(bootstrapRepo) {
+            result.push({...bootstrapRepo, ...{ name : bootstrapRepo.name ?? "bootstrap"}});
+            urls.add(bootstrapRepo.repoUrl);
+        }
+
+        if(this.options.workloadApplications) {
+            this.options.workloadApplications.forEach(repo => {
+                if(repo.repository && !urls.has(repo.repository.repoUrl)) {
+                    result.push(repo.repository);
+                    urls.add(repo.repository.repoUrl);
+                }
+            });
+        }
+
+        return result;
     }
 }
