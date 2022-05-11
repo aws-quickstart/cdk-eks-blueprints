@@ -5,7 +5,9 @@ import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
 import { Template } from 'aws-cdk-lib/assertions';
 
+jest.useFakeTimers();
 describe('Unit tests for EKS Blueprint', () => {
+
 
     test('Usage tracking created', () => {
         let app = new cdk.App();

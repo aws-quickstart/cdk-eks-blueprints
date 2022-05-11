@@ -39,15 +39,7 @@ export class MngClusterProvider extends GenericClusterProvider {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
-                amiReleaseVersion: props?.amiReleaseVersion,
-                customAmi: props?.customAmi,
-                amiType: props?.amiType,
-                desiredSize: props?.desiredSize,
-                instanceTypes: props?.instanceTypes,
-                maxSize: props?.maxSize,
-                minSize: props?.minSize,
-                nodeGroupCapacityType: props?.nodeGroupCapacityType,
-                nodeGroupSubnets: props?.nodeGroupSubnets,
+                ...props as Omit<ManagedNodeGroup, "id">
             }]
         }});
     }

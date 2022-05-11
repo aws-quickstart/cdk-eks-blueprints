@@ -81,7 +81,7 @@ export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemp
  * Also referred to as "self-managed" node group, implying that maintenance of the group
  * is performed by the customer (as oppposed to AWS as in case of a ManagedNodeGroup).
  */
-export interface AutoscalingNodeGroup extends Omit<AutoScalingGroupCapacityOptions, "minCapacity" | "maxCapacity" | "desiredCapacity" | "instanceType"> {
+export interface AutoscalingNodeGroup extends Omit<AutoScalingGroupCapacityOptions, "minCapacity" | "maxCapacity" | "desiredCapacity" | "instanceType" | "vpcSubnets"> {
 
     /**
      * Id of this node group. Expected to be unique in cluster scope.

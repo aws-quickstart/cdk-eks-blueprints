@@ -178,13 +178,14 @@ export class GenericClusterProvider implements ClusterProvider {
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
-            autoScalingGroupName: nodeGroup.id,
+            autoScalingGroupName: nodeGroup.autoScalingGroupName ?? nodeGroup.id,
             machineImageType,
             instanceType,
             minCapacity: minSize,
             maxCapacity: maxSize,
             desiredCapacity: desiredSize,
             updatePolicy,
+            vpcSubnets: nodeGroup.nodeGroupSubnets,
             ...nodeGroup
         });
     }

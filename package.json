@@ -7,7 +7,7 @@
     "scripts": {
         "build": "rm -rf dist && tsc",
         "watch": "tsc -w",
-        "test": "jest --verbose",
+        "test": "jest --verbose --detectOpenHandles",
         "cdk": "cdk",
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
