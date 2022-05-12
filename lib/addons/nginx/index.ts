@@ -56,7 +56,7 @@ export interface NginxAddOnProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps: NginxAddOnProps = {
-    name: "nginx-ingress",
+    name: "nginx",
     chart: "nginx-ingress",
     release: "blueprints-addon-nginx",
     version: "0.11.3",

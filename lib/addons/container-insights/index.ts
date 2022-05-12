@@ -11,7 +11,7 @@ export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "na
 }
 
 const defaultProps = {
-    name: "adot-exporter-for-eks-on-ec2",
+    name: "container-insights",
     namespace: undefined, // the chart will choke if this value is set
     chart: "adot-exporter-for-eks-on-ec2",
     version: "0.1.0",
@@ -20,6 +20,9 @@ const defaultProps = {
 };
 
 
+/**
+ * Leverages adot-exporter-for-eks-on-ec2 helm chart underneath.
+ */
 export class ContainerInsightsAddOn extends HelmAddOn {
 
     constructor(props?: ContainerInsightAddonProps) {

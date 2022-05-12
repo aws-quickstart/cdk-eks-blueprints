@@ -97,7 +97,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
-        const manifest = new ArgoApplication(deployment.repository).generate(deployment, wave);
+        const manifest = new ArgoApplication(deployment.repository ?? this.options.bootstrapRepo).generate(deployment, wave);
         const construct = clusterInfo.cluster.addManifest(deployment.name, manifest);
         promise.then(chart => {
             construct.node.addDependency(chart);

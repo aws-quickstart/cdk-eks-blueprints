@@ -6,6 +6,7 @@ import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
 import * as team from '../teams';
+import { ArgoGitOpsFactory, GlobalResources, VpcProvider } from "../../lib";
 
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -21,6 +22,7 @@ export interface BlueprintConstructProps {
 
 export default class BlueprintConstruct extends Construct {
     constructor(scope: Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
+        ArgoGitOpsFactory.enableGitOps();
         super(scope, blueprintProps.id);
 
         // TODO: fix IAM user provisioning for admin user
@@ -38,23 +40,37 @@ export default class BlueprintConstruct extends Construct {
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
-            // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
-            //      path: 'envs/dev',
-            //      targetRevision: "deployable",
-            //      credentialsSecretName: 'github-ssh',
-            //      credentialsType: 'SSH'
-            // },
-            // adminPasswordSecretName: "argo-admin-secret"
+            bootstrapRepo: {
+                 repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
+                 path: 'add-ons',
+                 targetRevision: "eks-blueprints-cdk",
+                 credentialsSecretName: 'github-ssh',
+                 credentialsType: 'SSH'
+            },
+            workloadApplications: [
+                {
+                    name: "micro-services",
+                    namespace: "argocd",
+                    repository: {
+                        repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
+                        path: 'envs/dev',
+                        targetRevision: "deployable",
+                    },
+                    values: {
+                        domain: ""
+                    }
+                }
+            ],
+            adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
+            prodBootstrapArgo,
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CalicoAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
-            prodBootstrapArgo,
             new blueprints.addons.SSMAgentAddOn(),
             new blueprints.addons.NginxAddOn({
                 values: {
@@ -85,25 +101,26 @@ export default class BlueprintConstruct extends Construct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new InstanceType('m5.2xlarge')]
                 },
-                {
-                    id: "mng2-custom",
-                    instanceTypes: [new InstanceType('m5.2xlarge')],
-                    nodeGroupCapacityType: CapacityType.SPOT,
-                    customAmi: {
-                        machineImage: ec2.MachineImage.genericLinux({
-                            'us-east-1': 'ami-0b297a512e2852b89',
-                            'us-west-2': 'ami-06a8c459c01f55c7b',
-                            'us-east-2': 'ami-093d9796e55a5b860',
-                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
-                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
-                        }),
-                        userData: userData,
-                    }
-                }
+                // {
+                //     id: "mng2-custom",
+                //     instanceTypes: [new InstanceType('m5.2xlarge')],
+                //     nodeGroupCapacityType: CapacityType.SPOT,
+                //     customAmi: {
+                //         machineImage: ec2.MachineImage.genericLinux({
+                //             'us-east-1': 'ami-0b297a512e2852b89',
+                //             'us-west-2': 'ami-06a8c459c01f55c7b',
+                //             'us-east-2': 'ami-093d9796e55a5b860',
+                //             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                //             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
+                //         }),
+                //         userData: userData,
+                //     }
+                // }
             ]
         });
 
         blueprints.EksBlueprint.builder()
+            .resourceProvider(GlobalResources.Vpc, new VpcProvider('vpc-022cd7c81d1e7c960'))
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams)

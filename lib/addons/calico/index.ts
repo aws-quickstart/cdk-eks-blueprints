@@ -30,7 +30,7 @@ export interface CalicoAddOnProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    name: 'calico-addon',
+    name: 'aws-calico',
     namespace: 'kube-system',
     version: '0.3.10',
     chart: "aws-calico",
