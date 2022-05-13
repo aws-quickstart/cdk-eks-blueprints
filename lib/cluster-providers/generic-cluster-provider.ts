@@ -97,7 +97,7 @@ export class ClusterBuilder {
  */
 export class GenericClusterProvider implements ClusterProvider {
 
-    constructor(private readonly props: GenericClusterProviderProps) {
+    constructor(readonly props: GenericClusterProviderProps) {
         assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0 
             && props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0),
             "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
@@ -178,15 +178,17 @@ export class GenericClusterProvider implements ClusterProvider {
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
-            autoScalingGroupName: nodeGroup.autoScalingGroupName ?? nodeGroup.id,
-            machineImageType,
-            instanceType,
-            minCapacity: minSize,
-            maxCapacity: maxSize,
-            desiredCapacity: desiredSize,
-            updatePolicy,
-            vpcSubnets: nodeGroup.nodeGroupSubnets,
-            ...nodeGroup
+            ...nodeGroup, 
+            ... {
+                autoScalingGroupName: nodeGroup.autoScalingGroupName ?? nodeGroup.id,
+                machineImageType,
+                instanceType,
+                minCapacity: minSize,
+                maxCapacity: maxSize,
+                desiredCapacity: desiredSize,
+                updatePolicy,
+                vpcSubnets: nodeGroup.nodeGroupSubnets,
+            }
         });
     }
 
@@ -214,15 +216,17 @@ export class GenericClusterProvider implements ClusterProvider {
 
         // Create a managed node group.
         const nodegroupOptions: Writeable<eks.NodegroupOptions> = {
-            nodegroupName: nodeGroup.nodegroupName ?? nodeGroup.id,
-            capacityType,
-            instanceTypes,
-            minSize,
-            maxSize,
-            desiredSize,
-            releaseVersion,
-            subnets: nodeGroup.nodeGroupSubnets,
-            ...nodeGroup
+            ...nodeGroup,
+            ...{
+                nodegroupName: nodeGroup.nodegroupName ?? nodeGroup.id,
+                capacityType,
+                instanceTypes,
+                minSize,
+                maxSize,
+                desiredSize,
+                releaseVersion,
+                subnets: nodeGroup.nodeGroupSubnets
+            }
         };
 
         if(nodeGroup.customAmi) {

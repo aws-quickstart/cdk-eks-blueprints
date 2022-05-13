@@ -3,6 +3,7 @@ import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+
 /**
  * Applies all manifests from a directory. Note: The manifests are not checked, 
  * so user must ensure the manifests have the correct namespaces. 

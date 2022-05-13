@@ -1,4 +1,4 @@
-import { aws_autoscaling as asg, aws_ec2 as ec2, aws_eks as eks } from "aws-cdk-lib";
+import { aws_autoscaling as asg, aws_eks as eks } from "aws-cdk-lib";
 // Cluster
 import { ClusterInfo } from "..";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
@@ -38,8 +38,8 @@ export class MngClusterProvider extends GenericClusterProvider {
     constructor(props?: MngClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
+                ...props as Omit<ManagedNodeGroup, "id">,
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
-                ...props as Omit<ManagedNodeGroup, "id">
             }]
         }});
     }
