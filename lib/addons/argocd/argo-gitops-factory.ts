@@ -19,7 +19,7 @@ export class ArgoGitOpsFactory {
 
 export const createArgoHelmApplication = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
     const argoAddOn = getArgoApplicationGenerator(clusterInfo);
-    const values = helmDeployment.dependencyMode ? { [helmDeployment.name]: helmDeployment.values } : helmDeployment.values;
+    const values = helmDeployment.dependencyMode ? { [helmDeployment.chart]: helmDeployment.values } : helmDeployment.values;
     return argoAddOn.generate(clusterInfo, {
         name: helmDeployment.name,
         namespace: helmDeployment.namespace,

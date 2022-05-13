@@ -41,10 +41,10 @@ export default class BlueprintConstruct extends Construct {
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
             bootstrapRepo: {
-                 repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
+                 repoUrl: 'git@github.com:aws-samples/eks-blueprints-add-ons.git',
                  path: 'add-ons',
                  targetRevision: "eks-blueprints-cdk",
-                 credentialsSecretName: 'github-ssh',
+                 credentialsSecretName: 'github-ssh-key',
                  credentialsType: 'SSH'
             },
             workloadApplications: [
