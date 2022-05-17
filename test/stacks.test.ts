@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
