@@ -44,10 +44,7 @@ export function loadExternalYaml(url: string): any {
     /* eslint-disable */
     const request = require('sync-request'); // moved away from import as it is causing open handles that prevents jest from completion
     const response = request('GET', url);
-    if(response.isError()) {
-        throw new Error(`Failed to retrieve ${url} status: ${response.statusCode}`);
-    }
-    return yaml.loadAll(response.getBody.toString());
+    return yaml.loadAll(response.getBody().toString());
 }
 
 export function serializeYaml(document: any): string {
