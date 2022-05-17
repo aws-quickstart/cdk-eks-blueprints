@@ -83,7 +83,8 @@ export default class BlueprintConstruct extends Construct {
                 {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new InstanceType('m5.2xlarge')]
+                    instanceTypes: [new InstanceType('m5.2xlarge')],
+                    diskSize: 25
                 },
                 {
                     id: "mng2-custom",
