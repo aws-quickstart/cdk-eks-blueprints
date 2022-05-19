@@ -25,7 +25,7 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 
 ```bash
 npm install -g aws-cdk@2.20.0 # may require sudo (Ubuntu) depending on configuration
-cdk --verson # must produce 2.20.0
+cdk --version # must produce 2.20.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
