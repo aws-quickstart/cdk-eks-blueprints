@@ -25,3 +25,5 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | fargateProfiles       | A map of Fargate profiles to use with the cluster.
 | vpcSubnets            | The subnets for the cluster.
 | privateCluster        | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
+
+You can find more details on the supported configuration options in the API documentation for the [FargateClusterProviderProps](../api/interfaces/FargateClusterProviderProps.html).

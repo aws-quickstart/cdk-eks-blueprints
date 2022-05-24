@@ -1,9 +1,9 @@
-import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
-import { Template } from 'aws-cdk-lib/assertions';
 
 describe('Unit tests for EKS Blueprint', () => {
 
@@ -190,37 +190,6 @@ test("Named resource providers are correctly registered and discovered", async (
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.HostedZone)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.Certificate)).toBeDefined();
     expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
-});
-
-test("Generic cluster provider correctly registers managed node groups", async () => {
-    const app = new cdk.App();
-
-    const clusterProvider = blueprints.clusterBuilder()
-    .managedNodeGroup({
-        id: "mng1",
-        maxSize: 2,
-        nodeGroupCapacityType: CapacityType.SPOT
-    })
-    .managedNodeGroup({
-        id: "mng2",
-        maxSize:1
-    })
-    .fargateProfile("fp1", {
-        selectors: [
-            {
-                namespace: "default"
-            }
-        ]
-    }).build();
-
-    const blueprint =  await blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-1')
-        .clusterProvider(clusterProvider)
-        .addOns(new blueprints.ClusterAutoScalerAddOn)
-        .buildAsync(app, 'stack-with-resource-providers');
-    
-    expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
-    expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
 });
 
 test("Building blueprint with builder properly clones properties", () => {

@@ -2,6 +2,15 @@
 
 The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity.
 
+# Configuration
+
+Full list of configuration options:
+
+- [Generic Cluster Provider](../api/interfaces/GenericClusterProviderProps.html)
+- [Managed Node Group](../api/interfaces/ManagedNodeGroup.html)
+- [Autoscaling Group](../api/interface/../interfaces/AutoscalingNodeGroup.html)
+- [Fargate Cluster](../api/interfaces/FargateClusterProviderProps.html)
+
 ## Usage 
 
 ```typescript
@@ -11,7 +20,8 @@ const clusterProvider = new blueprints.GenericClusterProvider({
         {
             id: "mng1",
             amiType: NodegroupAmiType.AL2_X86_64,
-            instanceTypes: [new InstanceType('m5.2xlarge')]
+            instanceTypes: [new InstanceType('m5.2xlarge')],
+            diskSize: 50
         },
         {
             id: "mng2-custom",
@@ -61,6 +71,8 @@ Default configuration for managed and autoscaling node groups can also be suppli
 - `eks.default.private-cluster`
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass individual `GenericProviderClusterProps` to each cluster blueprint.
+
+You can find more details on the supported configuration options in the API documentation for the [GenericClusterProviderProps](../api/interfaces/GenericClusterProviderProps.html).
 
 ## Upgrading Control Plane
 
