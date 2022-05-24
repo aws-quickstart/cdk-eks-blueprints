@@ -36,7 +36,13 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                 userData: userData,
             }
         }
-    ]
+    ],
+  fargateProfiles: {
+              "fp1": {
+                  fargateProfileName: "fp1",
+                  selectors:  [{ namespace: "serverless1" }] 
+              }
+          }
 });
 
 EksBlueprint.builder()
