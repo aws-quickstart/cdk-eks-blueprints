@@ -11,6 +11,9 @@ test("Generic cluster provider correctly registers managed node groups", async (
     const app = new cdk.App();
 
     const clusterProvider = blueprints.clusterBuilder()
+    .withCommonOptions({
+        serviceIpv4Cidr: "10.43.0.0/16"
+    })
     .managedNodeGroup({
         id: "mng1",
         maxSize: 2,
@@ -27,6 +30,8 @@ test("Generic cluster provider correctly registers managed node groups", async (
             }
         ]
     }).build();
+
+    expect(clusterProvider.props.serviceIpv4Cidr).toBe("10.43.0.0/16");
 
     const blueprint =  await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
