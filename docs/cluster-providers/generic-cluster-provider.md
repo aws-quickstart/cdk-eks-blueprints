@@ -16,6 +16,7 @@ Full list of configuration options:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_21,
+    serviceIpv4Cidr: "10.43.0.0/16"
     managedNodeGroups: [
         {
             id: "mng1",
@@ -37,12 +38,12 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             }
         }
     ],
-  fargateProfiles: {
-              "fp1": {
-                  fargateProfileName: "fp1",
-                  selectors:  [{ namespace: "serverless1" }] 
-              }
-          }
+    fargateProfiles: {
+        "fp1": {
+            fargateProfileName: "fp1",
+            selectors:  [{ namespace: "serverless1" }] 
+        }
+    }
 });
 
 EksBlueprint.builder()

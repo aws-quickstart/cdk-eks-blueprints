@@ -17,7 +17,7 @@ export function clusterBuilder() {
  * Properties for the generic cluster provider, containing definitions of managed node groups, 
  * auto-scaling groups, fargate profiles. 
  */
-export interface GenericClusterProviderProps extends eks.CommonClusterOptions {
+export interface GenericClusterProviderProps extends eks.ClusterOptions {
 
     /**
      * Whether API server is private.
@@ -60,7 +60,7 @@ export class ClusterBuilder {
         this.props = {...this.props, ...{version: eks.KubernetesVersion.V1_21}};
     }
 
-    withCommonOptions(options: Partial<eks.CommonClusterOptions>): this {
+    withCommonOptions(options: Partial<eks.ClusterOptions>): this {
         this.props = {...this.props, ...options};
         return this;
     }
@@ -127,7 +127,7 @@ export class GenericClusterProvider implements ClusterProvider {
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
-        const clusterOptions = {...this.props, ...defaultOptions };
+        const clusterOptions = { ...defaultOptions, ...this.props };
         // Create an EKS Cluster
         const cluster = this.internalCreateCluster(scope, id, clusterOptions);
         cluster.node.addDependency(vpc);

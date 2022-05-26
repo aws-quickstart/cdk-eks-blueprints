@@ -220,7 +220,7 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_22
+        version: KubernetesVersion.V1_21
     });
 
     const stack = blueprint.build(app, "builder-version-test1");

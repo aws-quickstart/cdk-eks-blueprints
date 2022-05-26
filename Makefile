@@ -49,9 +49,11 @@ destroy-all:
 	$(CDK) destroy --verbose --all --force
 
 mkdocs:
+	npx typedoc --out docs/api lib/index.ts
 	mkdocs serve 
 
 push-mkdocs:
+	npx typedoc --out docs/api lib/index.ts
 	mkdocs gh-deploy
 
 bootstrap:

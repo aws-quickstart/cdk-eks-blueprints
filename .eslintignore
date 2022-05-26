@@ -11,3 +11,5 @@ cdk.out
 jest.config.js
 
 site
+
+docs
