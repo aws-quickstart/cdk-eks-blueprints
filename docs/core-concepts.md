@@ -20,7 +20,7 @@ To view sample `blueprint` implementations, please see our [patterns repository]
 
 ## Cluster
 
-A `cluster` is simply an EKS cluster. The `eks-blueprints` framework provides for customizing the compute options you leverage with your `clusters`. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `EC2ClusterProvider`.
+A `cluster` is simply an EKS cluster. The `eks-blueprints` framework provides for customizing the compute options you leverage with your `clusters`. The framework currently supports `EC2`, `Fargate` and `BottleRocket` instances. To specify the type of compute you want to use for your `cluster`, you supply a `ClusterProvider` object to your `blueprint`. The framework defaults to leveraging the `MngClusterProvider`.
 
 Each `ClusterProvider` provides additional configuration options as well. For example, the `MngClusterProvider` allows you to configure instance types, min and max instance counts, and amiType, among other options. 
 
