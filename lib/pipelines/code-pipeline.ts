@@ -5,6 +5,7 @@ import * as cdkpipelines from 'aws-cdk-lib/pipelines';
 import * as assert from "assert";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
+import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 
 export {
     cdkpipelines
@@ -33,6 +34,26 @@ export interface GitHubSourceRepository extends Omit<ApplicationRepository, "cre
 }
 
 /**
+ * Props for the CodeCommit repository.
+ */
+export type CodeCommitProps = {
+    /**
+     * The name of the CodeCommit repository.
+     */
+    repoName: string;
+
+    /**
+     * The name of the CodeCommit repository branch.
+     */
+    branch?: string;
+
+    /**
+     * Optional CodeCommitSourceOptions.
+     */
+    options?: cdkpipelines.CodeCommitSourceOptions;
+}
+
+/**
  * Props for the Pipeline.
  */
 export type PipelineProps = {
@@ -48,9 +69,14 @@ export type PipelineProps = {
     owner: string;
 
     /**
-     * Repository for the pipeline
+     * Repository for the pipeline (GitHub handle).
      */
     repository: GitHubSourceRepository;
+
+    /**
+     * CodeCommit repository properties for the pipeline (CodeCommit handle).
+     */
+    codeCommitProps: CodeCommitProps;
 
     /**
      * Pipeline stages and options.
@@ -132,6 +158,11 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
+    public codeCommitProps(codeCommitProps: CodeCommitProps): CodePipelineBuilder {
+        this.props.codeCommitProps = codeCommitProps;
+        return this;
+    }
+
     /**
      * Adds standalone pipeline stages (in the order of invocation and elements in the input array)
      * @param stackStages 
@@ -157,7 +188,6 @@ export class CodePipelineBuilder implements StackBuilder {
     
     build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
         assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
-        assert(this.props.owner,"owner field is required for the pipeline stack Please provide value.");
         assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
         const fullProps = this.props as PipelineProps;
         return new CodePipelineStack(scope, fullProps, id, stackProps);
@@ -240,19 +270,35 @@ export class ApplicationStage extends cdk.Stage {
 class CodePipeline {
 
     public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
-        const branch = props.repository.targetRevision ?? 'main';
         let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
+        let codePipelineSource : cdkpipelines.CodePipelineSource | undefined = undefined;
 
-        if(props.repository.credentialsSecretName) {
-            githubProps = {
-                authentication: cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!)
-            };
+        if ((props.codeCommitProps) && (props.repository)) {
+            throw new Error("Only one type of codePipelineSource is supported: repository for GitHub, codeCommitProps for AWS CodeCommit.");
+        }
+
+        if (props.codeCommitProps) {
+            codePipelineSource = cdkpipelines.CodePipelineSource.codeCommit(
+                codecommit.Repository.fromRepositoryName(
+                    scope, 'cdk-eks-blueprints', props.codeCommitProps.repoName),
+                    props.codeCommitProps.branch ?? 'master',
+                    props.codeCommitProps.options);
+        } else {
+            if (props.repository.credentialsSecretName) {
+                githubProps = {
+                    authentication: cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!)
+                };
+            }
+            codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
+                `${props.owner}/${props.repository.repoUrl}`,
+                props.repository.targetRevision ?? 'main',
+                githubProps);
         }
 
         return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
-              input: cdkpipelines.CodePipelineSource.gitHub(`${props.owner}/${props.repository.repoUrl}`, branch, githubProps), 
+              input: codePipelineSource,
               installCommands: [
                 'npm install --global npm',
                 'npm install -g aws-cdk@2.25.0',
