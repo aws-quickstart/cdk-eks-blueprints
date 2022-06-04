@@ -14,7 +14,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 # Normal Usage
-const addOn = new blueprints.addons.KedaAddOn();
+# const addOn = new blueprints.addons.KedaAddOn();
 # In case of AWS SQS, there is a workaround required when initializing keda (Please refer https://github.com/kedacore/keda/issues/837#issuecomment-789037326 )
 const addOn = new blueprints.addons.KedaAddOn({podSecurityContextFsGroup: 1001, securityContextRunAsGroup: 1001, securityContextRunAsUser: 1001, irsaRoles: {"cloudwatch":"CloudWatchFullAccess", "sqs":"AmazonSQSFullAccess"});
 
