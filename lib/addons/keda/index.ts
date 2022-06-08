@@ -1,5 +1,6 @@
 import { Construct } from 'constructs';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import merge from "ts-deepmerge";
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi";
 import { setPath, createNamespace } from "../../utils";
@@ -17,7 +18,7 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
      */
     kedaOperatorName?: string,
     /**
-     * Specifies whether a service account should be created. 
+     * Specifies whether a service account should be created by keda. If provided false, CDK will create Service Account wth IAM Roles (IRSA). 
      */
     createServiceAccount?: boolean,
     /**
@@ -42,7 +43,7 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
     /**
      * Th Dictionary of MAnaged IAM Roles which Sercice Account needs for IRSA Eg: irsaRoles: {"cloudwatch":"CloudWatchFullAccess", "sqs":"AmazonSQSFullAccess"}
      */   
-    irsaRoles?: {}
+    irsaRoles?: string[]
 
 }
 
@@ -60,7 +61,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   createServiceAccount: true,
   kedaOperatorName: "keda-operator",
   kedaServiceAccountName: "keda-operator",
-  irsaRoles: {"cloudwatch":"CloudWatchFullAccess"}
+  irsaRoles: ["CloudWatchFullAccess"]
 };
 
 /**
@@ -78,6 +79,8 @@ export class KedaAddOn extends HelmAddOn {
     //Create Service Account with IRSA
     const cluster = clusterInfo.cluster;
     let values: Values = populateValues(this.options);
+    values = merge(values, this.props.values ?? {});
+
     if(this.options.createServiceAccount === false) {
       const opts = { name: this.options.kedaOperatorName, namespace: this.options.namespace };
       const sa = cluster.addServiceAccount(this.options.kedaServiceAccountName!, opts);
@@ -118,13 +121,13 @@ function populateValues(helmOptions: KedaAddOnProps): Values {
 /**
  * This function will set the roles to Service Account
  * @param sa - Service Account Object
- * @param irsaRoles - Dict of Managed IAM Roles
+ * @param irsaRoles - Array  of Managed IAM Roles
  */
-function setRoles(sa:any ,irsaRoles:{}){
-  for (let [key, value] of Object.entries(irsaRoles)) {
-      const policyName:string = value as string;
-      const policy = ManagedPolicy.fromAwsManagedPolicyName(policyName);
-      sa.role.addManagedPolicy(policy);
-  }
-  
+function setRoles(sa:any, irsaRoles: string[]){
+    irsaRoles.forEach((policyName) => {
+        //const policyName:string = value as string;
+        const policy = ManagedPolicy.fromAwsManagedPolicyName(policyName);
+        sa.role.addManagedPolicy(policy);
+      });
 }
+  
