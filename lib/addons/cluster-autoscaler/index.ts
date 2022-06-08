@@ -17,6 +17,11 @@ export interface ClusterAutoScalerAddOnProps extends HelmAddOnUserProps {
      * @default auto discovered based on EKS version.
      */
     version?: string;
+
+    /**
+     * Create namespace
+     */
+    createNamespace?: boolean;
 }
 
 const RELEASE = 'blueprints-addon-cluster-autoscaler';
@@ -24,7 +29,7 @@ const NAME = 'cluster-autoscaler';
 /**
  * Defaults options for the add-on
  */
-const defaultProps = {
+const defaultProps: ClusterAutoScalerAddOnProps = {
     chart: NAME,
     name: NAME,
     namespace: 'kube-system',
@@ -49,7 +54,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
     private options: ClusterAutoScalerAddOnProps;
 
     constructor(props?: ClusterAutoScalerAddOnProps) {
-        super({ ...defaultProps, ...props });
+        super({ ...defaultProps as any, ...props });
         this.options = this.props;
     }
     
@@ -66,7 +71,6 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         const nodeGroups = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
         const values = this.options.values || {};
         const namespace = this.options.namespace!;
-        const createANamespace = (this.options.namespace == "kube-system") ? false : true;
         
         // Create IAM Policy
         const autoscalerStmt = new iam.PolicyStatement();
@@ -95,10 +99,10 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
         }
         
         // Create namespace
-        if (createANamespace){
-            createNamespace(namespace, cluster, true, true);
+        if (this.options.createNamespace) {
+            createNamespace(namespace, cluster, true);
         }
-        
+
         // Create IRSA
         const sa = createServiceAccount(cluster, RELEASE, namespace, autoscalerPolicyDocument);
 
