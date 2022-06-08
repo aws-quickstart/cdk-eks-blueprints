@@ -48,7 +48,9 @@ Configuration can also be supplied via context variables (specify in cdk.json, c
 - `eks.default.instance-type` 
 - `eks.default.private-cluster`
 
-Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `MngProviderClusterProps` to each cluster blueprint.
+Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `MngClusterProviderProps` to each cluster blueprint.
+
+You can find more details on the supported configuration options in the API documentation for the [MngClusterProviderProps](../api/interfaces/MngClusterProviderProps.html).
 
 ## Upgrading Worker Nodes
 

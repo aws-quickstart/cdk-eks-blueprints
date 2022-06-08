@@ -50,6 +50,7 @@ nav:
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
   - Extensibility: 'extensibility.md'
+  - API Reference: '../api'
 markdown_extensions:
   - def_list
   - pymdownx.highlight  
