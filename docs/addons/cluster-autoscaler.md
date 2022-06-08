@@ -23,12 +23,18 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Functionality
 
-1. Adds proper IAM permissions (such as modify autoscaling groups, terminate instances, etc.) to the NodeGroup IAM role. 
-2. Configures service account, cluster roles, roles, role bindings and deployment.
+1. Configure proper IAM permissions (such as modify autoscaling groups, terminate instances, etc.) as a Policy. 
+2. Configures IAM Role for Service Account (IRSA) with the generated policy.
 3. Resolves proper CA image to pull based on the Kubernetes version.
-4. Configuration allows passing a specific version of the image to pull.
-5. Applies proper tags for discoverability to the EC2 instances.
-6. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+4. Applies proper tags for discoverability to the EC2 instances.
+5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+
+The add-on automatically sets the following Helm Chart [values](https://github.com/kubernetes/autoscaler/tree/master/charts/cluster-autoscaler#values), and it is **highly recommended** not to pass these values in (as it will result in a failed deployment):
+- cloudProvider
+- autoDiscovery.clusterName
+- awsRegion
+- rbac.serviceAccount.create
+- rbac.serviceAccount.name
 
 ## Testing the scaling functionality
 
