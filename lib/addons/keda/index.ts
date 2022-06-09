@@ -18,9 +18,13 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
      */
     kedaOperatorName?: string,
     /**
-     * Specifies whether a service account should be created by keda. If provided false, CDK will create Service Account wth IAM Roles (IRSA). 
+     * Specifies whether a service account should be created by by CDK with IRSA. If provided false, Service Account will be created by Keda without IRSA
      */
-    createServiceAccount?: boolean,
+     enableIRSA?: boolean,
+     /**
+      * Specifies whether a service account should be created by Keda, by default its true, but in case IRSA is true it will be set to false automatically
+      */
+     createServiceAccount?: boolean,
     /**
      * The name of the service account to use. If not set and create is true, a name is generated.
      */
@@ -41,7 +45,7 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
      */
     securityContextRunAsUser?: number,
     /**
-     * Th Dictionary of MAnaged IAM Roles which Sercice Account needs for IRSA Eg: irsaRoles: {"cloudwatch":"CloudWatchFullAccess", "sqs":"AmazonSQSFullAccess"}
+     * An array of MAnaged IAM Roles which Sercice Account needs for IRSA Eg: irsaRoles:["CloudWatchFullAccess","AmazonSQSFullAccess"]
      */   
     irsaRoles?: string[]
 
@@ -58,6 +62,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},
+  enableIRSA: false,
   createServiceAccount: true,
   kedaOperatorName: "keda-operator",
   kedaServiceAccountName: "keda-operator",
@@ -76,15 +81,16 @@ export class KedaAddOn extends HelmAddOn {
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    //Create Service Account with IRSA
+    
     const cluster = clusterInfo.cluster;
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
-
-    if(this.options.createServiceAccount === false) {
+    
+    if (this.options.enableIRSA === true) {
+      //Create Service Account with IRSA
       const opts = { name: this.options.kedaOperatorName, namespace: this.options.namespace };
       const sa = cluster.addServiceAccount(this.options.kedaServiceAccountName!, opts);
-      setRoles(sa,this.options.irsaRoles!)
+      setRoles(sa,this.options.irsaRoles!);
       const namespace = createNamespace(this.options.namespace! , cluster);
       sa.node.addDependency(namespace);
       
@@ -93,6 +99,7 @@ export class KedaAddOn extends HelmAddOn {
       return Promise.resolve(chart);
 
     } else {
+      //Let Keda Create Service account for you. This is controlled by flag helmOptions.createServiceAccount (refer line no:118)
       const chart = this.addHelmChart(clusterInfo, values);
       return Promise.resolve(chart);
     }
@@ -107,6 +114,10 @@ export class KedaAddOn extends HelmAddOn {
  */
 function populateValues(helmOptions: KedaAddOnProps): Values {
   const values = helmOptions.values ?? {};
+  //In Case enableIRSA is true, code should not allow Keda to create Service Account, CDK will create Service Account with IRSA enabled
+  if(helmOptions.enableIRSA === true){
+    helmOptions.createServiceAccount = false;
+  }
   // Check the workaround for SQS Scalar https://github.com/kedacore/keda/issues/837
   setPath(values, "operator.name",  helmOptions.kedaOperatorName);
   setPath(values, "podSecurityContext.fsGroup",  helmOptions.podSecurityContextFsGroup);
@@ -121,13 +132,12 @@ function populateValues(helmOptions: KedaAddOnProps): Values {
 /**
  * This function will set the roles to Service Account
  * @param sa - Service Account Object
- * @param irsaRoles - Array  of Managed IAM Roles
+ * @param irsaRoles - Array  of Managed IAM Policies
  */
-function setRoles(sa:any, irsaRoles: string[]){
+ function setRoles(sa:any, irsaRoles: string[]){
     irsaRoles.forEach((policyName) => {
-        //const policyName:string = value as string;
         const policy = ManagedPolicy.fromAwsManagedPolicyName(policyName);
         sa.role.addManagedPolicy(policy);
       });
-}
+  }
   

@@ -16,7 +16,14 @@ const app = new cdk.App();
 # Normal Usage
 # const addOn = new blueprints.addons.KedaAddOn();
 # In case of AWS SQS, there is a workaround required when initializing keda (Please refer https://github.com/kedacore/keda/issues/837#issuecomment-789037326 )
-const addOn = new blueprints.addons.KedaAddOn({podSecurityContextFsGroup: 1001, securityContextRunAsGroup: 1001, securityContextRunAsUser: 1001, irsaRoles: {"cloudwatch":"CloudWatchFullAccess", "sqs":"AmazonSQSFullAccess"});
+const kedaParams = {
+    podSecurityContextFsGroup: 1001,
+    securityContextRunAsGroup: 1001,
+    securityContextRunAsUser: 1001,
+    enableIRSA: true,
+    irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
+}
+const addOn = new blueprints.addons.KedaAddOn(kedaParams)
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -27,7 +34,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 - `version`: Version fo the Helm Chart to be used to install Kubevious
 - `kedaOperatorName`: Name of the KEDA operator
-- `createServiceAccount`: Specifies whether a service account should be created. 
+- `enableIRSA`: Specifies whether a service account should be created by by CDK with IRSA. If provided false, Service Account will be created by Keda without IRSA
+- `createServiceAccount`: Specifies whether a service account should be created by Keda. 
 - `kedaServiceAccountName`: The name of the service account to use. If not set and create is true, a name is generated.
 - `podSecurityContextFsGroup`: PodSecurityContext holds pod-level security attributes and common container settings. fsGroup is a special supplemental group that applies to all containers in a pod. This is an optional attribute, exposed directly inorder to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
 - `securityContextRunAsUser`: SecurityContext holds security configuration that will be applied to a container. runAsUser is the UID to run the entrypoint of the container process. This is an optional attribute, exposed directly inorder to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
