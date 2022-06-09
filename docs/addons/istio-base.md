@@ -44,7 +44,7 @@ workloadentries.networking.istio.io          2022-05-05T02:16:23Z
 workloadgroups.networking.istio.io           2022-05-05T02:16:23Z
 ```
 
-Note that the all the CRDs are created in the `istio-system` namespace.
+Note that the all the CRDs are created in provided namespace (istio-system by default).
 
 Once deployed, it allows the control plane to be installed.
 

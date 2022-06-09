@@ -48,7 +48,7 @@ import * as blueprints from '@edgarsilva948/eks-blueprints';
 
 const app = new cdk.App();
 
-const IstioControlPlaneAddOnProps = {
+const istioControlPlaneAddOnProps = {
   values: {
     pilot: {
       autoscaleEnabled: true,

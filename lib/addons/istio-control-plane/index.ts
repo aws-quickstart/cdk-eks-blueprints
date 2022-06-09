@@ -5,7 +5,7 @@ import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { dependable } from '../../utils';
 import { ValuesSchema } from "./values";
 
-export interface IstioControlPlaneAddOnProps extends Omit<HelmAddOnUserProps, "namespace"> {
+export interface IstioControlPlaneAddOnProps extends HelmAddOnUserProps {
     values?: ValuesSchema
 }
 
