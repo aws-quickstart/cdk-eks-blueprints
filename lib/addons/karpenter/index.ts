@@ -21,6 +21,12 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
         'karpenter.sh/capacity-type'?: string[],
     }
 
+    taints?:{
+        key: string,
+        value: string,
+        effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
+    } 
+
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
      */
@@ -45,7 +51,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.8.2',
+    version: '0.10.1',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -74,6 +80,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const provisionerSpecs = this.options.provisionerSpecs || {};
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
+        const taints = this.options.taints || {};
 
         // Tag VPC Subnets
         if (subnetTags){
@@ -149,6 +156,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 metadata: { name: 'default' },
                 spec: {
                     requirements: this.convertToSpec(provisionerSpecs),
+                    taints: taints,
                     provider: {
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
