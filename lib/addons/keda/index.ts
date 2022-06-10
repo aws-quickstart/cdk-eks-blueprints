@@ -1,5 +1,6 @@
 import { Construct } from 'constructs';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import merge from "ts-deepmerge";
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi";
@@ -12,42 +13,35 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
     /**
      * Version of the helm chart to deploy
      */    
-    version?: string,
+    version?: string;
     /**
      * Name of the KEDA operator
      */
-    kedaOperatorName?: string,
-    /**
-     * Specifies whether a service account should be created by by CDK with IRSA. If provided false, Service Account will be created by Keda without IRSA
-     */
-     enableIRSA?: boolean,
-     /**
-      * Specifies whether a service account should be created by Keda, by default its true, but in case IRSA is true it will be set to false automatically
-      */
-     createServiceAccount?: boolean,
+    kedaOperatorName?: string;
     /**
      * The name of the service account to use. If not set and create is true, a name is generated.
      */
-    kedaServiceAccountName?: string,
+    kedaServiceAccountName?: string;
     /**
      * securityContext: fsGroup
      * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
      */   
-    podSecurityContextFsGroup?: number,
-    /**
-     * securityContext:runAsUser
-     * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
-     */   
-    securityContextRunAsGroup?: number,
+    podSecurityContextFsGroup?: number;
     /**
      * securityContext:runAsGroup
      * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
-     */
-    securityContextRunAsUser?: number,
-    /**
-     * An array of MAnaged IAM Roles which Sercice Account needs for IRSA Eg: irsaRoles:["CloudWatchFullAccess","AmazonSQSFullAccess"]
      */   
-    irsaRoles?: string[]
+    securityContextRunAsGroup?: number;
+    /**
+     * securityContext:runAsUser
+     * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+     */
+    securityContextRunAsUser?: number;
+    /**
+     * An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["CloudWatchFullAccess","AmazonSQSFullAccess"]. If not empty
+     * Service Account will be Created by CDK with IAM Roles Mapped (IRSA). In case if its empty, Keda will create the Service Account with out IAM Roles
+     */   
+    irsaRoles?: string[];
 
 }
 
@@ -62,11 +56,9 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},
-  enableIRSA: false,
-  createServiceAccount: true,
   kedaOperatorName: "keda-operator",
   kedaServiceAccountName: "keda-operator",
-  irsaRoles: ["CloudWatchFullAccess"]
+  irsaRoles: []
 };
 
 /**
@@ -86,7 +78,7 @@ export class KedaAddOn extends HelmAddOn {
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
     
-    if (this.options.enableIRSA === true) {
+    if (this.options.irsaRoles!.length > 0) {
       //Create Service Account with IRSA
       const opts = { name: this.options.kedaOperatorName, namespace: this.options.namespace };
       const sa = cluster.addServiceAccount(this.options.kedaServiceAccountName!, opts);
@@ -114,16 +106,14 @@ export class KedaAddOn extends HelmAddOn {
  */
 function populateValues(helmOptions: KedaAddOnProps): Values {
   const values = helmOptions.values ?? {};
-  //In Case enableIRSA is true, code should not allow Keda to create Service Account, CDK will create Service Account with IRSA enabled
-  if(helmOptions.enableIRSA === true){
-    helmOptions.createServiceAccount = false;
-  }
+
   // Check the workaround for SQS Scalar https://github.com/kedacore/keda/issues/837
   setPath(values, "operator.name",  helmOptions.kedaOperatorName);
   setPath(values, "podSecurityContext.fsGroup",  helmOptions.podSecurityContextFsGroup);
   setPath(values, "securityContext.runAsGroup",  helmOptions.securityContextRunAsGroup);
   setPath(values, "securityContext.runAsUser",  helmOptions.securityContextRunAsUser);
-  setPath(values, "serviceAccount.create",  helmOptions.createServiceAccount); 
+  //In Case irsaRoles array is non empty, code should not allow Keda to create Service Account, CDK will create Service Account with IRSA enabled
+  setPath(values, "serviceAccount.create",  helmOptions.irsaRoles!.length > 0 ? false : true); 
   setPath(values, "serviceAccount.name",  helmOptions.kedaServiceAccountName); 
 
   return values;
@@ -134,7 +124,7 @@ function populateValues(helmOptions: KedaAddOnProps): Values {
  * @param sa - Service Account Object
  * @param irsaRoles - Array  of Managed IAM Policies
  */
- function setRoles(sa:any, irsaRoles: string[]){
+ function setRoles(sa:ServiceAccount, irsaRoles: string[]){
     irsaRoles.forEach((policyName) => {
         const policy = ManagedPolicy.fromAwsManagedPolicyName(policyName);
         sa.role.addManagedPolicy(policy);

@@ -1,4 +1,4 @@
-# Kubevious Add-on
+# Keda Add-on
 
 This add-on installs [Keda](https://github.com/kedacore/keda) Kubernetes-based Event Driven Autoscaling.
 
@@ -20,7 +20,6 @@ const kedaParams = {
     podSecurityContextFsGroup: 1001,
     securityContextRunAsGroup: 1001,
     securityContextRunAsUser: 1001,
-    enableIRSA: true,
     irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
 }
 const addOn = new blueprints.addons.KedaAddOn(kedaParams)
@@ -32,20 +31,19 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Configuration Options
 
-- `version`: Version fo the Helm Chart to be used to install Kubevious
+- `version`: Version fo the Helm Chart to be used to install Keda
 - `kedaOperatorName`: Name of the KEDA operator
-- `enableIRSA`: Specifies whether a service account should be created by by CDK with IRSA. If provided false, Service Account will be created by Keda without IRSA
 - `createServiceAccount`: Specifies whether a service account should be created by Keda. 
 - `kedaServiceAccountName`: The name of the service account to use. If not set and create is true, a name is generated.
-- `podSecurityContextFsGroup`: PodSecurityContext holds pod-level security attributes and common container settings. fsGroup is a special supplemental group that applies to all containers in a pod. This is an optional attribute, exposed directly inorder to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
-- `securityContextRunAsUser`: SecurityContext holds security configuration that will be applied to a container. runAsUser is the UID to run the entrypoint of the container process. This is an optional attribute, exposed directly inorder to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
-- `securityContextRunAsGroup`: SecurityContext holds security configuration that will be applied to a container. rusAsGroup The GID to run the entrypoint of the container process. This is an optional attribute, exposed directly inorder to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
-
-- `values`: Arbitrary values to pass to the chart. Refer to the Kubevious [Helm Chart documentation](https://github.com/kubevious/helm) for additional details
+- `podSecurityContextFsGroup`: PodSecurityContext holds pod-level security attributes and common container settings. fsGroup is a special supplemental group that applies to all containers in a pod. This is an optional attribute, exposed directly in order to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+- `securityContextRunAsUser`: SecurityContext holds security configuration that will be applied to a container. runAsUser is the UID to run the entrypoint of the container process. This is an optional attribute, exposed directly in order to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+- `securityContextRunAsGroup`: SecurityContext holds security configuration that will be applied to a container. runAsGroup is the GID to run the entrypoint of the container process. This is an optional attribute, exposed directly in order to make KedaScalar workaroud - https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+- `irsaRoles` - An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["CloudWatchFullAccess","AmazonSQSFullAccess"]. If not empty the Service Account will be created by the CDK with IAM Roles Mapped (IRSA). In case if its empty, Keda will create the Service Account with out IAM Roles
+- `values`: Arbitrary values to pass to the chart. Refer to the Keda [Helm Chart documentation](https://github.com/kedacore/charts) for additional details
 
 ## Validation
 
-To validate that Kubevious is installed properly in the cluster, check that the Kubevious deployments,
+To validate that Keda is installed properly in the cluster, check that the Keda deployments,
 services and stateful sets are running.
 
 ```shell
@@ -72,8 +70,9 @@ There should be an Service Account with name KedaOperator created and you can se
 
 We will test AWS SQS Scalar here
 1) Create SQS Queue in desired region
+Replace ${AWS_REGION} with your target region
 ```shell
-    aws sqs create-queue --queue-name keda-test --region REGION_NAME --output json
+    aws sqs create-queue --queue-name keda-test --region ${AWS_REGION} --output json
 ```
 2) Create a deployment with SQS Consumer, For simplicity we will create an nginx deployment (in real case scenarion it should be an SQS Consumer)
 After the port-forwarding has started, the application can be accessed by navigating to http://localhost:8080
@@ -82,6 +81,7 @@ kubectl create ns sqs-consumer
 kubectl create deployment sqs-consumer --image nginx -n sqs-consumer
 ```
 3) Create SQS Scalar by creating and applying following yaml file for eg: keda-scalar.yaml
+Replace ${AWS_REGION} with your target region
 ```yaml
 ---
 apiVersion: keda.sh/v1alpha1 # https://keda.sh/docs/2.0/concepts/scaling-deployments/
@@ -103,9 +103,9 @@ spec:
   triggers:
   - type: aws-sqs-queue
     metadata:
-      queueURL: https://sqs.AWS_REGION.amazonaws.com/ACCOUNT_NUMBER/sqs-consumer
+      queueURL: https://sqs.${AWS_REGION}.amazonaws.com/ACCOUNT_NUMBER/sqs-consumer
       queueLength: "5"
-      awsRegion: "AWS_REGION"
+      awsRegion: "${AWS_REGION}"
       identityOwner: operator
 ---
 ```
@@ -117,12 +117,13 @@ spec:
  kubectl get hpa -n sqs-consumer
 ```
 5) Now send 10 Messages to sqs queue
+Replace ${AWS_REGION} with your target region
 ```shell
 x=10
 a=0
 while [ $a -lt $x ]
 do
-   aws sqs send-message --region AWS_REGION --endpoint-url https://sqs.AWS_REGION.amazonaws.com/ --queue-url https://sqs.AWS_REGION.amazonaws.com/ACCOUNT_NUMBER/sqs-consumer  --message-body '{"key": "value"}'
+   aws sqs send-message --region ${AWS_REGION} --endpoint-url https://sqs.${AWS_REGION}.amazonaws.com/ --queue-url https://sqs.${AWS_REGION}.amazonaws.com/ACCOUNT_NUMBER/sqs-consumer  --message-body '{"key": "value"}'
    a=`expr $a + 1`
 done
 
@@ -132,8 +133,9 @@ done
  kubectl get pods -n sqs-consumer
 ```
 7) Purge the SQS queue to test scale in event
+Replace ${AWS_REGION} with your target region
 ```shell
-aws sqs purge-queue --queue-url https://sqs.AWS_REGION.amazonaws.com/CCOUNT_NUMBER/sqs-consumer  
+aws sqs purge-queue --queue-url https://sqs.${AWS_REGION}.amazonaws.com/CCOUNT_NUMBER/sqs-consumer  
 ```
 6) Verify if the nginx pod is scaledd in from 2 to 1 after teh cool down perion set (500 in this case)
 ```shell

@@ -74,7 +74,6 @@ export default class BlueprintConstruct extends Construct {
                 podSecurityContextFsGroup: 1001,
                 securityContextRunAsGroup: 1001,
                 securityContextRunAsUser: 1001,
-                enableIRSA: true,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
         ];
