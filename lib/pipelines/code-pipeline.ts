@@ -182,13 +182,18 @@ export class CodePipelineBuilder implements StackBuilder {
 export class CodePipelineStack extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465k6";
+    static readonly USAGE_ID_MULTI_ACCOUNT = "qs-1s1r465f2";
 
     static builder() {
         return new CodePipelineBuilder();
     }
 
     constructor(scope: Construct, pipelineProps: PipelineProps, id: string,  props?: StackProps) {
-        super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
+        if (pipelineProps.crossAccountKeys){
+            super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID_MULTI_ACCOUNT, props));
+        } else {
+            super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
+        }
         const pipeline  = CodePipeline.build(this, pipelineProps);
 
         let promises : Promise<ApplicationStage>[] = [];

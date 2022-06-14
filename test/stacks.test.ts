@@ -148,6 +148,55 @@ describe('Unit tests for EKS Blueprint', () => {
         expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
     });
 
+    test('Pipeline Builder creates multi-account pipeline', () => {
+
+        const app = new cdk.App();
+        const devTestAccount = "123456789012";
+        const prodAccount = "123456789013";
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account(devTestAccount)
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .owner('shapirov103')
+            .enableCrossAccountKeys()
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline'
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('dev-east-2')},
+                ]
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2', prodAccount),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("qs-1s1r465f2");
+    });
+
     test("Nested stack add-on creates correct nested stack", async () => {
         const app = new cdk.App();
         const vpcAddOn = new blueprints.NestedStackAddOn( {
