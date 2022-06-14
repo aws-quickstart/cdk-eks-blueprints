@@ -278,6 +278,21 @@ test("Building blueprint with version correctly passes k8s version to the cluste
  
 });
 
+test("Account and region are correctly initialized when not explicitly set on the blueprint", () => {
+
+    const app = new cdk.App();
+
+    const blueprint = blueprints.EksBlueprint.builder().name("region-test1")
+        .addOns(new blueprints.AwsLoadBalancerControllerAddOn);
+
+    const stack = blueprint.build(app, "region-test1");
+
+    expect(stack.getClusterInfo().cluster.stack.region).toBeDefined();
+    expect(stack.getClusterInfo().cluster.stack.account).toBeDefined();
+ 
+});
+
+
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {
     const template = Template.fromStack(stack);
     for (let chart of charts) {

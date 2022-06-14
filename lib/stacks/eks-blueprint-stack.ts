@@ -69,6 +69,9 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     env: {
         account?: string,
         region?: string
+    } = {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION
     };
 
     constructor() {
