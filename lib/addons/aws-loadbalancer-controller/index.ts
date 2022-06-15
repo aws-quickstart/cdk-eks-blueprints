@@ -64,7 +64,7 @@ function lookupImage(registry?: string, region?: string): Values {
         return {};
     }
     
-    return { repository: registry + "amazon/aws-load-balancer-controller" };
+    return { image : { repository: registry + "amazon/aws-load-balancer-controller" }};
 }
 
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
@@ -104,7 +104,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
             region: clusterInfo.cluster.stack.region,
-            image,
+            ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
         });
 

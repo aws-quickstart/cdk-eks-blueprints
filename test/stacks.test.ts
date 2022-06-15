@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { HelmChart, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
@@ -282,14 +282,44 @@ test("Account and region are correctly initialized when not explicitly set on th
 
     const app = new cdk.App();
 
+    process.env.CDK_DEFAULT_ACCOUNT = '1234567890';
+    process.env.CDK_DEFAULT_REGION  = 'us-west-2';
+
     const blueprint = blueprints.EksBlueprint.builder().name("region-test1")
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn);
 
     const stack = blueprint.build(app, "region-test1");
 
     expect(stack.getClusterInfo().cluster.stack.region).toBeDefined();
+    expect(stack.getClusterInfo().cluster.stack.region).toBe(process.env.CDK_DEFAULT_REGION);
     expect(stack.getClusterInfo().cluster.stack.account).toBeDefined();
- 
+    expect(stack.getClusterInfo().cluster.stack.account).toBe(process.env.CDK_DEFAULT_ACCOUNT);
+});
+
+test("Missing account and region are not causing failure in blueprint stack", async() => {
+
+    const app = new cdk.App();
+
+    const account = process.env.CDK_DEFAULT_ACCOUNT;
+    const region = process.env.CDK_DEFAULT_REGION;
+
+    // unset account and region
+    process.env.CDK_DEFAULT_ACCOUNT = undefined;
+    process.env.CDK_DEFAULT_REGION = undefined;
+
+    const blueprint = blueprints.EksBlueprint.builder().name("region-test2")
+        .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+        .addOns(new blueprints.addons.ClusterAutoScalerAddOn);
+
+    const stack = await blueprint.buildAsync(app, "region-test2");
+    const loadbalancerAddOn = stack.getClusterInfo().getProvisionedAddOn(blueprints.AwsLoadBalancerControllerAddOn.name) as HelmChart;
+
+    expect(loadbalancerAddOn).toBeDefined();
+
+    // restore account and region
+    process.env.CDK_DEFAULT_ACCOUNT = account;
+    process.env.CDK_DEFAULT_REGION = region;
+
 });
 
 
