@@ -5,6 +5,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
+import { GlobalResources, VpcProvider } from '../../lib';
 import * as team from '../teams';
 
 
@@ -29,9 +30,9 @@ export default class BlueprintConstruct extends Construct {
         // const platformTeam = new team.TeamPlatform(account)
         // Teams for the cluster.
         const teams: Array<blueprints.Team> = [
-            new team.TeamTroi,
-            new team.TeamRiker(scope, teamManifestDirList[1]),
-            new team.TeamBurnham(scope, teamManifestDirList[0]),
+            // new team.TeamTroi,
+            // new team.TeamRiker(scope, teamManifestDirList[1]),
+            // new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
@@ -112,6 +113,7 @@ export default class BlueprintConstruct extends Construct {
         });
 
         blueprints.EksBlueprint.builder()
+            .resourceProvider(GlobalResources.Vpc, new VpcProvider('vpc-04c419f793abb5507'))
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams)

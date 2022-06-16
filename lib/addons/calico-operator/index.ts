@@ -1,4 +1,3 @@
-import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
