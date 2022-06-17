@@ -19,7 +19,7 @@ nav:
     - AWS For Fluent Bit: 'addons/aws-for-fluent-bit.md'
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - AWS Node Termination Handler: 'addons/aws-node-termination-handler.md'
-    - Calico: 'addons/calico.md'
+    - Calico Operator: 'addons/calico-operator.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
     - CoreDns: 'addons/coredns.md'
