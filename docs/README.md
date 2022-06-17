@@ -137,6 +137,12 @@ The ecosystem of tools that have developed around Kubernetes and the Cloud Nativ
 
 AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `eks-blueprints` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
 
+## Workshop
+
+We maintain a hands-on self-paced workshop, the [EKS Blueprints for CDK workshop](https://catalog.workshops.aws/eks-blueprints-for-cdk/en-US) helps you with foundational setup of your EKS cluster, and it gradually adds complexity via existing and new modules.
+
+To post feedback, submit feature ideas, or report bugs regarding the workshop, use the **Issues** section of this GitHub repo, and tag it with `workshop`.
+
 ## Feedback
 
 For architectural details, step-by-step instructions, and customization options, see our [official documentation site](https://aws-quickstart.github.io/cdk-eks-blueprints/).
