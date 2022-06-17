@@ -81,22 +81,6 @@ export class KarpenterAddOn extends HelmAddOn {
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || {};
-
-        // Tag VPC Subnets
-        if (subnetTags){
-            Object.entries(subnetTags).forEach(
-                ([key,value]) => {
-                    tagSubnets(cluster.stack, cluster.vpc.privateSubnets, key, value);
-            });
-        }
-        
-        // Tag VPC Security Group
-        if (sgTags){
-            Object.entries(sgTags).forEach(
-                ([key,value]) => {
-                    tagSecurityGroup(cluster.stack, cluster.clusterSecurityGroupId, key, value);
-            });
-        }
       
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
