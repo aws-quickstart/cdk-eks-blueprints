@@ -1,6 +1,6 @@
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
 import { registries } from "../../utils/registry-utils";
@@ -58,6 +58,15 @@ const defaultProps: AwsLoadBalancerControllerProps = {
 };
 
 
+function lookupImage(registry?: string, region?: string): Values {
+    if(registry ==  null) {
+        console.log("Unable to get ECR repository for AWS Loadbalancer Controller for region " + region) + ". Using default helm image";
+        return {};
+    }
+    
+    return { image : { repository: registry + "amazon/aws-load-balancer-controller" }};
+}
+
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
 
     readonly options: AwsLoadBalancerControllerProps;
@@ -77,7 +86,11 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
-        const repo = registries.get(clusterInfo.cluster.stack.region) + "amazon/aws-load-balancer-controller";
+    
+        const registry = registries.get(cluster.stack.region);
+        
+        const image = lookupImage(registry, cluster.stack.region);
+        
         const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
             serviceAccount: {
@@ -91,7 +104,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
             region: clusterInfo.cluster.stack.region,
-            image: { repository: repo },
+            ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
         });
 

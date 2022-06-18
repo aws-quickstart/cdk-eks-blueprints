@@ -69,7 +69,12 @@ export type PipelineProps = {
     owner: string;
 
     /**
-     * Repository for the pipeline (GitHub handle).
+     * Enable/Disable allowing cross-account deployments.
+     */
+    crossAccountKeys: boolean;
+
+    /**
+     * Repository for the pipeline
      */
     repository: GitHubSourceRepository;
 
@@ -140,7 +145,7 @@ export class CodePipelineBuilder implements StackBuilder {
 
 
     constructor() {
-        this.props = { stages: [], waves: []};
+        this.props = { crossAccountKeys: false, stages: [], waves: []};
     }
 
     public name(name: string): CodePipelineBuilder {
@@ -150,6 +155,11 @@ export class CodePipelineBuilder implements StackBuilder {
 
     public owner(owner: string) : CodePipelineBuilder {
         this.props.owner = owner;
+        return this;
+    }
+
+    public enableCrossAccountKeys() : CodePipelineBuilder {
+        this.props.crossAccountKeys = true;
         return this;
     }
 
@@ -202,13 +212,18 @@ export class CodePipelineBuilder implements StackBuilder {
 export class CodePipelineStack extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465k6";
+    static readonly USAGE_ID_MULTI_ACCOUNT = "qs-1s1r465f2";
 
     static builder() {
         return new CodePipelineBuilder();
     }
 
     constructor(scope: Construct, pipelineProps: PipelineProps, id: string,  props?: StackProps) {
-        super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
+        if (pipelineProps.crossAccountKeys){
+            super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID_MULTI_ACCOUNT, props));
+        } else {
+            super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
+        }
         const pipeline  = CodePipeline.build(this, pipelineProps);
 
         let promises : Promise<ApplicationStage>[] = [];
@@ -305,7 +320,8 @@ class CodePipeline {
                 'npm install',
               ],
               commands: ['npm run build', 'npx cdk synth']
-            })
+            }),
+            crossAccountKeys: props.crossAccountKeys,
           });
     }
 }

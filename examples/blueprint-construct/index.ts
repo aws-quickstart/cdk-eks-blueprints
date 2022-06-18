@@ -27,7 +27,6 @@ export default class BlueprintConstruct extends Construct {
         // Setup platform team.
         //const account = props.env!.account!
         // const platformTeam = new team.TeamPlatform(account)
-
         // Teams for the cluster.
         const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
@@ -71,6 +70,12 @@ export default class BlueprintConstruct extends Construct {
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
+            new blueprints.addons.KedaAddOn({
+                podSecurityContextFsGroup: 1001,
+                securityContextRunAsGroup: 1001,
+                securityContextRunAsUser: 1001,
+                irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
+            }),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
