@@ -5,7 +5,7 @@ import { Construct } from "constructs";
 import { assert } from "console";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
-import { conflictsWith } from "../../utils";
+import { conflictsWith, createNamespace, createServiceAccount, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -17,16 +17,23 @@ export interface ClusterAutoScalerAddOnProps extends HelmAddOnUserProps {
      * @default auto discovered based on EKS version.
      */
     version?: string;
+
+    /**
+     * Create namespace
+     */
+    createNamespace?: boolean;
 }
 
+const RELEASE = 'blueprints-addon-cluster-autoscaler';
+const NAME = 'cluster-autoscaler';
 /**
  * Defaults options for the add-on
  */
-const defaultProps = {
-    chart: 'cluster-autoscaler',
-    name: 'cluster-autoscaler',
+const defaultProps: ClusterAutoScalerAddOnProps = {
+    chart: NAME,
+    name: NAME,
     namespace: 'kube-system',
-    release: 'blueprints-addon-cluster-autoscaler',
+    release: RELEASE,
     repository: 'https://kubernetes.github.io/autoscaler',
     version: 'auto'
 };
@@ -47,7 +54,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
     private options: ClusterAutoScalerAddOnProps;
 
     constructor(props?: ClusterAutoScalerAddOnProps) {
-        super({ ...defaultProps, ...props });
+        super({ ...defaultProps as any, ...props });
         this.options = this.props;
     }
     
@@ -62,8 +69,11 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
 
         const cluster = clusterInfo.cluster;
         const nodeGroups = assertEC2NodeGroup(clusterInfo, "Cluster Autoscaler");
+        const values = this.options.values || {};
+        const namespace = this.options.namespace!;
+        
+        // Create IAM Policy
         const autoscalerStmt = new iam.PolicyStatement();
-
         autoscalerStmt.addResources("*");
         autoscalerStmt.addActions(
             "autoscaling:DescribeAutoScalingGroups",
@@ -72,30 +82,39 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             "autoscaling:DescribeTags",
             "autoscaling:SetDesiredCapacity",
             "autoscaling:TerminateInstanceInAutoScalingGroup",
-            "ec2:DescribeInstanceTypes",
             "ec2:DescribeLaunchTemplateVersions"
         );
-        const autoscalerPolicy = new iam.Policy(cluster.stack, "cluster-autoscaler-policy", {
-            policyName: "ClusterAutoscalerPolicy",
-            statements: [autoscalerStmt],
+
+        const autoscalerPolicyDocument = new iam.PolicyDocument({
+            statements: [autoscalerStmt]
         });
+
+        // Tag node groups
         const clusterName = new CfnJson(cluster.stack, "clusterName", {
             value: cluster.clusterName,
         });
-        
         for(let ng of nodeGroups) {
-            autoscalerPolicy.attachToRole(ng.role);
             Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
             Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
         }
+        
+        // Create namespace
+        if (this.options.createNamespace) {
+            createNamespace(namespace, cluster, true);
+        }
 
-        const clusterAutoscalerChart = this.addHelmChart(clusterInfo, {
-            cloudProvider: 'aws',
-            autoDiscovery: {
-                clusterName: cluster.clusterName
-            },
-            awsRegion: clusterInfo.cluster.stack.region
-        });
+        // Create IRSA
+        const sa = createServiceAccount(cluster, RELEASE, namespace, autoscalerPolicyDocument);
+
+        // Create Helm Chart
+        setPath(values, "cloudProvider", "aws");
+        setPath(values, "autoDiscovery.clusterName", cluster.clusterName);
+        setPath(values, "awsRegion", cluster.stack.region);
+        setPath(values, "rbac.serviceAccount.create", false);
+        setPath(values, "rbac.serviceAccount.name", RELEASE);
+        
+        const clusterAutoscalerChart = this.addHelmChart(clusterInfo, values, false);
+        clusterAutoscalerChart.node.addDependency(sa);
 
         return Promise.resolve(clusterAutoscalerChart);
     }

@@ -2,9 +2,9 @@ site_name: Amazon EKS Blueprints Quick Start
 repo_name: "aws-quickstart/cdk-eks-blueprints"
 repo_url: "https://github.com/aws-quickstart/cdk-eks-blueprints"
 docs_dir: "docs"
-theme: 
+theme:
   name: material
-  features: 
+  features:
     - tabs
 nav:
   - Overview: 'index.md'
@@ -37,23 +37,25 @@ nav:
     - New Relic: 'addons/newrelic.md'
     - Nginx: 'addons/nginx.md'
     - OPA Gatekeeper: 'addons/opa-gatekeeper.md'
+    - Pixie: 'addons/pixie.md'
+    - Refay: 'addons/rafay.md'
     - Secrets Store: 'addons/secrets-store.md'
     - Snyk: 'https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon'
     - SSM Agent: 'addons/ssm-agent.md'
     - Velero: 'addons/velero.md'
     - Vpc Cni: 'addons/vpc-cni.md'
     - AWS XRay: 'addons/xray.md'
-  - Cluster Providers: 
+  - Cluster Providers:
     - Overview: 'cluster-providers/index.md'
     - Generic Cluster Provider: 'cluster-providers/generic-cluster-provider.md'
     - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
   - Extensibility: 'extensibility.md'
-  - API Reference: '../api'
+  - API Reference: 'api'
 markdown_extensions:
   - def_list
-  - pymdownx.highlight  
+  - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.tabbed
   - pymdownx.inlinehilite
