@@ -37,7 +37,9 @@ This code will produce a blueprint builder that can be instantiated inside the p
 
 ## Creating a pipeline
 
-We can create a new `CodePipeline` resource via the following. 
+We can create a new `CodePipeline` resource via the following.
+
+### Using GitHub as CodePipeline repository source.
 
 ```typescript
 import * as blueprints from '@aws-quickstart/eks-blueprints'
@@ -47,15 +49,31 @@ const blueprint = blueprints.EksBlueprint.builder()
 
  blueprints.CodePipelineStack.builder()
     .name("eks-blueprints-pipeline")
-    .owner("aws-samples")
     .repository({
+        owner: "aws-samples",
         repoUrl: 'cdk-eks-blueprints-patterns',
         credentialsSecretName: 'github-token',
-        targetRevision: 'main'
+        targetRevision: 'main' // optional, default is "main"
     })
 ```
 
 Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be fined in one main region, and replicated to all target regions. 
+
+### Using AWS CodeCommit as CodePipeline repository source.
+
+```typescript
+import * as blueprints from '@aws-quickstart/eks-blueprints'
+
+const blueprint = blueprints.EksBlueprint.builder()
+    ...; // configure your blueprint builder
+
+ blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
+    .repository({
+        codeCommitRepoName: 'cdk-eks-blueprints-patterns', // should be in the same region with pipeline-stack
+        targetRevision: 'master' // optional, default is "master"
+    })
+```
 
 ## Creating stages 
 

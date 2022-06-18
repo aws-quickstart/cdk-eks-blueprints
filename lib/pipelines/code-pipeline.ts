@@ -30,27 +30,32 @@ export interface GitHubSourceRepository extends Omit<ApplicationRepository, "cre
      *
      * @see https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html
      */
-    credentialsSecretName: string
+    credentialsSecretName: string;
+    /**
+     * The owner of the repository for the pipeline (GitHub handle).
+    */
+    owner?: string;
 }
 
-/**
- * Props for the CodeCommit repository.
- */
-export type CodeCommitProps = {
+export interface CodeCommitSourceRepository
+    extends Omit<ApplicationRepository, "credentialsType" | "credentialsSecretName " | "repoUrl"> {
     /**
      * The name of the CodeCommit repository.
      */
-    repoName: string;
-
-    /**
-     * The name of the CodeCommit repository branch.
-     */
-    branch?: string;
+    codeCommitRepoName: string;
 
     /**
      * Optional CodeCommitSourceOptions.
      */
-    options?: cdkpipelines.CodeCommitSourceOptions;
+    codeCommitOptions?: cdkpipelines.CodeCommitSourceOptions;
+}
+
+export function isCodeCommitRepo(repo: GitHubSourceRepository | CodeCommitSourceRepository): boolean{
+    if (repo.hasOwnProperty('codeCommitRepoName')) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -65,18 +70,15 @@ export type PipelineProps = {
 
     /**
      * The owner of the repository for the pipeline (GitHub handle).
-     */
-    owner: string;
+     *
+     * @deprecated Please use repository.GitHubSourceRepository.owner isntead.
+    */
+    owner?: string;
 
     /**
-     * Repository for the pipeline (GitHub handle).
+     * Repository for the pipeline (GitHub or CodeCommitRepository).
      */
-    repository: GitHubSourceRepository;
-
-    /**
-     * CodeCommit repository properties for the pipeline (CodeCommit handle).
-     */
-    codeCommitProps: CodeCommitProps;
+    repository: GitHubSourceRepository | CodeCommitSourceRepository;
 
     /**
      * Pipeline stages and options.
@@ -153,13 +155,11 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-    public repository(repo: GitHubSourceRepository): CodePipelineBuilder {
-        this.props.repository = repo;
-        return this;
-    }
-
-    public codeCommitProps(codeCommitProps: CodeCommitProps): CodePipelineBuilder {
-        this.props.codeCommitProps = codeCommitProps;
+    public repository(repo: GitHubSourceRepository | CodeCommitSourceRepository): CodePipelineBuilder {
+        this.props.repository = repo as GitHubSourceRepository;
+        if (isCodeCommitRepo(repo)) {
+            this.props.repository = repo as CodeCommitSourceRepository;
+        }
         return this;
     }
 
@@ -189,6 +189,13 @@ export class CodePipelineBuilder implements StackBuilder {
     build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
         assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
         assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
+        if (this.props.repository) {
+            let gitHubRepo = this.props.repository as GitHubSourceRepository;
+            if (!(isCodeCommitRepo(this.props.repository))) {
+                assert((this.props.owner || gitHubRepo.owner),
+                    "repository.owner field is required for the GitHub pipeline stack. Please provide value.");
+            }
+        }
         const fullProps = this.props as PipelineProps;
         return new CodePipelineStack(scope, fullProps, id, stackProps);
     }
@@ -270,28 +277,28 @@ export class ApplicationStage extends cdk.Stage {
 class CodePipeline {
 
     public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
-        let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
         let codePipelineSource : cdkpipelines.CodePipelineSource | undefined = undefined;
 
-        if ((props.codeCommitProps) && (props.repository)) {
-            throw new Error("Only one type of codePipelineSource is supported: repository for GitHub, codeCommitProps for AWS CodeCommit.");
-        }
-
-        if (props.codeCommitProps) {
+        if (isCodeCommitRepo(props.repository)) {
+            let codeCommitRepo = props.repository as CodeCommitSourceRepository;
             codePipelineSource = cdkpipelines.CodePipelineSource.codeCommit(
                 codecommit.Repository.fromRepositoryName(
-                    scope, 'cdk-eks-blueprints', props.codeCommitProps.repoName),
-                    props.codeCommitProps.branch ?? 'master',
-                    props.codeCommitProps.options);
+                    scope, 'cdk-eks-blueprints', codeCommitRepo.codeCommitRepoName),
+                    codeCommitRepo.targetRevision ?? 'master',
+                    codeCommitRepo.codeCommitOptions);
         } else {
-            if (props.repository.credentialsSecretName) {
+            let gitHubRepo = props.repository as GitHubSourceRepository;
+            let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
+            let gitHubOwner = gitHubRepo.owner ? gitHubRepo.owner : gitHubRepo.owner;
+
+            if (gitHubRepo.credentialsSecretName) {
                 githubProps = {
-                    authentication: cdk.SecretValue.secretsManager(props.repository.credentialsSecretName!)
+                    authentication: cdk.SecretValue.secretsManager(gitHubRepo.credentialsSecretName!)
                 };
             }
             codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
-                `${props.owner}/${props.repository.repoUrl}`,
-                props.repository.targetRevision ?? 'main',
+                `${gitHubOwner}/${gitHubRepo.repoUrl}`,
+                gitHubRepo.targetRevision ?? 'main',
                 githubProps);
         }
 
