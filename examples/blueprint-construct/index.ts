@@ -48,6 +48,8 @@ export default class BlueprintConstruct extends Construct {
             // adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.addons.IstioBaseAddOn(),
+            new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CalicoAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
