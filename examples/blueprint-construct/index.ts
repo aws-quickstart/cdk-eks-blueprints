@@ -1,7 +1,7 @@
+import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { InstanceType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
@@ -27,7 +27,6 @@ export default class BlueprintConstruct extends Construct {
         // Setup platform team.
         //const account = props.env!.account!
         // const platformTeam = new team.TeamPlatform(account)
-
         // Teams for the cluster.
         const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
@@ -67,11 +66,18 @@ export default class BlueprintConstruct extends Construct {
             new blueprints.addons.VpcCniAddOn(),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
-            // ssp.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.FalcoAddOn(),
+            // new.EksBlueprintProps.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.KarpenterAddOn(),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
+            new blueprints.addons.KedaAddOn({
+                podSecurityContextFsGroup: 1001,
+                securityContextRunAsGroup: 1001,
+                securityContextRunAsUser: 1001,
+                irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
+            }),
         ];
 
         const blueprintID = `${blueprintProps.id}-dev`;
@@ -85,7 +91,9 @@ export default class BlueprintConstruct extends Construct {
                 {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new InstanceType('m5.2xlarge')]
+                    instanceTypes: [new InstanceType('m5.2xlarge')],
+                    diskSize: 25,
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
                 },
                 {
                     id: "mng2-custom",
