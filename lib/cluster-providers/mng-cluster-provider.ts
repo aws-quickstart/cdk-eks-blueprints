@@ -1,6 +1,4 @@
-import { aws_autoscaling as asg } from "aws-cdk-lib";
-import { aws_ec2 as ec2 } from "aws-cdk-lib";
-import { aws_eks as eks } from "aws-cdk-lib";
+import { aws_autoscaling as asg, aws_eks as eks } from "aws-cdk-lib";
 // Cluster
 import { ClusterInfo } from "..";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
@@ -30,10 +28,6 @@ export interface MngClusterProviderProps extends eks.CommonClusterOptions, Omit<
      */
     privateCluster?: boolean;
 
-    /**
-     * Affects both control plane and the managed node group.
-     */
-    vpcSubnets?: ec2.SubnetSelection[];
 }
 
 /**
@@ -44,16 +38,8 @@ export class MngClusterProvider extends GenericClusterProvider {
     constructor(props?: MngClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
+                ...props as Omit<ManagedNodeGroup, "id">,
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
-                amiReleaseVersion: props?.amiReleaseVersion,
-                customAmi: props?.customAmi,
-                amiType: props?.amiType,
-                desiredSize: props?.desiredSize,
-                instanceTypes: props?.instanceTypes,
-                maxSize: props?.maxSize,
-                minSize: props?.minSize,
-                nodeGroupCapacityType: props?.nodeGroupCapacityType,
-                vpcSubnets: props?.vpcSubnets,
             }]
         }});
     }

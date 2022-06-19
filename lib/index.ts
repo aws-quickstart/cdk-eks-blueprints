@@ -11,8 +11,11 @@ export * from './pipelines';
 export * as pipelines from './pipelines';
 
 export * from './cluster-providers';
+export * as clusters from './cluster-providers';
+
 export * from './spi';
 
 export * from './resource-providers';
+export * as resources from './resource-providers';
 
 export * as utils from './utils';

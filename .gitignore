@@ -18,6 +18,6 @@ dist
 cdk.context.json
 package-lock.json
 yarn.lock
-
+docs/api
 # mkdocs artifact
 site

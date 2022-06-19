@@ -73,7 +73,10 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     constructor() {
         this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
-        this.env = {};
+        this.env = {
+            account: process.env.CDK_DEFAULT_ACCOUNT,
+            region: process.env.CDK_DEFAULT_REGION
+        };
     }
 
     public name(name: string): this {
