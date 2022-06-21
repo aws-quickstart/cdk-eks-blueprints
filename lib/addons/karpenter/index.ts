@@ -40,6 +40,11 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     securityGroupTags?: { 
         [key: string]: string
     }
+
+    /**
+     * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
+     */
+    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
 }
 
 const KARPENTER = 'karpenter';
@@ -81,6 +86,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || {};
+        const amiFamily = this.options.amiFamily || "";
       
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
@@ -142,6 +148,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     requirements: this.convertToSpec(provisionerSpecs),
                     taints: taints,
                     provider: {
+                        amiFamily: amiFamily,
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
