@@ -18,7 +18,7 @@ export interface AwsLoadBalancerControllerProps extends HelmAddOnUserProps {
     /**
      * Enable WAF (must be false for CN partition)
      */
-    enableWaf: boolean,
+    enableWaf?: boolean,
 
     /**
      * Enable WAFV2 (must be false for CN partition)

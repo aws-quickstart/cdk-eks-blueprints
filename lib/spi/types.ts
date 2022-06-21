@@ -19,7 +19,7 @@ export interface HelmRepository {
 /**
  * Utility type for values passed to Helm or GitOps applications.
  */
- export type Values = {
+export type Values = {
     [key: string]: any;
 };
 
@@ -80,15 +80,15 @@ export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
-    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
-    
+    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
+
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
      * @param name Specifies the name key under which the provided resources will be registered for subsequent look-ups.
      * @param provider Implementation of the resource provider interface
      * @returns the provided resource
      */
-    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
+    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>): T {
         const resource = provider.provide(this);
         assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
@@ -100,7 +100,7 @@ export class ResourceContext {
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
-    public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
+    public get<T extends cdk.IResource = cdk.IResource>(name: string): T | undefined {
         return <T>this.resources.get(name);
     }
 }
@@ -117,20 +117,22 @@ export enum GlobalResources {
  * which could be leveraged by the framework, add-on implementations and teams.
  */
 export class ClusterInfo {
-    
+
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private resourceContext: ResourceContext;
+    private addonContext: Map<string, Values>;
 
     /**
      * Constructor for ClusterInfo
      * @param props 
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, 
-            readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) { 
+    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
+        readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
+        this.addonContext = new Map<string, Values>();
     }
 
     /**
@@ -167,11 +169,11 @@ export class ClusterInfo {
         return this.provisionedAddOns.get(addOn);
     }
 
-     /**
-     * Returns all provisioned addons
-     * @returns scheduledAddOns: Map<string, cdk.Construct>
-     */
-      public getAllProvisionedAddons(): Map<string, Construct> {
+    /**
+    * Returns all provisioned addons
+    * @returns scheduledAddOns: Map<string, cdk.Construct>
+    */
+    public getAllProvisionedAddons(): Map<string, Construct> {
         return this.provisionedAddOns;
     }
 
@@ -181,7 +183,7 @@ export class ClusterInfo {
      * @param addOn
      * @param promise
      */
-     public addScheduledAddOn(addOn: string, promise: Promise<Construct>) {
+    public addScheduledAddOn(addOn: string, promise: Promise<Construct>) {
         this.scheduledAddOns.set(addOn, promise);
     }
 
@@ -220,5 +222,22 @@ export class ClusterInfo {
         const result = this.resourceContext.get<T>(name);
         assert(result, 'Required resource ' + name + ' is missing.');
         return result!;
+    }
+
+    /**
+     * Update addonContext map
+     * @param addOn
+     * @param Values
+     */
+    public addAddOnContext(addOn: string, values: Values) {
+        this.addonContext.set(addOn, values);
+    }
+
+    /**
+    * Returns all addon contexts
+    * @returns addonContext: Map<string, Values>
+    */
+    public getAddOnContexts(): Map<string, Values> {
+        return this.addonContext;
     }
 }

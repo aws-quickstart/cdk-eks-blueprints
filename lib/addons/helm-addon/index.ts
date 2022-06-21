@@ -14,13 +14,14 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
     constructor(props: HelmAddOnProps) {
         this.props = cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
     }
-    
+
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
 
-    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, createNamespace?: boolean, wait?: boolean, timeout?: Duration ) : Construct {
+    protected addHelmChart(clusterInfo: spi.ClusterInfo, values?: spi.Values, createNamespace?: boolean, wait?: boolean, timeout?: Duration): Construct {
         const kubectlProvider = new KubectlProvider(clusterInfo);
         values = values ?? {};
-        const chart = {...this.props, ...{ values, wait, timeout, createNamespace} };
+        const dependencyMode = this.props.dependencyMode ?? true;
+        const chart = { ...this.props, ...{ values, dependencyMode, wait, timeout, createNamespace } };
         return kubectlProvider.addHelmChart(chart);
     }
 }
