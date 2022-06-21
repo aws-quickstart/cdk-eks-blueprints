@@ -1,8 +1,8 @@
+import * as assert from "assert";
+import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as assert from "assert";
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 
@@ -218,7 +218,7 @@ export class ClusterInfo {
      */
     public getRequiredResource<T extends cdk.IResource>(name: string): T {
         const result = this.resourceContext.get<T>(name);
-        assert(result, `Required resource ${name} is missing.`);
+        assert(result, 'Required resource ' + name + ' is missing.');
         return result!;
     }
 }
