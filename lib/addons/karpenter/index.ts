@@ -56,7 +56,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.10.1',
+    version: '0.12.0',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -80,6 +80,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const endpoint = clusterInfo.cluster.clusterEndpoint;
         const name = clusterInfo.cluster.clusterName;
         const cluster = clusterInfo.cluster;
+        const stackName = clusterInfo.cluster.stack.stackName;
         let values = this.options.values ?? {};
 
         const provisionerSpecs = this.options.provisionerSpecs || {};
@@ -103,7 +104,7 @@ export class KarpenterAddOn extends HelmAddOn {
         // Set up Instance Profile
         const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
-            //instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
+            instanceProfileName: `KarpenterNodeInstanceProfile-${stackName}`,
             path: '/'
         });
 
