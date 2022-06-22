@@ -51,7 +51,7 @@ export interface CodeCommitSourceRepository
 }
 
 export function isCodeCommitRepo(repo: GitHubSourceRepository | CodeCommitSourceRepository): boolean{
-    if (repo.hasOwnProperty('codeCommitRepoName')) {
+    if (Object.prototype.hasOwnProperty.call(repo, "codeCommitRepoName")) {
         return true;
     } else {
         return false;
