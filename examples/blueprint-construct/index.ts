@@ -5,7 +5,6 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
-import { GlobalResources, VpcProvider } from '../../lib';
 import * as team from '../teams';
 
 
