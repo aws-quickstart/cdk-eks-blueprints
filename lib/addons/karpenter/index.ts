@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, conflictsWith, dependable, tagSubnets, tagSecurityGroup, createServiceAccount } from '../../utils';
+import { createNamespace, setPath, conflictsWith, dependable, createServiceAccount } from '../../utils';
 import { KarpenterControllerPolicy } from './iam';
 import merge from 'ts-deepmerge';
 
@@ -21,11 +21,11 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
         'karpenter.sh/capacity-type'?: string[],
     }
 
-    taints?:{
+    taints?: [{
         key: string,
         value: string,
         effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    } 
+    }]
 
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
