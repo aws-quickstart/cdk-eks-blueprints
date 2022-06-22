@@ -5,6 +5,7 @@ import { ClusterInfo } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
+import * as md5 from 'ts-md5';
 
 /**
  * Configuration options for the add-on
@@ -81,6 +82,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const name = clusterInfo.cluster.clusterName;
         const cluster = clusterInfo.cluster;
         const stackName = clusterInfo.cluster.stack.stackName;
+        const region = clusterInfo.cluster.stack.region;
         let values = this.options.values ?? {};
 
         const provisionerSpecs = this.options.provisionerSpecs || {};
@@ -102,9 +104,10 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Set up Instance Profile
+        const instanceProfileName = md5.Md5.hashStr(stackName+region);
         const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
-            instanceProfileName: `KarpenterNodeInstanceProfile-${stackName}`,
+            instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
 
