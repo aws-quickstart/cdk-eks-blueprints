@@ -1,13 +1,11 @@
-import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
- * @deprecated
  */
-export interface CalicoAddOnProps extends HelmAddOnUserProps {
+export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Namespace where Calico will be installed
@@ -17,7 +15,7 @@ export interface CalicoAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Helm chart version to use to install.
-     * @default 0.3.10
+     * @default 3.23.1
      */
     version?: string;
 
@@ -31,22 +29,19 @@ export interface CalicoAddOnProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    name: 'calico-addon',
-    namespace: 'kube-system',
-    version: '0.3.10',
-    chart: "aws-calico",
-    release: "blueprints-addon-calico",
-    repository: "https://aws.github.io/eks-charts"
+    name: 'calico-operator',
+    namespace: 'calico-operator',
+    version: '3.23.1',
+    chart: "tigera-operator",
+    release: "bp-addon-calico-operator",
+    repository: "https://projectcalico.docs.tigera.io/charts"
 };
 
-/**
- * @deprecated use CalicoOperator add-on instead
- */
-export class CalicoAddOn extends HelmAddOn {
+export class CalicoOperatorAddOn extends HelmAddOn {
 
-    private options: CalicoAddOnProps;
+    private options: CalicoOperatorAddOnProps;
 
-    constructor(props?: CalicoAddOnProps) {
+    constructor(props?: CalicoOperatorAddOnProps) {
         super({...defaultProps, ...props });
         this.options = this.props;
     }
@@ -54,9 +49,6 @@ export class CalicoAddOn extends HelmAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const values = this.options.values ?? {};
         const defaultValues = {};
-
-        dot.set("calico.node.resources.requests.memory", "64Mi", defaultValues, true);
-        dot.set("calico.node.resources.limits.memory", "100Mi", defaultValues, true);
 
         const merged = merge(defaultValues, values);
 
