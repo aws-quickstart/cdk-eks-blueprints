@@ -50,7 +50,7 @@ export default class BlueprintConstruct extends Construct {
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.AppMeshAddOn(),
-            new blueprints.addons.CalicoAddOn(),
+            new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
@@ -96,14 +96,15 @@ export default class BlueprintConstruct extends Construct {
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
                 },
                 {
-                    id: "mng2-custom",
-                    instanceTypes: [new InstanceType('m5.2xlarge')],
+                    id: "mng2-customami",
+                    instanceTypes: [new InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
-                            'us-east-1': 'ami-0b297a512e2852b89',
-                            'us-west-2': 'ami-06a8c459c01f55c7b',
-                            'us-east-2': 'ami-093d9796e55a5b860',
+                            'us-east-1': 'ami-08e520f5673ee0894',
+                            'us-west-2': 'ami-0403ff342ceb30967',
+                            'us-east-2': 'ami-07109d69738d6e1ee',
+                            'us-west-1': "ami-07bda4b61dc470985",
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
