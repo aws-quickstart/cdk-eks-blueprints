@@ -5,7 +5,6 @@ export * from './aws-for-fluent-bit';
 export * from './aws-loadbalancer-controller';
 export * from './aws-node-termination-handler';
 export * from './calico';
-export * from './calico-operator';
 export * from './cluster-autoscaler';
 export * from './container-insights';
 export * from './coredns';
