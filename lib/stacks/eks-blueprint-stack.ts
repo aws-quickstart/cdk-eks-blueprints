@@ -9,9 +9,11 @@ import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import { z } from 'zod';
 
 export class EksBlueprintProps {
 
+    
     /**
      * The id for the blueprint.
      */
@@ -77,6 +79,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             account: process.env.CDK_DEFAULT_ACCOUNT,
             region: process.env.CDK_DEFAULT_REGION
         };
+        
     }
 
     public name(name: string): this {
@@ -144,6 +147,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public build(scope: Construct, id: string, stackProps?: StackProps): EksBlueprint {
+        
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
@@ -172,7 +176,7 @@ export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
-        this.validateInput(blueprintProps);
+        this.validateInput(blueprintProps, blueprintProps.id);
        
         const resourceContext = this.provideNamedResources(blueprintProps);
 
@@ -270,8 +274,9 @@ export class EksBlueprint extends cdk.Stack {
     }
 
 
-    private validateInput(blueprintProps: EksBlueprintProps) {
+    private validateInput(blueprintProps: EksBlueprintProps, blueprintID: string) {
         const teamNames = new Set<string>();
+       nameLengthValidation(blueprintProps, blueprintID);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {
@@ -280,5 +285,18 @@ export class EksBlueprint extends cdk.Stack {
                 teamNames.add(e.name);
             });
         }
+    }
+}
+
+function nameLengthValidation(blueprintProps: EksBlueprintProps, blueprintID: string) 
+{
+    const test = z.string().max(63, {message: "Must be no more than 63 characters long."});//adds custom error message if I want to specify later on
+
+    try{
+        test.parse(blueprintID);
+    }
+    catch(e){
+        throw new Error('Must be no more than 63 characters long.');
+
     }
 }

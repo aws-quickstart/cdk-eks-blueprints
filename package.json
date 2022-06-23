@@ -16,7 +16,6 @@
         "@types/dot-object": "^2.1.2",
         "@types/jest": "^27.5.2",
         "@types/js-yaml": "^4.0.5",
-        "@types/mocha": "^9.1.1",
         "@types/node": "^16.11.27",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
