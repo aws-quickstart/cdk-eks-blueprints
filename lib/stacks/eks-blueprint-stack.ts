@@ -294,6 +294,7 @@ function generalConstraintsValidation(blueprintProps: EksBlueprintProps) {
     try {
         const testMax = z.string().max(generalConstraints.blueprintIDMax);
 
+        if(blueprintProps.id != undefined)
         testMax.parse(blueprintProps.id);
     } catch (e) {
         throw new Error('Managed Node Groups ID must be no more than 63 characters long!')
@@ -301,6 +302,7 @@ function generalConstraintsValidation(blueprintProps: EksBlueprintProps) {
     try {
         const testMin = z.string().min(generalConstraints.blueprintIDMin);
 
+        if(blueprintProps.id != undefined)
         testMin.parse(blueprintProps.id)
     } catch (e) {
         throw new Error('Managed Node Groups ID must be no less than 1 character long!')
@@ -308,14 +310,17 @@ function generalConstraintsValidation(blueprintProps: EksBlueprintProps) {
 
     try {
         const testMax = z.string().max(generalConstraints.blueprintNameMax);
-
+       
+        if(blueprintProps.name != undefined)
         testMax.parse(blueprintProps.name);
     } catch (e) {
+        
         throw new Error('Managed Node Groups name must be no more than 63 characters long!')
     }
     try {
         const testMin = z.string().min(generalConstraints.blueprintNameMin);
-
+        
+        if(blueprintProps.name != undefined)
         testMin.parse(blueprintProps.name)
     } catch (e) {
         throw new Error('Managed Node Groups name must be no less than 1 character long!')
