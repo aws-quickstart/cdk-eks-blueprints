@@ -2,6 +2,7 @@ import { Duration } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as spi from "../..";
 import { cloneDeep } from "../../utils";
+import { validateLatestVersion } from "./helm-version-checker";
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 
 export type HelmAddOnProps = HelmChartConfiguration;
@@ -13,6 +14,7 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
 
     constructor(props: HelmAddOnProps) {
         this.props = cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
+        validateLatestVersion(props);
     }
     
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
