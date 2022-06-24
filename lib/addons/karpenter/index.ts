@@ -1,10 +1,10 @@
-import { Construct } from "constructs";
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { ClusterInfo } from '../../spi';
-import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace, setPath, conflictsWith, dependable, tagSubnets, tagSecurityGroup, createServiceAccount } from '../../utils';
-import { KarpenterControllerPolicy } from './iam';
+import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
+import { ClusterInfo } from '../../spi';
+import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, tagSecurityGroup, tagSubnets } from '../../utils';
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
+import { KarpenterControllerPolicy } from './iam';
 
 /**
  * Configuration options for the add-on
@@ -100,13 +100,13 @@ export class KarpenterAddOn extends HelmAddOn {
                 iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
                 iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
             ],
-            roleName: `KarpenterNodeRole-${name}`
+            //roleName: `KarpenterNodeRole-${name}` // let role name to be generated as unique
         });
 
         // Set up Instance Profile
         const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
-            instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
+            //instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
             path: '/'
         });
 

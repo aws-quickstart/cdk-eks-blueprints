@@ -23,3 +23,9 @@ Customers can use this Quick Start to easily architect and deploy a multi-tenant
 ## Examples
 
 To view a library of examples for how you can leverage the `eks-blueprints`, please see our [Blueprints Patterns Repository](https://github.com/aws-samples/cdk-eks-blueprints-patterns).
+
+## Workshop
+
+We maintain a hands-on self-paced workshop, the [EKS Blueprints for CDK workshop](https://catalog.workshops.aws/eks-blueprints-for-cdk/en-US) helps you with foundational setup of your EKS cluster, and it gradually adds complexity via existing and new modules.
+
+To post feedback, submit feature ideas, or report bugs regarding the workshop, use the **Issues** section of this GitHub repo, and tag it with `workshop`.
