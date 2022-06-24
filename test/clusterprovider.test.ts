@@ -1,4 +1,3 @@
-
 import * as cdk from 'aws-cdk-lib';
 import { BlockDeviceVolume, EbsDeviceVolumeType } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';

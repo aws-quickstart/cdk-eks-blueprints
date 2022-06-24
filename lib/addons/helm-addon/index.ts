@@ -1,5 +1,6 @@
 import { Duration } from "aws-cdk-lib";
 import { Construct } from "constructs";
+import { z } from "zod";
 import * as spi from "../..";
 import { cloneDeep } from "../../utils";
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
@@ -13,6 +14,7 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
 
     constructor(props: HelmAddOnProps) {
         this.props = cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
+        //generalAddonConstraintsValidation(props); This is my addon approach. Leaving it for later
     }
     
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
@@ -24,3 +26,19 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
         return kubectlProvider.addHelmChart(chart);
     }
 }
+//below is my addon approach method for when I get too it. Leaving for later
+function generalAddonConstraintsValidation(props: HelmAddOnProps){
+    try{
+        const test = z.string().max(addonConstraints.addonNameMaxLength);
+        console.log(props.name + "-=-=-=-=-=")
+        test.parse(props.name);
+    }
+    catch(e){
+        throw new Error('Addon Names must be no more than 128 characters long!')
+    }
+}
+
+var addonConstraints = {
+    addonNameMaxLength: 128,
+    addonNameMinLength: 1
+};

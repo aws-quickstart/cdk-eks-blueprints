@@ -1,6 +1,5 @@
-
 import * as cdk from 'aws-cdk-lib';
-import { StackProps } from 'aws-cdk-lib';
+import { StackProps, TokenizedStringFragments } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
@@ -12,8 +11,6 @@ import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../uti
 import { z } from 'zod';
 
 export class EksBlueprintProps {
-
-    
     /**
      * The id for the blueprint.
      */
@@ -56,9 +53,16 @@ export class EksBlueprintProps {
      * Control Plane log types to be enabled (if not passed, none)
      * If wrong types are included, will throw an error.
      */
-    readonly enableControlPlaneLogTypes?: string[];
+    readonly enableControlPlaneLogTypes?: enabledControlPlaneLogTypes[];
 }
 
+export enum enabledControlPlaneLogTypes {
+    api = "api",
+    audit = "audit",
+    authenticator = "authenticator",
+    controllerManager = "controllerManager",
+    scheduler = "scheduler"
+}
 
 /**
  * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
@@ -79,14 +83,13 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             account: process.env.CDK_DEFAULT_ACCOUNT,
             region: process.env.CDK_DEFAULT_REGION
         };
-        
     }
 
     public name(name: string): this {
         this.props = { ...this.props, ...{ name } };
         return this;
     }
-    
+
     public account(account?: string): this {
         this.env.account = account;
         return this;
@@ -102,7 +105,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableControlPlaneLogTypes(...types: string[]): this {
+    public enableControlPlaneLogTypes(...types: enabledControlPlaneLogTypes[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
         return this;
     }
@@ -110,7 +113,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
         this.props = { ...this.props, ...cloneDeep(props) };
-        if(props.resourceProviders) {
+        if (props.resourceProviders) {
             this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }
         return this;
@@ -143,11 +146,12 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps({ ...this.props })
-            .account(account?? this.env.account).region(region?? this.env.region);
+            .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
     public build(scope: Construct, id: string, stackProps?: StackProps): EksBlueprint {
-        
+
+
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
@@ -156,7 +160,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this.build(scope, id, stackProps).waitForAsyncTasks();
     }
 }
-
 
 /**
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
@@ -176,26 +179,26 @@ export class EksBlueprint extends cdk.Stack {
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
-        this.validateInput(blueprintProps, blueprintProps.id);
-       
+        this.validateInput(blueprintProps);
+
         const resourceContext = this.provideNamedResources(blueprintProps);
 
-        let vpcResource : IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
+        let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
-        if(!vpcResource) {
+        if (!vpcResource) {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_21;
-        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ 
-            id: `${ blueprintProps.name ?? blueprintProps.id }-ng`,
+        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
+            id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
         });
 
         this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
         this.clusterInfo.setResourceContext(resourceContext);
 
-        let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
+        let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
             setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
@@ -235,8 +238,8 @@ export class EksBlueprint extends cdk.Stack {
         });
 
         this.asyncTasks.catch(err => {
-            console.error(err); 
-            throw new Error(err); 
+            console.error(err);
+            throw new Error(err);
         });
     }
 
@@ -259,24 +262,24 @@ export class EksBlueprint extends cdk.Stack {
      * May be used in testing for verification.
      * @returns cluster info object
      */
-    getClusterInfo() : spi.ClusterInfo {
+    getClusterInfo(): spi.ClusterInfo {
         return this.clusterInfo;
     }
 
-    private provideNamedResources(blueprintProps: EksBlueprintProps) : spi.ResourceContext {
+    private provideNamedResources(blueprintProps: EksBlueprintProps): spi.ResourceContext {
         const result = new spi.ResourceContext(this, blueprintProps);
 
-        for(let [key, value] of blueprintProps.resourceProviders ?? []) {
+        for (let [key, value] of blueprintProps.resourceProviders ?? []) {
             result.add(key, value);
         }
 
         return result;
     }
 
-
-    private validateInput(blueprintProps: EksBlueprintProps, blueprintID: string) {
+    private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-       nameLengthValidation(blueprintProps, blueprintID);
+        generalConstraintsValidation(blueprintProps);
+
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {
@@ -287,16 +290,41 @@ export class EksBlueprint extends cdk.Stack {
         }
     }
 }
+function generalConstraintsValidation(blueprintProps: EksBlueprintProps) {
+    try {
+        const testMax = z.string().max(generalConstraints.blueprintIDMax);
 
-function nameLengthValidation(blueprintProps: EksBlueprintProps, blueprintID: string) 
-{
-    const test = z.string().max(63, {message: "Must be no more than 63 characters long."});//adds custom error message if I want to specify later on
-
-    try{
-        test.parse(blueprintID);
+        testMax.parse(blueprintProps.id);
+    } catch (e) {
+        throw new Error('Managed Node Groups ID must be no more than 63 characters long!')
     }
-    catch(e){
-        throw new Error('Must be no more than 63 characters long.');
+    try {
+        const testMin = z.string().min(generalConstraints.blueprintIDMin);
 
+        testMin.parse(blueprintProps.id)
+    } catch (e) {
+        throw new Error('Managed Node Groups ID must be no less than 1 character long!')
+    }
+
+    try {
+        const testMax = z.string().max(generalConstraints.blueprintNameMax);
+
+        testMax.parse(blueprintProps.name);
+    } catch (e) {
+        throw new Error('Managed Node Groups name must be no more than 63 characters long!')
+    }
+    try {
+        const testMin = z.string().min(generalConstraints.blueprintNameMin);
+
+        testMin.parse(blueprintProps.name)
+    } catch (e) {
+        throw new Error('Managed Node Groups name must be no less than 1 character long!')
     }
 }
+
+var generalConstraints = {
+    blueprintIDMax: 63,
+    blueprintIDMin: 1,
+    blueprintNameMax: 63,
+    blueprintNameMin: 1
+};
