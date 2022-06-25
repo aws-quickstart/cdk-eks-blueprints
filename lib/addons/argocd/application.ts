@@ -16,8 +16,13 @@ export class ArgoApplication {
 
         for (let key in flatValues) {
             // Avoid passing the undefined values and empty objects
-            if (flatValues[key] !== undefined && Object.keys(flatValues[key]).length != 0)
-                nameValues.push({ name: key, value: `${flatValues[key]}` });
+            if (flatValues[key] !== undefined) {
+                if (Object.getPrototypeOf(flatValues[key]) !== Object.prototype) {
+                    nameValues.push({ name: key, value: `${flatValues[key]}` });
+                } else if (Object.getPrototypeOf(flatValues[key]) === Object.prototype && Object.keys(flatValues[key]).length != 0) {
+                    nameValues.push({ name: key, value: `${flatValues[key]}` });
+                }
+            }
         }
         const repository = deployment.repository ?? this.generateDefaultRepo(deployment.name);
 
