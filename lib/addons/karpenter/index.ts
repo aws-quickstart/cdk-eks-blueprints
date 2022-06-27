@@ -57,7 +57,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.11.1',
+    version: '0.12.1',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -89,7 +89,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || {};
-        const amiFamily = this.options.amiFamily || "";
+        const amiFamily = this.options.amiFamily;
 
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
