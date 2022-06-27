@@ -57,7 +57,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.12.0',
+    version: '0.11.1',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
