@@ -15,7 +15,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Specs for a Provisioner (Optional) - If not provided, the add-on will
      * deploy a Provisioner with default values.
      */
-    provisionerSpecs?: { 
+    provisionerSpecs?: {
         'node.kubernetes.io/instance-type'?: string[],
         'topology.kubernetes.io/zone'?: string[],
         'kubernetes.io/arch'?: string[],
@@ -31,14 +31,14 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
      */
-    subnetTags?: { 
+    subnetTags?: {
         [key: string]: string
     }
 
     /**
      * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
      */
-    securityGroupTags?: { 
+    securityGroupTags?: {
         [key: string]: string
     }
 
@@ -90,7 +90,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || {};
         const amiFamily = this.options.amiFamily || "";
-      
+
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
             assumedBy: new iam.ServicePrincipal(`ec2.${cluster.stack.urlSuffix}`),
@@ -157,7 +157,7 @@ export class KarpenterAddOn extends HelmAddOn {
                         securityGroupSelector: sgTags,
                     },
                     ttlSecondsAfterEmpty: 30,
-                }, 
+                },
             });
             provisioner.node.addDependency(karpenterChart);
         }
@@ -168,7 +168,7 @@ export class KarpenterAddOn extends HelmAddOn {
     /**
      * Helper function to convert a key-pair values of provisioner spec configurations
      * To appropriate json format for addManifest function
-     * @param specs 
+     * @param specs
      * @returns
      * */
     protected convertToSpec(specs: { [key: string]: string[]; }): any[] {
