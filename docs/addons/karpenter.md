@@ -18,6 +18,8 @@ Karpenter works by:
 
 2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`. 
 
+3. The current add-on supports up to ***v0.12.1***. The latest version introduces a new CRD that is not currently supported.
+
 ## Prerequisite
 
 (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
@@ -39,13 +41,17 @@ const karpenterAddonProps = {
     'karpenter.sh/capacity-type': ['spot','on-demand'],
   },
   subnetTags: {
-    'karpenter.sh/discovery/MyCluster': 'Name',
-    'karpenter.sh/discovery/Tag1': 'tag1value',
+    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
   },
   securityGroupTags: {
-    'karpenter.sh/discovery/MyCluster': 'Name',
-    'karpenter.sh/discovery/Tag1': 'tag1value',
+    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
   },
+  taints: [{
+    key: "workload",
+    value: "test",
+    effect: "NoSchedule",
+  }],
+  amiFamily: "AL2",
 }
 const vpcCniAddOn = new blueprints.addons.VpcCniAddOn();
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
@@ -57,11 +63,12 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 
 The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
+- aws.defaultInstanceProfile
 - clusterEndpoint
 - clusterName
 - serviceAccount.create
 - serviceAccount.name
-- serviceAccount.annotations
+- serviceAccount.annotations.eks.amazonaws.com/role-arn
 
 To validate that Karpenter add-on is running ensure that the add-on deployments for the controller and the webhook are in `RUNNING` state:
 
@@ -74,12 +81,11 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 ## Functionality
 
-1. (Optionally) tag EKS VPC subnets and security group with user-provided tags.
-2. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why).
-3. Creates `karpenter` namespace.
-4. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
-5. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-6. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/docs/provisioner/#specrequirements) and tags. 
+1. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why).
+2. Creates `karpenter` namespace.
+3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
+4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
+5. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/v0.12.1/provisioner/#specrequirements), [AMI type](https://karpenter.sh/v0.12.1/aws/provisioning/#amazon-machine-image-ami-family), taints and tags. If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with. 
 
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided. 
@@ -91,28 +97,19 @@ To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://ka
 
 This can be done in 2 ways:
 
-1. Provide the following: Subnet tags, Security Group tags and provisioner specs.
+1. Provide the following: Subnet tags and Security Group tags.
 
 ```typescript
-const provisionerSpecs = {
-    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
-    'topology.kubernetes.io/zone': ['us-east-1c'],
-    'kubernetes.io/arch': ['amd64','arm64'],
-    'karpenter.sh/capacity-type': ['spot','on-demand'],
-}
 
 const subnetTags = {
-    'karpenter.sh/discovery/MyCluster': 'Name',
-    'karpenter.sh/discovery/Tag1': 'tag1value',
+  "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
 }
 
 const sgTags = {
-    'karpenter.sh/discovery/MyCluster': 'Name',
-    'karpenter.sh/discovery/Tag1': 'tag1value',
+  "kubernetes.io/cluster/blueprint-construct-dev": "owned",
 }
 
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
-  provisionerSpecs: provisionerSpecs,
   subnetTags: subnetTags,
   securityGroupTags: sgTags,
 });
@@ -120,7 +117,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
 
 If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner. 
 
-2. Use `kubectl` to apply a provisioner manifest:
+2. Use `kubectl` to apply a sample provisioner manifest:
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: karpenter.sh/v1alpha5
@@ -142,18 +139,16 @@ spec:
       operator: In
       values: ["spot", "on-demand"]
   provider:
-    instanceProfile: KarpenterNodeInstanceProfile-${CLUSTER_NAME}
+    instanceProfile: <<Name of your Instance Profile>>
     subnetSelector:
-      karpenter.sh/discovery/MyCluster: 'Name'
-      karpenter.sh/discovery/Tag1: 'tag1value'
+      Name: blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1
     securityGroupSelector:
-      karpenter.sh/discovery/MyCluster: 'Name'
-      karpenter.sh/discovery/Tag1: 'tag1value'
+      "kubernetes.io/cluster/blueprint-construct-dev": "owned"
   ttlSecondsAfterEmpty: 30
 EOF
 ```
 
-If you choose to create a provisioner manually, you **MUST** tag the subnets and the EKS Security Group with the tags matching what is listed in the provisioner manifest.
+If you choose to create a provisioner manually, you **MUST** provide the tags that match the subnet and the security group that you want to use.
 
 ## Testing with a sample deployment
 
