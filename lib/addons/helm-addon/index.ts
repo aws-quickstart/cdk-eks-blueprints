@@ -14,7 +14,7 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
 
     constructor(props: HelmAddOnProps) {
         this.props = cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
-        //generalAddonConstraintsValidation(props); This is my addon approach. Leaving it for later
+       //validateInputAddonConstraints(props); //This is my addon approach. Leaving it for later
     }
     
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
@@ -27,18 +27,18 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
     }
 }
 //below is my addon approach method for when I get too it. Leaving for later
-function generalAddonConstraintsValidation(props: HelmAddOnProps){
+function validateInputAddonConstraints(props: HelmAddOnProps){
     try{
         const test = z.string().max(addonConstraints.addonNameMaxLength);
-        console.log(props.name + "-=-=-=-=-=")
+        console.log(props.name + "-=-=-=-=-=");
         test.parse(props.name);
     }
     catch(e){
-        throw new Error('Addon Names must be no more than 128 characters long!')
+        throw new Error('Addon Names must be no more than 128 characters long!');
     }
 }
 
-var addonConstraints = {
+const addonConstraints = {
     addonNameMaxLength: 128,
     addonNameMinLength: 1
 };

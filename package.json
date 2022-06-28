@@ -12,7 +12,6 @@
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "devDependencies": {
-        "@babel/preset-typescript": "^7.17.12",
         "@types/dot-object": "^2.1.2",
         "@types/jest": "^27.5.2",
         "@types/js-yaml": "^4.0.5",
