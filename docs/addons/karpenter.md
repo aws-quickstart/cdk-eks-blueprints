@@ -1,6 +1,6 @@
 # Karpenter Add-on
 
-Karpenter add-on is based on the [Karpenter](https://github.com/aws/karpenter) open source node provisioning project. It provides a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application. 
+Karpenter add-on is based on the [Karpenter](https://github.com/aws/karpenter) open source node provisioning project. It provides a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application.
 
 Karpenter works by:
 
@@ -10,13 +10,13 @@ Karpenter works by:
 * Scheduling the pods to run on the new nodes, and
 * Removing the nodes when the nodes are no longer needed
 
-***IMPORTANT***: 
+***IMPORTANT***:
 
 1. This add-on depends on [VPC CNI](vpc-cni.md) Add-on for cni support.
 
 ***VPC CNI add-on must be present in add-on array*** and ***must be in add-on array before the Karpenter add-on*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for VpcCniAddOn`.
 
-2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`. 
+2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`.
 
 3. The current add-on supports up to ***v0.12.1***. The latest version introduces a new CRD that is not currently supported.
 
@@ -85,10 +85,10 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/v0.12.1/provisioner/#specrequirements), [AMI type](https://karpenter.sh/v0.12.1/aws/provisioning/#amazon-machine-image-ami-family), taints and tags. If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with. 
+5. (Optionally) provisions a default Karpenter Provisioner CRD based on user-provided [spec.requirements](https://karpenter.sh/v0.12.1/provisioner/#specrequirements), [AMI type](https://karpenter.sh/v0.12.1/aws/provisioning/#amazon-machine-image-ami-family), taints and tags. If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
 
 **NOTE:**
-1. The default provisioner is created only if both the subnet tags and the security group tags are provided. 
+1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
 2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
 
 ## Using Karpenter
@@ -115,7 +115,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
 });
 ```
 
-If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner. 
+If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner.
 
 2. Use `kubectl` to apply a sample provisioner manifest:
 ```bash
@@ -126,16 +126,16 @@ metadata:
   name: default
 spec:
   requirements:
-    - key: "node.kubernetes.io/instance-type" 
+    - key: "node.kubernetes.io/instance-type"
       operator: In
       values: ["m5.2xlarge"]
-    - key: "topology.kubernetes.io/zone" 
+    - key: "topology.kubernetes.io/zone"
       operator: In
       values: ["us-east-1c"]
-    - key: "kubernetes.io/arch" 
+    - key: "kubernetes.io/arch"
       operator: In
       values: ["arm64", "amd64"]
-    - key: "karpenter.sh/capacity-type" 
+    - key: "karpenter.sh/capacity-type"
       operator: In
       values: ["spot", "on-demand"]
   provider:
