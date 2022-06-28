@@ -3,12 +3,12 @@ import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import { cloneDeep } from "../utils";
+import { cloneDeep, ConstraintsType } from "../utils";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
-import { number, z } from 'zod';
+import {StringConstraint, validateConstraints} from '../utils';
 
 export class EksBlueprintProps {
     /**
@@ -54,6 +54,12 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogTypes[];
+}
+
+const blueprintPropsContraints: ConstraintsType<Partial<EksBlueprintProps>> = {
+    
+    id: new StringConstraint(1,63),
+    name: new StringConstraint(1,63)
 }
 
 export enum ControlPlaneLogTypes {
@@ -275,11 +281,9 @@ export class EksBlueprint extends cdk.Stack {
 
         return result;
     }
-
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        //validateInputConstraints(blueprintProps);
-
+        validateConstraints(blueprintProps, blueprintPropsContraints);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {
@@ -290,74 +294,3 @@ export class EksBlueprint extends cdk.Stack {
         }
     }
 }
-/*
-function validateInputConstraints(blueprintProps: EksBlueprintProps) {
-    try {
-        let r = blueprintPropsContraints.id?.min;
-        const testMax = z.string().max(r);
-
-        if(blueprintProps.id != undefined)
-        testMax.parse(blueprintProps.id);
-    } catch (e) {
-        throw new Error('Managed Node Groups ID must be no more than 63 characters long!');
-    }
-    try {
-        const testMin = z.string().min();
-
-        if(blueprintProps.id != undefined)
-        testMin.parse(blueprintProps.id);
-    } catch (e) {
-        throw new Error('Managed Node Groups ID must be no less than 1 character long!');
-    }
-
-    try {
-        const testMax = z.string().max();
-       
-        if(blueprintProps.name != undefined)
-        testMax.parse(blueprintProps.name);
-    } catch (e) {
-        
-        throw new Error('Managed Node Groups name must be no more than 63 characters long!');
-    }
-    try {
-        const testMin = z.string().min();
-        if(blueprintProps.name != undefined)
-        testMin.parse(blueprintProps.name);
-    } catch (e) {
-        throw new Error('Managed Node Groups name must be no less than 1 character long!');
-    }
-}
-
-export interface Constraint {
-    validate(key: string, value: any);
- }
- 
- export class StringConstraint implements Constraint {
-    constructor(readonly min?: number, readonly max?: number ...){}
-    
-    validate(....) {
-      zod.
-    }
- }
- type ConstraintsType<T> = Partial<Record<keyof T, Constraint>>;
-
- const blueprintPropsContraints : ConstraintsType<Partial<EksBlueprintProps>> = {
-    id: {min: 1, max: 63},
-    name: {min: 1, max: 63}
-}
-*/
-
-/*
-export interface StringConstraint {
-    min?: number | undefined;
-    max?: number;
- }
-
-type ConstraintsType<T> = Partial<Record<keyof T, StringConstraint>>;
-
-const blueprintPropsContraints : ConstraintsType<Partial<EksBlueprintProps>> = {
-    id: {min: 1, max: 63},
-    name: {min: 1, max: 63}
-}
-console.log(blueprintPropsContraints.id?.min);
-*/
