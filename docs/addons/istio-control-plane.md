@@ -63,7 +63,7 @@ const istioControlPlaneAddOnProps = {
           memory: "2048Mi",
         }
       }
-    }    
+    }
   }
 }
 
