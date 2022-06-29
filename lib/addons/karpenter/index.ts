@@ -2,9 +2,10 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, tagSecurityGroup, tagSubnets } from '../../utils';
+import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
+import * as md5 from 'ts-md5';
 
 /**
  * Configuration options for the add-on
@@ -14,26 +15,37 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Specs for a Provisioner (Optional) - If not provided, the add-on will
      * deploy a Provisioner with default values.
      */
-    provisionerSpecs?: { 
+    provisionerSpecs?: {
         'node.kubernetes.io/instance-type'?: string[],
         'topology.kubernetes.io/zone'?: string[],
         'kubernetes.io/arch'?: string[],
         'karpenter.sh/capacity-type'?: string[],
     }
 
+    taints?: [{
+        key: string,
+        value: string,
+        effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
+    }]
+
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
      */
-    subnetTags?: { 
+    subnetTags?: {
         [key: string]: string
     }
 
     /**
      * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
      */
-    securityGroupTags?: { 
+    securityGroupTags?: {
         [key: string]: string
     }
+
+    /**
+     * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
+     */
+    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
 }
 
 const KARPENTER = 'karpenter';
@@ -45,7 +57,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.8.2',
+    version: '0.12.1',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -69,28 +81,16 @@ export class KarpenterAddOn extends HelmAddOn {
         const endpoint = clusterInfo.cluster.clusterEndpoint;
         const name = clusterInfo.cluster.clusterName;
         const cluster = clusterInfo.cluster;
+        const stackName = clusterInfo.cluster.stack.stackName;
+        const region = clusterInfo.cluster.stack.region;
         let values = this.options.values ?? {};
 
         const provisionerSpecs = this.options.provisionerSpecs || {};
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
+        const taints = this.options.taints || [];
+        const amiFamily = this.options.amiFamily;
 
-        // Tag VPC Subnets
-        if (subnetTags){
-            Object.entries(subnetTags).forEach(
-                ([key,value]) => {
-                    tagSubnets(cluster.stack, cluster.vpc.privateSubnets, key, value);
-            });
-        }
-        
-        // Tag VPC Security Group
-        if (sgTags){
-            Object.entries(sgTags).forEach(
-                ([key,value]) => {
-                    tagSecurityGroup(cluster.stack, cluster.clusterSecurityGroupId, key, value);
-            });
-        }
-      
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
             assumedBy: new iam.ServicePrincipal(`ec2.${cluster.stack.urlSuffix}`),
@@ -104,9 +104,10 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Set up Instance Profile
+        const instanceProfileName = md5.Md5.hashStr(stackName+region);
         const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
-            //instanceProfileName: `KarpenterNodeInstanceProfile-${name}`,
+            instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
 
@@ -149,12 +150,14 @@ export class KarpenterAddOn extends HelmAddOn {
                 metadata: { name: 'default' },
                 spec: {
                     requirements: this.convertToSpec(provisionerSpecs),
+                    taints: taints,
                     provider: {
+                        amiFamily: amiFamily,
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
                     ttlSecondsAfterEmpty: 30,
-                }, 
+                },
             });
             provisioner.node.addDependency(karpenterChart);
         }
@@ -165,7 +168,7 @@ export class KarpenterAddOn extends HelmAddOn {
     /**
      * Helper function to convert a key-pair values of provisioner spec configurations
      * To appropriate json format for addManifest function
-     * @param specs 
+     * @param specs
      * @returns
      * */
     protected convertToSpec(specs: { [key: string]: string[]; }): any[] {

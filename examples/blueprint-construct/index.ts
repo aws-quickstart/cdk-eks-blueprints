@@ -68,7 +68,19 @@ export default class BlueprintConstruct extends Construct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.FalcoAddOn(),
             // new.EksBlueprintProps.addons.OpaGatekeeperAddOn(),
-            new blueprints.addons.KarpenterAddOn(),
+            new blueprints.addons.KarpenterAddOn({
+                subnetTags: {
+                    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                },
+                securityGroupTags: {
+                    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+                },
+                taints: [{
+                    key: "workload",
+                    value: "test",
+                    effect: "NoSchedule",
+                }],
+            }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
