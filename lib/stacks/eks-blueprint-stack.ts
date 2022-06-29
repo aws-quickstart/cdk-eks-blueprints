@@ -56,11 +56,11 @@ export class EksBlueprintProps {
     readonly enableControlPlaneLogTypes?: ControlPlaneLogTypes[];
 }
 
-const blueprintPropsContraints: ConstraintsType<Partial<EksBlueprintProps>> = {
+const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
     
     id: new StringConstraint(1,63),
     name: new StringConstraint(1,63)
-}
+};
 
 export enum ControlPlaneLogTypes {
     api = "api",
