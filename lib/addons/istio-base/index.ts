@@ -56,7 +56,7 @@ const defaultProps = {
     chart: "base",
     version: "1.13.3",
     repository: "https://istio-release.storage.googleapis.com/charts"
- };
+};
 
 export class IstioBaseAddOn extends HelmAddOn {
 
@@ -68,27 +68,27 @@ export class IstioBaseAddOn extends HelmAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-      
+
         const cluster = clusterInfo.cluster;
 
         // Istio Namespace
         createNamespace('istio-system', cluster);
 
         let values: Values = {
-          global: {
-            istiod: {
-              enableAnalysis: this.options.enableAnalysis
-            },
-            configValidation: this.options.configValidation,
-            externalIstiod: this.options.externalIstiod,
-            base: {
-              enableIstioConfigCRDs: this.options.enableIstioConfigCRDs
+            global: {
+                istiod: {
+                    enableAnalysis: this.options.enableAnalysis
+                },
+                configValidation: this.options.configValidation,
+                externalIstiod: this.options.externalIstiod,
+                base: {
+                    enableIstioConfigCRDs: this.options.enableIstioConfigCRDs
+                }
             }
-          }
         };
 
         values = merge(values, this.props.values ?? {});
         const chart = this.addHelmChart(clusterInfo, values);
-      return Promise.resolve(chart);
+        return Promise.resolve(chart);
     }
 }
