@@ -26,15 +26,15 @@ export class IstioControlPlaneAddOn extends HelmAddOn {
 
     @dependable('IstioBaseAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-      
-        const cluster = clusterInfo.cluster;        
+
+        const cluster = clusterInfo.cluster;
 
         let values: ValuesSchema = {
             awsRegion: cluster.stack.region,
         };
 
         values = merge(values, this.props.values ?? {});
-        
+
         const chart = this.addHelmChart(clusterInfo, values);
         return Promise.resolve(chart);
     }
