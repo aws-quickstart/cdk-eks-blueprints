@@ -302,7 +302,7 @@ class CodePipeline {
         } else {
             let gitHubRepo = props.repository as GitHubSourceRepository;
             let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
-            let gitHubOwner = gitHubRepo.owner ? gitHubRepo.owner : gitHubRepo.owner;
+            const gitHubOwner = gitHubRepo.owner ?? props.owner;
 
             if (gitHubRepo.credentialsSecretName) {
                 githubProps = {
