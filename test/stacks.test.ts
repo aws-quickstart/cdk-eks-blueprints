@@ -358,7 +358,7 @@ describe('Unit tests for EKS Blueprint', () => {
         console.log(stack.templateOptions.description);
         expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
     });
-    
+
     test("Nested stack add-on creates correct nested stack", async () => {
         const app = new cdk.App();
         const vpcAddOn = new blueprints.NestedStackAddOn( {
@@ -396,7 +396,7 @@ test("Named resource providers are correctly registered and discovered", async (
             name: "appteam", namespace: "appteam-ns"
         }))
         .buildAsync(app, 'stack-with-resource-providers');
-    
+
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.Vpc)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.HostedZone)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.Certificate)).toBeDefined();
@@ -437,7 +437,7 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     const stack = blueprint.build(app, "builder-version-test1");
 
     expect(stack.getClusterInfo().version).toBeDefined();
- 
+
 });
 
 test("Account and region are correctly initialized when not explicitly set on the blueprint", () => {

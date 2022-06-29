@@ -13,7 +13,7 @@ export {
 
 /**
  * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
- * repoUrl 
+ * repoUrl
  */
 export interface GitHubSourceRepository extends Omit<ApplicationRepository, "credentialsType"> {
     /**
@@ -62,7 +62,7 @@ export function isCodeCommitRepo(repo: GitHubSourceRepository | CodeCommitSource
  * Props for the Pipeline.
  */
 export type PipelineProps = {
-    
+
     /**
      * The name for the pipeline.
      */
@@ -95,7 +95,7 @@ export type PipelineProps = {
 }
 
 /**
- * Stack stage is a builder construct to allow adding stages to a pipeline. Each stage is expected to produce a stack. 
+ * Stack stage is a builder construct to allow adding stages to a pipeline. Each stage is expected to produce a stack.
  */
 export interface StackStage {
     /**
@@ -114,12 +114,12 @@ export interface StackStage {
     stageProps?: cdkpipelines.AddStageOpts;
 }
 
-/** 
+/**
  * Internal interface for wave stages
  */
 interface WaveStage extends StackStage {
     /**
-     * Wave id if this stage is part of a wave. Not required if stage is supplied 
+     * Wave id if this stage is part of a wave. Not required if stage is supplied
      */
     waveId?: string,
 }
@@ -129,7 +129,7 @@ interface WaveStage extends StackStage {
  */
 export interface PipelineWave {
 
-    id: string, 
+    id: string,
 
     stages: StackStage[],
 
@@ -173,8 +173,8 @@ export class CodePipelineBuilder implements StackBuilder {
 
     /**
      * Adds standalone pipeline stages (in the order of invocation and elements in the input array)
-     * @param stackStages 
-     * @returns 
+     * @param stackStages
+     * @returns
      */
     public stage(...stackStages: StackStage[]) : CodePipelineBuilder {
         stackStages.forEach(stage => this.props.stages!.push(stage));
@@ -183,17 +183,17 @@ export class CodePipelineBuilder implements StackBuilder {
 
     /**
      * Adds wave(s) in the order specified. All stages in the wave can be executed in parallel, while standalone stages are executed sequentially.
-     * @param waves 
-     * @returns 
+     * @param waves
+     * @returns
      */
     public wave(...waves: PipelineWave[]) : CodePipelineBuilder {
-        waves.forEach(wave => { 
+        waves.forEach(wave => {
             this.props.waves!.push(wave);
             wave.stages.forEach(stage => this.props.stages?.push({...stage, ...{ waveId: wave.id}}));
         });
         return this;
     }
-    
+
     build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
         assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
         assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
@@ -211,7 +211,7 @@ export class CodePipelineBuilder implements StackBuilder {
 
 
 /**
- * Pipeline stack is generating a self-mutating pipeline to faciliate full CI/CD experience with the platform 
+ * Pipeline stack is generating a self-mutating pipeline to faciliate full CI/CD experience with the platform
  * for infrastructure changes.
  */
 export class CodePipelineStack extends cdk.Stack {
@@ -240,7 +240,7 @@ export class CodePipelineStack extends cdk.Stack {
 
         Promise.all(promises).then(stages => {
             let currentWave : cdkpipelines.Wave | undefined;
-            
+
             for(let i in stages) {
                 const stage = pipelineProps.stages[i];
                 if(stage.waveId) {
@@ -250,7 +250,7 @@ export class CodePipelineStack extends cdk.Stack {
                         currentWave = pipeline.addWave(stage.waveId, { ...waveProps.props });
                     }
                     currentWave.addStage(stages[i], stage.stageProps);
-                } 
+                }
                 else {
                     pipeline.addStage(stages[i], stage.stageProps);
                 }
