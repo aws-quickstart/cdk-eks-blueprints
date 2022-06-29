@@ -48,6 +48,8 @@ export default class BlueprintConstruct extends Construct {
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
+            new blueprints.addons.IstioBaseAddOn(),
+            new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.ContainerInsightsAddOn(),
