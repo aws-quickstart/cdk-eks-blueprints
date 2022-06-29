@@ -3,7 +3,7 @@ import { GitOpsApplicationDeployment, GitRepositoryReference } from '../../spi';
 
 /**
  * Argo Application is a utility class that can generate an ArgoCD application
- * from generic GitOps application properties.  
+ * from generic GitOps application properties.
  */
 export class ArgoApplication {
 
@@ -60,8 +60,8 @@ export class ArgoApplication {
 
     /**
      * Creates an opinionated path.
-     * @param name 
-     * @returns 
+     * @param name
+     * @returns
      */
     generateDefaultRepo(name: string): GitRepositoryReference {
         if (this.bootstrapRepo) {
