@@ -46,6 +46,12 @@ export default class BlueprintConstruct extends Construct {
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
+
+        // Instantiated to for helm version check.
+        new blueprints.ExternalDnsAddOn({
+            hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
+        });
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),

@@ -39,6 +39,7 @@
         "lint": "^1.1.2",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^1.1.0",
+        "tslog": "^3.3.3",
         "yaml": "^1.10.2"
     }
 }
