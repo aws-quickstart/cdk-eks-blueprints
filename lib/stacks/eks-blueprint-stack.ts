@@ -53,7 +53,7 @@ export class EksBlueprintProps {
      * Control Plane log types to be enabled (if not passed, none)
      * If wrong types are included, will throw an error.
      */
-    readonly enableControlPlaneLogTypes?: ControlPlaneLogTypes[];
+    readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
 }
 
 const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
@@ -62,12 +62,12 @@ const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
     name: new StringConstraint(1,63)
 };
 
-export enum ControlPlaneLogTypes {
-    api = "api",
-    audit = "audit",
-    authenticator = "authenticator",
-    controllerManager = "controllerManager",
-    scheduler = "scheduler"
+export enum ControlPlaneLogType {
+    api = 'api',
+    audit = 'audit',
+    authenticator = 'authenticator',
+    controllerManager = 'controllerManager',
+    scheduler = 'scheduler'
 }
 
 /**
@@ -111,7 +111,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableControlPlaneLogTypes(...types: ControlPlaneLogTypes[]): this {
+    public enableControlPlaneLogTypes(...types: ControlPlaneLogType[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
         return this;
     }
