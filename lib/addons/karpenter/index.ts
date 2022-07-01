@@ -88,7 +88,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const provisionerSpecs = this.options.provisionerSpecs || {};
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
-        const taints = this.options.taints || {};
+        const taints = this.options.taints || [];
         const amiFamily = this.options.amiFamily;
 
         // Set up Node Role
