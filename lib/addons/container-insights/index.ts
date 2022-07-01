@@ -14,7 +14,7 @@ const defaultProps = {
     name: "adot-exporter-for-eks-on-ec2",
     namespace: undefined, // the chart will choke if this value is set
     chart: "adot-exporter-for-eks-on-ec2",
-    version: "0.1.0",
+    version: "0.6.0",
     release: "adot-eks-addon",
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };

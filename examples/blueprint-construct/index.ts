@@ -5,6 +5,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
+import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
 
 
@@ -12,28 +13,20 @@ const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
 const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
 
-export interface BlueprintConstructProps {
-    /**
-     * Id
-     */
-    id: string
-}
 
-export default class BlueprintConstruct extends Construct {
-    constructor(scope: Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
-        super(scope, blueprintProps.id);
+export default class BlueprintConstruct {
 
-        // TODO: fix IAM user provisioning for admin user
-        // Setup platform team.
-        //const account = props.env!.account!
-        // const platformTeam = new team.TeamPlatform(account)
-        // Teams for the cluster.
+    constructor(scope: Construct, props: cdk.StackProps) {
+
+        HelmAddOn.validateHelmVersions = true;
+
         const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
             new team.TeamRiker(scope, teamManifestDirList[1]),
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
+
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
@@ -51,6 +44,8 @@ export default class BlueprintConstruct extends Construct {
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
+        
+        new blueprints.OpaGatekeeperAddOn();
 
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
@@ -84,7 +79,7 @@ export default class BlueprintConstruct extends Construct {
             }),
         ];
 
-        const blueprintID = `${blueprintProps.id}-dev`;
+        const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);

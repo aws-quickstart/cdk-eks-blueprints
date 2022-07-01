@@ -31,9 +31,21 @@ const semverComparator = (a: string, b: string) => {
 /**
  * Represent result of helm chart version validation against newer versions
  */
-export interface HelmChartVersionValidationResult {
+export interface CheckVersionResult {
+
+    /**
+     * Contains the highest version of the helm chart discovered in the helm chart repository.
+     */
     highestVersion: string | undefined,
+    
+    /**
+     * True if the provided version is the latest version in the helm chart repository. Otherwise, false.
+     */
     latestVersion: boolean,
+
+    /**
+     * All discovered versions of the chart, discovered in the provided helm chart repository.
+     */
     allVersions: string[];
 }
 
@@ -51,12 +63,12 @@ export function listChartVersions(chart: HelmChartVersion): string[] {
 }
 
 /**
- * Validates the provided helm chart version against the repository.
+ * Checks the provided helm chart version against the repository.
  * Validation is successful if there is no higher version registered in the repository. 
  * @param chart 
  * @returns 
  */
-export function validateLatestVersion(chart: HelmChartVersion) : HelmChartVersionValidationResult {
+export function checkHelmChartVersion(chart: HelmChartVersion) : CheckVersionResult {
     let versions = listChartVersions(chart);
     if(versions === null || versions.length == 0) {
         console.error("No versions are found for " + chart.chart + " in repository " + chart.repository );
