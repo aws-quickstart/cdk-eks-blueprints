@@ -283,7 +283,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(blueprintProps, blueprintPropsContraints);
+        validateConstraints(blueprintProps, blueprintPropsContraints, EksBlueprintProps.name);//this .name gives the class name! Good to know
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

@@ -16,23 +16,28 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 
 function getConstraintsDataSet(): [BlueprintBuilder, ZodError][] {
   let result: [BlueprintBuilder, ZodError][] = [];
-  const blueprint1 = blueprints.EksBlueprint.builder().addOns(...addOns).name(longName);
-  const blueprint1ZodError = new z.ZodError([]);
+  const blueprint1 = blueprints.EksBlueprint.builder().addOns(...addOns).id(longName);
+  
+  const blueprint1ZodError = new z.ZodError([{
+    code: "too_big",
+    maximum: 63,
+    type: "string",
+    inclusive: true,
+    path: [],
+    message: "sdfasdf"
+  }]);
 
-  //Seeing if this might be what I need for crafting my zod error to what I need it to be
-  const testing = z.array(z.string()).superRefine((val, ctx) => {
-      ctx.addIssue({
-        code: z.ZodIssueCode.too_big,
-        maximum: 3,
-        type: "array",
-        inclusive: true,
-        message: "Too many items",
-      });
-  });
-
-
-  const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(ControlPlaneLogTypes.api);
-  const blueprint2ZodError = new z.ZodError([]);
+  const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(ControlPlaneLogTypes.api).name(longName);
+  const blueprint2ZodError = new z.ZodError([{
+    //code: "too_small",
+    code: "too_big",
+    maximum: 63,
+    //minimum: 1,
+    type: "string",
+    inclusive: true,
+    path: [],
+    message: "sdfasdf"
+  }]);
 
   result.push([blueprint1, blueprint1ZodError]);
   result.push([blueprint2, blueprint2ZodError]);
@@ -41,8 +46,28 @@ function getConstraintsDataSet(): [BlueprintBuilder, ZodError][] {
 }
 
 test("For Each loop test.", () => {
-  getConstraintsDataSet().forEach((e, index) => {
-    expect(() => e[index][0].build(app, longName + index))
-      .toThrow(e[index][1]);
+  getConstraintsDataSet().forEach((ex) => {
+    try{
+     ex[0].build(app, ex[0].props.id!);//be sure all tests built have a id defined before this!
+     expect(true).toBe(false);
+     
+    } catch(e) {
+      if(e instanceof z.ZodError){ //we are testing for code, maximum/minimum, and type
+        const eMax = (e.issues[0] as any).maximum;
+        const eMin = (e.issues[0] as any).minimum;
+        const eCode = (e.issues[0] as any).code;
+        const eType = (e.issues[0] as any).type;
+
+        const exMax = (ex[1].issues[0] as any).maximum;
+        const exMin = (ex[1].issues[0] as any).minimum;
+        const exCode = (ex[1].issues[0] as any).code;
+        const exType = (ex[1].issues[0] as any).type;
+
+        expect( ((eMax ?? 11) == (exMax ?? 12) || //in case its min or max since that can differe I added this OR
+        (eMin ?? 11) == (exMin ?? 12)) &&//checks if maximum matches
+        eCode == exCode &&//checks if code matches
+        eType == exType).toBe(true);//checks if type matches
+      }
+  }
   });
 });
