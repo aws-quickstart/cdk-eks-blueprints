@@ -63,6 +63,7 @@ const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
 };
 
 export enum ControlPlaneLogType {
+    
     api = 'api',
     audit = 'audit',
     authenticator = 'authenticator',
