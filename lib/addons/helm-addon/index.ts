@@ -41,9 +41,8 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
     constructor(props: HelmAddOnProps) {
         this.props = cloneDeep(props); // avoids polution when reusing the same props across stacks, such as values
 
-        validateConstraints(props, helmAddonPropsContraints, HelmAddOn.name);
+        validateConstraints([props], helmAddonPropsContraints, HelmAddOn.name);
     }
-
 
     abstract deploy(clusterInfo: spi.ClusterInfo): void | Promise<Construct>;
 

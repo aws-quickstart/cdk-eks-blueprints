@@ -53,7 +53,7 @@ export class EksBlueprintProps {
      * Control Plane log types to be enabled (if not passed, none)
      * If wrong types are included, will throw an error.
      */
-    readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
+    readonly enableControlPlaneLogTypes?: CONTROL_PLANE_LOG_TYPE[];
 }
 
 const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
@@ -62,7 +62,7 @@ const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
     name: new StringConstraint(1,63)
 };
 
-export enum ControlPlaneLogType {
+export const enum CONTROL_PLANE_LOG_TYPE {
     
     api = 'api',
     audit = 'audit',
@@ -112,7 +112,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableControlPlaneLogTypes(...types: ControlPlaneLogType[]): this {
+    public enableControlPlaneLogTypes(...types: CONTROL_PLANE_LOG_TYPE[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
         return this;
     }
@@ -284,7 +284,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(blueprintProps, blueprintPropsContraints, EksBlueprintProps.name);//this .name gives the class name! Good to know
+        validateConstraints([blueprintProps], blueprintPropsContraints, EksBlueprintProps.name);//this .name gives the class name! Good to know
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

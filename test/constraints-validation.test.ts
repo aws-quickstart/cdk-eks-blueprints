@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { BlueprintBuilder, ControlPlaneLogType } from '../lib';
+import { BlueprintBuilder, CONTROL_PLANE_LOG_TYPE } from '../lib';
 import { z, ZodError } from 'zod';
 
 const longName = 'eks-blueprint-with-an-extra-kind-of-very-long-name-that-is-definitely-not-going-to-work';
@@ -13,7 +13,11 @@ const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.ClusterAutoScalerAddOn(),
   new blueprints.addons.VpcCniAddOn(),
 ];
+
+
 type BlueprintBuilderError = [BlueprintBuilder, ZodError];
+
+//function getConstraintsGenericCluster(): GenericClusterProvider{}
 
 function getConstraintsDataSet(): BlueprintBuilderError[] {
   let result: [BlueprintBuilder, ZodError][] = [];
@@ -28,7 +32,7 @@ function getConstraintsDataSet(): BlueprintBuilderError[] {
     message: "Big"
   }]);
 
-  const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(ControlPlaneLogType.authenticator).name(longName);
+  const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.authenticator).name(longName);
   const blueprint2ZodError = new z.ZodError([{
     code: "too_big",
     maximum: 63,

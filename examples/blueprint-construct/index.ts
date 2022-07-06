@@ -5,7 +5,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { Construct } from "constructs";
 
 import * as blueprints from '../../lib';
-import { ControlPlaneLogType } from '../../lib';
+import { CONTROL_PLANE_LOG_TYPE } from '../../lib';
 import * as team from '../teams';
 
 
@@ -131,7 +131,7 @@ export default class BlueprintConstruct extends Construct {
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams)
-            .enableControlPlaneLogTypes(ControlPlaneLogType.api)
+            .enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.api)
             .build(scope, blueprintID, props);
     }
 }

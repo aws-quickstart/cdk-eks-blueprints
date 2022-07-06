@@ -3,7 +3,7 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
-import { ConstraintsType, NumberConstraint, setPath, valueFromContext, Writeable } from "../utils";
+import { ArrayConstraint, ConstraintsType, NumberConstraint, setPath, valueFromContext, Writeable } from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
@@ -96,11 +96,11 @@ export const genericClusterPropsContraints: ConstraintsType<GenericClusterProvid
     /**
      * managedNodeGroups max size is 10 managed node groups per EKS cluster, and as little as 0.
      */
-    managedNodeGroups: new NumberConstraint(0, 10),
+    managedNodeGroups: new ArrayConstraint(0, 10),
     /**
     * autoscalingNodeGroups max size is 10 managed node groups per EKS cluster, and as little as 0.
     */
-    autoscalingNodeGroups: new NumberConstraint(0, 10)
+    autoscalingNodeGroups: new ArrayConstraint(0, 10)
 };
 
 export const defaultOptions = {
@@ -160,10 +160,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
     constructor(readonly props: GenericClusterProviderProps) {
 
-        validateConstraints(props, genericClusterPropsContraints, GenericClusterProvider.name);
-        validateConstraints(props.managedNodeGroups, managedNodeGroupContraints, "ManagedNodeGroup");//change context?
-        validateConstraints(props.autoscalingNodeGroups, autoscalingNodeGroupContraints, "AutoscalingNodeGroups");//change context?
-        validateConstraints(props.fargateProfiles, fargateProfileConstraints, "FargateProfiles");//change context?
+        this.validateInput(props);
 
         assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0
             && props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0),
@@ -311,6 +308,13 @@ export class GenericClusterProvider implements ClusterProvider {
         }
 
         return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
+    }
+
+    private validateInput(props: GenericClusterProviderProps) {
+        validateConstraints(props, genericClusterPropsContraints, GenericClusterProvider.name);
+        validateConstraints(props.managedNodeGroups, managedNodeGroupContraints, "ManagedNodeGroup");//change context?
+        validateConstraints(props.autoscalingNodeGroups, autoscalingNodeGroupContraints, "AutoscalingNodeGroups");//change context?
+        validateConstraints(props.fargateProfiles, fargateProfileConstraints, "FargateProfiles");//change context?
     }
 }
 
