@@ -20,7 +20,7 @@ export class CoreAddOnProps {
      */
     readonly policyDocumentProvider?: (partition: string) => PolicyDocument;
     /**
-     * Service Account Name to be used with AddOn.
+     * Service Account Name to be used with AddOn
      */
     readonly saName: string;
 }
