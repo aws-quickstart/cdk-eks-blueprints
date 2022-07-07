@@ -46,22 +46,27 @@ export interface GenericClusterProviderProps extends eks.ClusterOptions {
 export const managedNodeGroupContraints: ConstraintsType<ManagedNodeGroup> = {
     /**
      * id can be no less than 1 character long, and no greater than 63 characters long.
+     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     id: new StringConstraint(1, 63),
     /**
      * minSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     minSize: new NumberConstraint(0, 100),
     /**
      * maxSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     maxSize: new NumberConstraint(0, 100),
     /**
      * desiredSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     desiredSize: new NumberConstraint(0, 100),
     /**
      * amiReleaseVersion can be no less than 1 character long, and no greater than 63 characters long.
+     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     amiReleaseVersion: new StringConstraint(1, 63)
 };
@@ -69,18 +74,22 @@ export const managedNodeGroupContraints: ConstraintsType<ManagedNodeGroup> = {
 export const autoscalingNodeGroupContraints: ConstraintsType<ManagedNodeGroup> = {
     /**
      * id can be no less than 1 character long, and no greater than 63 characters long.
+     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     id: new StringConstraint(1, 63),
     /**
      * minSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     minSize: new NumberConstraint(0, 100),
     /**
      * maxSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     maxSize: new NumberConstraint(0, 100),
     /**
      * desiredSize has a maximum of 100 nodes per node group and can be as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     desiredSize: new NumberConstraint(0, 100)
 };
@@ -88,6 +97,7 @@ export const autoscalingNodeGroupContraints: ConstraintsType<ManagedNodeGroup> =
 export const fargateProfileConstraints: ConstraintsType<FargateProfileOptions> = {
     /**
      * fargateProfileNames can be no less than 1 character long, and no greater than 63 characters long.
+     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     fargateProfileName: new StringConstraint(1, 63)
 };
@@ -95,10 +105,12 @@ export const fargateProfileConstraints: ConstraintsType<FargateProfileOptions> =
 export const genericClusterPropsContraints: ConstraintsType<GenericClusterProviderProps> = {
     /**
      * managedNodeGroups max size is 10 managed node groups per EKS cluster, and as little as 0.
+     * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster
      */
     managedNodeGroups: new ArrayConstraint(0, 10),
     /**
     * autoscalingNodeGroups max size is 10 managed node groups per EKS cluster, and as little as 0.
+    * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster
     */
     autoscalingNodeGroups: new ArrayConstraint(0, 10)
 };
@@ -312,10 +324,11 @@ export class GenericClusterProvider implements ClusterProvider {
 
     private validateInput(props: GenericClusterProviderProps) {
         validateConstraints(props, genericClusterPropsContraints, GenericClusterProvider.name);
-        validateConstraints(props.managedNodeGroups, managedNodeGroupContraints, "ManagedNodeGroup");//change context?
-        validateConstraints(props.autoscalingNodeGroups, autoscalingNodeGroupContraints, "AutoscalingNodeGroups");//change context?
-        validateConstraints(props.fargateProfiles, fargateProfileConstraints, "FargateProfiles");//change context?
+        if (props.managedNodeGroups != undefined)
+            validateConstraints(props.managedNodeGroups, managedNodeGroupContraints, "ManagedNodeGroup");//change context?
+        if (props.autoscalingNodeGroups != undefined)
+            validateConstraints(props.autoscalingNodeGroups, autoscalingNodeGroupContraints, "AutoscalingNodeGroups");//change context?
+        if (props.fargateProfiles as any != undefined)
+            validateConstraints(Object.values(props.fargateProfiles as any), fargateProfileConstraints, "FargateProfiles");//change context?
     }
 }
-
-

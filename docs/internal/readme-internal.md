@@ -54,4 +54,7 @@ For external contributors:
    1. Clear description of the feature
    2. Test coverage
    3. Validation instructions
-   
+
+## Validations framework link to readme
+
+Path: docs/internal/input-validations-framework-readme.md

@@ -8,29 +8,35 @@ export type HelmAddOnProps = HelmChartConfiguration;
 export type HelmAddOnUserProps = Partial<HelmChartConfiguration>;
 
 export const helmAddonPropsContraints: ConstraintsType<HelmAddOnProps> = {
-    /**
- * chart can be no less than 1 character long, and no greater than 63 characters long.
- */
+   /**
+   * chart can be no less than 1 character long, and no greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     chart: new StringConstraint(1, 63),
-    /**
- * name can be undefined, but cannot be greater than 63 characters long.
- */
+   /**
+   * name can be undefined, but cannot be greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     name: new StringConstraint(undefined, 63),
-    /**
- * namespace can be no less than 1 character long, and no greater than 63 characters long.
- */
+   /**
+   * namespace can be no less than 1 character long, and no greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     namespace: new StringConstraint(1, 63),
-    /**
- * release can be no less than 1 character long, and no greater than 63 characters long.
- */
+   /**
+   * release can be no less than 1 character long, and no greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     release: new StringConstraint(1, 63),
-    /**
- * repository can be no less than 1 character long, and no greater than 63 characters long.
- */
+   /**
+   * repository can be no less than 1 character long, and no greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     repository: new StringConstraint(1, 63), //add URL constraint
-    /**
- * version can be no less than 1 character long, and no greater than 63 characters long.
- */
+   /**
+   * version can be no less than 1 character long, and no greater than 63 characters long.
+   * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+   */
     version: new StringConstraint(1, 63)
 };
 

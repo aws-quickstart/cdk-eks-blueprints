@@ -56,16 +56,11 @@ export function validateConstraints<T>(object: any, constraints: ConstraintsType
     if (Array.isArray(object) == false && object != undefined)
         object = [object];
 
-    if (object != undefined)
+        if (object != undefined)
         for (let i = 0; i < object.length; i++) {
             for (let k in constraints) {
-                try {
-                    const constraint: Constraint = constraints[k]!;
-                    constraint.validate(context + "." + k, object[i][k]);
-                } catch (e) {//this try-catch is for testing purposes only temporary
-                    //console.log(e);
-                    console.log("YOU MESSED UP SOMEWHERE-=-=-=-");
-                }
+                const constraint: Constraint = constraints[k]!;
+                constraint.validate(context + "." + k, object[i][k]);
             }
         }
 }
