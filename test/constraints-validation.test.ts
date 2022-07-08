@@ -15,10 +15,12 @@ const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.VpcCniAddOn(),
 ];
 
-type BlueprintBuilderError = [Function, ZodError];
+type Executeable = () => void;
 
-function getConstraintsDataSet(): BlueprintBuilderError[] {
-  let result: [Function, ZodError][] = [];
+type DataError = [Executeable, ZodError];
+
+function getConstraintsDataSet(): DataError[] {
+  let result: [Executeable, ZodError][] = [];
   const blueprint1 = blueprints.EksBlueprint.builder().addOns(...addOns).id(longName);
   const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.authenticator).name("").id("id name");
 
@@ -67,6 +69,13 @@ function getConstraintsDataSet(): BlueprintBuilderError[] {
     message: ""
   }]);
 
+  const notUrlError = new z.ZodError([{
+    validation: "url",
+    code: "invalid_string",
+    message: "",
+    path: []
+  }]);
+
   function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
     return new blueprints.GenericClusterProvider({
       version: KubernetesVersion.V1_21,
@@ -80,75 +89,63 @@ function getConstraintsDataSet(): BlueprintBuilderError[] {
     });
   }
 
-  function createManyAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
+  function manyAutoScalingGroup(id: string) {
     return new blueprints.GenericClusterProvider({
       version: KubernetesVersion.V1_21,
       autoscalingNodeGroups: [
         {
-          id: id + 1,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
+          id: id + 1
         },
         {
-          id: id + 2,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
+          id: id + 2
         },
         {
-          id: id + 3,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
+          id: id + 3
+        },
+        {
+          id: id + 4
+        },
+        {
+          id: id + 5
+        },
+        {
+          id: id + 6
+        },
+        {
+          id: id + 7
+        },
+        {
+          id: id + 8
+        },
+        {
+          id: id + 9
+        },
+        {
+          id: id + 10
+        },
+        {
+          id: id + 11
+        }
+      ]
+    });
+  }
+
+  function singleErrorInArray(id: string, errorNumberVariable?: number) {
+    return new blueprints.GenericClusterProvider({
+      version: KubernetesVersion.V1_21,
+      autoscalingNodeGroups: [
+        {
+          id: id + 1
+        },
+        {
+          id: id + 2
+        },
+        {
+          id: id + 3
         },
         {
           id: id + 4,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 5,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 6,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 7,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 8,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 9,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 10,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        },
-        {
-          id: id + 11,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
+          minSize: errorNumberVariable
         }
       ]
     });
@@ -166,6 +163,7 @@ function getConstraintsDataSet(): BlueprintBuilderError[] {
     });
   }
 
+  //be sure all blueprint tests built have a id defined before this!
   result.push([() => blueprint1.build(app, blueprint1.props.id!), tooBigString63]);
   result.push([() => blueprint2.build(app, blueprint2.props.id!), tooSmallString1]);
 
@@ -177,9 +175,13 @@ function getConstraintsDataSet(): BlueprintBuilderError[] {
   result.push([() => createAutoScalingGroup("Name", 5000), tooBigNumber100]);
   result.push([() => createAutoScalingGroup("Name", -1), tooSmallNumber0]);
 
-  result.push([() => createManyAutoScalingGroup("Name"), tooBigNumber10]);
+  result.push([() => manyAutoScalingGroup("Name"), tooBigNumber10]);
 
   result.push([() => new blueprints.addons.MetricsServerAddOn({ name: longName }), tooBigString63]);
+  result.push([() => new blueprints.addons.MetricsServerAddOn({ repository: "improper.website" }), notUrlError]);
+
+  result.push([() => manyAutoScalingGroup("Name"), tooBigNumber10]);
+  result.push([() => singleErrorInArray("Name", 345), tooBigNumber100]);
 
   return result;
 }
@@ -206,7 +208,7 @@ function compareObjectFields(object1: any, object2: any) {
 test("For Each loop test.", () => {
   getConstraintsDataSet().forEach((ex) => {
     try {
-      ex[0]();//be sure all tests built have a id defined before this!
+      ex[0]();
       expect(true).toBe(false);
     } catch (e) {
       if (e instanceof z.ZodError) {

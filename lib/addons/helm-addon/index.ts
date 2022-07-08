@@ -1,7 +1,7 @@
 import { Duration } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as spi from "../..";
-import { cloneDeep, ConstraintsType, StringConstraint, validateConstraints } from "../../utils";
+import { cloneDeep, ConstraintsType, StringConstraint, UrlStringConstraint, validateConstraints } from "../../utils";
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 
 export type HelmAddOnProps = HelmChartConfiguration;
@@ -13,26 +13,31 @@ export const helmAddonPropsContraints: ConstraintsType<HelmAddOnProps> = {
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
    */
     chart: new StringConstraint(1, 63),
+
    /**
-   * name can be undefined, but cannot be greater than 63 characters long.
+   * name can be no less than 1 character long, and no greater than 63 characters long.
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
    */
-    name: new StringConstraint(undefined, 63),
+    name: new StringConstraint(1, 63),
+
    /**
    * namespace can be no less than 1 character long, and no greater than 63 characters long.
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
    */
     namespace: new StringConstraint(1, 63),
+
    /**
    * release can be no less than 1 character long, and no greater than 63 characters long.
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
    */
     release: new StringConstraint(1, 63),
+
    /**
-   * repository can be no less than 1 character long, and no greater than 63 characters long.
+   * repository can be no less than 1 character long, and no greater than 63 characters long. It also must follow a URL format.
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
    */
-    repository: new StringConstraint(1, 63), //add URL constraint
+    repository: new UrlStringConstraint(1, 63),
+    
    /**
    * version can be no less than 1 character long, and no greater than 63 characters long.
    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/

@@ -49,21 +49,25 @@ export const managedNodeGroupContraints: ConstraintsType<ManagedNodeGroup> = {
      * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     id: new StringConstraint(1, 63),
+
     /**
      * minSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     minSize: new NumberConstraint(0, 100),
+
     /**
      * maxSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     maxSize: new NumberConstraint(0, 100),
+
     /**
      * desiredSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     desiredSize: new NumberConstraint(0, 100),
+
     /**
      * amiReleaseVersion can be no less than 1 character long, and no greater than 63 characters long.
      * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
@@ -77,16 +81,19 @@ export const autoscalingNodeGroupContraints: ConstraintsType<ManagedNodeGroup> =
      * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
     id: new StringConstraint(1, 63),
+
     /**
      * minSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     minSize: new NumberConstraint(0, 100),
+
     /**
      * maxSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
      */
     maxSize: new NumberConstraint(0, 100),
+    
     /**
      * desiredSize has a maximum of 100 nodes per node group and can be as little as 0.
      * https://aws.amazon.com/blogs/containers/eks-managed-node-groups/#:~:text=Additionally%2C%20there%20is%20a%20limit,on%20a%20given%20EKS%20cluster.
