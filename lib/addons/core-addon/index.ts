@@ -1,4 +1,4 @@
-import { CfnAddon } from "aws-cdk-lib/aws-eks";
+import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
@@ -19,6 +19,10 @@ export class CoreAddOnProps {
      * Policy document provider returns the policy required by the add-on to allow it to interact with AWS resources
      */
     readonly policyDocumentProvider?: (partition: string) => PolicyDocument;
+    /**
+     * Service Account Name to be used with AddOn
+     */
+    readonly saName: string;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -38,23 +42,28 @@ export class CoreAddOn implements ClusterAddOn {
 
         // Create a service account if user provides namespace and service account
         let serviceAccountRoleArn: string | undefined = undefined;
+        let serviceAccount: ServiceAccount | undefined = undefined;
 
         if (this.coreAddOnProps?.policyDocumentProvider) {
             const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
-            const serviceAccount = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.addOnName,
+            serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
                 DEFAULT_NAMESPACE, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
+
         }
-
-
-        // Instantiate the Add-on
-        return Promise.resolve(
-            new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
+        const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
-        }));
+        });
+        
+        if (serviceAccount) {
+            cfnaddon.node.addDependency(serviceAccount);
+        }
+
+        // Instantiate the Add-on
+        return Promise.resolve(cfnaddon!);
     }
 }
