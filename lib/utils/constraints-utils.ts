@@ -4,7 +4,6 @@ export interface Constraint {
     validate(key: string, value: any, identifier: string): any;
 }
 
-
 export class StringConstraint implements Constraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
@@ -19,15 +18,15 @@ export class StringConstraint implements Constraint {
     }
 }
 
-export class UrlStringConstraint implements StringConstraint{
+export class UrlStringConstraint implements StringConstraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
 
     validate(key: string, value: any, identifier: string) {
 
-        if (value != undefined){
+        if (value != undefined) {
 
-            z.string().url({ message: key + " (" + identifier + ": " + value + ") must be a URL!"}).parse(value);
+            z.string().url({ message: key + " (" + identifier + ": " + value + ") must be a URL!" }).parse(value);
 
             z.string()
                 .min(this.min ?? 0, { message: key + " (" + identifier + ": " + value + ") must be a URL no less than " + this.min + " characters long!" })
@@ -67,10 +66,7 @@ export class ArrayConstraint implements Constraint {
 
 export type ConstraintsType<T> = Partial<Record<keyof T, Constraint>>;
 
-export function validateConstraints<T>(object: any, constraints: ConstraintsType<T>, context: string) {
-
-    if (Array.isArray(object) == false && object != undefined)
-        object = [object];
+export function validateConstraints<T>(constraints: ConstraintsType<T>, context: string, ...object: any) {
 
     if (object != undefined)
         for (let i = 0; i < object.length; i++) {

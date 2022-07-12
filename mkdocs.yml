@@ -3,7 +3,7 @@ repo_name: "aws-quickstart/cdk-eks-blueprints"
 repo_url: "https://github.com/aws-quickstart/cdk-eks-blueprints"
 docs_dir: "docs"
 theme:
-  name: material
+  name: mkdocs
   features:
     - tabs
 nav:

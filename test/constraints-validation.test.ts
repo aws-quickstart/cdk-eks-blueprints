@@ -7,161 +7,163 @@ import { KubernetesVersion } from 'aws-cdk-lib/aws-eks/lib';
 
 const app = new cdk.App();
 
-const longName = 'eks-blueprint-with-an-extra-kind-of-very-long-name-that-is-definitely-not-going-to-work';
-
 const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.MetricsServerAddOn(),
   new blueprints.addons.ClusterAutoScalerAddOn(),
   new blueprints.addons.VpcCniAddOn(),
 ];
 
-type Executeable = () => void;
+const tooBigNumber100 = new z.ZodError([{
+  code: "too_big",
+  maximum: 100,
+  type: "number",
+  inclusive: true,
+  path: [],
+  message: ""
+}]);
 
-type DataError = [Executeable, ZodError];
+const tooBigString63 = new z.ZodError([{
+  code: "too_big",
+  maximum: 63,
+  type: "string",
+  inclusive: true,
+  path: [],
+  message: ""
+}]);
 
-function getConstraintsDataSet(): DataError[] {
-  let result: [Executeable, ZodError][] = [];
-  const blueprint1 = blueprints.EksBlueprint.builder().addOns(...addOns).id(longName);
-  const blueprint2 = blueprints.EksBlueprint.builder().addOns(...addOns).enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.authenticator).name("").id("id name");
+const tooBigNumber10 = new z.ZodError([{
+  code: "too_big",
+  maximum: 10,
+  type: "number",
+  inclusive: true,
+  path: [],
+  message: ""
+}]);
 
-  const tooBigNumber100 = new z.ZodError([{
-    code: "too_big",
-    maximum: 100,
-    type: "number",
-    inclusive: true,
-    path: [],
-    message: ""
-  }]);
+const tooSmallString1 = new z.ZodError([{
+  code: "too_small",
+  minimum: 1,
+  type: "string",
+  inclusive: true,
+  path: [],
+  message: ""
+}]);
 
-  const tooBigString63 = new z.ZodError([{
-    code: "too_big",
-    maximum: 63,
-    type: "string",
-    inclusive: true,
-    path: [],
-    message: ""
-  }]);
+const tooSmallNumber0 = new z.ZodError([{
+  code: "too_small",
+  minimum: 0,
+  type: "number",
+  inclusive: true,
+  path: [],
+  message: ""
+}]);
 
-  const tooBigNumber10 = new z.ZodError([{
-    code: "too_big",
-    maximum: 10,
-    type: "number",
-    inclusive: true,
-    path: [],
-    message: ""
-  }]);
+const notUrlError = new z.ZodError([{
+  validation: "url",
+  code: "invalid_string",
+  message: "",
+  path: []
+}]);
 
-  const tooSmallString1 = new z.ZodError([{
-    code: "too_small",
-    minimum: 1,
-    type: "string",
-    inclusive: true,
-    path: [],
-    message: ""
-  }]);
+const longName = 'eks-blueprint-with-an-extra-kind-of-very-long-name-that-is-definitely-not-going-to-work';
+const blueprintBase = blueprints.EksBlueprint.builder().addOns(...addOns);
 
-  const tooSmallNumber0 = new z.ZodError([{
-    code: "too_small",
-    minimum: 0,
-    type: "number",
-    inclusive: true,
-    path: [],
-    message: ""
-  }]);
+type Executable = () => void;
 
-  const notUrlError = new z.ZodError([{
-    validation: "url",
-    code: "invalid_string",
-    message: "",
-    path: []
-  }]);
+type DataError = [Executable, ZodError];
 
-  function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
-    return new blueprints.GenericClusterProvider({
-      version: KubernetesVersion.V1_21,
-      autoscalingNodeGroups: [
-        {
-          id: id,
-          minSize: minSize,
-          maxSize: maxSize,
-          desiredSize: desiredSize
-        }]
-    });
-  }
+function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
+  return new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_21,
+    autoscalingNodeGroups: [
+      {
+        id: id,
+        minSize: minSize,
+        maxSize: maxSize,
+        desiredSize: desiredSize
+      }]
+  });
+}
 
-  function manyAutoScalingGroup(id: string) {
-    return new blueprints.GenericClusterProvider({
-      version: KubernetesVersion.V1_21,
-      autoscalingNodeGroups: [
-        {
-          id: id + 1
-        },
-        {
-          id: id + 2
-        },
-        {
-          id: id + 3
-        },
-        {
-          id: id + 4
-        },
-        {
-          id: id + 5
-        },
-        {
-          id: id + 6
-        },
-        {
-          id: id + 7
-        },
-        {
-          id: id + 8
-        },
-        {
-          id: id + 9
-        },
-        {
-          id: id + 10
-        },
-        {
-          id: id + 11
-        }
-      ]
-    });
-  }
-
-  function singleErrorInArray(id: string, errorNumberVariable?: number) {
-    return new blueprints.GenericClusterProvider({
-      version: KubernetesVersion.V1_21,
-      autoscalingNodeGroups: [
-        {
-          id: id + 1
-        },
-        {
-          id: id + 2
-        },
-        {
-          id: id + 3
-        },
-        {
-          id: id + 4,
-          minSize: errorNumberVariable
-        }
-      ]
-    });
-  }
-
-  function createFargatProfile(fargateProfileName: string) {
-    return new blueprints.GenericClusterProvider({
-      version: KubernetesVersion.V1_21,
-      fargateProfiles: {
-        "fp1": {
-          fargateProfileName: fargateProfileName,
-          selectors: [{ namespace: "serverless1" }]
-        }
+function manyAutoScalingGroup(id: string) {
+  return new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_21,
+    autoscalingNodeGroups: [
+      {
+        id: id + 1
+      },
+      {
+        id: id + 2
+      },
+      {
+        id: id + 3
+      },
+      {
+        id: id + 4
+      },
+      {
+        id: id + 5
+      },
+      {
+        id: id + 6
+      },
+      {
+        id: id + 7
+      },
+      {
+        id: id + 8
+      },
+      {
+        id: id + 9
+      },
+      {
+        id: id + 10
+      },
+      {
+        id: id + 11
       }
-    });
-  }
+    ]
+  });
+}
+
+function singleErrorInArray(id: string, errorNumberVariable?: number) {
+  return new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_21,
+    autoscalingNodeGroups: [
+      {
+        id: id + 1
+      },
+      {
+        id: id + 2
+      },
+      {
+        id: id + 3
+      },
+      {
+        id: id + 4,
+        minSize: errorNumberVariable
+      }
+    ]
+  });
+}
+
+function createFargatProfile(fargateProfileName: string) {
+  return new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_21,
+    fargateProfiles: {
+      "fp1": {
+        fargateProfileName: fargateProfileName,
+        selectors: [{ namespace: "serverless1" }]
+      }
+    }
+  });
+}
+function getConstraintsDataSet(): DataError[] {
+
+  let result: [Executable, ZodError][] = [];
+
+  const blueprint1 = blueprintBase.clone().id(longName);
+  const blueprint2 = blueprintBase.clone().enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.authenticator).name("").id("id name");
 
   //be sure all blueprint tests built have a id defined before this!
   result.push([() => blueprint1.build(app, blueprint1.props.id!), tooBigString63]);
@@ -186,7 +188,7 @@ function getConstraintsDataSet(): DataError[] {
   return result;
 }
 
-function compareObjectFields(object1: any, object2: any) {
+function compareIssues(object1: any, object2: any) {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);
 
@@ -214,7 +216,7 @@ test("For Each loop test.", () => {
       if (e instanceof z.ZodError) {
         const thrownError = (e.issues[0] as any);
         const customError = (ex[1].issues[0] as any);
-        expect(compareObjectFields(thrownError, customError)).toBe(true);
+        expect(compareIssues(thrownError, customError)).toBe(true);
       }
     }
   });

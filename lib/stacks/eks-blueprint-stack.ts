@@ -8,7 +8,7 @@ import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
-import {StringConstraint, validateConstraints} from '../utils';
+import { StringConstraint, validateConstraints } from '../utils';
 
 export class EksBlueprintProps {
     /**
@@ -55,15 +55,22 @@ export class EksBlueprintProps {
      */
     readonly enableControlPlaneLogTypes?: CONTROL_PLANE_LOG_TYPE[];
 }
+export class BlueprintPropsContraints implements ConstraintsType<EksBlueprintProps> {
+    /**
+    * id can be no less than 1 character long, and no greater than 63 characters long.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    id = new StringConstraint(1, 63);
 
-const blueprintPropsContraints: ConstraintsType<EksBlueprintProps> = {
-    
-    id: new StringConstraint(1,63),
-    name: new StringConstraint(1,63)
-};
+    /**
+    * name can be no less than 1 character long, and no greater than 63 characters long.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    name = new StringConstraint(1, 63);
+}
 
 export const enum CONTROL_PLANE_LOG_TYPE {
-    
+
     api = 'api',
     audit = 'audit',
     authenticator = 'authenticator',
@@ -284,7 +291,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints([blueprintProps], blueprintPropsContraints, EksBlueprintProps.name);//this .name gives the class name! Good to know
+        validateConstraints(new BlueprintPropsContraints, EksBlueprintProps.name, blueprintProps);//this .name gives the class name! Good to know
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {
