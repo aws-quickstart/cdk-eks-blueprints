@@ -45,7 +45,7 @@ export class EksBlueprintProps {
     /**
      * Named resource providers to leverage for cluster resources.
      * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
-     * VPC for the cluster can be registed under the name of 'vpc' or as a single provider of type 
+     * VPC for the cluster can be registered under the name of 'vpc' or as a single provider of type 
      */
     resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
@@ -55,7 +55,7 @@ export class EksBlueprintProps {
      */
     readonly enableControlPlaneLogTypes?: CONTROL_PLANE_LOG_TYPE[];
 }
-export class BlueprintPropsContraints implements ConstraintsType<EksBlueprintProps> {
+export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {
     /**
     * id can be no less than 1 character long, and no greater than 63 characters long.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
@@ -291,7 +291,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(new BlueprintPropsContraints, EksBlueprintProps.name, blueprintProps);//this .name gives the class name! Good to know
+        validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);//this .name gives the class name! Good to know
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

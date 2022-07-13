@@ -45,7 +45,7 @@ export interface HelmChartConfiguration {
 }
 
 /**
- * Extends helm chart configurtion (repo/chart) with deployment parameters: values, timeout and wait.
+ * Extends helm chart configuration (repo/chart) with deployment parameters: values, timeout and wait.
  */
 export interface HelmChartDeployment extends Required<HelmChartConfiguration> {
     /**
@@ -75,7 +75,7 @@ export interface ManifestConfiguration {
 }
 
 /**
- * Data structure extends Kubernetes manifest configiuration and allows passing deployment parameters.
+ * Data structure extends Kubernetes manifest configuration and allows passing deployment parameters.
  * Such parameters are expected to be templated within values inside the manifest as {{parameter-key}}.
  * For example, if values contains {region: 'us-east-2'} then the manifest is expected to contain 
  * { 'some-attribute' : {{region}}.
@@ -87,7 +87,7 @@ export interface ManifestDeployment extends Omit<ManifestConfiguration, "manifes
 
 /**
  * Kubectl provider for the add-ons and teams that is capable of helm and generic manifest deployments.
- * It exposes extenion mechanism and central points for logging, stack output, extension of functionality.
+ * It exposes extension mechanism and central points for logging, stack output, extension of functionality.
  */
 export class KubectlProvider {
 
@@ -110,7 +110,7 @@ export class KubectlProvider {
     /**
      * Simple template provider for manifest based add-ons. 
      * Replaces values in format {{key}} with the values passed in as values.
-     * @param document where tempated parameters must be replaced
+     * @param document where templated parameters must be replaced
      * @param values values to replace (e.g. region will be passed as "region: us-west-1" and any occurrence of {{region}} will be replaced)
      * @returns 
      */
@@ -136,7 +136,7 @@ export class KubectlProvider {
         return KubectlProvider.applyHelmDeployment(this.clusterInfo, props);
     }
 
-    public addManfiest(props: ManifestDeployment) : Construct {
+    public addManifest(props: ManifestDeployment) : Construct {
         return KubectlProvider.applyManifestDeployment(this.clusterInfo, props);
     }
 }
