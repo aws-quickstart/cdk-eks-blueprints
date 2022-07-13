@@ -50,7 +50,9 @@ export default class BlueprintConstruct {
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.MetricsServerAddOn({
+                skipVersionValidation: true
+            }),
             new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),

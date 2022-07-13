@@ -21,7 +21,7 @@ export abstract class HelmAddOn implements spi.ClusterAddOn {
     }
 
     public static validateVersion(helmChart: HelmChartVersion) {
-        if(HelmAddOn.validateHelmVersions) {
+        if(HelmAddOn.validateHelmVersions && !helmChart.skipVersionValidation) {
             const result = checkHelmChartVersion(helmChart);
             if(this.failOnVersionValidation && !result.latestVersion) {
                 throw new Error(`Helm version validation failed for ${helmChart.chart}. 

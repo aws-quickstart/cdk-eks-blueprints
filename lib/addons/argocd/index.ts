@@ -61,7 +61,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     namespace: "argocd",
-    version: '4.9.11',
+    version: '4.9.12',
     chart: "argo-cd",
     release: "blueprints-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
