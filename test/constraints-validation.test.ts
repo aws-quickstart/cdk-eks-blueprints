@@ -176,7 +176,6 @@ test("So given that specific validation constraints have been done prior, when c
       ex[0]();
       expect(true).toBe(false);
     } catch (e) {
-      console.log(e);
       if (e instanceof z.ZodError) {
         const thrownError = (e.issues[0] as any);
         const customError = (ex[1].issues[0] as any);
