@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -40,6 +40,7 @@
         "lint": "^1.1.2",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^1.1.0",
+        "ts-md5": "^1.2.11",
         "tslog": "^3.3.3",
         "yaml": "^1.10.2"
     }

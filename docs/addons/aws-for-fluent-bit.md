@@ -73,7 +73,7 @@ const awsForFluentBit = new blueprints.addons.AwsForFluentBitAddOn({
 	values: {
 		elasticSearch: {
 			enabled: true,
-			region: "<aws_region",
+			awsRegion: "<aws_region",
 			host: "<elastic_search_host>"
 		}
 	}

@@ -13,20 +13,29 @@ const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
 const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
 
+export interface BlueprintConstructProps {
+    /**
+     * Id
+     */
+    id: string
+}
 
 export default class BlueprintConstruct {
-
     constructor(scope: Construct, props: cdk.StackProps) {
 
         HelmAddOn.validateHelmVersions = true;
 
+        // TODO: fix IAM user provisioning for admin user
+        // Setup platform team.
+        //const account = props.env!.account!
+        // const platformTeam = new team.TeamPlatform(account)
+        // Teams for the cluster.
         const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
             new team.TeamRiker(scope, teamManifestDirList[1]),
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
-
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
@@ -39,20 +48,12 @@ export default class BlueprintConstruct {
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
-
-        // Instantiated to for helm version check.
-        new blueprints.ExternalDnsAddOn({
-            hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
-        });
-        
-        new blueprints.OpaGatekeeperAddOn();
-
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
+            new blueprints.addons.IstioBaseAddOn(),
+            new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
-            new blueprints.addons.MetricsServerAddOn({
-                skipVersionValidation: true
-            }),
+            new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
@@ -69,7 +70,19 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.FalcoAddOn(),
             // new.EksBlueprintProps.addons.OpaGatekeeperAddOn(),
-            new blueprints.addons.KarpenterAddOn(),
+            new blueprints.addons.KarpenterAddOn({
+                subnetTags: {
+                    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                },
+                securityGroupTags: {
+                    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+                },
+                taints: [{
+                    key: "workload",
+                    value: "test",
+                    effect: "NoSchedule",
+                }],
+            }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
@@ -80,6 +93,12 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
         ];
+
+        // Instantiated to for helm version check.
+        new blueprints.ExternalDnsAddOn({
+            hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
+        });
+        new blueprints.OpaGatekeeperAddOn();
 
         const blueprintID = 'blueprint-construct-dev';
 
