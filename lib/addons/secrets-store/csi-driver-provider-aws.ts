@@ -15,11 +15,6 @@ export class CsiDriverProviderAws {
     const cluster = clusterInfo.cluster;
 
     type chartValues = {
-      linux: {
-        image: {
-          tag: string
-        }
-      },
       enableSecretRotation?: string,
       rotationPollInterval?: string,
       syncSecret?: {
@@ -29,11 +24,6 @@ export class CsiDriverProviderAws {
     }
 
     let values: chartValues = {
-      linux: {
-        image: {
-          tag: this.props.version!
-        }
-      },
       grpcSupportedProviders: 'aws'
     };
 
