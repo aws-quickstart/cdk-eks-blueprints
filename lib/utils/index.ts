@@ -1,6 +1,7 @@
 export * from './addon-utils';
-export * from './context-utils';
 export * from './cluster-utils';
+export * from './constraints-utils';
+export * from './context-utils';
 export * from './namespace-utils';
 export * from './object-utils';
 export * from './sa-utils';
@@ -11,4 +12,3 @@ export * from './yaml-utils';
 export * from './cluster-utils';
 export * from './vpc-utils';
 export * from './registry-utils';
-export * from './constraints-utils';

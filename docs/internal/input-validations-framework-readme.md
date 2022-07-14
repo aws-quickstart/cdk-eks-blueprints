@@ -1,31 +1,38 @@
-# Description
+# How to use the framework
 
-This is an internal readme to explain how to use the validation constraints framework to detect
-errors at build time rather than run time.
+The constraints framework implementation is located in the utils/constraints-utils.ts module
+
+import * from 'utils/constraints-utils';
 
 ## What can you use with the framework
 
-You will find in the constraints-utils.ts file the generic calls for the following classes if you properly import them from the constraints-utils.ts file.
+You will find in the constraints framework the generic calls for the following classes if you properly import them from the constraints framework.
 
 ## generic class of validations constraints-utils.ts
 
-This class holds the following classes and function(s) to validate constraints.
+This class holds the supported constraints and function(s) to validate constraints defined below in the rest of this document.
 
 ## StringConstraint
 
-Called with: new StringConstraint(minValue, maxValue);
+Constructor: new StringConstraint(minValue, maxValue);
+
+API reference ['here'](/docs/api/classes/utils.StringConstraint.html)
 
 If given string length falls outside of these inclusive bounds throws detailed Zod error
 
 ## UrlStringConstraint
 
-Called with new UrlStringConstraint(minValue, maxValue);
+Constructor: new UrlStringConstraint(minValue, maxValue); 
+
+API reference ['here'](/docs/api/classes/utils.UrlStringConstraint.html)
 
 If given string length falls outside of these inclusive bounds, or does not follow a proper URL format it throws detailed Zod error
 
 ## NumberConstraint
 
-Called with new NumberConstraint(minValue, maxValue);
+Constructor: new NumberConstraint(minValue, maxValue);
+
+API reference ['here'](/docs/api/classes/utils.NumberConstraint.html)
 
 If given number falls outside of these inclusive bounds throws detailed Zod error.
 
@@ -33,24 +40,36 @@ If given number falls outside of these inclusive bounds throws detailed Zod erro
 
 new utils.ArrayConstraint(minValue, maxValue);
 
+API reference ['here'](/docs/api/classes/utils.ArrayConstraint.html)
+
 If given array length falls outside of these inclusive bounds throws detailed Zod error.
 
 ## validateConstraints Function
 
-validateConstraints<T>(constraints: ConstraintsType<T>, context: string, ...object: any)
+validateConstraints<T>(constraints: ConstraintsType<T>, context: string, ...object: any) is the entry point to use the framework. This function can validate either a single object or an array of objects against the provided constraints.
 
-This is a generic function to take in three parameters:
+## How to use the constraints-utils.ts
 
-    constraints: the class type you specify to define key constraints.
+You need two things when utilizing constraints-utils.ts and the following examples are from ['here'](/lib/stacks/eks-blueprint-stack.ts)
 
-    context: context name of whats being tested for detailed error purposes.
+A class with specified keys assigned to given constraints. 
 
-    object: The object in question being validated.
+Example with two keys: 
 
-## How to use the constraints-utils.ts class?
+```typescript
+export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {
+    id = new StringConstraint(1, 63);
+    name = new StringConstraint(1, 63);
+```
 
-You need two things when utilizing constraints-utils.ts
+Calling validateConstraints.
 
-    -A class with specified keys assigned to given constraints.
+Example:
 
-    -Calling validateConstraints with right parameters in the right constructor.
+```typescript
+validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
+```
+
+## Limitations
+
+Currently, constraints can be defined for flat objects, and nested structures will require individual validations.

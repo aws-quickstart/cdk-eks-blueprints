@@ -53,8 +53,9 @@ export class EksBlueprintProps {
      * Control Plane log types to be enabled (if not passed, none)
      * If wrong types are included, will throw an error.
      */
-    readonly enableControlPlaneLogTypes?: CONTROL_PLANE_LOG_TYPE[];
+    readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
 }
+
 export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {
     /**
     * id can be no less than 1 character long, and no greater than 63 characters long.
@@ -69,13 +70,13 @@ export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintPr
     name = new StringConstraint(1, 63);
 }
 
-export const enum CONTROL_PLANE_LOG_TYPE {
+export const enum ControlPlaneLogType {
 
-    api = 'api',
-    audit = 'audit',
-    authenticator = 'authenticator',
-    controllerManager = 'controllerManager',
-    scheduler = 'scheduler'
+    API = 'api',
+    AUDIT = 'audit',
+    AUTHENTICATOR = 'authenticator',
+    CONTROLLER_MANAGER = 'controllerManager',
+    SCHEDULER = 'scheduler'
 }
 
 /**
@@ -119,7 +120,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableControlPlaneLogTypes(...types: CONTROL_PLANE_LOG_TYPE[]): this {
+    public enableControlPlaneLogTypes(...types: ControlPlaneLogType[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
         return this;
     }
@@ -291,7 +292,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);//this .name gives the class name! Good to know
+        validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

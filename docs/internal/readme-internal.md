@@ -57,4 +57,4 @@ For external contributors:
 
 ## Validations framework link to readme
 
-Path: docs/internal/input-validations-framework-readme.md
+See [this document](./input-validations-framework-readme.md) for more details. 

@@ -7,10 +7,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { StringConstraint, validateConstraints } from '../utils';
 import { FargateProfileOptions } from 'aws-cdk-lib/aws-eks';
-
-//DID THIS GET ADDED?
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -50,7 +47,7 @@ export class ManagedNodeGroupConstraints implements utils.ConstraintsType<Manage
      * id can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
      * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
      */
-    id = new StringConstraint(1, 63);
+    id = new utils.StringConstraint(1, 63);
 
     /**
     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
@@ -77,7 +74,7 @@ export class ManagedNodeGroupConstraints implements utils.ConstraintsType<Manage
      * amiReleaseVersion can be no less than 1 character long, and no greater than 1024 characters long.
      * https://docs.aws.amazon.com/imagebuilder/latest/APIReference/API_Ami.html
      */
-    amiReleaseVersion = new StringConstraint(1, 1024);
+    amiReleaseVersion = new utils.StringConstraint(1, 1024);
 }
 
 export class AutoscalingNodeGroupConstraints implements utils.ConstraintsType<AutoscalingNodeGroup> {
@@ -85,7 +82,7 @@ export class AutoscalingNodeGroupConstraints implements utils.ConstraintsType<Au
     * id can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    id = new StringConstraint(1, 63);
+    id = new utils.StringConstraint(1, 63);
 
     /**
     * Allowed range is 0 to 5000 inclusive.
@@ -111,7 +108,7 @@ export class FargateProfileConstraints implements utils.ConstraintsType<FargateP
     * fargateProfileNames can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    fargateProfileName = new StringConstraint(1, 63);
+    fargateProfileName = new utils.StringConstraint(1, 63);
 }
 
 export class GenericClusterPropsConstraints implements utils.ConstraintsType<GenericClusterProviderProps> {
@@ -337,12 +334,12 @@ export class GenericClusterProvider implements ClusterProvider {
     }
 
     private validateInput(props: GenericClusterProviderProps) {
-        validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
+        utils.validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
         if (props.managedNodeGroups != undefined)
-            validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
+            utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
         if (props.autoscalingNodeGroups != undefined)
-            validateConstraints(new AutoscalingNodeGroupConstraints, "AutoscalingNodeGroups", ...props.autoscalingNodeGroups);
+            utils.validateConstraints(new AutoscalingNodeGroupConstraints, "AutoscalingNodeGroups", ...props.autoscalingNodeGroups);
         if (props.fargateProfiles as any != undefined)
-            validateConstraints(new FargateProfileConstraints, "FargateProfiles", ...Object.values(props.fargateProfiles as any));
+            utils.validateConstraints(new FargateProfileConstraints, "FargateProfiles", ...Object.values(props.fargateProfiles as any));
     }
 }

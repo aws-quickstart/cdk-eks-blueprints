@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { AutoscalingNodeGroup, CONTROL_PLANE_LOG_TYPE } from '../lib';
+import { AutoscalingNodeGroup, ControlPlaneLogType } from '../lib';
 import { z, ZodError } from 'zod';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks/lib';
 
@@ -123,12 +123,13 @@ function createFargateProfile(fargateProfileName: string) {
     }
   });
 }
+
 function getConstraintsDataSet(): DataError[] {
 
   let result: [Executable, ZodError][] = [];
 
   const blueprint1 = blueprintBase.clone().id(longName);
-  const blueprint2 = blueprintBase.clone().enableControlPlaneLogTypes(CONTROL_PLANE_LOG_TYPE.authenticator).name("").id("idName");
+  const blueprint2 = blueprintBase.clone().enableControlPlaneLogTypes(ControlPlaneLogType.AUTHENTICATOR).name("").id("idName");
 
   //be sure all blueprint tests built have a id defined before this!
   result.push([() => blueprint1.build(app, blueprint1.props.id!), tooBigString63]);
@@ -170,11 +171,11 @@ function compareIssues(object1: any, object2: any) {
   return true;
 }
 
-test("So given that specific validation constraints have been done prior, when creating EKS Blueprints, ClusterProviders, and Helm Add-ons with invalid attributes, the tests will fail with the expected errors.", () => {
+test("Given validation constraints are defined, when creating EKS Blueprints, ClusterProviders, and Helm Add-ons with invalid attributes, the tests will fail with the expected errors.", () => {
   getConstraintsDataSet().forEach((ex) => {
     try {
       ex[0]();
-      expect(true).toBe(false);
+      throw new Error("No error was thrown as expected.");
     } catch (e) {
       if (e instanceof z.ZodError) {
         const thrownError = (e.issues[0] as any);
@@ -182,7 +183,7 @@ test("So given that specific validation constraints have been done prior, when c
         expect(compareIssues(thrownError, customError)).toBe(true);
       }
       else {
-        console.log("Not a Zod Error it passed: " + e);
+        throw new Error ("An unexpected error was thrown in the test. Message: " + e.message);
       }
     }
   });
