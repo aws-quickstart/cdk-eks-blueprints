@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/**
+ * This is interface for the constraints needed to test asking for the key name of the object, the value being tested, and context for detailed Zod errors.
+ */
 export interface Constraint {
     validate(key: string, value: any, identifier: string): any;
 }

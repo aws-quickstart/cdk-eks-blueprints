@@ -7,7 +7,6 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { FargateProfileOptions } from 'aws-cdk-lib/aws-eks';
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -103,7 +102,7 @@ export class AutoscalingNodeGroupConstraints implements utils.ConstraintsType<Au
     desiredSize = new utils.NumberConstraint(0, 5000);
 }
 
-export class FargateProfileConstraints implements utils.ConstraintsType<FargateProfileOptions> {
+export class FargateProfileConstraints implements utils.ConstraintsType<eks.FargateProfileOptions> {
     /**
     * fargateProfileNames can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
@@ -286,7 +285,6 @@ export class GenericClusterProvider implements ClusterProvider {
         cluster.addFargateProfile(name, profileOptions);
     }
 
-
     /**
      * Adds a managed node group to the cluster.
      * @param cluster 
@@ -334,6 +332,7 @@ export class GenericClusterProvider implements ClusterProvider {
     }
 
     private validateInput(props: GenericClusterProviderProps) {
+        
         utils.validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
         if (props.managedNodeGroups != undefined)
             utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);

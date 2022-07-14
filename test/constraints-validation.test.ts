@@ -1,7 +1,6 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { AutoscalingNodeGroup, ControlPlaneLogType } from '../lib';
 import { z, ZodError } from 'zod';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks/lib';
 
@@ -80,11 +79,11 @@ function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, 
 function createManyAutoScalingGroup(length: number) {
   return new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_21,
-    autoscalingNodeGroups: loop(new Array<AutoscalingNodeGroup>(length).fill({ id: "" }))
+    autoscalingNodeGroups: loop(new Array<blueprints.AutoscalingNodeGroup>(length).fill({ id: "" }))
   });
 }
 
-function loop(array: Array<AutoscalingNodeGroup>): AutoscalingNodeGroup[] {
+function loop(array: Array<blueprints.AutoscalingNodeGroup>): blueprints.AutoscalingNodeGroup[] {
   for (let i = 0; i < array.length; i++) {
     array[i] = { id: "" + i };
   }
@@ -129,7 +128,7 @@ function getConstraintsDataSet(): DataError[] {
   let result: [Executable, ZodError][] = [];
 
   const blueprint1 = blueprintBase.clone().id(longName);
-  const blueprint2 = blueprintBase.clone().enableControlPlaneLogTypes(ControlPlaneLogType.AUTHENTICATOR).name("").id("idName");
+  const blueprint2 = blueprintBase.clone().enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.AUTHENTICATOR).name("").id("idName");
 
   //be sure all blueprint tests built have a id defined before this!
   result.push([() => blueprint1.build(app, blueprint1.props.id!), tooBigString63]);
@@ -183,7 +182,7 @@ test("Given validation constraints are defined, when creating EKS Blueprints, Cl
         expect(compareIssues(thrownError, customError)).toBe(true);
       }
       else {
-        throw new Error ("An unexpected error was thrown in the test. Message: " + e.message);
+        throw new Error ("An unexpected error was thrown in the test. Message: " + e);
       }
     }
   });

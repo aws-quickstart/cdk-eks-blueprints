@@ -2,19 +2,24 @@
 
 The constraints framework implementation is located in the utils/constraints-utils.ts module
 
+```typescript
 import * from 'utils/constraints-utils';
+```
 
 ## What can you use with the framework
 
 You will find in the constraints framework the generic calls for the following classes if you properly import them from the constraints framework.
 
-## generic class of validations constraints-utils.ts
+## Validations file constraints-utils.ts
 
 This class holds the supported constraints and function(s) to validate constraints defined below in the rest of this document.
 
 ## StringConstraint
 
-Constructor: new StringConstraint(minValue, maxValue);
+Constructor: 
+```typescript
+new StringConstraint(minValue, maxValue);
+```
 
 API reference ['here'](/docs/api/classes/utils.StringConstraint.html)
 
@@ -22,7 +27,10 @@ If given string length falls outside of these inclusive bounds throws detailed Z
 
 ## UrlStringConstraint
 
-Constructor: new UrlStringConstraint(minValue, maxValue); 
+Constructor: 
+```typescript
+new UrlStringConstraint(minValue, maxValue);
+```
 
 API reference ['here'](/docs/api/classes/utils.UrlStringConstraint.html)
 
@@ -30,7 +38,10 @@ If given string length falls outside of these inclusive bounds, or does not foll
 
 ## NumberConstraint
 
-Constructor: new NumberConstraint(minValue, maxValue);
+Constructor: 
+```typescript
+new NumberConstraint(minValue, maxValue);
+```
 
 API reference ['here'](/docs/api/classes/utils.NumberConstraint.html)
 
@@ -38,7 +49,10 @@ If given number falls outside of these inclusive bounds throws detailed Zod erro
 
 ## ArrayConstraint
 
+Constructor:
+```typescript
 new utils.ArrayConstraint(minValue, maxValue);
+```
 
 API reference ['here'](/docs/api/classes/utils.ArrayConstraint.html)
 
@@ -46,13 +60,16 @@ If given array length falls outside of these inclusive bounds throws detailed Zo
 
 ## validateConstraints Function
 
-validateConstraints<T>(constraints: ConstraintsType<T>, context: string, ...object: any) is the entry point to use the framework. This function can validate either a single object or an array of objects against the provided constraints.
+```typescript
+validateConstraints<T>(constraints: ConstraintsType<T>, context: string, ...object: any)
+```
+This is the entry point to use the framework. This function can validate either a single object or an array of objects against the provided constraints.
 
 ## How to use the constraints-utils.ts
 
 You need two things when utilizing constraints-utils.ts and the following examples are from ['here'](/lib/stacks/eks-blueprint-stack.ts)
 
-A class with specified keys assigned to given constraints. 
+First you need a class with specified keys assigned to given constraints. 
 
 Example with two keys: 
 
@@ -62,7 +79,7 @@ export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintPr
     name = new StringConstraint(1, 63);
 ```
 
-Calling validateConstraints.
+Second you need to call validateConstraints.
 
 Example:
 

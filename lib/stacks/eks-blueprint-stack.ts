@@ -1,5 +1,4 @@
 import * as cdk from 'aws-cdk-lib';
-import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
@@ -164,14 +163,14 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
-    public build(scope: Construct, id: string, stackProps?: StackProps): EksBlueprint {
+    public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
 
 
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
 
-    public async buildAsync(scope: Construct, id: string, stackProps?: StackProps): Promise<EksBlueprint> {
+    public async buildAsync(scope: Construct, id: string, stackProps?: cdk.StackProps): Promise<EksBlueprint> {
         return this.build(scope, id, stackProps).waitForAsyncTasks();
     }
 }
@@ -192,7 +191,7 @@ export class EksBlueprint extends cdk.Stack {
         return new BlueprintBuilder();
     }
 
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
+    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
         super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
 
