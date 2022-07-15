@@ -79,12 +79,9 @@ export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintPr
     name = new StringConstraint(1, 63);
 ```
 
-Second you need to call 
-```typescript 
-validateConstraints();
-```
+Second you need to call the ```validateConstraints``` function:
 
-Example:
+Example (note: punctuation, formatting):
 
 ```typescript
 validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
