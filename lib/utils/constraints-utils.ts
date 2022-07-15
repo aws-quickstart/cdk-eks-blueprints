@@ -7,6 +7,9 @@ export interface Constraint {
     validate(key: string, value: any, identifier: string): any;
 }
 
+/**
+ * This validates if the given string (value) is within the bounds of min to max inclusive. If not a detailed Zod Error is thrown also utilizing the identifier for context.
+ */
 export class StringConstraint implements Constraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
@@ -21,6 +24,9 @@ export class StringConstraint implements Constraint {
     }
 }
 
+/**
+ * This is the same as StringConstraint, but also checks if the given string is a correctly formatted URL. If not a detailed Zod Error is thrown also utilizing the identifier for context.
+ */
 export class UrlStringConstraint implements StringConstraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
@@ -39,6 +45,9 @@ export class UrlStringConstraint implements StringConstraint {
     }
 }
 
+/**
+ * This class checks if the given number (value) is within the bounds of the given min and max inclusive number bounds. If not a detailed Zod Error is thrown also utilizing the identifier for context.
+ */
 export class NumberConstraint implements Constraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
@@ -53,6 +62,9 @@ export class NumberConstraint implements Constraint {
     }
 }
 
+/**
+ * This works just like NumberConstraint but checks the length of the given value for an expected array. If not a detailed Zod Error is thrown also utilizing the identifier for context.
+ */
 export class ArrayConstraint implements Constraint {
 
     constructor(readonly min?: number, readonly max?: number) { }
@@ -68,7 +80,7 @@ export class ArrayConstraint implements Constraint {
 }
 
 /**
- * This is responsible for grabbing all the given keys and excluding any not specified to be tested later.
+ * The type that derives from a generic input structure, retaining the keys. Enables to define mapping between the input structure keys and constraints.
  */
 export type ConstraintsType<T> = Partial<Record<keyof T, Constraint>>;
 

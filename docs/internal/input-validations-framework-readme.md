@@ -8,11 +8,11 @@ import * from 'utils/constraints-utils';
 
 ## What can you use with the framework
 
-You will find in the constraints framework the generic calls for the following classes if you properly import them from the constraints framework.
+The constraints framework provides a set of generic classes and interfaces as well as the invocation framework to validate constraints on arbitrary objects.
 
-## Validations file constraints-utils.ts
+## Validations in constraints-utils.ts
 
-This class holds the supported constraints and function(s) to validate constraints defined below in the rest of this document.
+This file holds the supported constraints and function(s) to validate constraints defined below in the rest of this document.
 
 ## StringConstraint
 
@@ -79,7 +79,10 @@ export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintPr
     name = new StringConstraint(1, 63);
 ```
 
-Second you need to call validateConstraints.
+Second you need to call 
+```typescript 
+validateConstraints();
+```
 
 Example:
 
