@@ -10,7 +10,7 @@ spec:
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: podinfo ##INSERT YOURS ELI
+    name: podinfo ##INSERT YOURS ELI!
   # the maximum time in seconds for the canary deployment
   # to make progress before rollback (default 600s)
   progressDeadlineSeconds: 60
