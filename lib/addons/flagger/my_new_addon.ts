@@ -19,7 +19,7 @@ export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {
 export const defaultProps: blueprints.HelmAddOnProps & FlaggerAddOnProps = {
   name: "flagger-progressive-delivery", // Internal identifyer for our add-on
   namespace: "flagger",          // Namespace used to deploy the chart
-  chart: "flagger",              // Name of the Chart to be deployed
+  chart: "flagger",            // Name of the Chart to be deployed
   version: "1.0",            // version of the chart 
   release: "flagger",            // Name for our chart in Kubernetes
   repository: "https://flagger.io",        // HTTPS address of the chart repository

@@ -29,7 +29,7 @@ spec:
     threshold: 2
     # number of checks to run before rollback
     iterations: 10
-    # Prometheus checks based on 
+    # Prometheus checks based on
     # http_request_duration_seconds histogram
     metrics:
       - name: request-success-rate
