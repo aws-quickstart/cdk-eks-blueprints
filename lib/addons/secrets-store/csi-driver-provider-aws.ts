@@ -4,6 +4,7 @@ import { loadExternalYaml } from "../../utils/yaml-utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { SecretsStoreAddOnProps } from ".";
 import merge from "ts-deepmerge";
+import { HelmAddOn } from "../helm-addon";
 
 
 export class CsiDriverProviderAws {
@@ -14,11 +15,6 @@ export class CsiDriverProviderAws {
     const cluster = clusterInfo.cluster;
 
     type chartValues = {
-      linux: {
-        image: {
-          tag: string
-        }
-      },
       enableSecretRotation?: string,
       rotationPollInterval?: string,
       syncSecret?: {
@@ -28,11 +24,6 @@ export class CsiDriverProviderAws {
     }
 
     let values: chartValues = {
-      linux: {
-        image: {
-          tag: this.props.version!
-        }
-      },
       grpcSupportedProviders: 'aws'
     };
 
@@ -48,17 +39,25 @@ export class CsiDriverProviderAws {
     }
 
     values = merge(values, this.props.values ?? {});
+    
+    const helmChartOptions = {
+        chart: this.props.chart!,
+        repository: this.props.repository!,
+        namespace: this.props.namespace!,
+        release: this.props.release,
+        version: this.props.version,
+        wait: true,
+        timeout: cdk.Duration.minutes(15),
+        values,
+      };
 
-    const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', {
-      chart: this.props.chart!,
-      repository: this.props.repository!,
-      namespace: this.props.namespace!,
-      release: this.props.release,
-      version: this.props.version,
-      wait: true,
-      timeout: cdk.Duration.minutes(15),
-      values,
+    HelmAddOn.validateVersion({
+        chart: helmChartOptions.chart,
+        repository: helmChartOptions.repository,
+        version: helmChartOptions.version!
     });
+
+    const secretStoreCSIDriverHelmChart = cluster.addHelmChart('SecretsStoreCSIDriver', helmChartOptions);
 
     const manifestUrl = this.props.ascpUrl!;
     const manifest: Record<string, any>[] = loadExternalYaml(manifestUrl);

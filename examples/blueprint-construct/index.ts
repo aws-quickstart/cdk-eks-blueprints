@@ -3,6 +3,7 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
+import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -16,9 +17,10 @@ export interface BlueprintConstructProps {
     id: string
 }
 
-export default class BlueprintConstruct extends Construct {
-    constructor(scope: Construct, blueprintProps: BlueprintConstructProps, props: cdk.StackProps) {
-        super(scope, blueprintProps.id);
+export default class BlueprintConstruct {
+    constructor(scope: Construct, props: cdk.StackProps) {
+
+        HelmAddOn.validateHelmVersions = true;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -89,7 +91,13 @@ export default class BlueprintConstruct extends Construct {
             }),
         ];
 
-        const blueprintID = `${blueprintProps.id}-dev`;
+        // Instantiated to for helm version check.
+        new blueprints.ExternalDnsAddOn({
+            hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
+        });
+        new blueprints.OpaGatekeeperAddOn();
+
+        const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
