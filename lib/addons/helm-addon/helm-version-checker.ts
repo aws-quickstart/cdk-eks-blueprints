@@ -58,7 +58,7 @@ export function listChartVersions(chart: HelmChartVersion): string[] {
     // TODO make function async and use async HTTP client to get results
     const helmRepository = loadExternalYaml(chart.repository + "/index.yaml");
     const versions: string[] = Object.values(helmRepository[0]['entries'][chart.chart])
-        .map((e: any) => { return e['version']});
+        .map((e: any) => { return e['version']; });
     return versions.filter(e => e.includes("."));
 }
 
