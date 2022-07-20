@@ -79,7 +79,7 @@ export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemp
 /**
  * A node groups for EKS that leverage EC2 Autoscaling Groups.
  * Also referred to as "self-managed" node group, implying that maintenance of the group
- * is performed by the customer (as oppposed to AWS as in case of a ManagedNodeGroup).
+ * is performed by the customer (as opposed to AWS as in case of a ManagedNodeGroup).
  */
 export interface AutoscalingNodeGroup extends Omit<AutoScalingGroupCapacityOptions, "minCapacity" | "maxCapacity" | "desiredCapacity" | "instanceType" | "vpcSubnets"> {
 

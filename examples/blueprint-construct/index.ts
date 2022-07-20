@@ -1,12 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { InstanceType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
-
 import * as blueprints from '../../lib';
 import * as team from '../teams';
-
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -103,13 +100,13 @@ export default class BlueprintConstruct extends Construct {
                 {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new InstanceType('m5.2xlarge')],
+                    instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
                 },
                 {
                     id: "mng2-customami",
-                    instanceTypes: [new InstanceType('t3.large')],
+                    instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
@@ -130,7 +127,7 @@ export default class BlueprintConstruct extends Construct {
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams)
-            .enableControlPlaneLogTypes('api')
+            .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
 }
