@@ -51,6 +51,8 @@ nav:
     - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
+  - Resource Providers:
+    - Resource Providers: 'resource-providers/index.md'
   - Extensibility: 'extensibility.md'
   - API Reference: 'api'
 markdown_extensions:

@@ -50,11 +50,11 @@ export interface IstioBaseAddOnProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    name: "base",
+    name: "istio-base",
     release: "istio-base",
     namespace: "istio-system",
     chart: "base",
-    version: "1.13.3",
+    version: "1.14.2",
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
