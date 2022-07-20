@@ -3,7 +3,7 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-//import { FlaggerAddOn } from '../../lib';
+import { FlaggerAddOn } from '../../lib/addons/flagger';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -125,7 +125,7 @@ export default class BlueprintConstruct extends Construct {
         });
 
         blueprints.EksBlueprint.builder()
-            //.addOns(new FlaggerAddOn())//...addOns)
+            .addOns(new FlaggerAddOn())//...addOns)
             //.clusterProvider(clusterProvider)
             .teams()//...teams)
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

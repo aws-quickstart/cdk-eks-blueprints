@@ -1,0 +1,61 @@
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: podinfo
+  namespace: test
+spec:
+  # service mesh provider can be: kubernetes, istio, appmesh, nginx, gloo
+  provider: kubernetes
+  # deployment reference
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: podinfo
+  # the maximum time in seconds for the canary deployment
+  # to make progress before rollback (default 600s)
+  progressDeadlineSeconds: 60
+  # HPA reference (optional)
+  autoscalerRef:
+    apiVersion: autoscaling/v2beta2
+    kind: HorizontalPodAutoscaler
+    name: podinfo
+  service:
+    port: 9898
+    portDiscovery: true
+  analysis:
+    # schedule interval (default 60s)
+    interval: 30s
+    # max number of failed checks before rollback
+    threshold: 2
+    # number of checks to run before rollback
+    iterations: 10
+    # Prometheus checks based on 
+    # http_request_duration_seconds histogram
+    metrics:
+      - name: request-success-rate
+        # minimum req success rate (non 5xx responses)
+        # percentage (0-100)
+        thresholdRange:
+          min: 99
+        interval: 1m
+      - name: request-duration
+        # maximum req duration P99
+        # milliseconds
+        thresholdRange:
+          max: 500
+        interval: 30s
+    # acceptance/load testing hooks
+    webhooks:
+      - name: smoke-test
+        type: pre-rollout
+        url: http://flagger-loadtester.test/
+        timeout: 15s
+        metadata:
+          type: bash
+          cmd: "curl -sd 'anon' http://podinfo-canary.test:9898/token | grep token"
+      - name: load-test
+        url: http://flagger-loadtester.test/
+        timeout: 5s
+        metadata:
+          type: cmd
+          cmd: "hey -z 1m -q 10 -c 2 http://podinfo-canary.test:9898/"
