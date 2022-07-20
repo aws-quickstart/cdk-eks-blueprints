@@ -2,7 +2,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import { z, ZodError } from 'zod';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks/lib';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
 const app = new cdk.App();
 

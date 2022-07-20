@@ -33,10 +33,9 @@ export class MyVpcStack extends NestedStack {
                 {
                     cidrMask: 22,
                     name: 'private',
-                    subnetType: ec2.SubnetType.ISOLATED,
+                    subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
                 },
             ],
         });
     }
-
 }
