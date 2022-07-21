@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
+import {FlaggerAddOn} from '../../lib/addons/flagger'
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -132,7 +133,7 @@ export default class BlueprintConstruct {
         });
 
         blueprints.EksBlueprint.builder()
-            //.addOns(new FlaggerAddOn())//...addOns)
+            .addOns(new FlaggerAddOn())//...addOns)
             //.clusterProvider(clusterProvider)
             .teams()//...teams)
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

@@ -1,18 +1,35 @@
 import 'source-map-support/register';
 import * as blueprints from '../../../lib';
 import { Construct } from 'constructs';
+import { Values } from "../../spi";
+import merge from "ts-deepmerge";
 
 /**
- * User provided options for the Helm Chart
+ * User provided options for the FlaggerAddonProps values.
  */
 export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {//this is the root level
   prometheusInstall?: boolean;
-  //meshProvider?: //need an enums for what you put from values;
-
+  meshProvider?: MeshProviderOptions;
 }
 
 /**
- * Default props to be used when creating the Helm chart
+ * All the meshProvider values that can be chosen by the user.
+ */
+export const enum MeshProviderOptions { //could use a better name later
+  KUBERNETES = 'kubernetes',
+  ISTIO = 'istio',
+  LINKERD = 'linkerd',
+  APPMESH = 'appmesh',
+  CONTOUR = 'contour',
+  NGINX = 'nginx',
+  GLOO = 'gloo',
+  SKIPPER = 'skipper',
+  TRAEFIK = 'traefik',
+  OSM = 'osm'
+}
+
+/**
+ * defaultProps makes the flagger namespace and chart.
  */
 export const defaultProps: blueprints.HelmAddOnProps & FlaggerAddOnProps = {
   name: "flagger",
@@ -20,25 +37,32 @@ export const defaultProps: blueprints.HelmAddOnProps & FlaggerAddOnProps = {
   chart: "flagger",
   version: "1.22.0",
   release: "flagger",
-  repository: "https://flagger.app",
-  values: {},
+  repository: "https://flagger.app"
 };
 
 /**
- * Main class to instantiate the Helm chart
+ * This creates and deploys a cluster with the prometheus and mesh provider settings set unless the user specifies their own values for them.
  */
 export class FlaggerAddOn extends blueprints.HelmAddOn {
 
   readonly options: FlaggerAddOnProps;
 
   constructor(props?: FlaggerAddOnProps) {
-    super({ ...defaultProps, ...props }); //merges your stuff and what they specify. They override our stuff, root level, and values properties
+    super({ ...defaultProps, ...props });
     this.options = this.props as FlaggerAddOnProps;
   }
 
   deploy(clusterInfo: blueprints.ClusterInfo): Promise<Construct> {
-    const chart = this.addHelmChart(clusterInfo, defaultProps.values);
 
+    let values: Values = {
+      prometheus: {
+        install: true
+      },
+      meshProvider: MeshProviderOptions.KUBERNETES
+    };
+
+    values = merge(values, this.props.values ?? {});
+    const chart = this.addHelmChart(clusterInfo, values);
     return Promise.resolve(chart);
   }
 }

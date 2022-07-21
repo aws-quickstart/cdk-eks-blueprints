@@ -29,7 +29,6 @@
         "typescript": "~4.7.4"
     },
     "dependencies": {
-        "@aws-quickstart/eks-blueprints": "file:/Users/pevetoej/environment/cdk-eks-blueprints/aws-quickstart-eks-blueprints-1.0.5.tgz",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
@@ -39,7 +38,7 @@
         "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
-        "lodash":"4.17.21",
+        "lodash": "4.17.21",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^2.0.4",
         "ts-md5": "^1.2.11",
