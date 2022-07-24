@@ -9,9 +9,18 @@ import { createNamespace } from "../../utils";
  * User provided options for the Helm Chart
  */
 export interface CertManagerAddOnProps extends HelmAddOnUserProps {
-  version?: string,
-  installCRDs?: boolean
-  createNamespace?: boolean
+    /**
+     * Version of the helm chart to deploy
+     */      
+    version?: string;
+    /**
+     * To automatically install and manage the CRDs as part of your Helm release,
+     */    
+    installCRDs?: boolean;
+    /**
+     * To Create Namespace using CDK
+     */    
+    createNamespace?: boolean;
 }
 
 /**
