@@ -3,7 +3,6 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
 import {FlaggerAddOn} from '../../lib/addons/flagger'
 

@@ -10,12 +10,13 @@ import merge from "ts-deepmerge";
 export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {//this is the root level
   prometheusInstall?: boolean;
   meshProvider?: MeshProviderOptions;
+  crd?: boolean;
 }
 
 /**
  * All the meshProvider values that can be chosen by the user.
  */
-export const enum MeshProviderOptions { //could use a better name later
+export const enum MeshProviderOptions {
   KUBERNETES = 'kubernetes',
   ISTIO = 'istio',
   LINKERD = 'linkerd',
@@ -56,9 +57,12 @@ export class FlaggerAddOn extends blueprints.HelmAddOn {
 
     let values: Values = {
       prometheus: {
-        install: true
+        install: this.options.prometheusInstall ?? true
       },
-      meshProvider: MeshProviderOptions.KUBERNETES
+      meshProvider: this.options.meshProvider ?? MeshProviderOptions.KUBERNETES,
+      crd: {
+        create: this.options.crd ?? true
+      }
     };
 
     values = merge(values, this.props.values ?? {});
