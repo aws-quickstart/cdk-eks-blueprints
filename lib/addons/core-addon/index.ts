@@ -75,7 +75,6 @@ export class CoreAddOn implements ClusterAddOn {
             return Promise.resolve(cfnaddon!);
         }
         else {
-            console.log("Addonout With Version")
             const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
                 addonName: this.coreAddOnProps.addOnName,
                 clusterName: clusterInfo.cluster.clusterName,
