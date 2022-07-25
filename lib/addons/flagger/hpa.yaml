@@ -8,8 +8,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: flagger-loadtester
-      minReplicas: 2
-      maxReplicas: 4
+  minReplicas: 2
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:
