@@ -59,8 +59,8 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
                 saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
-        }
 
+        }
         if (this.coreAddOnProps.version) {
             const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
                 addonName: this.coreAddOnProps.addOnName,

@@ -5,76 +5,46 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ValuesSchema {
-  nameOverride?: string;
-  fullnameOverride?: string;
-  global?: {
-    namespaceOverride?: string;
-    [k: string]: unknown;
-  };
-  awsRegion?: string;
-  clusterName?: string;
-  serviceAccount?: {
-    create?: boolean;
-    annotations?: {
+ export interface ValuesSchema {
+    nameOverride?: string;
+    fullnameOverride?: string;
+    global?: {
+      namespaceOverride?: string;
       [k: string]: unknown;
     };
-    name?: string;
-    [k: string]: unknown;
-  };
-  fluentbit?: {
-    enabled?: boolean;
-    namespaceOverride?: string;
-    name?: string;
-    configName?: string;
-    namespace?: string;
-    image?: {
-      repository: string;
-      tag?: string;
-      pullPolicy: string;
+    awsRegion?: string;
+    clusterName?: string;
+    serviceAccount?: {
+      create?: boolean;
+      annotations?: {
+        [k: string]: unknown;
+      };
+      name?: string;
       [k: string]: unknown;
     };
-    input?: {
-      applicationLog?: {
-        tag?: string;
-        excludePath?: string;
-        path?: string;
-        dockerMode?: string;
-        dockerModeFlush?: number;
-        parser?: string;
-        dockerModeParser?: string;
-        db?: string;
-        memBufLimit?: string;
-        skipLongLines?: string;
-        refreshInterval?: number;
-        rotateWait?: number;
-        storageType?: string;
-        fluentbit?: {
-          path?: string;
-          db?: string;
-          memBufLimit?: string;
-          [k: string]: unknown;
-        };
-        cloudwatchAgent?: {
-          path?: string;
-          dockerModeParser?: string;
-          db?: string;
-          memBufLimit?: string;
+    fluentbit?: {
+      enabled?: boolean;
+      namespaceOverride?: string;
+      name?: string;
+      configName?: string;
+      namespace?: string;
+      serviceAccount?: {
+        name?: string;
+        annotations?: {
           [k: string]: unknown;
         };
         [k: string]: unknown;
       };
-      dataplaneLog?: {
-        systemd?: {
+      image?: {
+        repository: string;
+        tag?: string;
+        pullPolicy: string;
+        [k: string]: unknown;
+      };
+      input?: {
+        applicationLog?: {
           tag?: string;
-          dockerUnit?: string;
-          kubeletUnit?: string;
-          db?: string;
-          path?: string;
-          [k: string]: unknown;
-        };
-        tail?: {
-          tag?: string;
+          excludePath?: string;
           path?: string;
           dockerMode?: string;
           dockerModeFlush?: number;
@@ -86,297 +56,109 @@ export interface ValuesSchema {
           refreshInterval?: number;
           rotateWait?: number;
           storageType?: string;
+          fluentbit?: {
+            path?: string;
+            db?: string;
+            memBufLimit?: string;
+            [k: string]: unknown;
+          };
+          cloudwatchAgent?: {
+            path?: string;
+            dockerModeParser?: string;
+            db?: string;
+            memBufLimit?: string;
+            [k: string]: unknown;
+          };
           [k: string]: unknown;
         };
-        [k: string]: unknown;
-      };
-      hostLog?: {
-        dmesg?: {
-          tag?: string;
-          path?: string;
-          db?: string;
-          [k: string]: unknown;
-        };
-        messages?: {
-          tag?: string;
-          path?: string;
-          db?: string;
-          [k: string]: unknown;
-        };
-        secure?: {
-          tag?: string;
-          path?: string;
-          db?: string;
-          [k: string]: unknown;
-        };
-        parser?: string;
-        memBufLimit?: string;
-        skipLongLines?: string;
-        refreshInterval?: number;
-        [k: string]: unknown;
-      };
-      [k: string]: unknown;
-    };
-    kubernetesFilter?: {
-      match?: string;
-      kubeURL?: string;
-      kubeTagPrefix?: string;
-      mergeLog?: string;
-      mergeLogKey?: string;
-      k8sLoggingParser?: string;
-      k8sLoggingExclude?: string;
-      labels?: string;
-      annotations?: string;
-      [k: string]: unknown;
-    };
-    resources?: {
-      limits?: {
-        memory?: string;
-        [k: string]: unknown;
-      };
-      requests?: {
-        cpu?: string;
-        memory?: string;
-        [k: string]: unknown;
-      };
-      [k: string]: unknown;
-    };
-    volumeMounts?: (
-      | {
-          name?: string;
-          mountPath?: string;
-          [k: string]: unknown;
-        }
-      | {
-          name?: string;
-          mountPath?: string;
-          readOnly?: boolean;
-          [k: string]: unknown;
-        }
-    )[];
-    volumes?: (
-      | {
-          name?: string;
-          hostPath?: {
+        dataplaneLog?: {
+          systemd?: {
+            tag?: string;
+            dockerUnit?: string;
+            kubeletUnit?: string;
+            db?: string;
             path?: string;
             [k: string]: unknown;
           };
-          [k: string]: unknown;
-        }
-      | {
-          name?: string;
-          configMap?: {
-            name?: string;
+          tail?: {
+            tag?: string;
+            path?: string;
+            dockerMode?: string;
+            dockerModeFlush?: number;
+            parser?: string;
+            dockerModeParser?: string;
+            db?: string;
+            memBufLimit?: string;
+            skipLongLines?: string;
+            refreshInterval?: number;
+            rotateWait?: number;
+            storageType?: string;
             [k: string]: unknown;
           };
           [k: string]: unknown;
-        }
-    )[];
-    tolerations?: (
-      | {
-          key?: string;
-          operator?: string;
-          effect?: string;
+        };
+        hostLog?: {
+          dmesg?: {
+            tag?: string;
+            path?: string;
+            db?: string;
+            [k: string]: unknown;
+          };
+          messages?: {
+            tag?: string;
+            path?: string;
+            db?: string;
+            [k: string]: unknown;
+          };
+          secure?: {
+            tag?: string;
+            path?: string;
+            db?: string;
+            [k: string]: unknown;
+          };
+          parser?: string;
+          memBufLimit?: string;
+          skipLongLines?: string;
+          refreshInterval?: number;
           [k: string]: unknown;
-        }
-      | {
-          operator?: string;
-          effect?: string;
-          [k: string]: unknown;
-        }
-    )[];
-    env?: {
-      httpServer?: string;
-      httpPort?: string;
-      readFromHead?: boolean;
-      readFromTail?: string;
-      [k: string]: unknown;
-    };
-    [k: string]: unknown;
-  };
-  fargateLog?: {
-    enabled?: boolean;
-    name?: string;
-    namespace?: string;
-    awsObservability?: string;
-    outputConf?: {
-      name?: string;
-      match?: string;
-      region?: string;
-      logGroupName?: string;
-      logStreamPrefix?: string;
-      autoCreateGroup?: boolean;
-      [k: string]: unknown;
-    };
-    parsersConf?: {
-      name?: string;
-      timeKey?: string;
-      timeFormat?: string;
-      [k: string]: unknown;
-    };
-    filtersConf?: {
-      name?: string;
-      match?: string;
-      keyName?: string;
-      parser?: string;
-      reserveData?: string;
-      preserveKey?: boolean;
-      [k: string]: unknown;
-    };
-    [k: string]: unknown;
-  };
-  adotCollector?: {
-    image?: {
-      name?: string;
-      repository: string;
-      tag?: string;
-      daemonSetPullPolicy: string;
-      sidecarPullPolicy: string;
-      [k: string]: unknown;
-    };
-    daemonSet?: {
-      enabled?: boolean;
-      daemonSetName?: string;
-      namespace?: string;
-      namespaceOverride?: string;
-      serviceAccount?: {
-        create?: boolean;
-        name?: string;
+        };
         [k: string]: unknown;
       };
-      clusterRoleName?: string;
-      clusterRoleBindingName?: string;
-      configMap?: {
-        name?: string;
-        app?: string;
-        component?: string;
+      output?: {
+        applicationLog?: {
+          log_retention?: {
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        dataplaneLog?: {
+          log_retention?: {
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        hostLog?: {
+          log_retention?: {
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
         [k: string]: unknown;
       };
-      containersName?: string;
-      env?:
-        | []
-        | [
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              valueFrom?: {
-                fieldRef?: {
-                  fieldPath?: string;
-                  [k: string]: unknown;
-                };
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ];
-      command?: [] | [string] | [string, string];
+      kubernetesFilter?: {
+        match?: string;
+        kubeURL?: string;
+        kubeTagPrefix?: string;
+        mergeLog?: string;
+        mergeLogKey?: string;
+        k8sLoggingParser?: string;
+        k8sLoggingExclude?: string;
+        labels?: string;
+        annotations?: string;
+        [k: string]: unknown;
+      };
       resources?: {
         limits?: {
-          cpu?: string;
           memory?: string;
           [k: string]: unknown;
         };
@@ -387,443 +169,696 @@ export interface ValuesSchema {
         };
         [k: string]: unknown;
       };
-      volumes?:
-        | []
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
+      volumeMounts?: (
+        | {
+            name?: string;
+            mountPath?: string;
+            [k: string]: unknown;
+          }
+        | {
+            name?: string;
+            mountPath?: string;
+            readOnly?: boolean;
+            [k: string]: unknown;
+          }
+      )[];
+      volumes?: (
+        | {
+            name?: string;
+            hostPath?: {
+              path?: string;
+              [k: string]: unknown;
+            };
+            [k: string]: unknown;
+          }
+        | {
+            name?: string;
+            configMap?: {
               name?: string;
               [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
-              name?: string;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
-              name?: string;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
-              name?: string;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
-              name?: string;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              configMap?: {
-                name?: string;
-                items?:
-                  | []
-                  | [
-                      {
-                        key?: string;
-                        path?: string;
-                        [k: string]: unknown;
-                      }
-                    ];
-                [k: string]: unknown;
-              };
-              name?: string;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              hostPath?: {
-                path?: string;
-                [k: string]: unknown;
-              };
-              [k: string]: unknown;
-            }
-          ];
-      volumeMounts?:
-        | []
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            }
-          ]
-        | [
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              readOnly?: boolean;
-              [k: string]: unknown;
-            },
-            {
-              name?: string;
-              mountPath?: string;
-              [k: string]: unknown;
-            }
-          ];
-      extensions?: {
-        healthCheck?: string;
-        [k: string]: unknown;
-      };
-      receivers?: {
-        collectionInterval?: string;
-        containerOrchestrator?: string;
-        addServiceAsAttribute?: string;
-        preferFullPodName?: string;
-        [k: string]: unknown;
-      };
-      processors?: {
-        timeout?: string;
-        [k: string]: unknown;
-      };
-      exporters?: {
-        namespace?: string;
-        logGroupName?: string;
-        logStreamName?: string;
-        enabled?: boolean;
-        dimensionRollupOption?: string;
-        parseJsonEncodedAttrValues?: [] | [string] | [string, string];
-        [k: string]: unknown;
-      };
-      metricDeclarations?: string;
-      service?: {
-        metrics?: {
-          receivers?: [] | [string];
-          processors?: [] | [string];
-          exporters?: [] | [string];
-          [k: string]: unknown;
-        };
-        extensions?: [] | [string];
+            };
+            [k: string]: unknown;
+          }
+      )[];
+      tolerations?: (
+        | {
+            key?: string;
+            operator?: string;
+            effect?: string;
+            [k: string]: unknown;
+          }
+        | {
+            operator?: string;
+            effect?: string;
+            [k: string]: unknown;
+          }
+      )[];
+      env?: {
+        httpServer?: string;
+        httpPort?: string;
+        readFromHead?: boolean;
+        readFromTail?: string;
         [k: string]: unknown;
       };
       [k: string]: unknown;
     };
-    sidecar?: {
+    fargateLog?: {
       enabled?: boolean;
       name?: string;
       namespace?: string;
-      namespaceOverride?: string;
-      regionS3?: string;
-      replicas?: number;
+      awsObservability?: string;
+      outputConf?: {
+        name?: string;
+        match?: string;
+        region?: string;
+        logGroupName?: string;
+        logStreamPrefix?: string;
+        autoCreateGroup?: boolean;
+        [k: string]: unknown;
+      };
+      parsersConf?: {
+        name?: string;
+        timeKey?: string;
+        timeFormat?: string;
+        [k: string]: unknown;
+      };
+      filtersConf?: {
+        name?: string;
+        match?: string;
+        keyName?: string;
+        parser?: string;
+        reserveData?: string;
+        preserveKey?: boolean;
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    };
+    adotCollector?: {
       image?: {
         name?: string;
         repository: string;
         tag?: string;
-        pullPolicy: string;
+        daemonSetPullPolicy: string;
+        sidecarPullPolicy: string;
         [k: string]: unknown;
       };
-      otelOtlpEndPointValue?: string;
-      otelResourceAttributesValue?: string;
-      resources?: {
-        limits?: {
-          cpu?: string;
-          memory?: string;
+      daemonSet?: {
+        enabled?: boolean;
+        daemonSetName?: string;
+        createNamespace?: boolean;
+        namespace?: string;
+        namespaceOverride?: string;
+        serviceAccount?: {
+          create?: boolean;
+          name?: string;
+          annotations?: {
+            [k: string]: unknown;
+          };
           [k: string]: unknown;
         };
-        requests?: {
-          cpu?: string;
-          memory?: string;
+        clusterRoleName?: string;
+        clusterRoleBindingName?: string;
+        configMap?: {
+          name?: string;
+          app?: string;
+          component?: string;
+          [k: string]: unknown;
+        };
+        containersName?: string;
+        env?:
+          | []
+          | [
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                valueFrom?: {
+                  fieldRef?: {
+                    fieldPath?: string;
+                    [k: string]: unknown;
+                  };
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ];
+        command?: [] | [string] | [string, string];
+        resources?: {
+          limits?: {
+            cpu?: string;
+            memory?: string;
+            [k: string]: unknown;
+          };
+          requests?: {
+            cpu?: string;
+            memory?: string;
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        volumes?:
+          | []
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                configMap?: {
+                  name?: string;
+                  items?:
+                    | []
+                    | [
+                        {
+                          key?: string;
+                          path?: string;
+                          [k: string]: unknown;
+                        }
+                      ];
+                  [k: string]: unknown;
+                };
+                name?: string;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                hostPath?: {
+                  path?: string;
+                  [k: string]: unknown;
+                };
+                [k: string]: unknown;
+              }
+            ];
+        volumeMounts?:
+          | []
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              }
+            ]
+          | [
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                readOnly?: boolean;
+                [k: string]: unknown;
+              },
+              {
+                name?: string;
+                mountPath?: string;
+                [k: string]: unknown;
+              }
+            ];
+        extensions?: {
+          healthCheck?: string;
+          [k: string]: unknown;
+        };
+        receivers?: {
+          collectionInterval?: string;
+          containerOrchestrator?: string;
+          addServiceAsAttribute?: string;
+          preferFullPodName?: string;
+          addFullPodNameMetricLabel?: string;
+          [k: string]: unknown;
+        };
+        processors?: {
+          timeout?: string;
+          [k: string]: unknown;
+        };
+        exporters?: {
+          namespace?: string;
+          logGroupName?: string;
+          logStreamName?: string;
+          enabled?: boolean;
+          dimensionRollupOption?: string;
+          parseJsonEncodedAttrValues?: [] | [string] | [string, string];
+          [k: string]: unknown;
+        };
+        metricDeclarations?: string;
+        service?: {
+          metrics?: {
+            receivers?: [] | [string];
+            processors?: [] | [string];
+            exporters?: [] | [string];
+            [k: string]: unknown;
+          };
+          extensions?: [] | [string];
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      sidecar?: {
+        enabled?: boolean;
+        name?: string;
+        namespace?: string;
+        namespaceOverride?: string;
+        regionS3?: string;
+        replicas?: number;
+        image?: {
+          name?: string;
+          repository: string;
+          tag?: string;
+          pullPolicy: string;
+          [k: string]: unknown;
+        };
+        otelOtlpEndPointValue?: string;
+        otelResourceAttributesValue?: string;
+        resources?: {
+          limits?: {
+            cpu?: string;
+            memory?: string;
+            [k: string]: unknown;
+          };
+          requests?: {
+            cpu?: string;
+            memory?: string;
+            [k: string]: unknown;
+          };
           [k: string]: unknown;
         };
         [k: string]: unknown;
@@ -831,6 +866,5 @@ export interface ValuesSchema {
       [k: string]: unknown;
     };
     [k: string]: unknown;
-  };
-  [k: string]: unknown;
-}
+  }
+  

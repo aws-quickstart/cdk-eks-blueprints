@@ -41,7 +41,10 @@ export class ContainerInsightsAddOn extends HelmAddOn {
 
         let values: ValuesSchema = {
             awsRegion: cluster.stack.region,
-            clusterName: cluster.clusterName,   
+            clusterName: cluster.clusterName,
+            fluentbit: {
+                enabled: true
+            }
         };
 
         values = merge(values, this.props.values ?? {});

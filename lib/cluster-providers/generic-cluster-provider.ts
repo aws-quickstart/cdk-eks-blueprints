@@ -3,11 +3,10 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
-import { setPath, valueFromContext, Writeable } from "../utils";
+import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -42,6 +41,90 @@ export interface GenericClusterProviderProps extends eks.ClusterOptions {
     }
 }
 
+export class ManagedNodeGroupConstraints implements utils.ConstraintsType<ManagedNodeGroup> {
+    /**
+     * id can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
+     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+     */
+    id = new utils.StringConstraint(1, 63);
+
+    /**
+    * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+    * of situations of a hard limit request being accepted, and as a result the limit would be raised
+    * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
+    */
+    minSize = new utils.NumberConstraint(0, 2250);
+
+    /**
+     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * of situations of a hard limit request being accepted, and as a result the limit would be raised
+     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
+     */
+    maxSize = new utils.NumberConstraint(0, 2250);
+
+    /**
+     * Nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * of situations of a hard limit request being accepted, and as a result the limit would be raised
+     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
+     */
+    desiredSize = new utils.NumberConstraint(0, 2250);
+
+    /**
+     * amiReleaseVersion can be no less than 1 character long, and no greater than 1024 characters long.
+     * https://docs.aws.amazon.com/imagebuilder/latest/APIReference/API_Ami.html
+     */
+    amiReleaseVersion = new utils.StringConstraint(1, 1024);
+}
+
+export class AutoscalingNodeGroupConstraints implements utils.ConstraintsType<AutoscalingNodeGroup> {
+    /**
+    * id can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    id = new utils.StringConstraint(1, 63);
+
+    /**
+    * Allowed range is 0 to 5000 inclusive.
+    * https://kubernetes.io/docs/setup/best-practices/cluster-large/
+    */
+    minSize = new utils.NumberConstraint(0, 5000);
+
+    /**
+    * Allowed range is 0 to 5000 inclusive.
+    * https://kubernetes.io/docs/setup/best-practices/cluster-large/
+    */
+    maxSize = new utils.NumberConstraint(0, 5000);
+
+    /**
+    * Allowed range is 0 to 5000 inclusive.
+    * https://kubernetes.io/docs/setup/best-practices/cluster-large/
+    */
+    desiredSize = new utils.NumberConstraint(0, 5000);
+}
+
+export class FargateProfileConstraints implements utils.ConstraintsType<eks.FargateProfileOptions> {
+    /**
+    * fargateProfileNames can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    fargateProfileName = new utils.StringConstraint(1, 63);
+}
+
+export class GenericClusterPropsConstraints implements utils.ConstraintsType<GenericClusterProviderProps> {
+    /**
+    * managedNodeGroups per cluster have a soft limit of 30 managed node groups per EKS cluster, and as little as 0. But we multiply that 
+    * by a factor of 5 to 150 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
+    * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
+    */
+    managedNodeGroups = new utils.ArrayConstraint(0, 150);
+    /**
+    * autoscalingNodeGroups per cluster have a soft limit of 500 autoscaling node groups per EKS cluster, and as little as 0. But we multiply that 
+    * by a factor of 5 to 2500 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
+    * https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-quotas.html
+    */
+    autoscalingNodeGroups = new utils.ArrayConstraint(0, 5000);
+}
+
 export const defaultOptions = {
     version: eks.KubernetesVersion.V1_21
 };
@@ -57,11 +140,11 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = {...this.props, ...{version: eks.KubernetesVersion.V1_21}};
+        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_21 } };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
-        this.props = {...this.props, ...options};
+        this.props = { ...this.props, ...options };
         return this;
     }
 
@@ -83,10 +166,10 @@ export class ClusterBuilder {
     build() {
         return new GenericClusterProvider({
             ...this.props,
-            version: this.props.version!, 
+            version: this.props.version!,
             privateCluster: this.privateCluster,
-            managedNodeGroups: this.managedNodeGroups, 
-            autoscalingNodeGroups: this.autoscalingNodeGroups, 
+            managedNodeGroups: this.managedNodeGroups,
+            autoscalingNodeGroups: this.autoscalingNodeGroups,
             fargateProfiles: this.fargateProfiles
         });
     }
@@ -98,7 +181,10 @@ export class ClusterBuilder {
 export class GenericClusterProvider implements ClusterProvider {
 
     constructor(readonly props: GenericClusterProviderProps) {
-        assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0 
+
+        this.validateInput(props);
+
+        assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0
             && props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0),
             "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
     }
@@ -113,7 +199,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
         const version = this.props.version;
-        const privateCluster = this.props.privateCluster ?? valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
+        const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }] : undefined);
 
@@ -133,14 +219,14 @@ export class GenericClusterProvider implements ClusterProvider {
         cluster.node.addDependency(vpc);
 
         const nodeGroups: eks.Nodegroup[] = [];
-        
-        this.props.managedNodeGroups?.forEach( n => {
+
+        this.props.managedNodeGroups?.forEach(n => {
             const nodeGroup = this.addManagedNodeGroup(cluster, n);
             nodeGroups.push(nodeGroup);
         });
 
         const autoscalingGroups: autoscaling.AutoScalingGroup[] = [];
-        this.props.autoscalingNodeGroups?.forEach( n => {
+        this.props.autoscalingNodeGroups?.forEach(n => {
             const autoscalingGroup = this.addAutoScalingGroup(cluster, n);
             autoscalingGroups.push(autoscalingGroup);
         });
@@ -158,7 +244,7 @@ export class GenericClusterProvider implements ClusterProvider {
      * @param clusterOptions 
      * @returns 
      */
-    protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any) : eks.Cluster {
+    protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.Cluster(scope, id, clusterOptions);
     }
 
@@ -170,15 +256,15 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: AutoscalingNodeGroup): autoscaling.AutoScalingGroup {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
-        const instanceType = nodeGroup.instanceType ?? valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
-        const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
-        const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
-        const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+        const instanceType = nodeGroup.instanceType ?? utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
+        const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
+        const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
+        const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
         const updatePolicy = nodeGroup.updatePolicy ?? autoscaling.UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
         return cluster.addAutoScalingGroupCapacity(nodeGroup.id, {
-            ...nodeGroup, 
+            ...nodeGroup,
             ... {
                 autoScalingGroupName: nodeGroup.autoScalingGroupName ?? nodeGroup.id,
                 machineImageType,
@@ -199,23 +285,22 @@ export class GenericClusterProvider implements ClusterProvider {
         cluster.addFargateProfile(name, profileOptions);
     }
 
-
     /**
      * Adds a managed node group to the cluster.
      * @param cluster 
      * @param nodeGroup 
      * @returns 
      */
-    addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup) : eks.Nodegroup {
+    addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
         const capacityType = nodeGroup.nodeGroupCapacityType;
         const releaseVersion = nodeGroup.amiReleaseVersion;
-        const instanceTypes = nodeGroup.instanceTypes ?? [valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
-        const minSize = nodeGroup.minSize ?? valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
-        const maxSize = nodeGroup.maxSize ?? valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
-        const desiredSize = nodeGroup.desiredSize ?? valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+        const instanceTypes = nodeGroup.instanceTypes ?? [utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
+        const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
+        const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
+        const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
 
         // Create a managed node group.
-        const nodegroupOptions: Writeable<eks.NodegroupOptions> = {
+        const nodegroupOptions: utils.Writeable<eks.NodegroupOptions> = {
             ...nodeGroup,
             ...{
                 nodegroupName: nodeGroup.nodegroupName ?? nodeGroup.id,
@@ -229,13 +314,13 @@ export class GenericClusterProvider implements ClusterProvider {
             }
         };
 
-        if(nodeGroup.customAmi) {
+        if (nodeGroup.customAmi) {
             // Create launch template if custom AMI is provided.
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
                 machineImage: nodeGroup.customAmi?.machineImage,
                 userData: nodeGroup.customAmi?.userData,
             });
-            setPath(nodegroupOptions, "launchTemplateSpec", {
+            utils.setPath(nodegroupOptions, "launchTemplateSpec", {
                 id: lt.launchTemplateId!,
                 version: lt.latestVersionNumber,
             });
@@ -244,5 +329,16 @@ export class GenericClusterProvider implements ClusterProvider {
         }
 
         return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
+    }
+
+    private validateInput(props: GenericClusterProviderProps) {
+        
+        utils.validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
+        if (props.managedNodeGroups != undefined)
+            utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
+        if (props.autoscalingNodeGroups != undefined)
+            utils.validateConstraints(new AutoscalingNodeGroupConstraints, "AutoscalingNodeGroups", ...props.autoscalingNodeGroups);
+        if (props.fargateProfiles as any != undefined)
+            utils.validateConstraints(new FargateProfileConstraints, "FargateProfiles", ...Object.values(props.fargateProfiles as any));
     }
 }

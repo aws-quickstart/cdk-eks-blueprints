@@ -7,7 +7,7 @@ import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
 import { createNamespace, getSecretValue } from '../../utils';
-import { HelmAddOnUserProps } from '../helm-addon';
+import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
 
@@ -53,6 +53,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
      * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
      */
     values?: spi.Values;
+    
 }
 
 /**
@@ -60,7 +61,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     namespace: "argocd",
-    version: '3.33.5',
+    version: '4.9.16',
     chart: "argo-cd",
     release: "blueprints-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
@@ -78,6 +79,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     constructor(props?: ArgoCDAddOnProps) {
         this.options = { ...defaultProps, ...props };
+        HelmAddOn.validateVersion({
+            chart: this.options.chart!,
+            version: this.options.version!,
+            repository: this.options.repository!
+        });
     }
 
     generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {
