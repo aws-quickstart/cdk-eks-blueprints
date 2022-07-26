@@ -8,8 +8,7 @@ import { Construct } from 'constructs';
 /**
  * Configuration options for the Adot add-on.
  */
- export interface AdotCollectorAddOnProps extends CoreAddOnProps {
- }
+ type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
