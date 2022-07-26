@@ -48,14 +48,6 @@ export class CoreAddOn implements ClusterAddOn {
         let serviceAccountRoleArn: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
-        
-        let addOnprops = {
-            addonName: this.coreAddOnProps.addOnName,
-            addonVersion: "",
-            clusterName: clusterInfo.cluster.clusterName,
-            serviceAccountRoleArn: "",
-            resolveConflicts: "OVERWRITE"
-        }
 
         saNamespace = DEFAULT_NAMESPACE;
         if (this.coreAddOnProps?.namespace) {
@@ -68,10 +60,14 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
                 saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
-
         }
-        if (serviceAccountRoleArn) {
-            addOnprops['serviceAccountRoleArn'] = serviceAccountRoleArn;
+
+        let addOnprops = {
+            addonName: this.coreAddOnProps.addOnName,
+            addonVersion: "",
+            clusterName: clusterInfo.cluster.clusterName,
+            serviceAccountRoleArn: serviceAccountRoleArn,
+            resolveConflicts: "OVERWRITE"
         }
 
         if (this.coreAddOnProps?.version) {
