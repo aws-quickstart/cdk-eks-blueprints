@@ -1,6 +1,6 @@
 # AWS Distro for OpenTelemetry (ADOT) Amazon EKS Add-on
 
-Amazon EKS supports using Amazon EKS API to install and manage the [AWS Distro for OpenTelemetry (ADOT) Operator] https://aws-otel.github.io/. This enables a simplified experience for instrumenting your applications running on Amazon EKS to send metric and trace data to multiple monitoring service options like Amazon CloudWatch, Prometheus, and X-Ray. 
+Amazon EKS supports using Amazon EKS API to install and manage the [AWS Distro for OpenTelemetry] (https://aws-otel.github.io/). This enables a simplified experience for instrumenting your applications running on Amazon EKS to send metric and trace data to multiple monitoring service options like Amazon CloudWatch, Prometheus, and X-Ray. 
 
 This driver is not automatically installed when you first create a cluster, it must be added to the cluster in order to manage ADOT Collectors.
 
