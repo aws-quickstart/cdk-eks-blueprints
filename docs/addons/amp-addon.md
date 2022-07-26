@@ -12,6 +12,10 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ## Usage
 
+This Addon can used with four different ways :
+
+Variant 1 : using Default property values.
+
 ```typescript
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
@@ -21,6 +25,68 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AmpAddOn();
 
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+Variant 2 : Overriding Property values for Name and Tags
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AmpAddOn({
+    workspaceName: 'sample-AMP-Workspace',
+    workspaceTagKey: 'Environment',
+    workspaceTagValue: 'Dev',
+    deploymentMode: DeploymentMode.DEPLOYMENT
+})
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+Variant 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AmpAddOn({
+    prometheusRemoteWriteURL: 'https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-e859f589-7eed-43c1-a82b-58f44119f17d/api/v1/remote_write',
+    deploymentMode: DeploymentMode.DEPLOYMENT
+})
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+Variant 4 : Overriding Property values for Different Deployment Modes. Supported Ones - DEPLOYMENT, DAEMONSET, STATEFULSET, SIDECAR
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AmpAddOn({
+    workspaceName: 'sample-AMP-Workspace',
+    workspaceTagKey: 'Environment',
+    workspaceTagValue: 'Dev',
+    deploymentMode: DeploymentMode.DEPLOYMENT
+    // deploymentMode: DeploymentMode.DAEMONSET
+    // deploymentMode: DeploymentMode.STATEFULSET
+    // deploymentMode: DeploymentMode.SIDECAR
+})
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');

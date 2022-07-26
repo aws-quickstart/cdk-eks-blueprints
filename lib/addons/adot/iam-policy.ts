@@ -1,6 +1,6 @@
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 
-export function getAdotCollectorPolicyDocument(partition: string) : PolicyDocument {
+export function getAdotCollectorPolicyDocument() : PolicyDocument {
     return PolicyDocument.fromJson({
             "Version": "2012-10-17",
             "Statement": [
