@@ -4,6 +4,7 @@ import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
+import { json } from "stream/consumers";
 
 export class CoreAddOnProps {
     /**
@@ -46,6 +47,7 @@ export class CoreAddOn implements ClusterAddOn {
 
         
         let serviceAccountRoleArn: string | undefined = undefined;
+        let addonVersion: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
 
@@ -64,14 +66,14 @@ export class CoreAddOn implements ClusterAddOn {
 
         let addOnprops = {
             addonName: this.coreAddOnProps.addOnName,
-            addonVersion: "",
+            addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
         }
 
         if (this.coreAddOnProps?.version) {
-            addOnprops['addonVersion'] = this.coreAddOnProps.version
+            addOnprops.addonVersion = this.coreAddOnProps.version
         }
 
         const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnprops);
