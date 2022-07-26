@@ -7,8 +7,7 @@ import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 /**
  * Configuration options for the Adot add-on.
  */
- export interface AdotCollectorAddOnProps extends CoreAddOnProps {
-}
+ export interface AdotCollectorAddOnProps extends CoreAddOnProps 
 
 const defaultProps = {
     addOnName: 'adot',
@@ -41,7 +40,7 @@ const defaultProps = {
 
         const addOnPromise = super.deploy(clusterInfo);
         addOnPromise.then(AdotCollectorAddOn => AdotCollectorAddOn.node.addDependency(otelPermissionsStatement));
-        return addOnPromise
+        return addOnPromise;
     }
  }
 
