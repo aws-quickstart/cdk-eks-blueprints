@@ -1,4 +1,5 @@
 
+export * from './adot';
 export * from './appmesh';
 export * from './argocd';
 export * from './aws-for-fluent-bit';
