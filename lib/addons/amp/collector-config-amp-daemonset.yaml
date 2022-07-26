@@ -3,7 +3,7 @@ kind: OpenTelemetryCollector
 metadata:
   name: my-collector-advanced
 spec:
-  mode: {{YOUR_DEPLOYMENT_METHOD}}
+  mode: {{your_deployment_method}}
   serviceAccount: adot-collector
   env:
     - name: "K8S_NODE_NAME"
@@ -286,9 +286,9 @@ spec:
 
     exporters:
       awsprometheusremotewrite:
-        endpoint: {{YOUR_REMOTE_WRITE_ENDPOINT}}
+        endpoint: {{your_remote_write_endpoint}}
         aws_auth:
-          region: {{YOUR_AWS_REGION}}
+          region: {{your_aws_region}}
           service: "aps"
 
     service:

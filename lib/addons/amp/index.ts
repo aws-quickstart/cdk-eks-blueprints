@@ -39,7 +39,7 @@ import { Construct } from 'constructs';
 export const enum DeploymentMode {
     DEPLOYMENT = 'deployment',
     DAEMONSET = 'daemonset',
-    STATEFULSET = 'statefulSet',
+    STATEFULSET = 'statefulset',
     SIDECAR = 'sidecar'
 }
 
@@ -118,9 +118,9 @@ export class AmpAddOn implements ClusterAddOn {
         else {
             doc = readYamlDocument(__dirname + '/collector-config-amp.yaml');
         }
-        const docArray = doc.replace(/{{YOUR_REMOTE_WRITE_ENDPOINT}}/g, finalRemoteWriteURLEndpoint)
-        .replace(/{{YOUR_AWS_REGION}}/g, cluster.stack.region)
-        .replace(/{{YOUR_DEPLOYMENT_METHOD}}/g, finalDeploymentMode);
+        const docArray = doc.replace(/{{your_remote_write_endpoint}}/g, finalRemoteWriteURLEndpoint)
+        .replace(/{{your_aws_region}}/g, cluster.stack.region)
+        .replace(/{{your_deployment_method}}/g, finalDeploymentMode);
         const manifest = docArray.split("---").map(e => loadYaml(e));
         const statement = new KubernetesManifest(cluster.stack, "adot-collector-amp", {
             cluster,
