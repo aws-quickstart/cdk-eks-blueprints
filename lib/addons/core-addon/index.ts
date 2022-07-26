@@ -44,16 +44,25 @@ export class CoreAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
-        // Create a service account if user provides namespace and service account
+        
         let serviceAccountRoleArn: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
+        
+        let addOnprops = {
+            addonName: this.coreAddOnProps.addOnName,
+            addonVersion: "",
+            clusterName: clusterInfo.cluster.clusterName,
+            serviceAccountRoleArn: "",
+            resolveConflicts: "OVERWRITE"
+        }
 
         saNamespace = DEFAULT_NAMESPACE;
         if (this.coreAddOnProps?.namespace) {
             saNamespace = this.coreAddOnProps.namespace;
         }
 
+        // Create a service account if user provides namespace, PolicyDocument
         if (this.coreAddOnProps?.policyDocumentProvider) {
             const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
@@ -61,30 +70,20 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccountRoleArn = serviceAccount.role.roleArn;
 
         }
-        if (this.coreAddOnProps.version) {
-            const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
-                addonName: this.coreAddOnProps.addOnName,
-                addonVersion: this.coreAddOnProps.version,
-                clusterName: clusterInfo.cluster.clusterName,
-                serviceAccountRoleArn: serviceAccountRoleArn, 
-                resolveConflicts: "OVERWRITE"});
-                if (serviceAccount) {
-                    cfnaddon.node.addDependency(serviceAccount);
-                }
-            // Instantiate the Add-on
-            return Promise.resolve(cfnaddon!);
+        if (serviceAccountRoleArn) {
+            addOnprops['serviceAccountRoleArn'] = serviceAccountRoleArn;
         }
-        else {
-            const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
-                addonName: this.coreAddOnProps.addOnName,
-                clusterName: clusterInfo.cluster.clusterName,
-                serviceAccountRoleArn: serviceAccountRoleArn, 
-                resolveConflicts: "OVERWRITE"});
-                if (serviceAccount) {
-                    cfnaddon.node.addDependency(serviceAccount);
-                }
-            // Instantiate the Add-on
-            return Promise.resolve(cfnaddon!);
+
+        if (this.coreAddOnProps?.version) {
+            addOnprops['addonVersion'] = this.coreAddOnProps.version
         }
+
+        const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnprops);
+        if (serviceAccount) {
+            cfnaddon.node.addDependency(serviceAccount);
+        }
+        // Instantiate the Add-on
+        return Promise.resolve(cfnaddon!);
+
     }
 }
