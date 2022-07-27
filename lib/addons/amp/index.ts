@@ -112,10 +112,10 @@ export class AmpAddOn implements ClusterAddOn {
 
         // Applying manifest for configuring ADOT Collector for Amp.
         if (finalDeploymentMode == DeploymentMode.DAEMONSET) {
-            doc = readYamlDocument(__dirname + '/collector-config-amp-daemonset.yaml');
+            doc = readYamlDocument(__dirname + '/collector-config-amp-daemonset.ytpl');
         }
         else {
-            doc = readYamlDocument(__dirname + '/collector-config-amp.yaml');
+            doc = readYamlDocument(__dirname + '/collector-config-amp.ytpl');
         }
         const docArray = doc.replace(/{{your_remote_write_endpoint}}/g, finalRemoteWriteURLEndpoint)
         .replace(/{{your_aws_region}}/g, cluster.stack.region)
