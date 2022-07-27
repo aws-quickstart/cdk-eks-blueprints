@@ -45,7 +45,6 @@ export class CoreAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         
         let serviceAccountRoleArn: string | undefined = undefined;
-        let addonVersion: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
 
