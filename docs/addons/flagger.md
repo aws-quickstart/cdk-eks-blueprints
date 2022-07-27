@@ -27,7 +27,6 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `prometheus`: Pass true or false if you wish to track deployment metrics via prometheus. `True by default`.
-- `crd`: Pass true or false. If true, create Flagger's CRDs (should be enabled for Helm v2 ONLY). If used in Helm v3 it will break the deployment so its `false by default`.
 - `meshProvider`: Pass from the following enum list of meshProviderOptions. `KUBERNETES by default`.
 
 ```typescript
@@ -50,15 +49,5 @@ export const enum MeshProviderOptions {
 ```typescript
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const flagger = new blueprints.addons.FlaggerAddOn({ 
-	values: {
-		prometheus: {
-        install: false
-      },
-      meshProvider: MeshProviderOptions.APPMESH,
-      crd: {
-        create: true
-      }
-	}
-});
-```
+const flagger = new blueprints.addons.FlaggerAddOn();
+``

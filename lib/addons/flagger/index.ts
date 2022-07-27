@@ -1,5 +1,4 @@
-import 'source-map-support/register';
-import * as blueprints from '../../../lib';
+import * as blueprints from '../../';
 import { Construct } from 'constructs';
 import { Values } from "../../spi";
 import merge from "ts-deepmerge";
@@ -7,10 +6,9 @@ import merge from "ts-deepmerge";
 /**
  * User provided options for the FlaggerAddonProps values.
  */
-export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {//this is the root level
+export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {
   prometheusInstall?: boolean;
   meshProvider?: MeshProviderOptions;
-  crd?: boolean;
 }
 
 /**
@@ -38,11 +36,17 @@ export const defaultProps: blueprints.HelmAddOnProps & FlaggerAddOnProps = {
   chart: "flagger",
   version: "1.22.0",
   release: "flagger",
-  repository: "https://flagger.app"
+  repository: "https://flagger.app",
+  values: {
+    prometheus: {
+      install: true
+    },
+    meshProvider: MeshProviderOptions.KUBERNETES
+  }
 };
 
 /**
- * This creates and deploys a cluster with the prometheus and mesh provider settings set unless the user specifies their own values for them.
+ * This creates and deploys a cluster with the FlaggerAddOnProps values for flagger settings with preset values unless the user specifies their own values.
  */
 export class FlaggerAddOn extends blueprints.HelmAddOn {
 
@@ -57,12 +61,9 @@ export class FlaggerAddOn extends blueprints.HelmAddOn {
 
     let values: Values = {
       prometheus: {
-        install: this.options.prometheusInstall ?? true
+        install: this.options.prometheusInstall ?? defaultProps.prometheusInstall
       },
-      meshProvider: this.options.meshProvider ?? MeshProviderOptions.KUBERNETES,
-      crd: {
-        create: this.options.crd ?? true
-      }
+      meshProvider: this.options.meshProvider ?? defaultProps.meshProvider
     };
 
     values = merge(values, this.props.values ?? {});

@@ -4,7 +4,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import * as team from '../teams';
-import {FlaggerAddOn} from '../../lib/addons/flagger'
+import {FlaggerAddOn} from '../../lib/addons/flagger';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
