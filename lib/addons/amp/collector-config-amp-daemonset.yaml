@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: my-collector-advanced
+  name: otel-collector-advanced
 spec:
   mode: {{your_deployment_method}}
   serviceAccount: adot-collector

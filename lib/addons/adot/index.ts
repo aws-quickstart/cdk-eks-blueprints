@@ -8,11 +8,11 @@ import { Construct } from 'constructs';
 /**
  * Configuration options for the Adot add-on.
  */
-type AdotCollectorAddOnProps = CoreAddOnProps;
-
+ type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
+    version: 'v0.51.0-eksbuild.1',
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
     namespace: 'default'
@@ -33,26 +33,14 @@ const defaultProps = {
         // Applying ADOT Permission manifest
         const otelPermissionsDoc = readYamlDocument(__dirname + '/otel-permissions.yaml');
         const otelPermissionsManifest = otelPermissionsDoc.split("---").map(e => loadYaml(e));
-        const otelpermissionsstatement = new KubernetesManifest(cluster.stack, "adot-addon-otelPermissions", {
+        const otelPermissionsStatement = new KubernetesManifest(cluster.stack, "adot-addon-otelPermissions", {
             cluster,
             manifest: otelPermissionsManifest,
             overwrite: true
         });
 
         const addOnPromise = super.deploy(clusterInfo);
-        addOnPromise.then(AdotCollectorAddOn => AdotCollectorAddOn.node.addDependency(otelpermissionsstatement));
+        addOnPromise.then(addOn => addOn.node.addDependency(otelPermissionsStatement));
         return addOnPromise;
     }
  }
-
-
-
-
-
-
-
-
-
-
-
-

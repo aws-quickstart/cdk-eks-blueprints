@@ -12,9 +12,9 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ## Usage
 
-This Addon can used with four different ways :
+This Addon can used with four different patterns :
 
-Variant 1 : using Default property values.
+Pattern # 1 : Simple and Easy - Using all default property values.
 
 ```typescript
 import 'source-map-support/register';
@@ -30,7 +30,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Variant 2 : Overriding Property values for Name and Tags
+Pattern # 2 : Overriding property values for Name and Tags.
 
 ```typescript
 import 'source-map-support/register';
@@ -50,7 +50,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
-Variant 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics.
+Pattern # 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics.
 
 ```typescript
 import 'source-map-support/register';
@@ -69,7 +69,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Variant 4 : Overriding Property values for Different Deployment Modes. Supported Ones - DEPLOYMENT, DAEMONSET, STATEFULSET, SIDECAR
+Pattern # 4 : Overriding Property values for Different Deployment Modes. Supported Ones - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import 'source-map-support/register';

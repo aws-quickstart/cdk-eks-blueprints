@@ -111,7 +111,6 @@ export class AmpAddOn implements ClusterAddOn {
         }
 
         // Applying manifest for configuring ADOT Collector for Amp.
-        console.log("Deployment Mode => " +finalDeploymentMode)
         if (finalDeploymentMode == DeploymentMode.DAEMONSET) {
             doc = readYamlDocument(__dirname + '/collector-config-amp-daemonset.yaml');
         }

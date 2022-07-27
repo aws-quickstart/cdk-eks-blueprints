@@ -6,7 +6,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: my-collector-amp
+  name: otel-collector-amp
 spec:
   mode: {{your_deployment_method}}
   serviceAccount: adot-collector
