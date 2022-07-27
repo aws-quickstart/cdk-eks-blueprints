@@ -4,7 +4,6 @@ import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
-import { json } from "stream/consumers";
 
 export class CoreAddOnProps {
     /**
@@ -15,7 +14,7 @@ export class CoreAddOnProps {
      * Version of the add-on to use. Must match the version of the cluster where it
      * will be deployed it
      */
-    readonly version?: string;
+    readonly version: string;
     /**
      * Policy document provider returns the policy required by the add-on to allow it to interact with AWS resources
      */
@@ -44,7 +43,6 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-
         
         let serviceAccountRoleArn: string | undefined = undefined;
         let addonVersion: string | undefined = undefined;
@@ -72,16 +70,11 @@ export class CoreAddOn implements ClusterAddOn {
             resolveConflicts: "OVERWRITE"
         }
 
-        if (this.coreAddOnProps?.version) {
-            addOnprops.addonVersion = this.coreAddOnProps.version
-        }
-
-        const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnprops);
+        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnprops);
         if (serviceAccount) {
-            cfnaddon.node.addDependency(serviceAccount);
+            cfnAddon.node.addDependency(serviceAccount);
         }
         // Instantiate the Add-on
-        return Promise.resolve(cfnaddon!);
-
+        return Promise.resolve(cfnAddon);
     }
 }
