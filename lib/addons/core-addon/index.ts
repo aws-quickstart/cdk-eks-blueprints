@@ -45,7 +45,6 @@ export class CoreAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         
         let serviceAccountRoleArn: string | undefined = undefined;
-        let addonVersion: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
 
@@ -62,7 +61,7 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
 
-        let addOnprops = {
+        let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
@@ -70,7 +69,7 @@ export class CoreAddOn implements ClusterAddOn {
             resolveConflicts: "OVERWRITE"
         }
 
-        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnprops);
+        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnProps);
         if (serviceAccount) {
             cfnAddon.node.addDependency(serviceAccount);
         }
