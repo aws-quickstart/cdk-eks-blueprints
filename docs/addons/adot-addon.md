@@ -49,7 +49,7 @@ replicaset.apps/opentelemetry-operator-controller-manager-845cbd7bf7   1        
 
 ```
 
-Additionally, the `aws cli` can be used to determine which version of the add-on is installed in the cluster
+Additionally, the `aws cli` can be used to determine which version of the add-on is installed in the cluster.
 ```bash
 # Assuming cluster-name is my-cluster, below command shows the version of coredns installed. Check if it is same as the version installed via EKS add-on
 aws eks describe-addon \
