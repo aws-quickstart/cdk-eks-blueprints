@@ -7,7 +7,7 @@ This driver is not automatically installed when you first create a cluster, it m
 For more information on the driver, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
 ## Prerequisites
-- The ADOT Operator uses admission webhooks to mutate and validate the Collector Custom Resource (CR) requests. In Kubernetes, the webhook requires a TLS certificate that the API server is configured to trust. There are multiple ways for you to generate the required TLS certificate. However, the default method is to install the latest version of the cert-manager. `certificate-manager` EKS blueprints should be added before ADOT addon.
+- The ADOT Operator uses admission webhooks to mutate and validate the Collector Custom Resource (CR) requests. In Kubernetes, the webhook requires a TLS certificate that the API server is configured to trust. There are multiple ways for you to generate the required TLS certificate. However, the default method is to install the latest version of the cert-manager. You can install Certificate Manager using this [user guide] https://cert-manager.io/docs/installation/helm/ or you can use `certificate-manager` EKS blueprints addon which should be added before ADOT addon.
 
 ## Usage
 
