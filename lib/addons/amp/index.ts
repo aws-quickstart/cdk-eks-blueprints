@@ -77,37 +77,36 @@ export class AmpAddOn implements ClusterAddOn {
             key: defaultProps.workspaceTagKey,
             value: defaultProps.workspaceTagValue
             }],
-        }
-
-        if (this.ampAddOnProps.workspaceName){
-            cfnWorkspaceProps = {
-                ...cfnWorkspaceProps,
-                alias:this.ampAddOnProps.workspaceName
-            };        
-        }
-
-        if (this.ampAddOnProps.workspaceTagKey && this.ampAddOnProps.workspaceTagValue){
-            cfnWorkspaceProps = {
-                ...cfnWorkspaceProps,
-                tags: [{
-                    key: this.ampAddOnProps.workspaceTagKey,
-                    value: this.ampAddOnProps.workspaceTagValue
-                }]
-            }
-        }
+        };
 
         if (this.ampAddOnProps.prometheusRemoteWriteURL) {
             finalRemoteWriteURLEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
         }
         else {
+            if (this.ampAddOnProps.workspaceName){
+                cfnWorkspaceProps = {
+                    ...cfnWorkspaceProps,
+                    alias:this.ampAddOnProps.workspaceName
+                };        
+            }
+    
+            if (this.ampAddOnProps.workspaceTagKey && this.ampAddOnProps.workspaceTagValue){
+                cfnWorkspaceProps = {
+                    ...cfnWorkspaceProps,
+                    tags: [{
+                        key: this.ampAddOnProps.workspaceTagKey,
+                        value: this.ampAddOnProps.workspaceTagValue
+                    }]
+                };
+            }
             const cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
             const URLEndpoint = cfnWorkspace.attrPrometheusEndpoint;
             finalRemoteWriteURLEndpoint = URLEndpoint + 'api/v1/remote_write';
         }
 
-        finalDeploymentMode = defaultProps.deploymentMode
+        finalDeploymentMode = defaultProps.deploymentMode;
         if (this.ampAddOnProps.deploymentMode) {
-            finalDeploymentMode = this.ampAddOnProps.deploymentMode
+            finalDeploymentMode = this.ampAddOnProps.deploymentMode;
         }
 
         // Applying manifest for configuring ADOT Collector for Amp.
