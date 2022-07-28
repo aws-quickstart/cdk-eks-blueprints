@@ -7,7 +7,7 @@ import merge from "ts-deepmerge";
  * User provided options for the FlaggerAddonProps values.
  */
 export interface FlaggerAddOnProps extends blueprints.HelmAddOnUserProps {
-  prometheusInstall?: boolean;
+  installPrometheus?: boolean;
   meshProvider?: MeshProviderOptions;
 }
 
@@ -61,7 +61,7 @@ export class FlaggerAddOn extends blueprints.HelmAddOn {
 
     let values: Values = {
       prometheus: {
-        install: this.options.prometheusInstall ?? defaultProps.prometheusInstall
+        install: this.options.installPrometheus ?? defaultProps.installPrometheus
       },
       meshProvider: this.options.meshProvider ?? defaultProps.meshProvider
     };

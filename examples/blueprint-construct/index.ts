@@ -3,8 +3,8 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
+import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
-import {FlaggerAddOn} from '../../lib/addons/flagger';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -20,7 +20,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        //HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.validateHelmVersions = true;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -132,9 +132,9 @@ export default class BlueprintConstruct {
         });
 
         blueprints.EksBlueprint.builder()
-            .addOns(new FlaggerAddOn())//...addOns)
-            //.clusterProvider(clusterProvider)
-            .teams()//...teams)
+            .addOns(...addOns)
+            .clusterProvider(clusterProvider)
+            .teams(...teams)
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }

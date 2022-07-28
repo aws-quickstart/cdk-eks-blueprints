@@ -20,7 +20,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Functionality
 
-1. Creates the `flagger` namespace.
+1. Creates the `flagger` namespace. This parameter is optional and may be provided by the user in the namespace field of your addon props.
 2. Deploys the `flagger` Helm chart into the cluster.
 3. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options)
 
