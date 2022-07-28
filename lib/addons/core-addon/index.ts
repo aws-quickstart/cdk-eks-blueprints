@@ -20,9 +20,13 @@ export class CoreAddOnProps {
      */
     readonly policyDocumentProvider?: (partition: string) => PolicyDocument;
     /**
-     * Service Account Name to be used with AddOn
+     * Service Account Name to be used with AddOn.
      */
     readonly saName: string;
+    /**
+     * Namespace to create the ServiceAccount.
+     */
+    readonly namespace?: string;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -39,31 +43,38 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-
-        // Create a service account if user provides namespace and service account
+        
         let serviceAccountRoleArn: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
+        let saNamespace: string | undefined = undefined;
 
+        saNamespace = DEFAULT_NAMESPACE;
+        if (this.coreAddOnProps?.namespace) {
+            saNamespace = this.coreAddOnProps.namespace;
+        }
+
+        // Create a service account if user provides namespace, PolicyDocument
         if (this.coreAddOnProps?.policyDocumentProvider) {
             const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
-                DEFAULT_NAMESPACE, policyDoc);
+                saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
-
         }
-        const cfnaddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
+
+        let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
-        });
-        
-        if (serviceAccount) {
-            cfnaddon.node.addDependency(serviceAccount);
-        }
+        };
 
+        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnProps);
+        if (serviceAccount) {
+            cfnAddon.node.addDependency(serviceAccount);
+        }
         // Instantiate the Add-on
-        return Promise.resolve(cfnaddon!);
+        return Promise.resolve(cfnAddon);
+
     }
 }
