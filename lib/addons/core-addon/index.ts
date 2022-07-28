@@ -67,7 +67,7 @@ export class CoreAddOn implements ClusterAddOn {
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
-        }
+        };
 
         const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnProps);
         if (serviceAccount) {
