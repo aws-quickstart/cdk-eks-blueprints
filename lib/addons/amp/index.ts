@@ -30,6 +30,11 @@ import { CfnTag } from "aws-cdk-lib/core";
      * @default deployment
      */
      deploymentMode?: DeploymentMode;
+    /**
+     * Namespace to deploy the ADOT Collector for AMP.
+     * @default default
+     */
+     namepace?: string;
 }
 
 export const enum DeploymentMode {
@@ -53,7 +58,8 @@ const defaultProps = {
         value: 'blueprints-sandbox',
       }
     ],
-    deploymentMode: DeploymentMode.DEPLOYMENT
+    deploymentMode: DeploymentMode.DEPLOYMENT,
+    namespace: 'default'
 };
 
 /**
@@ -72,6 +78,7 @@ export class AmpAddOn implements ClusterAddOn {
         const cluster = clusterInfo.cluster;
         let finalRemoteWriteURLEndpoint: string;
         let finalDeploymentMode: string;
+        let finalNamespace: string;
         let doc: string;
         let cfnWorkspace: aps.CfnWorkspace|undefined;
         
@@ -106,6 +113,12 @@ export class AmpAddOn implements ClusterAddOn {
             finalDeploymentMode = this.ampAddOnProps.deploymentMode;
         }
 
+
+        finalNamespace = defaultProps.namespace;
+        if (this.ampAddOnProps.namepace) {
+            finalNamespace = this.ampAddOnProps.namepace;
+        }
+
         // Applying manifest for configuring ADOT Collector for Amp.
         if (finalDeploymentMode == DeploymentMode.DAEMONSET) {
             doc = readYamlDocument(__dirname + '/collector-config-amp-daemonset.ytpl');
@@ -115,7 +128,8 @@ export class AmpAddOn implements ClusterAddOn {
         }
         const docArray = doc.replace(/{{your_remote_write_endpoint}}/g, finalRemoteWriteURLEndpoint)
         .replace(/{{your_aws_region}}/g, cluster.stack.region)
-        .replace(/{{your_deployment_method}}/g, finalDeploymentMode);
+        .replace(/{{your_deployment_method}}/g, finalDeploymentMode)
+        .replace(/{{your_namespace}}/g, finalNamespace);
         const manifest = docArray.split("---").map(e => loadYaml(e));
         const statement = new KubernetesManifest(cluster.stack, "adot-collector-amp", {
             cluster,

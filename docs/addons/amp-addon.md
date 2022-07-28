@@ -14,7 +14,7 @@ For more information on the driver, please review the [user guide](https://docs.
 
 This Addon can used with four different patterns :
 
-Pattern # 1 : Simple and Easy - Using all default property values. This pattern creates a new AMP workspace with default property values such as `workspaceName`, `tags` and deploys an ADOT collector with `deployment` as the mode to remote write metrics to AMP workspace.
+Pattern # 1 : Simple and Easy - Using all default property values. This pattern creates a new AMP workspace with default property values such as `workspaceName`, `tags`, `namespace` and deploys an ADOT collector in the `default` namespace with `deployment` as the mode to remote write metrics to AMP workspace.
 
 ```typescript
 import 'source-map-support/register';
@@ -30,7 +30,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding property values for Name and Tags for a custom AMP Workspace name and tags. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector with `deployment` as the mode to remote write metrics to AMP workspace.
+Pattern # 2 : Overriding property values for Name and Tags for a custom AMP Workspace name and tags. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with `deployment` as the mode to remote write metrics to AMP workspace.
 
 ```typescript
 import 'source-map-support/register';
@@ -53,14 +53,15 @@ const addOn = new blueprints.addons.AmpAddOn({
             key: 'Department',
             value: 'Operations',
     }],
-    deploymentMode: DeploymentMode.DEPLOYMENT
+    deploymentMode: DeploymentMode.DEPLOYMENT,
+    namespace: 'default'
 })
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
-Pattern # 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics. This pattern does not create an AMP workspace. Deploys an ADOT collector with `deployment` as the mode to remote write metrics to AMP workspace of the URL passed as input. This pattern ignores any other property values passed if `prometheusRemoteWriteURL` is present.
+Pattern # 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics. This pattern does not create an AMP workspace. Deploys an ADOT collector on the namespace specified in `namespace` with `deployment` as the mode to remote write metrics to AMP workspace of the URL passed as input. This pattern ignores any other property values passed if `prometheusRemoteWriteURL` is present.
 
 ```typescript
 import 'source-map-support/register';
@@ -71,7 +72,8 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AmpAddOn({
     prometheusRemoteWriteURL: 'https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-e859f589-7eed-43c1-a82b-58f44119f17d/api/v1/remote_write',
-    deploymentMode: DeploymentMode.DEPLOYMENT
+    deploymentMode: DeploymentMode.DEPLOYMENT,
+    namespace: 'default'
 })
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -79,7 +81,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 4 : Overriding Property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector with `daemonset` as the mode to remote write metrics to AMP workspace. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 4 : Overriding Property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with `daemonset` as the mode to remote write metrics to AMP workspace. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import 'source-map-support/register';
@@ -102,7 +104,8 @@ const addOn = new blueprints.addons.AmpAddOn({
             key: 'Department',
             value: 'Operations',
     }],
-    deploymentMode: DeploymentMode.DAEMONSET
+    deploymentMode: DeploymentMode.DAEMONSET,
+    namespace: 'default'
     // deploymentMode: DeploymentMode.DEPLOYMENT
     // deploymentMode: DeploymentMode.STATEFULSET
     // deploymentMode: DeploymentMode.SIDECAR

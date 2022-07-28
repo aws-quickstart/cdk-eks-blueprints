@@ -60,7 +60,8 @@ export default class BlueprintConstruct {
                     key: 'Department',
                     value: 'Operations',
             }],
-            deploymentMode: DeploymentMode.DEPLOYMENT
+            deploymentMode: DeploymentMode.DEPLOYMENT,
+            namespace: 'default'
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AdotCollectorAddOn(),

@@ -7,6 +7,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector-amp
+  namespace: {{your_namespace}}
 spec:
   mode: {{your_deployment_method}}
   serviceAccount: adot-collector
@@ -317,6 +318,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: otel-prometheus-role
+  namespace: {{your_namespace}}
 rules:
   - apiGroups:
       - ""
@@ -348,6 +350,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: otel-prometheus-role-binding
+  namespace: {{your_namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -355,4 +358,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: adot-collector
-    namespace: default
+    namespace: {{your_namespace}}
