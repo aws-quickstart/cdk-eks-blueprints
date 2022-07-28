@@ -41,8 +41,18 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AmpAddOn({
     workspaceName: 'sample-AMP-Workspace',
-    workspaceTagKey: 'Environment',
-    workspaceTagValue: 'Dev',
+    workspaceTag: [{
+            key: 'Name',
+            value: 'Sample-AMP-Workspace',
+        },
+        {
+            key: 'Environment',
+            value: 'Development',
+        },
+        {
+            key: 'Department',
+            value: 'Operations',
+    }],
     deploymentMode: DeploymentMode.DEPLOYMENT
 })
 
@@ -80,8 +90,18 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AmpAddOn({
     workspaceName: 'sample-AMP-Workspace',
-    workspaceTagKey: 'Environment',
-    workspaceTagValue: 'Dev',
+    workspaceTag: [{
+            key: 'Name',
+            value: 'Sample-AMP-Workspace',
+        },
+        {
+            key: 'Environment',
+            value: 'Development',
+        },
+        {
+            key: 'Department',
+            value: 'Operations',
+    }],
     deploymentMode: DeploymentMode.DAEMONSET
     // deploymentMode: DeploymentMode.DEPLOYMENT
     // deploymentMode: DeploymentMode.STATEFULSET

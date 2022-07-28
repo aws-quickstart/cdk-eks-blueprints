@@ -5,6 +5,7 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
+import { CfnTag } from "aws-cdk-lib/core";
 
 /**
  * Configuration options for add-on.
@@ -20,15 +21,10 @@ import { Construct } from 'constructs';
      */
      prometheusRemoteWriteURL?: string;
     /**
-     * Tag Key to passed while creating AMP workspace
+     * Tags to passed while creating AMP workspace
      * @default Project
      */
-     workspaceTagKey?: string;
-    /**
-     * Tag Value to passed while creating AMP workspace
-     * @default blueprints-amp-workspace
-     */
-     workspaceTagValue?: string;
+     workspaceTag?: CfnTag[];
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -48,8 +44,15 @@ export const enum DeploymentMode {
  */
 const defaultProps = {
     workspaceName: 'blueprints-amp-workspace',
-    workspaceTagKey: 'Project',
-    workspaceTagValue: 'blueprints-amp-workspace',
+    workspaceTag: [{
+        key: 'Name',
+        value: 'blueprints-amp-workspace',
+      },
+      {
+        key: 'Environment',
+        value: 'blueprints-sandbox',
+      }
+    ],
     deploymentMode: DeploymentMode.DEPLOYMENT
 };
 
@@ -70,15 +73,12 @@ export class AmpAddOn implements ClusterAddOn {
         let finalRemoteWriteURLEndpoint: string;
         let finalDeploymentMode: string;
         let doc: string;
+        let cfnWorkspace: aps.CfnWorkspace|undefined;
         
         let cfnWorkspaceProps : CfnWorkspaceProps  = {
             alias: defaultProps.workspaceName,  
-            tags: [{
-            key: defaultProps.workspaceTagKey,
-            value: defaultProps.workspaceTagValue
-            }],
+            tags: defaultProps.workspaceTag
         };
-
         if (this.ampAddOnProps.prometheusRemoteWriteURL) {
             finalRemoteWriteURLEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
         }
@@ -90,16 +90,13 @@ export class AmpAddOn implements ClusterAddOn {
                 };        
             }
     
-            if (this.ampAddOnProps.workspaceTagKey && this.ampAddOnProps.workspaceTagValue){
+            if (this.ampAddOnProps.workspaceTag){
                 cfnWorkspaceProps = {
                     ...cfnWorkspaceProps,
-                    tags: [{
-                        key: this.ampAddOnProps.workspaceTagKey,
-                        value: this.ampAddOnProps.workspaceTagValue
-                    }]
-                };
+                    tags:this.ampAddOnProps.workspaceTag
+                }; 
             }
-            const cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
+            cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
             const URLEndpoint = cfnWorkspace.attrPrometheusEndpoint;
             finalRemoteWriteURLEndpoint = URLEndpoint + 'api/v1/remote_write';
         }
@@ -125,6 +122,9 @@ export class AmpAddOn implements ClusterAddOn {
             manifest,
             overwrite: true
         });
+        if (cfnWorkspace){
+            statement.node.addDependency(cfnWorkspace);
+        }
         return Promise.resolve(statement);
     }
 }
