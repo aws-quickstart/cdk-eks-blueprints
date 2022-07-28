@@ -7,6 +7,7 @@ import merge from "ts-deepmerge";
  * User provided options for the FlaggerAddonProps values.
  */
 export interface FlaggerAddOnProps extends HelmAddOnUserProps {
+  
   installPrometheus?: boolean;
   meshProvider?: MeshProviderOptions;
 }
@@ -15,6 +16,7 @@ export interface FlaggerAddOnProps extends HelmAddOnUserProps {
  * All the meshProvider values that can be chosen by the user.
  */
 export const enum MeshProviderOptions {
+
   KUBERNETES = 'kubernetes',
   ISTIO = 'istio',
   LINKERD = 'linkerd',
@@ -31,6 +33,7 @@ export const enum MeshProviderOptions {
  * defaultProps makes the flagger namespace and chart.
  */
 export const defaultProps: HelmAddOnProps & FlaggerAddOnProps = {
+
   name: "flagger",
   namespace: "flagger",
   chart: "flagger",
@@ -38,6 +41,7 @@ export const defaultProps: HelmAddOnProps & FlaggerAddOnProps = {
   release: "flagger",
   repository: "https://flagger.app",
   values: {
+
     prometheus: {
       install: true
     },
@@ -48,24 +52,29 @@ export const defaultProps: HelmAddOnProps & FlaggerAddOnProps = {
 /**
  * This creates and deploys a cluster with the FlaggerAddOnProps values for flagger settings with preset values unless the user specifies their own values.
  */
-export class FlaggerAddOn extends HelmAddOn{
+export class FlaggerAddOn extends HelmAddOn {
 
   readonly options: FlaggerAddOnProps;
 
   constructor(props?: FlaggerAddOnProps) {
+    
     super({ ...defaultProps, ...props });
     this.options = this.props as FlaggerAddOnProps;
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+
     let values: Values = {
+
       prometheus: {
         install: this.options.installPrometheus ?? defaultProps.installPrometheus
       },
       meshProvider: this.options.meshProvider ?? defaultProps.meshProvider
     };
+
     values = merge(values, this.props.values ?? {});
     const chart = this.addHelmChart(clusterInfo, values);
+
     return Promise.resolve(chart);
   }
 }
