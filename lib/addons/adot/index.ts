@@ -1,9 +1,10 @@
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { ClusterInfo } from "../../spi";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
-import { loadYaml, readYamlDocument } from "../../utils";
+import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { Construct } from 'constructs';
+import { CertManagerAddOn } from "../cert-manager";
 
 /**
  * Configuration options for the Adot add-on.
@@ -26,7 +27,7 @@ const defaultProps = {
     constructor(props?: AdotCollectorAddOnProps) {
         super({ ...defaultProps, ...props });
     }
-
+    @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
 
         const cluster = clusterInfo.cluster;
