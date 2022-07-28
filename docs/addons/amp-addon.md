@@ -123,18 +123,17 @@ kubectl get all -n default
 ## Output
 ```bash
 NAME                                              READY   STATUS        RESTARTS   AGE
-pod/my-collector-amp-collector-7877b86dd4-z9ds5   1/1     Running       0          31m
-pod/traffic-generator-86f86d84cc-z78wc            0/1     Terminating   0          27m
+pod/otel-collector-amp-collector-7877b86dd4-z9ds5   1/1     Running       0          31m
 
 NAME                                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
 service/kubernetes                              ClusterIP   172.20.0.1       <none>        443/TCP    4h35m
-service/my-collector-amp-collector-monitoring   ClusterIP   172.20.216.242   <none>        8888/TCP   31m
+service/otel-collector-amp-collector-monitoring ClusterIP   172.20.216.242   <none>        8888/TCP   31m
 
 NAME                                         READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/my-collector-amp-collector   1/1     1            1           31m
+deployment.apps/otel-collector-amp-collector   1/1     1            1           31m
 
 NAME                                                    DESIRED   CURRENT   READY   AGE
-replicaset.apps/my-collector-amp-collector-7877b86dd4   1         1         1       31m
+replicaset.apps/otel-collector-amp-collector-7877b86dd4   1         1         1       31m
 ```
  
 
