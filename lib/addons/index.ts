@@ -27,6 +27,7 @@ export * from './ssm-agent';
 export * from './velero';
 export * from './vpc-cni';
 export * from './xray';
+export * from './xray-adot-addon';
 export * from './keda';
 export * from './kubevious';
 export * from './ebs-csi-driver';

@@ -67,6 +67,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.AdotCollectorAddOn(),
             ampAddOn,
             // new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.XrayAdotAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
