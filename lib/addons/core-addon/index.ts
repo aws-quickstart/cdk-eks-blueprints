@@ -75,6 +75,5 @@ export class CoreAddOn implements ClusterAddOn {
         }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
-        
     }
 }
