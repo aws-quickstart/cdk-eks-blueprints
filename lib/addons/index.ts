@@ -8,7 +8,11 @@ export * from './aws-loadbalancer-controller';
 export * from './aws-node-termination-handler';
 export * from './calico';
 export * from './calico-operator';
+<<<<<<< HEAD
 export * from './cloudwatch-adot-addon';
+=======
+export * from './cert-manager';
+>>>>>>> upstream/main
 export * from './cluster-autoscaler';
 export * from './container-insights';
 export * from './coredns';
