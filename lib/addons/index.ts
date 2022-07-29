@@ -1,4 +1,3 @@
-
 export * from './appmesh';
 export * from './argocd';
 export * from './aws-for-fluent-bit';
@@ -32,6 +31,7 @@ export * from './ebs-csi-driver';
 export * from './efs-csi-driver';
 export * from './istio-base';
 export * from './istio-control-plane';
+export * from './flagger';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
