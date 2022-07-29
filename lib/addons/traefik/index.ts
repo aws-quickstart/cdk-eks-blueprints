@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo } from "../../spi";
-import { createServiceAccount, createNamespace } from "../../utils";
+import { createNamespace } from "../../utils";
 
 /**
  * User provided options for the Helm Chart
@@ -44,9 +44,10 @@ export class TraefikAddOn extends HelmAddOn {
     const cluster = clusterInfo.cluster;
     const values = this.props.values ?? {};
     
-    //Create Service Account with IRSA
+    // Create namespace
     const ns = createNamespace(TRAEFIK, cluster, true, true);
     
+    // Create Helm Chart
     const chart = this.addHelmChart(clusterInfo, values);
     chart.node.addDependency(ns);
     return Promise.resolve(chart);   
