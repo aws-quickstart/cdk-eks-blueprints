@@ -34,7 +34,7 @@ import { CfnTag } from "aws-cdk-lib/core";
      * Namespace to deploy the ADOT Collector for AMP.
      * @default default
      */
-     namepace?: string;
+     namespace?: string;
 }
 
 export const enum DeploymentMode {
@@ -115,8 +115,8 @@ export class AmpAddOn implements ClusterAddOn {
 
 
         finalNamespace = defaultProps.namespace;
-        if (this.ampAddOnProps.namepace) {
-            finalNamespace = this.ampAddOnProps.namepace;
+        if (this.ampAddOnProps.namespace) {
+            finalNamespace = this.ampAddOnProps.namespace;
         }
 
         // Applying manifest for configuring ADOT Collector for Amp.
