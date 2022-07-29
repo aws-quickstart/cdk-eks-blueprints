@@ -5,7 +5,6 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { HelmAddOn } from '../../lib';
 import * as team from '../teams';
-import { DeploymentMode } from '../../lib';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -46,27 +45,7 @@ export default class BlueprintConstruct {
             // },
             // adminPasswordSecretName: "argo-admin-secret"
         });
-        const ampAddOn = new blueprints.addons.AmpAddOn({
-            workspaceName: 'sample-AMP-Workspace',
-            workspaceTag: [{
-                    key: 'Name',
-                    value: 'Sample-AMP-Workspace',
-                },
-                {
-                    key: 'Environment',
-                    value: 'Development',
-                },
-                {
-                    key: 'Department',
-                    value: 'Operations',
-            }],
-            deploymentMode: DeploymentMode.DEPLOYMENT,
-            namespace: 'default'
-        });
         const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.addons.AdotCollectorAddOn(),
-            ampAddOn,
-            // new blueprints.addons.AmpAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
@@ -110,6 +89,7 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
+            new blueprints.addons.CertManagerAddOn(),
         ];
 
         // Instantiated to for helm version check.
