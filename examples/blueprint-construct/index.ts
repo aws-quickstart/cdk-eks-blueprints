@@ -47,6 +47,7 @@ export default class BlueprintConstruct {
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
+            new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn(),
             new blueprints.addons.XrayAdotAddOn(),
@@ -92,7 +93,6 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
-            new blueprints.addons.CertManagerAddOn(),
         ];
 
         // Instantiated to for helm version check.
