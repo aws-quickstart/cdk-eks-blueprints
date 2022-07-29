@@ -6,6 +6,7 @@ export * from './aws-loadbalancer-controller';
 export * from './aws-node-termination-handler';
 export * from './calico';
 export * from './calico-operator';
+export * from './cert-manager';
 export * from './cluster-autoscaler';
 export * from './container-insights';
 export * from './coredns';
@@ -31,7 +32,6 @@ export * from './ebs-csi-driver';
 export * from './efs-csi-driver';
 export * from './istio-base';
 export * from './istio-control-plane';
-export * from './cert-manager';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

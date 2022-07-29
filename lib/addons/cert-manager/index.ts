@@ -10,10 +10,6 @@ import { createNamespace } from "../../utils";
  */
 export interface CertManagerAddOnProps extends HelmAddOnUserProps {
     /**
-     * Version of the helm chart to deploy
-     */      
-    version?: string;
-    /**
      * To automatically install and manage the CRDs as part of your Helm release,
      */    
     installCRDs?: boolean;
@@ -53,15 +49,25 @@ export class CertManagerAddOn extends HelmAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    
-    if( this.options.createNamespace == true){
-      createNamespace(this.options.namespace! , cluster);
-    }
-    
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
-    const chart = this.addHelmChart(clusterInfo, values);
-    return Promise.resolve(chart);
+
+
+    if( this.options.createNamespace == true){
+      // Let CDK Create the Namespace
+      const namespace = createNamespace(this.options.namespace! , cluster);
+      const chart = this.addHelmChart(clusterInfo, values);
+      chart.node.addDependency(namespace);
+      return Promise.resolve(chart);
+
+    } else {
+      //Namespace is already created
+      const chart = this.addHelmChart(clusterInfo, values);
+      return Promise.resolve(chart);
+    }
+    
+
+    
   }
 }
 
