@@ -52,7 +52,6 @@ export class CertManagerAddOn extends HelmAddOn {
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
 
-
     if( this.options.createNamespace == true){
       // Let CDK Create the Namespace
       const namespace = createNamespace(this.options.namespace! , cluster);
@@ -65,8 +64,6 @@ export class CertManagerAddOn extends HelmAddOn {
       const chart = this.addHelmChart(clusterInfo, values);
       return Promise.resolve(chart);
     }
-    
-
     
   }
 }
