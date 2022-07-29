@@ -7,8 +7,16 @@ import merge from "ts-deepmerge";
  * User provided options for the FlaggerAddonProps values.
  */
 export interface FlaggerAddOnProps extends HelmAddOnUserProps {
-  
+
+  /**
+   * Controls if prometheus is installed with the addon or not.
+   * default: true
+   */
   installPrometheus?: boolean;
+  /**
+   * Controls what mesh provider from MeshProviderOptions enums list is used.
+   * default: MeshProviderOptions.KUBERNETES
+   */
   meshProvider?: MeshProviderOptions;
 }
 
@@ -41,7 +49,6 @@ export const defaultProps: HelmAddOnProps & FlaggerAddOnProps = {
   release: "flagger",
   repository: "https://flagger.app",
   values: {
-
     prometheus: {
       install: true
     },
@@ -65,7 +72,6 @@ export class FlaggerAddOn extends HelmAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
     let values: Values = {
-
       prometheus: {
         install: this.options.installPrometheus ?? defaultProps.installPrometheus
       },
