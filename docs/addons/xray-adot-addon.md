@@ -2,7 +2,7 @@
 
 [AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. This Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
 
-This driver is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup AMP for remote write of metrics.
+This driver is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup X-Ray for remote write traces.
 
 For more information on the driver, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
@@ -51,7 +51,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that AMP add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
+To validate that X-Ray add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
 
 ```bash
 kubectl get all -n default
