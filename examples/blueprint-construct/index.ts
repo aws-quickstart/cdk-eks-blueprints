@@ -46,7 +46,6 @@ export default class BlueprintConstruct {
             // adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
@@ -90,6 +89,7 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
+            new blueprints.addons.CertManagerAddOn(),
         ];
 
         // Instantiated to for helm version check.
