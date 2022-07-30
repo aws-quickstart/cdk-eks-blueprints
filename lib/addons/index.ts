@@ -5,6 +5,7 @@ export * from './argocd';
 export * from './aws-for-fluent-bit';
 export * from './aws-loadbalancer-controller';
 export * from './aws-node-termination-handler';
+export * from './aws-privateca-issuer';
 export * from './calico';
 export * from './calico-operator';
 export * from './cert-manager';
