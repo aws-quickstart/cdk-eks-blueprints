@@ -22,7 +22,7 @@ const defaultProps = {
  /**
   * Implementation of Adot Collector EKS add-on.
   */
- export class AdotCollectorAddOn extends CoreAddOn {
+export class AdotCollectorAddOn extends CoreAddOn {
 
     constructor(props?: AdotCollectorAddOnProps) {
         super({ ...defaultProps, ...props });
@@ -44,4 +44,4 @@ const defaultProps = {
         addOnPromise.then(addOn => addOn.node.addDependency(otelPermissionsStatement));
         return addOnPromise;
     }
- }
+}
