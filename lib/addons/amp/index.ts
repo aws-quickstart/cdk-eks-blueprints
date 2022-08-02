@@ -8,7 +8,14 @@ import { Construct } from 'constructs';
 import { CfnTag } from "aws-cdk-lib/core";
 
 /**
- * Configuration options for add-on.
+ * This AMP Addon installs an ADOT Collector for Amazon Managed Service for Prometheus 
+ * (AMP) and creates an AMP worpsace to receive OTLP metrics from the application and 
+ * Prometheus metrics scraped from pods on the cluster and remote writes the metrics 
+ * to AMP remote write endpoint of the created or passed AMP workspace.
+ */
+
+/**
+ * Configuration options for the Amp add-on.
  */
  export interface AmpAddOnProps {
     /**
@@ -24,7 +31,7 @@ import { CfnTag } from "aws-cdk-lib/core";
      * Tags to passed while creating AMP workspace
      * @default Project
      */
-     workspaceTag?: CfnTag[];
+     workspaceTags?: CfnTag[];
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -49,7 +56,7 @@ export const enum DeploymentMode {
  */
 const defaultProps = {
     workspaceName: 'blueprints-amp-workspace',
-    workspaceTag: [{
+    workspaceTags: [{
         key: 'Name',
         value: 'blueprints-amp-workspace',
       },
@@ -84,7 +91,7 @@ export class AmpAddOn implements ClusterAddOn {
         
         let cfnWorkspaceProps : CfnWorkspaceProps  = {
             alias: defaultProps.workspaceName,  
-            tags: defaultProps.workspaceTag
+            tags: defaultProps.workspaceTags
         };
         if (this.ampAddOnProps.prometheusRemoteWriteURL) {
             finalRemoteWriteURLEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
@@ -97,10 +104,10 @@ export class AmpAddOn implements ClusterAddOn {
                 };        
             }
     
-            if (this.ampAddOnProps.workspaceTag){
+            if (this.ampAddOnProps.workspaceTags){
                 cfnWorkspaceProps = {
                     ...cfnWorkspaceProps,
-                    tags:this.ampAddOnProps.workspaceTag
+                    tags:this.ampAddOnProps.workspaceTags
                 }; 
             }
             cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
@@ -112,7 +119,6 @@ export class AmpAddOn implements ClusterAddOn {
         if (this.ampAddOnProps.deploymentMode) {
             finalDeploymentMode = this.ampAddOnProps.deploymentMode;
         }
-
 
         finalNamespace = defaultProps.namespace;
         if (this.ampAddOnProps.namepace) {
