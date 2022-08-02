@@ -9,7 +9,7 @@ import { CertManagerAddOn } from "../cert-manager";
 /**
  * Configuration options for the Adot add-on.
  */
- type AdotCollectorAddOnProps = CoreAddOnProps;
+type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
