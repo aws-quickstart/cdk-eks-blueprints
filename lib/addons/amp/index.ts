@@ -1,11 +1,11 @@
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import * as aps from 'aws-cdk-lib/aws-aps';
 import { CfnWorkspaceProps } from 'aws-cdk-lib/aws-aps';
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { CfnTag } from "aws-cdk-lib/core";
+import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
  * This AMP Addon installs an ADOT Collector for Amazon Managed Service for Prometheus 
@@ -15,9 +15,9 @@ import { CfnTag } from "aws-cdk-lib/core";
  */
 
 /**
- * Configuration options for the Amp add-on.
+ * Configuration options for add-on.
  */
- export interface AmpAddOnProps {
+export interface AmpAddOnProps {
     /**
      * Name that will be used by the Addon to create the Workspace
      * @default blueprints-amp-workspace
@@ -56,7 +56,7 @@ export const enum DeploymentMode {
  */
 const defaultProps = {
     workspaceName: 'blueprints-amp-workspace',
-    workspaceTags: [{
+    workspaceTag: [{
         key: 'Name',
         value: 'blueprints-amp-workspace',
       },
@@ -66,6 +66,7 @@ const defaultProps = {
       }
     ],
     deploymentMode: DeploymentMode.DEPLOYMENT,
+    name: 'adot-collector-amp',
     namespace: 'default'
 };
 
@@ -83,18 +84,21 @@ export class AmpAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let finalRemoteWriteURLEndpoint: string;
-        let finalDeploymentMode: string;
-        let finalNamespace: string;
+        let remoteWriteEndpoint: string;
+        let awsRegion: string;
+        let deploymentMode: string;
+        let name: string;
+        let namespace: string;
         let doc: string;
         let cfnWorkspace: aps.CfnWorkspace|undefined;
         
         let cfnWorkspaceProps : CfnWorkspaceProps  = {
             alias: defaultProps.workspaceName,  
-            tags: defaultProps.workspaceTags
+            tags: defaultProps.workspaceTag
         };
+
         if (this.ampAddOnProps.prometheusRemoteWriteURL) {
-            finalRemoteWriteURLEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
+            remoteWriteEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
         }
         else {
             if (this.ampAddOnProps.workspaceName){
@@ -112,39 +116,50 @@ export class AmpAddOn implements ClusterAddOn {
             }
             cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
             const URLEndpoint = cfnWorkspace.attrPrometheusEndpoint;
-            finalRemoteWriteURLEndpoint = URLEndpoint + 'api/v1/remote_write';
+            remoteWriteEndpoint = URLEndpoint + 'api/v1/remote_write';
         }
 
-        finalDeploymentMode = defaultProps.deploymentMode;
+        deploymentMode = defaultProps.deploymentMode;
         if (this.ampAddOnProps.deploymentMode) {
-            finalDeploymentMode = this.ampAddOnProps.deploymentMode;
+            deploymentMode = this.ampAddOnProps.deploymentMode;
         }
 
-        finalNamespace = defaultProps.namespace;
+        name = defaultProps.namespace;
+        namespace = defaultProps.namespace;
+        awsRegion = cluster.stack.region;
         if (this.ampAddOnProps.namepace) {
-            finalNamespace = this.ampAddOnProps.namepace;
+            namespace = this.ampAddOnProps.namepace;
         }
 
         // Applying manifest for configuring ADOT Collector for Amp.
-        if (finalDeploymentMode == DeploymentMode.DAEMONSET) {
-            doc = readYamlDocument(__dirname + '/collector-config-amp-daemonset.ytpl');
+        if (deploymentMode == DeploymentMode.DAEMONSET) {
+            doc = readYamlDocument(__dirname +'/collector-config-amp-daemonset.ytpl');
         }
         else {
             doc = readYamlDocument(__dirname + '/collector-config-amp.ytpl');
         }
-        const docArray = doc.replace(/{{your_remote_write_endpoint}}/g, finalRemoteWriteURLEndpoint)
-        .replace(/{{your_aws_region}}/g, cluster.stack.region)
-        .replace(/{{your_deployment_method}}/g, finalDeploymentMode)
-        .replace(/{{your_namespace}}/g, finalNamespace);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        const statement = new KubernetesManifest(cluster.stack, "adot-collector-amp", {
-            cluster,
+
+        const manifest = doc.split("---").map(e => loadYaml(e));
+        const values: Values = {
+            remoteWriteEndpoint,
+            awsRegion,
+            deploymentMode,
+            namespace
+         }
+         
+         const manifestDeployment: ManifestDeployment = {
+            name,
+            namespace,
             manifest,
-            overwrite: true
-        });
+            values
+        }
+
+        const kubectlProvider = new KubectlProvider(clusterInfo);
+        const statement = kubectlProvider.addManifest(manifestDeployment);
         if (cfnWorkspace){
             statement.node.addDependency(cfnWorkspace);
         }
+
         return Promise.resolve(statement);
     }
 }

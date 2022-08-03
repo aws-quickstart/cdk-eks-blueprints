@@ -123,7 +123,7 @@ export class KubectlProvider {
         const valueMap = new Map(Object.entries(values));
         let data = JSON.stringify(document);
         valueMap.forEach((value: string, key: string) => {
-            data.replace(`{{${key}}}`, value);
+            data = data.replace(new RegExp(`{{${key}}}`, 'g'), value);
         });
         return JSON.parse(data);
     };
