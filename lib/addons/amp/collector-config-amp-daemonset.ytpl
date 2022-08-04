@@ -2,9 +2,9 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector-advanced
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 spec:
-  mode: {{your_deployment_method}}
+  mode: "{{deploymentMode}}"
   serviceAccount: adot-collector
   env:
     - name: "K8S_NODE_NAME"
@@ -287,9 +287,9 @@ spec:
 
     exporters:
       awsprometheusremotewrite:
-        endpoint: {{your_remote_write_endpoint}}
+        endpoint: "{{remoteWriteEndpoint}}"
         aws_auth:
-          region: {{your_aws_region}}
+          region: "{{awsRegion}}"
           service: "aps"
 
     service:
