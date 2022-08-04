@@ -124,7 +124,7 @@ export class AmpAddOn implements ClusterAddOn {
             deploymentMode = this.ampAddOnProps.deploymentMode;
         }
 
-        name = defaultProps.namespace;
+        name = defaultProps.name;
         namespace = defaultProps.namespace;
         awsRegion = cluster.stack.region;
         if (this.ampAddOnProps.namepace) {
