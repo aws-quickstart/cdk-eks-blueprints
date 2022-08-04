@@ -32,8 +32,6 @@
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
-        "@types/yargs": "^17.0.10",
-        "@types/yargs-parser": "^21.0.0",
         "aws-cdk-lib": "2.33.0",
         "aws-sdk": "2.1178.0",
         "bcrypt": "^5.0.1",
