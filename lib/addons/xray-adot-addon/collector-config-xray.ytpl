@@ -2,9 +2,9 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector-xray
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 spec:
-  mode: {{your_deployment_method}} 
+  mode: "{{deploymentMode}}"
   serviceAccount: adot-collector
   config: |
     receivers:
@@ -18,7 +18,7 @@ spec:
 
     exporters:
       awsxray:
-        region: {{your_aws_region}}
+        region: "{{awsRegion}}"
 
     service:
       pipelines:

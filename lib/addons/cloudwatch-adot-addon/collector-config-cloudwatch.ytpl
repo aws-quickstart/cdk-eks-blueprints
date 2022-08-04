@@ -6,16 +6,16 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector-cloudwatch
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 spec:
-  mode: {{your_deployment_method}}
+  mode: "{{deploymentMode}}"
   serviceAccount: adot-collector
   podAnnotations:
     prometheus.io/scrape: 'true'
     prometheus.io/port: '8888'
   env:
     - name: CLUSTER_NAME
-      value: {{your_cluster_name}}
+      value: "{{clusterName}}"
   config: |
     receivers:
       #
@@ -331,7 +331,7 @@ spec:
       # Data from performance log events will be aggregated by Amazon CloudWatch using these dimensions to create an Amazon CloudWatch custom metric
       #    
       awsemf:
-        region: "{{your_aws_region}}"
+        region: "{{awsRegion}}"
         namespace: ContainerInsights/Prometheus
         log_group_name: '/aws/containerinsights/${CLUSTER_NAME}/prometheus'
         resource_to_telemetry_conversion:
@@ -357,7 +357,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: otel-prometheus-role
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 rules:
   - apiGroups:
       - ""
@@ -389,7 +389,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: otel-prometheus-role-binding
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -397,4 +397,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: adot-collector
-    namespace: {{your_namespace}}
+    namespace: "{{namespace}}"

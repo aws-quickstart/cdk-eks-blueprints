@@ -2,14 +2,13 @@
 # OpenTelemetry Collector configuration
 # Metrics pipeline with Prometheus Receiver and AWS Remote Write Exporter sending metrics to Amazon Managed Prometheus
 #
-
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector-amp
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 spec:
-  mode: {{your_deployment_method}}
+  mode: "{{deploymentMode}}"
   serviceAccount: adot-collector
   podAnnotations:
     prometheus.io/scrape: 'true'
@@ -301,9 +300,9 @@ spec:
 
     exporters:
       awsprometheusremotewrite:
-        endpoint: "{{your_remote_write_endpoint}}"
-        aws_auth:
-          region: "{{your_aws_region}}"
+        endpoint: "{{remoteWriteEndpoint}}"
+        aws_auth: 
+          region: "{{awsRegion}}"
           service: "aps"
 
     service:
@@ -318,7 +317,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: otel-prometheus-role
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 rules:
   - apiGroups:
       - ""
@@ -350,7 +349,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: otel-prometheus-role-binding
-  namespace: {{your_namespace}}
+  namespace: "{{namespace}}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -358,4 +357,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: adot-collector
-    namespace: {{your_namespace}}
+    namespace: "{{namespace}}"

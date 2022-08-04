@@ -1,13 +1,20 @@
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
+import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+
+/**
+ * This CloudWatch ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for 
+ * CloudWatch which receives metrics and logs from the application and sends the same to 
+ * CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar 
+ * depending on your deployment strategy.
+ */
 
 /**
  * Configuration options for add-on.
  */
- export interface CloudWatchAdotAddOnProps {
+export interface CloudWatchAdotAddOnProps {
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -49,32 +56,46 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let finalDeploymentMode: string;
-        let finalNamespace: string;
+        let awsRegion: string;
+        let deploymentMode: string;
+        let name: string;
+        let namespace: string;
+        let clusterName: string;
         let doc: string;
-        
-        finalDeploymentMode = defaultProps.deploymentMode;
+
+        deploymentMode = defaultProps.deploymentMode;
         if (this.cloudWatchAddOnProps.deploymentMode) {
-            finalDeploymentMode = this.cloudWatchAddOnProps.deploymentMode;
+            deploymentMode = this.cloudWatchAddOnProps.deploymentMode;
         }
 
-        finalNamespace = defaultProps.namespace;
+        name = defaultProps.namespace;
+        namespace = defaultProps.namespace;
+        awsRegion = cluster.stack.region;
+        clusterName = cluster.clusterName;
         if (this.cloudWatchAddOnProps.namepace) {
-            finalNamespace = this.cloudWatchAddOnProps.namepace;
+            namespace = this.cloudWatchAddOnProps.namepace;
         }
 
         // Applying manifest for configuring ADOT Collector for CloudWatch.
-        doc = readYamlDocument(__dirname + '/collector-config-cloudwatch.ytpl');
-        const docArray = doc.replace(/{{your_aws_region}}/g, cluster.stack.region)
-        .replace(/{{your_deployment_method}}/g, finalDeploymentMode)
-        .replace(/{{your_namespace}}/g, finalNamespace)
-        .replace(/{{your_cluster_name}}/g, clusterInfo.cluster.clusterName);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        const statement = new KubernetesManifest(cluster.stack, "adot-collector-cloudwatch", {
-            cluster,
+        doc = readYamlDocument(__dirname +'/collector-config-cloudwatch.ytpl');
+
+        const manifest = doc.split("---").map(e => loadYaml(e));
+        const values: Values = {
+            awsRegion,
+            deploymentMode,
+            namespace,
+            clusterName
+         };
+         
+         const manifestDeployment: ManifestDeployment = {
+            name,
+            namespace,
             manifest,
-            overwrite: true
-        });
+            values
+        };
+
+        const kubectlProvider = new KubectlProvider(clusterInfo);
+        const statement = kubectlProvider.addManifest(manifestDeployment);
         return Promise.resolve(statement);
     }
 }

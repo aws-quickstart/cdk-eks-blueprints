@@ -9,7 +9,7 @@ import { CertManagerAddOn } from "../cert-manager";
 /**
  * Configuration options for the Adot add-on.
  */
- type AdotCollectorAddOnProps = CoreAddOnProps;
+type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
@@ -22,7 +22,7 @@ const defaultProps = {
  /**
   * Implementation of Adot Collector EKS add-on.
   */
- export class AdotCollectorAddOn extends CoreAddOn {
+export class AdotCollectorAddOn extends CoreAddOn {
 
     constructor(props?: AdotCollectorAddOnProps) {
         super({ ...defaultProps, ...props });
@@ -44,4 +44,4 @@ const defaultProps = {
         addOnPromise.then(addOn => addOn.node.addDependency(otelPermissionsStatement));
         return addOnPromise;
     }
- }
+}

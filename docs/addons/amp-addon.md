@@ -123,7 +123,6 @@ To validate that AMP add-on is installed properly, ensure that the required kube
 kubectl get all -n default
 ```
 
-## Output
 ```bash
 NAME                                              READY   STATUS        RESTARTS   AGE
 pod/otel-collector-amp-collector-7877b86dd4-z9ds5   1/1     Running       0          31m
@@ -138,7 +137,18 @@ deployment.apps/otel-collector-amp-collector   1/1     1            1           
 NAME                                                    DESIRED   CURRENT   READY   AGE
 replicaset.apps/otel-collector-amp-collector-7877b86dd4   1         1         1       31m
 ```
- 
+
+To test whether Amazon Managed Service for Prometheus received the metrics, Please use the following commands :
+For instructions on installing awscurl, see awscurl (https://github.com/okigan/awscurl).
+
+```bash
+AMP_WORKSPACE_NAME="sample-AMP-Workspace" 
+# The above should be replaced with your AMP workspace name if you are passing remote write URL specified in Pattern #3.
+WORKSPACE_ID=$(aws amp list-workspaces \
+  --alias $AMP_WORKSPACE_NAME --region=${AWS_REGION} --query 'workspaces[0].[workspaceId]' --output text)
+AMP_ENDPOINT_QUERY=https://aps-workspaces.$AWS_REGION.amazonaws.com/workspaces/$WORKSPACE_ID/api/v1/query\?query=
+awscurl --service="aps" --region=${AWS_REGION} ${AMP_ENDPOINT_QUERY}up
+```
 
 ## Functionality
 
