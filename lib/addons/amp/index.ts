@@ -145,14 +145,14 @@ export class AmpAddOn implements ClusterAddOn {
             awsRegion,
             deploymentMode,
             namespace
-         }
+         };
          
          const manifestDeployment: ManifestDeployment = {
             name,
             namespace,
             manifest,
             values
-        }
+        };
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
         const statement = kubectlProvider.addManifest(manifestDeployment);
