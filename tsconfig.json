@@ -20,6 +20,7 @@
         "inlineSourceMap": true,
         "inlineSources": true,
         "experimentalDecorators": true,
+        "skipLibCheck": true,
         "strictPropertyInitialization": false,
         "typeRoots": [
             "./node_modules/@types"
