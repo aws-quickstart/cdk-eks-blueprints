@@ -1,18 +1,24 @@
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
+import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+
+/**
+ * This XRAY ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the 
+ * application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, 
+ * and Sidecar depending on your deployment strategy.
+ */
 
 /**
  * Configuration options for add-on.
  */
- export interface XrayAdotAddOnProps {
+export interface XrayAdotAddOnProps {
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
      */
-    deploymentMode?: XrayDeploymentMode;
+    deploymentMode?: xrayDeploymentMode;
     /**
      * Namespace to deploy the ADOT Collector for XRay.
      * @default default
@@ -20,7 +26,7 @@ import { Construct } from 'constructs';
     namepace?: string;
 }
 
-export const enum XrayDeploymentMode {
+export const enum xrayDeploymentMode {
     DEPLOYMENT = 'deployment',
     DAEMONSET = 'daemonset',
     STATEFULSET = 'statefulset',
@@ -31,7 +37,8 @@ export const enum XrayDeploymentMode {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    deploymentMode: XrayDeploymentMode.DEPLOYMENT,
+    deploymentMode: xrayDeploymentMode.DEPLOYMENT,
+    name: 'adot-collector-xray',
     namespace: 'default'
 };
 
@@ -49,31 +56,43 @@ export class XrayAdotAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let finalDeploymentMode: string;
-        let finalNamespace: string;
+        let awsRegion: string;
+        let deploymentMode: string;
+        let name: string;
+        let namespace: string;
         let doc: string;
-        
-        finalDeploymentMode = defaultProps.deploymentMode;
+
+        deploymentMode = defaultProps.deploymentMode;
         if (this.xrayAddOnProps.deploymentMode) {
-            finalDeploymentMode = this.xrayAddOnProps.deploymentMode;
+            deploymentMode = this.xrayAddOnProps.deploymentMode;
         }
 
-        finalNamespace = defaultProps.namespace;
+        name = defaultProps.name;
+        namespace = defaultProps.namespace;
+        awsRegion = cluster.stack.region;
         if (this.xrayAddOnProps.namepace) {
-            finalNamespace = this.xrayAddOnProps.namepace;
+            namespace = this.xrayAddOnProps.namepace;
         }
 
         // Applying manifest for configuring ADOT Collector for Xray.
-        doc = readYamlDocument(__dirname + '/collector-config-xray.ytpl');
-        const docArray = doc.replace(/{{your_aws_region}}/g, cluster.stack.region)
-        .replace(/{{your_deployment_method}}/g, finalDeploymentMode)
-        .replace(/{{your_namespace}}/g, finalNamespace);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        const statement = new KubernetesManifest(cluster.stack, "adot-collector-xray", {
-            cluster,
+        doc = readYamlDocument(__dirname +'/collector-config-xray.ytpl');
+
+        const manifest = doc.split("---").map(e => loadYaml(e));
+        const values: Values = {
+            awsRegion,
+            deploymentMode,
+            namespace
+         };
+         
+         const manifestDeployment: ManifestDeployment = {
+            name,
+            namespace,
             manifest,
-            overwrite: true
-        });
+            values
+        };
+
+        const kubectlProvider = new KubectlProvider(clusterInfo);
+        const statement = kubectlProvider.addManifest(manifestDeployment);
         return Promise.resolve(statement);
     }
 }
