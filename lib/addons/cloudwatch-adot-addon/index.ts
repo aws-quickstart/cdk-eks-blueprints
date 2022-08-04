@@ -39,6 +39,7 @@ export const enum cloudWatchDeploymentMode {
  */
 const defaultProps = {
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
+    name: 'adot-collector-cloudwatch',
     namespace: 'default'
 };
 
@@ -68,7 +69,7 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
             deploymentMode = this.cloudWatchAddOnProps.deploymentMode;
         }
 
-        name = defaultProps.namespace;
+        name = defaultProps.name;
         namespace = defaultProps.namespace;
         awsRegion = cluster.stack.region;
         clusterName = cluster.clusterName;
