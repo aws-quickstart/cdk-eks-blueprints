@@ -1,18 +1,18 @@
 # AWS X-Ray AWS Distro for OpenTelemetry (ADOT) Add-on
 
-[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. This Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
+[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
 
-This driver is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup X-Ray for remote write traces.
+This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup X-Ray for remote write traces.
 
-For more information on the driver, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
+For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
 ## Prerequisites
-- `Certificate-Manager` Blueprints Addon addon.
-- `ADOT` EKS Blueprints Addon.
+- `cert-manager` Blueprints add-on.
+- `adot` EKS Blueprints add-on.
 
 ## Usage
 
-This Addon can used with two different patterns :
+This add-on can used with two different patterns :
 
 Pattern # 1 : Simple and Easy - Using all default property values. This pattern deploys an ADOT collector in the `default` namespace with `deployment` as the mode to write traces to X-Ray console.
 
@@ -30,7 +30,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace` with `daemonset` as the mode to X-Ray console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to X-Ray console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import 'source-map-support/register';
@@ -41,7 +41,8 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.XrayAdotAddOn({
     deploymentMode: XrayDeploymentMode.DAEMONSET,
-    namespace: 'default'
+    namespace: 'default',
+    name: 'adot-collector-xray'
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
