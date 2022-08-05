@@ -5,7 +5,7 @@ import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
- * This CloudWatch ADOT add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for 
+ * This CloudWatch ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for 
  * CloudWatch which receives metrics and logs from the application and sends the same to 
  * CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar 
  * depending on your deployment strategy.
@@ -75,8 +75,8 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
          };
          
          const manifestDeployment: ManifestDeployment = {
-            name: this.cloudWatchAddOnProps.namepace!,
-            namespace: this.cloudWatchAddOnProps.name!,
+            name: this.cloudWatchAddOnProps.name!,
+            namespace: this.cloudWatchAddOnProps.namepace!,
             manifest,
             values
         };
