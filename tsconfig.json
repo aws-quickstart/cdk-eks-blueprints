@@ -7,7 +7,6 @@
             "es2018",
             "dom"
         ],
-        // "types": ["node"],
         "declaration": true,
         "strict": true,
         "noImplicitAny": true,
@@ -21,7 +20,7 @@
         "inlineSourceMap": true,
         "inlineSources": true,
         "experimentalDecorators": true,
-        // "skipLibCheck": true,
+        "skipLibCheck": true,
         "strictPropertyInitialization": false,
         "typeRoots": [
             "./node_modules/@types"
