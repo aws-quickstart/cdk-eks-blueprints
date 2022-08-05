@@ -1,18 +1,18 @@
 # AWS CloudWatch AWS Distro for OpenTelemetry (ADOT) Add-on
 
-[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) collects monitoring and operational data in the form of logs, metrics, and events. You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on AWS and on-premises.  This Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for CloudWatch which receives metrics and logs from the application and sends the same to CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
+[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) collects monitoring and operational data in the form of logs, metrics, and events. You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on AWS and on-premises.  This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for CloudWatch which receives metrics and logs from the application and sends the same to CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
 
 This driver is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup CloudWatch for remote write metrics.
 
 For more information on the driver, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
 ## Prerequisites
-- `Certificate-Manager` Blueprints Addon addon.
-- `ADOT` EKS Blueprints Addon.
+- `cert-manager` Blueprints add-on.
+- `adot` EKS Blueprints add-on.
 
 ## Usage
 
-This Addon can used with two different patterns :
+This add-on can used with two different patterns :
 
 Pattern # 1 : Simple and Easy - Using all default property values. This pattern deploys an ADOT collector with `deployment` as the mode to write traces to CloudWatch console.
 
@@ -30,7 +30,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace` with `daemonset` as the mode to CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import 'source-map-support/register';
@@ -41,7 +41,8 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.CloudWatchAdotAddOn({
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
-    namepace: 'default'
+    namepace: 'default',
+    name: 'adot-collector-cloudwatch'
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
