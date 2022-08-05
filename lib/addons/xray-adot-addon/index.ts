@@ -5,7 +5,7 @@ import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
- * This XRAY ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the 
+ * This XRAY ADOT add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the 
  * application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, 
  * and Sidecar depending on your deployment strategy.
  */
@@ -24,6 +24,11 @@ export interface XrayAdotAddOnProps {
      * @default default
      */
     namepace?: string;
+    /**
+     * Name for deployment of the ADOT Collector for XRay.
+     * @default 'adot-collector-xray'
+     */
+    name?: string;
 }
 
 export const enum xrayDeploymentMode {
@@ -48,7 +53,6 @@ const defaultProps = {
 export class XrayAdotAddOn implements ClusterAddOn {
 
     readonly xrayAddOnProps: XrayAdotAddOnProps;
-
     constructor(props?: XrayAdotAddOnProps) {
         this.xrayAddOnProps = { ...defaultProps, ...props };
     }
@@ -56,37 +60,21 @@ export class XrayAdotAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let awsRegion: string;
-        let deploymentMode: string;
-        let name: string;
-        let namespace: string;
         let doc: string;
-
-        deploymentMode = defaultProps.deploymentMode;
-        if (this.xrayAddOnProps.deploymentMode) {
-            deploymentMode = this.xrayAddOnProps.deploymentMode;
-        }
-
-        name = defaultProps.name;
-        namespace = defaultProps.namespace;
-        awsRegion = cluster.stack.region;
-        if (this.xrayAddOnProps.namepace) {
-            namespace = this.xrayAddOnProps.namepace;
-        }
 
         // Applying manifest for configuring ADOT Collector for Xray.
         doc = readYamlDocument(__dirname +'/collector-config-xray.ytpl');
 
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
-            awsRegion,
-            deploymentMode,
-            namespace
+            awsRegion: cluster.stack.region,
+            deploymentMode: this.xrayAddOnProps.deploymentMode,
+            namespace: this.xrayAddOnProps.namepace
          };
          
          const manifestDeployment: ManifestDeployment = {
-            name,
-            namespace,
+            name: this.xrayAddOnProps.name!,
+            namespace: this.xrayAddOnProps.namepace!,
             manifest,
             values
         };
