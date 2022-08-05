@@ -23,7 +23,7 @@ export interface XrayAdotAddOnProps {
      * Namespace to deploy the ADOT Collector for XRay.
      * @default default
      */
-    namepace?: string;
+    namespace?: string;
     /**
      * Name for deployment of the ADOT Collector for XRay.
      * @default 'adot-collector-xray'
@@ -69,12 +69,12 @@ export class XrayAdotAddOn implements ClusterAddOn {
         const values: Values = {
             awsRegion: cluster.stack.region,
             deploymentMode: this.xrayAddOnProps.deploymentMode,
-            namespace: this.xrayAddOnProps.namepace
+            namespace: this.xrayAddOnProps.namespace
          };
          
          const manifestDeployment: ManifestDeployment = {
             name: this.xrayAddOnProps.name!,
-            namespace: this.xrayAddOnProps.namepace!,
+            namespace: this.xrayAddOnProps.namespace!,
             manifest,
             values
         };
