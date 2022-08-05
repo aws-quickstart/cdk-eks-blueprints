@@ -24,7 +24,7 @@ export interface CloudWatchAdotAddOnProps {
      * Namespace to deploy the ADOT Collector for CloudWatch.
      * @default default
      */
-    namepace?: string;
+    namespace?: string;
     /**
      * Name to deploy the ADOT Collector for CloudWatch.
      * @default 'adot-collector-cloudwatch'
@@ -70,13 +70,13 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
         const values: Values = {
             awsRegion: cluster.stack.region,
             deploymentMode: this.cloudWatchAddOnProps.deploymentMode,
-            namespace: this.cloudWatchAddOnProps.namepace,
+            namespace: this.cloudWatchAddOnProps.namespace,
             clusterName: cluster.clusterName
          };
          
          const manifestDeployment: ManifestDeployment = {
             name: this.cloudWatchAddOnProps.name!,
-            namespace: this.cloudWatchAddOnProps.namepace!,
+            namespace: this.cloudWatchAddOnProps.namespace!,
             manifest,
             values
         };
