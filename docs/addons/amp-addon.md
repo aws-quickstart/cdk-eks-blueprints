@@ -155,4 +155,4 @@ awscurl --service="aps" --region=${AWS_REGION} ${AMP_ENDPOINT_QUERY}up
 
 ## Functionality
 
-Applies the AMP add-on to an Amazon EKS cluster. 
+Applies the Amazon Managed Service for Prometheus (AMP) add-on to an Amazon EKS cluster. 
