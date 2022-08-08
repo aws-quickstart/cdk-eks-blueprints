@@ -8,7 +8,7 @@ import { CfnTag } from "aws-cdk-lib/core";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
- * This AMP Addon installs an ADOT Collector for Amazon Managed Service for Prometheus 
+ * This AMP add-on installs an ADOT Collector for Amazon Managed Service for Prometheus 
  * (AMP) and creates an AMP worpsace to receive OTLP metrics from the application and 
  * Prometheus metrics scraped from pods on the cluster and remote writes the metrics 
  * to AMP remote write endpoint of the created or passed AMP workspace.
@@ -19,7 +19,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
  */
 export interface AmpAddOnProps {
     /**
-     * Name that will be used by the Addon to create the Workspace
+     * Name that will be used by the add-on to create the Workspace
      * @default blueprints-amp-workspace
      */
     workspaceName?: string;
@@ -41,7 +41,12 @@ export interface AmpAddOnProps {
      * Namespace to deploy the ADOT Collector for AMP.
      * @default default
      */
-     namepace?: string;
+     namespace?: string;
+    /**
+     * Name for deployment of the ADOT Collector for AMP.
+     * @default 'adot-collector-amp'
+     */
+     name?: string;
 }
 
 export const enum DeploymentMode {
@@ -84,11 +89,6 @@ export class AmpAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let remoteWriteEndpoint: string;
-        let awsRegion: string;
-        let deploymentMode: string;
-        let name: string;
-        let namespace: string;
         let doc: string;
         let cfnWorkspace: aps.CfnWorkspace|undefined;
         
@@ -97,10 +97,7 @@ export class AmpAddOn implements ClusterAddOn {
             tags: defaultProps.workspaceTag
         };
 
-        if (this.ampAddOnProps.prometheusRemoteWriteURL) {
-            remoteWriteEndpoint = this.ampAddOnProps.prometheusRemoteWriteURL;
-        }
-        else {
+        if (typeof(this.ampAddOnProps.prometheusRemoteWriteURL) == 'undefined') {
             if (this.ampAddOnProps.workspaceName){
                 cfnWorkspaceProps = {
                     ...cfnWorkspaceProps,
@@ -116,23 +113,11 @@ export class AmpAddOn implements ClusterAddOn {
             }
             cfnWorkspace = new aps.CfnWorkspace(cluster.stack, 'MyAMPWorkspace', cfnWorkspaceProps);/* all optional props */ 
             const URLEndpoint = cfnWorkspace.attrPrometheusEndpoint;
-            remoteWriteEndpoint = URLEndpoint + 'api/v1/remote_write';
-        }
-
-        deploymentMode = defaultProps.deploymentMode;
-        if (this.ampAddOnProps.deploymentMode) {
-            deploymentMode = this.ampAddOnProps.deploymentMode;
-        }
-
-        name = defaultProps.name;
-        namespace = defaultProps.namespace;
-        awsRegion = cluster.stack.region;
-        if (this.ampAddOnProps.namepace) {
-            namespace = this.ampAddOnProps.namepace;
+            this.ampAddOnProps.prometheusRemoteWriteURL = URLEndpoint + 'api/v1/remote_write';
         }
 
         // Applying manifest for configuring ADOT Collector for Amp.
-        if (deploymentMode == DeploymentMode.DAEMONSET) {
+        if (this.ampAddOnProps.deploymentMode == DeploymentMode.DAEMONSET) {
             doc = readYamlDocument(__dirname +'/collector-config-amp-daemonset.ytpl');
         }
         else {
@@ -141,15 +126,15 @@ export class AmpAddOn implements ClusterAddOn {
 
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
-            remoteWriteEndpoint,
-            awsRegion,
-            deploymentMode,
-            namespace
+            remoteWriteEndpoint: this.ampAddOnProps.prometheusRemoteWriteURL,
+            awsRegion: cluster.stack.region,
+            deploymentMode: this.ampAddOnProps.deploymentMode,
+            namespace: this.ampAddOnProps.namespace,
          };
          
          const manifestDeployment: ManifestDeployment = {
-            name,
-            namespace,
+            name: this.ampAddOnProps.name!,
+            namespace: this.ampAddOnProps.namespace!,
             manifest,
             values
         };
