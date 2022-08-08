@@ -55,7 +55,8 @@ const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     new blueprints.addons.VpcCniAddOn(),
     new blueprints.addons.CoreDnsAddOn(),
-    new blueprints.addons.KubeProxyAddOn()
+    new blueprints.addons.KubeProxyAddOn(),
+    new blueprints.addons.EbsCsiDriverAddOn()
 ];
 
 const account = 'XXXXXXXXXXXXX'
