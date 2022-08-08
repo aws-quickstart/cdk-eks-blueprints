@@ -20,7 +20,7 @@ Ensure that you have installed the following tools on your machine.
 2. [kubectl](https://Kubernetes.io/docs/tasks/tools/)
 3. [cdk](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install)
 4. [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
-5. [npm] (https://docs.npmjs.com/cli/v8/commands/npm-install)
+5. [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
 
 
 
