@@ -54,6 +54,7 @@ const defaultProps = {
 export class CloudWatchAdotAddOn implements ClusterAddOn {
 
     readonly cloudWatchAddOnProps: CloudWatchAdotAddOnProps;
+
     constructor(props?: CloudWatchAdotAddOnProps) {
         this.cloudWatchAddOnProps = { ...defaultProps, ...props };
     }
@@ -61,11 +62,9 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
     @dependable(AdotCollectorAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        let doc: string;
 
         // Applying manifest for configuring ADOT Collector for CloudWatch.
-        doc = readYamlDocument(__dirname +'/collector-config-cloudwatch.ytpl');
-
+        const doc = readYamlDocument(__dirname +'/collector-config-cloudwatch.ytpl');
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
             awsRegion: cluster.stack.region,
