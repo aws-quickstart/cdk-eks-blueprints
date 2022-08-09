@@ -20,6 +20,7 @@ export const KarpenterControllerPolicy = {
               "ec2:DescribeAvailabilityZones",
               "ssm:GetParameter",
               "pricing:GetProducts",
+              "ec2:DescribeSpotPriceHistory",
           ],
           "Resource": "*"
       }
