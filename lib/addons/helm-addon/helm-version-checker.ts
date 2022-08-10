@@ -12,6 +12,9 @@ export type HelmChartVersion = Omit<HelmChartConfiguration, "name" | "namespace"
  * @returns 
  */
 const semverComparator = (a: string, b: string) => { 
+    a = trimVersion(a);
+    b = trimVersion(b);
+
     const a1 = a.split('.');
     const b1 = b.split('.');
 
@@ -28,6 +31,14 @@ const semverComparator = (a: string, b: string) => {
     return b1.length - a1.length;
 };
 
+/**
+ * Remove leading "v". Placeholder to extend (e.g. remove -rc, -beta, etc.);
+ * @param v semver format version
+ * @returns 
+ */
+function trimVersion(v: string) {
+    return v.charAt(0) ==  'v' ? v.substring(1) : v;
+}
 /**
  * Represent result of helm chart version validation against newer versions
  */
@@ -59,7 +70,7 @@ export function listChartVersions(chart: HelmChartVersion): string[] {
     const helmRepository = loadExternalYaml(chart.repository + "/index.yaml");
     const versions: string[] = Object.values(helmRepository[0]['entries'][chart.chart])
         .map((e: any) => { return e['version']; });
-    return versions.filter(e => e.includes("."));
+    return versions.filter(e => e.includes(".") && !e.includes("beta") && !e.includes("rc"));
 }
 
 /**
@@ -79,7 +90,7 @@ export function checkHelmChartVersion(chart: HelmChartVersion) : CheckVersionRes
         };
     }
     versions = versions.sort(semverComparator);
-    const latestVersion = (versions[0] === chart.version);
+    const latestVersion = (trimVersion(versions[0]) === trimVersion(chart.version));
     if(latestVersion) {
         userLog.info(`Chart ${chart.chart}-${chart.version} is at the latest version.` );
     }
