@@ -17,8 +17,10 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
-
-const addOn = new blueprints.addons.AWSPrivateCAIssuerAddon()
+const awsPcaParams = {
+  irsaRoles: ["AWSCertificateManagerPrivateCAFullAccess"]
+}
+const addOn = new blueprints.addons.AWSPrivateCAIssuerAddon(awsPcaParams)
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -27,8 +29,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Configuration Options
 
-- `createServiceAccount`: (boolean) If specified true, The addon will create Service Account. if specified false the blueprint cdk will create Service Account with IRSA enabled (with role AWSCertificateManagerPrivateCAFullAccess). The default value is false hence and hence the cdk will create IRSA 
 - `serviceAccountName`: (string) User provided name for service account. The default value is aws-pca-issuer
+- `irsaRoles` - An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["AWSCertificateManagerPrivateCAFullAccess"]. If not empty the Service Account will be created by the CDK with IAM Roles Mapped (IRSA). In case if its empty,  Service Account will be created with out IAM Roles
 - `values`: Arbitrary values to pass to the chart. Refer to the aws-pca-issuer [Helm Chart Values](https://github.com/cert-manager/aws-privateca-issuer/blob/main/charts/aws-pca-issuer/values.yaml) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options)
 
 ## cert-manager compatibility with EKS and Fargate
