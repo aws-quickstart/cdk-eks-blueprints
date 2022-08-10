@@ -18,8 +18,6 @@ Karpenter works by:
 
 2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`.
 
-3. The current add-on supports up to ***v0.12.1***. The latest version introduces a new CRD that is not currently supported.
-
 ## Prerequisite
 
 (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
@@ -197,3 +195,9 @@ or, by looking at the nodes being created:
 ```bash
 kubectl get nodes
 ```
+
+## Troubleshooting
+
+The following are common troubleshooting issues observed when implementing Karpenter:
+
+1. For Karpenter version older than `0.14.0` deployed on Fargate Profiles, `values.yaml` must be overridden, setting `dnsPolicy` to `Default`. Versions after `0.14.0` has `dnsPolicy` value set default to `Default`. This is to ensure CoreDNS is set correctly on Fargate nodes.
