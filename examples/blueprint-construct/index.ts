@@ -56,7 +56,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.ContainerInsightsAddOn(),
+            // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
             prodBootstrapArgo,
