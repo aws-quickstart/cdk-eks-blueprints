@@ -17,7 +17,6 @@ This add-on can used with two different patterns :
 Pattern # 1 : Simple and Easy - Using all default property values. This pattern deploys an ADOT collector in the `default` namespace with `deployment` as the mode to write traces to X-Ray console.
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
@@ -33,7 +32,6 @@ const blueprint = blueprints.EksBlueprint.builder()
 Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to X-Ray console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
