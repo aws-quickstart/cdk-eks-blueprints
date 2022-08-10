@@ -14,7 +14,7 @@ For more information on the add-on, please review the [user guide](https://docs.
 
 This add-on can used with four different patterns :
 
-Pattern # 1 : Simple and Easy - Using all default property values. This pattern creates a new AMP workspace with default property values such as `workspaceName`, `tags`, `namespace` and deploys an ADOT collector in the `default` namespace with `deployment` as the mode to remote write metrics to AMP workspace.
+Pattern # 1 : Simple and Easy - Using all default property values. This pattern creates a new AMP workspace with default property values such as `workspaceName`, `namespace` with no tags on the AMP workspace and deploys an ADOT collector in the `default` namespace with `deployment` as the mode to remote write metrics to AMP workspace. 
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
