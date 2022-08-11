@@ -10,14 +10,15 @@ The framework currently supports the following add-ons.
 
 | Add-on                                                                 | Description                                                                                                                           |
 |------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs (pending validation on the latest version of CDK)                                                 |
+| [`AdotCollectorAddOn`](./adot-addon)                                   | Adds AWS Distro for OpenTelemetry (ADOT) Operator                                                 |
+| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs                                                  |
 | [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
 | [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
 | [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
 | [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |
-| [`CalicoAddOn`](./calico)                                              | Adds the Calico 1.7.1 CNI/Network policy engine                                                                                       |
+| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy engine                                                                                       |
+| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch                                                                |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler                                                                                                  |
-| [`ContainerInsightsAddOn`](./container-insights)                       | Adds Container Insights support integrating monitoring with CloudWatch                                                                |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
 | [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications. |
 | [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator) |

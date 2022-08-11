@@ -20,6 +20,9 @@ const defaultProps = {
 };
 
 
+/**
+ * @deprecated Use CloudWatchAdotAddOn.
+ */
 export class ContainerInsightsAddOn extends HelmAddOn {
 
     constructor(props?: ContainerInsightAddonProps) {
