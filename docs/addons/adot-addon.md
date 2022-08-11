@@ -30,8 +30,10 @@ To validate that ADOT add-on is installed properly, ensure that the ADOT kuberne
 
 ```bash
 kubectl get all -n opentelemetry-operator-system
+```
 
-# Output
+## Output
+```bash
 NAME                                                             READY   STATUS    RESTARTS   AGE
 pod/opentelemetry-operator-controller-manager-845cbd7bf7-b5s9l   2/2     Running   0          140m
 
@@ -45,9 +47,9 @@ deployment.apps/opentelemetry-operator-controller-manager   1/1     1           
 NAME                                                                   DESIRED   CURRENT   READY   AGE
 replicaset.apps/opentelemetry-operator-controller-manager-845cbd7bf7   1         1         1       140m
 
-
 ```
 
+## Testing
 Additionally, the `aws cli` can be used to determine which version of the add-on is installed in the cluster.
 ```bash
 # Assuming cluster-name is my-cluster, below command shows the version of coredns installed. Check if it is same as the version installed via EKS add-on
