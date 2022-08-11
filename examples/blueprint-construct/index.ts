@@ -69,7 +69,6 @@ export default class BlueprintConstruct {
             new blueprints.addons.VpcCniAddOn(),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.FalcoAddOn(),
             // new.EksBlueprintProps.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.KarpenterAddOn({
                 subnetTags: {

@@ -50,6 +50,10 @@ export interface FalcoAddOnProps extends HelmAddOnUserProps {
     values: {}
 };
 
+/**
+ * This add-on is currently not supported. It will apply the latest falco helm chart but the latest AMI does not have stock driver supported and
+ * driver build in the init fails atm. 
+ */
 export class FalcoAddOn extends HelmAddOn {
 
     readonly options: FalcoAddOnProps;
