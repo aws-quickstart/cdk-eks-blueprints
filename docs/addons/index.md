@@ -11,8 +11,8 @@ The framework currently supports the following add-ons.
 | Add-on                                                                 | Description                                                                                                                           |
 |------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                 |
-| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP               |
-| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs                                                  |
+| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               |
+| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                  |
 | [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
 | [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
 | [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
@@ -23,7 +23,7 @@ The framework currently supports the following add-ons.
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler.                                                                                                  |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             |
 | [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications. |
-| [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator) |
+| [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator). |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage.                 |
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. |
@@ -32,7 +32,7 @@ The framework currently supports the following add-ons.
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |                  |
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                        |
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         |
-| [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools)                                                                      |
+| [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      |
 | [`NewRelicAddOn`](./newrelic.md)                                             | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.|
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller.                                                                                                         |
 | [`OpaGatekeeperAddOn (Currently Not Supported, In Progress)`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper.                                                                                                        |
