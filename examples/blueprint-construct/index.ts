@@ -90,6 +90,7 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.CertManagerAddOn(),
+            new blueprints.addons.AWSPrivateCAIssuerAddon()
         ];
 
         // Instantiated to for helm version check.

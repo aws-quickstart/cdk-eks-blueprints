@@ -20,7 +20,7 @@ export interface AWSPrivateCAIssuerAddonProps extends HelmAddOnUserProps {
      * An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["AWSCertificateManagerPrivateCAFullAccess"]. If not empty
      * Service Account will be Created by CDK with IAM Roles Mapped (IRSA). In case if its empty, Service Account will be created with out IAM Roles
      */   
-     irsaRoles?: string[];    
+     iamPolicies?: string[];    
 }
 
 /**
@@ -35,7 +35,7 @@ const defaultProps: HelmAddOnProps & AWSPrivateCAIssuerAddonProps = {
   repository:  "https://cert-manager.github.io/aws-privateca-issuer",
   values: {},
   serviceAccountName: "aws-pca-issuer",
-  irsaRoles: []
+  iamPolicies: ["AWSCertificateManagerPrivateCAFullAccess"]
 
 };
 
@@ -62,11 +62,11 @@ export class AWSPrivateCAIssuerAddon extends HelmAddOn {
     const chart = this.addHelmChart(clusterInfo, values);
     const namespace = createNamespace(this.options.namespace! , cluster);
 
-    if (this.options.irsaRoles!.length > 0 ) {
+    if (this.options.iamPolicies!.length > 0 ) {
       //Create Service Account with IRSA
       const opts = { name: this.options.serviceAccountName, namespace: this.options.namespace };
       const sa = cluster.addServiceAccount(this.options.serviceAccountName!, opts);
-      setRoles(sa,this.options.irsaRoles!);
+      setRoles(sa,this.options.iamPolicies!);
       sa.node.addDependency(namespace);
       chart.node.addDependency(sa);
 
@@ -81,11 +81,10 @@ export class AWSPrivateCAIssuerAddon extends HelmAddOn {
  */
 function populateValues(helmOptions: AWSPrivateCAIssuerAddonProps): Values {
   const values = helmOptions.values ?? {};
-  setPath(values, "serviceAccount.create",  helmOptions.irsaRoles!.length > 0 ? false : true); 
+  setPath(values, "serviceAccount.create",  helmOptions.iamPolicies!.length > 0 ? false : true); 
   setPath(values, "serviceAccount.name",  helmOptions.serviceAccountName); 
   return values;
 }
-
 
 /**
  * This function will set the roles to Service Account
@@ -98,6 +97,3 @@ function populateValues(helmOptions: AWSPrivateCAIssuerAddonProps): Values {
       sa.role.addManagedPolicy(policy);
     });
 }
-
-
-
