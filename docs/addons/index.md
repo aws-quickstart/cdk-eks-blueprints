@@ -33,7 +33,7 @@ The framework currently supports the following add-ons.
 | [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools)                                                                      |
 | [`NewRelicAddOn`](./newrelic.md)                                             | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.|
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller                                                                                                         |
-| [`OpaGatekeeperAddOn (Currently Not Supported, In Progress)`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                        |
+| [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                        |
 | [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more. |
 | [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster                                           |
 | [`Snyk`](https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon)  | Adds the [Snyk Monitor](https://github.com/snyk/kubernetes-monitor) to the EKS Cluster                   |
