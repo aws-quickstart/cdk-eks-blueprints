@@ -10,13 +10,15 @@ The framework currently supports the following add-ons.
 
 | Add-on                                                                 | Description                                                                                                                           |
 |------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [`AdotCollectorAddOn`](./adot-addon)                                   | Adds AWS Distro for OpenTelemetry (ADOT) Operator                                                 |
+| [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator                                                 |
+| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP               |
 | [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs                                                  |
 | [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
 | [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
 | [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
 | [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |
-| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy engine                                                                                       |
+| [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager                                                             |
+| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                       |
 | [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch                                                                |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler                                                                                                  |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS             |
@@ -40,7 +42,8 @@ The framework currently supports the following add-ons.
 | [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes                  |
 | [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS                                              |
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster                                                                                  |
-| [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster                                                                                                   |
+| [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster                                                                                  |
+| [`XrayAdotAddOn`](./xray-adot-addon)                                   | Deploys ADOT Collector for Xray to receive traces from workloads                                                                                |
 
 # Standard Helm Add-On Configuration Options
 

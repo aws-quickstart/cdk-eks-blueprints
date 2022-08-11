@@ -1,4 +1,4 @@
-# AWS CloudWatch AWS Distro for OpenTelemetry (ADOT) Add-on
+# Amazon CloudWatch ADOT Add-on
 
 [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) collects monitoring and operational data in the form of logs, metrics, and events. You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on AWS and on-premises.  This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for CloudWatch which receives metrics and logs from the application and sends the same to CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
 

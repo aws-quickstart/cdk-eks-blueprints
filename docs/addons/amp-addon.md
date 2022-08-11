@@ -1,4 +1,4 @@
-# Amazon Managed Service for Prometheus (AMP)) Amazon EKS Add-on
+# Amazon Managed Service for Prometheus (AMP) ADOT Add-on
 
 Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and alerting service that makes it easy to monitor containerized applications and infrastructure at scale. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for Amazon Managed Service for Prometheus (AMP) which receives OTLP metrics from the application and Prometheus metrics scraped from pods on the cluster and remote writes the metrics to AMP remote write endpoint. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
 
@@ -136,9 +136,10 @@ deployment.apps/otel-collector-amp-collector   1/1     1            1           
 NAME                                                    DESIRED   CURRENT   READY   AGE
 replicaset.apps/otel-collector-amp-collector-7877b86dd4   1         1         1       31m
 ```
+## Testing
 
 To test whether Amazon Managed Service for Prometheus received the metrics, Please use the following commands :
-For instructions on installing awscurl, see awscurl (https://github.com/okigan/awscurl).
+For instructions on installing awscurl, see [awscurl](https://github.com/okigan/awscurl).
 
 ```bash
 AMP_WORKSPACE_NAME="sample-AMP-Workspace" 

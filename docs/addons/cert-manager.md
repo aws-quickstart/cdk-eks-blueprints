@@ -1,4 +1,4 @@
-# cert-manager Add-on
+# Certificate Manager Add-on
 
 This add-on installs [cert-manager](https://github.com/cert-manager/cert-manager).
 
