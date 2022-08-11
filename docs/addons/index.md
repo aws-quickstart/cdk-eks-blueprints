@@ -19,7 +19,7 @@ The framework currently supports the following add-ons.
 | [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |
 | [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager to your EKS cluster.                                                             |
 | [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                       |
-| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                                |
+| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                              |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler.                                                                                                  |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             |
 | [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications. |
