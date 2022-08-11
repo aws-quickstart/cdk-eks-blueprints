@@ -1,6 +1,6 @@
 # Amazon CloudWatch ADOT Add-on
 
-[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) collects monitoring and operational data in the form of logs, metrics, and events. You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on AWS and on-premises.  This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for CloudWatch which receives metrics and logs from the application and sends the same to CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
+[Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) collects monitoring and operational data in the form of logs, metrics, and events. You get a unified view of operational health and gain complete visibility of your AWS resources, applications, and services running on AWS and on-premises.  This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for CloudWatch which receives metrics and logs from the application and sends the same to CloudWatch console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending upon your deployment strategy.
 
 This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup CloudWatch for remote write metrics.
 
@@ -71,7 +71,6 @@ deployment.apps/otel-collector-cloudwatch-collector   1/1     1            1    
 NAME                                                             DESIRED   CURRENT   READY   AGE
 replicaset.apps/otel-collector-cloudwatch-collector-7565f958c6   1         1         1       2m42s
 ```
- 
 
 ## Functionality
 
