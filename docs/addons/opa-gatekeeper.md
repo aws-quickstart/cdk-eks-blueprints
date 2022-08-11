@@ -8,12 +8,12 @@ OPA Gatekeeper is an open-source project that provides a first-class integration
 
 In the context of a development platform running on Amazon EKS, platform teams and administrators need a way of being able to set policies to adhere to governance and security requirements for all workloads and teams working on the same cluster. Examples of standard use cases for using policies via OPA Gatekeeper are listed below:
 
-- Which users can access which resources.
-- Which subnets egress traffic is allowed to.
-- Which clusters a workload must be deployed to.
-- Which registries binaries can be downloaded from.
-- Which OS capabilities a container can execute with.
-- Which times of day the system can be accessed at.
+- Which users can access which resources?
+- Which subnets egress traffic is allowed to?
+- Which clusters a workload must be deployed to?
+- Which registries binaries can be downloaded from?
+- Which OS capabilities a container can execute with?
+- Which times of day the system can be accessed at?
 
 RBAC (role-based access control) can help with some of the scenarios above but **roles are nothing but a group of permissions that you then assign to users leveraging rolebindings.** If for example, a user tries to perform an operation (get, list, watch, create, etc...) that particular user may do so if they have the appropriate role. **Please note that RBAC should be used in conjunction with OPA Gatekeeper policies to fully secure your cluster.**
 
