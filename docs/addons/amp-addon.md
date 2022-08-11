@@ -1,6 +1,6 @@
 # Amazon Managed Service for Prometheus (AMP) ADOT Add-on
 
-Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and alerting service that makes it easy to monitor containerized applications and infrastructure at scale. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for Amazon Managed Service for Prometheus (AMP) which receives OTLP metrics from the application and Prometheus metrics scraped from pods on the cluster and remote writes the metrics to AMP remote write endpoint. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
+Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and alerting service that makes it easy to monitor containerized applications and infrastructure at scale. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for Amazon Managed Service for Prometheus (AMP) which receives OTLP metrics from the application and Prometheus metrics scraped from pods on the cluster and remote writes the metrics to AMP remote write endpoint. You can change the mode to Daemonset, StatefulSet, and Sidecar depending upon your deployment strategy.
 
 This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup AMP for remote write of metrics.
 
@@ -116,7 +116,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that AMP add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
+To validate that AMP add-on is installed properly, ensure that the required kubernetes resources are running in the cluster:
 
 ```bash
 kubectl get all -n default
@@ -138,7 +138,7 @@ replicaset.apps/otel-collector-amp-collector-7877b86dd4   1         1         1 
 ```
 ## Testing
 
-To test whether Amazon Managed Service for Prometheus received the metrics, Please use the following commands :
+To test whether Amazon Managed Service for Prometheus received the metrics, Please use the following commands:
 For instructions on installing awscurl, see [awscurl](https://github.com/okigan/awscurl).
 
 ```bash
