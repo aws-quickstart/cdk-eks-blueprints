@@ -23,7 +23,7 @@ nav:
     - AWS Node Termination Handler: 'addons/aws-node-termination-handler.md'
     - Calico Operator: 'addons/calico-operator.md'
     - Certificate Manager: 'addons/cert-manager.md'
-    - Cloud Watch ADOT: 'addons/cloudwatch-adot-addon.md'
+    - CloudWatch ADOT: 'addons/cloudwatch-adot-addon.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
     - CoreDns: 'addons/coredns.md'
