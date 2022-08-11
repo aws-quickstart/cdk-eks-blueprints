@@ -1,6 +1,6 @@
-# AWS X-Ray AWS Distro for OpenTelemetry (ADOT) Add-on
+# AWS X-Ray ADOT Add-on
 
-[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending on your deployment strategy.
+[AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. This add-on deploys an AWS Distro for OpenTelemetry (ADOT) Collector for X-Ray which receives traces from the application and sends the same to X-Ray console. You can change the mode to Daemonset, StatefulSet, and Sidecar depending upon your deployment strategy.
 
 This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup X-Ray for remote write traces.
 
@@ -74,7 +74,6 @@ deployment.apps/otel-collector-xray-collector   1/1     1            1          
 NAME                                                       DESIRED   CURRENT   READY   AGE
 replicaset.apps/otel-collector-xray-collector-6fc44d9bbf   1         1         1       6m44s
 ```
- 
 
 ## Functionality
 
