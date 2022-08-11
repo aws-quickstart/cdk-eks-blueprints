@@ -28,7 +28,6 @@ RBAC (role-based access control) can help with some of the scenarios above but *
 ## Usage
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
