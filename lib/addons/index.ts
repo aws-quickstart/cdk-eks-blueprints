@@ -1,5 +1,6 @@
 
 export * from './adot';
+export * from './amp';
 export * from './appmesh';
 export * from './argocd';
 export * from './aws-for-fluent-bit';
@@ -8,6 +9,7 @@ export * from './aws-node-termination-handler';
 export * from './aws-privateca-issuer';
 export * from './calico';
 export * from './calico-operator';
+export * from './cloudwatch-adot-addon';
 export * from './cert-manager';
 export * from './cluster-autoscaler';
 export * from './container-insights';
@@ -28,6 +30,7 @@ export * from './ssm-agent';
 export * from './velero';
 export * from './vpc-cni';
 export * from './xray';
+export * from './xray-adot-addon';
 export * from './keda';
 export * from './kubevious';
 export * from './ebs-csi-driver';

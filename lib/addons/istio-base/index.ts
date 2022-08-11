@@ -54,7 +54,7 @@ const defaultProps = {
     release: "istio-base",
     namespace: "istio-system",
     chart: "base",
-    version: "1.14.2",
+    version: "1.14.3",
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 

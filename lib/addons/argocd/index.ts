@@ -1,7 +1,7 @@
-import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
-import { Construct } from "constructs";
 import * as assert from "assert";
+import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import * as bcrypt from "bcrypt";
+import { Construct } from "constructs";
 import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
@@ -61,7 +61,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     namespace: "argocd",
-    version: '4.9.16',
+    version: '4.10.5',
     chart: "argo-cd",
     release: "blueprints-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"

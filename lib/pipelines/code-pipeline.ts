@@ -1,11 +1,11 @@
+import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { StackProps } from 'aws-cdk-lib';
-import { Construct } from "constructs";
+import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import * as cdkpipelines from 'aws-cdk-lib/pipelines';
-import * as assert from "assert";
+import { Construct } from "constructs";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
-import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 
 export {
     cdkpipelines
@@ -321,7 +321,7 @@ class CodePipeline {
               input: codePipelineSource,
               installCommands: [
                 'npm install --global npm',
-                'npm install -g aws-cdk@2.33.0',
+                'npm install -g aws-cdk@2.37.1',
                 'npm install',
               ],
               commands: ['npm run build', 'npx cdk synth']
