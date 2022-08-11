@@ -51,7 +51,7 @@ export class AWSPrivateCAIssuerAddon extends HelmAddOn {
     this.options = this.props as AWSPrivateCAIssuerAddonProps;
   }
 
-  // AWSPrivateCAIssuerAddon requires CertManagerAddOn as a prerequisite
+  // AWSPrivateCAIssuerAddon requires CertManagerAddOn as a prerequisite . Pls refer to documentation for more details
   @dependable('CertManagerAddOn')
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     //Create Service Account with IRSA
@@ -69,7 +69,6 @@ export class AWSPrivateCAIssuerAddon extends HelmAddOn {
       setRoles(sa,this.options.iamPolicies!);
       sa.node.addDependency(namespace);
       chart.node.addDependency(sa);
-
      } 
      return Promise.resolve(chart);
   }
