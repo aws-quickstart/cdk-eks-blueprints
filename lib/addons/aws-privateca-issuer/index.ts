@@ -18,7 +18,7 @@ export interface AWSPrivateCAIssuerAddonProps extends HelmAddOnUserProps {
     serviceAccountName?: string;
     /**
      * An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["AWSCertificateManagerPrivateCAFullAccess"]. If not empty
-     * Service Account will be Created by CDK with IAM Roles Mapped (IRSA). In case if its empty, Service Account will be created with out IAM Roles
+     * Service Account will be Created by CDK with IAM Roles Mapped (IRSA). In case if its empty, Service Account will be created with default IAM Policy AWSCertificateManagerPrivateCAFullAccess
      */   
      iamPolicies?: string[];    
 }

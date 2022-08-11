@@ -30,7 +30,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `serviceAccountName`: (string) User provided name for service account. The default value is aws-pca-issuer
-- `iamPolicies` - An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["AWSCertificateManagerPrivateCAFullAccess"]. If not empty the Service Account will be created by the CDK with IAM Roles Mapped (IRSA). In case if its empty,  Service Account will be created with out IAM Roles
+- `iamPolicies` - An array of Managed IAM Policies which Service Account needs for IRSA Eg: irsaRoles:["AWSCertificateManagerPrivateCAFullAccess"]. If not empty the Service Account will be created by the CDK with IAM Roles Mapped (IRSA). In case if its empty,  Service Account will be created with out default IAM Policy - AWSCertificateManagerPrivateCAFullAccess
 - `values`: Arbitrary values to pass to the chart. Refer to the aws-pca-issuer [Helm Chart Values](https://github.com/cert-manager/aws-privateca-issuer/blob/main/charts/aws-pca-issuer/values.yaml) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options)
 
 ## cert-manager compatibility with EKS and Fargate
