@@ -39,7 +39,7 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.CloudWatchAdotAddOn({
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
-    namepace: 'default',
+    namespace: 'default',
     name: 'adot-collector-cloudwatch'
 });
 
