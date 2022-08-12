@@ -9,8 +9,6 @@ It will ensure certificates are valid and up to date, and attempt to renew certi
 ## Usage
 
 ```typescript
-
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 

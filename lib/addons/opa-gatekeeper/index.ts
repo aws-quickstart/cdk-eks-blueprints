@@ -1,11 +1,10 @@
 import { ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
-
 /**
  * Properties available to configure opa gatekeeper.
  * namespace default is gatekeeper-system
- * version default is 3.6.0
+ * version default is 3.9.0
  * values as per https://github.com/open-policy-agent/gatekeeper/tree/master/charts/gatekeeper
  */
 export type OpaGatekeeperAddOnProps = HelmAddOnUserProps;
