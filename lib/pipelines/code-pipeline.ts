@@ -2,6 +2,7 @@ import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { StackProps } from 'aws-cdk-lib';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as cdkpipelines from 'aws-cdk-lib/pipelines';
 import { Construct } from "constructs";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
@@ -79,6 +80,14 @@ export type PipelineProps = {
     crossAccountKeys: boolean;
 
     /**
+     * IAM policies to attach to the code build role. 
+     * By default it allows access for lookups, including secret look-ups.
+     * Passing an empty list will result in no extra-policies passed to the build role.
+     * Leaving this unspecified will result in the default policy applied (not recommended for proudction).
+     */
+    codeBuildPolicies?: PolicyStatement[];
+
+    /**
      * Repository for the pipeline (GitHub or CodeCommitRepository).
      */
     repository: GitHubSourceRepository | CodeCommitSourceRepository;
@@ -137,12 +146,25 @@ export interface PipelineWave {
 }
 
 /**
+ * Default policy for the CodeBuild role generated. 
+ * It allows look-ups, including access to AWS Secrets Manager. 
+ */
+const DEFAULT_BUILD_POLICY = new PolicyStatement({
+    resources: ["*"],
+    actions: [    
+        "sts:AssumeRole",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "cloudformation:*"
+    ]
+});
+
+/**
  * Builder for CodePipeline.
  */
 export class CodePipelineBuilder implements StackBuilder {
 
     private props: Partial<PipelineProps>;
-
 
     constructor() {
         this.props = { crossAccountKeys: false, stages: [], waves: []};
@@ -158,6 +180,30 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
+    /**
+     * For production use cases, make sure all policies are tied to concrete resources.
+     * @param policies 
+     * @returns 
+     */
+    public codeBuildPolicies(policies: PolicyStatement[]) : CodePipelineBuilder {
+        this.props.codeBuildPolicies = policies;
+        return this;
+    }
+
+    /**
+     * Enables default code build policies (opt-in method). 
+     * Allows secret lookup access to AWS Secrets Manager.
+     * Not recommended for production. In production, CodeBuild policies must be restricted to particular resources.
+     * Outbound access from the build should be controlled by ACL.
+     * @see DEFAULT_BUILD_POLICY 
+     * @returns 
+     */
+    public defaultCodeBuildPolicies() : CodePipelineBuilder {
+        this.props.codeBuildPolicies = [ DEFAULT_BUILD_POLICY ];
+        return this;
+    }
+
+ 
     public enableCrossAccountKeys() : CodePipelineBuilder {
         this.props.crossAccountKeys = true;
         return this;
@@ -229,7 +275,8 @@ export class CodePipelineStack extends cdk.Stack {
         } else {
             super(scope, id, withUsageTracking(CodePipelineStack.USAGE_ID, props));
         }
-        const pipeline  = CodePipeline.build(this, pipelineProps);
+
+        const pipeline = CodePipeline.build(this, pipelineProps);
 
         let promises : Promise<ApplicationStage>[] = [];
 
@@ -327,6 +374,9 @@ class CodePipeline {
               commands: ['npm run build', 'npx cdk synth']
             }),
             crossAccountKeys: props.crossAccountKeys,
+            codeBuildDefaults: {
+                rolePolicy: props.codeBuildPolicies
+            }
           });
     }
 }
