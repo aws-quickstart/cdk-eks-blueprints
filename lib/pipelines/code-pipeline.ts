@@ -148,8 +148,11 @@ export interface PipelineWave {
 /**
  * Default policy for the CodeBuild role generated. 
  * It allows look-ups, including access to AWS Secrets Manager. 
+ * Not recommended for production. For production use case, CodeBuild policies 
+ * must be restricted to particular resources. Outbound access from the build should be 
+ * controlled by ACL.
  */
-const DEFAULT_BUILD_POLICY = new PolicyStatement({
+export const DEFAULT_BUILD_POLICIES = [ new PolicyStatement({
     resources: ["*"],
     actions: [    
         "sts:AssumeRole",
@@ -157,7 +160,7 @@ const DEFAULT_BUILD_POLICY = new PolicyStatement({
         "secretsmanager:DescribeSecret",
         "cloudformation:*"
     ]
-});
+})];
 
 /**
  * Builder for CodePipeline.
@@ -189,20 +192,6 @@ export class CodePipelineBuilder implements StackBuilder {
         this.props.codeBuildPolicies = policies;
         return this;
     }
-
-    /**
-     * Enables default code build policies (opt-in method). 
-     * Allows secret lookup access to AWS Secrets Manager.
-     * Not recommended for production. In production, CodeBuild policies must be restricted to particular resources.
-     * Outbound access from the build should be controlled by ACL.
-     * @see DEFAULT_BUILD_POLICY 
-     * @returns 
-     */
-    public defaultCodeBuildPolicies() : CodePipelineBuilder {
-        this.props.codeBuildPolicies = [ DEFAULT_BUILD_POLICY ];
-        return this;
-    }
-
  
     public enableCrossAccountKeys() : CodePipelineBuilder {
         this.props.crossAccountKeys = true;

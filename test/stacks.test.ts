@@ -108,6 +108,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const pipeline = blueprints.CodePipelineStack.builder()
             .name("blueprints-pipeline-inaction")
             .owner('shapirov103')
+            .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
             .repository({
                 repoUrl: 'git@github',
                 credentialsSecretName: 'github-token',
