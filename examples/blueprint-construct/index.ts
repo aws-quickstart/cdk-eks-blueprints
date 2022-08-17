@@ -99,6 +99,7 @@ export default class BlueprintConstruct {
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
+        new blueprints.ExternalsSecretsAddOn();
         new blueprints.OpaGatekeeperAddOn();
 
         const blueprintID = 'blueprint-construct-dev';
