@@ -62,7 +62,7 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
 
     // Create the ExternalsSecrets namespace.
     const namespace = this.options.namespace;
-    createNamespace(this.options.namespace!, cluster, true);
+    const ns = createNamespace(this.options.namespace!, cluster, true);
 
     // Create the ExternalsSecrets service account.
     const serviceAccountName = "external-secrets-sa";
@@ -70,6 +70,7 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
       name: serviceAccountName,
       namespace: namespace,
     });
+    sa.node.addDependency(ns);
 
     // Apply additional IAM policies to the service account.
     const policies = this.options.iamPolicies || [defaultIamPolicy];
@@ -87,6 +88,8 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
     };
 
     const helmChart = this.addHelmChart(clusterInfo, values);
+    helmChart.node.addDependency(sa);
+
     return Promise.resolve(helmChart);
   }
 }
