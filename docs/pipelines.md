@@ -140,6 +140,43 @@ blueprints.CodePipelineStack.builder()
     })
 ```
 
+## Handling Build Time Access
+
+CodePipeline leverages CodeBuild to build artifacts. During build time, add-ons may require various look-ups. For example, the add-on or stack may look up VPC, subnets, certificates, hosted zones as well as secrets. 
+
+By default, such look-ups at build time are restricted by the CodeBuild role created by the pipeline dynamically. That means that builds that require look-ups will fail with access denined exception. 
+
+Customers can configure the IAM policies used by the CodeBuild as part of the pipeline execution. The framework provides a convenience default build policies `blueprints.DEFAULT_BUILD_POLICIES` that enable look-ups (including secret look-ups).
+
+Example with default policies:
+
+```typescript
+const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-with-build-roles")
+            .owner('aws-samples')
+            .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+```
+
+Example with customer supplied policies:
+
+```typescript
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+
+const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .owner('your-owner')
+            .codeBuildPolicies([ 
+                new PolicyStatement({
+                    resources: [mySecretArn],
+                    actions: [    
+                        "secretsmanager:GetSecretValue",
+                        "secretsmanager:DescribeSecret",
+                    ]
+                })
+            ])
+            .build(...)
+```
+
 ## Build the pipeline stack
 
 Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.
@@ -224,5 +261,7 @@ This can happen for a few reasons, but most typical is  related to the stack req
 
 **Resolution**
 
-To address this issue, you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`.
+You can take advantage of supplying the require IAM policies to the pipeline to avoid this error. See [this](#handling-build-time-access) for more details.
+
+To address this issue "manually" (without the change to the pipeline), you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`.
 If adding administrative access to the role solves the issue, you can the consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.
