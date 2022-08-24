@@ -39,7 +39,7 @@ function getArgoApplicationGenerator(clusterInfo: ClusterInfo): ArgoCDAddOn {
 
 export const generateArgoHelmApplicationValues = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
     // Add `enabled` property to each addon
-    helmDeployment.values.enabled = true;
+    helmDeployment.values.enable = true;
     clusterInfo.addAddOnContext(
         kebabToCamel(helmDeployment.name),
         helmDeployment.values,

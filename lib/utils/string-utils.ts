@@ -20,3 +20,10 @@ export function atob(b64Encoded: string) { return Buffer.from(b64Encoded, 'base6
  * @returns
  */
 export function kebabToCamel(str: string) { return str.replace(/-./g, x => x[1].toUpperCase()); }
+
+/**
+ * Escape the dots in the string
+ * @param string
+ * @returns
+ */
+export function escapeDots(str: string) { return str.replace(/\./g, '\\.'); }

@@ -53,6 +53,7 @@ export class CalicoAddOn extends HelmAddOn {
 
         dot.set("calico.node.resources.requests.memory", "64Mi", defaultValues, true);
         dot.set("calico.node.resources.limits.memory", "100Mi", defaultValues, true);
+        dot.set("installation.kubernetesProvider", "EKS", defaultValues, true);
 
         const merged = merge(defaultValues, values);
 
