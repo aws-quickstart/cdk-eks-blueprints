@@ -1,8 +1,8 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {KubectlProvider, ManifestConfiguration, ManifestDeployment} from "../helm-addon/kubectl-provider";
-import {dependable, loadExternalYaml, loadYaml, readYamlDocument} from "../../utils";
-import * as cluster from "cluster";
+import { dependable, loadExternalYaml } from "../../utils";
+import { KubectlProvider, ManifestConfiguration, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import {AmpAddOnProps} from "../amp";
 
 /**
  * This KNative add-on install the KNative Eventing Core
@@ -56,10 +56,14 @@ const defaultProps = {
 export class KNativeAddOn implements ClusterAddOn {
     readonly knativeAddOnProps: KNativeProps;
 
+    constructor(props?: KNativeProps) {
+        this.knativeAddOnProps = { ...defaultProps, ...props };
+    }
+
     deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {
         const cluster = clusterInfo.cluster;
 
-        let
+        let ;
 
         const crds_manifest = loadExternalYaml();
     }
