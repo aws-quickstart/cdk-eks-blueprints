@@ -43,6 +43,8 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 1. Deploys the jupyterhub helm chart in `jupyterhub` namespace by default.
 2. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
+***Note***: For custom helm values, please consult the [official documentation](https://zero-to-jupyterhub.readthedocs.io/en/latest/resources/reference.html#). 
+
 ## Using JupyterHub
 
 JupyterHub, by default, creates a proxy that is exposed to a `LoadBalancer` type Kubernetes service, which will integrate with AWS Load Balancer as indicated when running the following command:
