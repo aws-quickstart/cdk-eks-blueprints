@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { dependable, loadExternalYaml } from "../../utils";
 import { KubectlProvider, ManifestConfiguration, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
@@ -29,6 +29,9 @@ export interface KNativeEventingProps extends ManifestConfiguration {
     core_manifest?: string;
 }
 
+/**
+ * Enumerated extensions that we support :)
+ */
 export const enum SupportedExtensions {
     KAFKA_MESSAGING = 'kafka_messaging',
     KAFKA_BROKER = 'kafka_broker',
@@ -41,7 +44,6 @@ export const enum SupportedExtensions {
 const defaultProps: KNativeEventingProps = {
     name: 'knative-event-engine',
     namespace: 'knative-eventing',
-    version: '1.6.0',
     crd_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-crds.yaml',
     core_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-core.yaml',
     manifestUrl: 'https://github.com/knative/eventing',
