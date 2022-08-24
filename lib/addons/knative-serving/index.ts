@@ -2,7 +2,6 @@ import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadExternalYaml } from "../../utils";
 import { KubectlProvider, ManifestConfiguration, ManifestDeployment } from "../helm-addon/kubectl-provider";
-import {AmpAddOnProps} from "../amp";
 
 /**
  * This KNative add-on install the KNative Eventing Core
@@ -13,28 +12,20 @@ import {AmpAddOnProps} from "../amp";
  */
 export interface KNativeProps extends ManifestConfiguration {
     /**
-     * Version of KNative Eventing Service that will be used by the Cluster
-     * @default '1.6.0'
+     *
      */
-    version?: string;
+    extensions?: [SupportedExtensions];
 
     /**
-     * Name of the Repository download endpoint
-     * @default 'knative'
+     *
      */
-    repository?: string;
 
-    /**
-     * Name of the Kubernetes manifest for knative eventing custom resource definitions
-     * @default 'eventing-crds.yaml'
-     */
-    crd_yaml?: string;
+}
 
-    /**
-     * Name of the Kubernetes manifest for knative eventing core
-     * @default 'eventing-core.yaml'
-     */
-    core_yaml?: string;
+export const enum SupportedExtensions {
+    KAFKA_MESSAGING = 'kafka_messaging',
+    KAFKA_BROKER = 'kafka_broker',
+    KAFKA_SINK = 'kafka_sink'
 }
 
 /**
@@ -47,7 +38,7 @@ const defaultProps = {
     crd_yaml: 'eventing-crds.yaml',
     core_yaml: 'eventing-core.yaml',
     version: '1.6.0',
-    manifestUrl: 'https://github.com/',
+    manifestUrl: 'https://github.com',
 };
 
 /**
@@ -63,9 +54,26 @@ export class KNativeAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {
         const cluster = clusterInfo.cluster;
 
-        let ;
+        const props = this.knativeAddOnProps;
+
+        // https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-crds.yaml
 
         const crds_manifest = loadExternalYaml();
     }
 
 }
+
+export class KNativeMessagingLayer implements ClusterAddOn {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {
+        return undefined;
+    }
+}
+
+export class KNativeBroker implements ClusterAddOn {
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {
+        return undefined;
+    }
+}
+
+// TODO: Should we install the eventing extensions as listed here?
+// https://knative.dev/docs/install/yaml-install/eventing/install-eventing-with-yaml/#install-optional-eventing-extensions
