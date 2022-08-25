@@ -82,7 +82,8 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
-                consolidation: { enabled: true }
+                consolidation: { enabled: true },
+                weight: 20,
             }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),

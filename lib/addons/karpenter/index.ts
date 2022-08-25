@@ -66,7 +66,8 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     ttlSecondsAfterEmpty?: number,
 
     /**
-     * A weight mechanism similar to how weight is described with pod and node affinities.
+     * Priority given to the provisioner when the scheduler considers which provisioner
+     * to select. Higher weights indicate higher priority when comparing provisioners.
      */
     weight?: number
 }
@@ -80,7 +81,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.16.0',
+    version: '0.14.0',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -115,13 +116,19 @@ export class KarpenterAddOn extends HelmAddOn {
         const amiFamily = this.options.amiFamily;
         const version = this.options.version!;
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
+        const weight = this.options.weight;
         
+        // Weight only available with v0.16.0 and later
+        if (semver.lt(version, '0.16.0')){
+            assert(!weight, 'weight only supported on versions v0.16.0 and later.')
+        }
+
         // Consolidation only available with v0.15.0 and later
         let consolidation;
         if (semver.gte(version, '0.15.0')){
             consolidation = this.options.consolidation; 
             // You cannot set both consolidation and ttlSecondsAfterEmpty values
-            assert(( consolidation && !ttlSecondsAfterEmpty ) || ( !consolidation && ttlSecondsAfterEmpty ) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive');
+            assert(( consolidation && !ttlSecondsAfterEmpty ) || ( !consolidation && ttlSecondsAfterEmpty ) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
         }
 
         // Set up Node Role
@@ -191,6 +198,7 @@ export class KarpenterAddOn extends HelmAddOn {
                         securityGroupSelector: sgTags,
                     },
                     ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
+                    weight: weight,
                 },
             });
             provisioner.node.addDependency(karpenterChart);
