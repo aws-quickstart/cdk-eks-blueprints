@@ -30,12 +30,12 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const karpenterAddonProps = {
-  provisionerSpecs: {
-    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
-    'topology.kubernetes.io/zone': ['us-east-1c'],
-    'kubernetes.io/arch': ['amd64','arm64'],
-    'karpenter.sh/capacity-type': ['spot','on-demand'],
-  },
+  requirements: [
+      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+  ],
   subnetTags: {
     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
   },
@@ -97,25 +97,7 @@ To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://ka
 
 This can be done in 2 ways:
 
-1. Provide the following: Subnet tags and Security Group tags.
-
-```typescript
-
-const subnetTags = {
-  "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-}
-
-const sgTags = {
-  "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-}
-
-const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
-  subnetTags: subnetTags,
-  securityGroupTags: sgTags,
-});
-```
-
-If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner.
+1. Provide the properties as show in [Usage](#usage). If subnet tags and security group tags are not provided at deploy time, the add-on will be installed without a Provisioner.
 
 2. Use `kubectl` to apply a sample provisioner manifest:
 ```bash

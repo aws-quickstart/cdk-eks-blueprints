@@ -15,15 +15,14 @@ import * as assert from "assert";
  */
 interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
-     * Specs for a Provisioner (Optional) - If not provided, the add-on will
+     * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
      * deploy a Provisioner with default values.
      */
     requirements?: {
-        'node.kubernetes.io/instance-type'?: string[],
-        'topology.kubernetes.io/zone'?: string[],
-        'kubernetes.io/arch'?: string[],
-        'karpenter.sh/capacity-type'?: string[],
-    }
+        key: string,
+        op: 'In' | 'NotIn' ,
+        vals: string[],
+    }[]
 
     taints?: {
         key: string,
@@ -109,7 +108,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const region = clusterInfo.cluster.stack.region;
         let values = this.options.values ?? {};
 
-        const requirements = this.options.requirements || {};
+        const requirements = this.options.requirements || [];
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || [];
@@ -190,7 +189,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 metadata: { name: 'default' },
                 spec: {
                     consolidation: consolidation,
-                    requirements: this.convertToSpec(requirements),
+                    requirements: this.convert(requirements),
                     taints: taints,
                     provider: {
                         amiFamily: amiFamily,
@@ -208,22 +207,24 @@ export class KarpenterAddOn extends HelmAddOn {
     }
 
     /**
-     * Helper function to convert a key-pair values of provisioner spec configurations
-     * To appropriate json format for addManifest function
-     * @param specs
+     * Helper function to convert a key-pair values (with an operator) 
+     * of spec configurations to appropriate json format for addManifest function
+     * @param reqs
      * @returns
      * */
-    protected convertToSpec(specs: { [key: string]: string[]; }): any[] {
-        const newSpecs = [];
-        for (const key in specs){
-            const value = specs[key];
+    protected convert(reqs: {key: string, op: string, vals: string[]}[]): any[] {
+        const newReqs = [];
+        for (var req of reqs){
+            const key = req['key'];
+            const op = req['op'];
+            const val = req['vals'];
             const requirement = {
                 "key": key,
-                "operator": "In",
-                "values": value
+                "operator": op,
+                "values": val
             };
-            newSpecs.push(requirement);
+            newReqs.push(requirement);
         }
-        return newSpecs;
+        return newReqs;
     }
 }
