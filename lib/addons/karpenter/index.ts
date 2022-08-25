@@ -117,7 +117,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
         
         // Consolidation only available with v0.15.0 and later
-        var consolidation;
+        let consolidation;
         if (semver.gte(version, '0.15.0')){
             consolidation = this.options.consolidation; 
             // You cannot set both consolidation and ttlSecondsAfterEmpty values
