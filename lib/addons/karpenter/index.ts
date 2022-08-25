@@ -119,7 +119,7 @@ export class KarpenterAddOn extends HelmAddOn {
         
         // Weight only available with v0.16.0 and later
         if (semver.lt(version, '0.16.0')){
-            assert(!weight, 'weight only supported on versions v0.16.0 and later.')
+            assert(!weight, 'weight only supported on versions v0.16.0 and later.');
         }
 
         // Consolidation only available with v0.15.0 and later
@@ -214,7 +214,7 @@ export class KarpenterAddOn extends HelmAddOn {
      * */
     protected convert(reqs: {key: string, op: string, vals: string[]}[]): any[] {
         const newReqs = [];
-        for (var req of reqs){
+        for (let req of reqs){
             const key = req['key'];
             const op = req['op'];
             const val = req['vals'];
