@@ -12,7 +12,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
  */
 
 /**
- * Configuration options for add-on.
+ * Configuration options for CloudWatch Adot add-on.
  */
 export interface CloudWatchAdotAddOnProps {
     /**
