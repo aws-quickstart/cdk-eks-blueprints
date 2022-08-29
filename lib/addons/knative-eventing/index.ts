@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { dependable, loadExternalYaml } from "../../utils";
+import {dependable, loadExternalYaml, loadYaml, readYamlDocument} from "../../utils";
 import { KubectlProvider, ManifestConfiguration, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
@@ -44,8 +44,8 @@ export const enum SupportedExtensions {
 const defaultProps: KNativeEventingProps = {
     name: 'knative-event-engine',
     namespace: 'knative-eventing',
-    crd_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-crds.yaml',
-    core_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-core.yaml',
+    // crd_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-crds.yaml',
+    // core_manifest: 'https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-core.yaml',
     manifestUrl: 'https://github.com/knative/eventing',
 };
 
@@ -63,8 +63,13 @@ export class KNativeEventingAddOn implements ClusterAddOn {
         const props = this.knativeEventingAddOnProps;
 
         // https://github.com/knative/eventing/releases/download/knative-v1.6.0/eventing-crds.yaml
-        const crds_manifest = loadExternalYaml(props.crd_manifest!);
-        const core_manifest = loadExternalYaml(props.core_manifest!);
+        // const crds_doc = readYamlDocument(__dirname + '/eventing-crds.yaml');
+        // const core_doc = readYamlDocument(__dirname + '/eventing-core.yaml');
+        //
+        // const crds_manifest = crds_doc.split("---").map(e => loadYaml(e));
+        // const core_manifest = core_doc.split("---").map(e => loadYaml(e));
+        const crds_manifest = loadExternalYaml(__dirname + '/eventing-crds.yaml');
+        const core_manifest = loadExternalYaml(__dirname + '/eventing-core.yaml');
 
         const crds_deployment: ManifestDeployment = {
             name: this.knativeEventingAddOnProps.name!,

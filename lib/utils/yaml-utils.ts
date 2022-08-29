@@ -1,7 +1,7 @@
 import * as eks from 'aws-cdk-lib/aws-eks';
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import * as fs from 'fs';
-import * as yaml from 'js-yaml';
+import * as yaml from 'yaml';
 
 
 /**
@@ -15,11 +15,11 @@ export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceMan
     fs.readdirSync(dir, { encoding: 'utf8' }).forEach((file, index) => {
         if (file.split('.').pop() == 'yaml') {
             const data = fs.readFileSync(dir + file, 'utf8');
-            if (data != undefined) {  
-                yaml.loadAll(data, function (item) {
-                    const resources = cluster.addManifest(file.substring(0, file.length - 5) + index, <Record<string, any>[]>item);
-                    resources.node.addDependency(namespaceManifest);
-                });
+            if (data != undefined) {
+                // yaml.loadAll(data, function (item) {
+                //     const resources = cluster.addManifest(file.substring(0, file.length - 5) + index, <Record<string, any>[]>item);
+                //     resources.node.addDependency(namespaceManifest);
+                // });
             }
         }
     });
@@ -37,16 +37,16 @@ export function readYamlDocument(path: string): string {
 
 
 export function loadYaml(document: string): any {
-    return yaml.load(document);
+    return yaml.parse(document);
 }
 
 export function loadExternalYaml(url: string): any {
     /* eslint-disable */
     const request = require('sync-request'); // moved away from import as it is causing open handles that prevents jest from completion
     const response = request('GET', url);
-    return yaml.loadAll(response.getBody().toString());
+    return yaml.parseAllDocuments(response.getBody().toString());
 }
 
 export function serializeYaml(document: any): string {
-    return yaml.dump(document);
+    return yaml.stringify(document);
 }
