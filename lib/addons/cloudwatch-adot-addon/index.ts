@@ -32,7 +32,7 @@ export interface CloudWatchAdotAddOnProps {
      name?: string;
     /**
      * Metrics name selectors.
-     * @default 'adot-collector-cloudwatch'
+     * @default "['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']"
      */
      metricsNameSelectors?: string[];
 }
