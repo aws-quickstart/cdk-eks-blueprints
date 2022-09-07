@@ -339,7 +339,7 @@ spec:
         dimension_rollup_option: NoDimensionRollup
         parse_json_encoded_attr_values: [Sources, kubernetes]
         metric_declarations:
-          - dimensions: [[EKS_Cluster, EKS_Namespace, EKS_PodName]]
+          - dimensions: [[EKS_Cluster], [EKS_Namespace], [EKS_PodName]]
             metric_name_selectors: {{metricsNameSelectors}}
 
     service:

@@ -29,7 +29,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to visualize metrics in CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`. You can pass required metrics to visualize using `metricsNameSelectors` as shown below.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -40,7 +40,8 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.CloudWatchAdotAddOn({
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
     namespace: 'default',
-    name: 'adot-collector-cloudwatch'
+    name: 'adot-collector-cloudwatch',
+    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
