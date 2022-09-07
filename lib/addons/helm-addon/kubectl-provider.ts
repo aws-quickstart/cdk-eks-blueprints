@@ -125,6 +125,7 @@ export class KubectlProvider {
         valueMap.forEach((value: any, key: string) => {
             if(Array.isArray(value)) {
                 value = JSON.stringify(value);
+                value = value.slice(1, -1);
             }
             data = data.replace(new RegExp(`{{${key}}}`, 'g'), value);
         });
