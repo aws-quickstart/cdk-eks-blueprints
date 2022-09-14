@@ -80,7 +80,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 4 : Overriding property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `daemonset` as the mode to remote write metrics to AMP workspace. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 4 : Overriding property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `daemonset` as the mode to remote write metrics to AMP workspace. Deployment modes can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
