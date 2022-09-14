@@ -29,17 +29,17 @@ export interface CloudWatchAdotAddOnProps {
      * Name to deploy the ADOT Collector for CloudWatch.
      * @default 'adot-collector-cloudwatch'
      */
-     name?: string;
+    name?: string;
     /**
      * Metrics name selectors.
      * @default "['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']"
      */
-     metricsNameSelectors?: string[];
+    metricsNameSelectors?: string[];
     /**
      * Pod Labels.
      * @default 'frontend|downstream(.*)'
      */
-     podLabels?: string;
+    podLabels?: string;
 }
 
 export const enum cloudWatchDeploymentMode {
