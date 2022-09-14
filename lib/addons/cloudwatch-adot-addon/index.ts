@@ -36,7 +36,7 @@ export interface CloudWatchAdotAddOnProps {
      */
     metricsNameSelectors?: string[];
     /**
-     * Pod Labels to select your applications emitting custom .
+     * Pod Labels to select your application pods emitting custom metrics.
      * @default 'frontend|downstream(.*)'
      */
     podLabels?: string;
