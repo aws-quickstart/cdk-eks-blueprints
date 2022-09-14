@@ -35,6 +35,11 @@ export interface CloudWatchAdotAddOnProps {
      * @default "['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']"
      */
      metricsNameSelectors?: string[];
+    /**
+     * Pod Labels.
+     * @default 'frontend|downstream(.*)'
+     */
+     podLabels?: string;
 }
 
 export const enum cloudWatchDeploymentMode {
@@ -51,7 +56,8 @@ const defaultProps: CloudWatchAdotAddOnProps = {
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
     namespace: 'default',
     name: 'adot-collector-cloudwatch',
-    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']
+    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*', 'ho11y*'],
+    podLabels: 'frontend|downstream(.*)'
 };
 
 /**
@@ -77,7 +83,8 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
             deploymentMode: this.cloudWatchAddOnProps.deploymentMode,
             namespace: this.cloudWatchAddOnProps.namespace,
             clusterName: cluster.clusterName,
-            metricsNameSelectors: this.cloudWatchAddOnProps.metricsNameSelectors?? defaultProps.metricsNameSelectors
+            metricsNameSelectors: this.cloudWatchAddOnProps.metricsNameSelectors?? defaultProps.metricsNameSelectors,
+            podLabels: this.cloudWatchAddOnProps.podLabels?? defaultProps.podLabels
          };
          
          const manifestDeployment: ManifestDeployment = {
