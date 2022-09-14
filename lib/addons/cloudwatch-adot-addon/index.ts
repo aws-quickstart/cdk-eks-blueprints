@@ -31,7 +31,7 @@ export interface CloudWatchAdotAddOnProps {
      */
     name?: string;
     /**
-     * Metrics name selectors.
+     * Metrics name selectors to remote write.
      * @default "['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']"
      */
     metricsNameSelectors?: string[];
