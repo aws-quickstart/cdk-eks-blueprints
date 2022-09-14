@@ -52,7 +52,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that CloudWatch add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
+To validate whether CloudWatch add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
 
 ```bash
 kubectl get all -n default
