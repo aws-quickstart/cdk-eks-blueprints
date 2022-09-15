@@ -29,7 +29,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to visualize metrics in CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`. You can pass required metrics including custom metrics and required pod labels of applications emitting custom metrics to visualize using `metricsNameSelectors`, `podLabels` as parameters as shown below.
+Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to visualize metrics in CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`. `sidecar` mode is to support Fargate profile. You can pass required metrics including custom metrics and required pod labels of application pods emitting custom metrics to visualize using `metricsNameSelectors`, `podLabelRegex` as parameters as shown below.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -42,7 +42,7 @@ const addOn = new blueprints.addons.CloudWatchAdotAddOn({
     namespace: 'default',
     name: 'adot-collector-cloudwatch',
     metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*'],
-    podLabels: 'frontend|downstream(.*)' 
+    podLabelRegex: 'frontend|downstream(.*)' 
 });
 
 const blueprint = blueprints.EksBlueprint.builder()

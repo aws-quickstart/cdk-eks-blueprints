@@ -36,10 +36,11 @@ export interface CloudWatchAdotAddOnProps {
      */
     metricsNameSelectors?: string[];
     /**
-     * Pod Labels to select your application pods emitting custom metrics.
-     * @default 'frontend|downstream(.*)'
+     * Labels of Pods to select your application pods emitting custom metrics.
+     * Example 'frontend|downstream(.*)'
+     * @default '.*'
      */
-    podLabels?: string;
+     podLabelRegex?: string;
 }
 
 export const enum cloudWatchDeploymentMode {
@@ -57,7 +58,7 @@ const defaultProps: CloudWatchAdotAddOnProps = {
     namespace: 'default',
     name: 'adot-collector-cloudwatch',
     metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*', 'ho11y*'],
-    podLabels: 'frontend|downstream(.*)'
+    podLabelRegex: '.*'
 };
 
 /**
@@ -84,7 +85,7 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
             namespace: this.cloudWatchAddOnProps.namespace,
             clusterName: cluster.clusterName,
             metricsNameSelectors: this.cloudWatchAddOnProps.metricsNameSelectors?? defaultProps.metricsNameSelectors,
-            podLabels: this.cloudWatchAddOnProps.podLabels?? defaultProps.podLabels
+            podLabelRegex: this.cloudWatchAddOnProps.podLabelRegex?? defaultProps.podLabelRegex
          };
          
          const manifestDeployment: ManifestDeployment = {
