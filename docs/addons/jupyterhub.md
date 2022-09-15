@@ -6,6 +6,10 @@ The Hub can offer notebook servers to a class of students, a corporate data scie
 
 For more information regarding a Jupyter notebook, please consult the [official documentation](https://jupyter-notebook.readthedocs.io/en/stable/notebook.html).
 
+***IMPORTANT***: This add-on depends on [EBS CSI Driver](ebs-csi-driver.md) Add-on for using EBS as persistent storage.
+
+***EBS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the Jupyter add-on*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for EbsCsiDriverAddOn`.
+
 ## Usage
 
 ```typescript
@@ -15,8 +19,15 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const jupyterHubAddOn = new blueprints.addons.JupyterHubAddOn();
-const addOns: Array<blueprints.ClusterAddOn> = [ jupyterHubAddOn ];
+const jupyterHubAddOn = new blueprints.addons.JupyterHubAddOn({
+  ebsConfig: {
+    storageClass: "gp2",
+    capacity: "4Gi",
+  }
+});
+
+const ebsCsiAddOn = new blueprints.addons.EbsCsiDriverAddOn();
+const addOns: Array<blueprints.ClusterAddOn> = [ ebsCsiAddOn, jupyterHubAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(...addOns)
@@ -41,6 +52,7 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 ## Functionality
 
 1. Deploys the jupyterhub helm chart in `jupyterhub` namespace by default.
+2. Leverages EBS as persistent storage.
 2. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ***Note***: For custom helm values, please consult the [official documentation](https://zero-to-jupyterhub.readthedocs.io/en/latest/resources/reference.html#). 
