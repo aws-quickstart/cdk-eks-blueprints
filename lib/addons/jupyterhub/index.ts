@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { createNamespace, dependable, setPath } from '../../utils';
