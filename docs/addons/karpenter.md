@@ -186,4 +186,30 @@ The following are common troubleshooting issues observed when implementing Karpe
 
 1. For Karpenter version older than `0.14.0` deployed on Fargate Profiles, `values.yaml` must be overridden, setting `dnsPolicy` to `Default`. Versions after `0.14.0` has `dnsPolicy` value set default to `Default`. This is to ensure CoreDNS is set correctly on Fargate nodes.
 
+## Upgrade Path
+
+1. Using an older version of the Karptner add-on, you may notice the difference in the "provisionerSpecs" property:
+
+```
+provisionerSpecs: {
+    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
+    'topology.kubernetes.io/zone': ['us-east-1c'],
+    'kubernetes.io/arch': ['amd64','arm64'],
+    'karpenter.sh/capacity-type': ['spot','on-demand'],
+  },
+```
+
+This now changes to the "requirement" property:
+
+```
+requirements: [
+      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+  ],
+```
+
+The property is changed to align with the naming convention of the provisioner, and to allow multiple operators (In vs NotIn). The values correspond similarly between the two, with type change being the only difference.
+
 2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/v0.16.0/upgrade-guide/#custom-resource-definition-crd-upgrades) for details.
