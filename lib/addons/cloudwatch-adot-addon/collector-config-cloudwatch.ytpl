@@ -328,7 +328,7 @@ spec:
                 target_label: kubernetes_pod_name
               - action: keep
                 source_labels: [__meta_kubernetes_pod_label_app]
-                regex: {{podLabels}}           
+                regex: {{podLabelRegex}}           
                                                             
     processors:
       batch/metrics:
