@@ -1,6 +1,7 @@
+import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, setPath } from '../../utils';
+import { createNamespace, dependable, setPath } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
 /**
@@ -13,9 +14,9 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
      * Defines storageClass for EBS Volume type, and
      * capacity for storage capacity
      */
-    ebsConfig?: {
+    ebsConfig: {
         storageClass: string,
-        capacity?: string,
+        capacity: string,
     }
 }
 
@@ -47,18 +48,19 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
 
+    @dependable('EbsCsiDriverAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
         
-        const storageClass = this.options.ebsConfig?.storageClass || "";
-        const capacity = this.options.ebsConfig?.capacity || "";
-
+        // Create persistent storage with EBS
+        const storageClass = this.options.ebsConfig.storageClass || "";
+        const capacity = this.options.ebsConfig.capacity || "";
         setPath(values, "singleuser.storage.dynamic.storageClass", storageClass);
         setPath(values, "singleuser.storage.capacity", capacity);
 
         // Create Namespace
-        const ns = createNamespace(JUPYTERHUB, cluster, true, true);
+        const ns = createNamespace(this.options.namespace!, cluster, true, true);
 
         // Create Helm Chart
         const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, true);
