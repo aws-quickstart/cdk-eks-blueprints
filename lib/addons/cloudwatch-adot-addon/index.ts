@@ -57,7 +57,7 @@ const defaultProps: CloudWatchAdotAddOnProps = {
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
     namespace: 'default',
     name: 'adot-collector-cloudwatch',
-    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*', 'ho11y*'],
+    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*'],
     podLabelRegex: '.*'
 };
 
