@@ -71,6 +71,12 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.KarpenterAddOn({
+                requirements: [
+                    { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+                    { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+                ],
                 subnetTags: {
                     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
                 },
@@ -82,6 +88,8 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
+                consolidation: { enabled: true },
+                weight: 20,
             }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
