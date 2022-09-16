@@ -16,7 +16,7 @@ $ npm install @kubecost/kubecost-eks-blueprints-addon
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
-import { KubecostAddOn } from '@kubecost/kubecost-blueprints-addon';
+import { KubecostAddOn } from '@kubecost/kubecost-eks-blueprints-addon';
 
 const app = new cdk.App();
 
