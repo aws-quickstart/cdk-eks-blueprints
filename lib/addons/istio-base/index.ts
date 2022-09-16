@@ -72,7 +72,7 @@ export class IstioBaseAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
 
         // Istio Namespace
-        createNamespace('istio-system', cluster);
+        const namespace = createNamespace('istio-system', cluster);
 
         let values: Values = {
             global: {
@@ -89,6 +89,8 @@ export class IstioBaseAddOn extends HelmAddOn {
 
         values = merge(values, this.props.values ?? {});
         const chart = this.addHelmChart(clusterInfo, values);
-        return Promise.resolve(chart);
+        chart.node.addDependency(namespace)
+
+        return Promise.resolve(namespace);
     }
 }

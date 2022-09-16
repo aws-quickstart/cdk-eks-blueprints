@@ -10,7 +10,7 @@ Karpenter works by:
 * Scheduling the pods to run on the new nodes, and
 * Removing the nodes when the nodes are no longer needed
 
-***IMPORTANT***:
+## Prerequisites
 
 1. This add-on depends on [VPC CNI](vpc-cni.md) Add-on for cni support.
 
@@ -18,9 +18,7 @@ Karpenter works by:
 
 2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`.
 
-## Prerequisite
-
-(If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
+3. (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
 
 ## Usage
 
@@ -32,12 +30,12 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const karpenterAddonProps = {
-  provisionerSpecs: {
-    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
-    'topology.kubernetes.io/zone': ['us-east-1c'],
-    'kubernetes.io/arch': ['amd64','arm64'],
-    'karpenter.sh/capacity-type': ['spot','on-demand'],
-  },
+  requirements: [
+      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+  ],
   subnetTags: {
     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
   },
@@ -50,6 +48,8 @@ const karpenterAddonProps = {
     effect: "NoSchedule",
   }],
   amiFamily: "AL2",
+  consolidation: { enabled: true },
+  weight: 20
 }
 const vpcCniAddOn = new blueprints.addons.VpcCniAddOn();
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
@@ -88,6 +88,8 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
 2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
+3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterempty`, so if you provide both properties, the addon will throw an error.
+4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
 
 ## Using Karpenter
 
@@ -95,25 +97,7 @@ To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://ka
 
 This can be done in 2 ways:
 
-1. Provide the following: Subnet tags and Security Group tags.
-
-```typescript
-
-const subnetTags = {
-  "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-}
-
-const sgTags = {
-  "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-}
-
-const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
-  subnetTags: subnetTags,
-  securityGroupTags: sgTags,
-});
-```
-
-If either of the tags are not provided at deploy time, the add-on will be installed without a Provisioner.
+1. Provide the properties as show in [Usage](#usage). If subnet tags and security group tags are not provided at deploy time, the add-on will be installed without a Provisioner.
 
 2. Use `kubectl` to apply a sample provisioner manifest:
 ```bash
@@ -201,3 +185,31 @@ kubectl get nodes
 The following are common troubleshooting issues observed when implementing Karpenter:
 
 1. For Karpenter version older than `0.14.0` deployed on Fargate Profiles, `values.yaml` must be overridden, setting `dnsPolicy` to `Default`. Versions after `0.14.0` has `dnsPolicy` value set default to `Default`. This is to ensure CoreDNS is set correctly on Fargate nodes.
+
+## Upgrade Path
+
+1. Using an older version of the Karptner add-on, you may notice the difference in the "provisionerSpecs" property:
+
+```
+provisionerSpecs: {
+    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
+    'topology.kubernetes.io/zone': ['us-east-1c'],
+    'kubernetes.io/arch': ['amd64','arm64'],
+    'karpenter.sh/capacity-type': ['spot','on-demand'],
+  },
+```
+
+This now changes to the "requirement" property:
+
+```
+requirements: [
+      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+  ],
+```
+
+The property is changed to align with the naming convention of the provisioner, and to allow multiple operators (In vs NotIn). The values correspond similarly between the two, with type change being the only difference.
+
+2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/v0.16.0/upgrade-guide/#custom-resource-definition-crd-upgrades) for details.
