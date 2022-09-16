@@ -105,7 +105,8 @@ export default class BlueprintConstruct {
                 ebsConfig: {
                     storageClass: "gp2",
                     capacity: "4Gi",
-                }
+                },
+                enableIngress: true,
             }),
         ];
 
