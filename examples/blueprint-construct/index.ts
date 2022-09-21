@@ -106,7 +106,7 @@ export default class BlueprintConstruct {
                     storageClass: "gp2",
                     capacity: "4Gi",
                 },
-                enableIngress: true,
+                enableIngress: false,
             }),
         ];
 
