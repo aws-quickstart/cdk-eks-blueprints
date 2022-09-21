@@ -6,6 +6,8 @@ This add-on is not automatically installed when you first create a cluster, it m
 
 For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
+Note: Due to lack of helm chart support and lack of “serverside apply” in the current version of EKS CW add-on cannot be used together with AMP add-on. Check this [Github Issue](https://github.com/aws/aws-cdk/issues/20263#issuecomment-1252910571) for more information.
+
 ## Prerequisites
 - `cert-manager` Blueprints add-on.
 - `adot` EKS Blueprints add-on.
