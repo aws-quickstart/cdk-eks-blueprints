@@ -92,6 +92,6 @@ export class IstioBaseAddOn extends HelmAddOn {
         const chart = this.addHelmChart(clusterInfo, values, undefined, true, Duration.seconds(60));
         chart.node.addDependency(namespace);
 
-        return Promise.resolve(namespace);
+        return Promise.resolve(chart);
     }
 }
