@@ -100,7 +100,14 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
-            new blueprints.addons.AWSPrivateCAIssuerAddon()
+            new blueprints.addons.AWSPrivateCAIssuerAddon(),
+            new blueprints.addons.JupyterHubAddOn({
+                ebsConfig: {
+                    storageClass: "gp2",
+                    capacity: "4Gi",
+                },
+                enableIngress: false,
+            }),
         ];
 
         // Instantiated to for helm version check.
