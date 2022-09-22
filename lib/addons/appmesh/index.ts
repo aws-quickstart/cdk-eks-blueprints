@@ -43,7 +43,7 @@ const defaultProps = {
     name: "appmesh-controller",
     namespace: "appmesh-system",
     chart: "appmesh-controller",
-    version: "1.5.1",
+    version: "1.7.0",
     release: "appmesh-release",
     repository: "https://aws.github.io/eks-charts"
 };
