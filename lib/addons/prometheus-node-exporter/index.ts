@@ -9,7 +9,7 @@ import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
  */
 export interface PrometheusNodeExporterAddOnProps extends HelmAddOnUserProps {
     /**
-     * To Create Namespace using CDK
+     * To Create Namespace using 
      */    
     createNamespace?: boolean;
 }
