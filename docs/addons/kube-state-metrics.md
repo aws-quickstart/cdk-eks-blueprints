@@ -23,7 +23,6 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Configuration Options
 
-- `installCRDs`: (boolean) To automatically install and manage the CRDs as part of your Helm release,
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you
 - `values`: Arbitrary values to pass to the chart. Refer to the kube-state-metrics [Helm Chart documentation](https://artifacthub.io/packages/helm/kube-state-metrics/kube-state-metrics) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options)
 
