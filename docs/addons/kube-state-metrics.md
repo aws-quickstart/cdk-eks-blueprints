@@ -29,7 +29,6 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 To validate that kube-state-metrics is installed properly in the cluster, check if the kube-state-metrics pods are running.
 
-
 Verify if the pods are running correctly for kube-state-metrics
 ```bash
   kubectl get pods -n kube-system  
