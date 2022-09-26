@@ -5,7 +5,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
- * User provided options for the Helm Chart
+ * User provided option for the Helm Chart
  */
 export interface PrometheusNodeExporterAddOnProps extends HelmAddOnUserProps {
     /**
