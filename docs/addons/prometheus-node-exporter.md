@@ -33,6 +33,7 @@ Verify if the pods are running correctly for prometheus-node-exporter in `promet
   kubectl get pods -n prometheus-node-exporter
 ```
 
+
 ## Output
 
 There should list 3 pods starting with name prometheus-node-exporter-
