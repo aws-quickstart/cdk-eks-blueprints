@@ -3,6 +3,8 @@ import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { KubeStateMetricsAddOn } from "../kube-state-metrics";
+import { PrometheusNodeExporterAddOn } from "../prometheus-node-exporter";
 
 /**
  * This CloudWatch ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for 
@@ -73,6 +75,8 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
     }
 
     @dependable(AdotCollectorAddOn.name)
+    @dependable(KubeStateMetricsAddOn.name)
+    @dependable(PrometheusNodeExporterAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
 
