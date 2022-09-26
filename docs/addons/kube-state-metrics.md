@@ -3,6 +3,7 @@
 This add-on installs [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics).
 
 kube-state-metrics (KSM) is a simple service that listens to the Kubernetes API server and generates metrics about the state of the objects. (See examples in the Metrics section below.) It is not focused on the health of the individual Kubernetes components, but rather on the health of the various objects inside, such as deployments, nodes and pods.
+
 kube-state-metrics Add-on is about generating metrics from Kubernetes API objects without modification. This ensures that features provided by kube-state-metrics have the same grade of stability as the Kubernetes API objects themselves.
 
 ## Usage
