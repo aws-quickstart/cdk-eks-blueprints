@@ -46,7 +46,6 @@ kube-state-metrics-cainjector-5ff98c66d-g4kpv   1/1     Running   0          2m5
 kube-state-metrics-webhook-fb48856b5-bpsbl      1/1     Running   0          2m56s
 ```
 
-
 ## Functionality
 
 Applies the kube-state-metrics add-on to an Amazon EKS cluster. 
