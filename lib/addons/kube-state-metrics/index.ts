@@ -3,16 +3,11 @@ import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
-import { setPath } from '../../utils/object-utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided options for the Helm Chart
  */
 export interface KubeStateMetricsAddOnProps extends HelmAddOnUserProps {
-    /**
-     * To automatically install and manage the CRDs as part of your Helm release,
-     */    
-    installCRDs?: boolean;
     /**
      * To Create Namespace using CDK
      */    
@@ -23,14 +18,13 @@ export interface KubeStateMetricsAddOnProps extends HelmAddOnUserProps {
  * Default props to be used when creating the Helm chart
  */
 const defaultProps: HelmAddOnProps & KubeStateMetricsAddOnProps = {
-  name: "blueprints-cert-manager-addon",
-  namespace: "cert-manager",
-  chart: "cert-manager",
-  version: "1.9.1",
-  release: "cert-manager",
-  repository:  "https://charts.jetstack.io",
+  name: "kube-state-metrics",
+  namespace: "kube-system",
+  chart: "kube-state-metrics",
+  version: "4.16.0",
+  release: "kube-state-metrics",
+  repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},
-  installCRDs: true, //To automatically install and manage the CRDs as part of your Helm release,
   createNamespace: true
 
 };
@@ -74,6 +68,5 @@ export class KubeStateMetricsAddOn extends HelmAddOn {
  */
 function populateValues(helmOptions: KubeStateMetricsAddOnProps): Values {
   const values = helmOptions.values ?? {};
-  setPath(values, "installCRDs",  helmOptions.installCRDs);
   return values;
 }
