@@ -57,7 +57,7 @@ test("Generic cluster provider correctly registers autoscaling node groups", () 
         id: "mng2",
         maxSize: 1,
         nodeGroupSubnets: {
-           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+           subnetType: ec2.SubnetType.PRIVATE_WITH_NAT
         }
     })
     .fargateProfile("fp1", {
@@ -90,7 +90,7 @@ test("Mng cluster provider correctly initializes managed node group", () => {
         instanceTypes: [new ec2.InstanceType('t3.micro')],
         nodeGroupCapacityType: CapacityType.SPOT,
         nodeGroupSubnets: {
-            subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+            subnetType: ec2.SubnetType.PRIVATE_WITH_NAT
         }
     });
 
@@ -99,7 +99,7 @@ test("Mng cluster provider correctly initializes managed node group", () => {
     expect(managedNodeGroups[0].diskSize).toBe(34);
     expect(managedNodeGroups[0].nodeGroupCapacityType).toBe(CapacityType.SPOT);
     expect(managedNodeGroups[0].nodeGroupSubnets).toBeDefined();
-    expect(managedNodeGroups[0].nodeGroupSubnets!.subnetType).toBe(ec2.SubnetType.PRIVATE_WITH_EGRESS);
+    expect(managedNodeGroups[0].nodeGroupSubnets!.subnetType).toBe(ec2.SubnetType.PRIVATE_WITH_NAT);
 
 
     const blueprint =  blueprints.EksBlueprint.builder()
@@ -128,7 +128,7 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
         instanceType: new ec2.InstanceType('t3.micro'),
         spotPrice: "23",
         nodeGroupSubnets: {
-            subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+            subnetType: ec2.SubnetType.PRIVATE_WITH_NAT
         },
         vpcSubnets: [ {subnetType:SubnetType.PUBLIC }]
     });
@@ -138,7 +138,7 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     expect(autoscalingNodeGroups[0].blockDevices![0].volume!.ebsDevice?.volumeSize).toBe(34)!;
     expect(autoscalingNodeGroups[0].spotPrice).toBe("23")!;
     expect(autoscalingNodeGroups[0].nodeGroupSubnets).toBeDefined();
-    expect(autoscalingNodeGroups[0].nodeGroupSubnets!.subnetType).toBe(ec2.SubnetType.PRIVATE_WITH_EGRESS);
+    expect(autoscalingNodeGroups[0].nodeGroupSubnets!.subnetType).toBe(ec2.SubnetType.PRIVATE_WITH_NAT);
 
     const blueprint =  blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
