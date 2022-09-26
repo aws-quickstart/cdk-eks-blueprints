@@ -32,18 +32,15 @@ To validate that kube-state-metrics is installed properly in the cluster, check 
 
 Verify if the pods are running correctly for kube-state-metrics
 ```bash
-  kubectl get pods -n kube-system  
+  kubectl get pods -A | awk '/kube-state/ {print ;exit}'  
 ```
 
 ## Output
 
-There should list 3 pods starting with name kube-state-metrics-
+There should list pod starting with name `kube-state`
 For Eg:
 ```bash
-NAME                                      READY   STATUS    RESTARTS   AGE
-kube-state-metrics-5bb7949947-vxf76             1/1     Running   0          2m56s
-kube-state-metrics-cainjector-5ff98c66d-g4kpv   1/1     Running   0          2m56s
-kube-state-metrics-webhook-fb48856b5-bpsbl      1/1     Running   0          2m56s
+kube-system                     kube-state-metrics-5d4c95885d-82bv4                               1/1     Running   0          13h
 ```
 
 ## Functionality
