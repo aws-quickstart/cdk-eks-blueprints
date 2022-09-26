@@ -131,7 +131,7 @@ export default class BlueprintConstruct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
                 },
                 {
                     id: "mng2-customami",
