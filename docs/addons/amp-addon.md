@@ -9,6 +9,7 @@ For more information on the add-on, please review the [user guide](https://docs.
 ## Prerequisites
 - `cert-manager` Blueprints add-on.
 - `adot` EKS Blueprints add-on.
+- `kube-state-metrics` Blueprints add-on.
 
 ## Usage
 
