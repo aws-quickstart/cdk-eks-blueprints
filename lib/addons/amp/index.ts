@@ -6,6 +6,8 @@ import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { CfnTag } from "aws-cdk-lib/core";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { KubeStateMetricsAddOn } from '../kube-state-metrics';
+import { PrometheusNodeExporterAddOn } from '../prometheus-node-exporter';
 
 /**
  * This AMP add-on installs an ADOT Collector for Amazon Managed Service for Prometheus 
@@ -78,6 +80,8 @@ export class AmpAddOn implements ClusterAddOn {
     }
 
     @dependable(AdotCollectorAddOn.name)
+    @dependable(KubeStateMetricsAddOn.name)
+    @dependable(PrometheusNodeExporterAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let doc: string;
