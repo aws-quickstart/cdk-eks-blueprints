@@ -12,7 +12,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.KubeStateMetricsAddOn()
+const addOn = new blueprints.addons.PrometheusNodeExporterAddOn()
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -26,11 +26,11 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that prometheus-node-exporter is installed properly in the cluster, check if the prometheus-node-exporter pods are running.
+To validate that prometheus-node-exporter is installed properly in the cluster, check if the prometheus-node-exporter namespace is created and pods are running.
 
-Verify if the pods are running correctly for prometheus-node-exporter
+Verify if the pods are running correctly for prometheus-node-exporter in `prometheus-node-exporter` namespace.
 ```bash
-  kubectl get pods -n kube-system  
+  kubectl get pods -n prometheus-node-exporter
 ```
 
 ## Output
