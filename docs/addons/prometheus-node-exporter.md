@@ -35,13 +35,12 @@ Verify if the pods are running correctly for prometheus-node-exporter in `promet
 
 ## Output
 
-There should list 3 pods starting with name prometheus-node-exporter-
+There should list pods starting with name `prometheus-node-exporter`
 For Eg:
 ```bash
-NAME                                      READY   STATUS    RESTARTS   AGE
-prometheus-node-exporter-5bb7949947-vxf76             1/1     Running   0          2m56s
-prometheus-node-exporter-cainjector-5ff98c66d-g4kpv   1/1     Running   0          2m56s
-prometheus-node-exporter-webhook-fb48856b5-bpsbl      1/1     Running   0          2m56s
+NAME                             READY   STATUS    RESTARTS   AGE
+prometheus-node-exporter-l7s25   1/1     Running   0          105m
+prometheus-node-exporter-zh5sn   1/1     Running   0          105m
 ```
 
 ## Functionality
