@@ -19,10 +19,10 @@ export interface PrometheusNodeExporterAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps: HelmAddOnProps & PrometheusNodeExporterAddOnProps = {
   name: "prometheus-node-exporter",
-  namespace: "kube-system",
-  chart: "kube-state-metrics",
-  version: "4.16.0",
-  release: "kube-state-metrics",
+  namespace: "prometheus-node-exporter",
+  chart: "prometheus-node-exporter",
+  version: "2.0.3",
+  release: "prometheus-node-exporter",
   repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},
   createNamespace: true
