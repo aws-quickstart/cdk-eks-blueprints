@@ -10,6 +10,7 @@ For more information on the add-on, please review the [user guide](https://docs.
 - `cert-manager` EKS Blueprints add-on.
 - `adot` EKS Blueprints add-on.
 - `kube-state-metrics` EKS Blueprints add-on.
+- `prometheus-node-explorter` EKS Blueprints add-on.
 
 ## Usage
 
