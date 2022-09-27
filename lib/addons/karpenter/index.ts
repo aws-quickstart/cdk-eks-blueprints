@@ -5,9 +5,11 @@ import { ClusterInfo } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
+import { CfnOutput } from 'aws-cdk-lib';
 import * as md5 from 'ts-md5';
 import * as semver from 'semver';
 import * as assert from "assert";
+import { Instance } from 'aws-cdk-lib/aws-ec2';
 
 
 /**
@@ -148,6 +150,10 @@ export class KarpenterAddOn extends HelmAddOn {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
+        });
+        new CfnOutput(clusterInfo.cluster.stack, 'Karpenter Instance Profile name', { 
+            value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
+            description: "Karpenter add-on Instance Profile name" 
         });
 
         // Map Node Role to aws-auth
