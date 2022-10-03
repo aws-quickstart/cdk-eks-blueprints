@@ -4,6 +4,7 @@ import merge from "ts-deepmerge";
 import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { Duration } from "aws-cdk-lib";
 
 /**
  * Configuration options for the ExternalsSecrets add-on.
@@ -85,6 +86,8 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
         name: serviceAccountName,
         create: false,
       },
+      wait: true,
+      timeout: Duration.minutes(15),
       ...this.options.values,
     };
 
