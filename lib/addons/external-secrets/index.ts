@@ -86,14 +86,12 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
         name: serviceAccountName,
         create: false,
       },
-      wait: true,
-      timeout: Duration.minutes(15),
       ...this.options.values,
     };
 
     values = merge(values, this.props.values ?? {});
 
-    const helmChart = this.addHelmChart(clusterInfo, values);
+    const helmChart = this.addHelmChart(clusterInfo, values, false, true, Duration.minutes(15));
     helmChart.node.addDependency(sa);
 
     return Promise.resolve(helmChart);
