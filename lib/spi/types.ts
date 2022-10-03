@@ -24,7 +24,7 @@ export interface HelmRepository {
 };
 
 /**
- * Interface that includes a reference to a Git repository for reuse, without credentials 
+ * Interface that includes a reference to a Git repository for reuse, without credentials
  * and other access information.
  */
 export interface GitRepositoryReference {
@@ -33,8 +33,8 @@ export interface GitRepositoryReference {
      */
     repoUrl: string,
 
-    /** 
-     * Path within the repository 
+    /**
+     * Path within the repository
      */
     path?: string,
 
@@ -54,13 +54,13 @@ export interface GitRepositoryReference {
 }
 
 /**
- * Data type defining an application repository (git). 
+ * Data type defining an application repository (git).
  */
 export interface ApplicationRepository extends GitRepositoryReference {
 
     /**
      * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
-     * The secret must exist in the same region and account where the stack will run. 
+     * The secret must exist in the same region and account where the stack will run.
      */
     credentialsSecretName?: string,
 
@@ -81,7 +81,7 @@ export class ResourceContext {
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
-    
+
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
      * @param name Specifies the name key under which the provided resources will be registered for subsequent look-ups.
@@ -96,7 +96,7 @@ export class ResourceContext {
     }
 
     /**
-     * Gets the provided resource by the supplied name. 
+     * Gets the provided resource by the supplied name.
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
@@ -108,26 +108,27 @@ export class ResourceContext {
 export enum GlobalResources {
     Vpc = 'vpc',
     HostedZone = 'hosted-zone',
-    Certificate = 'certificate'
+    Certificate = 'certificate',
+    KmsKey = 'kms-key'
 }
 
 
 /**
- * Cluster info supplies required information on the cluster configuration, registered resources and add-ons 
+ * Cluster info supplies required information on the cluster configuration, registered resources and add-ons
  * which could be leveraged by the framework, add-on implementations and teams.
  */
 export class ClusterInfo {
-    
+
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private resourceContext: ResourceContext;
 
     /**
      * Constructor for ClusterInfo
-     * @param props 
+     * @param props
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion, 
-            readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) { 
+    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
+            readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
@@ -143,7 +144,7 @@ export class ClusterInfo {
 
     /**
      * Injection method to provide resource context.
-     * @param resourceContext 
+     * @param resourceContext
      */
     public setResourceContext(resourceContext: ResourceContext) {
         this.resourceContext = resourceContext;
@@ -151,8 +152,8 @@ export class ClusterInfo {
 
     /**
      * Update provisionedAddOns map
-     * @param addOn 
-     * @param construct 
+     * @param addOn
+     * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
         this.provisionedAddOns.set(addOn, construct);
@@ -160,7 +161,7 @@ export class ClusterInfo {
 
     /**
      * Given the addOn name, return the provisioned addOn construct
-     * @param addOn 
+     * @param addOn
      * @returns undefined
      */
     public getProvisionedAddOn(addOn: string): Construct | undefined {
