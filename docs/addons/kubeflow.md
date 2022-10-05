@@ -59,7 +59,7 @@ kubectl get nodes # Output shows the EKS Managed Node group nodes
 kubectl get ns | kubeflow # Output shows kubeflow namespace
 
 kubectl get pods --namespace=kubeflow-pipelines  # Output shows kubeflow pods
-
+```
 
 
 ## Execute Machine learning jobs on Kubeflow
@@ -79,6 +79,11 @@ To clean up your EKS Blueprints, run the following commands:
 
 ```sh
 cdk destroy kubeflow-blueprint 
+```
+
+## [Kubeflow on EKS Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns/blob/main/docs/patterns/kubeflow.md) 
+For more information about the Kubeflow add module, please visit [Kubeflow on EKS Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns/blob/main/docs/patterns/kubeflow.md).
+
 
 ## License
 
