@@ -122,7 +122,7 @@ export class KubectlProvider {
     public static applyManifestTemplate = function(document: any, values: Values) : any {
         const valueMap = new Map(Object.entries(values));
         let data = JSON.stringify(document);
-        valueMap.forEach((value: string, key: string) => {
+        valueMap.forEach((value: any, key: string) => {
             data = data.replace(new RegExp(`{{${key}}}`, 'g'), value);
         });
         return JSON.parse(data);

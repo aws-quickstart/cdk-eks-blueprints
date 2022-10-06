@@ -108,6 +108,7 @@ export class AmpAddOn implements ClusterAddOn {
             awsRegion: cluster.stack.region,
             deploymentMode: this.ampAddOnProps.deploymentMode,
             namespace: this.ampAddOnProps.namespace,
+            clusterName: cluster.clusterName
          };
          
          const manifestDeployment: ManifestDeployment = {

@@ -12,7 +12,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
  */
 
 /**
- * Configuration options for add-on.
+ * Configuration options for CloudWatch Adot add-on.
  */
 export interface CloudWatchAdotAddOnProps {
     /**
@@ -29,7 +29,18 @@ export interface CloudWatchAdotAddOnProps {
      * Name to deploy the ADOT Collector for CloudWatch.
      * @default 'adot-collector-cloudwatch'
      */
-     name?: string;
+    name?: string;
+    /**
+     * Metrics name selectors to write to CloudWatch.
+     * @default "['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*']"
+     */
+    metricsNameSelectors?: string[];
+    /**
+     * Labels of Pods to select your application pods emitting custom metrics.
+     * Example 'frontend|downstream(.*)'
+     * @default '.*'
+     */
+     podLabelRegex?: string;
 }
 
 export const enum cloudWatchDeploymentMode {
@@ -42,10 +53,12 @@ export const enum cloudWatchDeploymentMode {
 /**
  * Defaults options for the add-on
  */
-const defaultProps = {
+const defaultProps: CloudWatchAdotAddOnProps = {
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
     namespace: 'default',
-    name: 'adot-collector-cloudwatch'
+    name: 'adot-collector-cloudwatch',
+    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*'],
+    podLabelRegex: '.*'
 };
 
 /**
@@ -70,7 +83,9 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
             awsRegion: cluster.stack.region,
             deploymentMode: this.cloudWatchAddOnProps.deploymentMode,
             namespace: this.cloudWatchAddOnProps.namespace,
-            clusterName: cluster.clusterName
+            clusterName: cluster.clusterName,
+            metricsNameSelectors: this.cloudWatchAddOnProps.metricsNameSelectors?? defaultProps.metricsNameSelectors,
+            podLabelRegex: this.cloudWatchAddOnProps.podLabelRegex?? defaultProps.podLabelRegex
          };
          
          const manifestDeployment: ManifestDeployment = {

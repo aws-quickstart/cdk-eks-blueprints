@@ -51,7 +51,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn(),
             new blueprints.addons.XrayAdotAddOn(),
-            new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -130,7 +130,7 @@ export default class BlueprintConstruct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
                     id: "mng2-customami",

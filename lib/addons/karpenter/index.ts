@@ -9,7 +9,6 @@ import { CfnOutput } from 'aws-cdk-lib';
 import * as md5 from 'ts-md5';
 import * as semver from 'semver';
 import * as assert from "assert";
-import { Instance } from 'aws-cdk-lib/aws-ec2';
 
 
 /**
@@ -82,7 +81,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.16.0',
+    version: '0.16.2',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
