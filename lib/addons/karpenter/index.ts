@@ -115,21 +115,22 @@ export class KarpenterAddOn extends HelmAddOn {
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || [];
         const amiFamily = this.options.amiFamily;
-        const version = this.options.version!;
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
-        const weight = this.options.weight;
+        const weight = this.options.weight || null;
         
         // Weight only available with v0.16.0 and later
-        if (semver.lt(version, '0.16.0')){
-            assert(!weight, 'weight only supported on versions v0.16.0 and later.');
+        if (semver.lt(this.options.version!, '0.16.0')){
+            assert(!weight, 'The prop weight is only supported on versions v0.16.0 and later.');
         }
 
-        // Consolidation only available with v0.15.0 and later
         let consolidation;
-        if (semver.gte(version, '0.15.0')){
-            consolidation = this.options.consolidation; 
-            // You cannot set both consolidation and ttlSecondsAfterEmpty values
-            assert(( consolidation && !ttlSecondsAfterEmpty ) || ( !consolidation && ttlSecondsAfterEmpty ) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
+        // Consolidation only available with v0.15.0 and later
+        if (semver.lt(this.options.version!, '0.15.0')){
+            assert(!this.options.consolidation, 'The prop consolidation is only supported on versions v0.15.0 and later.');
+        } else {
+            consolidation = this.options.consolidation || { enabled: false }; 
+            // You cannot enable consolidation and ttlSecondsAfterEmpty values
+            assert( !(consolidation.enabled && ttlSecondsAfterEmpty) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
         }
 
         // Set up Node Role
