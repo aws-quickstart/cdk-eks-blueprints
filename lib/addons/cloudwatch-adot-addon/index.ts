@@ -75,8 +75,6 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
     }
 
     @dependable(AdotCollectorAddOn.name)
-    @dependable(KubeStateMetricsAddOn.name)
-    @dependable(PrometheusNodeExporterAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
 
