@@ -3,8 +3,6 @@ import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
-import { KubeStateMetricsAddOn } from "../kube-state-metrics";
-import { PrometheusNodeExporterAddOn } from "../prometheus-node-exporter";
 
 /**
  * This CloudWatch ADOT Addon deploys an AWS Distro for OpenTelemetry (ADOT) Collector for 
