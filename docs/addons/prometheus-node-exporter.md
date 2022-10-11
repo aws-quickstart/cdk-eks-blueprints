@@ -2,7 +2,7 @@
 
 This add-on installs [prometheus-node-exporter](https://github.com/prometheus/node_exporter).
 
-prometheus-node-exporter Add-on enables you to measure various machine resources such as memory, disk and CPU utilization. For installations from source you must install and configure it yourself. To enable the node exporter: Enable Prometheus.
+prometheus-node-exporter Add-on enables you to measure various machine resources such as memory, disk and CPU utilization.
 
 ## Usage
 
@@ -22,7 +22,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you
-- `values`: Arbitrary values to pass to the chart. Refer to the prometheus-node-exporter [Helm Chart documentation](https://prometheus-community.github.io/helm-charts) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options)
+- `values`: Arbitrary values to pass to the chart. Refer to the prometheus-node-exporter [Helm Chart documentation](https://prometheus-community.github.io/helm-charts) for additional details.
 
 ## Validation
 
