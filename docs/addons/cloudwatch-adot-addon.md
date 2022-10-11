@@ -10,8 +10,6 @@ Note: Due to lack of helm chart support and lack of “serverside apply” in th
 
 ## Prerequisites
 - `adot` EKS Blueprints add-on.
-- `kube-state-metrics` EKS Blueprints add-on.
-- `prometheus-node-explorter` EKS Blueprints add-on.
 
 ## Usage
 
