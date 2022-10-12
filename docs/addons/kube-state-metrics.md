@@ -25,6 +25,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you
 - `values`: Arbitrary values to pass to the chart. 
+- [Standard helm configuration options](https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
 ## Validation
 
