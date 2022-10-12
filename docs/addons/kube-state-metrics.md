@@ -24,7 +24,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you
-- `values`: Arbitrary values to pass to the chart. Refer to the kube-state-metrics [Helm Chart documentation](https://prometheus-community.github.io/helm-charts) for additional details.
+- `values`: Arbitrary values to pass to the chart. 
 
 ## Validation
 
