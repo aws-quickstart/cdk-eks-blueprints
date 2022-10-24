@@ -60,6 +60,13 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     }
 
     /**
+     * If omitted, the feature is disabled and nodes will never expire.  
+     * If set to less time than it requires for a node to become ready, 
+     * the node may expire before any pods successfully start.
+     */
+    ttlSecondsUntilExpired?: number,
+
+    /**
      * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
      * Mutually exclusive with the consolidation parameter.
      */
@@ -115,6 +122,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const taints = this.options.taints || [];
         const amiFamily = this.options.amiFamily;
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
+        const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
         const weight = this.options.weight || null;
         
         // Weight only available with v0.16.0 and later
@@ -202,6 +210,7 @@ export class KarpenterAddOn extends HelmAddOn {
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
+                    ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                     ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
                     weight: weight,
                 },
