@@ -8,6 +8,8 @@ import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
 import { StringConstraint, validateConstraints } from '../utils';
+import { IResource } from 'aws-cdk-lib';
+import { Handler } from 'proxy-handler';
 
 export class EksBlueprintProps {
     /**
@@ -53,6 +55,16 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
+
+    protected resourceContext : spi.ResourceContext;
+
+
+    getResource<T extends IResource = IResource>(resourceName : string) : T {
+        return new Proxy({} as T, new Handler(() => {
+            return this.resourceContext.get(resourceName) as T;
+        }));
+    }
+
 }
 
 export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {

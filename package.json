@@ -40,6 +40,7 @@
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
         "lodash": "4.17.21",
+        "proxy-handler": "^2.0.0",
         "semver": "^7.3.7",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^4.0.0",
