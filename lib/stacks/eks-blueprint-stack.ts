@@ -8,8 +8,8 @@ import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
 import { StringConstraint, validateConstraints } from '../utils';
-import { IResource } from 'aws-cdk-lib';
-import { Handler } from 'proxy-handler';
+import * as store from '@leapfrogtechnology/async-store';
+
 
 export class EksBlueprintProps {
     /**
@@ -55,15 +55,6 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
-
-    protected resourceContext : spi.ResourceContext;
-
-
-    getResource<T extends IResource = IResource>(resourceName : string) : T {
-        return new Proxy({} as T, new Handler(() => {
-            return this.resourceContext.get(resourceName) as T;
-        }));
-    }
 
 }
 
@@ -187,6 +178,8 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 }
 
+store.initialize();
+
 /**
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
  * and orchestrates provisioning of add-ons, teams and post deployment hooks. 
@@ -208,6 +201,8 @@ export class EksBlueprint extends cdk.Stack {
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
+
+        store.set({resourceContext});
 
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
@@ -301,6 +296,7 @@ export class EksBlueprint extends cdk.Stack {
 
         return result;
     }
+
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
         validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
@@ -314,3 +310,4 @@ export class EksBlueprint extends cdk.Stack {
         }
     }
 }
+

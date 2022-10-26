@@ -30,6 +30,7 @@
         "typescript": "~4.8.3"
     },
     "dependencies": {
+        "@leapfrogtechnology/async-store": "2.0.0",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
@@ -40,7 +41,7 @@
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
         "lodash": "4.17.21",
-        "proxy-handler": "^2.0.0",
+        "proxy-handler": "2.0.0",
         "semver": "^7.3.7",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^4.0.0",
