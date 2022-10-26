@@ -27,16 +27,8 @@ The framework currently supports the following add-ons.
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage.                 |
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. |
-<<<<<<< HEAD
-<<<<<<< HEAD
-| [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster. |
-=======
-| [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster. |
->>>>>>> eddd1f9 (jupyterhub init deploy)
-=======
 | [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster. |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster. |
->>>>>>> 4785cb8 (added OIDC and Ingress/NLB support - doc updated)
 | [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn. |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.   
 | [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                                             |
