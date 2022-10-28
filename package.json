@@ -13,7 +13,7 @@
     },
     "devDependencies": {
         "@types/dot-object": "^2.1.2",
-        "@types/jest": "^29.0.3",
+        "@types/jest": "^29.2.0",
         "@types/js-yaml": "^4.0.5",
         "@types/node": "^16.11.7",
         "@types/semver": "^7.3.12",
@@ -41,6 +41,7 @@
         "lint": "^1.1.2",
         "lodash": "4.17.21",
         "semver": "^7.3.7",
+        "simple-base": "^1.0.0",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^4.0.0",
         "ts-md5": "^1.2.11",
