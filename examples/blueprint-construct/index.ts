@@ -1,9 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { EmrEksTeamProps, HelmAddOn } from '../../lib';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -110,6 +111,7 @@ export default class BlueprintConstruct {
                 },
                 enableIngress: false,
             }),
+            new blueprints.EmrEksAddOn()
         ];
 
         // Instantiated to for helm version check.
@@ -153,10 +155,40 @@ export default class BlueprintConstruct {
             ]
         });
 
+        const executionRolePolicyStatement: PolicyStatement [] = [
+            new PolicyStatement({
+              resources: ['*'],
+              actions: ['s3:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],   
+              actions: ['glue:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],
+              actions: [
+                'logs:*',
+              ],
+            }),
+          ];
+      
+      const dataTeam: EmrEksTeamProps = {
+              name:'dataTeam',
+              virtualClusterName: 'batchJob',
+              virtualClusterNamespace: 'batchjob',
+              createNamespace: true,
+              excutionRoles: [
+                  {
+                      excutionRoleIamPolicyStatement: executionRolePolicyStatement,
+                      excutionRoleName: 'myBlueprintExecRole'
+                  }
+              ]
+          };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .teams(...teams)
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
