@@ -5,6 +5,7 @@ import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
+import { ExclusiveStackLocalStorage } from 'stack-local-storage';
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -103,7 +104,15 @@ export class ResourceContext {
     public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
         return <T>this.resources.get(name);
     }
-}
+
+    /**
+     * Utility function for testing. Identifies the resource context.
+     * @returns 
+     */
+    public getName() : string {
+        return this.scope.stackName;
+    }
+ }
 
 export enum GlobalResources {
     Vpc = 'vpc',
@@ -222,3 +231,8 @@ export class ClusterInfo {
         return result!;
     }
 }
+
+export const localStack : ExclusiveStackLocalStorage<ResourceContext> = new ExclusiveStackLocalStorage({
+    emptyErrorMessage: "Local stack store is not set for the current stack",
+    conflictErrorMessage: "Local stack store cannot be overridden - possible async issue"
+});

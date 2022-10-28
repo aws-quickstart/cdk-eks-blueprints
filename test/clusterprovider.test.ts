@@ -1,10 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
 import { BlockDeviceVolume, EbsDeviceVolumeType } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as blueprints from '../lib';
 import { AsgClusterProvider, MngClusterProvider } from '../lib';
+import { logger } from '../lib/utils';
 
 test("Generic cluster provider correctly registers managed node groups", async () => {
     const app = new cdk.App();
@@ -148,4 +150,34 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     
     expect(blueprint.getClusterInfo().autoscalingGroups).toBeDefined();
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
+});
+
+test("Passing dynamic proxies to cluster provider works correct across multiple stacks", async () => {
+    const app = new cdk.App();
+
+    const clusterProvider = blueprints.clusterBuilder()
+    .withCommonOptions({
+        serviceIpv4Cidr: "10.43.0.0/16",
+        mastersRole: blueprints.resources.getResource( context => {
+            logger.info("calling get myroleid " + context.getName())
+            return iam.Role.fromRoleName(context.scope, "myroleid", "Administrator");
+        })
+    })
+    .build();
+
+    expect(clusterProvider.props.serviceIpv4Cidr).toBe("10.43.0.0/16");
+
+    const blueprint =  await blueprints.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .clusterProvider(clusterProvider)
+        .addOns(new blueprints.ClusterAutoScalerAddOn);
+
+    const stack1 = await blueprint.buildAsync(app, 'stack-with-resource-providers1');
+    const stack2 = await blueprint.buildAsync(app, 'stack-with-resource-providers2');
+    
+    logger.info(stack1.getClusterInfo().getResourceContext().getName());
+    logger.info(stack2.getClusterInfo().getResourceContext().getName());
+
+    expect(stack1.getClusterInfo().cluster.adminRole).toBeDefined();
+    expect(stack2.getClusterInfo().cluster.adminRole).toBeDefined();
 });

@@ -8,7 +8,8 @@ import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
 import { StringConstraint, validateConstraints } from '../utils';
-import * as store from '@leapfrogtechnology/async-store';
+import { localStack } from '../spi';
+
 
 
 export class EksBlueprintProps {
@@ -167,8 +168,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
-
-
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
@@ -178,7 +177,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 }
 
-store.initialize();
 
 /**
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
@@ -201,9 +199,15 @@ export class EksBlueprint extends cdk.Stack {
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
+        localStack.run(resourceContext, this.createStack, blueprintProps, this);
+    }
 
-        store.set({resourceContext});
-
+    /**
+     * Internal create stack method. 
+     * @param blueprintProps 
+     */
+    private createStack(blueprintProps: EksBlueprintProps, stack: EksBlueprint) {
+        const resourceContext = localStack.getStore();
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
         if (!vpcResource) {
@@ -216,21 +220,21 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
-        this.clusterInfo.setResourceContext(resourceContext);
+        stack.clusterInfo = clusterProvider.createCluster(stack, vpcResource!);
+        stack.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+            setupClusterLogging(stack.clusterInfo.cluster.stack, stack.clusterInfo.cluster, enableLogTypes);
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result = addOn.deploy(this.clusterInfo);
+            const result = addOn.deploy(stack.clusterInfo);
             if (result) {
                 const addOnKey = getAddOnNameOrId(addOn);
-                this.clusterInfo.addScheduledAddOn(addOnKey, result);
+                stack.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
@@ -238,32 +242,31 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        const scheduledAddOns = this.clusterInfo.getAllScheduledAddons();
+        const scheduledAddOns = stack.clusterInfo.getAllScheduledAddons();
         const addOnKeys = [...scheduledAddOns.keys()];
         const promises = scheduledAddOns.values();
 
-        this.asyncTasks = Promise.all(promises).then((constructs) => {
+        stack.asyncTasks = Promise.all(promises).then((constructs) => {
             constructs.forEach((construct, index) => {
-                this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+                stack.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
 
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
-                    team.setup(this.clusterInfo);
+                    team.setup(stack.clusterInfo);
                 }
             }
 
             for (let step of postDeploymentSteps) {
-                step.postDeploy(this.clusterInfo, blueprintProps.teams ?? []);
+                step.postDeploy(stack.clusterInfo, blueprintProps.teams ?? []);
             }
         });
 
-        this.asyncTasks.catch(err => {
+        stack.asyncTasks.catch(err => {
             console.error(err);
             throw new Error(err);
         });
     }
-
     /**
      * Since constructor cannot be marked as async, adding a separate method to wait
      * for async code to finish. 
