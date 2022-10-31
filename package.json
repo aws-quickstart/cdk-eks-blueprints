@@ -33,6 +33,7 @@
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
+        "@types/uuid": "^8.3.4",
         "aws-cdk-lib": "2.43.0",
         "aws-sdk": "2.1221.0",
         "bcrypt": "^5.0.1",
@@ -47,6 +48,7 @@
         "ts-deepmerge": "^4.0.0",
         "ts-md5": "^1.2.11",
         "tslog": "^3.3.4",
+        "uuid": "^9.0.0",
         "yaml": "^2.1.1",
         "zod": "^3.19.1"
     }

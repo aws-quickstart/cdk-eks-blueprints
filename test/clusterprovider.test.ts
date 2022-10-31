@@ -159,9 +159,13 @@ test("Passing dynamic proxies to cluster provider works correct across multiple 
     .withCommonOptions({
         serviceIpv4Cidr: "10.43.0.0/16",
         mastersRole: blueprints.resources.getResource( context => {
-            logger.info("calling get myroleid " + context.getName())
+            logger.info("calling get myroleid " + context.getName());
             return iam.Role.fromRoleName(context.scope, "myroleid", "Administrator");
         })
+    })
+    .managedNodeGroup({
+        id: "mng1",
+        desiredSize: 1
     })
     .build();
 

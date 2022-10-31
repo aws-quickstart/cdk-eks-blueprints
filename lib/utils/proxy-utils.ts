@@ -7,7 +7,9 @@ export interface HandlerOptions {
 }
 
 export type ProxyHandlerKey = keyof ProxyHandler<any>;
+
 export type SwitchableKey = Exclude<ProxyHandlerKey, 'apply' | 'construct'>;
+
 export class Handler<T extends object> implements Required<ProxyHandler<T>> {
   public static proxy<T extends object, U extends object = T>(
     source: SourceFn<T>,

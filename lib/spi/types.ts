@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { ExclusiveStackLocalStorage } from 'stack-local-storage';
+import { logger } from "../utils";
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -90,6 +91,7 @@ export class ResourceContext {
      * @returns the provided resource
      */
     public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
+        logger.debug(`Registering resource provider: ${name}`);
         const resource = provider.provide(this);
         assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
