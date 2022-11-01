@@ -82,7 +82,7 @@ test("Mng cluster provider correctly initializes managed node group", () => {
     const app = new cdk.App();
 
     const clusterProvider = new MngClusterProvider({
-        version: KubernetesVersion.V1_21,
+        version: KubernetesVersion.V1_23,
         clusterName: "my-cluster",
         forceUpdate:true,
         labels: { "mylabel": "value" },
@@ -117,7 +117,7 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
 
     const clusterProvider = new AsgClusterProvider({
         id: "asg1",
-        version: KubernetesVersion.V1_21,
+        version: KubernetesVersion.V1_23,
         clusterName: "my-cluster",
         blockDevices: [
             {

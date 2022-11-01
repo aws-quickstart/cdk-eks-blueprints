@@ -125,7 +125,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_21,
+            version: KubernetesVersion.V1_23,
             managedNodeGroups: [
                 {
                     id: "mng1",

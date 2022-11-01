@@ -126,7 +126,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_21
+    version: eks.KubernetesVersion.V1_23
 };
 
 export class ClusterBuilder {

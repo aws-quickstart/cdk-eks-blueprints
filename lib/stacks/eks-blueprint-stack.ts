@@ -2,12 +2,10 @@ import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import { cloneDeep, ConstraintsType } from "../utils";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
-import { StringConstraint, validateConstraints } from '../utils';
+import { cloneDeep, ConstraintsType, getAddOnNameOrId, setupClusterLogging, StringConstraint, validateConstraints, withUsageTracking } from "../utils";
 
 export class EksBlueprintProps {
     /**
@@ -39,7 +37,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_21;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_23;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -203,7 +201,7 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_21;
+        const version = blueprintProps.version ?? KubernetesVersion.V1_23;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
