@@ -1,14 +1,19 @@
+
+import { KubectlV22Layer } from "@aws-cdk/lambda-layer-kubectl-v22";
+import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
+import { } from "aws-cdk-lib/";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { IVpc } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import { IKey } from "aws-cdk-lib/aws-kms";
+import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
 import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import {IVpc} from "aws-cdk-lib/aws-ec2";
-import {IKey} from "aws-cdk-lib/aws-kms";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -205,7 +210,9 @@ export class GenericClusterProvider implements ClusterProvider {
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
 
-        const defaultOptions = {
+        const kubectlLayer = this.getKubectlLayer(scope, version);
+
+        const defaultOptions: Partial<eks.ClusterProps> = {
             vpc,
             secretsEncryptionKey,
             clusterName,
@@ -213,6 +220,7 @@ export class GenericClusterProvider implements ClusterProvider {
             version,
             vpcSubnets,
             endpointAccess,
+            kubectlLayer,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
@@ -249,6 +257,22 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.Cluster(scope, id, clusterOptions);
+    }
+
+    /**
+     * Can be overridden to provide a custom kubectl layer. 
+     * @param scope 
+     * @param version 
+     * @returns 
+     */
+    protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
+        switch(version) {
+            case eks.KubernetesVersion.V1_23:
+                return new KubectlV23Layer(scope, "kubectllayer23");
+            case eks.KubernetesVersion.V1_22:
+                return new KubectlV22Layer(scope, "kubectllayer22");
+        }
+        return undefined;
     }
 
     /**
