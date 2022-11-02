@@ -4,6 +4,7 @@ import merge from "ts-deepmerge";
 import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { Duration } from "aws-cdk-lib";
 
 /**
  * Configuration options for the ExternalsSecrets add-on.
@@ -90,7 +91,7 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
 
     values = merge(values, this.props.values ?? {});
 
-    const helmChart = this.addHelmChart(clusterInfo, values);
+    const helmChart = this.addHelmChart(clusterInfo, values, false, true, Duration.minutes(15));
     helmChart.node.addDependency(sa);
 
     return Promise.resolve(helmChart);
