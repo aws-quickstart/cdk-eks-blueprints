@@ -117,8 +117,7 @@ export default class BlueprintConstruct {
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
         new blueprints.ExternalsSecretsAddOn();
-        new blueprints.OpaGatekeeperAddOn();
-
+       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
