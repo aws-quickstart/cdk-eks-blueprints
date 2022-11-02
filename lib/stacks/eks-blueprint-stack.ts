@@ -2,12 +2,12 @@ import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import { cloneDeep, ConstraintsType } from "../utils";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
+import * as constraints from '../utils/constraints-utils';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
-import { StringConstraint, validateConstraints } from '../utils';
+import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
 
@@ -41,7 +41,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_21;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_23;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -57,18 +57,18 @@ export class EksBlueprintProps {
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
 }
 
-export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {
+export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
     /**
     * id can be no less than 1 character long, and no greater than 63 characters long.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    id = new StringConstraint(1, 63);
+    id = new constraints.StringConstraint(1, 63);
 
     /**
     * name can be no less than 1 character long, and no greater than 63 characters long.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    name = new StringConstraint(1, 63);
+    name = new constraints.StringConstraint(1, 63);
 }
 
 export const enum ControlPlaneLogType {
@@ -205,13 +205,13 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
+        const version = blueprintProps.version ?? KubernetesVersion.V1_23;
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
         if (!kmsKeyResource) {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_21;
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
@@ -299,7 +299,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
+        constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

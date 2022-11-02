@@ -118,15 +118,14 @@ export default class BlueprintConstruct {
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
         new blueprints.ExternalsSecretsAddOn();
-        new blueprints.OpaGatekeeperAddOn();
-
+       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_21,
+            version: KubernetesVersion.V1_23,
             managedNodeGroups: [
                 {
                     id: "mng1",

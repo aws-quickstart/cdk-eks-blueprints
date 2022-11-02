@@ -15,7 +15,7 @@ Full list of configuration options:
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_21,
+    version: KubernetesVersion.V1_23,
     serviceIpv4Cidr: "10.43.0.0/16"
     managedNodeGroups: [
         {
