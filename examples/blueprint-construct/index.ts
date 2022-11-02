@@ -91,6 +91,7 @@ export default class BlueprintConstruct {
                     effect: "NoSchedule",
                 }],
                 consolidation: { enabled: true },
+                ttlSecondsUntilExpired: 360,
                 weight: 20,
             }),
             new blueprints.addons.KubeviousAddOn(),
