@@ -5,7 +5,11 @@ import { Construct } from 'constructs';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import { cloneDeep, ConstraintsType, getAddOnNameOrId, setupClusterLogging, StringConstraint, validateConstraints, withUsageTracking } from "../utils";
+import * as constraints from '../utils/constraints-utils';
+import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import { cloneDeep } from '../utils';
+import { IKey } from "aws-cdk-lib/aws-kms";
+import {KmsKeyProvider} from "../resource-providers/kms-key";
 
 export class EksBlueprintProps {
     /**
@@ -42,7 +46,7 @@ export class EksBlueprintProps {
     /**
      * Named resource providers to leverage for cluster resources.
      * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
-     * VPC for the cluster can be registered under the name of 'vpc' or as a single provider of type 
+     * VPC for the cluster can be registered under the name of 'vpc' or as a single provider of type
      */
     resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
@@ -53,18 +57,18 @@ export class EksBlueprintProps {
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
 }
 
-export class BlueprintPropsConstraints implements ConstraintsType<EksBlueprintProps> {
+export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
     /**
     * id can be no less than 1 character long, and no greater than 63 characters long.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    id = new StringConstraint(1, 63);
+    id = new constraints.StringConstraint(1, 63);
 
     /**
     * name can be no less than 1 character long, and no greater than 63 characters long.
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
-    name = new StringConstraint(1, 63);
+    name = new constraints.StringConstraint(1, 63);
 }
 
 export const enum ControlPlaneLogType {
@@ -78,8 +82,8 @@ export const enum ControlPlaneLogType {
 
 /**
  * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
- * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
- * in accounts and regions. 
+ * and allows creating a blueprint in an abstract state that can be applied to various instantiations
+ * in accounts and regions.
  */
 export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
@@ -175,7 +179,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
 /**
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
- * and orchestrates provisioning of add-ons, teams and post deployment hooks. 
+ * and orchestrates provisioning of add-ons, teams and post deployment hooks.
  */
 export class EksBlueprint extends cdk.Stack {
 
@@ -202,12 +206,18 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         const version = blueprintProps.version ?? KubernetesVersion.V1_23;
+        let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
+
+        if (!kmsKeyResource) {
+            kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
+        }
+
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource!);
         this.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
@@ -257,7 +267,7 @@ export class EksBlueprint extends cdk.Stack {
 
     /**
      * Since constructor cannot be marked as async, adding a separate method to wait
-     * for async code to finish. 
+     * for async code to finish.
      * @returns Promise that resolves to the blueprint
      */
     public async waitForAsyncTasks(): Promise<EksBlueprint> {
@@ -289,7 +299,7 @@ export class EksBlueprint extends cdk.Stack {
     }
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
-        validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
+        constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

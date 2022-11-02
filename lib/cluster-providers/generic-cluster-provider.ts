@@ -7,14 +7,16 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import {IVpc} from "aws-cdk-lib/aws-ec2";
+import {IKey} from "aws-cdk-lib/aws-kms";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
 }
 
 /**
- * Properties for the generic cluster provider, containing definitions of managed node groups, 
- * auto-scaling groups, fargate profiles. 
+ * Properties for the generic cluster provider, containing definitions of managed node groups,
+ * auto-scaling groups, fargate profiles.
  */
 export interface GenericClusterProviderProps extends eks.ClusterOptions {
 
@@ -49,21 +51,21 @@ export class ManagedNodeGroupConstraints implements utils.ConstraintsType<Manage
     id = new utils.StringConstraint(1, 63);
 
     /**
-    * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+    * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
     * of situations of a hard limit request being accepted, and as a result the limit would be raised
     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
     */
     minSize = new utils.NumberConstraint(0, 2250);
 
     /**
-     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
      * of situations of a hard limit request being accepted, and as a result the limit would be raised
      * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
      */
     maxSize = new utils.NumberConstraint(0, 2250);
 
     /**
-     * Nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * Nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
      * of situations of a hard limit request being accepted, and as a result the limit would be raised
      * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
      */
@@ -112,13 +114,13 @@ export class FargateProfileConstraints implements utils.ConstraintsType<eks.Farg
 
 export class GenericClusterPropsConstraints implements utils.ConstraintsType<GenericClusterProviderProps> {
     /**
-    * managedNodeGroups per cluster have a soft limit of 30 managed node groups per EKS cluster, and as little as 0. But we multiply that 
+    * managedNodeGroups per cluster have a soft limit of 30 managed node groups per EKS cluster, and as little as 0. But we multiply that
     * by a factor of 5 to 150 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
     */
     managedNodeGroups = new utils.ArrayConstraint(0, 150);
     /**
-    * autoscalingNodeGroups per cluster have a soft limit of 500 autoscaling node groups per EKS cluster, and as little as 0. But we multiply that 
+    * autoscalingNodeGroups per cluster have a soft limit of 500 autoscaling node groups per EKS cluster, and as little as 0. But we multiply that
     * by a factor of 5 to 2500 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
     * https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-quotas.html
     */
@@ -176,7 +178,7 @@ export class ClusterBuilder {
 }
 
 /**
- * Cluster provider implementation that supports multiple node groups. 
+ * Cluster provider implementation that supports multiple node groups.
  */
 export class GenericClusterProvider implements ClusterProvider {
 
@@ -189,10 +191,10 @@ export class GenericClusterProvider implements ClusterProvider {
             "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
     }
 
-    /** 
-     * @override 
+    /**
+     * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
+    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey: IKey): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
@@ -205,6 +207,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
         const defaultOptions = {
             vpc,
+            secretsEncryptionKey,
             clusterName,
             outputClusterName,
             version,
@@ -239,10 +242,10 @@ export class GenericClusterProvider implements ClusterProvider {
 
     /**
      * Template method that may be overridden by subclasses to create a specific cluster flavor (e.g. FargateCluster vs eks.Cluster)
-     * @param scope 
-     * @param id 
-     * @param clusterOptions 
-     * @returns 
+     * @param scope
+     * @param id
+     * @param clusterOptions
+     * @returns
      */
     protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.Cluster(scope, id, clusterOptions);
@@ -250,9 +253,9 @@ export class GenericClusterProvider implements ClusterProvider {
 
     /**
      * Adds an autoscaling group to the cluster.
-     * @param cluster 
-     * @param nodeGroup 
-     * @returns 
+     * @param cluster
+     * @param nodeGroup
+     * @returns
      */
     addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: AutoscalingNodeGroup): autoscaling.AutoScalingGroup {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
@@ -287,9 +290,9 @@ export class GenericClusterProvider implements ClusterProvider {
 
     /**
      * Adds a managed node group to the cluster.
-     * @param cluster 
-     * @param nodeGroup 
-     * @returns 
+     * @param cluster
+     * @param nodeGroup
+     * @returns
      */
     addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
         const capacityType = nodeGroup.nodeGroupCapacityType;
@@ -332,7 +335,7 @@ export class GenericClusterProvider implements ClusterProvider {
     }
 
     private validateInput(props: GenericClusterProviderProps) {
-        
+
         utils.validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
         if (props.managedNodeGroups != undefined)
             utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
