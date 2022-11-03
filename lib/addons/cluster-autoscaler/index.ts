@@ -83,7 +83,8 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             "autoscaling:DescribeTags",
             "autoscaling:SetDesiredCapacity",
             "autoscaling:TerminateInstanceInAutoScalingGroup",
-            "ec2:DescribeLaunchTemplateVersions"
+            "ec2:DescribeLaunchTemplateVersions",
+            "ec2:DescribeInstanceTypes"
         );
 
         const autoscalerPolicyDocument = new iam.PolicyDocument({
