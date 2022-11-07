@@ -15,7 +15,7 @@ export class EmrEksAddOn implements ClusterAddOn {
     });
 
 
-    //Init the service role as IRole because `addRoleMapping` method does
+    //Init the service role as IRole because `addRoleMapping` method does not
     //support the CfnServiceLinkedRole type
     const emrEksServiceRole: IRole = Role.fromRoleArn(
       cluster.stack,
