@@ -3,7 +3,7 @@
 # CDK asset staging directory
 .cdk.staging
 cdk.out
-
+cdk.context.json
 # Other files excluded from package
 .vscode
 .github

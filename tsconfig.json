@@ -33,7 +33,8 @@
         "test",
         ".git",
         ".idea",
-        ".vscode"
+        ".vscode",
+        "cdk.context.json"
     ],
     "include": [
         "lib"

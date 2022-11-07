@@ -29,7 +29,7 @@ const defaultProps: HelmAddOnProps & KubeviousAddOnProps = {
     name: "blueprints-kubevious-addon",
     namespace: "kubevious",
     chart: "kubevious",
-    version: "1.0.13",
+    version: "1.1.2",
     release: "kubevious",
     repository:  "https://helm.kubevious.io",
     values: {},
