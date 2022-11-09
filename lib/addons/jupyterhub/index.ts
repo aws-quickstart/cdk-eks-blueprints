@@ -1,7 +1,10 @@
+import { assert } from "console";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { createNamespace, dependable, setPath } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
+
+import * as efs from 'aws-cdk-lib/aws-efs';
 
 /**
  * Configuration options for the add-on.
@@ -13,10 +16,16 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
      * Defines storageClass for EBS Volume type, and
      * capacity for storage capacity
      */
-    ebsConfig: {
+    ebsConfig?: {
         storageClass: string,
         capacity: string,
     }
+
+    /**
+     * Configuration necessary to use EFS as Persistent Volume
+     * Requires an EFS volume in the same VPC
+     */
+    efsConfig: boolean
 
     /**
      * Configuration settings for OpenID Connect authentication protocol
@@ -67,16 +76,57 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
 
-    @dependable('EbsCsiDriverAddOn')
+    @dependable('EbsCsiDriverAddOn' || 'EfsCsiDriverAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
+
+        // The addon requires a persistent storage option
+        assert(this.options.ebsConfig || this.options.efsConfig, "You need to provide a persistent storage option.");
         
-        // Create persistent storage with EBS
-        const storageClass = this.options.ebsConfig.storageClass || "";
-        const capacity = this.options.ebsConfig.capacity || "";
-        setPath(values, "singleuser.storage.dynamic.storageClass", storageClass);
-        setPath(values, "singleuser.storage.capacity", capacity);
+        // But you can only provide one option for persistent storage
+        assert((!this.options.ebsConfig && this.options.efsConfig) || (this.options.ebsConfig && !this.options.efsConfig), 
+            "You cannot provide more than one persistent storage option."
+        );
+
+        // Persistent Storage Setup
+        if (this.options.ebsConfig){
+            // Create persistent storage with EBS
+            const storageClass = this.options.ebsConfig.storageClass || "";
+            const capacity = this.options.ebsConfig.capacity || "";
+            setPath(values, "singleuser.storage.dynamic.storageClass", storageClass);
+            setPath(values, "singleuser.storage.capacity", capacity);
+        } else {
+            // EFS Setup
+            const jupyterHubFileSystem = new efs.FileSystem(cluster, 'MyEfsFileSystem', {
+                vpc: clusterInfo.cluster.vpc,
+              });
+            const efsId = jupyterHubFileSystem.fileSystemId;
+            const efsPV = cluster.addManifest('efs-pv', {
+                apiVersion: 'v1',
+                kind: 'PersistentVolume',
+                metadata: { name: 'efs-persist' },
+                spec: {
+                    capacity: { storage: '123Gi' },
+                    accessModes: [ 'ReadWriteMany' ],
+                    nfs: {
+                        server: `fs-${efsId}.efs.us-east-1.amazonaws.com`,
+                        path: "/"
+                    }
+                },
+            });
+            efsPV.node.addDependency(jupyterHubFileSystem);
+            const efsPVC = cluster.addManifest('efs-pvc', {
+                apiVersion: 'v1',
+                kind: 'PersistentVolumeClaim',
+                metadata: { name: 'efs-persist' },
+                spec: {
+                    storageClassName: "",
+                    accessModes: [ 'ReadWriteMany' ],
+                    resources: { requests: { storage: '10Gi' } },
+                },
+            });
+        }
 
         // OpenID Connect authentication setup
         if (this.options.oidcConfig){

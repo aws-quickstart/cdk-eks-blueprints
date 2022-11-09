@@ -105,6 +105,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
             new blueprints.addons.JupyterHubAddOn({
+                efsConfig: false,
                 ebsConfig: {
                     storageClass: "gp2",
                     capacity: "4Gi",
