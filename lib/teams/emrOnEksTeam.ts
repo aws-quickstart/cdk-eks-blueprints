@@ -1,21 +1,21 @@
 import { Cluster, KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
-import { Aws, CfnJson, CfnOutput } from "aws-cdk-lib/core";
+import { Aws, CfnJson, CfnOutput } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';
 import * as simplebase from 'simple-base';
 import { CfnVirtualCluster } from "aws-cdk-lib/aws-emrcontainers";
 import { ClusterInfo, Values } from "../spi";
-import { ApplicationTeam, TeamProps } from ".";
+import { ApplicationTeam, TeamProps } from "./team";
 import { ManifestDeployment } from "../addons/helm-addon/kubectl-provider";
 import { loadYaml, readYamlDocument } from "../utils/yaml-utils";
 
 /**
  * Interface define the object to create an execution role
  */
- export interface ExecutionRoleDefinition {
-    /**
-     * The name of the IAM role to create
-     */
+export interface ExecutionRoleDefinition {
+  /**
+   * The name of the IAM role to create
+   */
   executionRoleName: string,
   /**
     * The IAM policy to use with IAM role if it already exists
@@ -35,7 +35,7 @@ import { loadYaml, readYamlDocument } from "../utils/yaml-utils";
 export interface EmrEksTeamProps extends TeamProps {
   /*
   * The namespace of where the virtual cluster will be created
-  */ 
+  */
   virtualClusterNamespace: string,
   /**
    * To define if the namespace that team will use need to be created
@@ -43,7 +43,7 @@ export interface EmrEksTeamProps extends TeamProps {
   createNamespace: boolean,
   /*
   * The name of the virtual cluster the team will use
-  */ 
+  */
   virtualClusterName: string,
   /**
    * List of execution role to associated with the VC namespace
@@ -63,10 +63,10 @@ export interface EmrEksTeamProps extends TeamProps {
 export class EmrEksTeam extends ApplicationTeam {
 
   private emrTeam: EmrEksTeamProps;
-    /**
-     * @public
-     * @param {EmrEksTeamProps} props the EMR on EKS team definition {@link EmrEksTeamProps}
-     */
+  /**
+   * @public
+   * @param {EmrEksTeamProps} props the EMR on EKS team definition {@link EmrEksTeamProps}
+   */
   constructor(props: EmrEksTeamProps) {
     super(props);
     this.emrTeam = props;
@@ -107,7 +107,7 @@ export class EmrEksTeam extends ApplicationTeam {
 
     teamVC.node.addDependency(emrVcPrerequisit);
 
-    new CfnOutput(cluster.stack, `${this.emrTeam.virtualClusterName}-id`, {
+    new CfnOutput(cluster.stack, `${this.emrTeam.virtualClusterName}-virtual cluster-id`, {
       value: teamVC.attrId
     });
 
@@ -126,33 +126,23 @@ export class EmrEksTeam extends ApplicationTeam {
 
   private setEmrContainersForNamespace(cluster: Cluster, namespace: string, createNamespace: boolean): KubernetesManifest {
 
-  let doc = readYamlDocument(`${__dirname}//emrContainersRbacConfig.ytpl`);
-  
+    let doc = readYamlDocument(`${__dirname}//emrContainersRbacConfig.ytpl`);
 
-  const manifest = doc.split("---").map(e => loadYaml(e));
-    
+    //Get the RBAC definition and replace with the namespace provided by the user
+    const manifest = doc.split("---").map(e => loadYaml(e.replace('{{namespace}}', namespace)));
 
-    const values: Values = {};
-
-    //Get the Role definition and add the namespace of the EMR on EKS virtual cluster
-    const emrContainersK8sRoleManifest: ManifestDeployment = {
-      name: '',
-      namespace: namespace,
-      manifest,
-      values: values
-    };
-
-    //Create the role used by EMR on EKS
-    const emrContainersK8sRoleResource = cluster.addManifest('emrContainersK8sRoleManifest',
-      emrContainersK8sRoleManifest
-    );
+    //Get the k8s Role definition and add the namespace of the EMR on EKS virtual cluster
+    const emrContainersK8sRoleManifest: KubernetesManifest = new KubernetesManifest(cluster.stack, "myproduct-manifest", {
+      cluster,
+      manifest
+    });
 
     if (createNamespace) {
       const namespaceManifest = nsutils.createNamespace(namespace, cluster, true);
-      emrContainersK8sRoleResource.node.addDependency(namespaceManifest);
+      emrContainersK8sRoleManifest.node.addDependency(namespaceManifest);
     }
 
-    return emrContainersK8sRoleResource;
+    return emrContainersK8sRoleManifest;
   }
 
   /**

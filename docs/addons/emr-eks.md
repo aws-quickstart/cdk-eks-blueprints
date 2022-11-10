@@ -1,0 +1,33 @@
+# EMR on EKS Add-on
+
+The `Amazon EMR on EKS Add-on` enable an EKS cluster to be used by EMR on EKS. It creates the EMR on EKS IAM Service Linked Role and add it to `awsAuth` configmap.
+
+## Usage
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.EmrEksAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+## Verify
+
+One the AddOn is deployed you can execute the following command.
+
+```
+kubectl describe -n kube-system configmap/aws-auth
+```
+The output of the command would show a list of IAM role and mapping to Kuberenets users, one fo the mapping would be for EMR on EKS role and would be similar to below.
+
+```
+  mapRoles: |
+    - rolearn: arn:aws:iam::<your-account-id>:role/AWSServiceRoleForAmazonEMRContainers
+      username: emr-containers
+```

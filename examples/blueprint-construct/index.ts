@@ -4,7 +4,8 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { EmrEksTeamProps, HelmAddOn } from '../../lib';
+import { HelmAddOn } from '../../lib';
+import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -145,7 +146,7 @@ export default class BlueprintConstruct {
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': "ami-07bda4b61dc470985",
+                            'us-west-1': 'ami-07bda4b61dc470985',
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),

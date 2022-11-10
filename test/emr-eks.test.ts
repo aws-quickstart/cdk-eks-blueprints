@@ -34,10 +34,10 @@ const dataTeam: EmrEksTeamProps = {
         virtualClusterName: 'batchJob',
         virtualClusterNamespace: 'batchjob',
         createNamespace: true,
-        excutionRoles: [
+        executionRoles: [
             {
-                excutionRoleIamPolicyStatement: executionRolePolicyStatement,
-                excutionRoleName: 'myBlueprintExecRole'
+                executionRoleIamPolicyStatement: executionRolePolicyStatement,
+                executionRoleName: 'myBlueprintExecRole'
             }
         ]
     };
