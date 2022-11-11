@@ -1,6 +1,6 @@
 # EMR on EKS Add-on
 
-The `Amazon EMR on EKS Add-on` enable an EKS cluster to be used by EMR on EKS. It creates the EMR on EKS IAM Service Linked Role and add it to `awsAuth` configmap.
+The `Amazon EMR on EKS Add-on` enables EMR on EKS service to use an EKS cluster. It creates the EMR on EKS IAM Service Linked Role and add it to `awsAuth` configmap.
 
 ## Usage
 
@@ -19,7 +19,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 ## Verify
 
-One the AddOn is deployed you can execute the following command.
+Once the AddOn is deployed you can execute the following command.
 
 ```
 kubectl describe -n kube-system configmap/aws-auth
