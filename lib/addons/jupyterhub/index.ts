@@ -1,10 +1,12 @@
-import { assert } from "console";
+import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { createNamespace, dependable, setPath } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
+import * as cdk from 'aws-cdk-lib';
 import * as efs from 'aws-cdk-lib/aws-efs';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 /**
  * Configuration options for the add-on.
@@ -13,8 +15,8 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Configurations necessary to use EBS as Persistent Volume
-     * Defines storageClass for EBS Volume type, and
-     * capacity for storage capacity
+     * @property {string} storageClass - storage class for the volume
+     * @property {string} capacity - storage capacity (in Mi or Gi)
      */
     ebsConfig?: {
         storageClass: string,
@@ -23,9 +25,15 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Configuration necessary to use EFS as Persistent Volume
-     * Requires an EFS volume in the same VPC
+     * @property {cdk.RemovalPolicy} removalPolicy - Removal Policy for EFS (DESTROY, RETAIN or SNAPSHOT)
+     * @property {string} pvcName - Name of the Volume to be used for PV and PVC
+     * @property {string} capacity - Storage Capacity (in Mi or Gi)
      */
-    efsConfig: boolean
+    efsConfig?: {
+        removalPolicy: cdk.RemovalPolicy,
+        pvcName: string,
+        capacity: string,
+    }
 
     /**
      * Configuration settings for OpenID Connect authentication protocol
@@ -43,7 +51,7 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
-     * This will enable ALB and will require Load Balancer Controller add-on
+     * @property {boolean} enableIngress - This will enable ALB and will require Load Balancer Controller add-on
      */
     enableIngress?: boolean
 }
@@ -89,42 +97,39 @@ export class JupyterHubAddOn extends HelmAddOn {
             "You cannot provide more than one persistent storage option."
         );
 
-        // Persistent Storage Setup
+        // Create Namespace
+        const ns = createNamespace(this.options.namespace!, cluster, true, true);
+    
+        // Persistent Storage Setup for EBS
         if (this.options.ebsConfig){
             // Create persistent storage with EBS
-            const storageClass = this.options.ebsConfig.storageClass || "";
-            const capacity = this.options.ebsConfig.capacity || "";
-            setPath(values, "singleuser.storage.dynamic.storageClass", storageClass);
-            setPath(values, "singleuser.storage.capacity", capacity);
-        } else {
-            // EFS Setup
-            const jupyterHubFileSystem = new efs.FileSystem(cluster, 'MyEfsFileSystem', {
-                vpc: clusterInfo.cluster.vpc,
-              });
-            const efsId = jupyterHubFileSystem.fileSystemId;
-            const efsPV = cluster.addManifest('efs-pv', {
-                apiVersion: 'v1',
-                kind: 'PersistentVolume',
-                metadata: { name: 'efs-persist' },
-                spec: {
-                    capacity: { storage: '123Gi' },
-                    accessModes: [ 'ReadWriteMany' ],
-                    nfs: {
-                        server: `fs-${efsId}.efs.us-east-1.amazonaws.com`,
-                        path: "/"
+            const storageClass = this.options.ebsConfig.storageClass;
+            const ebsCapacity = this.options.ebsConfig.capacity;
+            setPath(values, "singleuser.storage", {
+                "dynamic": { "storageClass": storageClass },
+                "capacity": ebsCapacity
+            });
+        } 
+        
+        // Persistent Storage Setup for EFS
+        if (this.options.efsConfig) {
+            const pvcName = this.options.efsConfig.pvcName;
+            const removalPolicy = this.options.efsConfig.removalPolicy;
+            const efsCapacity = this.options.efsConfig.capacity;
+
+            this.setupEFS(clusterInfo, this.options.namespace!, pvcName, efsCapacity, removalPolicy);
+            setPath(values, "singleuser", {
+                "storage": {
+                    "type": "static",
+                    "static": {
+                        "pvcName": `${pvcName}`,
+                        "subPath": "home/{username}"
                     }
                 },
-            });
-            efsPV.node.addDependency(jupyterHubFileSystem);
-            const efsPVC = cluster.addManifest('efs-pvc', {
-                apiVersion: 'v1',
-                kind: 'PersistentVolumeClaim',
-                metadata: { name: 'efs-persist' },
-                spec: {
-                    storageClassName: "",
-                    accessModes: [ 'ReadWriteMany' ],
-                    resources: { requests: { storage: '10Gi' } },
-                },
+                "extraEnv": { "CHOWN_HOME": "yes" },
+                "uid": 0,
+                "fsGid": 0,
+                "cmd": "start-singleuser.sh"
             });
         }
 
@@ -167,9 +172,6 @@ export class JupyterHubAddOn extends HelmAddOn {
             );
         }
 
-        // Create Namespace
-        const ns = createNamespace(this.options.namespace!, cluster, true, true);
-
         // Create Helm Chart
         const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, true);
 
@@ -177,4 +179,97 @@ export class JupyterHubAddOn extends HelmAddOn {
         jupyterHubChart.node.addDependency(ns);
         return Promise.resolve(jupyterHubChart);
     }
+
+    /**
+     * This is a helper function to use EFS as persistent storage
+     * including necessary security group with ingress rule,
+     * EFS File System, Kubernetes PV and PVC
+     * @param {ClusterInfo} clusterInfo - Cluster Info
+     * @param {string} namespace - Namespace
+     * @param {string} pvcName - Name of the PV and PVC
+     * @param {RemovalPolicy}removalPolicy - Removal Policy for EFS File System (RETAIN, DESTROY or SNAPSHOT)
+     * @returns
+     * */
+    protected setupEFS(clusterInfo: ClusterInfo, namespace: string, pvcName: string, capacity: string, removalPolicy: cdk.RemovalPolicy){
+        const cluster = clusterInfo.cluster;
+        const clusterVpcCidr = clusterInfo.cluster.vpc.vpcCidrBlock;
+
+        // Security Group required for access to the File System
+        // With the right ingress rule
+        const jupyterHubSG = new ec2.SecurityGroup(
+            cluster.stack, 'MyEfsSecurityGroup',
+            {
+                vpc: clusterInfo.cluster.vpc,
+                securityGroupName: "EksBlueprintsJHubEFSSG",
+            }
+        )
+        jupyterHubSG.addIngressRule(
+            ec2.Peer.ipv4(clusterVpcCidr),
+            new ec2.Port({
+                protocol: ec2.Protocol.TCP,
+                stringRepresentation: "EFSconnection",
+                toPort: 2049,
+                fromPort: 2049,
+            }),
+        )
+
+        // Create the EFS File System
+        const jupyterHubFileSystem = new efs.FileSystem(
+            cluster.stack, 'MyEfsFileSystem', 
+            {
+                vpc: clusterInfo.cluster.vpc,
+                securityGroup: jupyterHubSG,
+                removalPolicy: removalPolicy,
+            }
+        );
+        const efsId = jupyterHubFileSystem.fileSystemId;
+        
+        // Create StorageClass
+        const efsSC = cluster.addManifest('efs-storage-class', {
+            apiVersion: 'storage.k8s.io/v1',
+            kind: 'StorageClass',
+            metadata: {
+                name: 'efs-sc',
+            },
+            provisioner: 'efs.csi.aws.com',
+        });
+
+        // Setup PersistentVolume and PersistentVolumeClaim
+        const efsPV = cluster.addManifest('efs-pv', {
+            apiVersion: 'v1',
+            kind: 'PersistentVolume',
+            metadata: { 
+                name: `${pvcName}`,
+                namespace: namespace
+            },
+            spec: {
+                capacity: { storage: `${capacity}` },
+                volumeMode: 'Filesystem',
+                accessModes: [ 'ReadWriteMany' ],
+                storageClassName: 'efs-sc',
+                csi: {
+                    driver: 'efs.csi.aws.com',
+                    volumeHandle: `${efsId}`,
+                }
+            },
+        });
+        efsPV.node.addDependency(efsSC);
+        efsPV.node.addDependency(jupyterHubFileSystem);
+
+        const efsPVC = cluster.addManifest('efs-pvc', {
+            apiVersion: 'v1',
+            kind: 'PersistentVolumeClaim',
+            metadata: { 
+                name: `${pvcName}`,
+                namespace: namespace
+            },
+            spec: {
+                storageClassName: 'efs-sc',
+                accessModes: [ 'ReadWriteMany' ],
+                resources: { requests: { storage: `${capacity}` } },
+            },
+        });
+        efsPVC.node.addDependency(efsPV);
+    }
 }
+
