@@ -111,6 +111,7 @@ export default class BlueprintConstruct {
                     capacity: '10Gi',
                 },
                 enableIngress: false,
+                notebookStack: 'jupyter/datascience-notebook',
             }),
         ];
 

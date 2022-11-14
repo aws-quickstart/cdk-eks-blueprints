@@ -53,7 +53,13 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
      * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
      * @property {boolean} enableIngress - This will enable ALB and will require Load Balancer Controller add-on
      */
-    enableIngress?: boolean
+    enableIngress?: boolean,
+
+    /**
+     * Notebook stack as defined using Docker Stacks for Jupyter here:
+     * https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
+     */
+    notebookStack?: string,
 }
 
 const JUPYTERHUB = 'jupyterhub';
@@ -99,7 +105,20 @@ export class JupyterHubAddOn extends HelmAddOn {
 
         // Create Namespace
         const ns = createNamespace(this.options.namespace!, cluster, true, true);
-    
+        
+        // User Environment setup
+        const notebook = this.options.notebookStack || 'jupyter/base-notebook';
+        setPath(values, "singleuser", {
+            "image":{
+                "name": `${notebook}`,
+                "tag": "latest" 
+            },
+            "extraEnv": { "CHOWN_HOME": "yes" },
+            "uid": 0,
+            "fsGid": 0,
+            "cmd": "start-singleuser.sh"
+        })
+
         // Persistent Storage Setup for EBS
         if (this.options.ebsConfig){
             // Create persistent storage with EBS
@@ -118,18 +137,12 @@ export class JupyterHubAddOn extends HelmAddOn {
             const efsCapacity = this.options.efsConfig.capacity;
 
             this.setupEFS(clusterInfo, this.options.namespace!, pvcName, efsCapacity, removalPolicy);
-            setPath(values, "singleuser", {
-                "storage": {
-                    "type": "static",
-                    "static": {
-                        "pvcName": `${pvcName}`,
-                        "subPath": "home/{username}"
-                    }
-                },
-                "extraEnv": { "CHOWN_HOME": "yes" },
-                "uid": 0,
-                "fsGid": 0,
-                "cmd": "start-singleuser.sh"
+            setPath(values, "singleuser.storage", {
+                "type": "static",
+                "static": {
+                    "pvcName": `${pvcName}`,
+                    "subPath": "home/{username}"
+                }
             });
         }
 
