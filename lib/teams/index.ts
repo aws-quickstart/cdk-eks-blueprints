@@ -1,2 +1,2 @@
 export * from './team';
-export * from './emrOnEksTeam';
+export * from './emr-on-eks-team';

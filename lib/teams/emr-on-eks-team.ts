@@ -1,13 +1,14 @@
-import { Cluster, KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { Cluster } from "aws-cdk-lib/aws-eks";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
-import { Aws, CfnJson, CfnOutput } from "aws-cdk-lib";
+import { Aws, CfnJson, CfnOutput, Tag, Tags } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';
 import * as simplebase from 'simple-base';
 import { CfnVirtualCluster } from "aws-cdk-lib/aws-emrcontainers";
 import { ClusterInfo, Values } from "../spi";
 import { ApplicationTeam, TeamProps } from "./team";
-import { ManifestDeployment } from "../addons/helm-addon/kubectl-provider";
+import { KubectlProvider, ManifestDeployment } from "../addons/helm-addon/kubectl-provider";
 import { loadYaml, readYamlDocument } from "../utils/yaml-utils";
+import { Construct } from "constructs";
 
 /**
  * Interface define the object to create an execution role
@@ -48,7 +49,7 @@ export interface EmrEksTeamProps extends TeamProps {
   /**
    * List of execution role to associated with the VC namespace
    */
-  executionRoles: ExecutionRoleDefinition[]
+  executionRoles: ExecutionRoleDefinition[] 
 }
 
 /*
@@ -75,7 +76,7 @@ export class EmrEksTeam extends ApplicationTeam {
   setup(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;
 
-    const emrVcPrerequisit = this.setEmrContainersForNamespace(cluster, this.emrTeam.virtualClusterNamespace, this.emrTeam.createNamespace);
+    const emrVcPrerequisit = this.setEmrContainersForNamespace(clusterInfo, this.emrTeam.virtualClusterNamespace, this.emrTeam.createNamespace);
 
     this.emrTeam.executionRoles.forEach(executionRole => {
 
@@ -118,31 +119,39 @@ export class EmrEksTeam extends ApplicationTeam {
    * For more information on the RBAC read consult the EMR on EKS documentation in this link 
    * https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-cluster-access.html
    * This method 
-   * @param cluster EKS cluster where to apply the RBAC
+   * @param ClusterInfo EKS cluster where to apply the RBAC
    * @param namespace Namespace where the RBAC are applied
    * @param createNamespace flag to create namespace if not already created
    * @returns 
    */
 
-  private setEmrContainersForNamespace(cluster: Cluster, namespace: string, createNamespace: boolean): KubernetesManifest {
+  private setEmrContainersForNamespace(ClusterInfo: ClusterInfo, namespace: string, createNamespace: boolean): Construct {
 
-    let doc = readYamlDocument(`${__dirname}//emrContainersRbacConfig.ytpl`);
+    let doc = readYamlDocument(`${__dirname}/emr-containers-rbac-config.ytpl`);
 
     //Get the RBAC definition and replace with the namespace provided by the user
-    const manifest = doc.split("---").map(e => loadYaml(e.replace('{{namespace}}', namespace)));
+    const manifest = doc.split("---").map(e => loadYaml(e));
 
-    //Get the k8s Role definition and add the namespace of the EMR on EKS virtual cluster
-    const emrContainersK8sRoleManifest: KubernetesManifest = new KubernetesManifest(cluster.stack, "myproduct-manifest", {
-      cluster,
-      manifest
-    });
+    const values: Values = {
+      namespace: namespace
+    };
+
+    const manifestDeployment: ManifestDeployment = {
+      name: 'emr-containers',
+      namespace: namespace,
+      manifest,
+      values
+    };
+
+    const kubectlProvider = new KubectlProvider(ClusterInfo);
+    const statement = kubectlProvider.addManifest(manifestDeployment);
 
     if (createNamespace) {
-      const namespaceManifest = nsutils.createNamespace(namespace, cluster, true);
-      emrContainersK8sRoleManifest.node.addDependency(namespaceManifest);
+      const namespaceManifest = nsutils.createNamespace(namespace, ClusterInfo.cluster, true);
+      statement.node.addDependency(namespaceManifest);
     }
 
-    return emrContainersK8sRoleManifest;
+    return statement;
   }
 
   /**
