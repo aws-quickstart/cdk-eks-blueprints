@@ -8,6 +8,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
+import * as semver from 'semver';
+
 /**
  * Configuration options for the add-on.
  */
@@ -71,7 +73,7 @@ const RELEASE = 'blueprints-addon-jupyterhub';
 const defaultProps: HelmAddOnProps = {
     name: JUPYTERHUB,
     namespace: JUPYTERHUB,
-    version: '1.2.0',
+    version: '2.0.0',
     chart: JUPYTERHUB,
     release: RELEASE,
     repository: 'https://jupyterhub.github.io/helm-chart/',
@@ -107,6 +109,12 @@ export class JupyterHubAddOn extends HelmAddOn {
         const ns = createNamespace(this.options.namespace!, cluster, true, true);
         
         // User Environment setup
+        let cmd;
+        if (semver.lt(this.options.version!, '2.0.0')){
+            cmd = ["start-singleuser.sh"];
+        } else {
+            cmd = ["jupyterhub-singleuser","--allow-root"];
+        }
         const notebook = this.options.notebookStack || 'jupyter/base-notebook';
         setPath(values, "singleuser", {
             "image":{
@@ -116,8 +124,8 @@ export class JupyterHubAddOn extends HelmAddOn {
             "extraEnv": { "CHOWN_HOME": "yes" },
             "uid": 0,
             "fsGid": 0,
-            "cmd": "start-singleuser.sh"
-        })
+            "cmd": cmd
+        });
 
         // Persistent Storage Setup for EBS
         if (this.options.ebsConfig){
@@ -215,7 +223,7 @@ export class JupyterHubAddOn extends HelmAddOn {
                 vpc: clusterInfo.cluster.vpc,
                 securityGroupName: "EksBlueprintsJHubEFSSG",
             }
-        )
+        );
         jupyterHubSG.addIngressRule(
             ec2.Peer.ipv4(clusterVpcCidr),
             new ec2.Port({
@@ -224,7 +232,7 @@ export class JupyterHubAddOn extends HelmAddOn {
                 toPort: 2049,
                 fromPort: 2049,
             }),
-        )
+        );
 
         // Create the EFS File System
         const jupyterHubFileSystem = new efs.FileSystem(
