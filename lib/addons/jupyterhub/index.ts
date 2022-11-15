@@ -182,15 +182,15 @@ export class JupyterHubAddOn extends HelmAddOn {
                     "alb.ingress.kubernetes.io/target-type": "ip",
                 }
             );
-            setPath(values, "proxy.service.type", "NodePort");
+            setPath(values, "proxy.service", {"type" : "Nodeport"});
         } else {
-            setPath(values, "proxy.service.annotations",
-                {
+            setPath(values, "proxy.service", { 
+                "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
                     "service.beta.kubernetes.io/aws-load-balancer-scheme": "internet-facing",
                     "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type": "ip",
                 }
-            );
+            });
         }
 
         // Create Helm Chart
