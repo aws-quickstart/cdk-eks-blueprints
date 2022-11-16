@@ -1,16 +1,17 @@
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Stack } from "aws-cdk-lib";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 
 export class EmrEksAddOn implements ClusterAddOn {
-  deploy(clusterInfo: ClusterInfo): void {
+  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     
 
     /*
     * Create the service role used by EMR on EKS 
     */
-    new CfnServiceLinkedRole(cluster.stack, 'EmrServiceRole', {
+    const emrOnEksSlr = new CfnServiceLinkedRole(cluster.stack, 'EmrServiceRole', {
       awsServiceName: 'emr-containers.amazonaws.com',
     });
 
@@ -32,6 +33,8 @@ export class EmrEksAddOn implements ClusterAddOn {
         groups: ['']
       }
     );
+  
+    return Promise.resolve(emrOnEksSlr);
 
   }
 }
