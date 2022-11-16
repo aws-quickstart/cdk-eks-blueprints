@@ -23,7 +23,7 @@ const defaultProps = {
     namespace: 'external-dns',
     repository: 'https://charts.bitnami.com/bitnami',
     release: 'blueprints-addon-external-dns',
-    version: '6.9.0'
+    version: '6.11.3'
 };
 
 /**

@@ -7,8 +7,9 @@ This add-on is not automatically installed when you first create a cluster, it m
 For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html). please review the Amazon Managed Service for Prometheus supported regions [documentation page](https://docs.aws.amazon.com/prometheus/latest/userguide/what-is-Amazon-Managed-Service-Prometheus.html) for more information.
 
 ## Prerequisites
-- `cert-manager` Blueprints add-on.
 - `adot` EKS Blueprints add-on.
+- `kube-state-metrics` EKS Blueprints add-on.
+- `prometheus-node-explorter` EKS Blueprints add-on.
 
 ## Usage
 

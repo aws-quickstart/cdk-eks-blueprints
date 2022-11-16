@@ -5,6 +5,7 @@ import { ClusterInfo } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
+import { CfnOutput } from 'aws-cdk-lib';
 import * as md5 from 'ts-md5';
 import * as semver from 'semver';
 import * as assert from "assert";
@@ -59,6 +60,13 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     }
 
     /**
+     * If omitted, the feature is disabled and nodes will never expire.  
+     * If set to less time than it requires for a node to become ready, 
+     * the node may expire before any pods successfully start.
+     */
+    ttlSecondsUntilExpired?: number,
+
+    /**
      * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
      * Mutually exclusive with the consolidation parameter.
      */
@@ -80,7 +88,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.16.2',
+    version: '0.16.3',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -113,21 +121,23 @@ export class KarpenterAddOn extends HelmAddOn {
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || [];
         const amiFamily = this.options.amiFamily;
-        const version = this.options.version!;
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
-        const weight = this.options.weight;
+        const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
+        const weight = this.options.weight || null;
         
         // Weight only available with v0.16.0 and later
-        if (semver.lt(version, '0.16.0')){
-            assert(!weight, 'weight only supported on versions v0.16.0 and later.');
+        if (semver.lt(this.options.version!, '0.16.0')){
+            assert(!weight, 'The prop weight is only supported on versions v0.16.0 and later.');
         }
 
-        // Consolidation only available with v0.15.0 and later
         let consolidation;
-        if (semver.gte(version, '0.15.0')){
-            consolidation = this.options.consolidation; 
-            // You cannot set both consolidation and ttlSecondsAfterEmpty values
-            assert(( consolidation && !ttlSecondsAfterEmpty ) || ( !consolidation && ttlSecondsAfterEmpty ) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
+        // Consolidation only available with v0.15.0 and later
+        if (semver.lt(this.options.version!, '0.15.0')){
+            assert(!this.options.consolidation, 'The prop consolidation is only supported on versions v0.15.0 and later.');
+        } else {
+            consolidation = this.options.consolidation || { enabled: false }; 
+            // You cannot enable consolidation and ttlSecondsAfterEmpty values
+            assert( !(consolidation.enabled && ttlSecondsAfterEmpty) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
         }
 
         // Set up Node Role
@@ -148,6 +158,10 @@ export class KarpenterAddOn extends HelmAddOn {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
+        });
+        new CfnOutput(clusterInfo.cluster.stack, 'Karpenter Instance Profile name', { 
+            value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
+            description: "Karpenter add-on Instance Profile name" 
         });
 
         // Map Node Role to aws-auth
@@ -196,6 +210,7 @@ export class KarpenterAddOn extends HelmAddOn {
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
+                    ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                     ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
                     weight: weight,
                 },

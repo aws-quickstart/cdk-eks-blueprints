@@ -10,7 +10,9 @@ nav:
   - Overview: 'index.md'
   - Getting Started: 'getting-started.md'
   - Core Concepts: 'core-concepts.md'
-  - Teams: 'teams.md'
+  - Teams: 
+    - Teams: 'teams/teams.md'
+    - EMR on EKS Team: 'teams/emr-eks-team.md'
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
@@ -33,6 +35,7 @@ nav:
     - EFS CSI Driver: 'addons/efs-csi-driver.md'
     - External DNS: 'addons/external-dns.md'
     - External Secrets: 'addons/external-secrets.md'
+    - EMR on EKS: 'addons/emr-eks.md'
     - JupyterHub: 'addons/jupyterhub.md'
     - Karpenter: 'addons/karpenter.md'
     - Keptn: 'https://github.com/keptn-sandbox/keptn-eks-blueprints-addon'

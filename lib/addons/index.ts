@@ -20,10 +20,12 @@ export * from './falco';
 export * from './helm-addon';
 export * from './karpenter';
 export * from './kube-proxy';
+export * from './kube-state-metrics';
 export * from './metrics-server';
 export * from './nested-stack';
 export * from './nginx';
 export * from './opa-gatekeeper';
+export * from './prometheus-node-exporter';
 export * from './secrets-store';
 export * from './secrets-store/csi-driver-provider-aws-secrets';
 export * from './secrets-store/secret-provider';
@@ -40,6 +42,7 @@ export * from './istio-base';
 export * from './istio-control-plane';
 export * from './knative-operator';
 export * from './jupyterhub';
+export * from './emr-on-eks';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

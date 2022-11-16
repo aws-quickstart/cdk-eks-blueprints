@@ -38,20 +38,6 @@ describe('Unit tests for EKS Blueprint', () => {
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
     });
 
-    test("Stack creation fails due to conflicting add-ons", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn({version: '0.14.0'}), new blueprints.ClusterAutoScalerAddOn)
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-addons');
-        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
-    });
-
     test("Stack creation fails due to wrong node group type for NTH addon", () => {
         const app = new cdk.App();
 
@@ -410,7 +396,7 @@ test("Building blueprint with builder properly clones properties", () => {
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_21
+        version: KubernetesVersion.V1_23
     });
 
     expect(blueprint.props.addOns).toHaveLength(1);
@@ -432,7 +418,7 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_21
+        version: KubernetesVersion.V1_23
     });
 
     const stack = blueprint.build(app, "builder-version-test1");
