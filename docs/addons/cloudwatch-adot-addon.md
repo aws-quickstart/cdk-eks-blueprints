@@ -6,6 +6,8 @@ This add-on is not automatically installed when you first create a cluster, it m
 
 For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
+Note: Due to lack of helm chart support and lack of “serverside apply” in the current version of EKS CW add-on cannot be used together with AMP add-on. Check this [Github Issue](https://github.com/aws/aws-cdk/issues/20263#issuecomment-1252910571) for more information.
+
 ## Prerequisites
 - `cert-manager` Blueprints add-on.
 - `adot` EKS Blueprints add-on.
@@ -29,7 +31,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 2 : Overriding property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to visualize metrics in CloudWatch console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`. Mode `sidecar` is to support Fargate profile. You can pass required metrics including custom metrics and required pod labels of application pods emitting custom metrics to visualize using `metricsNameSelectors`, `podLabelRegex` as parameters as shown below.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -40,7 +42,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.CloudWatchAdotAddOn({
     deploymentMode: cloudWatchDeploymentMode.DEPLOYMENT,
     namespace: 'default',
-    name: 'adot-collector-cloudwatch'
+    name: 'adot-collector-cloudwatch',
+    metricsNameSelectors: ['apiserver_request_.*', 'container_memory_.*', 'container_threads', 'otelcol_process_.*'],
+    podLabelRegex: 'frontend|downstream(.*)' 
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -50,7 +54,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that CloudWatch add-on is installed properly, ensure that the required kubernetes resources are running in the cluster
+To validate whether CloudWatch add-on is installed properly, ensure that the required kubernetes resources are running in the cluster.
 
 ```bash
 kubectl get all -n default

@@ -295,7 +295,40 @@ spec:
             - action: drop
               regex: Pending|Succeeded|Failed|Completed
               source_labels:
-              - __meta_kubernetes_pod_phase              
+              - __meta_kubernetes_pod_phase   
+
+          - job_name: otel
+            kubernetes_sd_configs:
+              - role: pod
+            relabel_configs:
+              - action: replace
+                regex: ([^:]+)(?::\d+)?
+                replacement: 8077{1}:8888
+                source_labels: [__address__]
+                target_label: __address__
+              - action: replace
+                source_labels: [__meta_kubernetes_namespace]
+                target_label: kubernetes_pod_name
+              - action: replace
+                source_labels: [__meta_kubernetes_pod_name]
+                target_label: kubernetes_pod_name
+              - action: keep
+                source_labels: [__meta_kubernetes_pod_label_app]
+                regex: otel
+
+          - job_name: custom-metrics
+            kubernetes_sd_configs:
+              - role: pod
+            relabel_configs:
+              - action: replace
+                source_labels: [__meta_kubernetes_namespace]
+                target_label: kubernetes_pod_name
+              - action: replace
+                source_labels: [__meta_kubernetes_pod_name]
+                target_label: kubernetes_pod_name
+              - action: keep
+                source_labels: [__meta_kubernetes_pod_label_app]
+                regex: {{podLabelRegex}}           
                                                             
     processors:
       batch/metrics:
@@ -311,7 +344,7 @@ spec:
             operations:
               - action: add_label
                 new_label: EKS_Cluster
-                new_value: ${CLUSTER_NAME}
+                new_value: "{{clusterName}}"
               - action: update_label
                 label: kubernetes_pod_name
                 new_label: EKS_PodName
@@ -339,12 +372,9 @@ spec:
         dimension_rollup_option: NoDimensionRollup
         parse_json_encoded_attr_values: [Sources, kubernetes]
         metric_declarations:
-          - dimensions: [[EKS_Cluster, EKS_Namespace, EKS_PodName]]
-            metric_name_selectors:
-              - apiserver_request_.*
-              - container_memory_.*
-              - container_threads
-              - otelcol_process_.*
+          - dimensions: [[EKS_Cluster], [EKS_Namespace], [EKS_PodName]]
+            metric_name_selectors: {{metricsNameSelectors}}
+
     service:
       pipelines:
         metrics:

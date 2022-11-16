@@ -51,7 +51,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn(),
             new blueprints.addons.XrayAdotAddOn(),
-            new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -71,6 +71,12 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.KarpenterAddOn({
+                requirements: [
+                    { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+                    { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+                ],
                 subnetTags: {
                     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
                 },
@@ -82,6 +88,8 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
+                consolidation: { enabled: true },
+                weight: 20,
             }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
@@ -92,13 +100,21 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
-            new blueprints.addons.AWSPrivateCAIssuerAddon()
+            new blueprints.addons.AWSPrivateCAIssuerAddon(),
+            new blueprints.addons.JupyterHubAddOn({
+                ebsConfig: {
+                    storageClass: "gp2",
+                    capacity: "4Gi",
+                },
+                enableIngress: false,
+            }),
         ];
 
         // Instantiated to for helm version check.
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
+        new blueprints.ExternalsSecretsAddOn();
         new blueprints.OpaGatekeeperAddOn();
 
         const blueprintID = 'blueprint-construct-dev';
@@ -114,7 +130,7 @@ export default class BlueprintConstruct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_NAT }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
                     id: "mng2-customami",

@@ -4,7 +4,7 @@ Amazon Managed Service for Prometheus is a Prometheus-compatible monitoring and 
 
 This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to setup AMP for remote write of metrics.
 
-For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
+For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html). please review the Amazon Managed Service for Prometheus supported regions [documentation page](https://docs.aws.amazon.com/prometheus/latest/userguide/what-is-Amazon-Managed-Service-Prometheus.html) for more information.
 
 ## Prerequisites
 - `cert-manager` Blueprints add-on.
@@ -80,7 +80,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 4 : Overriding property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `daemonset` as the mode to remote write metrics to AMP workspace. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
+Pattern # 4 : Overriding property values for different deployment Modes. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `daemonset` as the mode to remote write metrics to AMP workspace. Deployment modes can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';

@@ -6,27 +6,29 @@ import { conflictsWith, createNamespace, createServiceAccount, dependable, setPa
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
 import * as md5 from 'ts-md5';
+import * as semver from 'semver';
+import * as assert from "assert";
+
 
 /**
  * Configuration options for the add-on
  */
 interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
-     * Specs for a Provisioner (Optional) - If not provided, the add-on will
+     * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
      * deploy a Provisioner with default values.
      */
-    provisionerSpecs?: {
-        'node.kubernetes.io/instance-type'?: string[],
-        'topology.kubernetes.io/zone'?: string[],
-        'kubernetes.io/arch'?: string[],
-        'karpenter.sh/capacity-type'?: string[],
-    }
+    requirements?: {
+        key: string,
+        op: 'In' | 'NotIn' ,
+        vals: string[],
+    }[]
 
-    taints?: [{
+    taints?: {
         key: string,
         value: string,
         effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    }]
+    }[]
 
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
@@ -46,6 +48,27 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
      */
     amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
+
+    /**
+     * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
+     * Mutually exclusive with the ttlSecondsAfterEmpty parameter.
+     * Only applicable for v0.15.0 or later.
+     */
+    consolidation?: {
+        enabled: boolean,
+    }
+
+    /**
+     * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
+     * Mutually exclusive with the consolidation parameter.
+     */
+    ttlSecondsAfterEmpty?: number,
+
+    /**
+     * Priority given to the provisioner when the scheduler considers which provisioner
+     * to select. Higher weights indicate higher priority when comparing provisioners.
+     */
+    weight?: number
 }
 
 const KARPENTER = 'karpenter';
@@ -57,7 +80,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: '0.14.0',
+    version: '0.16.2',
     chart: KARPENTER,
     release: RELEASE,
     repository: 'https://charts.karpenter.sh',
@@ -85,11 +108,27 @@ export class KarpenterAddOn extends HelmAddOn {
         const region = clusterInfo.cluster.stack.region;
         let values = this.options.values ?? {};
 
-        const provisionerSpecs = this.options.provisionerSpecs || {};
+        const requirements = this.options.requirements || [];
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || [];
         const amiFamily = this.options.amiFamily;
+        const version = this.options.version!;
+        const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
+        const weight = this.options.weight;
+        
+        // Weight only available with v0.16.0 and later
+        if (semver.lt(version, '0.16.0')){
+            assert(!weight, 'weight only supported on versions v0.16.0 and later.');
+        }
+
+        // Consolidation only available with v0.15.0 and later
+        let consolidation;
+        if (semver.gte(version, '0.15.0')){
+            consolidation = this.options.consolidation; 
+            // You cannot set both consolidation and ttlSecondsAfterEmpty values
+            assert(( consolidation && !ttlSecondsAfterEmpty ) || ( !consolidation && ttlSecondsAfterEmpty ) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
+        }
 
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
@@ -149,14 +188,16 @@ export class KarpenterAddOn extends HelmAddOn {
                 kind: 'Provisioner',
                 metadata: { name: 'default' },
                 spec: {
-                    requirements: this.convertToSpec(provisionerSpecs),
+                    consolidation: consolidation,
+                    requirements: this.convert(requirements),
                     taints: taints,
                     provider: {
                         amiFamily: amiFamily,
                         subnetSelector: subnetTags,
                         securityGroupSelector: sgTags,
                     },
-                    ttlSecondsAfterEmpty: 30,
+                    ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
+                    weight: weight,
                 },
             });
             provisioner.node.addDependency(karpenterChart);
@@ -166,22 +207,24 @@ export class KarpenterAddOn extends HelmAddOn {
     }
 
     /**
-     * Helper function to convert a key-pair values of provisioner spec configurations
-     * To appropriate json format for addManifest function
-     * @param specs
+     * Helper function to convert a key-pair values (with an operator) 
+     * of spec configurations to appropriate json format for addManifest function
+     * @param reqs
      * @returns
      * */
-    protected convertToSpec(specs: { [key: string]: string[]; }): any[] {
-        const newSpecs = [];
-        for (const key in specs){
-            const value = specs[key];
+    protected convert(reqs: {key: string, op: string, vals: string[]}[]): any[] {
+        const newReqs = [];
+        for (let req of reqs){
+            const key = req['key'];
+            const op = req['op'];
+            const val = req['vals'];
             const requirement = {
                 "key": key,
-                "operator": "In",
-                "values": value
+                "operator": op,
+                "values": val
             };
-            newSpecs.push(requirement);
+            newReqs.push(requirement);
         }
-        return newSpecs;
+        return newReqs;
     }
 }

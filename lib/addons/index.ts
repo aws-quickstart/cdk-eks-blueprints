@@ -15,6 +15,7 @@ export * from './cluster-autoscaler';
 export * from './container-insights';
 export * from './coredns';
 export * from './external-dns';
+export * from './external-secrets';
 export * from './falco';
 export * from './helm-addon';
 export * from './karpenter';
@@ -38,6 +39,7 @@ export * from './efs-csi-driver';
 export * from './istio-base';
 export * from './istio-control-plane';
 export * from './knative-operator';
+export * from './jupyterhub';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

@@ -44,7 +44,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
+            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn({version: '0.14.0'}), new blueprints.ClusterAutoScalerAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {

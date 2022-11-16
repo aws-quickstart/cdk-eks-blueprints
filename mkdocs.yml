@@ -32,6 +32,8 @@ nav:
     - EBS CSI Driver: 'addons/ebs-csi-driver.md'
     - EFS CSI Driver: 'addons/efs-csi-driver.md'
     - External DNS: 'addons/external-dns.md'
+    - External Secrets: 'addons/external-secrets.md'
+    - JupyterHub: 'addons/jupyterhub.md'
     - Karpenter: 'addons/karpenter.md'
     - Keptn: 'https://github.com/keptn-sandbox/keptn-eks-blueprints-addon'
     - Kube Proxy: 'addons/kube-proxy.md'

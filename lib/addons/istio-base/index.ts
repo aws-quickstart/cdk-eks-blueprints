@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
 import merge from "ts-deepmerge";
+import { Duration } from "aws-cdk-lib";
 
 /**
  * Configuration options for the add-on.
@@ -54,7 +55,7 @@ const defaultProps = {
     release: "istio-base",
     namespace: "istio-system",
     chart: "base",
-    version: "1.14.3",
+    version: "1.15.0",
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
@@ -72,7 +73,7 @@ export class IstioBaseAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
 
         // Istio Namespace
-        createNamespace('istio-system', cluster);
+        const namespace = createNamespace('istio-system', cluster);
 
         let values: Values = {
             global: {
@@ -88,7 +89,9 @@ export class IstioBaseAddOn extends HelmAddOn {
         };
 
         values = merge(values, this.props.values ?? {});
-        const chart = this.addHelmChart(clusterInfo, values);
+        const chart = this.addHelmChart(clusterInfo, values, undefined, true, Duration.seconds(60));
+        chart.node.addDependency(namespace);
+
         return Promise.resolve(chart);
     }
 }
