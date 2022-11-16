@@ -59,6 +59,7 @@ export interface EmrEksTeamProps extends TeamProps {
  *The class will set the necessary k8s RBAC needed by EMR on EKS as defined in the AWS documentation 
  * https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-cluster-access.html
  * The class constructor take a the EMR on EKS Team definition
+ * The EmrEksTeam will `throw` an error if the EMR on EKS AddOn is not added
  */
 
 export class EmrEksTeam extends ApplicationTeam {
@@ -75,6 +76,12 @@ export class EmrEksTeam extends ApplicationTeam {
 
   setup(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;
+
+    const emrOnEksAddOn = clusterInfo.getProvisionedAddOn('EmrEksAddOn');
+
+    if (emrOnEksAddOn === undefined) {
+      throw new Error("EmrEksAddOn must be deployed before creating EMR on EKS team");
+    }
 
     const emrVcPrerequisit = this.setEmrContainersForNamespace(clusterInfo, this.emrTeam.virtualClusterNamespace, this.emrTeam.createNamespace);
 
@@ -107,6 +114,9 @@ export class EmrEksTeam extends ApplicationTeam {
     });
 
     teamVC.node.addDependency(emrVcPrerequisit);
+    teamVC.node.addDependency(emrOnEksAddOn);
+    //Force dependency between the EKS cluster and EMR on EKS Virtual cluster
+    teamVC.node.addDependency(clusterInfo.cluster);
 
     new CfnOutput(cluster.stack, `${this.emrTeam.virtualClusterName}-virtual cluster-id`, {
       value: teamVC.attrId
