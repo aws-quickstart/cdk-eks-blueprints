@@ -1,7 +1,8 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {loadYaml, readYamlDocument} from "../../utils";
+import {dependable, loadYaml, readYamlDocument} from "../../utils";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { IstioBaseAddOn } from '../istio-base';
 
 /**
  * 
@@ -35,7 +36,7 @@ export class KNativeOperator implements ClusterAddOn {
     constructor(props?: KnativeOperatorProps) {
         this.knativeAddOnProps = { ...defaultProps, ...props };
     }
-
+    @dependable(IstioBaseAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {        
         const doc = readYamlDocument(__dirname + '/knative-operator.ytpl');
 
