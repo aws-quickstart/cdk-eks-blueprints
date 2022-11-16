@@ -1,9 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { HelmAddOn } from '../../lib';
+import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -111,6 +113,7 @@ export default class BlueprintConstruct {
                 },
                 enableIngress: false,
             }),
+            new blueprints.EmrEksAddOn()
         ];
 
         // Instantiated to for helm version check.
@@ -143,7 +146,7 @@ export default class BlueprintConstruct {
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': "ami-07bda4b61dc470985",
+                            'us-west-1': 'ami-07bda4b61dc470985',
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
@@ -153,10 +156,40 @@ export default class BlueprintConstruct {
             ]
         });
 
+        const executionRolePolicyStatement: PolicyStatement [] = [
+            new PolicyStatement({
+              resources: ['*'],
+              actions: ['s3:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],   
+              actions: ['glue:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],
+              actions: [
+                'logs:*',
+              ],
+            }),
+          ];
+      
+      const dataTeam: EmrEksTeamProps = {
+              name:'dataTeam',
+              virtualClusterName: 'batchJob',
+              virtualClusterNamespace: 'batchjob',
+              createNamespace: true,
+              executionRoles: [
+                  {
+                      executionRoleIamPolicyStatement: executionRolePolicyStatement,
+                      executionRoleName: 'myBlueprintExecRole'
+                  }
+              ]
+          };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .teams(...teams)
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
