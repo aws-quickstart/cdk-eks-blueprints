@@ -1,6 +1,6 @@
 import { Cluster } from "aws-cdk-lib/aws-eks";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
-import { Aws, CfnJson, CfnOutput, Tag, Tags } from "aws-cdk-lib";
+import { Aws, CfnJson, CfnOutput } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';
 import * as simplebase from 'simple-base';
 import { CfnVirtualCluster } from "aws-cdk-lib/aws-emrcontainers";
