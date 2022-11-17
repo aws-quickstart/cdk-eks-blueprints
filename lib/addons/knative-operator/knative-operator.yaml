@@ -16,7 +16,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: operator-webhook-certs
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     app.kubernetes.io/component: webhook
     operator.knative.dev/release: "v1.8.1"
@@ -43,7 +43,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: operator-webhook
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/component: operator-webhook
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/version: "1.8.1"
     app.kubernetes.io/name: knative-operator
   name: operator-webhook
-  namespace: "{{namespace}}"
+  namespace: default
 spec:
   ports:
     # Define metrics and profiling for them to be accessible within service meshes.
@@ -1606,7 +1606,7 @@ spec:
       clientConfig:
         service:
           name: operator-webhook
-          namespace: "{{namespace}}"
+          namespace: default
           path: /resource-conversion
 
 ---
@@ -3100,7 +3100,7 @@ spec:
       clientConfig:
         service:
           name: operator-webhook
-          namespace: "{{namespace}}"
+          namespace: default
           path: /resource-conversion
 
 ---
@@ -3772,7 +3772,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: knative-operator
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/version: "1.8.1"
@@ -3809,7 +3809,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 ---
 # TODO: Consider restriction of non-aggregated role to knativeeventing namespaces.
 apiVersion: rbac.authorization.k8s.io/v1
@@ -3827,7 +3827,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 
 ---
 # Copyright 2022 The Knative Authors
@@ -3847,7 +3847,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: "{{namespace}}"
+  namespace: default
   name: knative-operator-webhook
   labels:
     eventing.knative.dev/release: devel
@@ -3962,7 +3962,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: operator-webhook
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/version: "1.8.1"
@@ -3986,7 +3986,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  namespace: "{{namespace}}"
+  namespace: default
   name: operator-webhook
   labels:
     eventing.knative.dev/release: devel
@@ -3995,7 +3995,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: operator-webhook
-    namespace: "{{namespace}}"
+    namespace: default
 roleRef:
   kind: Role
   name: knative-operator-webhook
@@ -4016,7 +4016,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: operator-webhook
-    namespace: "{{namespace}}"
+    namespace: default
 
 ---
 # Copyright 2020 The Knative Authors
@@ -4048,7 +4048,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -4065,7 +4065,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -4082,7 +4082,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -4099,7 +4099,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: knative-operator
-    namespace: "{{namespace}}"
+    namespace: default
 
 ---
 # Copyright 2019 The Knative Authors
@@ -4120,7 +4120,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-logging
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/version: "1.8.1"
@@ -4184,7 +4184,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-observability
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/version: "1.8.1"
@@ -4288,7 +4288,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: knative-operator
-  namespace: "{{namespace}}"
+  namespace: default
   labels:
     operator.knative.dev/release: "v1.8.1"
     app.kubernetes.io/name: knative-operator

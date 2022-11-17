@@ -1,8 +1,7 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {dependable, loadYaml, readYamlDocument} from "../../utils";
+import {loadYaml, readYamlDocument} from "../../utils";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
-import { IstioBaseAddOn } from '../istio-base';
 
 /**
  * 
@@ -23,7 +22,8 @@ export interface KnativeOperatorProps {
 
 const defaultProps = {
     name: 'knative-operator',
-    namespace: 'default'
+    namespace: 'default',
+    version: 'v1.8',
 };
 
 /**
@@ -36,26 +36,28 @@ export class KNativeOperator implements ClusterAddOn {
     constructor(props?: KnativeOperatorProps) {
         this.knativeAddOnProps = { ...defaultProps, ...props };
     }
-    @dependable(IstioBaseAddOn.name)
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> | void {        
-        const doc = readYamlDocument(__dirname + '/knative-operator.ytpl');
+
+    // TODO: Find out why @dependable isn't working
+    // @dependable('IstioBaseAddOn')
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+
+        const doc = readYamlDocument(__dirname + '/knative-operator.yaml');
 
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
-            namespace: this.knativeAddOnProps.namespace,
-            name: this.knativeAddOnProps.name,
+            namespace: 'default',
+            name: 'knative-operator',
+            version: 'v1.8'
         };
-
-        const manifestDeployment: ManifestDeployment = {
-            name: this.knativeAddOnProps.name!,
-            namespace: this.knativeAddOnProps.namespace!,
-            manifest,
-            values
+        const knativeStatement: ManifestDeployment = {
+            name: 'knative-operator',
+            namespace: 'default',
+            manifest: manifest,
+            values: values
         };
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
-        const statement = kubectlProvider.addManifest(manifestDeployment);
-        
+        const statement = kubectlProvider.addManifest(knativeStatement);
         return Promise.resolve(statement);
     }
 
