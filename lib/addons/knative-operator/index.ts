@@ -23,7 +23,7 @@ export interface KnativeOperatorProps {
 const defaultProps = {
     name: 'knative-operator',
     namespace: 'default',
-    version: 'v1.8',
+    version: 'v1.8.1',
 };
 
 /**
@@ -41,6 +41,7 @@ export class KNativeOperator implements ClusterAddOn {
     // @dependable('IstioBaseAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
+        // Load External YAML: https://github.com/knative/operator/releases/download/knative-v1.8.1/operator.yaml
         const doc = readYamlDocument(__dirname + '/knative-operator.yaml');
 
         const manifest = doc.split("---").map(e => loadYaml(e));
