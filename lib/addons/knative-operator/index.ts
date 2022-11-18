@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {loadYaml, readYamlDocument} from "../../utils";
+import {dependable, loadExternalYaml, loadYaml, readYamlDocument} from "../../utils";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
@@ -18,12 +18,25 @@ export interface KnativeOperatorProps {
      * @default knative-operator
      */
     name?: string;
+
+    /**
+     * The version of the KNative Operator to use
+     * @default v1.8.1
+     */
+    version?: string;
+
+    /**
+     * 
+     * @default 'https://github.com/knative/operator/releases/download/knative'
+     */
+    base_url?: string;
 }
 
 const defaultProps = {
     name: 'knative-operator',
     namespace: 'default',
     version: 'v1.8.1',
+    base_url: `https://github.com/knative/operator/releases/download/knative`
 };
 
 /**
@@ -38,22 +51,22 @@ export class KNativeOperator implements ClusterAddOn {
     }
 
     // TODO: Find out why @dependable isn't working
-    // @dependable('IstioBaseAddOn')
+    // @dependable('IstioControlPlaneAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         // Load External YAML: https://github.com/knative/operator/releases/download/knative-v1.8.1/operator.yaml
-        const doc = readYamlDocument(__dirname + '/knative-operator.yaml');
-
-        const manifest = doc.split("---").map(e => loadYaml(e));
+        const doc: string = loadExternalYaml(this.knativeAddOnProps.base_url + `-${this.knativeAddOnProps.version}/operator.yaml`);
+        // console.log(doc);
+        // const manifest = doc.split("---")
         const values: Values = {
-            namespace: 'default',
-            name: 'knative-operator',
-            version: 'v1.8'
+            namespace: this.knativeAddOnProps.namespace,
+            name: this.knativeAddOnProps.name,
+            version: this.knativeAddOnProps.version
         };
         const knativeStatement: ManifestDeployment = {
-            name: 'knative-operator',
-            namespace: 'default',
-            manifest: manifest,
+            name: this.knativeAddOnProps.name!,
+            namespace: this.knativeAddOnProps.namespace!,
+            manifest: doc,
             values: values
         };
 

@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { IstioBaseAddOn, KNativeOperator } from "../lib";
+import { IstioBaseAddOn, IstioControlPlaneAddOn, KNativeOperator } from "../lib";
 
 test("Generic cluster with kNative Eventing deployment", async () => {
     const app = new cdk.App();
@@ -9,6 +9,7 @@ test("Generic cluster with kNative Eventing deployment", async () => {
         .account('123456789').region('us-east-1')
         .addOns(
             new IstioBaseAddOn(),
+            new IstioControlPlaneAddOn(),
             new KNativeOperator(),
         )
         .buildAsync(app, 'knative-stack');
