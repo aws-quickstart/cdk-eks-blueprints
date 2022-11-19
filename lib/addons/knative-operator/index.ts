@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {dependable, loadExternalYaml, loadYaml, readYamlDocument} from "../../utils";
+import {loadExternalYaml} from "../../utils";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
