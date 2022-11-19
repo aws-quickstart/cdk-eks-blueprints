@@ -5,14 +5,16 @@ import { IstioBaseAddOn, IstioControlPlaneAddOn, KNativeOperator } from "../lib"
 test("Generic cluster with kNative Eventing deployment", async () => {
     const app = new cdk.App();
 
+    const addons = [
+        new IstioBaseAddOn(),
+        new IstioControlPlaneAddOn(),
+        new KNativeOperator(),
+    ];
+
     const blueprint = await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-east-1')
-        .addOns(
-            new IstioBaseAddOn(),
-            new IstioControlPlaneAddOn(),
-            new KNativeOperator(),
-        )
-        .buildAsync(app, 'knative-stack');
+        .addOns(...addons)
+        .build(app, 'knative-stack');
 
     expect(blueprint).toBeDefined();
 });
