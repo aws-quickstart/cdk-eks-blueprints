@@ -50,6 +50,14 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
         scope: string[],
         usernameKey: string,
     }
+    /**
+     * Configuration settings for LDAP authentication protocol
+     */
+    ldapConfig?:{
+        serverAddress: string,
+        lookupDN: boolean,
+        bindDnTemplate: string[],
+    }
 
     /**
      * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
