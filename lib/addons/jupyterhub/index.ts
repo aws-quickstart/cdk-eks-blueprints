@@ -58,6 +58,12 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
     enableIngress?: boolean,
 
     /**
+     * Ingress host - only if Ingress is enabled
+     * It is a list of available hosts to be routed upon request
+     */
+    ingressHosts?: string[],
+
+    /**
      * Notebook stack as defined using Docker Stacks for Jupyter here:
      * https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
      */
@@ -156,22 +162,45 @@ export class JupyterHubAddOn extends HelmAddOn {
 
         // OpenID Connect authentication setup
         if (this.options.oidcConfig){
-            setPath(values, "hub.config.GenericOAuthenticator", {
-                "client_id": this.options.oidcConfig.clientId,
-                "client_secret": this.options.oidcConfig.clientSecret,
-                "oauth_callback_url": this.options.oidcConfig.callbackUrl,
-                "authorize_url": this.options.oidcConfig.authUrl,
-                "token_url": this.options.oidcConfig.tokenUrl,
-                "userdata_url": this.options.oidcConfig.userDataUrl,
-                scope:  this.options.oidcConfig.scope,
-                username_key:  this.options.oidcConfig.usernameKey,
+            setPath(values, "hub.config", {
+                "JupyterHub": { "authenticator_class": "generic-oauth" }, 
+                "GenericOAuthenticator": {
+                    "client_id": this.options.oidcConfig.clientId,
+                    "client_secret": this.options.oidcConfig.clientSecret,
+                    "oauth_callback_url": this.options.oidcConfig.callbackUrl,
+                    "authorize_url": this.options.oidcConfig.authUrl,
+                    "token_url": this.options.oidcConfig.tokenUrl,
+                    "userdata_url": this.options.oidcConfig.userDataUrl,
+                    scope:  this.options.oidcConfig.scope,
+                    username_key:  this.options.oidcConfig.usernameKey,
+                }
             });
-            setPath(values, "hub.config.JupyterHub.authenticator_class", "generic-oauth");
+        }
+
+        // LDAP authentication step
+        if (this.options.ldapConfig){
+            if (!this.options.ldapConfig.lookupDN){
+                assert(this.options.ldapConfig.bindDnTemplate.length > 0, "If the lookup DN flag is false, the DN template must be non-empty.");
+            }
+            
+            setPath(values, "hub.config", {
+                "JupyterHub": { "authenticator_class": "ldapauthenticator.LDAPAuthenticator" },
+                "LDAPAuthenticator": {
+                    "server_address": this.options.ldapConfig.serverAddress,
+                    "bind_dn_template": [],
+                    "lookup_dn": true,
+                    "user_search_base": "OU=corp,dc=blueprints,dc=com",
+                    "user_attribute": "sAMAccountName",
+                    "lookup_dn_user_dn_attribute":"CN",
+                    "lookup_dn_search_filter": "({login_attr}={login})"
+                }
+            })
         }
 
         // Ingress instead of LoadBalancer service to expose the proxy - leverages AWS ALB
         // If not, then it will leverage AWS NLB
         const enableIngress = this.options.enableIngress || false;
+        const ingressHosts = this.options.ingressHosts || [];
         setPath(values, "ingress.enabled", enableIngress);
 
         if (enableIngress){
@@ -182,8 +211,10 @@ export class JupyterHubAddOn extends HelmAddOn {
                     "alb.ingress.kubernetes.io/target-type": "ip",
                 }
             );
-            setPath(values, "proxy.service", {"type" : "Nodeport"});
+            setPath(values, "ingress.hosts", this.options.ingressHosts);
+            setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
+            assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             setPath(values, "proxy.service", { 
                 "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
