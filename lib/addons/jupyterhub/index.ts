@@ -50,14 +50,6 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
         scope: string[],
         usernameKey: string,
     }
-    /**
-     * Configuration settings for LDAP authentication protocol
-     */
-    ldapConfig?:{
-        serverAddress: string,
-        lookupDN: boolean,
-        bindDnTemplate: string[],
-    }
 
     /**
      * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
@@ -183,26 +175,6 @@ export class JupyterHubAddOn extends HelmAddOn {
                     username_key:  this.options.oidcConfig.usernameKey,
                 }
             });
-        }
-
-        // LDAP authentication step
-        if (this.options.ldapConfig){
-            if (!this.options.ldapConfig.lookupDN){
-                assert(this.options.ldapConfig.bindDnTemplate.length > 0, "If the lookup DN flag is false, the DN template must be non-empty.");
-            }
-            
-            setPath(values, "hub.config", {
-                "JupyterHub": { "authenticator_class": "ldapauthenticator.LDAPAuthenticator" },
-                "LDAPAuthenticator": {
-                    "server_address": this.options.ldapConfig.serverAddress,
-                    "bind_dn_template": [],
-                    "lookup_dn": true,
-                    "user_search_base": "OU=corp,dc=blueprints,dc=com",
-                    "user_attribute": "sAMAccountName",
-                    "lookup_dn_user_dn_attribute":"CN",
-                    "lookup_dn_search_filter": "({login_attr}={login})"
-                }
-            })
         }
 
         // Ingress instead of LoadBalancer service to expose the proxy - leverages AWS ALB
