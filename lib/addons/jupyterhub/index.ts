@@ -197,7 +197,7 @@ export class JupyterHubAddOn extends HelmAddOn {
             setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
-            assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled')
+            assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
             setPath(values, "proxy.service", { 
                 "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
