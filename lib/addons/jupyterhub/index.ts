@@ -64,6 +64,13 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
     ingressHosts?: string[],
 
     /**
+     * Ingress annotations - only apply if Ingress is enabled, otherwise throws an error
+     */
+    ingressAnnotations?: {
+        [key: string]: string
+    }
+
+    /**
      * Notebook stack as defined using Docker Stacks for Jupyter here:
      * https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
      */
@@ -181,20 +188,16 @@ export class JupyterHubAddOn extends HelmAddOn {
         // If not, then it will leverage AWS NLB
         const enableIngress = this.options.enableIngress || false;
         const ingressHosts = this.options.ingressHosts || [];
+        const ingressAnnotations = this.options.ingressAnnotations;
         setPath(values, "ingress.enabled", enableIngress);
 
         if (enableIngress){
-            setPath(values, "ingress.annotations", 
-                {
-                    "kubernetes.io/ingress.class": "alb",
-                    "alb.ingress.kubernetes.io/scheme": "internet-facing",
-                    "alb.ingress.kubernetes.io/target-type": "ip",
-                }
-            );
-            setPath(values, "ingress.hosts", this.options.ingressHosts);
+            setPath(values, "ingress.annotations", ingressAnnotations);
+            setPath(values, "ingress.hosts", ingressHosts);
             setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
+            assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled')
             setPath(values, "proxy.service", { 
                 "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",

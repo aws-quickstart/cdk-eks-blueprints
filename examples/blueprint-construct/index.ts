@@ -20,7 +20,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.validateHelmVersions = false;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -110,7 +110,12 @@ export default class BlueprintConstruct {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '10Gi',
                 },
-                enableIngress: false,
+                enableIngress: true,
+                ingressAnnotations: {
+                    "kubernetes.io/ingress.class": "alb",
+                    "alb.ingress.kubernetes.io/scheme": "internet-facing",
+                    "alb.ingress.kubernetes.io/target-type": "ip",
+                },
                 notebookStack: 'jupyter/datascience-notebook',
             }),
         ];
