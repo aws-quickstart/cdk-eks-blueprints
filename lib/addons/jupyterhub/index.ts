@@ -114,9 +114,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         assert(this.options.ebsConfig || this.options.efsConfig, "You need to provide a persistent storage option.");
         
         // But you can only provide one option for persistent storage
-        assert((!this.options.ebsConfig && this.options.efsConfig) || (this.options.ebsConfig && !this.options.efsConfig), 
-            "You cannot provide more than one persistent storage option."
-        );
+        assert(!(this.options.ebsConfig && this.options.efsConfig), "You cannot provide more than one persistent storage option.");
 
         // Create Namespace
         const ns = createNamespace(this.options.namespace!, cluster, true, true);

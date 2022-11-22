@@ -20,7 +20,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = false;
+        HelmAddOn.validateHelmVersions = true;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
