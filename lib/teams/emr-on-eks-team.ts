@@ -49,7 +49,7 @@ export interface EmrEksTeamProps extends TeamProps {
   /**
    * List of execution role to associated with the VC namespace {@link ExecutionRoleDefinition}
    */
-  executionRoles: ExecutionRoleDefinition[]
+  executionRoles: ExecutionRoleDefinition[],
   /**
    * Tags to apply to EMR on EKS Virtual Cluster
    */
@@ -62,8 +62,8 @@ export interface EmrEksTeamProps extends TeamProps {
  *It can either create a namespace or use an existing one
  *The class will set the necessary k8s RBAC needed by EMR on EKS as defined in the AWS documentation 
  * https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-cluster-access.html
- * The class constructor take an EMR on EKS Team definition and need the EMR on EKS AddOn added
- * The EmrEksTeam will `throw` an error if the EMR on EKS AddOn is not added
+ * class constructor takes EMR on EKS team definition as a parameter. Pre:requisite: EMS on EKS AddOn is part of the blueprint.
+ * The EmrEksTeam will `throw` an error if the EMR on EKS AddOn is not part of the blueprint.
  */
 
 export class EmrEksTeam extends ApplicationTeam {
