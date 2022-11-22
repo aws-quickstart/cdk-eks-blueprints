@@ -17,17 +17,17 @@ export interface ExecutionRoleDefinition {
   /**
    * The name of the IAM role to create
    */
-  executionRoleName: string,
+  executionRoleName: string;
   /**
     * The IAM policy to use with IAM role if it already exists
     * Can be initialized for example by `fromPolicyName` in Policy class
     */
-  excutionRoleIamPolicy?: IManagedPolicy,
+  excutionRoleIamPolicy?: IManagedPolicy;
   /**
     * Takes an array of IAM Policy Statement, you should pass this 
     * if you want the Team to create the policy along the IAM role 
     */
-  executionRoleIamPolicyStatement?: PolicyStatement[],
+  executionRoleIamPolicyStatement?: PolicyStatement[];
 }
 
 /**
@@ -37,23 +37,23 @@ export interface EmrEksTeamProps extends TeamProps {
   /*
   * The namespace of where the virtual cluster will be created
   */
-  virtualClusterNamespace: string,
+  virtualClusterNamespace: string;
   /**
    * To define if the namespace that team will use need to be created
    */
-  createNamespace: boolean,
+  createNamespace: boolean;
   /*
   * The name of the virtual cluster the team will use
   */
-  virtualClusterName: string,
+  virtualClusterName: string;
   /**
    * List of execution role to associated with the VC namespace {@link ExecutionRoleDefinition}
    */
-  executionRoles: ExecutionRoleDefinition[],
+  executionRoles: ExecutionRoleDefinition[];
   /**
    * Tags to apply to EMR on EKS Virtual Cluster
    */
-   virtualClusterTags?: CfnTag[]
+   virtualClusterTags?: CfnTag[];
 }
 
 /*
@@ -62,7 +62,7 @@ export interface EmrEksTeamProps extends TeamProps {
  *It can either create a namespace or use an existing one
  *The class will set the necessary k8s RBAC needed by EMR on EKS as defined in the AWS documentation 
  * https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-cluster-access.html
- * class constructor takes EMR on EKS team definition as a parameter. Pre:requisite: EMS on EKS AddOn is part of the blueprint.
+ * class constructor takes EMR on EKS team definition as a parameter. Pre:requisite: EMR on EKS AddOn is part of the blueprint.
  * The EmrEksTeam will `throw` an error if the EMR on EKS AddOn is not part of the blueprint.
  */
 
