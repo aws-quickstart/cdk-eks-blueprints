@@ -74,6 +74,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.AckAddOn(),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
