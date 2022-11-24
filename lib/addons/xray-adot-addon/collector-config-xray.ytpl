@@ -6,6 +6,10 @@ metadata:
 spec:
   mode: "{{deploymentMode}}"
   serviceAccount: adot-collector
+  ports:
+  - name: awsproxy
+    targetPort: 2000
+    port: 2000
   config: |
     receivers:
       otlp:
@@ -20,7 +24,11 @@ spec:
       awsxray:
         region: "{{awsRegion}}"
 
+    extensions:
+      awsproxy:
+
     service:
+      extensions: [awsproxy]
       pipelines:
         traces:
           receivers: [otlp]
