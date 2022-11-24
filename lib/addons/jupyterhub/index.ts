@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, dependable, setPath } from '../../utils';
+import { createNamespace, setPath } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
 import * as cdk from 'aws-cdk-lib';
@@ -105,7 +105,6 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
 
-    @dependable('EbsCsiDriverAddOn' || 'EfsCsiDriverAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
@@ -140,29 +139,12 @@ export class JupyterHubAddOn extends HelmAddOn {
 
         // Persistent Storage Setup for EBS
         if (this.options.ebsConfig){
-            // Create persistent storage with EBS
-            const storageClass = this.options.ebsConfig.storageClass;
-            const ebsCapacity = this.options.ebsConfig.capacity;
-            setPath(values, "singleuser.storage", {
-                "dynamic": { "storageClass": storageClass },
-                "capacity": ebsCapacity
-            });
+            this.addEbsStorage(clusterInfo, values, this.options.ebsConfig);
         } 
         
         // Persistent Storage Setup for EFS
         if (this.options.efsConfig) {
-            const pvcName = this.options.efsConfig.pvcName;
-            const removalPolicy = this.options.efsConfig.removalPolicy;
-            const efsCapacity = this.options.efsConfig.capacity;
-
-            this.setupEFS(clusterInfo, this.options.namespace!, pvcName, efsCapacity, removalPolicy);
-            setPath(values, "singleuser.storage", {
-                "type": "static",
-                "static": {
-                    "pvcName": `${pvcName}`,
-                    "subPath": "home/{username}"
-                }
-            });
+            this.addEfsStorage(clusterInfo, values, this.options.efsConfig);
         }
 
         // OpenID Connect authentication setup
@@ -212,7 +194,51 @@ export class JupyterHubAddOn extends HelmAddOn {
         jupyterHubChart.node.addDependency(ns);
         return Promise.resolve(jupyterHubChart);
     }
+    /**
+     * This is a helper function to create EBS persistent storage
+     * @param {ClusterInfo} clusterInfo - Cluster Info
+     * @param {string} values - Helm Chart Values
+     * @param {string} ebsConfig - EBS Configurations supplied by user
+     * @returns
+     */
+    protected addEbsStorage(clusterInfo: ClusterInfo, values: any, ebsConfig: any){
+        const ebsAddon = 'EbsCsiDriverAddOn';
+        const dep = clusterInfo.getScheduledAddOn(ebsAddon);
+        assert(dep, `Missing a dependency: ${ebsAddon}. Please add it to your list of addons.`); 
+        // Create persistent storage with EBS
+        const storageClass = ebsConfig.storageClass;
+        const ebsCapacity = ebsConfig.capacity;
+        setPath(values, "singleuser.storage", {
+            "dynamic": { "storageClass": storageClass },
+            "capacity": ebsCapacity
+        });
+    }
 
+    /**
+     * This is a helper function to create EFS persistent storage
+     * @param {ClusterInfo} clusterInfo - Cluster Info
+     * @param {string} values - Helm Chart Values
+     * @param {string} efsConfig - EFS Configurations supplied by user
+     * @returns
+     */
+    protected addEfsStorage(clusterInfo: ClusterInfo, values: any, efsConfig: any){
+        const efsAddon = 'EfsCsiDriverAddOn';
+        const dep = clusterInfo.getScheduledAddOn(efsAddon);
+        assert(dep, `Missing a dependency: ${efsAddon}. Please add it to your list of addons.`); 
+
+        const pvcName = efsConfig.pvcName;
+        const removalPolicy = efsConfig.removalPolicy;
+        const efsCapacity = efsConfig.capacity;
+
+        this.setupEFS(clusterInfo, this.options.namespace!, pvcName, efsCapacity, removalPolicy);
+        setPath(values, "singleuser.storage", {
+            "type": "static",
+            "static": {
+                "pvcName": `${pvcName}`,
+                "subPath": "home/{username}"
+            }
+        });
+    }
     /**
      * This is a helper function to use EFS as persistent storage
      * including necessary security group with ingress rule,
