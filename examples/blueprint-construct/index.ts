@@ -23,6 +23,7 @@ export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
         HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.failOnVersionValidation = false;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -74,7 +75,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
-            new blueprints.addons.AckAddOn(),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },

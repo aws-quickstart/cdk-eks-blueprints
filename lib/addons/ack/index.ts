@@ -68,7 +68,7 @@ export class AckAddOn extends HelmAddOn {
       name: this.options.name,
     });
 
-    sa.node.addDependency(this.options.namespace!);
+    sa.node.addDependency((this.options.namespace!));
     sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
 
     if( this.options.createNamespace == true){
