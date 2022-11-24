@@ -9,6 +9,8 @@ import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 import * as semver from 'semver';
+import { EbsCsiDriverAddOn } from "../ebs-csi-driver";
+import { EfsCsiDriverAddOn } from "../efs-csi-driver";
 
 /**
  * Configuration options for the add-on.
@@ -47,8 +49,8 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
         userDataUrl: string,
         clientId: string,
         clientSecret: string,
-        scope: string[],
-        usernameKey: string,
+        scope?: string[],
+        usernameKey?: string,
     }
 
     /**
@@ -158,8 +160,8 @@ export class JupyterHubAddOn extends HelmAddOn {
                     "authorize_url": this.options.oidcConfig.authUrl,
                     "token_url": this.options.oidcConfig.tokenUrl,
                     "userdata_url": this.options.oidcConfig.userDataUrl,
-                    scope:  this.options.oidcConfig.scope,
-                    username_key:  this.options.oidcConfig.usernameKey,
+                    "scope":  this.options.oidcConfig.scope,
+                    "username_key":  this.options.oidcConfig.usernameKey,
                 }
             });
         }
@@ -202,9 +204,8 @@ export class JupyterHubAddOn extends HelmAddOn {
      * @returns
      */
     protected addEbsStorage(clusterInfo: ClusterInfo, values: any, ebsConfig: any){
-        const ebsAddon = 'EbsCsiDriverAddOn';
-        const dep = clusterInfo.getScheduledAddOn(ebsAddon);
-        assert(dep, `Missing a dependency: ${ebsAddon}. Please add it to your list of addons.`); 
+        const dep = clusterInfo.getScheduledAddOn(EbsCsiDriverAddOn.name);
+        assert(dep, `Missing a dependency: ${EbsCsiDriverAddOn.name}. Please add it to your list of addons.`); 
         // Create persistent storage with EBS
         const storageClass = ebsConfig.storageClass;
         const ebsCapacity = ebsConfig.capacity;
@@ -222,9 +223,8 @@ export class JupyterHubAddOn extends HelmAddOn {
      * @returns
      */
     protected addEfsStorage(clusterInfo: ClusterInfo, values: any, efsConfig: any){
-        const efsAddon = 'EfsCsiDriverAddOn';
-        const dep = clusterInfo.getScheduledAddOn(efsAddon);
-        assert(dep, `Missing a dependency: ${efsAddon}. Please add it to your list of addons.`); 
+        const dep = clusterInfo.getScheduledAddOn(EfsCsiDriverAddOn.name);
+        assert(dep, `Missing a dependency: ${EfsCsiDriverAddOn.name}. Please add it to your list of addons.`); 
 
         const pvcName = efsConfig.pvcName;
         const removalPolicy = efsConfig.removalPolicy;
