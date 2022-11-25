@@ -3,7 +3,7 @@ import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided option for the Helm Chart
@@ -16,10 +16,25 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
      */
     name?: string;
     /**
+     * Name of the ack controller Chart
+     * @default iam-chart
+     */
+    chart?: string;
+    /**
      * Version of the ack controller
      * @default v0.0.13
      */
     version?: string;
+    /**
+     * Release of ack controller
+     * @default iam-chart
+     */
+    release?: string;
+    /**
+     * Repository of ack controller
+     * @default oci://public.ecr.aws/aws-controllers-k8s/iam-chart
+     */
+    repository?: string;
     /**
      * Managed IAM Policy of the ack controller
      * @default IAMFullAccess
@@ -60,30 +75,23 @@ export class AckAddOn extends HelmAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    let values: Values = populateValues(this.options);
+    let values: Values = populateValues(this.options,cluster.stack.region);
     values = merge(values, this.props.values ?? {});
 
-    const sa = cluster.addServiceAccount(`${this.options.name}-sa`, {
+    const sa = cluster.addServiceAccount(`${this.options.chart}-sa`, {
       namespace: this.options.namespace,
-      name: this.options.name,
+      name: this.options.chart,
     });
 
-    sa.node.addDependency((this.options.namespace!));
-    sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
-
-    if( this.options.createNamespace == true){
+    if(this.options.createNamespace == true){
       // Let CDK Create the Namespace
       const namespace = createNamespace(this.options.namespace! , cluster);
-      const chart = this.addHelmChart(clusterInfo, values);
-      chart.node.addDependency(namespace);
-      return Promise.resolve(chart);
-
-    } else {
-      //Namespace is already created
-      const chart = this.addHelmChart(clusterInfo, values);
-      return Promise.resolve(chart);
+      sa.node.addDependency(namespace);
     }
     
+    sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
+    const chart = this.addHelmChart(clusterInfo, values);
+    return Promise.resolve(chart);
   }
 }
 
@@ -91,7 +99,10 @@ export class AckAddOn extends HelmAddOn {
  * populateValues populates the appropriate values used to customize the Helm chart
  * @param helmOptions User provided values to customize the chart
  */
-function populateValues(helmOptions: AckAddOnProps): Values {
+function populateValues(helmOptions: AckAddOnProps, awsRegion: string): Values {
   const values = helmOptions.values ?? {};
+  setPath(values, "aws.region", awsRegion);
+  setPath(values,"serviceAccount.create", false);
+  setPath(values,"serviceAccount.name", helmOptions.chart);
   return values;
 }

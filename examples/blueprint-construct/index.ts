@@ -78,6 +78,16 @@ export default class BlueprintConstruct {
             new blueprints.addons.AckAddOn({
                 skipVersionValidation: true
             }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                name: "rds-chart",
+                chart: "rds-chart",
+                version: "v0.1.1",
+                release: "rds-chart",
+                repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
+                managedPolicyName: "AmazonRDSFullAccess",
+                createNamespace: false
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
