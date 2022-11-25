@@ -76,7 +76,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `name`: Name of the ACK Chart
-- `chart`: Chart Name of the ACK Chart.
+- `chart`: Chart Name of the ACK Chart
 - `version`: Version of the ACK Chart.
 - `release`: Release Name of the ACK Chart.
 - `repository`: Repository URI of the specific ACK Chart. 
