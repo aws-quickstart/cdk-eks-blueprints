@@ -110,6 +110,6 @@ replicaset.apps/rds-chart-5f6f5b8fc7   1         1         1       5m36s
 ## aws-controller-8s references
 
 Please refer to following aws-controller-8s references for more information :
-[ACK Workshop](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
-[ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/)
-[ACK GitHub](https://github.com/aws-controllers-k8s/community)
+- [ACK Workshop](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
+- [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/)
+- [ACK GitHub](https://github.com/aws-controllers-k8s/community)
