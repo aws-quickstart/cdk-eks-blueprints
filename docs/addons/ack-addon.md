@@ -78,7 +78,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `name`: Name of the ACK Chart
 - `chart`: Chart Name of the ACK Chart
 - `version`: Version of the ACK Chart
-- `release`: Release Name of the ACK Chart.
+- `release`: Release Name of the ACK Chart
 - `repository`: Repository URI of the specific ACK Chart. 
 - `managedPolicyName`: Policy Name required to be added to the IAM role for that ACK.
 - `createNamespace`: (boolean) This should be false if you are using for the second time.
