@@ -25,7 +25,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 2 : This installs AWS Controller for Kubernetes for RDS ACK controller. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller
+> Pattern # 2 : This installs AWS Controller for Kubernetes for RDS ACK controller. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
