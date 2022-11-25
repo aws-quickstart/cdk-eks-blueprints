@@ -86,7 +86,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Validation
 
-To validate that ack-controller-k8s is installed properly in the cluster, check if the namespace is created and pods are running in the `ack-system` ns.
+To validate that ack-controller-k8s is installed properly in the cluster, check if the namespace is created and pods are running in the `ack-system` namespace.
 
 Verify if the namespace is created correctly
 ```bash
