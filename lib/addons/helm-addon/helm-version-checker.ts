@@ -67,6 +67,9 @@ export interface CheckVersionResult {
  */
 export function listChartVersions(chart: HelmChartVersion): string[] {
     // TODO make function async and use async HTTP client to get results
+    if(chart.repository.startsWith("oci:")){
+        return []; // skip for now if OCI repo
+    }
     const helmRepository = loadExternalYaml(chart.repository + "/index.yaml");
     const versions: string[] = Object.values(helmRepository[0]['entries'][chart.chart])
         .map((e: any) => { return e['version']; });
