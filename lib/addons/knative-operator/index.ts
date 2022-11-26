@@ -55,31 +55,16 @@ export class KNativeOperator implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         // Load External YAML: https://github.com/knative/operator/releases/download/knative-v1.8.1/operator.yaml
-        const doc = loadExternalYaml(this.knativeAddOnProps.base_url + `-${this.knativeAddOnProps.version}/operator.yaml`);
-        // console.log(doc);
-        // const manifest = doc.split("---")
-        // const values: Values = {
-        //     namespace: this.knativeAddOnProps.namespace,
-        //     name: this.knativeAddOnProps.name,
-        //     version: this.knativeAddOnProps.version
-        // };
-        // const knativeStatement: ManifestDeployment = {
-        //     name: this.knativeAddOnProps.name!,
-        //     namespace: this.knativeAddOnProps.namespace!,
-        //     manifest: doc,
-        //     values: values
-        // };
+        const doc = loadExternalYaml(
+            this.knativeAddOnProps.base_url + `-${this.knativeAddOnProps.version}/operator.yaml`
+        ).slice(0, 26); // the last element is null
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
-        // TODO: This statement errors out because addManifest doesn't actually like multi-manifest files
-        /*
-            this is also possibly an upstream issue where aws-cdk-lib/aws-eks/lib/k8s-manifest.js:36:79
-            does not accept an array of K8s Manifests. It uses for (const res OF manifest) instead of IN manifest
-            Will try to resolve by adding each manifest separately
-        */
-        const all_but_last = doc.slice(0, -1);
-        all_but_last.forEach((e: ManifestDeployment) => kubectlProvider.addManifest(e));  // Hacky way of adding each manifest manually until the last one
-        const statement = kubectlProvider.addManifest(doc.slice(-1)[0]);         // Then resolve on the last statement signifying, we're done adding
+
+        const statement = kubectlProvider.addManifest(
+            { manifest: doc, values: {}, name: 'knative-operator', namespace: 'default' }
+        );
+
         return Promise.resolve(statement);
     }
 }
