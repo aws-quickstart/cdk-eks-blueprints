@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
-import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import {loadExternalYaml} from "../../utils";
-import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { ClusterAddOn, ClusterInfo } from "../../spi";
+import {dependable, loadExternalYaml} from "../../utils";
+import { KubectlProvider } from "../helm-addon/kubectl-provider";
 
 /**
  * 
@@ -51,7 +51,7 @@ export class KNativeOperator implements ClusterAddOn {
     }
 
     // TODO: Find out why @dependable isn't working
-    // @dependable('IstioControlPlaneAddOn')
+    @dependable('IstioControlPlaneAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         // Load External YAML: https://github.com/knative/operator/releases/download/knative-v1.8.1/operator.yaml
