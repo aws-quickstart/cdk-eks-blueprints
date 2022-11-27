@@ -1,7 +1,8 @@
 import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, setPath } from '../../utils';
+import { createNamespace, dependable, setPath } from '../../utils';
+import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
 import * as cdk from 'aws-cdk-lib';
@@ -107,6 +108,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
 
+    @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
