@@ -1,6 +1,7 @@
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { createNamespace, dependable, setPath } from '../../utils';
+import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
 /**
@@ -67,7 +68,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
 
-    @dependable('EbsCsiDriverAddOn')
+    @dependable('EbsCsiDriverAddOn', AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
