@@ -112,12 +112,7 @@ export default class BlueprintConstruct {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '10Gi',
                 },
-                enableIngress: true,
-                ingressAnnotations: {
-                    "kubernetes.io/ingress.class": "alb",
-                    "alb.ingress.kubernetes.io/scheme": "internet-facing",
-                    "alb.ingress.kubernetes.io/target-type": "ip",
-                },
+                enableIngress: false,
                 notebookStack: 'jupyter/datascience-notebook',
             }),
             new blueprints.EmrEksAddOn()
