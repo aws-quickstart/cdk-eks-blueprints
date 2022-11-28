@@ -107,11 +107,13 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
             new blueprints.addons.JupyterHubAddOn({
-                ebsConfig: {
-                    storageClass: "gp2",
-                    capacity: "4Gi",
+                efsConfig: {
+                    pvcName: "efs-persist",
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                    capacity: '10Gi',
                 },
                 enableIngress: false,
+                notebookStack: 'jupyter/datascience-notebook',
             }),
             new blueprints.EmrEksAddOn()
         ];
