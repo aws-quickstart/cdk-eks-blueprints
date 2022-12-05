@@ -8,7 +8,7 @@ For more information regarding a Jupyter notebook, please consult the [official 
 
 ***IMPORTANT***: This add-on depends on [EBS CSI Driver](ebs-csi-driver.md) Add-on for using EBS as persistent storage.
 
-***EBS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the Jupyter add-on*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for EbsCsiDriverAddOn`.
+***EBS CSI Driver or EFS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the Jupyter add-on*** for it to work, as shown in below example (with EBS). Otherwise will run into error `Assertion failed: Missing a dependency for <EbsCsiDriverAddOn or EfsCsiDriverAddOn>`.
 
 ## Usage
 
@@ -34,7 +34,8 @@ const jupyterHubAddOn = new blueprints.addons.JupyterHubAddOn({
     scope: [], //list of OIDC provider scopes
     usernameKey: "<username key>",
   },
-  enableIngress?: true
+  enableIngress?: true,
+  notebookStack: 'jupyter/datascience-notebook'
 });
 
 const ebsCsiAddOn = new blueprints.addons.EbsCsiDriverAddOn();
@@ -63,8 +64,11 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 ## Functionality
 
 1. Deploys the jupyterhub helm chart in `jupyterhub` namespace by default.
-2. (Optional) Leverages EBS as persistent storage if storage type and capacity are provided. If you provide this configuration, ***EBS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the JupyterHub add-on*** for it to work, as shown in above example. Otherwise it will not work.
+2. JupyterHub is backed with persistent storage. You must provide ***one (and only one)*** of the following configuration (or otherwise will receive an error):
+  - Leverage EBS as persistent storage with storage type and capacity provided. If you provide this configuration, ***EBS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the JupyterHub add-on*** for it to work, as shown in above example. Otherwise it will not work.
+  - Leverage EFS as persistent storage with the name, capacity and file system removal policy provided. If you provide this configuration, ***EFS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the JupyterHub add-on*** for it to work, as shown in above example. Otherwise it will not work.
 3. (Optional) Leverage OIDC Provider as a way to manage authentication and authorization. If not provided, the default creates no user, and the user will be able to login with any arbitrary username and password. **It is highly recommended to leverage an Identity provider for any production use case.**
+4. (Optional) Leverage a different notebook stack than the standard one provided. Jupyter team maintains a set of Docker image definition in a GitHub repository as explained [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 4. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ***Note***: For custom helm values, please consult the [official documentation](https://zero-to-jupyterhub.readthedocs.io/en/latest/resources/reference.html#). 
