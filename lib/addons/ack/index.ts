@@ -18,6 +18,10 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
      * To Create Namespace using CDK. This should be done only for the first time.
      */    
     createNamespace?: boolean;
+    /**
+     * To create Service Account
+     */    
+    saName?: string;
 }
 
 /**
@@ -32,7 +36,8 @@ const defaultProps: HelmAddOnProps & AckAddOnProps = {
   repository: `oci://public.ecr.aws/aws-controllers-k8s/iam-chart`,
   values: {},
   managedPolicyName: "IAMFullAccess",
-  createNamespace: true
+  createNamespace: true,
+  saName: "iam-chart"
 };
 
 /**
@@ -54,7 +59,7 @@ export class AckAddOn extends HelmAddOn {
 
     const sa = cluster.addServiceAccount(`${this.options.chart}-sa`, {
       namespace: this.options.namespace,
-      name: this.options.chart,
+      name: this.options.saName,
     });
 
     if(this.options.createNamespace == true){
@@ -77,6 +82,6 @@ function populateValues(helmOptions: AckAddOnProps, awsRegion: string): Values {
   const values = helmOptions.values ?? {};
   setPath(values, "aws.region", awsRegion);
   setPath(values,"serviceAccount.create", false);
-  setPath(values,"serviceAccount.name", helmOptions.chart);
+  setPath(values,"serviceAccount.name", helmOptions.saName);
   return values;
 }
