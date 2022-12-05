@@ -65,7 +65,8 @@ const addOn = new blueprints.addons.AckAddOn({
   release: "ec2-chart",
   repository: "oci://public.ecr.aws/aws-controllers-k8s/ec2-chart",
   managedPolicyName: "AmazonEC2FullAccess",
-  createNamespace: false
+  createNamespace: false,
+  saName: "ec2-chart"
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -82,6 +83,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `repository`: Repository URI of the specific ACK Chart
 - `managedPolicyName`: Policy Name required to be added to the IAM role for that ACK
 - `createNamespace`: (boolean) This should be false if you are using for the second time
+- `saName` : Name to create the service account.
 - `values`: Arbitrary values to pass to the chart
 - [Standard helm configuration options](https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
