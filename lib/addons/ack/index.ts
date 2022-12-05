@@ -9,32 +9,6 @@ import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
  * User provided option for the Helm Chart
  */
 export interface AckAddOnProps extends HelmAddOnUserProps {
-    
-    /**
-     * Name of the ack controller
-     * @default iam-chart
-     */
-    name?: string;
-    /**
-     * Name of the ack controller Chart
-     * @default iam-chart
-     */
-    chart?: string;
-    /**
-     * Version of the ack controller
-     * @default v0.0.13
-     */
-    version?: string;
-    /**
-     * Release of ack controller
-     * @default iam-chart
-     */
-    release?: string;
-    /**
-     * Repository of ack controller
-     * @default oci://public.ecr.aws/aws-controllers-k8s/iam-chart
-     */
-    repository?: string;
     /**
      * Managed IAM Policy of the ack controller
      * @default IAMFullAccess

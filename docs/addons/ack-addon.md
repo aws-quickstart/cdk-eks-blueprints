@@ -82,7 +82,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `repository`: Repository URI of the specific ACK Chart
 - `managedPolicyName`: Policy Name required to be added to the IAM role for that ACK
 - `createNamespace`: (boolean) This should be false if you are using for the second time
-- `values`: Arbitrary values to pass to the chart. Refer to the cert-manager [Helm Chart documentation](https://artifacthub.io/packages/helm/cert-manager/cert-manager) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options)
+- `values`: Arbitrary values to pass to the chart
+- [Standard helm configuration options](https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
 ## Validation
 

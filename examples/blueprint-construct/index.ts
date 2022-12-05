@@ -75,11 +75,8 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.AckAddOn(),
             new blueprints.addons.AckAddOn({
-                skipVersionValidation: true
-            }),
-            new blueprints.addons.AckAddOn({
-                skipVersionValidation: true,
                 name: "rds-chart",
                 chart: "rds-chart",
                 version: "v0.1.1",
