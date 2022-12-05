@@ -5,6 +5,7 @@ TSC := node node_modules/.bin/tsc
 ESLINT := node node_modules/.bin/eslint
 CDK := npx cdk
 COPY := node node_modules/.bin/copyfiles
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 # Dependecies
 HOMEBREW_LIBS :=  nvm typescript argocd
@@ -17,17 +18,14 @@ lint:
 
 build:
 	rm -rf dist 
-	$(TSC) 
-	$(COPY) lib/**/*.yaml dist/ -u 1 -V -E
-	$(COPY) lib/**/*.ytpl dist/ -u 1 -V -E
+	@$(MAKE) -f $(THIS_FILE) compile
 
 compile:
 	$(TSC)
-	$(COPY) lib/**/*.yaml dist/ -u 1
-	$(COPY) lib/**/*.ytpl dist/ -u 1
+	@$(MAKE) -f $(THIS_FILE) copyfiles
 
 copyfiles:
-	$(COPY) lib/**/*.ytpl dist/ -u 1 -V -E
+	$(COPY) "lib/**/*.yaml" "lib/**/*.ytpl" "dist/" -u 1 -V -E
 
 list:
 	$(DEPS)
