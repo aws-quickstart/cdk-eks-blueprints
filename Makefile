@@ -16,14 +16,18 @@ lint:
 	$(ESLINT) . --ext .js,.jsx,.ts,.tsx
 
 build:
-	rm -rf dist && $(TSC)
-	$(COPY) lib/**/*.yaml dist/ -u 1
-	$(COPY) lib/**/*.ytpl dist/ -u 1
+	rm -rf dist 
+	$(TSC) 
+	$(COPY) lib/**/*.yaml dist/ -u 1 -V -E
+	$(COPY) lib/**/*.ytpl dist/ -u 1 -V -E
 
 compile:
 	$(TSC)
 	$(COPY) lib/**/*.yaml dist/ -u 1
 	$(COPY) lib/**/*.ytpl dist/ -u 1
+
+copyfiles:
+	$(COPY) lib/**/*.ytpl dist/ -u 1 -V -E
 
 list:
 	$(DEPS)
