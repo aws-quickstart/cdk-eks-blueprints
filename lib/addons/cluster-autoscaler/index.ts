@@ -42,8 +42,9 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
  * Version of the autoscaler, controls the image tag
  */
 const versionMap = new Map([
-    //[KubernetesVersion.V1_22, "9.11.0"],
-    [KubernetesVersion.V1_21, "9.10.8"],
+    [KubernetesVersion.V1_23, "9.21.0"],
+    [KubernetesVersion.V1_22, "9.13.1"],
+    [KubernetesVersion.V1_21, "9.13.1"],
     [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],
@@ -82,7 +83,8 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             "autoscaling:DescribeTags",
             "autoscaling:SetDesiredCapacity",
             "autoscaling:TerminateInstanceInAutoScalingGroup",
-            "ec2:DescribeLaunchTemplateVersions"
+            "ec2:DescribeLaunchTemplateVersions",
+            "ec2:DescribeInstanceTypes"
         );
 
         const autoscalerPolicyDocument = new iam.PolicyDocument({

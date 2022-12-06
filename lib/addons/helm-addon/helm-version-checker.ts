@@ -67,10 +67,14 @@ export interface CheckVersionResult {
  */
 export function listChartVersions(chart: HelmChartVersion): string[] {
     // TODO make function async and use async HTTP client to get results
+    if(chart.repository.startsWith("oci:")){
+        return []; // skip for now if OCI repo
+    }
     const helmRepository = loadExternalYaml(chart.repository + "/index.yaml");
     const versions: string[] = Object.values(helmRepository[0]['entries'][chart.chart])
         .map((e: any) => { return e['version']; });
-    return versions.filter(e => e.includes(".") && !e.includes("beta") && !e.includes("rc"));
+    // TODO: refactor to support dictionary of keywords that qualify as non-production
+    return versions.filter(e => e.includes(".") && !e.includes("beta") && !e.includes("alpha") && !e.includes("dev") && !e.includes("rc"));
 }
 
 /**

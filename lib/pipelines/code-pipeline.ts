@@ -356,8 +356,8 @@ class CodePipeline {
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
               input: codePipelineSource,
               installCommands: [
-                'npm install --global npm',
-                'npm install -g aws-cdk@2.43.0',
+                'n stable',
+                'npm install -g aws-cdk@2.51.1',
                 'npm install',
               ],
               commands: ['npm run build', 'npx cdk synth']
