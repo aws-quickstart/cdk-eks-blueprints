@@ -2,11 +2,10 @@
 import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
-import { string } from 'zod';
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { serviceMappings } from "./serviceMappings";
+import { serviceMappings } from './serviceMappings';
 /**
  * User provided option for the Helm Chart
  */
@@ -14,7 +13,7 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
     /**
      * Required identified, must be unique within the parent stack scope.
      */
-    id: string;
+    id?: string;
     /**
      * Default Service Name
      * @default IAM
@@ -36,8 +35,8 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
 }
 
 export enum AckServiceName {
-  "IAM",
-  "RDS" // etc.
+  IAM = "iam",
+  RDS= "rds" // etc.
 }
 
 /**
@@ -72,6 +71,7 @@ export class AckAddOn extends HelmAddOn {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.id = ""; // TODO add id field`
     this.options = this.props as AckAddOnProps;
+    console.log(this.options);
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -116,7 +116,7 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   let tempProps : Partial<AckAddOnProps> = {...props ?? {}}; // since props may be empty
   tempProps.id = tempProps.id ?? defaultProps.id;
   tempProps.serviceName = tempProps.serviceName ?? defaultProps.serviceName;
-  tempProps.name = tempProps.name ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.name;
+  tempProps.name = tempProps.name ?? serviceMappings[tempProps.serviceName!].chart  ?? defaultProps.name;
   tempProps.namespace = tempProps.namespace ?? defaultProps.namespace;
   tempProps.chart = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.chart;
   tempProps.version = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.version` ?? defaultProps.version;
