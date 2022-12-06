@@ -7,7 +7,7 @@ export interface AckChartMapping {
 }
   
 export const serviceMappings : {
-    [key in AckServiceName]: AckChartMapping
+    [key in AckServiceName]?: AckChartMapping
 } = {
     [AckServiceName.IAM]: {
       chart: "iam-chart",
