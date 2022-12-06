@@ -69,8 +69,9 @@ export class AckAddOn extends HelmAddOn {
   readonly id? : string;
 
   constructor(props?: AckAddOnProps) {
-    super(populateDefautls(defaultProps,props) as AckAddOnProps);
-    // this.options = this.props as AckAddOnProps;
+    super(populateDefaults(defaultProps, props) as HelmAddOnProps);
+    this.id = ""; // TODO add id field`
+    this.options = this.props as AckAddOnProps;
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -111,17 +112,17 @@ function populateValues(helmOptions: AckAddOnProps, awsRegion: string): Values {
 /**
  * populate parameters passed or the default values from service Mappings.
  */
-function populateDefautls(defaultProps: AckAddOnProps, props: AckAddOnProps): AckAddOnProps {
-  let tempProps : AckAddOnProps = {...props};
-  tempProps.id = props.id ?? defaultProps.id;
-  tempProps.serviceName = props.serviceName ?? defaultProps.serviceName;
-  tempProps.name = props.name ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.name;
-  tempProps.namespace = props.namespace ?? defaultProps.namespace;
-  tempProps.chart = props.chart ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.chart;
-  tempProps.version = props.chart ?? `serviceMappings.${tempProps.serviceName}.version` ?? defaultProps.version;
-  tempProps.repository = props.repository ?? `oci://public.ecr.aws/aws-controllers-k8s\${tempProps.name}` ?? defaultProps.repository;
-  tempProps.managedPolicyName = props.managedPolicyName ?? `serviceMappings.${tempProps.serviceName}.managedPolicyName` ?? defaultProps.managedPolicyName;
-  tempProps.createNamespace = props.createNamespace ?? defaultProps.createNamespace;
-  tempProps.saName = props.saName ?? `${props.chart}-sa`;
-  return tempProps;
+function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): AckAddOnProps {
+  let tempProps : Partial<AckAddOnProps> = {...props ?? {}}; // since props may be empty
+  tempProps.id = tempProps.id ?? defaultProps.id;
+  tempProps.serviceName = tempProps.serviceName ?? defaultProps.serviceName;
+  tempProps.name = tempProps.name ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.name;
+  tempProps.namespace = tempProps.namespace ?? defaultProps.namespace;
+  tempProps.chart = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.chart;
+  tempProps.version = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.version` ?? defaultProps.version;
+  tempProps.repository = tempProps.repository ?? `oci://public.ecr.aws/aws-controllers-k8s\${tempProps.name}` ?? defaultProps.repository;
+  tempProps.managedPolicyName = tempProps.managedPolicyName ?? `serviceMappings.${tempProps.serviceName}.managedPolicyName` ?? defaultProps.managedPolicyName;
+  tempProps.createNamespace = tempProps.createNamespace ?? defaultProps.createNamespace;
+  tempProps.saName = tempProps.saName ?? `${tempProps.chart}-sa`;
+  return tempProps as AckAddOnProps;
 }
