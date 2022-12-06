@@ -9,7 +9,9 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.JupyterHubAddOn({
+            .addOns(
+                new blueprints.AwsLoadBalancerControllerAddOn,
+                new blueprints.JupyterHubAddOn({
                 ebsConfig: {
                     storageClass: "gp2",
                     capacity: "4Gi",
@@ -29,7 +31,9 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.JupyterHubAddOn({
+            .addOns(
+                new blueprints.AwsLoadBalancerControllerAddOn,
+                new blueprints.JupyterHubAddOn({
                 efsConfig: {
                     pvcName: "efs-persist",
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -64,7 +68,7 @@ describe('Unit tests for JupyterHub addon', () => {
 
         expect(()=> {
             blueprint.build(app, 'stack-with-no-efs-csi-addon');
-        }).toThrow("Missing a dependency: AwsLoadBalancerControllerAddOn. Please add it to your list of addons.");
+        }).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-no-efs-csi-addon");
     });
 });
 
