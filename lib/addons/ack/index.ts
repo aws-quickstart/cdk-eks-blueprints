@@ -58,7 +58,7 @@ export class AckAddOn extends HelmAddOn {
   constructor(props?: AckAddOnProps) {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.options = this.props as AckAddOnProps;
-    // this.id = this.options.id;
+    this.id = this.options.id;
     console.log(this.options);
   }
 
