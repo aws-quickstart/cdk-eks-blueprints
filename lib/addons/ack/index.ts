@@ -5,8 +5,10 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { serviceMappings } from './serviceMappings';
-export * from "./serviceMappings";
+import { serviceMappings, AckServiceName } from './serviceMappings';
+
+export { AckServiceName } from "./serviceMappings";
+
 
 
 /**
@@ -36,8 +38,6 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
      */    
     saName?: string;
 }
-
-export const enum AckServiceName
 
 /**
  * Default props to be used when creating the Helm chart
@@ -71,7 +71,6 @@ export class AckAddOn extends HelmAddOn {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.id = ""; // TODO add id field`
     this.options = this.props as AckAddOnProps;
-    console.log(this.options);
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {

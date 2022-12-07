@@ -1,31 +1,31 @@
+
 export interface AckChartMapping {
     chart: string,
     version: string,
     managedPolicyName: string
 }
 
-export const enum AckServiceName {
-  IAM = "iam",
-  RDS = "rds",
-  EC2 = "ec2",
-  S3  = "s3",
-  DYNAMODB = "dynamodb",
-  ECR = "ecr",
-  SNS = "sns",
-  APIGATEWAY = "apigatewayv2",
-  ELASTICACHE = "elasticache",
-  OPENSEARCH = "opensearchservice",
-  MQ = "mq",
-  LAMBDA = "lambda",
-
-
-
-
-}
+export enum AckServiceName {
+    IAM = "iam",
+    RDS = "rds",
+    EC2 = "ec2",
+    S3 = "s3",
+    DYNAMODB = "dynamodb",
+    ECR = "ecr",
+    SNS = "sns",
+    APIGATEWAY = "apigatewayv2",
+    ELASTICACHE = "elasticache",
+    OPENSEARCH = "opensearchservice",
+    MQ = "mq",
+    LAMBDA = "lambda",
+    KMS = "kms",
+    MEMORYDB = "memorydb",
+    EKS = "eks",
+    AUTOSCALING = "autoscaling",
+    ELASTICSEARCH = "elasticsearch"
+};
   
-export const serviceMappings : {
-    [key in AckServiceName]?: AckChartMapping
-} = {
+export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.IAM]: {
       chart: "iam-chart",
       version:  "v0.0.13",
