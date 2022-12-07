@@ -16,16 +16,14 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.AckAddOn({
-    skipVersionValidation: true
-}),
+const addOn = new blueprints.addons.AckAddOn(),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 2 : This installs AWS Controller for Kubernetes for RDS ACK controller. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
+> Pattern # 2 : This installs AWS Controller for Kubernetes for EC2 ACK controller using service name internally referencing service mapping values for helm options. After Installing this EC2 ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -34,39 +32,33 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.AckAddOn({
-  skipVersionValidation: true,
+  id: "ec2-ack", // Having this field is important if you are using multiple iterations of this Addon.
+  serviceName: AckServiceName.EC2 // This value can be references from supported service section below,
+}),
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AckAddOn({
+  id: "rds-ack",
   name: "rds-chart",
   chart: "rds-chart",
   version: "v0.1.1",
   release: "rds-chart",
   repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
   managedPolicyName: "AmazonRDSFullAccess",
-  createNamespace: false
-}),
-
-const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(addOn)
-  .build(app, 'my-stack-name');
-```
-
-> Pattern # 3 : This installs AWS Controller for Kubernetes for EC2 ACK controller. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
-
-```typescript
-import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '@aws-quickstart/eks-blueprints';
-
-const app = new cdk.App();
-
-const addOn = new blueprints.addons.AckAddOn({
-  skipVersionValidation: true,
-  name: "ec2-chart",
-  chart: "ec2-chart",
-  version: "v0.1.0",
-  release: "ec2-chart",
-  repository: "oci://public.ecr.aws/aws-controllers-k8s/ec2-chart",
-  managedPolicyName: "AmazonEC2FullAccess",
   createNamespace: false,
-  saName: "ec2-chart"
+  saName: "rds-chart"
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -76,6 +68,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Configuration Options
 
+- `id`: Unique identifier of the Addon especially if you are using ACK Addon multiple times
 - `name`: Name of the ACK Chart
 - `chart`: Chart Name of the ACK Chart
 - `version`: Version of the ACK Chart
@@ -114,5 +107,34 @@ replicaset.apps/rds-chart-5f6f5b8fc7   1         1         1       5m36s
 
 Please refer to following aws-controller-8s references for more information :
 - [ACK Workshop](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
-- [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/)
+- [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/) 
 - [ACK GitHub](https://github.com/aws-controllers-k8s/community)
+
+## Supported AWS Services by ACK Addon
+
+*You can use this ACK Addon today to provision resources for below mentioned 22 AWS services :*
+
+1. IAM
+2. RDS
+3. EC2
+4. S3
+5. DYNAMODB
+6. ECR
+7. SNS
+8. APIGATEWAYV2
+9. ELASTICACHE
+10. OPENSEARCHSERVICE
+11. MQ
+12. LAMBDA
+13. KMS
+14. MEMORYDB
+15. EKS
+16. APPLICATIONAUTOSCALING
+17. ELASTICSEARCHSERVICE
+18. PROMETHEUSSERVICE
+19. EMRCONTAINERS
+20. SFN
+21. KINESIS
+21. CLOUDTRAIL
+
+*We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to ECR Gallery for ACK.*

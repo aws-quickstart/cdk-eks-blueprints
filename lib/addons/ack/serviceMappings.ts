@@ -27,7 +27,7 @@ export enum AckServiceName {
     SFN = "sfn",
     KINESIS = "kinesis",
     CLOUDTRAIL = "cloudtrail"
-};
+}
   
 export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.IAM]: {
@@ -140,5 +140,4 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       version:  "v0.0.3",
       managedPolicyName: "AWSCloudTrail_FullAccess"
     }
-
-}
+};
