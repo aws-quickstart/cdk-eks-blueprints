@@ -1,4 +1,3 @@
-
 export interface AckChartMapping {
     chart: string,
     version: string,
@@ -16,6 +15,11 @@ export const enum AckServiceName {
   APIGATEWAY = "apigatewayv2",
   ELASTICACHE = "elasticache",
   OPENSEARCH = "opensearchservice",
+  MQ = "mq",
+  LAMBDA = "lambda",
+
+
+
 
 }
   
@@ -87,7 +91,7 @@ export const serviceMappings : {
       version:  "v0.1.3",
       managedPolicyName: ""
     },
-    [AckServiceName.memorydb]: {
+    [AckServiceName.MEMORYDB]: {
       chart: "memorydb-chart",
       version:  "v0.0.3",
       managedPolicyName: ""
@@ -97,14 +101,14 @@ export const serviceMappings : {
       version:  "v0.1.7",
       managedPolicyName: ""
     },
-    [AckServiceName.LAMBDA]: {
-      chart: "lambda-chart",
-      version:  "v0.1.3",
+    [AckServiceName.AUTOSCALING]: {
+      chart: "applicationautoscaling-chart",
+      version:  "v0.2.14",
       managedPolicyName: ""
     },
-    [AckServiceName.KMS]: {
-      chart: "kms-chart",
-      version:  "v0.1.3",
+    [AckServiceName.ELASTICSEARCH]: {
+      chart: "elasticsearchservice-chart",
+      version:  "v0.0.2",
       managedPolicyName: ""
     }
 
