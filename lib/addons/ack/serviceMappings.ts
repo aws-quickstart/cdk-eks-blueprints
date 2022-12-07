@@ -6,17 +6,16 @@ export interface AckChartMapping {
     managedPolicyName: string
 }
   
-export const serviceMappings : {
-    [key in AckServiceName]?: AckChartMapping
-} = {
-    [AckServiceName.IAM]: {
+export const serviceMappings : { [key in AckServiceName]?: AckChartMapping } = 
+{
+    "iam": {
       chart: "iam-chart",
       version:  "v0.0.13",
       managedPolicyName: "IAMFullAccess"
     },
-    [AckServiceName.RDS]: {
+    "rds": {
       chart: "iam-chart",
       version:  "v0.0.13",
       managedPolicyName: "IAMFullAccess"
     }
-}
+};
