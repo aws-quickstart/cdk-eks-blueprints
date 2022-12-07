@@ -1,10 +1,12 @@
+import AckServiceName from "./index";
+
 export interface AckChartMapping {
     chart: string,
     version: string,
     managedPolicyName: string
 }
 
-export const enum AckServiceName {
+AckServiceName {
   IAM = "iam",
   RDS = "rds",
   EC2 = "ec2",
@@ -71,20 +73,40 @@ export const serviceMappings : {
       version:  "v0.0.14",
       managedPolicyName: ""
     },
-    [AckServiceName.DYNAMODB]: {
-      chart: "dynamodb-chart",
-      version:  "v0.1.7",
-      managedPolicyName: "AmazonDynamoDBFullAccess"
+    [AckServiceName.MQ]: {
+      chart: "mq-chart",
+      version:  "v0.0.23",
+      managedPolicyName: ""
     },
-    [AckServiceName.ECR]: {
-      chart: "ecr-chart",
-      version:  "v0.1.7",
-      managedPolicyName: "AmazonEC2ContainerRegistryFullAccess"
+    [AckServiceName.LAMBDA]: {
+      chart: "lambda-chart",
+      version:  "v0.1.3",
+      managedPolicyName: ""
     },
-    [AckServiceName.SNS]: {
-      chart: "sns-chart",
-      version:  "v0.0.1",
-      managedPolicyName: "AmazonSNSFullAccess"
+    [AckServiceName.KMS]: {
+      chart: "kms-chart",
+      version:  "v0.1.3",
+      managedPolicyName: ""
+    },
+    [AckServiceName.memorydb]: {
+      chart: "memorydb-chart",
+      version:  "v0.0.3",
+      managedPolicyName: ""
+    },
+    [AckServiceName.EKS]: {
+      chart: "eks-chart",
+      version:  "v0.1.7",
+      managedPolicyName: ""
+    },
+    [AckServiceName.LAMBDA]: {
+      chart: "lambda-chart",
+      version:  "v0.1.3",
+      managedPolicyName: ""
+    },
+    [AckServiceName.KMS]: {
+      chart: "kms-chart",
+      version:  "v0.1.3",
+      managedPolicyName: ""
     }
 
 }
