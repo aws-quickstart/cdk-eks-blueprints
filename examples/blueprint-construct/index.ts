@@ -76,7 +76,8 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
-                skipVersionValidation: true
+                skipVersionValidation: true,
+                serviceName: AckServiceName.S3
             }),
             new blueprints.addons.AckAddOn({
                 skipVersionValidation: true,
@@ -86,6 +87,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AckAddOn({
                 skipVersionValidation: true,
+                serviceName: AckServiceName.RDS,
                 id: "rds-ack",
                 name: "rds-chart",
                 chart: "rds-chart",

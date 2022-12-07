@@ -1,34 +1,44 @@
+/**
+ * Chart Mapping for fields such as chart, version, managed IAM policy.
+ */
 export interface AckChartMapping {
     chart: string,
     version: string,
     managedPolicyName: string
 }
 
+/**
+ * List of all supported supported AWS services by ACK Addon.
+ */
 export enum AckServiceName {
-    IAM = "iam",
-    RDS = "rds",
-    EC2 = "ec2",
-    S3 = "s3",
-    DYNAMODB = "dynamodb",
-    ECR = "ecr",
-    SNS = "sns",
-    APIGATEWAYV2 = "apigatewayv2",
-    ELASTICACHE = "elasticache",
-    OPENSEARCHSERVICE = "opensearchservice",
-    MQ = "mq",
-    LAMBDA = "lambda",
-    KMS = "kms",
-    MEMORYDB = "memorydb",
-    EKS = "eks",
-    APPLICATIONAUTOSCALING = "applicationautoscaling",
-    ELASTICSEARCHSERVICE = "elasticsearchservice",
-    PROMETHEUSSERVICE = "prometheusservice",
-    EMRCONTAINERS = "emrcontainers",
-    SFN = "sfn",
-    KINESIS = "kinesis",
-    CLOUDTRAIL = "cloudtrail"
+  APIGATEWAYV2 = "apigatewayv2",
+  APPLICATIONAUTOSCALING = "applicationautoscaling",
+  CLOUDTRAIL = "cloudtrail",
+  DYNAMODB = "dynamodb",
+  EC2 = "ec2",
+  ECR = "ecr",
+  EKS = "eks",
+  ELASTICACHE = "elasticache",
+  ELASTICSEARCHSERVICE = "elasticsearchservice",
+  EMRCONTAINERS = "emrcontainers",
+  IAM = "iam",
+  KINESIS = "kinesis",
+  KMS = "kms",
+  LAMBDA = "lambda",
+  MEMORYDB = "memorydb",
+  MQ = "mq",
+  OPENSEARCHSERVICE = "opensearchservice",
+  PROMETHEUSSERVICE = "prometheusservice",
+  RDS = "rds",  
+  S3 = "s3",
+  SFN = "sfn",
+  SNS = "sns"
 }
-  
+
+/**
+ * List of all Service Mappings such as chart, version, managed IAM policy 
+ * for all supported AWS services by ACK Addon.
+ */
 export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.IAM]: {
       chart: "iam-chart",

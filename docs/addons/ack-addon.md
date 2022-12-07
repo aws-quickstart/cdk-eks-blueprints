@@ -16,7 +16,9 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.AckAddOn(),
+const addOn = new blueprints.addons.AckAddOn({
+  serviceName: AckServiceName.IAM,
+}),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -52,6 +54,7 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AckAddOn({
   id: "rds-ack",
+  serviceName: AckServiceName.RDS,
   name: "rds-chart",
   chart: "rds-chart",
   version: "v0.1.1",
@@ -70,6 +73,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `id`: Unique identifier of the Addon especially if you are using ACK Addon multiple times
+- `serviceName`: Name of the service and this is mandatory
 - `name`: Name of the ACK Chart
 - `chart`: Chart Name of the ACK Chart
 - `version`: Version of the ACK Chart
