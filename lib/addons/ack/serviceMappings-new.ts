@@ -10,14 +10,14 @@ export const enum AckServiceName {
   EC2 = "ec2"
 }
   
-export const serviceMappings : {
-    [key in AckServiceName]?: AckChartMapping
-} = {
-    [AckServiceName.IAM]: {
+export const serviceMappings : { [key in AckServiceName]?: AckChartMapping } = 
+{
+    "iam": {
       chart: "iam-chart",
       version:  "v0.0.13",
       managedPolicyName: "IAMFullAccess"
     },
+<<<<<<< HEAD
     [AckServiceName.RDS]: {
       chart: "rds-chart",
       version:  "v0.1.1",
@@ -27,5 +27,11 @@ export const serviceMappings : {
       chart: "ec2-chart",
       version:  "v0.1.0",
       managedPolicyName: "AmazonRDSFullAccess"
+=======
+    "rds": {
+      chart: "iam-chart",
+      version:  "v0.0.13",
+      managedPolicyName: "IAMFullAccess"
+>>>>>>> f36ce25720ae0689c3e329a489d5479d401de406
     }
-}
+};

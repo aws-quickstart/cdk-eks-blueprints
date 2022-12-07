@@ -114,7 +114,7 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   let tempProps : Partial<AckAddOnProps> = {...props ?? {}}; // since props may be empty
   tempProps.id = tempProps.id ?? defaultProps.id;
   tempProps.serviceName = tempProps.serviceName ?? defaultProps.serviceName;
-  tempProps.name = tempProps.name ?? serviceMappings[tempProps.serviceName!]?.chart ?? defaultProps.name;
+  tempProps.name = tempProps.name ?? serviceMappings[tempProps.serviceName!]!.chart  ?? defaultProps.name;
   tempProps.namespace = tempProps.namespace ?? defaultProps.namespace;
   tempProps.chart = tempProps.chart ?? serviceMappings[tempProps.serviceName!]?.chart ?? defaultProps.chart;
   tempProps.version = tempProps.version ?? serviceMappings[tempProps.serviceName!]?.version ?? defaultProps.version;
