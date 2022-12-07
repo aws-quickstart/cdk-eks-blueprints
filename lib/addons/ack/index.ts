@@ -58,7 +58,7 @@ export class AckAddOn extends HelmAddOn {
   constructor(props?: AckAddOnProps) {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.options = this.props as AckAddOnProps;
-    this.id = this.options.id;
+    // this.id = this.options.id;
     console.log(this.options);
   }
 
@@ -109,7 +109,8 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   tempProps.namespace = tempProps.namespace ?? defaultProps.namespace;
   tempProps.chart = tempProps.chart ?? serviceMappings[tempProps.serviceName!]?.chart;
   tempProps.version = tempProps.version ?? serviceMappings[tempProps.serviceName!]?.version;
-  const repositoryUrl = "oci://public.ecr.aws/aws-controllers-k8s"
+  const repositoryUrl = "oci://public.ecr.aws/aws-controllers-k8s";
+  tempProps.release = tempProps.release ?? tempProps.chart;
   tempProps.repository = tempProps.repository ?? `${repositoryUrl}/${tempProps.name}`;
   tempProps.managedPolicyName = tempProps.managedPolicyName ?? serviceMappings[tempProps.serviceName!]?.managedPolicyName;
   tempProps.createNamespace = tempProps.createNamespace ?? defaultProps.createNamespace;
