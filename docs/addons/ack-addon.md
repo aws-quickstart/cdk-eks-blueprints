@@ -33,6 +33,7 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.AckAddOn({
   id: "ec2-ack", // Having this field is important if you are using multiple iterations of this Addon.
+  createNamespace: false, //This is essential if you are using multiple iterations of this Addon to run in same namespace.
   serviceName: AckServiceName.EC2 // This value can be references from supported service section below,
 }),
 
