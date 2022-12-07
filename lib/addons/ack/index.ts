@@ -5,7 +5,9 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { serviceMappings, AckServiceName } from './serviceMappings';
+import { serviceMappings } from './serviceMappings';
+export * from "./serviceMappings";
+
 
 /**
  * User provided option for the Helm Chart
@@ -35,7 +37,7 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
     saName?: string;
 }
 
-
+export const enum AckServiceName
 
 /**
  * Default props to be used when creating the Helm chart
