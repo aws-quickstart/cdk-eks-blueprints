@@ -1,4 +1,3 @@
-
 export interface AckChartMapping {
     chart: string,
     version: string,
@@ -13,16 +12,21 @@ export enum AckServiceName {
     DYNAMODB = "dynamodb",
     ECR = "ecr",
     SNS = "sns",
-    APIGATEWAY = "apigatewayv2",
+    APIGATEWAYV2 = "apigatewayv2",
     ELASTICACHE = "elasticache",
-    OPENSEARCH = "opensearchservice",
+    OPENSEARCHSERVICE = "opensearchservice",
     MQ = "mq",
     LAMBDA = "lambda",
     KMS = "kms",
     MEMORYDB = "memorydb",
     EKS = "eks",
-    AUTOSCALING = "autoscaling",
-    ELASTICSEARCH = "elasticsearch"
+    APPLICATIONAUTOSCALING = "applicationautoscaling",
+    ELASTICSEARCHSERVICE = "elasticsearchservice",
+    PROMETHEUSSERVICE = "prometheusservice",
+    EMRCONTAINERS = "emrcontainers",
+    SFN = "sfn",
+    KINESIS = "kinesis",
+    CLOUDTRAIL = "cloudtrail"
 };
   
 export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
@@ -61,7 +65,7 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       version:  "v0.0.1",
       managedPolicyName: "AmazonSNSFullAccess"
     },
-    [AckServiceName.APIGATEWAY]: {
+    [AckServiceName.APIGATEWAYV2]: {
       chart: "apigatewayv2-chart",
       version:  "v0.1.4",
       managedPolicyName: ""
@@ -71,7 +75,7 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       version:  "v0.0.20",
       managedPolicyName: ""
     },
-    [AckServiceName.OPENSEARCH]: {
+    [AckServiceName.OPENSEARCHSERVICE]: {
       chart: "opensearchservice-chart",
       version:  "v0.0.14",
       managedPolicyName: ""
@@ -101,14 +105,39 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       version:  "v0.1.7",
       managedPolicyName: ""
     },
-    [AckServiceName.AUTOSCALING]: {
+    [AckServiceName.APPLICATIONAUTOSCALING]: {
       chart: "applicationautoscaling-chart",
       version:  "v0.2.14",
       managedPolicyName: ""
     },
-    [AckServiceName.ELASTICSEARCH]: {
+    [AckServiceName.ELASTICSEARCHSERVICE]: {
       chart: "elasticsearchservice-chart",
       version:  "v0.0.2",
+      managedPolicyName: ""
+    },
+    [AckServiceName.PROMETHEUSSERVICE]: {
+      chart: "prometheusservice-chart",
+      version:  "v0.1.1",
+      managedPolicyName: ""
+    },
+    [AckServiceName.EMRCONTAINERS]: {
+      chart: "emrcontainers-chart",
+      version:  "v0.1.0",
+      managedPolicyName: ""
+    },
+    [AckServiceName.SFN]: {
+      chart: "sfn-chart",
+      version:  "v0.1.2",
+      managedPolicyName: ""
+    },
+    [AckServiceName.KINESIS]: {
+      chart: "kinesis-chart",
+      version:  "v0.0.1",
+      managedPolicyName: ""
+    },
+    [AckServiceName.CLOUDTRAIL]: {
+      chart: "cloudtrail-chart",
+      version:  "v0.0.3",
       managedPolicyName: ""
     }
 
