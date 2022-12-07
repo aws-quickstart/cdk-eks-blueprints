@@ -68,77 +68,77 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.APIGATEWAYV2]: {
       chart: "apigatewayv2-chart",
       version:  "v0.1.4",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonAPIGatewayAdministrator"
     },
     [AckServiceName.ELASTICACHE]: {
       chart: "elasticache-chart",
       version:  "v0.0.20",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonElastiCacheFullAccess"
     },
     [AckServiceName.OPENSEARCHSERVICE]: {
       chart: "opensearchservice-chart",
       version:  "v0.0.14",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonOpenSearchServiceFullAccess"
     },
     [AckServiceName.MQ]: {
       chart: "mq-chart",
       version:  "v0.0.23",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonMQFullAccess"
     },
     [AckServiceName.LAMBDA]: {
       chart: "lambda-chart",
       version:  "v0.1.3",
-      managedPolicyName: ""
+      managedPolicyName: "AWSLambda_FullAccess"
     },
     [AckServiceName.KMS]: {
       chart: "kms-chart",
       version:  "v0.1.3",
-      managedPolicyName: ""
+      managedPolicyName: "AWSKeyManagementServicePowerUser"
     },
     [AckServiceName.MEMORYDB]: {
       chart: "memorydb-chart",
       version:  "v0.0.3",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonMemoryDBFullAccess"
     },
     [AckServiceName.EKS]: {
       chart: "eks-chart",
       version:  "v0.1.7",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonEKSClusterPolicy"
     },
     [AckServiceName.APPLICATIONAUTOSCALING]: {
       chart: "applicationautoscaling-chart",
       version:  "v0.2.14",
-      managedPolicyName: ""
+      managedPolicyName: "AutoScalingFullAccess"
     },
     [AckServiceName.ELASTICSEARCHSERVICE]: {
       chart: "elasticsearchservice-chart",
       version:  "v0.0.2",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonElasticsearchServiceRolePolicy"
     },
     [AckServiceName.PROMETHEUSSERVICE]: {
       chart: "prometheusservice-chart",
       version:  "v0.1.1",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonPrometheusFullAccess"
     },
     [AckServiceName.EMRCONTAINERS]: {
       chart: "emrcontainers-chart",
       version:  "v0.1.0",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonEMRContainersServiceRolePolicy"
     },
     [AckServiceName.SFN]: {
       chart: "sfn-chart",
       version:  "v0.1.2",
-      managedPolicyName: ""
+      managedPolicyName: "AWSStepFunctionsFullAccess"
     },
     [AckServiceName.KINESIS]: {
       chart: "kinesis-chart",
       version:  "v0.0.1",
-      managedPolicyName: ""
+      managedPolicyName: "AmazonKinesisFullAccess"
     },
     [AckServiceName.CLOUDTRAIL]: {
       chart: "cloudtrail-chart",
       version:  "v0.0.3",
-      managedPolicyName: ""
+      managedPolicyName: "AWSCloudTrail_FullAccess"
     }
 
 }
