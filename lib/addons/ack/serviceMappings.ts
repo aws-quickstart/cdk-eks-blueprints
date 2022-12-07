@@ -1,4 +1,3 @@
-import AckServiceName from "./index";
 
 export interface AckChartMapping {
     chart: string,
@@ -6,7 +5,7 @@ export interface AckChartMapping {
     managedPolicyName: string
 }
 
-AckServiceName {
+export const enum AckServiceName {
   IAM = "iam",
   RDS = "rds",
   EC2 = "ec2",
