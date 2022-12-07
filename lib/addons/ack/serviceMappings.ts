@@ -32,7 +32,7 @@ export enum AckServiceName {
 export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.IAM]: {
       chart: "iam-chart",
-      version:  "v0.0.13",
+      version:  "v0.0.22",
       managedPolicyName: "IAMFullAccess"
     },
     [AckServiceName.RDS]: {

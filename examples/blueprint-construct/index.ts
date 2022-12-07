@@ -4,7 +4,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { AckServiceName, HelmAddOn } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
@@ -77,6 +77,11 @@ export default class BlueprintConstruct {
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn(),
             new blueprints.addons.AckAddOn({
+                id: "ec2-ack",
+                serviceName: AckServiceName.EC2
+            }),
+            new blueprints.addons.AckAddOn({
+                id: "rds-ack",
                 name: "rds-chart",
                 chart: "rds-chart",
                 version: "v0.1.1",
