@@ -16,7 +16,7 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
     id?: string;
     /**
      * Default Service Name
-     * @default IAM
+     * @default iam
      */
     serviceName?: AckServiceName;
     /**
@@ -34,9 +34,9 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
     saName?: string;
 }
 
-export enum AckServiceName {
+export const enum AckServiceName {
   IAM = "iam",
-  RDS= "rds" // etc.
+  RDS = "rds"
 }
 
 /**
@@ -116,12 +116,12 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   let tempProps : Partial<AckAddOnProps> = {...props ?? {}}; // since props may be empty
   tempProps.id = tempProps.id ?? defaultProps.id;
   tempProps.serviceName = tempProps.serviceName ?? defaultProps.serviceName;
-  tempProps.name = tempProps.name ?? serviceMappings[tempProps.serviceName!].chart  ?? defaultProps.name;
+  tempProps.name = tempProps.name ?? serviceMappings[tempProps.serviceName!]?.chart ?? defaultProps.name;
   tempProps.namespace = tempProps.namespace ?? defaultProps.namespace;
-  tempProps.chart = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.chart` ?? defaultProps.chart;
-  tempProps.version = tempProps.chart ?? `serviceMappings.${tempProps.serviceName}.version` ?? defaultProps.version;
-  tempProps.repository = tempProps.repository ?? `oci://public.ecr.aws/aws-controllers-k8s\${tempProps.name}` ?? defaultProps.repository;
-  tempProps.managedPolicyName = tempProps.managedPolicyName ?? `serviceMappings.${tempProps.serviceName}.managedPolicyName` ?? defaultProps.managedPolicyName;
+  tempProps.chart = tempProps.chart ?? serviceMappings[tempProps.serviceName!]?.chart ?? defaultProps.chart;
+  tempProps.version = tempProps.version ?? serviceMappings[tempProps.serviceName!]?.version ?? defaultProps.version;
+  tempProps.repository = tempProps.repository ?? `oci://public.ecr.aws/aws-controllers-k8s/${tempProps.name}` ?? defaultProps.repository;
+  tempProps.managedPolicyName = tempProps.managedPolicyName ?? serviceMappings[tempProps.serviceName!]?.managedPolicyName ?? defaultProps.managedPolicyName;
   tempProps.createNamespace = tempProps.createNamespace ?? defaultProps.createNamespace;
   tempProps.saName = tempProps.saName ?? `${tempProps.chart}-sa`;
   return tempProps as AckAddOnProps;
