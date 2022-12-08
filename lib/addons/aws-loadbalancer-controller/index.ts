@@ -1,9 +1,9 @@
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
+import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { registries } from "../../utils/registry-utils";
 
 /**
  * Configuration options for the add-on.
@@ -49,7 +49,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.4.4',
+    version: '1.4.6',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false,

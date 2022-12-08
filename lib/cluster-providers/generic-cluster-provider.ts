@@ -1,6 +1,13 @@
+
+import { KubectlV22Layer } from "@aws-cdk/lambda-layer-kubectl-v22";
+import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
+import { } from "aws-cdk-lib/";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { IVpc } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import { IKey } from "aws-cdk-lib/aws-kms";
+import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { ClusterInfo, ClusterProvider } from "../spi";
 import * as utils from "../utils";
@@ -13,8 +20,8 @@ export function clusterBuilder() {
 }
 
 /**
- * Properties for the generic cluster provider, containing definitions of managed node groups, 
- * auto-scaling groups, fargate profiles. 
+ * Properties for the generic cluster provider, containing definitions of managed node groups,
+ * auto-scaling groups, fargate profiles.
  */
 export interface GenericClusterProviderProps extends eks.ClusterOptions {
 
@@ -49,21 +56,21 @@ export class ManagedNodeGroupConstraints implements utils.ConstraintsType<Manage
     id = new utils.StringConstraint(1, 63);
 
     /**
-    * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+    * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
     * of situations of a hard limit request being accepted, and as a result the limit would be raised
     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
     */
     minSize = new utils.NumberConstraint(0, 2250);
 
     /**
-     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
      * of situations of a hard limit request being accepted, and as a result the limit would be raised
      * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
      */
     maxSize = new utils.NumberConstraint(0, 2250);
 
     /**
-     * Nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case 
+     * Nodes per node group has a soft limit of 450 nodes, and as little as 0. But we multiply that by a factor of 5 to 2250 in case
      * of situations of a hard limit request being accepted, and as a result the limit would be raised
      * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
      */
@@ -112,13 +119,13 @@ export class FargateProfileConstraints implements utils.ConstraintsType<eks.Farg
 
 export class GenericClusterPropsConstraints implements utils.ConstraintsType<GenericClusterProviderProps> {
     /**
-    * managedNodeGroups per cluster have a soft limit of 30 managed node groups per EKS cluster, and as little as 0. But we multiply that 
+    * managedNodeGroups per cluster have a soft limit of 30 managed node groups per EKS cluster, and as little as 0. But we multiply that
     * by a factor of 5 to 150 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
     * https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
     */
     managedNodeGroups = new utils.ArrayConstraint(0, 150);
     /**
-    * autoscalingNodeGroups per cluster have a soft limit of 500 autoscaling node groups per EKS cluster, and as little as 0. But we multiply that 
+    * autoscalingNodeGroups per cluster have a soft limit of 500 autoscaling node groups per EKS cluster, and as little as 0. But we multiply that
     * by a factor of 5 to 2500 in case of situations of a hard limit request being accepted, and as a result the limit would be raised.
     * https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-quotas.html
     */
@@ -126,7 +133,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_21
+    version: eks.KubernetesVersion.V1_23
 };
 
 export class ClusterBuilder {
@@ -176,7 +183,7 @@ export class ClusterBuilder {
 }
 
 /**
- * Cluster provider implementation that supports multiple node groups. 
+ * Cluster provider implementation that supports multiple node groups.
  */
 export class GenericClusterProvider implements ClusterProvider {
 
@@ -189,10 +196,10 @@ export class GenericClusterProvider implements ClusterProvider {
             "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
     }
 
-    /** 
-     * @override 
+    /**
+     * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc): ClusterInfo {
+    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey: IKey): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
@@ -203,13 +210,17 @@ export class GenericClusterProvider implements ClusterProvider {
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
 
-        const defaultOptions = {
+        const kubectlLayer = this.getKubectlLayer(scope, version);
+
+        const defaultOptions: Partial<eks.ClusterProps> = {
             vpc,
+            secretsEncryptionKey,
             clusterName,
             outputClusterName,
             version,
             vpcSubnets,
             endpointAccess,
+            kubectlLayer,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
@@ -239,20 +250,36 @@ export class GenericClusterProvider implements ClusterProvider {
 
     /**
      * Template method that may be overridden by subclasses to create a specific cluster flavor (e.g. FargateCluster vs eks.Cluster)
-     * @param scope 
-     * @param id 
-     * @param clusterOptions 
-     * @returns 
+     * @param scope
+     * @param id
+     * @param clusterOptions
+     * @returns
      */
     protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.Cluster(scope, id, clusterOptions);
     }
 
     /**
-     * Adds an autoscaling group to the cluster.
-     * @param cluster 
-     * @param nodeGroup 
+     * Can be overridden to provide a custom kubectl layer. 
+     * @param scope 
+     * @param version 
      * @returns 
+     */
+    protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
+        switch(version) {
+            case eks.KubernetesVersion.V1_23:
+                return new KubectlV23Layer(scope, "kubectllayer23");
+            case eks.KubernetesVersion.V1_22:
+                return new KubectlV22Layer(scope, "kubectllayer22");
+        }
+        return undefined;
+    }
+
+    /**
+     * Adds an autoscaling group to the cluster.
+     * @param cluster
+     * @param nodeGroup
+     * @returns
      */
     addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: AutoscalingNodeGroup): autoscaling.AutoScalingGroup {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
@@ -287,9 +314,9 @@ export class GenericClusterProvider implements ClusterProvider {
 
     /**
      * Adds a managed node group to the cluster.
-     * @param cluster 
-     * @param nodeGroup 
-     * @returns 
+     * @param cluster
+     * @param nodeGroup
+     * @returns
      */
     addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
         const capacityType = nodeGroup.nodeGroupCapacityType;
@@ -332,7 +359,7 @@ export class GenericClusterProvider implements ClusterProvider {
     }
 
     private validateInput(props: GenericClusterProviderProps) {
-        
+
         utils.validateConstraints(new GenericClusterPropsConstraints, GenericClusterProvider.name, props);
         if (props.managedNodeGroups != undefined)
             utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);

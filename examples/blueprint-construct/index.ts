@@ -1,9 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { AckServiceName, HelmAddOn } from '../../lib';
+import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -21,6 +23,7 @@ export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
         HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.failOnVersionValidation = false;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -72,6 +75,29 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.S3
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                id: "ec2-ack",
+                createNamespace: false,
+                serviceName: AckServiceName.EC2
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.RDS,
+                id: "rds-ack",
+                name: "rds-chart",
+                chart: "rds-chart",
+                version: "v0.1.1",
+                release: "rds-chart",
+                repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
+                managedPolicyName: "AmazonRDSFullAccess",
+                createNamespace: false,
+                saName: "rds-chart"
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
@@ -105,12 +131,15 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
             new blueprints.addons.JupyterHubAddOn({
-                ebsConfig: {
-                    storageClass: "gp2",
-                    capacity: "4Gi",
+                efsConfig: {
+                    pvcName: "efs-persist",
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                    capacity: '10Gi',
                 },
                 enableIngress: false,
+                notebookStack: 'jupyter/datascience-notebook',
             }),
+            new blueprints.EmrEksAddOn()
         ];
 
         // Instantiated to for helm version check.
@@ -118,15 +147,14 @@ export default class BlueprintConstruct {
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
         new blueprints.ExternalsSecretsAddOn();
-        new blueprints.OpaGatekeeperAddOn();
-
+       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_21,
+            version: KubernetesVersion.V1_23,
             managedNodeGroups: [
                 {
                     id: "mng1",
@@ -144,7 +172,7 @@ export default class BlueprintConstruct {
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': "ami-07bda4b61dc470985",
+                            'us-west-1': 'ami-07bda4b61dc470985',
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
@@ -154,10 +182,40 @@ export default class BlueprintConstruct {
             ]
         });
 
+        const executionRolePolicyStatement: PolicyStatement [] = [
+            new PolicyStatement({
+              resources: ['*'],
+              actions: ['s3:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],   
+              actions: ['glue:*'],
+            }),
+            new PolicyStatement({
+              resources: ['*'],
+              actions: [
+                'logs:*',
+              ],
+            }),
+          ];
+      
+      const dataTeam: EmrEksTeamProps = {
+              name:'dataTeam',
+              virtualClusterName: 'batchJob',
+              virtualClusterNamespace: 'batchjob',
+              createNamespace: true,
+              executionRoles: [
+                  {
+                      executionRoleIamPolicyStatement: executionRolePolicyStatement,
+                      executionRoleName: 'myBlueprintExecRole'
+                  }
+              ]
+          };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .teams(...teams)
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }

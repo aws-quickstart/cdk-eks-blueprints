@@ -44,20 +44,21 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.43.0
+npm install -g aws-cdk@2.51.1
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.43.0
+# must output 2.51.1
 ```
 
 Create a new CDK project. We use `typescript` for this example.
 
 ```bash
 cdk init app --language typescript
+npm install typescript@~4.8.4
 ```
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment.
@@ -97,10 +98,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.XrayAddOn()
 ];
 
-const account = 'XXXXXXXXXXXXX'
-const region = 'us-east-2'
-const props = { env: { account, region } }
-new blueprints.EksBlueprint(app, { id: 'east-test-1', addOns}, props)
+const account = 'XXXXXXXXXXXXX';
+const region = 'us-east-2';
+
+blueprints.EksBlueprint.builder()
+    .account(account)
+    .region(region)
+    .addOns(...addOns)
+    .build(app, 'eks-blueprint');
 ```
 
 Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.

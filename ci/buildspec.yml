@@ -7,7 +7,7 @@ phases:
     runtime-versions:
       nodejs: 14
     commands:
-      - n 16.17.0
+      - n 18.12.1
       - |
         if [ ! -z "${COMMIT_ID}" ]; then 
           git fetch origin pull/${PR_NUMBER}/head:pr

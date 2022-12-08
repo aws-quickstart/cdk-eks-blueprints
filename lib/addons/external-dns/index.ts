@@ -4,6 +4,7 @@ import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
+import merge from "ts-deepmerge";
 
 
 /**
@@ -23,7 +24,8 @@ const defaultProps = {
     namespace: 'external-dns',
     repository: 'https://charts.bitnami.com/bitnami',
     release: 'blueprints-addon-external-dns',
-    version: '6.9.0'
+    version: '6.12.1',
+    values: {},
 };
 
 /**
@@ -76,17 +78,20 @@ export class ExternalDnsAddOn extends HelmAddOn {
 
         sa.node.addDependency(namespaceManifest);
 
-        const chart = this.addHelmChart(clusterInfo, {
-            provider: 'aws',
-            zoneIdFilters: hostedZones.map(hostedZone => hostedZone!.hostedZoneId),
+        let values = {
+            provider: "aws",
+            zoneIdFilters: hostedZones.map((hostedZone) => hostedZone!.hostedZoneId),
             aws: {
-                region,
+              region,
             },
             serviceAccount: {
-                create: false,
-                name: sa.serviceAccountName,
+              create: false,
+             name: sa.serviceAccountName,
             },
-        });
+        };
+
+        values = merge(values, this.props.values ?? {});
+        const chart = this.addHelmChart(clusterInfo, values);
 
         chart.node.addDependency(namespaceManifest);
         // return the Promise Construct for any teams that may depend on this
