@@ -15,7 +15,8 @@ import { Construct } from "constructs";
  */
 export interface ExecutionRoleDefinition {
   /**
-   * The name of the IAM role to create
+   * The name of the IAM role to create, this name is used as base for the excution Role name
+   * The name will have the following format after deployment: `NAME-AWS-REGION-EKS-CLUSTER-NAME`.
    */
   executionRoleName: string;
   /**
