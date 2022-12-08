@@ -4,7 +4,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { AckServiceName, HelmAddOn } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
@@ -23,6 +23,7 @@ export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
         HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.failOnVersionValidation = false;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -74,6 +75,29 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.S3
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                id: "ec2-ack",
+                createNamespace: false,
+                serviceName: AckServiceName.EC2
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.RDS,
+                id: "rds-ack",
+                name: "rds-chart",
+                chart: "rds-chart",
+                version: "v0.1.1",
+                release: "rds-chart",
+                repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
+                managedPolicyName: "AmazonRDSFullAccess",
+                createNamespace: false,
+                saName: "rds-chart"
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
