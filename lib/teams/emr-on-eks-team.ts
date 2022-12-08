@@ -1,6 +1,6 @@
 import { Cluster } from "aws-cdk-lib/aws-eks";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
-import { Aws, CfnJson, CfnOutput, CfnTag } from "aws-cdk-lib";
+import { Aws, CfnJson, CfnOutput, CfnTag, Stack } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';
 import * as simplebase from 'simple-base';
 import { CfnVirtualCluster } from "aws-cdk-lib/aws-emrcontainers";
@@ -186,9 +186,11 @@ export class EmrEksTeam extends ApplicationTeam {
 
     const stack = cluster.stack;
 
+    const roleName = `${name}-${Aws.REGION.toString()}-${cluster.clusterName}`;
+
     let irsaConditionkey: CfnJson = new CfnJson(stack, `${name}roleIrsaConditionkey'`, {
       value: {
-        [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: 'system:serviceaccount:' + namespace + ':emr-containers-sa-*-*-' + Aws.ACCOUNT_ID.toString() + '-' + simplebase.base36.encode(name),
+        [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: 'system:serviceaccount:' + namespace + ':emr-containers-sa-*-*-' + Aws.ACCOUNT_ID.toString() + '-' + simplebase.base36.encode(roleName),
       },
     });
 
@@ -200,7 +202,7 @@ export class EmrEksTeam extends ApplicationTeam {
           StringLike: irsaConditionkey,
         },
         'sts:AssumeRoleWithWebIdentity'),
-      roleName: name,
+      roleName: roleName,
       managedPolicies: [policy],
     });
   }
