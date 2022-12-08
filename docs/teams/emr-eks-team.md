@@ -2,7 +2,7 @@
 
 The `EMR on EKS Team` extends the `ApplicationTeam` and allows the EMR on EKS team to manage the namespace where the virtual cluster is deployed. This team **MUST** be used in conjuction with [EMR on EKS AddOn](../addons/emr-eks.md).
 
-The EMR on EKS Team allows you to create a [Virtual Cluster](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/virtual-cluster.html) and job Execution Roles that are used by the job to access data in Amazon S3, AWS Glue Data Catalog or any other AWS resources that you need to interact with. The job execution roles are scoped with IRSA to be only assumed by pods deployed by EMR on EKS in the namespace of the virtual cluster. You can learn more about the condition applied [here](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/iam-execution-role.html). 
+The EMR on EKS Team allows you to create a [Virtual Cluster](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/virtual-cluster.html) and job Execution Roles that are used by the job to access data in Amazon S3, AWS Glue Data Catalog or any other AWS resources that you need to interact with. The job execution roles are scoped with IRSA to be only assumed by pods deployed by EMR on EKS in the namespace of the virtual cluster. You can learn more about the condition applied [here](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/iam-execution-role.html). The IAM roles will have the following format: `NAME-AWS_REGION-EKS_CLUSTER_NAME`.
 
 
 ## Usage

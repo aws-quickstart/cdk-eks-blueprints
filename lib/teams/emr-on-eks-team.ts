@@ -15,7 +15,8 @@ import { Construct } from "constructs";
  */
 export interface ExecutionRoleDefinition {
   /**
-   * The name of the IAM role to create
+   * The name of the IAM role to create, this name is used as base for the excution Role name
+   * The name will have the following format after deployment: `NAME-AWS-REGION-EKS-CLUSTER-NAME`.
    */
   executionRoleName: string;
   /**
@@ -64,6 +65,10 @@ export interface EmrEksTeamProps extends TeamProps {
  * https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-cluster-access.html
  * class constructor takes EMR on EKS team definition as a parameter. Pre:requisite: EMR on EKS AddOn is part of the blueprint.
  * The EmrEksTeam will `throw` an error if the EMR on EKS AddOn is not part of the blueprint.
+ * 
+ * The team will create the IAM execution roles based on the IAM policies passed to it.
+ * 
+ * The IAM roles will have the following format: `NAME-AWS-REGION-EKS-CLUSTER-NAME`
  */
 
 export class EmrEksTeam extends ApplicationTeam {
@@ -186,9 +191,11 @@ export class EmrEksTeam extends ApplicationTeam {
 
     const stack = cluster.stack;
 
+    const roleName = `${name}-${Aws.REGION.toString()}-${cluster.clusterName}`;
+
     let irsaConditionkey: CfnJson = new CfnJson(stack, `${name}roleIrsaConditionkey'`, {
       value: {
-        [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: 'system:serviceaccount:' + namespace + ':emr-containers-sa-*-*-' + Aws.ACCOUNT_ID.toString() + '-' + simplebase.base36.encode(name),
+        [`${cluster.openIdConnectProvider.openIdConnectProviderIssuer}:sub`]: 'system:serviceaccount:' + namespace + ':emr-containers-sa-*-*-' + Aws.ACCOUNT_ID.toString() + '-' + simplebase.base36.encode(roleName),
       },
     });
 
@@ -200,7 +207,7 @@ export class EmrEksTeam extends ApplicationTeam {
           StringLike: irsaConditionkey,
         },
         'sts:AssumeRoleWithWebIdentity'),
-      roleName: name,
+      roleName: roleName,
       managedPolicies: [policy],
     });
   }
