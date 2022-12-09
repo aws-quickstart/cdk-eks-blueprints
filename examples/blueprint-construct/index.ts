@@ -121,6 +121,7 @@ export default class BlueprintConstruct {
                 weight: 20,
                 interruptionHandling: true,
             }),
+            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
