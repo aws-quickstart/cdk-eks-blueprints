@@ -49,7 +49,9 @@ const karpenterAddonProps = {
   }],
   amiFamily: "AL2",
   consolidation: { enabled: true },
-  weight: 20
+  ttlSecondsUntilExpired: 360,
+  weight: 20,
+  interruptionHandling: true,
 }
 const vpcCniAddOn = new blueprints.addons.VpcCniAddOn();
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
@@ -61,9 +63,10 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 
 The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
-- aws.defaultInstanceProfile
-- clusterEndpoint
-- clusterName
+- settings.aws.defaultInstanceProfile
+- settings.aws.clusterEndpoint
+- settings.aws.clusterName
+- settings.aws.interruptionQueueName (if interruption handling is enabled)
 - serviceAccount.create
 - serviceAccount.name
 - serviceAccount.annotations.eks.amazonaws.com/role-arn
@@ -90,6 +93,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
 3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterempty`, so if you provide both properties, the addon will throw an error.
 4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
+5. Interruption Handling, which is a native way to handle interruption due to involuntary interruption events, is supported on versions 0.19.0 and later. For interruption handling in the earlier versions, Karpenter supports using AWS Node Interruption Handler (which you will need to add as an add-on and ***must be in add-on array after the Karpenter add-on*** for it to work.
 
 ## Using Karpenter
 
