@@ -119,6 +119,7 @@ export default class BlueprintConstruct {
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 360,
                 weight: 20,
+                interruptionHandling: true,
             }),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
