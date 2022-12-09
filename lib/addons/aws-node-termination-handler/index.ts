@@ -66,10 +66,14 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    */
   deploy(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;    
-    const asgCapacity = clusterInfo.autoscalingGroups;
+    const asgCapacity = clusterInfo.autoscalingGroups || [];
 
-    // No support for Fargate and Managed Node Groups, lets catch that
-    assert(asgCapacity && asgCapacity.length > 0, 'AWS Node Termination Handler is only supported for self-managed nodes');
+    const karpenter = clusterInfo.getScheduledAddOn('KarpenterAddOn');
+    if (!karpenter){
+      // No support for Fargate and Managed Node Groups, lets catch that
+      assert(asgCapacity && asgCapacity.length > 0, 'AWS Node Termination Handler is only supported for self-managed nodes');
+    }
+    
 
     // Create an SQS Queue
     let helmValues: any;
