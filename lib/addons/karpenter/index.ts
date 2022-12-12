@@ -137,7 +137,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
         const weight = this.options.weight || null;
         const consol = this.options.consolidation || null;
-        const repo = this.options.repository!
+        const repo = this.options.repository!;
         const interruption = this.options.interruptionHandling || false;
         
         // Various checks for version errors
@@ -162,7 +162,7 @@ export class KarpenterAddOn extends HelmAddOn {
             const queue = new sqs.Queue(cluster.stack, 'karpenter-queue', {
                 queueName: stackName,
                 retentionPeriod: Duration.seconds(300),
-            })
+            });
             queue.addToResourcePolicy(new iam.PolicyStatement({
                 sid: 'EC2InterruptionPolicy',
                 effect: iam.Effect.ALLOW,
@@ -174,36 +174,36 @@ export class KarpenterAddOn extends HelmAddOn {
                     "sqs:SendMessage"
                 ],
                 resources: [`${queue.queueArn}`]
-            }))
+            }));
 
             // Add Interruption Rules
-            const scheduleChangeRule = new Rule(cluster.stack, 'schedule-change-rule', {
+            new Rule(cluster.stack, 'schedule-change-rule', {
                 eventPattern: {
                     source: ["aws.health"],
                     detailType: ['AWS Health Event']
                 },
-            }).addTarget(new SqsQueue(queue))
+            }).addTarget(new SqsQueue(queue));
 
-            const spotInterruptionRule = new Rule(cluster.stack, 'spot-interruption-rule', {
+            new Rule(cluster.stack, 'spot-interruption-rule', {
                 eventPattern: {
                     source: ["aws.ec2"],
                     detailType: ['EC2 Spot Instance Interruption Warning']
                 },
-            }).addTarget(new SqsQueue(queue))
+            }).addTarget(new SqsQueue(queue));
 
-            const rebalanceRule = new Rule(cluster.stack, 'rebalance-rule', {
+            new Rule(cluster.stack, 'rebalance-rule', {
                 eventPattern: {
                     source: ["aws.ec2"],
                     detailType: ['EC2 Instance Rebalance Recommendation']
                 },
-            }).addTarget(new SqsQueue(queue))
+            }).addTarget(new SqsQueue(queue));
 
-            const instanceStateChangeRule = new Rule(cluster.stack, 'inst-state-change-rule', {
+            new Rule(cluster.stack, 'inst-state-change-rule', {
                 eventPattern: {
                     source: ["aws.ec2"],
                     detailType: ['C2 Instance State-change Notification']
                 },
-            }).addTarget(new SqsQueue(queue))
+            }).addTarget(new SqsQueue(queue));
 
             // Add policy to the node role to allow access to the Interruption Queue
             const interruptionQueueStatement = new iam.PolicyStatement({
@@ -231,7 +231,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 clusterName: name,
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
                 interruptionQueueName: cluster.clusterName
-            })
+            });
         } else {
             setPath(values, "clusterEndpoint", endpoint);
             setPath(values, "clusterName", name);
@@ -330,9 +330,9 @@ export class KarpenterAddOn extends HelmAddOn {
         
         // Registry changes with v0.17.0 and later
         if (semver.gte(version, '0.17.0')){
-            assert(repo === 'oci://public.ecr.aws/karpenter/karpenter', 'Please provide the OCI repository.')
+            assert(repo === 'oci://public.ecr.aws/karpenter/karpenter', 'Please provide the OCI repository.');
         } else {
-            assert(repo === 'charts.karpenter.sh', 'Please provide the older Karpenter repository url.')
+            assert(repo === 'charts.karpenter.sh', 'Please provide the older Karpenter repository url.');
         }
 
         // Interruption handling only available with v0.19.0 and later

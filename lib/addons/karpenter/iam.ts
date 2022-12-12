@@ -1,5 +1,3 @@
-import * as iam from 'aws-cdk-lib/aws-iam';
-
 export const KarpenterControllerPolicy = {
 "Version": "2012-10-17",
 "Statement": [
