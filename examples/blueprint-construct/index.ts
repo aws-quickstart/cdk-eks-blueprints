@@ -5,7 +5,7 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { HelmAddOn } from '../../lib';
-import { EmrEksTeamProps } from '../../lib/teams';
+import { EmrEksTeamProps, BatchEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -77,7 +77,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+                    { key: 'topology.kubernetes.io/zone', op: 'In', vals: ['us-west-2a','us-west-2b','us-west-2c']},
                     { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
                     { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
                 ],
@@ -87,11 +87,11 @@ export default class BlueprintConstruct {
                 securityGroupTags: {
                     "kubernetes.io/cluster/blueprint-construct-dev": "owned",
                 },
-                taints: [{
-                    key: "workload",
-                    value: "test",
-                    effect: "NoSchedule",
-                }],
+                // taints: [{
+                //     key: "workload",
+                //     value: "test",
+                //     effect: "NoSchedule",
+                // }],
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 360,
                 weight: 20,
@@ -106,16 +106,17 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                enableIngress: false,
-                notebookStack: 'jupyter/datascience-notebook',
-            }),
-            new blueprints.EmrEksAddOn()
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     enableIngress: false,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            // }),
+            new blueprints.EmrEksAddOn(),
+            new blueprints.AwsBatchAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -175,7 +176,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-      const dataTeam: EmrEksTeamProps = {
+        const dataTeam: EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -188,10 +189,17 @@ export default class BlueprintConstruct {
               ]
           };
 
+        const batchTeam: BatchEksTeamProps = {
+            name: 'team-batch-a',
+            namespace: 'aws-batch',
+            jobQueueName: 'team-a-job-queue',
+            priority: 10
+        };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }

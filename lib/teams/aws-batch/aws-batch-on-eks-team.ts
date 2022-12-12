@@ -19,6 +19,11 @@ const NAMESPACE = 'aws-batch';
  */
 export interface BatchEksTeamProps extends TeamProps {
   /**
+   * Name of the team
+   */
+  name: string,
+
+  /**
    * Namespace name for AWS Batch
    */
   namespace: string
@@ -26,13 +31,19 @@ export interface BatchEksTeamProps extends TeamProps {
   /**
    * Allocation strategies for EKS Compute environment
    */
-  allocationStrategy?: 'BEST_FIT_PROGRESSIVE' | 'SPOT_CAPACITY_OPTIMIZED';
+  allocationStrategy?: 'BEST_FIT_PROGRESSIVE' | 'SPOT_CAPACITY_OPTIMIZED'
+
+  jobQueueName: string
+
+  priority: number,
 }
 
 const defaultProps: BatchEksTeamProps = {
   name: NAMESPACE,
   namespace: NAMESPACE,
-  allocationStrategy: 'BEST_FIT_PROGRESSIVE'
+  allocationStrategy: 'BEST_FIT_PROGRESSIVE',
+  jobQueueName: 'batch-eks-job',
+  priority: 10,
 }
 
 /*
@@ -61,9 +72,25 @@ export class BatchEksTeam extends ApplicationTeam {
       throw new Error("AwsBatchAddOn must be deployed before creating AWS Batch on EKS team.");
     }
 
-    const batchSetUpStatements = this.setBatchEksNamespace(clusterInfo, this.batchTeam.namespace);
+    // Set AWS Batch namespace and necessary RBACs
+    const ns = this.setBatchEksNamespace(clusterInfo, this.batchTeam.namespace);
 
-    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeam.namespace, allocStr);
+    // Create compute environment
+    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeam.namespace, ns, allocStr);
+
+    // Submit a job queue
+    const jobQueue = new batch.CfnJobQueue(clusterInfo.cluster.stack,'batch-eks-job-queue',{
+      jobQueueName: this.batchTeam.jobQueueName,
+      priority: this.batchTeam.priority,
+      computeEnvironmentOrder: [
+        {
+          order: 1,
+          computeEnvironment: computeEnv.attrComputeEnvironmentArn
+        }
+      ]
+    })
+
+    jobQueue.node.addDependency(computeEnv);
   }
   /**
    * method to to apply k8s RBAC to the service account used by Batch service role
@@ -73,7 +100,7 @@ export class BatchEksTeam extends ApplicationTeam {
    * @returns 
    */
 
-  private setBatchEksNamespace(clusterInfo: ClusterInfo, namespace: string): Construct {
+  private setBatchEksNamespace(clusterInfo: ClusterInfo, namespace: string): eks.KubernetesManifest {
 
     let doc = readYamlDocument(`${__dirname}/aws-batch-rbac-config.ytpl`);
 
@@ -97,17 +124,17 @@ export class BatchEksTeam extends ApplicationTeam {
     const batchEksNamespace = createNamespace(namespace, clusterInfo.cluster, true, true);
     statement.node.addDependency(batchEksNamespace);
 
-    return statement;
+    return batchEksNamespace;
   }
 
-  private setComputeEnvironment(clusterInfo: ClusterInfo, namespace: string, allocStr: string): batch.CfnComputeEnvironment {
+  private setComputeEnvironment(clusterInfo: ClusterInfo, namespace: string, nsNode: eks.KubernetesManifest, allocStr: string): batch.CfnComputeEnvironment {
     const nodeGroups = assertEC2NodeGroup(clusterInfo, "Batch Compute Environment");
     const ngRoleNames = nodeGroups.map((ng: eks.Nodegroup | AutoScalingGroup) => {return ng.role.roleName});
     const cluster = clusterInfo.cluster;
     const ngRole = ngRoleNames[0];
 
     // Need to create instance profile for the nodegroup role
-    new iam.CfnInstanceProfile(cluster, 'ng-role-instance-profile',{
+    const instanceProfile = new iam.CfnInstanceProfile(cluster, 'ng-role-instance-profile',{
       instanceProfileName: ngRole,
       roles: [ngRole]
     })
@@ -131,6 +158,9 @@ export class BatchEksTeam extends ApplicationTeam {
         instanceRole: ngRole,
       }
     });
+
+    batchComputeEnv.node.addDependency(instanceProfile);
+    batchComputeEnv.node.addDependency(nsNode);
 
     return batchComputeEnv;
   } 
