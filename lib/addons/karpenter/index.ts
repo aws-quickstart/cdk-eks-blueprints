@@ -340,7 +340,7 @@ export class KarpenterAddOn extends HelmAddOn {
         if (semver.lt(version, '0.19.0')){
             assert(!interruption, 'Interruption handling is only supported on versions v0.19.0 and later.');
         } else {
-            assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.')
+            assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.');
         }
 
         return consolidation;
