@@ -141,7 +141,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const interruption = this.options.interruptionHandling || false;
         
         // Various checks for version errors
-        const consolidation = this.versionFeatureChecksForError(version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
+        const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
 
         // Set up the node role and instance profile
         const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(cluster, stackName, region);
@@ -311,7 +311,7 @@ export class KarpenterAddOn extends HelmAddOn {
      * @param ttlSecondsAfterEmpty ttlSecondsAfterEmpty setting
      * @returns consolidation
      */
-    private versionFeatureChecksForError(version: string, weight: any, consol: any, repo: string, ttlSecondsAfterEmpty: any, interruption: boolean): any {
+    private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, weight: any, consol: any, repo: string, ttlSecondsAfterEmpty: any, interruption: boolean): any {
         
         // Consolidation only available with v0.15.0 and later
         let consolidation;
@@ -332,12 +332,15 @@ export class KarpenterAddOn extends HelmAddOn {
         if (semver.gte(version, '0.17.0')){
             assert(repo === 'oci://public.ecr.aws/karpenter/karpenter', 'Please provide the OCI repository.');
         } else {
-            assert(repo === 'charts.karpenter.sh', 'Please provide the older Karpenter repository url.');
+            assert(repo === 'https://charts.karpenter.sh', 'Please provide the older Karpenter repository url.');
         }
 
         // Interruption handling only available with v0.19.0 and later
+        // Conversely, we should block Node Termination Handler usage once Karpenter is leveraged
         if (semver.lt(version, '0.19.0')){
             assert(!interruption, 'Interruption handling is only supported on versions v0.19.0 and later.');
+        } else {
+            assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.')
         }
 
         return consolidation;

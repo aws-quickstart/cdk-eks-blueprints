@@ -72,8 +72,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
     if (!karpenter){
       // No support for Fargate and Managed Node Groups, lets catch that
       assert(asgCapacity && asgCapacity.length > 0, 'AWS Node Termination Handler is only supported for self-managed nodes');
-    }
-    
+    }    
 
     // Create an SQS Queue
     let helmValues: any;
@@ -86,12 +85,12 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
 
     // Get the appropriate Helm Values depending upon the Mode selected
     if (this.options.mode === Mode.IMDS) {
-        helmValues = this.configureImdsMode(serviceAccount);
+        helmValues = this.configureImdsMode(serviceAccount, karpenter);
     }
     else {
-        helmValues = this.configureQueueMode(cluster, serviceAccount, asgCapacity);
+        helmValues = this.configureQueueMode(cluster, serviceAccount, asgCapacity, karpenter);
     }
-
+    
     // Deploy the helm chart
     const awsNodeTerminationHandlerChart = this.addHelmChart(clusterInfo, helmValues);
     awsNodeTerminationHandlerChart.node.addDependency(serviceAccount);
@@ -102,10 +101,11 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param serviceAccount 
    * @returns Helm values
    */
-    private configureImdsMode(serviceAccount: ServiceAccount): any {
+    private configureImdsMode(serviceAccount: ServiceAccount, karpenter: Promise<Construct> | undefined): any {
         return {
             enableSpotInterruptionDraining: true,
             enableRebalanceMonitoring: true,
+            enableRebalanceDraining: karpenter ? true : false,
             enableScheduledEventDraining: true,
             serviceAccount: {
                 create: false,
@@ -121,7 +121,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param asgCapacity
    * @returns Helm values
    */
-    private configureQueueMode(cluster: Cluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup[]): any {
+    private configureQueueMode(cluster: Cluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup[], karpenter: Promise<Construct> | undefined): any {
         const queue = new Queue(cluster.stack, "aws-nth-queue", {
             retentionPeriod: Duration.minutes(5)
         });
@@ -137,23 +137,26 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
 
         const resources: string[] = [];
 
-        for (let i = 0; i < asgCapacity.length; i++) {
-            const nodeGroup = asgCapacity[i];
-            // Setup a Termination Lifecycle Hook on an ASG
-            new LifecycleHook(cluster.stack, `aws-${nodeGroup.autoScalingGroupName}-nth-lifecycle-hook`, {
-                lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
-                heartbeatTimeout: Duration.minutes(5), // based on https://github.com/aws/aws-node-termination-handler docs
-                notificationTarget: new QueueHook(queue),
-                autoScalingGroup: nodeGroup
-            });
+        // This does not apply if you leverage Karpenter (which uses NTH for Spot/Fargate)
+        if (!karpenter){
+          for (let i = 0; i < asgCapacity.length; i++) {
+              const nodeGroup = asgCapacity[i];
+              // Setup a Termination Lifecycle Hook on an ASG
+              new LifecycleHook(cluster.stack, `aws-${nodeGroup.autoScalingGroupName}-nth-lifecycle-hook`, {
+                  lifecycleTransition: LifecycleTransition.INSTANCE_TERMINATING,
+                  heartbeatTimeout: Duration.minutes(5), // based on https://github.com/aws/aws-node-termination-handler docs
+                  notificationTarget: new QueueHook(queue),
+                  autoScalingGroup: nodeGroup
+              });
 
-            // Tag the ASG
-            const tags = [{
-                Key: 'aws-node-termination-handler/managed',
-                Value: 'true'
-            }];
-            tagAsg(cluster.stack, nodeGroup.autoScalingGroupName, tags);
-            resources.push(nodeGroup.autoScalingGroupArn);
+              // Tag the ASG
+              const tags = [{
+                  Key: 'aws-node-termination-handler/managed',
+                  Value: 'true'
+              }];
+              tagAsg(cluster.stack, nodeGroup.autoScalingGroupName, tags);
+              resources.push(nodeGroup.autoScalingGroupArn);
+          }
         }
 
         // Create Amazon EventBridge Rules
