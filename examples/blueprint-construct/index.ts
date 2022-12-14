@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { IRole, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { getNamedResource, HelmAddOn, LookupRoleProvider } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import * as team from '../teams';
 
@@ -22,7 +22,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.validateHelmVersions = false;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -137,7 +137,8 @@ export default class BlueprintConstruct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+                    nodeRole: getNamedResource<IRole>("mynoderole")
                 },
                 {
                     id: "mng2-customami",
@@ -189,6 +190,7 @@ export default class BlueprintConstruct {
           };
 
         blueprints.EksBlueprint.builder()
+            .resourceProvider("mynoderole", new LookupRoleProvider("Admin"))
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))

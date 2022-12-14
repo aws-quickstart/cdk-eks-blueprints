@@ -199,14 +199,14 @@ export class EksBlueprint extends cdk.Stack {
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
-        localStack.run(resourceContext, this.createStack, blueprintProps);
+        localStack.run(resourceContext, EksBlueprint.createStack, this, blueprintProps);
     }
 
     /**
      * Internal create stack method. 
      * @param blueprintProps 
      */
-    private createStack(this: EksBlueprint, blueprintProps: EksBlueprintProps) {
+    private static createStack(stack: EksBlueprint, blueprintProps: EksBlueprintProps) {
         const resourceContext = localStack.getStore();
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
@@ -226,21 +226,21 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource!);
-        this.clusterInfo.setResourceContext(resourceContext);
+        stack.clusterInfo = clusterProvider.createCluster(stack, vpcResource!, kmsKeyResource!);
+        stack.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+            setupClusterLogging(stack.clusterInfo.cluster.stack, stack.clusterInfo.cluster, enableLogTypes);
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
 
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
-            const result = addOn.deploy(this.clusterInfo);
+            const result = addOn.deploy(stack.clusterInfo);
             if (result) {
                 const addOnKey = getAddOnNameOrId(addOn);
-                this.clusterInfo.addScheduledAddOn(addOnKey, result);
+                stack.clusterInfo.addScheduledAddOn(addOnKey, result);
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
@@ -248,27 +248,27 @@ export class EksBlueprint extends cdk.Stack {
             }
         }
 
-        const scheduledAddOns = this.clusterInfo.getAllScheduledAddons();
+        const scheduledAddOns = stack.clusterInfo.getAllScheduledAddons();
         const addOnKeys = [...scheduledAddOns.keys()];
         const promises = scheduledAddOns.values();
 
-        this.asyncTasks = Promise.all(promises).then((constructs) => {
+        stack.asyncTasks = Promise.all(promises).then((constructs) => {
             constructs.forEach((construct, index) => {
-                this.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
+                stack.clusterInfo.addProvisionedAddOn(addOnKeys[index], construct);
             });
 
             if (blueprintProps.teams != null) {
                 for (let team of blueprintProps.teams) {
-                    team.setup(this.clusterInfo);
+                    team.setup(stack.clusterInfo);
                 }
             }
 
             for (let step of postDeploymentSteps) {
-                step.postDeploy(this.clusterInfo, blueprintProps.teams ?? []);
+                step.postDeploy(stack.clusterInfo, blueprintProps.teams ?? []);
             }
         });
 
-        this.asyncTasks.catch(err => {
+        stack.asyncTasks.catch(err => {
             console.error(err);
             throw new Error(err);
         });

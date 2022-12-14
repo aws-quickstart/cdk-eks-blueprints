@@ -3,9 +3,10 @@ import * as spi from '../spi';
 
 export class LookupRoleProvider implements spi.ResourceProvider<iam.IRole> {
 
-    constructor(readonly roleName: string) { }
+    constructor(private readonly roleName: string) { }
 
     provide(context: spi.ResourceContext): iam.IRole {
+        console.log(this.roleName);
         return iam.Role.fromRoleName(context.scope, `${this.roleName}-iam-provider`, this.roleName);
     }
 

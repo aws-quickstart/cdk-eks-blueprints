@@ -16,7 +16,7 @@ export function getResource<T extends IResource = IResource>(fn: (context: Resou
         const resourceContext: ResourceContext = localStack.getStore();
         const result = resourceContext.get(uuid);
 
-        if(result === null) {
+        if(result == null) {
             resourceContext.add(uuid, {
                 provide(context: ResourceContext) : T {
                     return fn(context);
