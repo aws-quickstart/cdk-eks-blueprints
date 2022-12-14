@@ -107,6 +107,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
             enableRebalanceMonitoring: true,
             enableRebalanceDraining: karpenter ? true : false,
             enableScheduledEventDraining: true,
+            nodeSelector: karpenter ? {'karpenter.sh/capacity-type': 'spot'} : {},
             serviceAccount: {
                 create: false,
                 name: serviceAccount.serviceAccountName,
@@ -160,7 +161,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
         }
 
         // Create Amazon EventBridge Rules
-        this.createEvents(cluster.stack, queue);
+        this.createEvents(cluster.stack, queue, karpenter);
 
         // Service Account Policy
         serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
@@ -170,7 +171,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
                 'autoscaling:DescribeAutoScalingInstances',
                 'autoscaling:DescribeTags'
             ],
-            resources
+            resources: karpenter ? ['*'] : resources
         }));
 
         serviceAccount.addToPrincipalPolicy(new iam.PolicyStatement({
@@ -183,10 +184,13 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
         return {
             enableSqsTerminationDraining: true,
             queueURL: queue.queueUrl,
+            awsRegion: karpenter ? cluster.stack.region: '',
             serviceAccount: {
                 create: false,
                 name: serviceAccount.serviceAccountName,
-            }
+            },
+            checkASGTagBeforeDraining: karpenter ? false : true,
+            enableSpotInterruptionDraining: karpenter ? true : false,
         };
     }
 
@@ -195,13 +199,9 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param scope 
    * @param queue 
    */
-  private createEvents(scope: Construct, queue: Queue): void {
+  private createEvents(scope: Construct, queue: Queue, karpenter: Promise<Construct> | undefined): void {
     const target = new SqsQueue(queue);
     const eventPatterns: EventPattern[] = [
-      {
-        source: ['aws.autoscaling'],
-        detailType: ['EC2 Instance-terminate Lifecycle Action']
-      },
       {
         source: ['aws.ec2'],
         detailType: ['EC2 Spot Instance Interruption Warning']
@@ -216,9 +216,18 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
       },
       {
         source: ['aws.health'],
-        detailType: ['AWS Health Even'],
+        detailType: ['AWS Health Event'],
       }
     ];
+
+    if (!karpenter){
+      eventPatterns.push(
+        {
+          source: ['aws.autoscaling'],
+          detailType: ['EC2 Instance-terminate Lifecycle Action']
+        },
+      );
+    }
 
     eventPatterns.forEach((event, index) => {
       const rule = new Rule(scope, `rule-${index}`, { eventPattern: event });

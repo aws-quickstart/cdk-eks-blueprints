@@ -103,7 +103,7 @@ export default class BlueprintConstruct {
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
                     { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
                     { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
                 ],
                 subnetTags: {
                     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",

@@ -231,5 +231,5 @@ The property is changed to align with the naming convention of the provisioner, 
 
 3. Starting with v0.17.0, Karpenter's Helm chart package is stored in OCI (Open Container Initiative) registry. With this change, [charts.karpenter.sh](https://charts.karpenter.sh/) is no longer updated to preserve older versions. You have to adjust for the following:
 
-  1. The full URL needs to be present (including 'oci://').
-  2. You need to append a `v` to the version number (i.e. v0.17.0, not 0.17.0)
+* The full URL needs to be present (including 'oci://').
+* You need to append a `v` to the version number (i.e. v0.17.0, not 0.17.0)
