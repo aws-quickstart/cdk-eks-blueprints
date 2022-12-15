@@ -107,7 +107,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         super({...defaultProps, ...props});
         this.options = this.props as JupyterHubAddOnProps;
     }
-
+    
     @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
