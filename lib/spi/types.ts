@@ -7,6 +7,7 @@ import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { ExclusiveStackLocalStorage } from 'stack-local-storage';
 import { logger } from "../utils";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -239,3 +240,13 @@ export const localStack : ExclusiveStackLocalStorage<ResourceContext> = new Excl
     emptyErrorMessage: "Local stack store is not set for the current stack",
     conflictErrorMessage: "Local stack store cannot be overridden - possible async issue"
 });
+
+export const asyncLocalStorage = new class extends AsyncLocalStorage<ResourceContext> {
+    public getStore(): ResourceContext {
+        const result: ResourceContext | undefined = super.getStore();
+        if(result == null) {
+            throw new Error("Context not set");
+        }
+        return result!;
+    }
+}();

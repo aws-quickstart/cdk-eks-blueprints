@@ -1,11 +1,11 @@
 import { IResource } from 'aws-cdk-lib/core';
 import { Handler } from '../utils/proxy-utils';
-import { ResourceContext, localStack } from '../spi';
+import { ResourceContext, asyncLocalStorage } from '../spi';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getNamedResource<T extends IResource = IResource>(resourceName : string) : T {
     return new Proxy({} as T, new Handler(() => {
-        const resourceContext: ResourceContext = localStack.getStore();
+        const resourceContext: ResourceContext = asyncLocalStorage.getStore()!;
         return resourceContext.get(resourceName) as T;
     }));
 }
@@ -13,8 +13,8 @@ export function getNamedResource<T extends IResource = IResource>(resourceName :
 export function getResource<T extends IResource = IResource>(fn: (context: ResourceContext) => T) : T {
     const uuid = uuidv4();
     return new Proxy({} as T, new Handler(() => {
-        const resourceContext: ResourceContext = localStack.getStore();
-        const result = resourceContext.get(uuid);
+        const resourceContext: ResourceContext = asyncLocalStorage.getStore()!;
+        let result = resourceContext.get(uuid);
 
         if(result == null) {
             resourceContext.add(uuid, {
@@ -22,7 +22,7 @@ export function getResource<T extends IResource = IResource>(fn: (context: Resou
                     return fn(context);
                 }
             });
-            return resourceContext.get(uuid) as T;
+            result = resourceContext.get(uuid) as T;
         }
         return result as T;
     }));

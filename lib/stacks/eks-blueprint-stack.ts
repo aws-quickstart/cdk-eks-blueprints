@@ -7,7 +7,7 @@ import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import * as constraints from '../utils/constraints-utils';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
-import { localStack } from '../spi';
+import { asyncLocalStorage, ResourceContext } from '../spi';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
@@ -199,15 +199,17 @@ export class EksBlueprint extends cdk.Stack {
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
-        localStack.run(resourceContext, EksBlueprint.createStack, this, blueprintProps);
+        asyncLocalStorage.enterWith(resourceContext);
+
+        // localStack.run(resourceContext, EksBlueprint.createStack, this, blueprintProps);
+        EksBlueprint.createStack(this, blueprintProps, resourceContext);
     }
 
     /**
      * Internal create stack method. 
      * @param blueprintProps 
      */
-    private static createStack(stack: EksBlueprint, blueprintProps: EksBlueprintProps) {
-        const resourceContext = localStack.getStore();
+    private static createStack(stack: EksBlueprint, blueprintProps: EksBlueprintProps, resourceContext: ResourceContext) {
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
         if (!vpcResource) {
