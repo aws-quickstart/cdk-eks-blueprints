@@ -49,7 +49,7 @@ const karpenterAddonProps = {
   }],
   amiFamily: "AL2",
   consolidation: { enabled: true },
-  ttlSecondsUntilExpired: 360,
+  ttlSecondsUntilExpired: 2592000,
   weight: 20,
   interruptionHandling: true,
 }

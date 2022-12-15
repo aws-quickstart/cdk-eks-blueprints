@@ -117,7 +117,7 @@ export default class BlueprintConstruct {
                     effect: "NoSchedule",
                 }],
                 consolidation: { enabled: true },
-                ttlSecondsUntilExpired: 360,
+                ttlSecondsUntilExpired: 2592000,
                 weight: 20,
                 interruptionHandling: true,
             }),
