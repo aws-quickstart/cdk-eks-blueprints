@@ -233,3 +233,5 @@ The property is changed to align with the naming convention of the provisioner, 
 
 * The full URL needs to be present (including 'oci://').
 * You need to append a `v` to the version number (i.e. v0.17.0, not 0.17.0)
+
+4. Starting with v0.22.0, Karpenter will no longer work on Kubernetes version prior to 1.21. Either upgrade your Kubernetes to 1.21 or later version and apply Karpenter, or use prior Karpenter versions.
