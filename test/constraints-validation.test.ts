@@ -152,7 +152,6 @@ function getConstraintsDataSet(): DataError[] {
 }
 
 function compareIssues(object1: any, object2: any) {
-    const keys1 = Object.keys(object1);
     const keys2 = Object.keys(object2);
 
     for (let key of keys2) {
