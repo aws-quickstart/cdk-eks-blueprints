@@ -41,7 +41,6 @@ You can also configure KNative to ingest from specific event sources. More confi
 documentation about [event source configurations](https://knative.dev/docs/install/operator/knative-with-operators/#installing-knative-eventing-with-event-sources)
 
 
-
 ### Applying KNative Serving
 To apply KNative Serving to a specific Namespace, you can use the following YAML:
 ```yaml
