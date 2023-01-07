@@ -1,19 +1,11 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '../lib';
+import BlueprintConstruct from '../examples/blueprint-construct';
 
 const app = new cdk.App();
 
 const account = process.env.CDK_DEFAULT_ACCOUNT;
-const region = 'us-east-2';
+const region = process.env.CDK_DEFAULT_REGION;
 const props = { env: { account, region } };
 
-const addOns = [
-    new blueprints.addons.IstioBaseAddOn(),
-    new blueprints.addons.IstioControlPlaneAddOn(),
-    new blueprints.addons.KNativeOperator()
-];
-
-blueprints.EksBlueprint.builder()
-    .addOns(...addOns)
-    .build(app, 'knative-test', props);
+new BlueprintConstruct(app, props);
