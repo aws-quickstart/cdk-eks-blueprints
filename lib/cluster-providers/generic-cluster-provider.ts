@@ -199,7 +199,7 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey: IKey): ClusterInfo {
+    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
