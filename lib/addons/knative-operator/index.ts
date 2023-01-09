@@ -50,7 +50,6 @@ export class KNativeOperator implements ClusterAddOn {
         this.knativeAddOnProps = { ...defaultProps, ...props };
     }
 
-    // TODO: Find out why @dependable isn't working
     @dependable('IstioControlPlaneAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
