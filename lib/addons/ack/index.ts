@@ -5,7 +5,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { serviceMappings, AckServiceName } from './serviceMappings';
+import { AckServiceName, serviceMappings } from './serviceMappings';
 export * from "./serviceMappings";
 
 /**
@@ -59,7 +59,6 @@ export class AckAddOn extends HelmAddOn {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.options = this.props as AckAddOnProps;
     this.id = this.options.id;
-    console.log(this.options);
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {

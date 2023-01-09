@@ -30,7 +30,7 @@ const defaultProps: HelmAddOnProps & AWSPrivateCAIssuerAddonProps = {
   name: "blueprints-aws-pca-issuer-addon",
   chart: "aws-privateca-issuer",
   namespace:"aws-pca-issuer",
-  version: "1.2.2",
+  version: "1.2.4",
   release: "aws-pca-issuer",
   repository:  "https://cert-manager.github.io/aws-privateca-issuer",
   values: {},

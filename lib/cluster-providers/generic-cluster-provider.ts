@@ -1,7 +1,7 @@
 
 import { KubectlV22Layer } from "@aws-cdk/lambda-layer-kubectl-v22";
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
-import { } from "aws-cdk-lib/";
+import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { IVpc } from "aws-cdk-lib/aws-ec2";
@@ -267,6 +267,8 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
         switch(version) {
+            case eks.KubernetesVersion.V1_24:
+                return new KubectlV24Layer(scope, "kubectllayer24");
             case eks.KubernetesVersion.V1_23:
                 return new KubectlV23Layer(scope, "kubectllayer23");
             case eks.KubernetesVersion.V1_22:

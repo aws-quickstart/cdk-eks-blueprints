@@ -12,7 +12,7 @@ type MetricsServerAddOnProps = HelmAddOnUserProps;
 const defaultProps: HelmAddOnProps = {
     chart: "metrics-server",
     repository: "https://kubernetes-sigs.github.io/metrics-server",
-    version: "3.8.2",
+    version: "3.8.3",
     release: 'blueprints-addon-metrics-server',
     name: 'metrics-server',
     namespace: 'kube-system'
