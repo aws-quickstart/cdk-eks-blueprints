@@ -49,7 +49,9 @@ const karpenterAddonProps = {
   }],
   amiFamily: "AL2",
   consolidation: { enabled: true },
-  weight: 20
+  ttlSecondsUntilExpired: 2592000,
+  weight: 20,
+  interruptionHandling: true,
 }
 const vpcCniAddOn = new blueprints.addons.VpcCniAddOn();
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
@@ -61,9 +63,10 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 
 The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
-- aws.defaultInstanceProfile
-- clusterEndpoint
-- clusterName
+- settings.aws.defaultInstanceProfile
+- settings.aws.clusterEndpoint
+- settings.aws.clusterName
+- settings.aws.interruptionQueueName (if interruption handling is enabled)
 - serviceAccount.create
 - serviceAccount.name
 - serviceAccount.annotations.eks.amazonaws.com/role-arn
@@ -90,6 +93,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
 3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterempty`, so if you provide both properties, the addon will throw an error.
 4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
+5. Interruption Handling, which is a native way to handle interruption due to involuntary interruption events, is supported on versions 0.19.0 and later. For interruption handling in the earlier versions, Karpenter supports using AWS Node Interruption Handler (which you will need to add as an add-on and ***must be in add-on array after the Karpenter add-on*** for it to work.
 
 ## Using Karpenter
 
@@ -186,6 +190,17 @@ The following are common troubleshooting issues observed when implementing Karpe
 
 1. For Karpenter version older than `0.14.0` deployed on Fargate Profiles, `values.yaml` must be overridden, setting `dnsPolicy` to `Default`. Versions after `0.14.0` has `dnsPolicy` value set default to `Default`. This is to ensure CoreDNS is set correctly on Fargate nodes.
 
+2. With the upgrade to the new OCI registry starting with `v0.17.0`, if you try to upgrade you may get a following error:
+
+```
+Received response status [FAILED] from custom resource. Message returned: Error: b'Error: path "/tmp/tmpkxgr57q5/blueprints-addon-karpenter" not found\n' 
+```
+
+Karpenter, starting from the OCI registry versions, will untar the files under `karpenter` release name only. So if you have previous version deployed under a different release name, you will run into the above error. Therefore, in order to upgrade, you will have to take the following steps:
+
+  1. Remove the existing add-on.
+  2. Re-deploy the Karpenter add-on with the release name `karpenter`.
+
 ## Upgrade Path
 
 1. Using an older version of the Karptner add-on, you may notice the difference in the "provisionerSpecs" property:
@@ -213,3 +228,10 @@ requirements: [
 The property is changed to align with the naming convention of the provisioner, and to allow multiple operators (In vs NotIn). The values correspond similarly between the two, with type change being the only difference.
 
 2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/v0.16.0/upgrade-guide/#custom-resource-definition-crd-upgrades) for details.
+
+3. Starting with v0.17.0, Karpenter's Helm chart package is stored in OCI (Open Container Initiative) registry. With this change, [charts.karpenter.sh](https://charts.karpenter.sh/) is no longer updated to preserve older versions. You have to adjust for the following:
+
+* The full URL needs to be present (including 'oci://').
+* You need to append a `v` to the version number (i.e. v0.17.0, not 0.17.0)
+
+4. Starting with v0.22.0, Karpenter will no longer work on Kubernetes version prior to 1.21. Either upgrade your Kubernetes to 1.21 or later version and apply Karpenter, or use prior Karpenter versions.
