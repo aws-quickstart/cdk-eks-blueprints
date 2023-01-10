@@ -55,6 +55,17 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
+
+
+    /**
+     * If set to true and no resouce provider for KMS key is defined (under GlobalResources.KmsKey),
+     * a default KMS encryption key will be used for envelope encryption of Kubernetes secrets (AWS managed new KMS key).
+     * If set to false, and no resouce provider for KMS key is defined (under GlobalResources.KmsKey), then no secrets 
+     * encyrption is applied.
+     * 
+     * Default is true.
+     */
+    readonly useDefaultSecretEncryption? : boolean  = true;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -160,14 +171,17 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
+    public useDefaultSecretEncryption(useDefault: boolean): this {
+        this.props = { ...this.props, ...{ useDefaultSecretEncryption: useDefault } };
+        return this;
+    }
+
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps({ ...this.props })
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
-
-
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
@@ -208,7 +222,7 @@ export class EksBlueprint extends cdk.Stack {
         const version = blueprintProps.version ?? KubernetesVersion.V1_23;
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
-        if (!kmsKeyResource) {
+        if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
 
@@ -217,7 +231,7 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource!);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource);
         this.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;

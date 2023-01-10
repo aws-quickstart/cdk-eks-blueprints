@@ -68,6 +68,7 @@ const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .addOns(...addOns)
+    .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
     .build(app, 'eks-blueprint');
 ```
 
