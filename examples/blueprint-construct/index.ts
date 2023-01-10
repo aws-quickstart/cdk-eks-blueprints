@@ -76,6 +76,8 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
+                id: "s3-ack",
+                createNamespace: true,
                 skipVersionValidation: true,
                 serviceName: AckServiceName.S3
             }),
@@ -132,15 +134,15 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                enableIngress: false,
-                notebookStack: 'jupyter/datascience-notebook',
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     enableIngress: false,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            // }),
             new blueprints.EmrEksAddOn()
         ];
 
