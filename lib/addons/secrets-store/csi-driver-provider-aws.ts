@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import { ClusterInfo } from "../../spi";
-import { loadExternalYaml } from "../../utils/yaml-utils";
+import { loadExternalYaml } from "../../utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { SecretsStoreAddOnProps } from ".";
 import merge from "ts-deepmerge";
@@ -20,7 +20,7 @@ export class CsiDriverProviderAws {
       syncSecret?: {
         enabled: string
       },
-      grpcSupportedProviders: string
+      grpcSupportedProviders?: string
     }
 
     let values: chartValues = {

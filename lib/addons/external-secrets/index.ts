@@ -80,8 +80,15 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
       sa.addToPrincipalPolicy(policy)
     );
 
+    type chartValues = {
+      serviceAccount?: {
+        name: string,
+        create: boolean
+      },
+    }
+
     // Configure values.
-    let values = {
+    let values:chartValues = {
       serviceAccount: {
         name: serviceAccountName,
         create: false,

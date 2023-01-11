@@ -30,7 +30,7 @@ const defaultProps = {
 
 /**
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
- * It is required to integrate with Route53 for external DNS resolution. 
+ * It is required to integrate with Route53 for external DNS resolution.
  */
 export class ExternalDnsAddOn extends HelmAddOn {
 
@@ -78,15 +78,24 @@ export class ExternalDnsAddOn extends HelmAddOn {
 
         sa.node.addDependency(namespaceManifest);
 
-        let values = {
+        type chartValues = {
+            provider?: string,
+            zoneIdFilters?: string[],
+            region?: string,
+            serviceAccount?: {
+                name: string,
+                create: boolean
+            },
+        }
+
+
+        let values:chartValues = {
             provider: "aws",
             zoneIdFilters: hostedZones.map((hostedZone) => hostedZone!.hostedZoneId),
-            aws: {
-              region,
-            },
+            region: region,
             serviceAccount: {
-              create: false,
-             name: sa.serviceAccountName,
+              name: sa.serviceAccountName,
+                create: false,
             },
         };
 
