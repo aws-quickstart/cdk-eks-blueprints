@@ -43,6 +43,7 @@
         "js-yaml": "4.1.0",
         "lint": "^1.1.2",
         "lodash": "4.17.21",
+        "reflect-metadata": "^0.1.13",
         "semver": "^7.3.8",
         "simple-base": "^1.0.0",
         "sync-request": "6.1.0",

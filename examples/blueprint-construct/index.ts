@@ -165,12 +165,14 @@ export default class BlueprintConstruct {
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
                     diskSize: 25,
+                    desiredSize: 3,
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
                     id: "mng2-customami",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
+                    desiredSize: 0,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
