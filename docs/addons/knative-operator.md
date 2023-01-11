@@ -1,7 +1,7 @@
 # Knative Operator Add-On
 
-[Knative] is an open source enterprise-level solution to build serverless and Event Driven applications on Kubernetes.
-The `Knative Operator` provides support for installing, configuring and managing Knative.
+[Knative](https://knative.dev/docs/) is an open source enterprise-grade solution to build serverless and Event Driven applications on Kubernetes.
+The `Knative Operator` provides support for installing, configuring and managing Knative without using custom CRDs.
 
 Knative Add-on supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options)
 
