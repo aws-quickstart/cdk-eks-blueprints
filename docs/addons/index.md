@@ -31,6 +31,7 @@ The framework currently supports the following add-ons.
 | [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.                                 |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               |
 | [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn.                                                                    |
+| [`KnativeAddOn`](./knative.md)                                         | Deploys the [KNative Operator](https://knative.dev/docs/install/operator/knative-with-operators/) to ease setting up the rest of KNatives CRDs                                                          |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.                                                                
 | [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                |
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |                  |
@@ -48,7 +49,6 @@ The framework currently supports the following add-ons.
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  |
 | [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                                   |
 | [`XrayAdotAddOn`](./xray-adot-addon)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 |
-| [`KnativeAddOn`](./knative.md)                                         | Deploys the [KNative Operator](https://knative.dev/docs/install/operator/knative-with-operators/) to ease setting up the rest of KNatives CRDs                                                          |
 
 # Standard Helm Add-On Configuration Options
 
