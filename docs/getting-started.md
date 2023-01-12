@@ -25,8 +25,8 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 
 ```bash
 n stable # may require sudo 
-npm install -g aws-cdk@2.51.1 # may require sudo (Ubuntu) depending on configuration
-cdk --version # must produce 2.51.1
+npm install -g aws-cdk@2.59.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.59.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
@@ -68,6 +68,7 @@ const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .addOns(...addOns)
+    .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
     .build(app, 'eks-blueprint');
 ```
 

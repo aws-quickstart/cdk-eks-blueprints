@@ -22,5 +22,6 @@ export const logger = new Logger({
     colorizePrettyLogs: true,
     displayLogLevel: true,
     name: "main",
-    overwriteConsole: true
+    overwriteConsole: true,
+    minLevel: "info"
 });

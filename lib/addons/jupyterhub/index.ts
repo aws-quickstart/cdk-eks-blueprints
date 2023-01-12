@@ -192,7 +192,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         }
 
         // Create Helm Chart
-        const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, true);
+        const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, false);
 
         // Add dependency
         jupyterHubChart.node.addDependency(ns);

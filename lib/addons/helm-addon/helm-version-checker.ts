@@ -86,7 +86,7 @@ export function listChartVersions(chart: HelmChartVersion): string[] {
 export function checkHelmChartVersion(chart: HelmChartVersion) : CheckVersionResult {
     let versions = listChartVersions(chart);
     if(versions === null || versions.length == 0) {
-        console.error("No versions are found for " + chart.chart + " in repository " + chart.repository );
+        console.warn("No versions are found for " + chart.chart + " in repository " + chart.repository );
         return {
             allVersions: versions,
             highestVersion: undefined,

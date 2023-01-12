@@ -110,4 +110,33 @@ describe("KmsKeyProvider", () => {
       },
     });
   });
+
+  test("Blueprint with no KMS Key resource provider and default secret encryption set to false should result in a stack with no encryption", () => {
+    // Given
+    const app = new App();
+
+    const stack = blueprints.EksBlueprint.builder()
+      .account("123456789012")
+      .region("us-east-1")
+      .useDefaultSecretEncryption(false)
+      .build(app, "east-test-1");
+
+    // When
+    const template = Template.fromStack(stack);
+
+    // Then EKS cluster config has no encryption
+    template.resourcePropertiesCountIs("Custom::AWSCDK-EKS-Cluster", {
+        Config: {
+            encryptionConfig: [
+            {
+                provider: {
+                    keyArn: Match.anyValue(),
+                },
+                resources: ["secrets"],
+            },
+            ],
+        },
+    }, 
+    0);
+  });
 });

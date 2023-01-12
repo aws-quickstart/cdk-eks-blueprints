@@ -1,11 +1,12 @@
-// lib/certmanager_addon.ts
 import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
+import "reflect-metadata";
 import { createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { serviceMappings, AckServiceName } from './serviceMappings';
+import { AckServiceName, serviceMappings } from './serviceMappings';
+
 export * from "./serviceMappings";
 
 /**
@@ -50,6 +51,7 @@ const defaultProps: AckAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@Reflect.metadata("ordered", true)
 export class AckAddOn extends HelmAddOn {
 
   readonly options: AckAddOnProps;
@@ -59,7 +61,6 @@ export class AckAddOn extends HelmAddOn {
     super(populateDefaults(defaultProps, props) as HelmAddOnProps);
     this.options = this.props as AckAddOnProps;
     this.id = this.options.id;
-    console.log(this.options);
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {

@@ -1,10 +1,10 @@
-import { Construct } from 'constructs';
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
-import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi";
-import { setPath, createNamespace } from "../../utils";
+import { createNamespace, setPath } from "../../utils";
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * User provided options for the Helm Chart
@@ -52,7 +52,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   name: "blueprints-keda-addon",
   chart: "keda",
   namespace:"keda",
-  version: "2.8.2",
+  version: "2.9.1",
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},

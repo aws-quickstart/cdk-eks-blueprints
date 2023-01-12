@@ -8,7 +8,7 @@ export class VpcCniAddOn extends CoreAddOn {
     constructor(version?: string) {
         super({
             addOnName: "vpc-cni",
-            version: version ?? "v1.11.4-eksbuild.1",
+            version: version ?? "v1.12.0-eksbuild.1",
             saName: "vpc-cni"
         });
     }
