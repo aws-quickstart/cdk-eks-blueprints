@@ -7,7 +7,7 @@ import { getEbsDriverPolicyDocument } from "./iam-policy";
 const defaultProps = {
     addOnName: 'aws-ebs-csi-driver',
     version: 'v1.14.0-eksbuild.1',
-    saName: 'aws-ebs-csi-driver'
+    saName: 'ebs-csi-controller-sa'
 };
 
 /**
