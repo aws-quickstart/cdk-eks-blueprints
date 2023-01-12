@@ -12,8 +12,8 @@ export function getAddOnNameOrId(addOn: ClusterAddOn): string {
   return addOn.id ?? addOn.constructor.name;
 }
 
-export function isStrictOrder(addOn: ClusterAddOn) : boolean {
-    return Reflect.getMetadata("strictOrder", addOn) ?? false;
+export function isOrderedAddOn(addOn: ClusterAddOn) : boolean {
+    return Reflect.getMetadata("ordered", addOn.constructor) ?? false;
 }
 /**
  * Decorator function that accepts a list of AddOns and

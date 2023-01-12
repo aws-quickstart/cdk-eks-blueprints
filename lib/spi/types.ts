@@ -5,6 +5,7 @@ import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
+import { logger } from "../utils/log-utils";
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -121,6 +122,7 @@ export class ClusterInfo {
 
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
+    private readonly orderedAddOns: string[];
     private resourceContext: ResourceContext;
 
     /**
@@ -132,6 +134,7 @@ export class ClusterInfo {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
+        this.orderedAddOns = [];
     }
 
     /**
@@ -156,6 +159,12 @@ export class ClusterInfo {
      * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
+        if(this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0){
+            const prev : Construct = Array.from(this.provisionedAddOns.values()).pop()!;
+            construct.node.addDependency(prev);
+            const prevAddOn = Array.from(this.provisionedAddOns.keys()).pop()!;
+            logger.debug(`Adding dependency from ${addOn} to ${prevAddOn}`);
+        }
         this.provisionedAddOns.set(addOn, construct);
     }
 
@@ -172,7 +181,7 @@ export class ClusterInfo {
      * Returns all provisioned addons
      * @returns scheduledAddOns: Map<string, cdk.Construct>
      */
-      public getAllProvisionedAddons(): Map<string, Construct> {
+    public getAllProvisionedAddons(): Map<string, Construct> {
         return this.provisionedAddOns;
     }
 
@@ -181,10 +190,24 @@ export class ClusterInfo {
      * of the addon being provisioned
      * @param addOn
      * @param promise
+     * @param ordered if addon depends on previous addons for completion (runs serially)
      */
-     public addScheduledAddOn(addOn: string, promise: Promise<Construct>) {
+    public addScheduledAddOn(addOn: string, promise: Promise<Construct>, ordered: boolean) {
         this.scheduledAddOns.set(addOn, promise);
+        if(ordered) {
+            this.orderedAddOns.push(addOn);
+        }
     }
+
+    /**
+     * Indicates if strict ordering is applied to the addon
+     * @param addOn addOn key
+     * @returns 
+     */
+    public isOrderedAddOn(addOn: string) {
+        return this.orderedAddOns.includes(addOn);
+    }
+
 
     /**
      * Returns the promise for the Addon construct

@@ -51,7 +51,7 @@ const defaultProps: AckAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
-@Reflect.metadata("strictOrder", true)
+@Reflect.metadata("ordered", true)
 export class AckAddOn extends HelmAddOn {
 
   readonly options: AckAddOnProps;

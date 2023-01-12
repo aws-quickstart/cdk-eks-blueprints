@@ -6,7 +6,7 @@ import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import * as constraints from '../utils/constraints-utils';
-import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
@@ -208,7 +208,7 @@ export class EksBlueprint extends cdk.Stack {
     }
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
-        super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
+        super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
@@ -236,7 +236,7 @@ export class EksBlueprint extends cdk.Stack {
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+            utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
@@ -244,8 +244,8 @@ export class EksBlueprint extends cdk.Stack {
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                const addOnKey = getAddOnNameOrId(addOn);
-                this.clusterInfo.addScheduledAddOn(addOnKey, result);
+                const addOnKey = utils.getAddOnNameOrId(addOn);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result, utils.isOrderedAddOn(addOn));
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {

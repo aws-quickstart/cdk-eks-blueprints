@@ -22,7 +22,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.validateHelmVersions = false;
         HelmAddOn.failOnVersionValidation = false;
 
         // TODO: fix IAM user provisioning for admin user
@@ -134,15 +134,16 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            // new blueprints.addons.JupyterHubAddOn({
-            //     efsConfig: {
-            //         pvcName: "efs-persist",
-            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
-            //         capacity: '10Gi',
-            //     },
-            //     enableIngress: false,
-            //     notebookStack: 'jupyter/datascience-notebook',
-            // }),
+            new blueprints.addons.JupyterHubAddOn({
+                efsConfig: {
+                    pvcName: "efs-persist",
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                    capacity: '10Gi',
+                },
+                enableIngress: false,
+                notebookStack: 'jupyter/datascience-notebook',
+                values: { prePuller: { hook: { enabled: false }}}
+            }),
             new blueprints.EmrEksAddOn()
         ];
 
@@ -163,9 +164,10 @@ export default class BlueprintConstruct {
                 {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
+                    instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
                     diskSize: 25,
-                    desiredSize: 3,
+                    desiredSize: 2,
+                    maxSize: 3, 
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
@@ -173,6 +175,7 @@ export default class BlueprintConstruct {
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     desiredSize: 0,
+                    minSize: 0,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
