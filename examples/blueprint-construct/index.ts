@@ -22,7 +22,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = false;
+        HelmAddOn.validateHelmVersions = true;
         HelmAddOn.failOnVersionValidation = false;
 
         // TODO: fix IAM user provisioning for admin user
@@ -142,7 +142,7 @@ export default class BlueprintConstruct {
                 },
                 enableIngress: false,
                 notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
+                values: { prePuller: { hook: { enabled: 'false' }}}
             }),
             new blueprints.EmrEksAddOn()
         ];
