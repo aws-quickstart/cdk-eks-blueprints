@@ -230,7 +230,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 clusterEndpoint: endpoint,
                 clusterName: name,
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
-                interruptionQueueName: cluster.clusterName
+                interruptionQueueName: stackName
             });
         } else {
             setPath(values, "clusterEndpoint", endpoint);
