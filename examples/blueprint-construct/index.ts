@@ -158,7 +158,7 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);qgit 
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
