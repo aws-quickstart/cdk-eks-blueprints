@@ -6,6 +6,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { AckServiceName, HelmAddOn } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
+import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -24,6 +25,7 @@ export default class BlueprintConstruct {
 
         HelmAddOn.validateHelmVersions = true;
         HelmAddOn.failOnVersionValidation = false;
+        logger.settings.minLevel =  "debug";
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -142,7 +144,7 @@ export default class BlueprintConstruct {
                 },
                 enableIngress: false,
                 notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: 'false' }}}
+                values: { prePuller: { hook: { enabled: false }}}
             }),
             new blueprints.EmrEksAddOn()
         ];
@@ -156,7 +158,7 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);qgit 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
