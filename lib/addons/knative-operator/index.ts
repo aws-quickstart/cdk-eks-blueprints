@@ -1,12 +1,13 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import {dependable, loadExternalYaml} from "../../utils";
+import { HelmAddOnUserProps } from '../helm-addon';
 import { KubectlProvider } from "../helm-addon/kubectl-provider";
 
 /**
- * 
+ * Knative Operator Properties extended 
  */
-export interface KnativeOperatorProps {
+export interface KnativeOperatorProps extends HelmAddOnUserProps {
     /**
      * The namespace to install Knative in
      * @default default
@@ -61,7 +62,7 @@ export class KNativeOperator implements ClusterAddOn {
         const kubectlProvider = new KubectlProvider(clusterInfo);
 
         const statement = kubectlProvider.addManifest(
-            { manifest: doc, values: {}, name: 'knative-operator', namespace: 'default' }
+            { manifest: doc, values: {}, name: 'knative-operator', namespace: this.knativeAddOnProps.namespace! }
         );
 
         return Promise.resolve(statement);
