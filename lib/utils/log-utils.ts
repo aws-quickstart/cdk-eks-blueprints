@@ -16,7 +16,7 @@ export const userLog = new LoggerWithoutCallSite({
 });
 
 /**
- * Standard developer logger for troublshooting. Will leverage sourcemap support.
+ * Standard developer logger for troubleshooting. Will leverage sourcemap support.
  */
 export const logger = new Logger({
     colorizePrettyLogs: true,
