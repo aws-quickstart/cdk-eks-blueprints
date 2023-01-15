@@ -25,19 +25,12 @@ export interface KnativeOperatorProps extends HelmAddOnUserProps {
      * @default v1.8.1
      */
     version?: string;
-
-    /**
-     * 
-     * @default 'https://github.com/knative/operator/releases/download/knative'
-     */
-    base_url?: string;
 }
 
 const defaultProps = {
     name: 'knative-operator',
     namespace: 'default',
     version: 'v1.8.1',
-    base_url: `https://github.com/knative/operator/releases/download/knative`
 };
 
 /**
@@ -53,10 +46,11 @@ export class KNativeOperator implements ClusterAddOn {
 
     @dependable('IstioControlPlaneAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        const BASE_URL = `https://github.com/knative/operator/releases/download/knative`;
 
         // Load External YAML: https://github.com/knative/operator/releases/download/knative-v1.8.1/operator.yaml
         const doc = loadExternalYaml(
-            this.knativeAddOnProps.base_url + `-${this.knativeAddOnProps.version}/operator.yaml`
+            BASE_URL + `-${this.knativeAddOnProps.version}/operator.yaml`
         ).slice(0, 26); // the last element is null
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
