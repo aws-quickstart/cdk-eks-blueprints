@@ -63,6 +63,7 @@ const adminTeam = new PlatformTeam( {
     userRoleArn: `${YOUR_ROLE_ARN}`;
 })
 ```
+**NOTE:** `YOUR_ROLE_ARN` should be stripped of any path component, as explained in the [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/security_iam_troubleshoot.html#security-iam-troubleshoot-ConfigMap). So, for example, `arn:aws:iam::111122223333:role/team/developers/eks-admin` should be changed to `arn:aws:iam::111122223333:role/eks-admin`.
 
 ### DefaultTeamRoles 
 
