@@ -52,16 +52,14 @@ const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
 
 const addOns: Array<blueprints.ClusterAddOn> = [
-    new blueprints.addons.ArgoCDAddOn,
-    new blueprints.addons.CalicoAddOn,
-    new blueprints.addons.MetricsServerAddOn,
-    new blueprints.addons.ClusterAutoScalerAddOn,
-    new blueprints.addons.ContainerInsightsAddOn,
+    new blueprints.addons.ArgoCDAddOn(),
+    new blueprints.addons.CalicoOperatorAddOn(),
+    new blueprints.addons.MetricsServerAddOn(),
+    new blueprints.addons.ClusterAutoScalerAddOn(),
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     new blueprints.addons.VpcCniAddOn(),
     new blueprints.addons.CoreDnsAddOn(),
-    new blueprints.addons.KubeProxyAddOn(),
-    new blueprints.addons.XrayAddOn()
+    new blueprints.addons.KubeProxyAddOn()
 ];
 
 const stack = blueprints.EksBlueprint.builder()
