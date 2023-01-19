@@ -146,7 +146,14 @@ export default class BlueprintConstruct {
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn()
+            new blueprints.EmrEksAddOn(),
+            new blueprints.addons.GmaestroAddOn({
+                b64ClientId: "test_client_id",
+                clientName: "test_client_name",
+                clusterName: "test_cluster_name",
+                grafanaMetricsAuthKey: "test_grafana_metrics_auth_key",
+                grafanaLogsAuthKey: "test_grafana_logs_auth_key",
+            })
         ];
 
         // Instantiated to for helm version check.
@@ -154,7 +161,7 @@ export default class BlueprintConstruct {
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
         new blueprints.ExternalsSecretsAddOn();
-       
+
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
