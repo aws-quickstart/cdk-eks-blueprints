@@ -1,6 +1,6 @@
-import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { UpdatePolicy } from "aws-cdk-lib/aws-autoscaling";
+import * as eks from "aws-cdk-lib/aws-eks";
+import { AutoScalingGroupCapacityOptions } from "aws-cdk-lib/aws-eks";
 
 /**
  * Configuration options for the custom AMI.
@@ -18,7 +18,7 @@ export interface CustomAmiProps {
 }
 
 
-export interface ManagedNodeGroup {
+export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemplate" | "subnets" | "capacityType" | "releaseVersion"> {
 
     /**
      * Id of this node group. Expected to be unique in cluster scope.
@@ -70,17 +70,18 @@ export interface ManagedNodeGroup {
     nodeGroupCapacityType?: eks.CapacityType;
 
     /**
-     * Subnets are passed to the cluster configuration.
+     * Subnets for the autoscaling group where nodes (instances) will be placed.
+     * @default all private subnets
      */
-    vpcSubnets?: ec2.SubnetSelection[];
+    nodeGroupSubnets?: ec2.SubnetSelection;
 }
 
 /**
  * A node groups for EKS that leverage EC2 Autoscaling Groups.
  * Also referred to as "self-managed" node group, implying that maintenance of the group
- * is performed by the customer (as oppposed to AWS as in case of a ManagedNodeGroup).
+ * is performed by the customer (as opposed to AWS as in case of a ManagedNodeGroup).
  */
-export interface AutoscalingNodeGroup {
+export interface AutoscalingNodeGroup extends Omit<AutoScalingGroupCapacityOptions, "minCapacity" | "maxCapacity" | "desiredCapacity" | "instanceType" | "vpcSubnets"> {
 
     /**
      * Id of this node group. Expected to be unique in cluster scope.
@@ -105,25 +106,16 @@ export interface AutoscalingNodeGroup {
     desiredSize?: number;
 
     /**
-     * Instance types used for the node group.
-     * @default m5.large
+     * Instance type of the instances to start. If not specified defaults are applied in the following order:
+     * - 'eks.default.instance-type' in CDK context (e.g. ~/.cdk.json under "context" key))
+     * - M5.Large
      */
     instanceType?: ec2.InstanceType;
 
     /**
-     * Machine Image Type for the Autoscaling Group.
-     * @default eks.MachineImageType.AMAZON_LINUX_2
+     * Subnets for the autoscaling group where nodes (instances) will be placed.
+     * @default all private subnets
      */
-    machineImageType?: eks.MachineImageType;
-
-    /**
-     * Update policy for the Autoscaling Group.
-     */
-    updatePolicy?: UpdatePolicy;
-
-    /**
-     * Subnets are passed to the cluster configuration.
-     */
-    vpcSubnets?: ec2.SubnetSelection[];
+    nodeGroupSubnets?: ec2.SubnetSelection;
 
 }

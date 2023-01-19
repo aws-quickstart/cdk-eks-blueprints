@@ -1,9 +1,9 @@
-import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { HelmChart, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import * as blueprints from '../lib';
 import { MyVpcStack } from './test-support';
-import { Template } from 'aws-cdk-lib/assertions';
 
 describe('Unit tests for EKS Blueprint', () => {
 
@@ -36,20 +36,6 @@ describe('Unit tests for EKS Blueprint', () => {
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
-    });
-
-    test("Stack creation fails due to conflicting add-ons", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .addOns(new blueprints.VpcCniAddOn, new blueprints.KarpenterAddOn, new blueprints.ClusterAutoScalerAddOn)
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-addons');
-        }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
     });
 
     test("Stack creation fails due to wrong node group type for NTH addon", () => {
@@ -108,9 +94,221 @@ describe('Unit tests for EKS Blueprint', () => {
         const pipeline = blueprints.CodePipelineStack.builder()
             .name("blueprints-pipeline-inaction")
             .owner('shapirov103')
+            .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
             .repository({
                 repoUrl: 'git@github',
                 credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline'
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
+    });
+
+    test('Pipeline Builder creates multi-account pipeline', () => {
+
+        const app = new cdk.App();
+        const devTestAccount = "123456789012";
+        const prodAccount = "123456789013";
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account(devTestAccount)
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .owner('shapirov103')
+            .enableCrossAccountKeys()
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline'
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('dev-east-2')},
+                ]
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2', prodAccount),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("qs-1s1r465f2");
+    });
+
+    test('Pipeline Builder Creates correct pipeline. With repository.owner property.', () => {
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline',
+                owner: 'shapirov103',
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
+    });
+
+    test("Stack creation fails due to missing owner property for GitHub Repository", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline',
+                // owner: 'shapirov103',
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        expect(()=> {
+            pipeline.build(app, "blueprints-pipeline-id");
+        }).toThrow("repository.owner field is required for the GitHub pipeline stack. Please provide value.");
+    });
+
+    test('Pipeline Builder Creates correct pipeline. With CodeCommit as a repository.', () => {
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                codeCommitRepoName: 'eks-blueprints-cc',
                 name: 'my-iac-pipeline'
             })
             .stage({
@@ -185,42 +383,11 @@ test("Named resource providers are correctly registered and discovered", async (
             name: "appteam", namespace: "appteam-ns"
         }))
         .buildAsync(app, 'stack-with-resource-providers');
-    
+
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.Vpc)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.HostedZone)).toBeDefined();
     expect(blueprint.getClusterInfo().getResource(blueprints.GlobalResources.Certificate)).toBeDefined();
     expect(blueprint.getClusterInfo().getProvisionedAddOn('NginxAddOn')).toBeDefined();
-});
-
-test("Generic cluster provider correctly registers managed node groups", async () => {
-    const app = new cdk.App();
-
-    const clusterProvider = blueprints.clusterBuilder()
-    .managedNodeGroup({
-        id: "mng1",
-        maxSize: 2,
-        nodeGroupCapacityType: CapacityType.SPOT
-    })
-    .managedNodeGroup({
-        id: "mng2",
-        maxSize:1
-    })
-    .fargateProfile("fp1", {
-        selectors: [
-            {
-                namespace: "default"
-            }
-        ]
-    }).build();
-
-    const blueprint =  await blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-1')
-        .clusterProvider(clusterProvider)
-        .addOns(new blueprints.ClusterAutoScalerAddOn)
-        .buildAsync(app, 'stack-with-resource-providers');
-    
-    expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
-    expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
 });
 
 test("Building blueprint with builder properly clones properties", () => {
@@ -229,7 +396,7 @@ test("Building blueprint with builder properly clones properties", () => {
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_21
+        version: KubernetesVersion.V1_23
     });
 
     expect(blueprint.props.addOns).toHaveLength(1);
@@ -251,14 +418,59 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_22
+        version: KubernetesVersion.V1_23
     });
 
     const stack = blueprint.build(app, "builder-version-test1");
 
     expect(stack.getClusterInfo().version).toBeDefined();
- 
+
 });
+
+test("Account and region are correctly initialized when not explicitly set on the blueprint", () => {
+
+    const app = new cdk.App();
+
+    process.env.CDK_DEFAULT_ACCOUNT = '1234567890';
+    process.env.CDK_DEFAULT_REGION  = 'us-west-2';
+
+    const blueprint = blueprints.EksBlueprint.builder().name("region-test1")
+        .addOns(new blueprints.AwsLoadBalancerControllerAddOn);
+
+    const stack = blueprint.build(app, "region-test1");
+
+    expect(stack.getClusterInfo().cluster.stack.region).toBeDefined();
+    expect(stack.getClusterInfo().cluster.stack.region).toBe(process.env.CDK_DEFAULT_REGION);
+    expect(stack.getClusterInfo().cluster.stack.account).toBeDefined();
+    expect(stack.getClusterInfo().cluster.stack.account).toBe(process.env.CDK_DEFAULT_ACCOUNT);
+});
+
+test("Missing account and region are not causing failure in blueprint stack", async() => {
+
+    const app = new cdk.App();
+
+    const account = process.env.CDK_DEFAULT_ACCOUNT;
+    const region = process.env.CDK_DEFAULT_REGION;
+
+    // unset account and region
+    process.env.CDK_DEFAULT_ACCOUNT = undefined;
+    process.env.CDK_DEFAULT_REGION = undefined;
+
+    const blueprint = blueprints.EksBlueprint.builder().name("region-test2")
+        .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+        .addOns(new blueprints.addons.ClusterAutoScalerAddOn);
+
+    const stack = await blueprint.buildAsync(app, "region-test2");
+    const loadbalancerAddOn = stack.getClusterInfo().getProvisionedAddOn(blueprints.AwsLoadBalancerControllerAddOn.name) as HelmChart;
+
+    expect(loadbalancerAddOn).toBeDefined();
+
+    // restore account and region
+    process.env.CDK_DEFAULT_ACCOUNT = account;
+    process.env.CDK_DEFAULT_REGION = region;
+
+});
+
 
 function assertBlueprint(stack: blueprints.EksBlueprint, ...charts: string[]) {
     const template = Template.fromStack(stack);

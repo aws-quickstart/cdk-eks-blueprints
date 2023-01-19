@@ -44,20 +44,21 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.20.0
+npm install -g aws-cdk@2.60.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.20.0
+# must output 2.60.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.
 
 ```bash
 cdk init app --language typescript
+npm install typescript@~4.8.4
 ```
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment.
@@ -97,10 +98,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.XrayAddOn()
 ];
 
-const account = 'XXXXXXXXXXXXX'
-const region = 'us-east-2'
-const props = { env: { account, region } }
-new blueprints.EksBlueprint(app, { id: 'east-test-1', addOns}, props)
+const account = 'XXXXXXXXXXXXX';
+const region = 'us-east-2';
+
+blueprints.EksBlueprint.builder()
+    .account(account)
+    .region(region)
+    .addOns(...addOns)
+    .build(app, 'eks-blueprint');
 ```
 
 Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.
@@ -136,6 +141,12 @@ This will provision the following:
 The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge.
 
 AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `eks-blueprints` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
+
+## Workshop
+
+We maintain a hands-on self-paced workshop, the [EKS Blueprints for CDK workshop](https://catalog.workshops.aws/eks-blueprints-for-cdk/en-US) helps you with foundational setup of your EKS cluster, and it gradually adds complexity via existing and new modules.
+
+To post feedback, submit feature ideas, or report bugs regarding the workshop, use the **Issues** section of this GitHub repo, and tag it with `workshop`.
 
 ## Feedback
 

@@ -1,4 +1,3 @@
-import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 import { AutoscalingNodeGroup } from "./types";
@@ -20,10 +19,6 @@ export interface AsgClusterProviderProps extends eks.CommonClusterOptions, Autos
      */
     privateCluster?: boolean;
 
-    /**
-     * Affects both control plane and the managed node group.
-    */
-    vpcSubnets?: ec2.SubnetSelection[];
 }
 
 /**
@@ -35,13 +30,7 @@ export class AsgClusterProvider extends GenericClusterProvider {
         super({...defaultOptions, ...props, ...{
             autoscalingNodeGroups: [{
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-asg",
-                desiredSize: props?.desiredSize,
-                maxSize: props?.maxSize,
-                minSize: props?.minSize,
-                vpcSubnets: props?.vpcSubnets,
-                instanceType: props?.instanceType,
-                machineImageType: props?.machineImageType,
-                updatePolicy: props?.updatePolicy
+                ...props as Omit<AutoscalingNodeGroup, "id">
             }]
         }});
     }

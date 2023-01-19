@@ -2,7 +2,7 @@ import * as eks from 'aws-cdk-lib/aws-eks';
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import request from 'sync-request';
+
 
 /**
  * Applies all manifests from a directory. Note: The manifests are not checked, 
@@ -41,7 +41,10 @@ export function loadYaml(document: string): any {
 }
 
 export function loadExternalYaml(url: string): any {
-    return yaml.loadAll(request('GET', url).getBody().toString());
+    /* eslint-disable */
+    const request = require('sync-request'); // moved away from import as it is causing open handles that prevents jest from completion
+    const response = request('GET', url);
+    return yaml.loadAll(response.getBody().toString());
 }
 
 export function serializeYaml(document: any): string {

@@ -1,5 +1,7 @@
 # AWS X-Ray Add-on
 
+This add-on is currently deprecated since the underlying manifests are incompatible with the latest versions of EKS. Please use [XRay Adot Add-on](xray-adot-addon.md).
+
 [AWS X-Ray](https://aws.amazon.com/xray/) helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. The X-Ray addon provisions X-Ray daemon into an EKS cluster. This daemon exposes an internal endpoint `xray-service.xray-system.svc.cluster.local:2000` that could be leveraged to aggregate and post traces to the AWS X-Ray service. 
 
 For instructions on getting started with X-Ray on EKS refer to the [EKS Workshop X-Ray Section](https://www.eksworkshop.com/intermediate/245_x-ray/).

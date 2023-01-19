@@ -1,10 +1,11 @@
+import * as assert from "assert";
+import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
 import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as assert from "assert";
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
+import { logger } from "../utils/log-utils";
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -24,7 +25,7 @@ export type Values = {
 };
 
 /**
- * Interface that includes a reference to a Git repository for reuse, without credentials 
+ * Interface that includes a reference to a Git repository for reuse, without credentials
  * and other access information.
  */
 export interface GitRepositoryReference {
@@ -33,8 +34,8 @@ export interface GitRepositoryReference {
      */
     repoUrl: string,
 
-    /** 
-     * Path within the repository 
+    /**
+     * Path within the repository
      */
     path?: string,
 
@@ -54,13 +55,13 @@ export interface GitRepositoryReference {
 }
 
 /**
- * Data type defining an application repository (git). 
+ * Data type defining an application repository (git).
  */
 export interface ApplicationRepository extends GitRepositoryReference {
 
     /**
      * Secret from AWS Secrets Manager to import credentials to access the specified git repository.
-     * The secret must exist in the same region and account where the stack will run. 
+     * The secret must exist in the same region and account where the stack will run.
      */
     credentialsSecretName?: string,
 
@@ -80,7 +81,7 @@ export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
-    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
+    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
 
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
@@ -96,7 +97,7 @@ export class ResourceContext {
     }
 
     /**
-     * Gets the provided resource by the supplied name. 
+     * Gets the provided resource by the supplied name.
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
@@ -108,30 +109,33 @@ export class ResourceContext {
 export enum GlobalResources {
     Vpc = 'vpc',
     HostedZone = 'hosted-zone',
-    Certificate = 'certificate'
+    Certificate = 'certificate',
+    KmsKey = 'kms-key'
 }
 
 
 /**
- * Cluster info supplies required information on the cluster configuration, registered resources and add-ons 
+ * Cluster info supplies required information on the cluster configuration, registered resources and add-ons
  * which could be leveraged by the framework, add-on implementations and teams.
  */
 export class ClusterInfo {
 
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
+    private readonly orderedAddOns: string[];
     private resourceContext: ResourceContext;
     private addonContext: Map<string, Values>;
 
     /**
      * Constructor for ClusterInfo
-     * @param props 
+     * @param props
      */
     constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
         readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
+        this.orderedAddOns = [];
         this.addonContext = new Map<string, Values>();
     }
 
@@ -145,7 +149,7 @@ export class ClusterInfo {
 
     /**
      * Injection method to provide resource context.
-     * @param resourceContext 
+     * @param resourceContext
      */
     public setResourceContext(resourceContext: ResourceContext) {
         this.resourceContext = resourceContext;
@@ -153,16 +157,22 @@ export class ClusterInfo {
 
     /**
      * Update provisionedAddOns map
-     * @param addOn 
-     * @param construct 
+     * @param addOn
+     * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
+        if(this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0){
+            const prev : Construct = Array.from(this.provisionedAddOns.values()).pop()!;
+            construct.node.addDependency(prev);
+            const prevAddOn = Array.from(this.provisionedAddOns.keys()).pop()!;
+            logger.debug(`Adding dependency from ${addOn} to ${prevAddOn}`);
+        }
         this.provisionedAddOns.set(addOn, construct);
     }
 
     /**
      * Given the addOn name, return the provisioned addOn construct
-     * @param addOn 
+     * @param addOn
      * @returns undefined
      */
     public getProvisionedAddOn(addOn: string): Construct | undefined {
@@ -170,9 +180,9 @@ export class ClusterInfo {
     }
 
     /**
-    * Returns all provisioned addons
-    * @returns scheduledAddOns: Map<string, cdk.Construct>
-    */
+     * Returns all provisioned addons
+     * @returns scheduledAddOns: Map<string, cdk.Construct>
+     */
     public getAllProvisionedAddons(): Map<string, Construct> {
         return this.provisionedAddOns;
     }
@@ -182,10 +192,24 @@ export class ClusterInfo {
      * of the addon being provisioned
      * @param addOn
      * @param promise
+     * @param ordered if addon depends on previous addons for completion (runs serially)
      */
-    public addScheduledAddOn(addOn: string, promise: Promise<Construct>) {
+    public addScheduledAddOn(addOn: string, promise: Promise<Construct>, ordered: boolean) {
         this.scheduledAddOns.set(addOn, promise);
+        if(ordered) {
+            this.orderedAddOns.push(addOn);
+        }
     }
+
+    /**
+     * Indicates if strict ordering is applied to the addon
+     * @param addOn addOn key
+     * @returns 
+     */
+    public isOrderedAddOn(addOn: string) {
+        return this.orderedAddOns.includes(addOn);
+    }
+
 
     /**
      * Returns the promise for the Addon construct
@@ -220,7 +244,7 @@ export class ClusterInfo {
      */
     public getRequiredResource<T extends cdk.IResource>(name: string): T {
         const result = this.resourceContext.get<T>(name);
-        assert(result, `Required resource ${name} is missing.`);
+        assert(result, 'Required resource ' + name + ' is missing.');
         return result!;
     }
 

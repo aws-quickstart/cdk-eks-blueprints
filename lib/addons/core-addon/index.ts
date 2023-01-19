@@ -1,4 +1,4 @@
-import { CfnAddon } from "aws-cdk-lib/aws-eks";
+import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
@@ -19,6 +19,14 @@ export class CoreAddOnProps {
      * Policy document provider returns the policy required by the add-on to allow it to interact with AWS resources
      */
     readonly policyDocumentProvider?: (partition: string) => PolicyDocument;
+    /**
+     * Service Account Name to be used with AddOn.
+     */
+    readonly saName: string;
+    /**
+     * Namespace to create the ServiceAccount.
+     */
+    readonly namespace?: string;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -35,26 +43,37 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-
-        // Create a service account if user provides namespace and service account
+        
         let serviceAccountRoleArn: string | undefined = undefined;
+        let serviceAccount: ServiceAccount | undefined = undefined;
+        let saNamespace: string | undefined = undefined;
 
+        saNamespace = DEFAULT_NAMESPACE;
+        if (this.coreAddOnProps?.namespace) {
+            saNamespace = this.coreAddOnProps.namespace;
+        }
+
+        // Create a service account if user provides namespace, PolicyDocument
         if (this.coreAddOnProps?.policyDocumentProvider) {
             const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
-            const serviceAccount = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.addOnName,
-                DEFAULT_NAMESPACE, policyDoc);
+            serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
+                saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
 
-
-        // Instantiate the Add-on
-        return Promise.resolve(
-            new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", {
+        let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
-        }));
+        };
+
+        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnProps);
+        if (serviceAccount) {
+            cfnAddon.node.addDependency(serviceAccount);
+        }
+        // Instantiate the Add-on
+        return Promise.resolve(cfnAddon);
     }
 }

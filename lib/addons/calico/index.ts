@@ -5,6 +5,7 @@ import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
  * Configuration options for the add-on.
+ * @deprecated
  */
 export interface CalicoAddOnProps extends HelmAddOnUserProps {
 
@@ -38,6 +39,9 @@ const defaultProps = {
     repository: "https://aws.github.io/eks-charts"
 };
 
+/**
+ * @deprecated use CalicoOperator add-on instead
+ */
 export class CalicoAddOn extends HelmAddOn {
 
     private options: CalicoAddOnProps;

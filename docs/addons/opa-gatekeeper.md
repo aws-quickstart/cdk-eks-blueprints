@@ -8,12 +8,12 @@ OPA Gatekeeper is an open-source project that provides a first-class integration
 
 In the context of a development platform running on Amazon EKS, platform teams and administrators need a way of being able to set policies to adhere to governance and security requirements for all workloads and teams working on the same cluster. Examples of standard use cases for using policies via OPA Gatekeeper are listed below:
 
-- Which users can access which resources.
-- Which subnets egress traffic is allowed to.
-- Which clusters a workload must be deployed to.
-- Which registries binaries can be downloaded from.
-- Which OS capabilities a container can execute with.
-- Which times of day the system can be accessed at.
+- Which users can access which resources?
+- Which subnets egress traffic is allowed to?
+- Which clusters a workload must be deployed to?
+- Which registries binaries can be downloaded from?
+- Which OS capabilities a container can execute with?
+- Which times of day the system can be accessed at?
 
 RBAC (role-based access control) can help with some of the scenarios above but **roles are nothing but a group of permissions that you then assign to users leveraging rolebindings.** If for example, a user tries to perform an operation (get, list, watch, create, etc...) that particular user may do so if they have the appropriate role. **Please note that RBAC should be used in conjunction with OPA Gatekeeper policies to fully secure your cluster.**
 
@@ -28,7 +28,6 @@ RBAC (role-based access control) can help with some of the scenarios above but *
 ## Usage
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
@@ -81,7 +80,7 @@ NAME                AGE
 k8srequiredlabels   45s
 ```
 
-You will notice that if you create a new namespace without any labels that the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
+You will notice that if you create a new namespace without any labels, the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
 
 ```bash
 k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml           

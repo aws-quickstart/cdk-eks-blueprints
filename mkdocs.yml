@@ -2,24 +2,31 @@ site_name: Amazon EKS Blueprints Quick Start
 repo_name: "aws-quickstart/cdk-eks-blueprints"
 repo_url: "https://github.com/aws-quickstart/cdk-eks-blueprints"
 docs_dir: "docs"
-theme: 
+theme:
   name: material
-  features: 
+  features:
     - tabs
 nav:
   - Overview: 'index.md'
   - Getting Started: 'getting-started.md'
   - Core Concepts: 'core-concepts.md'
-  - Teams: 'teams.md'
+  - Teams: 
+    - Teams: 'teams/teams.md'
+    - EMR on EKS Team: 'teams/emr-eks-team.md'
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
+    - ACK: 'addons/ack-addon.md'
+    - ADOT: 'addons/adot-addon.md'
+    - AMP ADOT: 'addons/amp-addon.md'
     - AWS App Mesh: 'addons/app-mesh.md'
     - ArgoCD: 'addons/argo-cd.md'
     - AWS For Fluent Bit: 'addons/aws-for-fluent-bit.md'
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - AWS Node Termination Handler: 'addons/aws-node-termination-handler.md'
-    - Calico: 'addons/calico.md'
+    - Calico Operator: 'addons/calico-operator.md'
+    - Certificate Manager: 'addons/cert-manager.md'
+    - CloudWatch ADOT: 'addons/cloudwatch-adot-addon.md'
     - Cluster Autoscaler: 'addons/cluster-autoscaler.md'
     - Container Insights: 'addons/container-insights.md'
     - CoreDns: 'addons/coredns.md'
@@ -28,6 +35,9 @@ nav:
     - EBS CSI Driver: 'addons/ebs-csi-driver.md'
     - EFS CSI Driver: 'addons/efs-csi-driver.md'
     - External DNS: 'addons/external-dns.md'
+    - External Secrets: 'addons/external-secrets.md'
+    - EMR on EKS: 'addons/emr-eks.md'
+    - JupyterHub: 'addons/jupyterhub.md'
     - Karpenter: 'addons/karpenter.md'
     - Keptn: 'https://github.com/keptn-sandbox/keptn-eks-blueprints-addon'
     - Kube Proxy: 'addons/kube-proxy.md'
@@ -37,22 +47,28 @@ nav:
     - New Relic: 'addons/newrelic.md'
     - Nginx: 'addons/nginx.md'
     - OPA Gatekeeper: 'addons/opa-gatekeeper.md'
+    - Pixie: 'addons/pixie.md'
+    - Rafay: 'addons/rafay.md'
     - Secrets Store: 'addons/secrets-store.md'
     - Snyk: 'https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon'
     - SSM Agent: 'addons/ssm-agent.md'
     - Velero: 'addons/velero.md'
     - Vpc Cni: 'addons/vpc-cni.md'
     - AWS XRay: 'addons/xray.md'
-  - Cluster Providers: 
+    - AWS XRay ADOT: 'addons/xray-adot-addon.md'
+  - Cluster Providers:
     - Overview: 'cluster-providers/index.md'
     - Generic Cluster Provider: 'cluster-providers/generic-cluster-provider.md'
     - ASG Cluster Provider: 'cluster-providers/asg-cluster-provider.md'
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
+  - Resource Providers:
+    - Resource Providers: 'resource-providers/index.md'
   - Extensibility: 'extensibility.md'
+  - API Reference: 'api'
 markdown_extensions:
   - def_list
-  - pymdownx.highlight  
+  - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.tabbed
   - pymdownx.inlinehilite

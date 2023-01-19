@@ -24,11 +24,13 @@ To use the `eks-blueprints` module, you must have [Node.js](https://nodejs.org/e
 Create a directory that represents you project (e.g. `my-blueprints`) and then create a new `typescript` CDK project in that directory.
 
 ```bash
-npm install -g aws-cdk@2.20.0 # may require sudo (Ubuntu) depending on configuration
-cdk --verson # must produce 2.20.0
+n stable # may require sudo 
+npm install -g aws-cdk@2.60.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.60.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
+npm install typescript@~4.8.4 # installs compatible version of typescript
 ```
 
 ## Configure and Deploy EKS Clusters
@@ -50,22 +52,21 @@ const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
 
 const addOns: Array<blueprints.ClusterAddOn> = [
-    new blueprints.addons.ArgoCDAddOn,
-    new blueprints.addons.CalicoAddOn,
-    new blueprints.addons.MetricsServerAddOn,
-    new blueprints.addons.ClusterAutoScalerAddOn,
-    new blueprints.addons.ContainerInsightsAddOn,
+    new blueprints.addons.ArgoCDAddOn(),
+    new blueprints.addons.CalicoOperatorAddOn(),
+    new blueprints.addons.MetricsServerAddOn(),
+    new blueprints.addons.ClusterAutoScalerAddOn(),
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     new blueprints.addons.VpcCniAddOn(),
     new blueprints.addons.CoreDnsAddOn(),
-    new blueprints.addons.KubeProxyAddOn(),
-    new blueprints.addons.XrayAddOn()
+    new blueprints.addons.KubeProxyAddOn()
 ];
 
-blueprints.EksBlueprint.builder()
+const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .addOns(...addOns)
+    .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
     .build(app, 'eks-blueprint');
 ```
 

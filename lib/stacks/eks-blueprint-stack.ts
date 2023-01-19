@@ -1,18 +1,18 @@
-
 import * as cdk from 'aws-cdk-lib';
-import { StackProps } from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import { cloneDeep } from "../utils";
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import * as constraints from '../utils/constraints-utils';
+import * as utils from '../utils';
+import { cloneDeep } from '../utils';
+import { IKey } from "aws-cdk-lib/aws-kms";
+import {KmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../../lib";
 
 export class EksBlueprintProps {
-
     /**
      * The id for the blueprint.
      */
@@ -42,12 +42,12 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_21;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_23;
 
     /**
      * Named resource providers to leverage for cluster resources.
      * The resource can represent Vpc, Hosting Zones or other resources, see {@link spi.ResourceType}.
-     * VPC for the cluster can be registed under the name of 'vpc' or as a single provider of type 
+     * VPC for the cluster can be registered under the name of 'vpc' or as a single provider of type
      */
     resourceProviders?: Map<string, spi.ResourceProvider> = new Map();
 
@@ -55,7 +55,17 @@ export class EksBlueprintProps {
      * Control Plane log types to be enabled (if not passed, none)
      * If wrong types are included, will throw an error.
      */
-    readonly enableControlPlaneLogTypes?: string[];
+    readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
+
+    /**
+     * If set to true and no resouce provider for KMS key is defined (under GlobalResources.KmsKey),
+     * a default KMS encryption key will be used for envelope encryption of Kubernetes secrets (AWS managed new KMS key).
+     * If set to false, and no resouce provider for KMS key is defined (under GlobalResources.KmsKey), then no secrets 
+     * encyrption is applied.
+     * 
+     * Default is true.
+     */
+    readonly useDefaultSecretEncryption? : boolean  = true;
 
     /**
      * Whether to manage cluster addOns using GitOps.
@@ -68,11 +78,33 @@ export class EksBlueprintProps {
     readonly enableGitOpsAppOfApps?: boolean = false;
 }
 
+export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
+    /**
+    * id can be no less than 1 character long, and no greater than 63 characters long.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    id = new constraints.StringConstraint(1, 63);
+
+    /**
+    * name can be no less than 1 character long, and no greater than 63 characters long.
+    * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
+    */
+    name = new constraints.StringConstraint(1, 63);
+}
+
+export const enum ControlPlaneLogType {
+
+    API = 'api',
+    AUDIT = 'audit',
+    AUTHENTICATOR = 'authenticator',
+    CONTROLLER_MANAGER = 'controllerManager',
+    SCHEDULER = 'scheduler'
+}
 
 /**
  * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
- * and allows creating a blueprint in an abstract state that can be applied to various instantiations 
- * in accounts and regions. 
+ * and allows creating a blueprint in an abstract state that can be applied to various instantiations
+ * in accounts and regions.
  */
 export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
@@ -84,14 +116,17 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     constructor() {
         this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
-        this.env = {};
+        this.env = {
+            account: process.env.CDK_DEFAULT_ACCOUNT,
+            region: process.env.CDK_DEFAULT_REGION
+        };
     }
 
     public name(name: string): this {
         this.props = { ...this.props, ...{ name } };
         return this;
     }
-    
+
     public account(account?: string): this {
         this.env.account = account;
         return this;
@@ -107,7 +142,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableControlPlaneLogTypes(...types: string[]): this {
+    public enableControlPlaneLogTypes(...types: ControlPlaneLogType[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
         return this;
     }
@@ -125,7 +160,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     public withBlueprintProps(props: Partial<EksBlueprintProps>): this {
         const resourceProviders = this.props.resourceProviders!;
         this.props = { ...this.props, ...cloneDeep(props) };
-        if(props.resourceProviders) {
+        if (props.resourceProviders) {
             this.props.resourceProviders = new Map([...resourceProviders!.entries(), ...props.resourceProviders.entries()]);
         }
         return this;
@@ -156,25 +191,29 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public clone(region?: string, account?: string): BlueprintBuilder {
-        return new BlueprintBuilder().withBlueprintProps({ ...this.props })
-            .account(account?? this.env.account).region(region?? this.env.region);
+    public useDefaultSecretEncryption(useDefault: boolean): this {
+        this.props = { ...this.props, ...{ useDefaultSecretEncryption: useDefault } };
+        return this;
     }
 
-    public build(scope: Construct, id: string, stackProps?: StackProps): EksBlueprint {
+    public clone(region?: string, account?: string): BlueprintBuilder {
+        return new BlueprintBuilder().withBlueprintProps({ ...this.props })
+            .account(account ?? this.env.account).region(region ?? this.env.region);
+    }
+
+    public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
 
-    public async buildAsync(scope: Construct, id: string, stackProps?: StackProps): Promise<EksBlueprint> {
+    public async buildAsync(scope: Construct, id: string, stackProps?: cdk.StackProps): Promise<EksBlueprint> {
         return this.build(scope, id, stackProps).waitForAsyncTasks();
     }
 }
 
-
 /**
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
- * and orchestrates provisioning of add-ons, teams and post deployment hooks. 
+ * and orchestrates provisioning of add-ons, teams and post deployment hooks.
  */
 export class EksBlueprint extends cdk.Stack {
 
@@ -188,30 +227,36 @@ export class EksBlueprint extends cdk.Stack {
         return new BlueprintBuilder();
     }
 
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: StackProps) {
-        super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
+    constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
+        super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
-       
+
         const resourceContext = this.provideNamedResources(blueprintProps);
 
-        let vpcResource : IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
+        let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
-        if(!vpcResource) {
+        if (!vpcResource) {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_21;
-        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({ 
-            id: `${ blueprintProps.name ?? blueprintProps.id }-ng`,
+        const version = blueprintProps.version ?? KubernetesVersion.V1_23;
+        let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
+
+        if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
+            kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
+        }
+
+        const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
+            id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource);
         this.clusterInfo.setResourceContext(resourceContext);
 
-        let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
+        let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+            utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
 
         if (blueprintProps.enableGitOps) {
@@ -227,8 +272,8 @@ export class EksBlueprint extends cdk.Stack {
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                const addOnKey = getAddOnNameOrId(addOn);
-                this.clusterInfo.addScheduledAddOn(addOnKey, result);
+                const addOnKey = utils.getAddOnNameOrId(addOn);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result, utils.isOrderedAddOn(addOn));
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {
@@ -257,14 +302,14 @@ export class EksBlueprint extends cdk.Stack {
         });
 
         this.asyncTasks.catch(err => {
-            console.error(err); 
-            throw new Error(err); 
+            console.error(err);
+            throw new Error(err);
         });
     }
 
     /**
      * Since constructor cannot be marked as async, adding a separate method to wait
-     * for async code to finish. 
+     * for async code to finish.
      * @returns Promise that resolves to the blueprint
      */
     public async waitForAsyncTasks(): Promise<EksBlueprint> {
@@ -281,23 +326,22 @@ export class EksBlueprint extends cdk.Stack {
      * May be used in testing for verification.
      * @returns cluster info object
      */
-    getClusterInfo() : spi.ClusterInfo {
+    getClusterInfo(): spi.ClusterInfo {
         return this.clusterInfo;
     }
 
-    private provideNamedResources(blueprintProps: EksBlueprintProps) : spi.ResourceContext {
+    private provideNamedResources(blueprintProps: EksBlueprintProps): spi.ResourceContext {
         const result = new spi.ResourceContext(this, blueprintProps);
 
-        for(let [key, value] of blueprintProps.resourceProviders ?? []) {
+        for (let [key, value] of blueprintProps.resourceProviders ?? []) {
             result.add(key, value);
         }
 
         return result;
     }
-
-
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
+        constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
         if (blueprintProps.teams) {
             blueprintProps.teams.forEach(e => {
                 if (teamNames.has(e.name)) {

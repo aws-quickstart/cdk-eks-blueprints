@@ -19,3 +19,5 @@ export function cloneDeep<T>(source: T): T {
         return undefined;
     });
 }
+
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] };

@@ -53,7 +53,7 @@ export function createUserNameSecretRef(secretName: string): CsiSecretProps {
         jmesPath: [{ path: "url", objectAlias: "url" }, { path: "username", objectAlias: "username" }, { path: "password", objectAlias: "password" }],
         kubernetesSecret: {
             secretName: secretName,
-            labels: { "argocd.argoproj.io/secret-type": "repo-creds" },
+            labels: {"argocd.argoproj.io/secret-type": "repo-creds"},
             data: [
                 { key: "url", objectName: "url" },
                 { key: "username", objectName: "username" },
