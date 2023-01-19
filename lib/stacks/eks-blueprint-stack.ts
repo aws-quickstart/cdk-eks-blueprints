@@ -9,6 +9,7 @@ import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import { ArgoGitOpsFactory } from "../../lib";
 
 export class EksBlueprintProps {
 
@@ -55,6 +56,16 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: string[];
+
+    /**
+     * Whether to manage cluster addOns using GitOps.
+     */
+    readonly enableGitOps?: boolean = false;
+
+    /**
+     * Whether to manage cluster addOns using GitOps App of Apps.
+     */
+    readonly enableGitOpsAppOfApps?: boolean = false;
 }
 
 
@@ -98,6 +109,16 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public enableControlPlaneLogTypes(...types: string[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
+        return this;
+    }
+
+    public enableGitOps(): this {
+        this.props = { ...this.props, ...{ enableGitOps: true } };
+        return this;
+    }
+
+    public enableGitOpsAppOfApps(): this {
+        this.props = { ...this.props, ...{ enableGitOpsAppOfApps: true } };
         return this;
     }
 
@@ -191,6 +212,14 @@ export class EksBlueprint extends cdk.Stack {
         let enableLogTypes : string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
             setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+        }
+
+        if (blueprintProps.enableGitOps) {
+            ArgoGitOpsFactory.enableGitOps();
+        }
+
+        if (blueprintProps.enableGitOpsAppOfApps) {
+            ArgoGitOpsFactory.enableGitOpsAppOfApps();
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();

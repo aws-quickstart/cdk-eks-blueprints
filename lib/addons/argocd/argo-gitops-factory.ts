@@ -1,12 +1,13 @@
 import { Construct } from "constructs";
-import { ArgoCDAddOn } from "../../../lib";
+import { ArgoCDAddOn } from "../../addons";
 import { HelmChartDeployment } from "../helm-addon/kubectl-provider";
 import { ClusterInfo } from "../../../lib/spi";
 import { KubectlProvider } from '../helm-addon/kubectl-provider';
 import { kebabToCamel } from "../../utils";
 
-export class ArgoGitOpsFactory {
+const original = KubectlProvider.applyHelmDeployment
 
+export class ArgoGitOpsFactory {
     public static enableGitOps() {
         KubectlProvider.applyHelmDeployment = createArgoHelmApplication;
     }
@@ -14,17 +15,20 @@ export class ArgoGitOpsFactory {
     public static enableGitOpsAppOfApps() {
         KubectlProvider.applyHelmDeployment = generateArgoHelmApplicationValues;
     }
-
 }
 
 export const createArgoHelmApplication = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
-    const argoAddOn = getArgoApplicationGenerator(clusterInfo);
-    const values = helmDeployment.dependencyMode ? { [helmDeployment.chart]: helmDeployment.values } : helmDeployment.values;
-    return argoAddOn.generate(clusterInfo, {
-        name: helmDeployment.name,
-        namespace: helmDeployment.namespace,
-        values: values,
-    });
+    if (clusterInfo.getResourceContext().blueprintProps.enableGitOps) {
+        const argoAddOn = getArgoApplicationGenerator(clusterInfo);
+        const values = helmDeployment.dependencyMode ? { [helmDeployment.chart]: helmDeployment.values } : helmDeployment.values;
+        return argoAddOn.generate(clusterInfo, {
+            name: helmDeployment.name,
+            namespace: helmDeployment.namespace,
+            values: values,
+        });
+    } else {
+        return original(clusterInfo, helmDeployment)
+    }
 };
 
 function getArgoApplicationGenerator(clusterInfo: ClusterInfo): ArgoCDAddOn {
@@ -38,13 +42,17 @@ function getArgoApplicationGenerator(clusterInfo: ClusterInfo): ArgoCDAddOn {
 }
 
 export const generateArgoHelmApplicationValues = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
-    // Add `enabled` property to each addon
-    helmDeployment.values.enable = true;
-    clusterInfo.addAddOnContext(
-        kebabToCamel(helmDeployment.name),
-        helmDeployment.values,
-    );
-    // No dependencies required because the values are used at postDeploy stage of ArgoCD AddOn.
-    // Generate dummy construct to meet the function requirement.
-    return new Construct(clusterInfo.cluster, `dummy${helmDeployment.name}`);
+    if (clusterInfo.getResourceContext().blueprintProps.enableGitOpsAppOfApps) {
+        // Add `enabled` property to each addon
+        helmDeployment.values.enable = true;
+        clusterInfo.addAddOnContext(
+            kebabToCamel(helmDeployment.name),
+            helmDeployment.values,
+        );
+        // No dependencies required because the values are used at postDeploy stage of ArgoCD AddOn.
+        // Generate dummy construct to meet the function requirement.
+        return new Construct(clusterInfo.cluster, `dummy${helmDeployment.name}`);
+    } else {
+        return original(clusterInfo, helmDeployment)
+    }
 };
