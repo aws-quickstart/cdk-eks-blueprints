@@ -8,18 +8,19 @@ Within the context of the `eks-blueprints` framework, an add-on is abstracted as
 
 The framework currently supports the following add-ons.
 
-| Add-on                                                                 | Description                                                                                                                            |
-|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                                     |
-| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.                                                                |
-| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                                                                   |
-| [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                  |
-| [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                           |
-| [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                         |
-| [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                                 |
-| [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager to your EKS cluster.                                                                                          |
-| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                            |
-| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                |
+| Add-on                                                                 | Description                                                                                                                           |
+|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [`ACKAddOn`](./adot-addon)                                             | Adds ACK (AWS Controllers for Kubernetes .                                                                 |
+| [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                 |
+| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               |
+| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                  |
+| [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
+| [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
+| [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
+| [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |
+| [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager to your EKS cluster.                                                             |
+| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                       |
+| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                              |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler.                                                                                                  |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             |
 | [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications.  |

@@ -4,8 +4,9 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { HelmAddOn } from '../../lib';
+import { AckServiceName, HelmAddOn } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
+import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
@@ -23,6 +24,8 @@ export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
         HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.failOnVersionValidation = false;
+        logger.settings.minLevel =  "debug";
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -74,12 +77,37 @@ export default class BlueprintConstruct {
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.AckAddOn({
+                id: "s3-ack",
+                createNamespace: true,
+                skipVersionValidation: true,
+                serviceName: AckServiceName.S3
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                id: "ec2-ack",
+                createNamespace: false,
+                serviceName: AckServiceName.EC2
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.RDS,
+                id: "rds-ack",
+                name: "rds-chart",
+                chart: "rds-chart",
+                version: "v0.1.1",
+                release: "rds-chart",
+                repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
+                managedPolicyName: "AmazonRDSFullAccess",
+                createNamespace: false,
+                saName: "rds-chart"
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
                     { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
                     { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
+                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
                 ],
                 subnetTags: {
                     "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
@@ -93,9 +121,11 @@ export default class BlueprintConstruct {
                     effect: "NoSchedule",
                 }],
                 consolidation: { enabled: true },
-                ttlSecondsUntilExpired: 360,
+                ttlSecondsUntilExpired: 2592000,
                 weight: 20,
+                interruptionHandling: true,
             }),
+            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
@@ -107,11 +137,14 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
             new blueprints.addons.JupyterHubAddOn({
-                ebsConfig: {
-                    storageClass: "gp2",
-                    capacity: "4Gi",
+                efsConfig: {
+                    pvcName: "efs-persist",
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                    capacity: '10Gi',
                 },
                 enableIngress: false,
+                notebookStack: 'jupyter/datascience-notebook',
+                values: { prePuller: { hook: { enabled: false }}}
             }),
             new blueprints.EmrEksAddOn()
         ];
@@ -125,7 +158,7 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
@@ -133,14 +166,18 @@ export default class BlueprintConstruct {
                 {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
+                    instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
                     diskSize: 25,
+                    desiredSize: 2,
+                    maxSize: 3, 
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
                     id: "mng2-customami",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
+                    desiredSize: 0,
+                    minSize: 0,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
