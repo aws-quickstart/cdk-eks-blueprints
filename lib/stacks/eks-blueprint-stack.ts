@@ -6,7 +6,7 @@ import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
 import * as constraints from '../utils/constraints-utils';
-import { getAddOnNameOrId, setupClusterLogging, withUsageTracking } from '../utils';
+import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
@@ -55,6 +55,17 @@ export class EksBlueprintProps {
      * If wrong types are included, will throw an error.
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
+
+
+    /**
+     * If set to true and no resouce provider for KMS key is defined (under GlobalResources.KmsKey),
+     * a default KMS encryption key will be used for envelope encryption of Kubernetes secrets (AWS managed new KMS key).
+     * If set to false, and no resouce provider for KMS key is defined (under GlobalResources.KmsKey), then no secrets 
+     * encyrption is applied.
+     * 
+     * Default is true.
+     */
+    readonly useDefaultSecretEncryption? : boolean  = true;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -160,14 +171,17 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
+    public useDefaultSecretEncryption(useDefault: boolean): this {
+        this.props = { ...this.props, ...{ useDefaultSecretEncryption: useDefault } };
+        return this;
+    }
+
     public clone(region?: string, account?: string): BlueprintBuilder {
         return new BlueprintBuilder().withBlueprintProps({ ...this.props })
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
-
-
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
@@ -194,7 +208,7 @@ export class EksBlueprint extends cdk.Stack {
     }
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
-        super(scope, blueprintProps.id, withUsageTracking(EksBlueprint.USAGE_ID, props));
+        super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
@@ -208,7 +222,7 @@ export class EksBlueprint extends cdk.Stack {
         const version = blueprintProps.version ?? KubernetesVersion.V1_23;
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
-        if (!kmsKeyResource) {
+        if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
 
@@ -217,12 +231,12 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource!);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource);
         this.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
-            setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+            utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
@@ -230,8 +244,8 @@ export class EksBlueprint extends cdk.Stack {
         for (let addOn of (blueprintProps.addOns ?? [])) { // must iterate in the strict order
             const result = addOn.deploy(this.clusterInfo);
             if (result) {
-                const addOnKey = getAddOnNameOrId(addOn);
-                this.clusterInfo.addScheduledAddOn(addOnKey, result);
+                const addOnKey = utils.getAddOnNameOrId(addOn);
+                this.clusterInfo.addScheduledAddOn(addOnKey, result, utils.isOrderedAddOn(addOn));
             }
             const postDeploy: any = addOn;
             if ((postDeploy as spi.ClusterPostDeploy).postDeploy !== undefined) {

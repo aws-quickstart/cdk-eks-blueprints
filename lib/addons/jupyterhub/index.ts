@@ -107,7 +107,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         super({...defaultProps, ...props});
         this.options = this.props as JupyterHubAddOnProps;
     }
-
+    
     @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
@@ -192,7 +192,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         }
 
         // Create Helm Chart
-        const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, true);
+        const jupyterHubChart = this.addHelmChart(clusterInfo, values, false, false);
 
         // Add dependency
         jupyterHubChart.node.addDependency(ns);

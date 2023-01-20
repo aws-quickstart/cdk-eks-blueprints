@@ -10,6 +10,7 @@ The framework currently supports the following add-ons.
 
 | Add-on                                                                 | Description                                                                                                                           |
 |------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [`ACKAddOn`](./adot-addon)                                             | Adds ACK (AWS Controllers for Kubernetes .                                                                 |
 | [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                 |
 | [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               |
 | [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                  |

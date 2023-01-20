@@ -16,6 +16,7 @@ nav:
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
+    - ACK: 'addons/ack-addon.md'
     - ADOT: 'addons/adot-addon.md'
     - AMP ADOT: 'addons/amp-addon.md'
     - AWS App Mesh: 'addons/app-mesh.md'
