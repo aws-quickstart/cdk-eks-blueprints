@@ -146,7 +146,8 @@ export default class BlueprintConstruct {
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn()
+            new blueprints.EmrEksAddOn(),
+            new blueprints.AwsBatchAddOn(),
         ];
 
         // Instantiated to for helm version check.
