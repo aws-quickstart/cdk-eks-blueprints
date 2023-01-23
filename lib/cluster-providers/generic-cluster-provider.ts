@@ -14,6 +14,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import * as iam from "aws-cdk-lib/aws-iam";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -232,7 +233,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const nodeGroups: eks.Nodegroup[] = [];
 
         this.props.managedNodeGroups?.forEach(n => {
-            const nodeGroup = this.addManagedNodeGroup(cluster, n);
+            const nodeGroup = this.addManagedNodeGroup(scope, cluster, n);
             nodeGroups.push(nodeGroup);
         });
 
@@ -320,13 +321,20 @@ export class GenericClusterProvider implements ClusterProvider {
      * @param nodeGroup
      * @returns
      */
-    addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
+    addManagedNodeGroup(scope: Construct, cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
         const capacityType = nodeGroup.nodeGroupCapacityType;
         const releaseVersion = nodeGroup.amiReleaseVersion;
         const instanceTypes = nodeGroup.instanceTypes ?? [utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
         const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+
+        // Create a node role with minimal permissions
+        const nodeRole = new iam.Role(scope, nodeGroup.id + 'Role', {
+            assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+        });
+        nodeRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSWorkerNodePolicy'));
+        nodeRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryReadOnly'));
 
         // Create a managed node group.
         const nodegroupOptions: utils.Writeable<eks.NodegroupOptions> = {
@@ -339,7 +347,8 @@ export class GenericClusterProvider implements ClusterProvider {
                 maxSize,
                 desiredSize,
                 releaseVersion,
-                subnets: nodeGroup.nodeGroupSubnets
+                subnets: nodeGroup.nodeGroupSubnets,
+                nodeRole
             }
         };
 
