@@ -16,22 +16,31 @@ Before using gMaestro, you need to:
 2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" 
 
 
+## Installation
+
+Using [npm](https://npmjs.org):
+
+```bash
+$ npm i @granulate/gmaestro-eks-blueprints-addon
+```
+
 ## Usage
 
 ```typescript
 import 'source-map-support/register';
 import * as CDK from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
+import {GmaestroAddOn} from '@granulate/gmaestro-eks-blueprints-addon';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.Gmaestro({
-        b64ClientId: "<client id>",
+const addOn = new GmaestroAddOn({
+        clientIdSecretName: "<client id secret name>", // Create and copy from gMaestro deployment yaml
         clientName: "<client name>",
         clusterName: "<cluster name>",
         namespace: "<namespace>",
-        grafanaMetricsAuthKey: "<grafana metrics auth key>",
-        grafanaLogsAuthKey: "<grafana logs auth key>",
+        grafanaMetricsSecretName: "<grafana metrics secret name>", // Create and copy from gMaestro deployment yaml
+        grafanaLogsSecretName: "<grafana logs secret name>", // Create and copy from gMaestro deployment yaml
     });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -58,9 +67,9 @@ The first rightsizing recommendations may take up to 5 minutes to load.
 ## `gMaestroAddOn` Required (props)
 Take the following parameter from the sample YAML file that was downloaded.
 
-#### `b64ClientId: string`
+#### `clientIdSecretName: string`
 
-Copy from the Deployment section `MAESTRO_CLIENT_ID` value
+Create a secret (as a plaintext) in AWS copy its value from the Deployment section `MAESTRO_CLIENT_ID` 
 
 #### `clientName: string`
 
@@ -74,13 +83,13 @@ Copy from the Deployment section `MAESTRO_SERVICE_NAME` value
 
 The namespace where gMaestro will be installed. `default` namespace is used as default.
 
-#### `grafanaMetricsAuthKey: string`
+#### `grafanaMetricsSecretName: string`
 
-Copy from the ConfigMap section `prometheus.configs.remote_write.basic_auth.password` value.
+Create a secret (as a plaintext) in AWS copy its value from the ConfigMap section `prometheus.configs.remote_write.basic_auth.password` value.
 
-#### `grafanaLogsAuthKey: string`
+#### `grafanaLogsSecretName: string`
 
-Copy from the ConfigMap section `loki.configs.clients.basic_auth.password` value
+Create a secret (as a plaintext) in AWS copy its value from the ConfigMap section `loki.configs.clients.basic_auth.password` value
 
 ## Support
 

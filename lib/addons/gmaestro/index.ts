@@ -2,7 +2,7 @@ import {Construct} from 'constructs';
 import {ClusterInfo, Values} from "../../spi";
 
 import {HelmAddOn, HelmAddOnProps, HelmAddOnUserProps} from "../helm-addon";
-import {createNamespace, setPath} from "../../utils";
+import {createNamespace, getSecretValue, setPath} from "../../utils";
 
 
 /**
@@ -16,9 +16,9 @@ export interface GmaestroAddOnProps extends HelmAddOnUserProps {
     namespace?: string;
 
     /**
-     * granulate base 64 id.
+     * client id secret name as defined in AWS Secrets Manager (plaintext).
      */
-    b64ClientId: string;
+    clientIdSecretName: string;
 
     /**
      * plain text client name.
@@ -31,14 +31,16 @@ export interface GmaestroAddOnProps extends HelmAddOnUserProps {
     clusterName: string;
 
     /**
-     * plain text grafana metrics auth key.
+     * grafana metrics secret name as defined in AWS Secrets Manager (plaintext).
+     * This allows us to store the gmaestro metrics in our grafana account.
      */
-    grafanaMetricsAuthKey: string;
+    grafanaMetricsSecretName: string;
 
     /**
-     * plain text grafana logs auth key.
+     * grafana logs secret name as defined in AWS Secrets Manager (plaintext).
+     * This allows us to store the gmaestro logs in our grafana account.
      */
-    grafanaLogsAuthKey: string;
+    grafanaLogsSecretName: string;
 }
 
 /**
@@ -61,14 +63,13 @@ export class GmaestroAddOn extends HelmAddOn {
     constructor(props?: GmaestroAddOnProps) {
         super({...defaultProps, ...props});
         this.options = this.props as GmaestroAddOnProps;
-        if (!this.options.b64ClientId || !this.options.clientName || !this.options.clusterName || !this.options.grafanaMetricsAuthKey || !this.options.grafanaLogsAuthKey) {
-            throw new Error(`b64ClientId, clientName, clusterName, grafanaMetricsAuthKey, grafanaLogsAuthKey are Gmaestro addon required fields. 
-            Please copy those values form the gmaestro deployment Yaml file (Signup to gmaestro before and generate yaml from the Deploy page).`);
+        if (!this.options.clientIdSecretName || !this.options.clientName || !this.options.clusterName || !this.options.grafanaMetricsSecretName || !this.options.grafanaLogsSecretName) {
+            throw new Error(`clientIdSecretName, clientName, clusterName, grafanaMetricsSecretName, grafanaLogsSecretName are Gmaestro addon required fields.`);
         }
     }
 
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        let values: Values = populateValues(this.options);
+    async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        let values: Values = await populateValues(this.options, clusterInfo.cluster.stack.region);
         if (this.options.namespace) {
             const namespace = createNamespace(this.options.namespace!, clusterInfo.cluster, true);
             const chart = this.addHelmChart(clusterInfo, values);
@@ -85,16 +86,20 @@ export class GmaestroAddOn extends HelmAddOn {
 /**
  * populateValues populates the appropriate values used to customize the Helm chart
  * @param helmOptions User provided values to customize the chart
+ * @param region Region of the stack
  */
-function populateValues(helmOptions: GmaestroAddOnProps): Values {
+async function populateValues(helmOptions: GmaestroAddOnProps, region: string): Promise<Values> {
     const values = helmOptions.values ?? {};
 
     setPath(values, "namespace", helmOptions.namespace);
-    setPath(values, "b64ClientId", helmOptions.b64ClientId);
+    const clientIdSecretValue = await getSecretValue(helmOptions.clientIdSecretName!, region);
+    setPath(values, "b64ClientId", clientIdSecretValue);
     setPath(values, "clientName", helmOptions.clientName);
     setPath(values, "clusterName", helmOptions.clusterName);
-    setPath(values, "secrets.grafanaMetricsAuthKey", helmOptions.grafanaMetricsAuthKey);
-    setPath(values, "secrets.grafanaLogsAuthKey", helmOptions.grafanaLogsAuthKey);
+    const grafanaMetricsSecretValue = await getSecretValue(helmOptions.grafanaMetricsSecretName!, region);
+    const grafanaLogsSecretValue = await getSecretValue(helmOptions.grafanaLogsSecretName!, region);
+    setPath(values, "secrets.grafanaMetricsAuthKey", grafanaMetricsSecretValue);
+    setPath(values, "secrets.grafanaLogsAuthKey", grafanaLogsSecretValue);
 
     return values;
 }

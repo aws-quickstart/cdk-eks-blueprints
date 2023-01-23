@@ -148,11 +148,11 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.addons.GmaestroAddOn({
-                b64ClientId: "test_client_id",
+                clientIdSecretName: "test_client_id_secret_name",
                 clientName: "test_client_name",
                 clusterName: "test_cluster_name",
-                grafanaMetricsAuthKey: "test_grafana_metrics_auth_key",
-                grafanaLogsAuthKey: "test_grafana_logs_auth_key",
+                grafanaMetricsSecretName: "test_metrics_secret_name",
+                grafanaLogsSecretName: "test_logs_secret_name",
             })
         ];
 
