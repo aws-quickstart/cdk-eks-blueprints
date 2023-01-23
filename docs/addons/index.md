@@ -49,6 +49,7 @@ The framework currently supports the following add-ons.
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  |
 | [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                  |
 | [`XrayAdotAddOn`](./xray-adot-addon)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                                |
+[`Paralus`](./paralus-addon)                                   | Deploys Paralus to the EKS Cluster.                                                                                |
 
 # Standard Helm Add-On Configuration Options
 
