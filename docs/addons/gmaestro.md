@@ -1,6 +1,6 @@
-# gMaestro AddOn for Amazon EKS Blueprints
+# gMaestro add-on for Amazon EKS Blueprints
 
-This repository contains the source code for the gMaestro AddOn for [Amazon EKS Blueprints](https://aws-quickstart.github.io/cdk-eks-blueprints/). This AddOn is a [CDK](https://aws.amazon.com/cdk/) construct that allows customers to add gMaestro to their Amazon EKS clusters.
+This repository contains the source code for the gMaestro add-on for [Amazon EKS Blueprints](https://aws-quickstart.github.io/cdk-eks-blueprints/). This add-on is a [CDK](https://aws.amazon.com/cdk/) construct that allows customers to add gMaestro to their Amazon EKS clusters.
 
 gMaestro is a Kubernetes cost optimization solution that helps companies reduce spending on unutilized resources by up to 60%.
 With gMaestro, you gain full visibility into K8s clusters, seamlessly interact with HPA scaling policies, and achieve your cost-performance goals by applying custom rightsizing recommendations based on actual usage in production.
@@ -15,6 +15,14 @@ Before using gMaestro, you need to:
 1. [Sign up](https://app.granulate.io/gMaestroSignup) to the gMaestro platform
 2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" 
 
+![GmaestroGenerateConfigFile](../assets/images/gmaestro-generate-config-file.png)
+
+![GmaestroConfigFile](../assets/images/gmaestro-config-file.png)
+
+3. Create 3 secrets (as a plaintext) in AWS Secrets Manager copy their values from the following places:
+   1. Deployment section `MAESTRO_CLIENT_ID`
+   2. ConfigMap section `prometheus.configs.remote_write.basic_auth.password`.
+   3. ConfigMap section `loki.configs.clients.basic_auth.password`
 
 ## Installation
 
@@ -69,7 +77,7 @@ Take the following parameter from the sample YAML file that was downloaded.
 
 #### `clientIdSecretName: string`
 
-Create a secret (as a plaintext) in AWS copy its value from the Deployment section `MAESTRO_CLIENT_ID` 
+The secret name from the Prerequisite section 3.i.
 
 #### `clientName: string`
 
@@ -85,11 +93,11 @@ The namespace where gMaestro will be installed. `default` namespace is used as d
 
 #### `grafanaMetricsSecretName: string`
 
-Create a secret (as a plaintext) in AWS copy its value from the ConfigMap section `prometheus.configs.remote_write.basic_auth.password` value.
+The secret name from the Prerequisite section 3.ii.
 
 #### `grafanaLogsSecretName: string`
 
-Create a secret (as a plaintext) in AWS copy its value from the ConfigMap section `loki.configs.clients.basic_auth.password` value
+The secret name from the Prerequisite section 3.iii.
 
 ## Support
 
@@ -97,4 +105,4 @@ If you have questions about Gmaestro, catch us [on Slack](https://granulatecommu
 
 ## License
 
-The gMaestro AddOn is licensed under the Apache 2.0 license.
+The gMaestro add-on is licensed under the Apache 2.0 license.

@@ -146,14 +146,7 @@ export default class BlueprintConstruct {
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn(),
-            new blueprints.addons.GmaestroAddOn({
-                clientIdSecretName: "test_client_id_secret_name",
-                clientName: "test_client_name",
-                clusterName: "test_cluster_name",
-                grafanaMetricsSecretName: "test_metrics_secret_name",
-                grafanaLogsSecretName: "test_logs_secret_name",
-            })
+            new blueprints.EmrEksAddOn()
         ];
 
         // Instantiated to for helm version check.
