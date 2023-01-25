@@ -228,6 +228,6 @@ export default class BlueprintConstruct {
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
-            .build(scope, blueprintID, props);
+            .build(scope, blueprintID, props);;
     }
 }
