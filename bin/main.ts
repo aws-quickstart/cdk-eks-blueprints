@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-
 import BlueprintConstruct from '../examples/blueprint-construct';
 
 const app = new cdk.App();
