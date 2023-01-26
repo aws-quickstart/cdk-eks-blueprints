@@ -13,7 +13,7 @@ export type ProxyHandlerKey = keyof ProxyHandler<any>;
 
 export type SwitchableKey = Exclude<ProxyHandlerKey, 'apply' | 'construct'>;
 
-const isDynamicProxy = Symbol("isDynamicProxy")
+const isDynamicProxy = Symbol("isDynamicProxy");
 
 export class Handler<T extends object> implements Required<ProxyHandler<T>> {
     public static proxy<T extends object, U extends object = T>(

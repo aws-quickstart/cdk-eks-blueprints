@@ -1,5 +1,6 @@
-import { Construct } from "constructs";
 import * as assert from "assert";
+import { Construct } from "constructs";
+import "reflect-metadata";
 import { ClusterAddOn, ClusterInfo } from '../spi';
 
 /**
@@ -11,6 +12,9 @@ export function getAddOnNameOrId(addOn: ClusterAddOn): string {
   return addOn.id ?? addOn.constructor.name;
 }
 
+export function isOrderedAddOn(addOn: ClusterAddOn) : boolean {
+    return Reflect.getMetadata("ordered", addOn.constructor) ?? Reflect.getMetadata("ordered", addOn) ?? false;
+}
 /**
  * Decorator function that accepts a list of AddOns and
  * ensures addons are scheduled to be added as well as

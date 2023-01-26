@@ -21,3 +21,5 @@ yarn.lock
 docs/api
 # mkdocs artifact
 site
+# macOS extraneous file
+.DS_STORE

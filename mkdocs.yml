@@ -16,6 +16,7 @@ nav:
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
+    - ACK: 'addons/ack-addon.md'
     - ADOT: 'addons/adot-addon.md'
     - AMP ADOT: 'addons/amp-addon.md'
     - AWS App Mesh: 'addons/app-mesh.md'
@@ -39,6 +40,7 @@ nav:
     - JupyterHub: 'addons/jupyterhub.md'
     - Karpenter: 'addons/karpenter.md'
     - Keptn: 'https://github.com/keptn-sandbox/keptn-eks-blueprints-addon'
+    - Knative: 'addons/knative-operator.md'
     - Kube Proxy: 'addons/kube-proxy.md'
     - Kubecost: 'addons/kubecost.md'
     - Kubevious: 'addons/kubevious.md'

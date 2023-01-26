@@ -49,7 +49,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.4.6',
+    version: '1.4.7',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false,
