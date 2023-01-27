@@ -1,7 +1,7 @@
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 
-export function getEbsDriverPolicyDocument(partition: string) : PolicyDocument {
-    return PolicyDocument.fromJson({
+export function getEbsDriverPolicyDocument(partition: string, kmsKeys?: string[]) : PolicyDocument {
+    const result = {
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -145,5 +145,38 @@ export function getEbsDriverPolicyDocument(partition: string) : PolicyDocument {
                 }
             }
         ]
-    });
+    };
+    if (kmsKeys != null) {
+        const kmsPolicy = [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "kms:CreateGrant",
+                    "kms:ListGrants",
+                    "kms:RevokeGrant"
+                ],
+                "Resource": kmsKeys,
+                "Condition": {
+                    "Bool": {
+                        "kms:GrantIsForAWSResource": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "kms:Encrypt",
+                    "kms:Decrypt",
+                    "kms:ReEncrypt*",
+                    "kms:GenerateDataKey*",
+                    "kms:DescribeKey"
+                ],
+                "Resource": kmsKeys
+            }
+        ];
+        // @ts-ignore
+        result.Statement.push(kmsPolicy);
+    }
+    return PolicyDocument.fromJson(result);
 }
+

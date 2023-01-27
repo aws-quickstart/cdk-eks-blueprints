@@ -15,12 +15,12 @@ const defaultProps = {
  */
 export class EbsCsiDriverAddOn extends CoreAddOn {
 
-    constructor(version?: string) {
+    constructor(version?: string, kmsKeys?: string[]) {
         super({
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
             saName: defaultProps.saName,
-            policyDocumentProvider: getEbsDriverPolicyDocument
+            policyDocumentProvider: (partition: string) => getEbsDriverPolicyDocument(partition, kmsKeys)
         });
     }
 }
