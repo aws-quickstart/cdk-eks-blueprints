@@ -197,14 +197,14 @@ export class JupyterHubAddOn extends HelmAddOn {
                 presetAnnotations['alb.ingress.kubernetes.io/certificate-arn'] = certificate?.certificateArn;
             } 
 
-            const annotations = { ...ingressAnnotations, ...presetAnnotations}
+            const annotations = { ...ingressAnnotations, ...presetAnnotations};
             setPath(values, "ingress.annotations", annotations);
             setPath(values, "ingress.hosts", ingressHosts);
             setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
-            assert(!cert, 'You cannot provide a certificate for NLB.');
+            assert(!cert, 'Cert option is only supported if ingress is enabled.');
             setPath(values, "proxy.service", { 
                 "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",

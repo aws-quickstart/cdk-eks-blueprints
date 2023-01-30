@@ -90,7 +90,7 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 3. (Optional) Leverage OIDC Provider as a way to manage authentication and authorization. If not provided, the default creates no user, and the user will be able to login with any arbitrary username and password. **It is highly recommended to leverage an Identity provider for any production use case.**
 4. If enabled, will front the JupyterHub UI with an Ingress using AWS Application Load Balancer. ***This requires AWS Load Balancer Controller add-on and it must be in add-on array before the JupyterHub add-on***. This will also look for any additional Ingress annotations provided by the user to be tagged.
 5. (Optional) Annotates Ingress with user-provided AWS Certificate Manager certificate name. It will be looked up and automatically tagged to be used with Ingress. It will require user to provide a DNS name and ***External DNS add-on to be added in add-on array before the JupyterHub add-on***.
-6. (Optional) Leverage a different notebook stack than the standard one provided. Jupyter team maintains a set of Docker image definition in a GitHub repository as explained [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
+6. (Optional) User can choose a different notebook stack than the standard one provided. Jupyter team maintains a set of Docker image definition in a GitHub repository as explained [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 7. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 ***Note***: For custom helm values, please consult the [official documentation](https://zero-to-jupyterhub.readthedocs.io/en/latest/resources/reference.html#). 
