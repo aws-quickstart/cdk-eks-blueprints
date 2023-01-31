@@ -10,7 +10,7 @@ import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
-import { ArgoGitOpsFactory } from "../../lib";
+import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 export class EksBlueprintProps {
     /**

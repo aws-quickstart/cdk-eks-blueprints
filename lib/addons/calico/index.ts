@@ -31,7 +31,7 @@ export interface CalicoAddOnProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    name: 'aws-calico',
+    name: 'calico-addon',
     namespace: 'kube-system',
     version: '0.3.10',
     chart: "aws-calico",
@@ -57,7 +57,6 @@ export class CalicoAddOn extends HelmAddOn {
 
         dot.set("calico.node.resources.requests.memory", "64Mi", defaultValues, true);
         dot.set("calico.node.resources.limits.memory", "100Mi", defaultValues, true);
-        dot.set("installation.kubernetesProvider", "EKS", defaultValues, true);
 
         const merged = merge(defaultValues, values);
 

@@ -147,10 +147,13 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
         new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
-    blueprints.addons.ArgoGitOpsFactory.enableGitOps();
+    blueprints.EksBlueprint.builder()
+        .addOns(...addOns)
+        .enableGitOps()
+        .build(scope, stackID);
 ```
 
-- CDK deploys the only `Application` resource for the App of Apps, aka App Zero, and ArgoCD deploys all the AddOns based on the App Zero. This requires the naming pattern between the AddOns and App of Apps matches. Example:
+- CDK deploys the only `Application` resource for the App of Apps, aka `bootstrap-apps`, and ArgoCD deploys all the AddOns based on the `bootstrap-apps`. This requires the naming pattern between the AddOns and App of Apps matches. Example:
 
 ```typescript
     import * as blueprints from '@aws-quickstart/eks-blueprints';
@@ -171,7 +174,10 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
         new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     ];
 
-    blueprints.addons.ArgoGitOpsFactory.enableGitOpsAppOfApps();
+    blueprints.EksBlueprint.builder()
+        .addOns(...addOns)
+        .enableGitOpsAppOfApps()
+        .build(scope, stackID);
 ```
 
 ## Secrets Support
