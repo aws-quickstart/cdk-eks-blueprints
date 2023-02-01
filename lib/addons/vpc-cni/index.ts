@@ -11,7 +11,7 @@ export interface VpcCniAddOnProps {
    */
   version?: string;
   /**
-   * Version of the addon
+   * Version of the addon.
    */
   additionalEniTags?: string;
   /**
