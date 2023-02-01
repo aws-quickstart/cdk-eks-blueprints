@@ -4,6 +4,7 @@ import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
+import { Json } from "aws-sdk/clients/robomaker";
 
 export class CoreAddOnProps {
     /**
@@ -27,6 +28,10 @@ export class CoreAddOnProps {
      * Namespace to create the ServiceAccount.
      */
     readonly namespace?: string;
+    /**
+     * ConfigurationValues field to pass custom configurations to Addon
+     */
+    readonly configurationValues?: JSON;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -64,6 +69,7 @@ export class CoreAddOn implements ClusterAddOn {
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
+            configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
