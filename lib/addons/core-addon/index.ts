@@ -1,10 +1,9 @@
 import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { createServiceAccount } from "../../utils";
-import { Json } from "aws-sdk/clients/robomaker";
 
 export class CoreAddOnProps {
     /**
@@ -31,7 +30,7 @@ export class CoreAddOnProps {
     /**
      * ConfigurationValues field to pass custom configurations to Addon
      */
-    readonly configurationValues?: JSON;
+    readonly configurationValues?: Values;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
