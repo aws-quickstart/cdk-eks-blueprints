@@ -41,14 +41,14 @@ export default class BlueprintConstruct {
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
-            bootstrapRepo: {
-                 repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
-                 path: 'envs/dev',
-                 targetRevision: "deployable",
-                 credentialsSecretName: 'github-token',
-                 credentialsType: 'SSH'
-            },
-            adminPasswordSecretName: "argo-admin-secret"
+            // bootstrapRepo: {
+            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
+            //      path: 'envs/dev',
+            //      targetRevision: "deployable",
+            //      credentialsSecretName: 'github-ssh',
+            //      credentialsType: 'SSH'
+            // },
+            // adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
@@ -58,7 +58,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn(),
             new blueprints.addons.XrayAdotAddOn(),
-            new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -73,36 +73,35 @@ export default class BlueprintConstruct {
                 }
             }),
             new blueprints.addons.VeleroAddOn(),
-            // new blueprints.addons.ClusterAutoScalerAddOn(),
             new blueprints.addons.VpcCniAddOn(),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
-            // new blueprints.addons.OpaGatekeeperAddOn(),
+            new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
                 id: "s3-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
                 serviceName: AckServiceName.S3
             }),
-        //     new blueprints.addons.AckAddOn({
-        //         skipVersionValidation: true,
-        //         id: "ec2-ack",
-        //         createNamespace: false,
-        //         serviceName: AckServiceName.EC2
-        //     }),
-        //     new blueprints.addons.AckAddOn({
-        //         skipVersionValidation: true,
-        //         serviceName: AckServiceName.RDS,
-        //         id: "rds-ack",
-        //         name: "rds-chart",
-        //         chart: "rds-chart",
-        //         version: "v0.1.1",
-        //         release: "rds-chart",
-        //         repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
-        //         managedPolicyName: "AmazonRDSFullAccess",
-        //         createNamespace: false,
-        //         saName: "rds-chart"
-        //     }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                id: "ec2-ack",
+                createNamespace: false,
+                serviceName: AckServiceName.EC2
+            }),
+            new blueprints.addons.AckAddOn({
+                skipVersionValidation: true,
+                serviceName: AckServiceName.RDS,
+                id: "rds-ack",
+                name: "rds-chart",
+                chart: "rds-chart",
+                version: "v0.1.1",
+                release: "rds-chart",
+                repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
+                managedPolicyName: "AmazonRDSFullAccess",
+                createNamespace: false,
+                saName: "rds-chart"
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
@@ -126,8 +125,8 @@ export default class BlueprintConstruct {
                 weight: 20,
                 interruptionHandling: true,
             }),
-            // new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
-            // new blueprints.addons.KubeviousAddOn(),
+            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
+            new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn(),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
             new blueprints.addons.KedaAddOn({
@@ -147,18 +146,14 @@ export default class BlueprintConstruct {
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn(),
-            new blueprints.ExternalsSecretsAddOn(),
-            // new blueprints.ExternalDnsAddOn({
-            //     hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
-            // })
+            new blueprints.EmrEksAddOn()
         ];
 
-        // // Instantiated to for helm version check.
-        // new blueprints.ExternalDnsAddOn({
-        //     hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
-        // });
-        
+        // Instantiated to for helm version check.
+        new blueprints.ExternalDnsAddOn({
+            hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
+        });
+        new blueprints.ExternalsSecretsAddOn();
        
         const blueprintID = 'blueprint-construct-dev';
 
@@ -170,8 +165,8 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 {
                     id: "mng1",
-                    amiType: NodegroupAmiType.AL2_ARM_64,
-                    instanceTypes: [new ec2.InstanceType('m6g.4xlarge')],
+                    amiType: NodegroupAmiType.AL2_X86_64,
+                    instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
                     diskSize: 25,
                     desiredSize: 2,
                     maxSize: 3, 
@@ -179,15 +174,18 @@ export default class BlueprintConstruct {
                 },
                 {
                     id: "mng2-customami",
-                    instanceTypes: [new ec2.InstanceType('t4g.2xlarge')],
-                    desiredSize: 2,
-                    maxSize: 3,
+                    instanceTypes: [new ec2.InstanceType('t3.large')],
+                    nodeGroupCapacityType: CapacityType.SPOT,
+                    desiredSize: 0,
+                    minSize: 0,
                     customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
-                            'us-east-1': 'ami-02d5a5508f2c23400',
-                            'us-west-2': 'ami-050cab41bd7761f0d',
-                            'us-east-2': 'ami-004bcb59d7803886f',
-                            'us-west-1': 'ami-02f3b2e28f5a27643'
+                            'us-east-1': 'ami-08e520f5673ee0894',
+                            'us-west-2': 'ami-0403ff342ceb30967',
+                            'us-east-2': 'ami-07109d69738d6e1ee',
+                            'us-west-1': 'ami-07bda4b61dc470985',
+                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
                         userData: userData,
                     }
