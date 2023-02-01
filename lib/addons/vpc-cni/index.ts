@@ -97,7 +97,7 @@ export interface VpcCniAddOnProps {
   /**
   * `cpu` Limits.
   */
-  memoryLimit?: string;
+  memoryLimit: string;
   /**
   * `memory` Limits.
   */
