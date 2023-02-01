@@ -104,7 +104,7 @@ export interface VpcCniAddOnProps {
 }
 
 /**
- * Implementation of VpcCni EKS add-on.
+ * Implementation of VpcCni EKS add-on with Advanced Configurations.
  */
 export class VpcCniAddOn extends CoreAddOn {
 
