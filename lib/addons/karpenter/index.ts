@@ -375,17 +375,20 @@ export class KarpenterAddOn extends HelmAddOn {
             path: '/'
         });
 
+        const clusterName = cluster.clusterName;
+        const clusterHash = md5.Md5.hashStr(clusterName);
+
         //Cfn output for Node Role in case of needing to add additional policies
         new CfnOutput(cluster.stack, 'Karpenter Instance Node Role', {
             value: karpenterNodeRole.roleName,
             description: "Karpenter add-on Node Role name",
-            exportName: "KarpenterNodeRoleName",
+            exportName: "KarpenterNodeRoleName"+clusterHash,
         });
         //Cfn output for Instance Profile for creating additional provisioners
         new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', { 
             value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
             description: "Karpenter add-on Instance Profile name",
-            exportName: "KarpenterInstanceProfileName", 
+            exportName: "KarpenterInstanceProfileName"+clusterHash, 
         });
 
         // Map Node Role to aws-auth
