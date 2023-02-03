@@ -33,7 +33,7 @@ awsVpcK8sCniCustomNetworkCfg: "true"
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
 //This required to create Secondary CIDR while creating your VPC.
-  .resourceProvider(blueprints.GlobalResources.Vpc,new VpcProvider(undefined,"10.64.0.0",))
+  .resourceProvider(blueprints.GlobalResources.Vpc,new VpcProvider(undefined,"10.64.0.0/24",))
   .build(app, 'my-stack-name');
 ```
 ## Configuration Options
