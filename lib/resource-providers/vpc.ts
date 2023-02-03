@@ -32,12 +32,15 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
             // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
-            new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
-                vpcId: vpc.vpcId,
-                cidrBlock: this.secondaryCidrId,
-            });
+            if (this.secondaryCidrId) {
+                new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
+                    vpcId: vpc.vpcId,
+                    cidrBlock: this.secondaryCidrId});
+            } else {
+                new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
+                    vpcId: vpc.vpcId});
+            }
         }
-
         return vpc;
     }
 }

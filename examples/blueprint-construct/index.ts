@@ -74,7 +74,8 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
-                enablePrefixDelegation: "true"
+                enablePrefixDelegation: "true",
+                awsVpcK8sCniCustomNetworkCfg: "true"
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
@@ -227,7 +228,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.secondaryCidr,new VpcProvider("10.64.0.0"))
+            .resourceProvider(blueprints.GlobalResources.Vpc,new VpcProvider(undefined,"10.64.0.0",))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
