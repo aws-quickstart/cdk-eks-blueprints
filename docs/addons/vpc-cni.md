@@ -8,6 +8,8 @@ Installing VPC CNI as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest
 
 Amazon EKS automatically installs VPC CNI as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
+Amazon EKS VPC CNI Addon now supports advanced configurations which means we can now pass configuration values as environment variables and limits for setting up advanced configurations in Amazon VPC CNI. Please refer [Amazon EKS add-ons: Advanced configuration](https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/) for more informatoion.
+
 ## Prerequisite
 - Amazon EKS add-ons are only available with Amazon EKS clusters running Kubernetes version 1.18 and later.
 
@@ -20,10 +22,18 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.VpcCniAddOn('v1.7.5-eksbuild.2');
+const addOn = new blueprints.addons.VpcCniAddOn({
+'v1.7.5-eksbuild.2',
+//Enabling prefix delegation to Primary ENIs.
+enablePrefixDelegation: "true", 
+//Enables Custom Networking with Secondary CIDRs.
+awsVpcK8sCniCustomNetworkCfg: "true"
+});
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
+//This required to create Secondary CIDR while creating your VPC.
+  .resourceProvider(blueprints.GlobalResources.Vpc,new VpcProvider(undefined,"10.64.0.0",))
   .build(app, 'my-stack-name');
 ```
 ## Configuration Options
@@ -74,4 +84,6 @@ v1.7.5-eksbuild.2
 
 ## Functionality
 
-Applies VPC CNI add-on to Amazon EKS cluster.
+Applies VPC CNI add-on to Amazon EKS cluster. 
+Reference [VpcCniAddon](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/addons.VpcCniAddOn.html) to further on this addon.
+Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values.

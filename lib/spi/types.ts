@@ -108,12 +108,10 @@ export class ResourceContext {
 
 export enum GlobalResources {
     Vpc = 'vpc',
-    secondaryCidr = 'secondary-cidr',
     HostedZone = 'hosted-zone',
     Certificate = 'certificate',
     KmsKey = 'kms-key'
 }
-
 
 /**
  * Cluster info supplies required information on the cluster configuration, registered resources and add-ons
