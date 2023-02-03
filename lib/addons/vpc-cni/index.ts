@@ -1,6 +1,5 @@
 import { Values } from "../../spi";
-import { setPath } from "../../utils";
-import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { CoreAddOn } from "../core-addon";
 
 /**
  * User provided option for the Helm Chart
@@ -49,7 +48,7 @@ export interface VpcCniAddOnProps {
   /**
   * `AWS_VPC_K8S_CNI_LOG_FILE` Environment Variable.
   */
-  awsVpcK8sCniRandomizeSnat: string;
+  awsVpcK8sCniRandomizeSnat?: string;
   /**
   * `AWS_VPC_K8S_CNI_RANDOMIZESNAT` Environment Variable.
   */
@@ -108,8 +107,8 @@ export interface VpcCniAddOnProps {
  */
 export class VpcCniAddOn extends CoreAddOn {
 
-    constructor(props: VpcCniAddOnProps) {
-        super({
+    constructor(props?: VpcCniAddOnProps) {
+        super({ 
             addOnName: "vpc-cni",
             version: props.version ?? "v1.12.0-eksbuild.1",
             saName: "vpc-cni",
@@ -120,71 +119,38 @@ export class VpcCniAddOn extends CoreAddOn {
 
 function populateVpcCniConfigurationValues(props: VpcCniAddOnProps): Values {
   let values: Values = {};
-  if (props.additionalEniTags) {
-    setPath(values,"Env.ADDITIONAL_ENI_TAGS", props.additionalEniTags);
+  const result : Values = {
+    Env: {
+        ADDITIONAL_ENI_TAGS: props.additionalEniTags, 
+        ANNOTATE_POD_IP: props.annotatePodIp,
+        AWS_VPC_CNI_NODE_PORT_SUPPORT: props.awsVpcCniNodePortSupport,
+        AWS_VPC_ENI_MTU: props.awsVpcEniMtu,
+        AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER: props.awsVpcK8sCniConfigureRpfilter,
+        AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: props.awsVpcK8sCniCustomNetworkCfg,
+        AWS_VPC_K8S_CNI_EXTERNALSNAT: props.awsVpcK8sCniExternalSnat,
+        AWS_VPC_K8S_CNI_LOGLEVEL: props.awsVpcK8sCniLogLevel,
+        AWS_VPC_K8S_CNI_LOG_FILE: props.awsVpcK8sCniLogFile,
+        AWS_VPC_K8S_CNI_RANDOMIZESNAT: props.awsVpcK8sCniRandomizeSnat,
+        AWS_VPC_K8S_CNI_VETHPREFIX: props.awsVpcK8sCniVethPrefix,
+        AWS_VPC_K8S_PLUGIN_LOG_FILE: props.awsVpcK8sCniLogFile,
+        AWS_VPC_K8S_PLUGIN_LOG_LEVEL: props.awsVpcK8sPluginLogLevel,
+        DISABLE_INTROSPECTION: props.disableIntrospection,
+        DISABLE_METRICS: props.disableMetrics,
+        DISABLE_NETWORK_RESOURCE_PROVISIONING: props.disablenetworkResourceProvisioning,
+        ENABLE_POD_ENI: props.enablePodEni,
+        // How can we read GlobalResouces.secondaryCidr from here?
+        ENABLE_PREFIX_DELEGATION: props.enablePrefixDelegation,
+        WARM_ENI_TARGET: props.warmEniTarget,
+        WARM_PREFIX_TARGET: props.warmPrefixTarget
+    },
+    Limits: {
+      cpu: props.cpuLimit,
+      memory: props.memoryLimit,
+    }
   }
-  if (props.annotatePodIp) {
-    setPath(values,"Env.ANNOTATE_POD_IP", props.annotatePodIp);
-  }
-  if (props.awsVpcCniNodePortSupport) {
-    setPath(values,"Env.AWS_VPC_CNI_NODE_PORT_SUPPORT", props.awsVpcCniNodePortSupport);
-  }
-  if (props.awsVpcEniMtu) {
-    setPath(values,"Env.AWS_VPC_ENI_MTU", props.awsVpcEniMtu);
-  }
-  if (props.awsVpcK8sCniConfigureRpfilter) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER", props.awsVpcK8sCniConfigureRpfilter)
-  }
-  if (props.awsVpcK8sCniCustomNetworkCfg) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG", props.awsVpcK8sCniCustomNetworkCfg)
-  }
-  if (props.awsVpcK8sCniExternalSnat) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_EXTERNALSNAT", props.awsVpcK8sCniExternalSnat)
-  }
-  if (props.awsVpcK8sCniLogLevel) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_LOGLEVEL", props.awsVpcK8sCniLogLevel)
-  }
-  if (props.awsVpcK8sCniLogFile) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_LOG_FILE", props.awsVpcK8sCniLogFile)
-  }
-  if (props.awsVpcK8sCniRandomizeSnat) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_RANDOMIZESNAT", props.awsVpcK8sCniRandomizeSnat)
-  }
-  if (props.awsVpcK8sCniVethPrefix) {
-    setPath(values,"Env.AWS_VPC_K8S_CNI_VETHPREFIX", props.awsVpcK8sCniVethPrefix)
-  }
-  if (props.awsVpcK8sPluginLogFile) {
-    setPath(values,"Env.AWS_VPC_K8S_PLUGIN_LOG_FILE", props.awsVpcK8sCniLogFile)
-  }
-  if (props.awsVpcK8sPluginLogLevel) {
-    setPath(values,"Env.AWS_VPC_K8S_PLUGIN_LOG_LEVEL", props.awsVpcK8sPluginLogLevel)
-  }
-  if (props.disableIntrospection) {
-    setPath(values,"Env.DISABLE_INTROSPECTION", props.disableIntrospection)
-  }
-  if (props.disableMetrics) {
-    setPath(values,"Env.DISABLE_METRICS", props.disableMetrics)
-  }
-  if (props.disablenetworkResourceProvisioning) {
-    setPath(values,"Env.DISABLE_NETWORK_RESOURCE_PROVISIONING", props.disablenetworkResourceProvisioning)
-  }
-  if (props.enablePodEni) {
-    setPath(values,"Env.ENABLE_POD_ENI", props.enablePodEni)
-  }
-  if (props.enablePrefixDelegation) {
-    setPath(values,"Env.ENABLE_PREFIX_DELEGATION", props.enablePrefixDelegation)
-  }
-  if (props.warmEniTarget) {
-    setPath(values,"Env.WARM_ENI_TARGET", props.warmEniTarget)
-  }
-  if (props.warmPrefixTarget) {
-    setPath(values,"Env.WARM_PREFIX_TARGET", props.warmPrefixTarget)
-  }
-  if (props.cpuLimit) {
-    setPath(values,"Limits.cpu", props.cpuLimit)
-  }
-  if (props.memoryLimit) {
-    setPath(values,"Limits.memory", props.memoryLimit)
-  }
+
+  // clean up all undefined
+  Object.keys(result).forEach(key => values[key] === undefined ? delete values[key] : {});
+
   return values;
 }

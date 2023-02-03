@@ -4,7 +4,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, HelmAddOn } from '../../lib';
+import { AckServiceName, HelmAddOn, VpcProvider } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -73,7 +73,9 @@ export default class BlueprintConstruct {
                 }
             }),
             new blueprints.addons.VeleroAddOn(),
-            new blueprints.addons.VpcCniAddOn(),
+            new blueprints.addons.VpcCniAddOn({
+                enablePrefixDelegation: "true"
+            }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
@@ -225,6 +227,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
+            .resourceProvider(blueprints.GlobalResources.secondaryCidr,new VpcProvider("10.64.0.0"))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

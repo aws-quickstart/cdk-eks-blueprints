@@ -6,9 +6,11 @@ import { ResourceContext, ResourceProvider } from "../spi";
  */
 export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
+    readonly secondaryCidrId?: string;
 
-    constructor(vpcId?: string) {
+    constructor(vpcId?: string, secondaryCidrId?: string) {
         this.vpcId = vpcId;
+        this.secondaryCidrId = secondaryCidrId;
     }
 
     provide(context: ResourceContext): ec2.IVpc {
@@ -31,7 +33,8 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
             const secondaryVpcCidrBlock = new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
-                vpcId: vpc.vpcId
+                vpcId: vpc.vpcId,
+                cidrBlock: this.secondaryCidrId,
             });
         }
 

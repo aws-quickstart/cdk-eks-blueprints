@@ -108,6 +108,7 @@ export class ResourceContext {
 
 export enum GlobalResources {
     Vpc = 'vpc',
+    secondaryCidr = 'secondary-cidr',
     HostedZone = 'hosted-zone',
     Certificate = 'certificate',
     KmsKey = 'kms-key'
