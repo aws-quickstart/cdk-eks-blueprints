@@ -6,100 +6,98 @@ import { CoreAddOn } from "../core-addon";
  */
 export interface VpcCniAddOnProps {
   /**
-   * Required identified, must be unique within the parent stack scope.
+   * Version of the addon.
    */
   version?: string;
   /**
-   * Version of the addon.
+   * `ADDITIONAL_ENI_TAGS` Environment Variable. 
    */
   additionalEniTags?: string;
   /**
-   * `ADDITIONAL_ENI_TAGS` Environment Variable. 
+   * `ANNOTATE_POD_IP` Environment Variable. Format `boolean`
    */
   annotatePodIp?: string;
   /**
-   * `ANNOTATE_POD_IP` Environment Variable. Format `boolean`
-   */
-  awsVpcCniNodePortSupport?: string;
-  /**
   * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Format `boolean`
   */
-  awsVpcEniMtu?: string;
+  awsVpcCniNodePortSupport?: string;
   /**
   * `AWS_VPC_ENI_MTU` Environment Variable. Format `integer`
   */
-  awsVpcK8sCniConfigureRpfilter?: string;
+  awsVpcEniMtu?: string;
   /**
   * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Format `boolean`
   */
-  awsVpcK8sCniCustomNetworkCfg?: string;
+  awsVpcK8sCniConfigureRpfilter?: string;
   /**
   * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Format `boolean`
   */
-  awsVpcK8sCniVethPrefix?: string;
+  awsVpcK8sCniCustomNetworkCfg?: string;
   /**
   * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Format `boolean`
   */
-  awsVpcK8sCniLogLevel?: string;
+  awsVpcK8sCniVethPrefix?: string;
   /**
   * `AWS_VPC_K8S_CNI_LOGLEVEL` Environment Variable.
   */
-  awsVpcK8sCniLogFile?: string;
+  awsVpcK8sCniLogLevel?: string;
   /**
   * `AWS_VPC_K8S_CNI_LOG_FILE` Environment Variable.
   */
-  awsVpcK8sCniRandomizeSnat?: string;
+  awsVpcK8sCniLogFile?: string;
   /**
   * `AWS_VPC_K8S_CNI_RANDOMIZESNAT` Environment Variable.
   */
-  awsVpcK8sCniExternalSnat?: string;
+  awsVpcK8sCniRandomizeSnat?: string;
   /**
   * `AWS_VPC_K8S_CNI_EXTERNALSNAT` Environment Variable.
   */
-  awsVpcK8sPluginLogFile?: string;
+  awsVpcK8sCniExternalSnat?: string;
   /**
   * `AWS_VPC_K8S_PLUGIN_LOG_FILE` Environment Variable.
   */
-  awsVpcK8sPluginLogLevel?: string;
+  awsVpcK8sPluginLogFile?: string;
   /**
   * `AWS_VPC_K8S_PLUGIN_LOG_LEVEL` Environment Variable.
   */
-  disableIntrospection?: string;
+  awsVpcK8sPluginLogLevel?: string;
   /**
   * `DISABLE_INTROSPECTION` Environment Variable. Format `boolean`
   */
-  disableMetrics?: string;
+  disableIntrospection?: string;
   /**
   * `DISABLE_METRICS` Environment Variable. Format `boolean`
   */
-  disablenetworkResourceProvisioning?: string;
+  disableMetrics?: string;
+  
   /**
   * `DISABLE_NETWORK_RESOURCE_PROVISIONING` Environment Variable. Format `boolean`
   */
-  enablePodEni?: string;
+  disablenetworkResourceProvisioning?: string;
   /**
   * `ENABLE_POD_ENI` Environment Variable. Format `boolean`
   */
-  enablePrefixDelegation?: string;
+  enablePodEni?: string;
   /**
   * `ENABLE_PREFIX_DELEGATION` Environment Variable. Format `boolean`
   */
-  warmEniTarget?: string;
+  enablePrefixDelegation?: string;
   /**
   * `WARM_ENI_TARGET` Environment Variable. Format `integer`
   */
-  warmPrefixTarget?: string;
+  warmEniTarget?: string;
   /**
   * `WARM_PREFIX_TARGET` Environment Variable. Format `integer`
   */
-  cpuLimit?: string;
+  warmPrefixTarget?: string;
   /**
   * `cpu` Limits.
   */
-  memoryLimit?: string;
+  cpuLimit?: string;
   /**
   * `memory` Limits.
   */
+  memoryLimit?: string;
 }
 
 /**
