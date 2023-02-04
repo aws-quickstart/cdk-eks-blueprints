@@ -128,14 +128,6 @@ export interface VpcCniAddOnProps {
   * should attempt to keep available for pod assignment on the node.
   */
   warmPrefixTarget?: string;
-  /**
-  * `cpu` Limits.
-  */
-  cpuLimit?: string;
-  /**
-  * `memory` Limits.
-  */
-  memoryLimit?: string;
 }
 
 /**
@@ -147,7 +139,7 @@ export class VpcCniAddOn extends CoreAddOn {
   constructor(props?: VpcCniAddOnProps) {
     super({
       addOnName: "vpc-cni",
-      version: props?.version ?? "v1.12.0-eksbuild.1",
+      version: props?.version ?? "v1.12.1-eksbuild.2",
       saName: "vpc-cni",
       configurationValues: populateVpcCniConfigurationValues(props)  
     });
@@ -162,7 +154,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
 
   let values: Values = {};
   const result : Values = {
-    Env: {
+    env: {
         ADDITIONAL_ENI_TAGS: props?.additionalEniTags, 
         ANNOTATE_POD_IP: props?.annotatePodIp,
         AWS_VPC_CNI_NODE_PORT_SUPPORT: props?.awsVpcCniNodePortSupport,
@@ -183,15 +175,11 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
         ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
         WARM_ENI_TARGET: props?.warmEniTarget,
         WARM_PREFIX_TARGET: props?.warmPrefixTarget
-    },
-    Limits: {
-      cpu: props?.cpuLimit,
-      memory: props?.memoryLimit,
     }
   }
 
   // clean up all undefined
   Object.keys(result).forEach(key => values[key] === undefined ? delete values[key] : {});
-
-  return values;
+  
+  return result;
 }
