@@ -23,7 +23,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.VpcCniAddOn({
-'v1.7.5-eksbuild.2',
+'v1.12.1-eksbuild.2',
 //Enabling prefix delegation to Primary ENIs.
 enablePrefixDelegation: "true", 
 //Enables Custom Networking with Secondary CIDRs.
@@ -43,18 +43,32 @@ const blueprint = blueprints.EksBlueprint.builder()
 # Assuming cluster version is 1.19, below command shows versions of the vpc-cni add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
     --addon-name vpc-cni \
-    --kubernetes-version 1.19 \
+    --kubernetes-version 1.23 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 # Output
-v1.9.0-eksbuild.1
+v1.12.1-eksbuild.2
 False
-v1.8.0-eksbuild.1
+v1.12.1-eksbuild.1
 False
-...
-...
-v1.7.5-eksbuild.2
-True
+v1.12.0-eksbuild.2
+False
+v1.12.0-eksbuild.1
+False
+v1.11.4-eksbuild.3
+False
+v1.11.4-eksbuild.2
+False
+v1.11.4-eksbuild.1
+False
+v1.11.3-eksbuild.3
+False
+v1.11.3-eksbuild.2
+False
+v1.11.3-eksbuild.1
+False
+v1.11.2-eksbuild.3
+False
 ...
 ...
 v1.7.5-eksbuild.1
@@ -79,7 +93,7 @@ aws eks describe-addon \
     --query "addon.addonVersion" \
     --output text
 # Output
-v1.7.5-eksbuild.2
+v1.12.1-eksbuild.2
 ```
 
 ## Functionality
