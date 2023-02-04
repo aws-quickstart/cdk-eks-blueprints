@@ -8,7 +8,7 @@ Installing VPC CNI as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest
 
 Amazon EKS automatically installs VPC CNI as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
-Amazon EKS VPC CNI Addon now supports advanced configurations which means we can now pass configuration values as environment variables and limits for setting up advanced configurations in Amazon VPC CNI. Please refer [Amazon EKS add-ons: Advanced configuration](https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/) for more informatoion.
+Amazon EKS VPC CNI Addon now supports advanced configurations which means we can now pass configuration values as environment variables for setting up advanced configurations in Amazon VPC CNI. Please refer [Amazon EKS add-ons: Advanced configuration](https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/) for more informatoion.
 
 ## Prerequisite
 - Amazon EKS add-ons are only available with Amazon EKS clusters running Kubernetes version 1.18 and later.
