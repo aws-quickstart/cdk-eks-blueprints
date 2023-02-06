@@ -36,9 +36,6 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
                     cidrBlock: this.secondaryCidrId});
-            } else {
-                new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
-                    vpcId: vpc.vpcId});
             }
         }
         return vpc;
