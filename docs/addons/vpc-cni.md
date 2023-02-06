@@ -102,6 +102,6 @@ Applies VPC CNI add-on to Amazon EKS cluster.
 
 ## References
 
-- Reference [VpcCniAddon](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/addons.VpcCniAddOn.html) to learn more about this addon.
-- Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values.
-- Reference [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) to learn about Amazon EKS networking best practices.
+- Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values
+- Reference [VpcCniAddon](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/addons.VpcCniAddOn.html) to learn more about this addon
+- Reference [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) to learn about Amazon EKS networking best practices
