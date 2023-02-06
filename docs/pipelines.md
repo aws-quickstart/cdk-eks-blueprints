@@ -144,7 +144,7 @@ blueprints.CodePipelineStack.builder()
 
 CodePipeline leverages CodeBuild to build artifacts. During build time, add-ons may require various look-ups. For example, the add-on or stack may look up VPC, subnets, certificates, hosted zones as well as secrets. 
 
-By default, such look-ups at build time are restricted by the CodeBuild role created by the pipeline dynamically. That means that builds that require look-ups will fail with access denined exception. 
+By default, such look-ups at build time are restricted by the CodeBuild role created by the pipeline dynamically. That means that builds that require look-ups will fail with access denied exception. 
 
 Customers can configure the IAM policies used by the CodeBuild as part of the pipeline execution. The framework provides a convenience default build policies `blueprints.DEFAULT_BUILD_POLICIES` that enable look-ups (including secret look-ups).
 
