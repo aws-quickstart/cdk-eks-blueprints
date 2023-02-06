@@ -16,114 +16,114 @@ export interface VpcCniAddOnProps {
    */
   additionalEniTags?: string;
   /**
-   * `ANNOTATE_POD_IP` Environment Variable. Format `boolean`.
+   * `ANNOTATE_POD_IP` Environment Variable. Type: Boolean as a String.
    * Setting ANNOTATE_POD_IP to true will allow IPAMD to add an annotation 
    * vpc.amazonaws.com/pod-ips to the pod with pod IP.
    */
   annotatePodIp?: string;
   /**
-  * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Format `boolean`.
+  * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Type: Boolean as a String.
   * Specifies whether NodePort services are enabled on a worker node's primary 
   * network interface. 
   */
   awsVpcCniNodePortSupport?: string;
   /**
-  * `AWS_VPC_ENI_MTU` Environment Variable. Format `integer`.
+  * `AWS_VPC_ENI_MTU` Environment Variable. Type: Integer as a String.
   * Used to configure the MTU size for attached ENIs. The valid range is 
   * from 576 to 9001.
   */
   awsVpcEniMtu?: string;
   /**
-  * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Format `boolean`.
+  * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Type: Boolean as a String.
   * Specifies whether ipamd should configure rp filter for primary interface. 
   * Setting this to false will require rp filter to be configured through init 
   * container.
   */
   awsVpcK8sCniConfigureRpfilter?: string;
   /**
-  * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Format `boolean`.
+  * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean as a String.
   * Specifies that your pods may use subnets and security groups that are 
   * independent of your worker node's VPC configuration.
   */
   awsVpcK8sCniCustomNetworkCfg?: string;
   /**
-  * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Format `boolean`.
+  * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Type: String.
   * Specifies the veth prefix used to generate the host-side veth device name 
   * for the CNI.
   */
   awsVpcK8sCniVethPrefix?: string;
   /**
-  * `AWS_VPC_K8S_CNI_LOGLEVEL` Environment Variable.
+  * `AWS_VPC_K8S_CNI_LOGLEVEL` Environment Variable. Type: String.
   * Specifies the loglevel for ipamd and cni-metric-helper.
   */
   awsVpcK8sCniLogLevel?: string;
   /**
-  * `AWS_VPC_K8S_CNI_LOG_FILE` Environment Variable.
+  * `AWS_VPC_K8S_CNI_LOG_FILE` Environment Variable. Type: String.
   * Specifies where to write the logging output of ipamd. Either to stdout 
   * or to override the default file (i.e., /var/log/aws-routed-eni/ipamd.log).
   */
   awsVpcK8sCniLogFile?: string;
   /**
-  * `AWS_VPC_K8S_CNI_RANDOMIZESNAT` Environment Variable.
+  * `AWS_VPC_K8S_CNI_RANDOMIZESNAT` Environment Variable. Type: String.
   * Specifies whether the SNAT iptables rule should randomize the outgoing 
   * ports for connections.
   */
   awsVpcK8sCniRandomizeSnat?: string;
   /**
-  * `AWS_VPC_K8S_CNI_EXTERNALSNAT` Environment Variable.
+  * `AWS_VPC_K8S_CNI_EXTERNALSNAT` Environment Variable. Type: Boolean as a String.
   * Specifies whether an external NAT gateway should be used to provide SNAT 
   * of secondary ENI IP addresses.
   */
   awsVpcK8sCniExternalSnat?: string;
   /**
-  * `AWS_VPC_K8S_PLUGIN_LOG_FILE` Environment Variable.
+  * `AWS_VPC_K8S_PLUGIN_LOG_FILE` Environment Variable. Type: String.
   * Specifies where to write the logging output for aws-cni plugin. 
   */
   awsVpcK8sPluginLogFile?: string;
   /**
-  * `AWS_VPC_K8S_PLUGIN_LOG_LEVEL` Environment Variable.
+  * `AWS_VPC_K8S_PLUGIN_LOG_LEVEL` Environment Variable. Type: String.
   * Specifies the loglevel for aws-cni plugin.
   */
   awsVpcK8sPluginLogLevel?: string;
   /**
-  * `DISABLE_INTROSPECTION` Environment Variable. Format `boolean`.
+  * `DISABLE_INTROSPECTION` Environment Variable. Type: Boolean as a String.
   */
   disableIntrospection?: string;
   /**
-  * `DISABLE_METRICS` Environment Variable. Format `boolean`.
+  * `DISABLE_METRICS` Environment Variable. Type: Boolean as a String.
   * Specifies whether the prometheus metrics endpoint is disabled or not for 
   * ipamd. By default metrics are published on :61678/metrics.
   */
   disableMetrics?: string;
   
   /**
-  * `DISABLE_NETWORK_RESOURCE_PROVISIONING` Environment Variable. Format `boolean`.
+  * `DISABLE_NETWORK_RESOURCE_PROVISIONING` Environment Variable. Type: Boolean as a String.
   * Setting DISABLE_NETWORK_RESOURCE_PROVISIONING to true will make IPAMD 
   * depend only on IMDS to get attached ENIs and IPs/prefixes.
   */
   disablenetworkResourceProvisioning?: string;
   /**
-  * `ENABLE_POD_ENI` Environment Variable. Format `boolean`.
+  * `ENABLE_POD_ENI` Environment Variable. Type: Boolean as a String.
   * Setting ENABLE_POD_ENI to true will allow IPAMD to add the 
   * vpc.amazonaws.com/has-trunk-attached label to the node if the instance 
   * has the capacity to attach an additional ENI.
   */
   enablePodEni?: string;
   /**
-  * `ENABLE_PREFIX_DELEGATION` Environment Variable. Format `boolean`.
+  * `ENABLE_PREFIX_DELEGATION` Environment Variable. Type: Boolean as a String.
   * To enable prefix delegation on nitro instances. Setting 
   * ENABLE_PREFIX_DELEGATION to true will start allocating a prefix (/28 for IPv4 and /80 for IPv6) instead of a secondary IP in the ENIs subnet. 
   */
   enablePrefixDelegation?: string;
   /**
-  * `WARM_ENI_TARGET` Environment Variable. Format `integer`.
+  * `WARM_ENI_TARGET` Environment Variable. Format `integer` as a String.
   * Specifies the number of free elastic network interfaces (and all of their 
   * available IP addresses) that the ipamd daemon should attempt to keep 
   * available for pod assignment on the node. 
   */
   warmEniTarget?: string;
   /**
-  * `WARM_PREFIX_TARGET` Environment Variable. Format `integer`.
+  * `WARM_PREFIX_TARGET` Environment Variable. Format `integer` as  a String.
   * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon 
   * should attempt to keep available for pod assignment on the node.
   */
