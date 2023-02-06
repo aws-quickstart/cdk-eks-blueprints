@@ -176,7 +176,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
         WARM_ENI_TARGET: props?.warmEniTarget,
         WARM_PREFIX_TARGET: props?.warmPrefixTarget
     }
-  }
+  };
 
   // clean up all undefined
   Object.keys(result).forEach(key => values[key] === undefined ? delete values[key] : {});
