@@ -1,10 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, HelmAddOn } from '../../lib';
+import { AckServiceName, GlobalResources, HelmAddOn } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -23,7 +24,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
+        HelmAddOn.validateHelmVersions = false;
         HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  "debug";
 
@@ -226,6 +227,11 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
+            .resourceProvider(GlobalResources.Vpc, {
+                provide(context: blueprints.ResourceContext) : IVpc {
+                    return new ec2.Vpc(context.scope, "my-vpc");
+                }
+            })
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);

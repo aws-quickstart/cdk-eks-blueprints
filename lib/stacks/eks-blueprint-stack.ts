@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
+import deepMap from 'deep-map';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
@@ -10,6 +11,7 @@ import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
+import { IResource } from 'aws-cdk-lib';
 
 export class EksBlueprintProps {
     /**
@@ -213,6 +215,8 @@ export class EksBlueprint extends cdk.Stack {
 
         const resourceContext = this.provideNamedResources(blueprintProps);
 
+        blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
+
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
         if (!vpcResource) {
@@ -311,6 +315,21 @@ export class EksBlueprint extends cdk.Stack {
 
         return result;
     }
+
+    /**
+     * Resolves all dynamic proxies, that substitutes resource provider proxies with the resolved values. 
+     * @param blueprintProps 
+     * @param resourceContext 
+     * @returns a copy of blueprint props with resolved values
+     */
+    private resolveDynamicProxies(blueprintProps: EksBlueprintProps, resourceContext: spi.ResourceContext) : EksBlueprintProps {
+        return deepMap<EksBlueprintProps>(blueprintProps, (value) => utils.resolveTarget(value, resourceContext), { inPlace: true });
+    }
+
+    /**
+     * Validates input against basic defined constraints.
+     * @param blueprintProps 
+     */
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
         constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);

@@ -1,8 +1,8 @@
 
 export type OneArgFn<T> = (arg: any) => T;
 
-const isDynamicProxy = Symbol("isDynamicProxy");
-const sourceFunction = Symbol("sourceFunction");
+export const isDynamicProxy = Symbol("isDynamicProxy");
+export const sourceFunction = Symbol("sourceFunction");
 
 
 export class DummyProxy<T extends object> implements ProxyHandler<T> {
@@ -17,6 +17,19 @@ export class DummyProxy<T extends object> implements ProxyHandler<T> {
         if(key === sourceFunction) {
             return this.source;
         }
+
+        return undefined; 
     }
+}
+
+export function resolveTarget(value: any, arg: any) {
+    if(typeof value === 'object' && value !== null) {
+        const object : any = value;
+        if(object.utils.isDynamicProxy) {
+            const fn: OneArgFn<any>  = object.utils.sourceFunction;
+            return fn(arg);
+        }
+    }
+    return value;
 }
 
