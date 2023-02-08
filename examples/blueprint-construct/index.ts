@@ -74,9 +74,9 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
-                enablePrefixDelegation: "true",
-                awsVpcK8sCniCustomNetworkCfg: "true",
-                awsVpcK8sCniConfigureRpfilter: "true"
+                enablePrefixDelegation: true,
+                awsVpcK8sCniCustomNetworkCfg: true,
+                awsVpcK8sCniConfigureRpfilter: true
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),

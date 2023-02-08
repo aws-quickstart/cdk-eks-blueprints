@@ -25,9 +25,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn({
 'v1.12.1-eksbuild.2',
 //Enabling prefix delegation to Primary ENIs.
-enablePrefixDelegation: "true", 
+enablePrefixDelegation: true, 
 //Enables Custom Networking with Secondary CIDRs.
-awsVpcK8sCniCustomNetworkCfg: "true"
+awsVpcK8sCniCustomNetworkCfg: true
 });
 
 const blueprint = blueprints.EksBlueprint.builder()

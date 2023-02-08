@@ -1,3 +1,5 @@
+import { integer } from "aws-sdk/clients/cloudfront";
+import { boolean } from "zod";
 import { Values } from "../../spi";
 import { CoreAddOn } from "../core-addon";
 
@@ -10,42 +12,42 @@ export interface VpcCniAddOnProps {
    */
   version?: string;
   /**
-   * `ADDITIONAL_ENI_TAGS` Environment Variable. 
+   * `ADDITIONAL_ENI_TAGS` Environment Variable. Type: String.
    * Metadata applied to ENI helps you categorize and organize your 
    * resources for billing or other purposes. 
    */
-  additionalEniTags?: string;
+  additionalEniTags?: string
   /**
-   * `ANNOTATE_POD_IP` Environment Variable. Type: Boolean as a String.
+   * `ANNOTATE_POD_IP` Environment Variable. Type: Boolean.
    * Setting ANNOTATE_POD_IP to true will allow IPAMD to add an annotation 
    * vpc.amazonaws.com/pod-ips to the pod with pod IP.
    */
-  annotatePodIp?: string;
+  annotatePodIp?: boolean;
   /**
-  * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Type: Boolean as a String.
+  * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Type: Boolean.
   * Specifies whether NodePort services are enabled on a worker node's primary 
   * network interface. 
   */
-  awsVpcCniNodePortSupport?: string;
+  awsVpcCniNodePortSupport?: boolean;
   /**
-  * `AWS_VPC_ENI_MTU` Environment Variable. Type: Integer as a String.
+  * `AWS_VPC_ENI_MTU` Environment Variable. Type: Integer.
   * Used to configure the MTU size for attached ENIs. The valid range is 
   * from 576 to 9001.
   */
-  awsVpcEniMtu?: string;
+  awsVpcEniMtu?: integer;
   /**
-  * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Type: Boolean as a String.
+  * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Type: Boolean.
   * Specifies whether ipamd should configure rp filter for primary interface. 
   * Setting this to false will require rp filter to be configured through init 
   * container.
   */
-  awsVpcK8sCniConfigureRpfilter?: string;
+  awsVpcK8sCniConfigureRpfilter?: boolean;
   /**
-  * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean as a String.
+  * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean.
   * Specifies that your pods may use subnets and security groups that are 
   * independent of your worker node's VPC configuration.
   */
-  awsVpcK8sCniCustomNetworkCfg?: string;
+  awsVpcK8sCniCustomNetworkCfg?: boolean;
   /**
   * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Type: String.
   * Specifies the veth prefix used to generate the host-side veth device name 
@@ -70,11 +72,11 @@ export interface VpcCniAddOnProps {
   */
   awsVpcK8sCniRandomizeSnat?: string;
   /**
-  * `AWS_VPC_K8S_CNI_EXTERNALSNAT` Environment Variable. Type: Boolean as a String.
+  * `AWS_VPC_K8S_CNI_EXTERNALSNAT` Environment Variable. Type: Boolean.
   * Specifies whether an external NAT gateway should be used to provide SNAT 
   * of secondary ENI IP addresses.
   */
-  awsVpcK8sCniExternalSnat?: string;
+  awsVpcK8sCniExternalSnat?: boolean;
   /**
   * `AWS_VPC_K8S_PLUGIN_LOG_FILE` Environment Variable. Type: String.
   * Specifies where to write the logging output for aws-cni plugin. 
@@ -86,55 +88,53 @@ export interface VpcCniAddOnProps {
   */
   awsVpcK8sPluginLogLevel?: string;
   /**
-  * `DISABLE_INTROSPECTION` Environment Variable. Type: Boolean as a String.
+  * `DISABLE_INTROSPECTION` Environment Variable. Type: Boolean.
   */
-  disableIntrospection?: string;
+  disableIntrospection?: boolean;
   /**
-  * `DISABLE_METRICS` Environment Variable. Type: Boolean as a String.
+  * `DISABLE_METRICS` Environment Variable. Type: Boolean.
   * Specifies whether the prometheus metrics endpoint is disabled or not for 
   * ipamd. By default metrics are published on :61678/metrics.
   */
-  disableMetrics?: string;
-  
+  disableMetrics?: boolean;
   /**
-  * `DISABLE_NETWORK_RESOURCE_PROVISIONING` Environment Variable. Type: Boolean as a String.
+  * `DISABLE_NETWORK_RESOURCE_PROVISIONING` Environment Variable. Type: Boolean.
   * Setting DISABLE_NETWORK_RESOURCE_PROVISIONING to true will make IPAMD 
   * depend only on IMDS to get attached ENIs and IPs/prefixes.
   */
-  disablenetworkResourceProvisioning?: string;
+  disablenetworkResourceProvisioning?: boolean;
   /**
-  * `ENABLE_POD_ENI` Environment Variable. Type: Boolean as a String.
+  * `ENABLE_POD_ENI` Environment Variable. Type: Boolean.
   * Setting ENABLE_POD_ENI to true will allow IPAMD to add the 
   * vpc.amazonaws.com/has-trunk-attached label to the node if the instance 
   * has the capacity to attach an additional ENI.
   */
-  enablePodEni?: string;
+  enablePodEni?: boolean;
   /**
-  * `ENABLE_PREFIX_DELEGATION` Environment Variable. Type: Boolean as a String.
+  * `ENABLE_PREFIX_DELEGATION` Environment Variable. Type: Boolean.
   * To enable prefix delegation on nitro instances. Setting 
   * ENABLE_PREFIX_DELEGATION to true will start allocating a prefix (/28 for IPv4 and /80 for IPv6) instead of a secondary IP in the ENIs subnet. 
   */
-  enablePrefixDelegation?: string;
+  enablePrefixDelegation?: boolean;
   /**
-  * `WARM_ENI_TARGET` Environment Variable. Format `integer` as a String.
+  * `WARM_ENI_TARGET` Environment Variable. Format integer.
   * Specifies the number of free elastic network interfaces (and all of their 
   * available IP addresses) that the ipamd daemon should attempt to keep 
   * available for pod assignment on the node. 
   */
-  warmEniTarget?: string;
+  warmEniTarget?: integer;
   /**
-  * `WARM_PREFIX_TARGET` Environment Variable. Format `integer` as  a String.
+  * `WARM_PREFIX_TARGET` Environment Variable. Format integer.
   * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon 
   * should attempt to keep available for pod assignment on the node.
   */
-  warmPrefixTarget?: string;
+  warmPrefixTarget?: integer;
 }
 
 /**
  * Implementation of VpcCni EKS add-on with Advanced Configurations.
  */
 export class VpcCniAddOn extends CoreAddOn {
-
     
   constructor(props?: VpcCniAddOnProps) {
     super({
@@ -143,7 +143,6 @@ export class VpcCniAddOn extends CoreAddOn {
       saName: "vpc-cni",
       configurationValues: populateVpcCniConfigurationValues(props)  
     });
-      
   }
 }
 
@@ -152,7 +151,6 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
     return {};
   }
 
-  let values: Values = {};
   const result : Values = {
     env: {
         ADDITIONAL_ENI_TAGS: props?.additionalEniTags, 
@@ -179,7 +177,9 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   };
 
   // clean up all undefined
-  Object.keys(result).forEach(key => values[key] === undefined ? delete values[key] : {});
+  const values = result.env;
+  Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
+  Object.keys(values).forEach(key => values[key] = JSON.stringify(values[key]));
   
   return result;
 }
