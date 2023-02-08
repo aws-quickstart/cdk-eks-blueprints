@@ -13,7 +13,7 @@ export const setPath = (obj : any, path: string, val: any) => {
 
 export function cloneDeep<T>(source: T): T {
     return cloneDeepWith(source, (value) => {
-        if(value && value instanceof KubernetesVersion) {
+        if(value && (value instanceof KubernetesVersion || value instanceof Proxy)) {
             return value;
         }
         return undefined;

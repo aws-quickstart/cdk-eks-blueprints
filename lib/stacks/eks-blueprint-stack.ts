@@ -11,7 +11,6 @@ import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
-import { IResource } from 'aws-cdk-lib';
 
 export class EksBlueprintProps {
     /**
@@ -212,6 +211,8 @@ export class EksBlueprint extends cdk.Stack {
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
         super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
+
+        blueprintProps = utils.cloneDeep(blueprintProps);
 
         const resourceContext = this.provideNamedResources(blueprintProps);
 

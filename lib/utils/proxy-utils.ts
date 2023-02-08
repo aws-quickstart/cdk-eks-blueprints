@@ -9,7 +9,7 @@ export class DummyProxy<T extends object> implements ProxyHandler<T> {
 
     constructor(private source : OneArgFn<T>) {}
 
-    public get(_: T, key: PropertyKey, receiver: any): any {
+    public get(_: T, key: PropertyKey): any {
         if(key === isDynamicProxy) {
             return true;
         }
@@ -25,8 +25,8 @@ export class DummyProxy<T extends object> implements ProxyHandler<T> {
 export function resolveTarget(value: any, arg: any) {
     if(typeof value === 'object' && value !== null) {
         const object : any = value;
-        if(object.utils.isDynamicProxy) {
-            const fn: OneArgFn<any>  = object.utils.sourceFunction;
+        if(object[isDynamicProxy]) {
+            const fn: OneArgFn<any>  = object[sourceFunction];
             return fn(arg);
         }
     }
