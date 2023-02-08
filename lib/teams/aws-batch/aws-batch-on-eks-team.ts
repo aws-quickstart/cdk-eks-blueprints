@@ -3,7 +3,6 @@ import { ClusterInfo, Values } from "../../spi";
 import { ApplicationTeam, TeamProps } from "../team";
 import { KubectlProvider, ManifestDeployment } from "../../addons/helm-addon/kubectl-provider";
 import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
-import { Construct } from "constructs";
 import { createNamespace } from "../../utils";
 
 import * as batch from 'aws-cdk-lib/aws-batch';
@@ -44,7 +43,7 @@ const defaultProps: BatchEksTeamProps = {
   allocationStrategy: 'BEST_FIT_PROGRESSIVE',
   jobQueueName: 'batch-eks-job',
   priority: 10,
-}
+};
 
 /*
  *This class define the Team that can be used with AWS Batch on EKS
@@ -63,7 +62,6 @@ export class BatchEksTeam extends ApplicationTeam {
   }
 
   setup(clusterInfo: ClusterInfo): void {
-    const cluster = clusterInfo.cluster;
     const allocStr = this.batchTeam.allocationStrategy || 'BEST_FIT_PROGRESSIVE';
 
     const AwsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
@@ -88,7 +86,7 @@ export class BatchEksTeam extends ApplicationTeam {
           computeEnvironment: computeEnv.attrComputeEnvironmentArn
         }
       ]
-    })
+    });
 
     jobQueue.node.addDependency(computeEnv);
   }
@@ -129,7 +127,7 @@ export class BatchEksTeam extends ApplicationTeam {
 
   private setComputeEnvironment(clusterInfo: ClusterInfo, namespace: string, nsNode: eks.KubernetesManifest, allocStr: string): batch.CfnComputeEnvironment {
     const nodeGroups = assertEC2NodeGroup(clusterInfo, "Batch Compute Environment");
-    const ngRoleNames = nodeGroups.map((ng: eks.Nodegroup | AutoScalingGroup) => {return ng.role.roleName});
+    const ngRoleNames = nodeGroups.map((ng: eks.Nodegroup | AutoScalingGroup) => {return ng.role.roleName;});
     const cluster = clusterInfo.cluster;
     const ngRole = ngRoleNames[0];
 
@@ -137,7 +135,7 @@ export class BatchEksTeam extends ApplicationTeam {
     const instanceProfile = new iam.CfnInstanceProfile(cluster, 'ng-role-instance-profile',{
       instanceProfileName: ngRole,
       roles: [ngRole]
-    })
+    });
 
     const batchComputeEnv = new batch.CfnComputeEnvironment(cluster, "batch-eks-compute-environment", {
       type: 'MANAGED',
@@ -153,7 +151,7 @@ export class BatchEksTeam extends ApplicationTeam {
         minvCpus: 0,
         maxvCpus: 128,
         instanceTypes: ["m5"],
-        subnets: cluster.vpc.publicSubnets.map((e: ec2.ISubnet) => {return e.subnetId}),
+        subnets: cluster.vpc.publicSubnets.map((e: ec2.ISubnet) => {return e.subnetId;}),
         securityGroupIds: [cluster.clusterSecurityGroupId],
         instanceRole: ngRole,
       }
