@@ -46,6 +46,7 @@ export interface VpcCniAddOnProps {
   * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean.
   * Specifies that your pods may use subnets and security groups that are 
   * independent of your worker node's VPC configuration.
+  * Note : This environment variable is deprecated after v1.12.1+ version.
   */
   awsVpcK8sCniCustomNetworkCfg?: boolean;
   /**
