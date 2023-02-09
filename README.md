@@ -57,7 +57,6 @@ cdk --version
 Create a new CDK project. We use `typescript` for this example.
 
 ```bash
-npm install typescript@~4.8.4
 cdk init app --language typescript
 ```
 
@@ -72,7 +71,6 @@ cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 Run the following command to install the `eks-blueprints` dependency in your project.
 
 ```sh
-npm install typescript@~4.8.4
 npm i @aws-quickstart/eks-blueprints
 ```
 
