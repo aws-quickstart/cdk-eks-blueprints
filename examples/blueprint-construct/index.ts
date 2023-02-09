@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import { PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
+import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { AckServiceName, getResource, GlobalResources, HelmAddOn } from '../../lib';
@@ -164,7 +164,7 @@ export default class BlueprintConstruct {
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
             mastersRole: getResource(context => {
-                return Role.fromRoleName(context.scope, "mastersRole", "myrole");
+                return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
             }),
             managedNodeGroups: [
                 {

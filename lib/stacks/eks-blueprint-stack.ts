@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
-import deepMap from 'deep-map';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
@@ -212,8 +211,6 @@ export class EksBlueprint extends cdk.Stack {
         super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
         this.validateInput(blueprintProps);
 
-        blueprintProps = utils.cloneDeep(blueprintProps);
-
         const resourceContext = this.provideNamedResources(blueprintProps);
 
         blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
@@ -324,7 +321,9 @@ export class EksBlueprint extends cdk.Stack {
      * @returns a copy of blueprint props with resolved values
      */
     private resolveDynamicProxies(blueprintProps: EksBlueprintProps, resourceContext: spi.ResourceContext) : EksBlueprintProps {
-        return deepMap<EksBlueprintProps>(blueprintProps, (value) => utils.resolveTarget(value, resourceContext), { inPlace: true });
+        return utils.cloneDeep(blueprintProps, (value) => {
+            return utils.resolveTarget(value, resourceContext);
+        });
     }
 
     /**

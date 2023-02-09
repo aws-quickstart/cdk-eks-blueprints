@@ -1,12 +1,28 @@
 import { App } from "aws-cdk-lib";
-import { Match, Template } from "aws-cdk-lib/assertions";
+import { Template } from "aws-cdk-lib/assertions";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Role } from "aws-cdk-lib/aws-iam";
 import * as blueprints from "../../lib";
 import { EksBlueprint } from "../../lib";
-
+import { cloneDeep } from "../../lib/utils";
+import * as nutil from 'node:util/types';
 
 describe("ResourceProxy",() => {
+
+    test("proxy copied as is when cloned", () => {
+        
+        const proxy = blueprints.getNamedResource("someresourcename");
+        console.log(`proxy is ${nutil.isProxy(proxy)}`);
+        const values : blueprints.Values = {
+            id: 1,
+            proxy
+        };
+
+        const cloned = cloneDeep(values);
+        const fn = cloned.proxy[blueprints.utils.sourceFunction];
+        
+        expect(fn).toBeDefined();
+    });
 
     test("resource proxy resolves", () => {
         
@@ -24,17 +40,11 @@ describe("ResourceProxy",() => {
             .clusterProvider(clusterProvider)
             .account("123456789012")
             .region("us-east-1")
-            .build(app, "resource-proxy-role");
+            .build(app, "resource-cluster");
 
         const template = Template.fromStack(stack);
-
             // Then
-        template.hasResourceProperties("AWS::IAM::Role", {
-            Metadata: {
-                "aws:cdk:path": Match.stringLikeRegexp("MastersRole"),
-            },
-        });
-
+        expect(JSON.stringify(template.toJSON())).toContain(':iam::123456789012:role/myrole');
     });
 
 });

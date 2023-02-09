@@ -1,3 +1,4 @@
+import * as nutil from 'node:util/types';
 
 export type OneArgFn<T> = (arg: any) => T;
 
@@ -23,7 +24,7 @@ export class DummyProxy<T extends object> implements ProxyHandler<T> {
 }
 
 export function resolveTarget(value: any, arg: any) {
-    if(typeof value === 'object' && value !== null) {
+    if(nutil.isProxy(value)) {
         const object : any = value;
         if(object[isDynamicProxy]) {
             const fn: OneArgFn<any>  = object[sourceFunction];
