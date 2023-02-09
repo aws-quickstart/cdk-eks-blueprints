@@ -264,4 +264,4 @@ This can happen for a few reasons, but most typical is  related to the stack req
 You can take advantage of supplying the require IAM policies to the pipeline to avoid this error. See [this](#handling-build-time-access) for more details.
 
 To address this issue "manually" (without the change to the pipeline), you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`.
-If adding administrative access to the role solves the issue, you can the consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.
+If adding administrative access to the role solves the issue, you can then consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.
