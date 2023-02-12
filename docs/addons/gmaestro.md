@@ -99,6 +99,12 @@ The secret name from the Prerequisite section 3.ii.
 
 The secret name from the Prerequisite section 3.iii.
 
+
+## Security issue
+
+As the implementation uses getSecretValue(), the secret parameters will be displayed as plain text in the CloudFormation. These secrets are gMaestro’s secrets which don’t affect the user.
+This issue will be mitigated and updated in the following weeks.
+
 ## Support
 
 If you have questions about Gmaestro, catch us [on Slack](https://granulatecommunity.slack.com/archives/C03RK0HN2TU)!
