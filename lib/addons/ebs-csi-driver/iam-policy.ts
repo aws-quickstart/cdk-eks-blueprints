@@ -174,7 +174,6 @@ export function getEbsDriverPolicyDocument(partition: string, kmsKeys?: string[]
                 "Resource": kmsKeys
             }
         ];
-        // @ts-ignore
         result.Statement.push(kmsPolicy);
     }
     return PolicyDocument.fromJson(result);
