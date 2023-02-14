@@ -68,14 +68,9 @@ export class EksBlueprintProps {
     readonly useDefaultSecretEncryption? : boolean  = true;
 
     /**
-     * Whether to manage cluster addOns using GitOps.
+     * GitOps modes to be enabled. If not specified, GitOps mode is not enabled.
      */
-    readonly enableGitOps?: boolean = false;
-
-    /**
-     * Whether to manage cluster addOns using GitOps App of Apps.
-     */
-    readonly enableGitOpsAppOfApps?: boolean = false;
+    readonly enableGitOpsMode?: spi.GitOpsMode;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -147,13 +142,8 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public enableGitOps(): this {
-        this.props = { ...this.props, ...{ enableGitOps: true } };
-        return this;
-    }
-
-    public enableGitOpsAppOfApps(): this {
-        this.props = { ...this.props, ...{ enableGitOpsAppOfApps: true } };
+    public enableGitOps(mode?: spi.GitOpsMode): this {
+        this.props = { ...this.props, ...{ enableGitOpsMode: mode ?? spi.GitOpsMode.APP_OF_APPS } };
         return this;
     }
 
@@ -259,11 +249,9 @@ export class EksBlueprint extends cdk.Stack {
             utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
         }
 
-        if (blueprintProps.enableGitOps) {
+        if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
             ArgoGitOpsFactory.enableGitOps();
-        }
-
-        if (blueprintProps.enableGitOpsAppOfApps) {
+        } else if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APP_OF_APPS) {
             ArgoGitOpsFactory.enableGitOpsAppOfApps();
         }
 

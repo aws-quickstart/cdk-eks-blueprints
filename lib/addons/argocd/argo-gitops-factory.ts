@@ -1,11 +1,11 @@
 import { Construct } from "constructs";
 import { ArgoCDAddOn } from "../../addons";
 import { HelmChartDeployment } from "../helm-addon/kubectl-provider";
-import { ClusterInfo } from "../../../lib/spi";
+import { ClusterInfo, GitOpsMode } from "../../spi";
 import { KubectlProvider } from '../helm-addon/kubectl-provider';
 import { kebabToCamel } from "../../utils";
 
-const original = KubectlProvider.applyHelmDeployment
+const originalHelmDeploy = KubectlProvider.applyHelmDeployment;
 
 export class ArgoGitOpsFactory {
     public static enableGitOps() {
@@ -18,7 +18,7 @@ export class ArgoGitOpsFactory {
 }
 
 export const createArgoHelmApplication = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
-    if (clusterInfo.getResourceContext().blueprintProps.enableGitOps) {
+    if (clusterInfo.getResourceContext().blueprintProps.enableGitOpsMode == GitOpsMode.APPLICATION) {
         const argoAddOn = getArgoApplicationGenerator(clusterInfo);
         const values = helmDeployment.dependencyMode ? { [helmDeployment.chart]: helmDeployment.values } : helmDeployment.values;
         return argoAddOn.generate(clusterInfo, {
@@ -27,7 +27,7 @@ export const createArgoHelmApplication = function (clusterInfo: ClusterInfo, hel
             values: values,
         });
     } else {
-        return original(clusterInfo, helmDeployment)
+        return originalHelmDeploy(clusterInfo, helmDeployment);
     }
 };
 
@@ -42,7 +42,7 @@ function getArgoApplicationGenerator(clusterInfo: ClusterInfo): ArgoCDAddOn {
 }
 
 export const generateArgoHelmApplicationValues = function (clusterInfo: ClusterInfo, helmDeployment: HelmChartDeployment): Construct {
-    if (clusterInfo.getResourceContext().blueprintProps.enableGitOpsAppOfApps) {
+    if (clusterInfo.getResourceContext().blueprintProps.enableGitOpsMode == GitOpsMode.APP_OF_APPS) {
         // Add `enabled` property to each addon
         helmDeployment.values.enable = true;
         clusterInfo.addAddOnContext(
@@ -53,6 +53,6 @@ export const generateArgoHelmApplicationValues = function (clusterInfo: ClusterI
         // Generate dummy construct to meet the function requirement.
         return new Construct(clusterInfo.cluster, `dummy${helmDeployment.name}`);
     } else {
-        return original(clusterInfo, helmDeployment)
+        return originalHelmDeploy(clusterInfo, helmDeployment);
     }
 };

@@ -81,7 +81,7 @@ export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
-    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
+    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
 
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
@@ -161,8 +161,8 @@ export class ClusterInfo {
      * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
-        if(this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0){
-            const prev : Construct = Array.from(this.provisionedAddOns.values()).pop()!;
+        if (this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0) {
+            const prev: Construct = Array.from(this.provisionedAddOns.values()).pop()!;
             construct.node.addDependency(prev);
             const prevAddOn = Array.from(this.provisionedAddOns.keys()).pop()!;
             logger.debug(`Adding dependency from ${addOn} to ${prevAddOn}`);
@@ -196,7 +196,7 @@ export class ClusterInfo {
      */
     public addScheduledAddOn(addOn: string, promise: Promise<Construct>, ordered: boolean) {
         this.scheduledAddOns.set(addOn, promise);
-        if(ordered) {
+        if (ordered) {
             this.orderedAddOns.push(addOn);
         }
     }
@@ -264,4 +264,20 @@ export class ClusterInfo {
     public getAddOnContexts(): Map<string, Values> {
         return this.addonContext;
     }
+}
+
+/**
+ * Enum type for two different GitOps operating modes
+ */
+export enum GitOpsMode {
+    /**
+     * CDK deploys the `Application` resource for each AddOn enabled or customer workloads,
+     * and ArgoCD deploys the actual AddOn and workloads via GitOps based on the `Application` resource.
+     */
+    APPLICATION,
+    /**
+     * CDK deploys only one `Application` resource for the App of Apps, aka `bootstrap-apps`,
+     * and ArgoCD deploys all the AddOns based on the child `Application` defined in `bootstrap-apps`.
+     */
+    APP_OF_APPS
 }

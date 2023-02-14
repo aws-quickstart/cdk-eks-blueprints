@@ -51,10 +51,10 @@ export interface HelmChartConfiguration {
 
     /**
      * Indicate the helm chart provided uses dependency mode (https://helm.sh/docs/helm/helm_dependency/).
-     * Dependency mode is widely used in `aws-samples/ssp-eks-add-ons` repository, for example:
-     * https://github.com/aws-samples/ssp-eks-add-ons/blob/main/add-ons/appmesh-controller/Chart.yaml
+     * Dependency mode is widely used in `aws-samples/eks-blueprints-add-ons` repository, for example:
+     * https://github.com/aws-samples/eks-blueprints-add-ons/blob/main/add-ons/appmesh-controller/Chart.yaml
      * Dependency mode requires the chart values to be wrapped within the chart name.
-     * This value is only used when AddOns are deployed via GitOps way: `ArgoGitOpsFactory.enableGitOps()`
+     * This value is only used to turn off dependency mode in case customers choose to copy the whole helm chart into their repo
      */
     dependencyMode?: boolean
 }
