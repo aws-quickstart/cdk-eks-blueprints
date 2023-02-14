@@ -1,5 +1,3 @@
-import { integer } from "aws-sdk/clients/cloudfront";
-import { boolean } from "zod";
 import { Values } from "../../spi";
 import { CoreAddOn } from "../core-addon";
 
@@ -34,7 +32,7 @@ export interface VpcCniAddOnProps {
   * Used to configure the MTU size for attached ENIs. The valid range is 
   * from 576 to 9001.
   */
-  awsVpcEniMtu?: integer;
+  awsVpcEniMtu?: number;
   /**
   * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Type: Boolean.
   * Specifies whether ipamd should configure rp filter for primary interface. 
@@ -123,13 +121,13 @@ export interface VpcCniAddOnProps {
   * available IP addresses) that the ipamd daemon should attempt to keep 
   * available for pod assignment on the node. 
   */
-  warmEniTarget?: integer;
+  warmEniTarget?: number;
   /**
   * `WARM_PREFIX_TARGET` Environment Variable. Format integer.
   * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon 
   * should attempt to keep available for pod assignment on the node.
   */
-  warmPrefixTarget?: integer;
+  warmPrefixTarget?: number;
 }
 
 /**
