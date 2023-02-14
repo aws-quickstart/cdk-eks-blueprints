@@ -87,6 +87,17 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Only applicable for v0.19.0 and later
      */
     interruptionHandling?: boolean,
+
+    /**
+     * Limits define a set of bounds for provisioning capacity.
+     */
+    limits?: {
+        resources?: {
+          cpu?: number;
+          memory?: string;
+          [k: string]: unknown;
+        };
+    };
 }
 
 const KARPENTER = 'karpenter';
@@ -139,6 +150,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const consol = this.options.consolidation || null;
         const repo = this.options.repository!;
         const interruption = this.options.interruptionHandling || false;
+        const limits = this.options.limits || null;
         
         // Various checks for version errors
         const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
@@ -263,6 +275,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     consolidation: consolidation,
                     requirements: this.convert(requirements),
                     taints: taints,
+                    limits: limits,
                     provider: {
                         amiFamily: amiFamily,
                         subnetSelector: subnetTags,
