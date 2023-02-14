@@ -164,7 +164,7 @@ export class ApplicationTeam implements Team {
                     "eks:ListUpdates",
                     "eks:ListFargateProfiles"
                 ]
-            })
+                })
             );
             role.addToPrincipalPolicy(new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,

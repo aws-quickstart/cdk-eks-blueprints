@@ -171,6 +171,32 @@ blueprints.EksBlueprint.builder()
     .teams(...)
     .build(app, 'stack-with-resource-providers');
 ```
+## Using Resource Providers with CDK Constructs
+
+Some constructs used in the `EKSBlueprint` stack are standard CDK constructs that accept CDK resources. 
+
+For example, `GenericClusterProvider` (which is the basis for all cluster providers) allows passing resources like `IRole`, `SecurityGroup` and other properties that customers may find inconvenient to define with a builder pattern.
+
+Example:
+
+```typescript
+  const clusterProvider = new blueprints.GenericClusterProvider({
+            version: KubernetesVersion.V1_23,
+            mastersRole: getResource(context => {
+                return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+            }),
+            managedNodeGroups: [
+                ...
+            ]
+          });
+
+
+        blueprints.EksBlueprint.builder()
+            .addOns(...addOns)
+            .clusterProvider(clusterProvider)
+            .build(scope, blueprintID, props);
+    }
+```
 
 ## Implementing Custom Resource Providers
 

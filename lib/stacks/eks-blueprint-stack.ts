@@ -213,8 +213,6 @@ export class EksBlueprint extends cdk.Stack {
 
         const resourceContext = this.provideNamedResources(blueprintProps);
 
-        blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
-
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
         if (!vpcResource) {
@@ -227,6 +225,8 @@ export class EksBlueprint extends cdk.Stack {
         if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
+
+        blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
 
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
