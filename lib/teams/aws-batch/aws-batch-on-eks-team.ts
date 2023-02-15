@@ -14,33 +14,38 @@ import * as iam from "aws-cdk-lib/aws-iam";
 const NAMESPACE = 'aws-batch';
 
 /**
+ * Enum for Allocation Strategy:
+ * Best - Best Fit Progressive
+ * Spot - Spot Capacity Optimized
+ */
+enum Allocation {
+  Best = 'BEST_FIT_PROGRESSIVE',
+  Spot = 'SPOT_CAPACITY_OPTIMIZED'
+}
+
+/**
  * Interface to define an AWS Batch on EKS team
  */
 export interface BatchEksTeamProps extends TeamProps {
   /**
-   * Name of the team
-   */
-  name: string,
-
-  /**
-   * Namespace name for AWS Batch
-   */
-  namespace: string
-
-  /**
    * Allocation strategies for EKS Compute environment
    */
-  allocationStrategy?: 'BEST_FIT_PROGRESSIVE' | 'SPOT_CAPACITY_OPTIMIZED'
-
+  allocationStrategy?: Allocation
+  /**
+   * Name of the Job Queue
+   */
   jobQueueName: string
 
+  /**
+   * Priority of the job queue - priority is set in descending order
+   */
   priority: number,
 }
 
 const defaultProps: BatchEksTeamProps = {
   name: NAMESPACE,
   namespace: NAMESPACE,
-  allocationStrategy: 'BEST_FIT_PROGRESSIVE',
+  allocationStrategy: Allocation.Best,
   jobQueueName: 'batch-eks-job',
   priority: 10,
 };
@@ -51,30 +56,31 @@ const defaultProps: BatchEksTeamProps = {
 
 export class BatchEksTeam extends ApplicationTeam {
 
-  private batchTeam: BatchEksTeamProps;
+  private readonly batchTeam: BatchEksTeamProps;
   /**
    * @public
    * @param {BatchEksTeamProps} props the Batch team definition {@link BatchEksTeamProps}
    */
   constructor(props: BatchEksTeamProps) {
     super({...defaultProps, ...props});
-    this.batchTeam = props;
+    this.batchTeam = this.teamProps as BatchEksTeamProps;
   }
 
   setup(clusterInfo: ClusterInfo): void {
-    const allocStr = this.batchTeam.allocationStrategy || 'BEST_FIT_PROGRESSIVE';
+    const allocStr = this.batchTeam.allocationStrategy!;
 
-    const AwsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
+    const awsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
 
-    if (AwsBatchAddOn === undefined) {
+    if (awsBatchAddOn === undefined) {
       throw new Error("AwsBatchAddOn must be deployed before creating AWS Batch on EKS team.");
     }
 
     // Set AWS Batch namespace and necessary RBACs
-    const ns = this.setBatchEksNamespace(clusterInfo, this.batchTeam.namespace);
+    const ns = this.setBatchEksNamespace(clusterInfo, this.batchTeam.namespace!);
 
     // Create compute environment
-    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeam.namespace, ns, allocStr);
+    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeam.namespace!, ns, allocStr);
+    computeEnv.node.addDependency(ns);
 
     // Submit a job queue
     const jobQueue = new batch.CfnJobQueue(clusterInfo.cluster.stack,'batch-eks-job-queue',{
