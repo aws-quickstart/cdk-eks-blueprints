@@ -11,14 +11,18 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { AutoScalingGroup } from "aws-cdk-lib/aws-autoscaling";
 import * as iam from "aws-cdk-lib/aws-iam";
 
+import * as assert from "assert";
+
 const NAMESPACE = 'aws-batch';
 
 /**
  * Enum for Allocation Strategy:
- * Best - Best Fit Progressive
- * Spot - Spot Capacity Optimized
+ * Best - Best Fit Progressive: AWS Batch selects additional instance types that are large enough to meet the requirements of the jobs. 
+ * Instance types with a lower cost for each unit vCPU are preferred.
+ * Spot - Spot Capacity Optimized: AWS Batch selects one or more instance types that are large enough to meet the requirements of the jobs in the queue. 
+ * Instance types that are less likely to be interrupted are preferred. This allocation strategy is only available for Spot Instance compute resources.
  */
-enum Allocation {
+export enum BatchEksAllocation {
   Best = 'BEST_FIT_PROGRESSIVE',
   Spot = 'SPOT_CAPACITY_OPTIMIZED'
 }
@@ -28,9 +32,9 @@ enum Allocation {
  */
 export interface BatchEksTeamProps extends TeamProps {
   /**
-   * Allocation strategies for EKS Compute environment
+   * Allocation strategies for EKS Compute environment. See enum Allocation for options.
    */
-  allocationStrategy?: Allocation
+  allocationStrategy: BatchEksAllocation
   /**
    * Name of the Job Queue
    */
@@ -42,12 +46,9 @@ export interface BatchEksTeamProps extends TeamProps {
   priority: number,
 }
 
-const defaultProps: BatchEksTeamProps = {
+const defaultProps: TeamProps = {
   name: NAMESPACE,
   namespace: NAMESPACE,
-  allocationStrategy: Allocation.Best,
-  jobQueueName: "job-queue",
-  priority: 10
 };
 
 /*
@@ -62,12 +63,15 @@ export class BatchEksTeam extends ApplicationTeam {
    * @param {BatchEksTeamProps} props the Batch team definition {@link BatchEksTeamProps}
    */
   constructor(props: BatchEksTeamProps) {
-    super({...defaultProps, ...props});
-    this.batchTeamProps = props;
+    const teamProps = {...defaultProps, ...props};
+    super(teamProps);
+    this.batchTeamProps = teamProps;
   }
 
   setup(clusterInfo: ClusterInfo): void {
     const allocStr = this.batchTeamProps.allocationStrategy!;
+    const priority = this.batchTeamProps.priority;
+    assert((priority >= 0) && (priority % 1 == 0), 'Priority must be a whole number.');
 
     const awsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
 
