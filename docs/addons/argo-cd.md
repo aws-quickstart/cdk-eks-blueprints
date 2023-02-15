@@ -149,7 +149,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
 
     blueprints.EksBlueprint.builder()
         .addOns(...addOns)
-        .enableGitOps()
+        .enableGitOps(blueprints.GitOpsMode.APPLICATION)
         .build(scope, stackID);
 ```
 
@@ -176,7 +176,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
 
     blueprints.EksBlueprint.builder()
         .addOns(...addOns)
-        .enableGitOpsAppOfApps()
+        .enableGitOps(blueprints.GitOpsMode.APP_OF_APPS)
         .build(scope, stackID);
 ```
 
