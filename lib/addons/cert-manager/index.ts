@@ -23,7 +23,7 @@ export interface CertManagerAddOnProps extends HelmAddOnUserProps {
  * Default props to be used when creating the Helm chart
  */
 const defaultProps: HelmAddOnProps & CertManagerAddOnProps = {
-  name: "cert-manager",
+  name: "blueprints-cert-manager-addon",
   namespace: "cert-manager",
   chart: "cert-manager",
   version: "1.11.0",
