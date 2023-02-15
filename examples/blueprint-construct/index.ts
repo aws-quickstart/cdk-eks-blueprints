@@ -231,7 +231,7 @@ export default class BlueprintConstruct {
           };
 
         const batchTeam: BatchEksTeamProps = {
-            name: 'team-batch-a',
+            name: 'batch-a',
             namespace: 'aws-batch',
             jobQueueName: 'team-a-job-queue',
             priority: 10

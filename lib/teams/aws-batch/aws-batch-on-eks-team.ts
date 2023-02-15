@@ -46,8 +46,8 @@ const defaultProps: BatchEksTeamProps = {
   name: NAMESPACE,
   namespace: NAMESPACE,
   allocationStrategy: Allocation.Best,
-  jobQueueName: 'batch-eks-job',
-  priority: 10,
+  jobQueueName: "job-queue",
+  priority: 10
 };
 
 /*
@@ -56,18 +56,18 @@ const defaultProps: BatchEksTeamProps = {
 
 export class BatchEksTeam extends ApplicationTeam {
 
-  private readonly batchTeam: BatchEksTeamProps;
+  readonly batchTeamProps: BatchEksTeamProps;
   /**
    * @public
    * @param {BatchEksTeamProps} props the Batch team definition {@link BatchEksTeamProps}
    */
   constructor(props: BatchEksTeamProps) {
     super({...defaultProps, ...props});
-    this.batchTeam = this.teamProps as BatchEksTeamProps;
+    this.batchTeamProps = props;
   }
 
   setup(clusterInfo: ClusterInfo): void {
-    const allocStr = this.batchTeam.allocationStrategy!;
+    const allocStr = this.batchTeamProps.allocationStrategy!;
 
     const awsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
 
@@ -76,16 +76,16 @@ export class BatchEksTeam extends ApplicationTeam {
     }
 
     // Set AWS Batch namespace and necessary RBACs
-    const ns = this.setBatchEksNamespace(clusterInfo, this.batchTeam.namespace!);
+    const ns = this.setBatchEksNamespace(clusterInfo, this.batchTeamProps.namespace!);
 
     // Create compute environment
-    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeam.namespace!, ns, allocStr);
+    const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeamProps.namespace!, ns, allocStr);
     computeEnv.node.addDependency(ns);
 
     // Submit a job queue
     const jobQueue = new batch.CfnJobQueue(clusterInfo.cluster.stack,'batch-eks-job-queue',{
-      jobQueueName: this.batchTeam.jobQueueName,
-      priority: this.batchTeam.priority,
+      jobQueueName: this.batchTeamProps.jobQueueName!,
+      priority: this.batchTeamProps.priority!,
       computeEnvironmentOrder: [
         {
           order: 1,
