@@ -90,11 +90,19 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Limits define a set of bounds for provisioning capacity.
+     * Resource limits constrain the total size of the cluster.
+     * Limits prevent Karpenter from creating new instances once the limit is exceeded.
      */
     limits?: {
         resources?: {
           cpu?: number;
           memory?: string;
+          /**
+           * Extended resources are fully-qualified resource names outside the kubernetes.io domain.
+           * They allow cluster operators to advertise and users to consume the non-Kubernetes-built-in
+           * resources such as hardware devices GPUs, RDMAs, SR-IOVs...
+           * e.g nvidia.com/gpu, amd.com/gpu, etc...
+           */
           [k: string]: unknown;
         };
     };
