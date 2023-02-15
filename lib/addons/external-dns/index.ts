@@ -46,7 +46,7 @@ export class ExternalDnsAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
         const namespace = this.options.namespace ?? this.options.name;
 
-        const namespaceManifest = new KubernetesManifest(cluster.stack, 'external-dns-ns', {
+        const namespaceManifest = new KubernetesManifest(cluster.stack, `${this.props.name}-ns`, {
             cluster,
             manifest: [{
                 apiVersion: 'v1',
@@ -56,7 +56,7 @@ export class ExternalDnsAddOn extends HelmAddOn {
             overwrite: true
         });
 
-        const sa = cluster.addServiceAccount(this.props.name, { name: 'external-dns-sa', namespace });
+        const sa = cluster.addServiceAccount(this.props.name, { name: `${this.props.name}-sa`, namespace });
 
         const hostedZones = this.options.hostedZoneResources.map(e => clusterInfo.getRequiredResource<IHostedZone>(e));
 

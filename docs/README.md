@@ -58,7 +58,6 @@ Create a new CDK project. We use `typescript` for this example.
 
 ```bash
 cdk init app --language typescript
-npm install typescript@~4.8.4
 ```
 
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment.

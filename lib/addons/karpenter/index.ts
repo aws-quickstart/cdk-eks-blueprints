@@ -87,6 +87,25 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Only applicable for v0.19.0 and later
      */
     interruptionHandling?: boolean,
+
+    /**
+     * Limits define a set of bounds for provisioning capacity.
+     * Resource limits constrain the total size of the cluster.
+     * Limits prevent Karpenter from creating new instances once the limit is exceeded.
+     */
+    limits?: {
+        resources?: {
+          cpu?: number;
+          memory?: string;
+          /**
+           * Extended resources are fully-qualified resource names outside the kubernetes.io domain.
+           * They allow cluster operators to advertise and users to consume the non-Kubernetes-built-in
+           * resources such as hardware devices GPUs, RDMAs, SR-IOVs...
+           * e.g nvidia.com/gpu, amd.com/gpu, etc...
+           */
+          [k: string]: unknown;
+        };
+    };
 }
 
 const KARPENTER = 'karpenter';
@@ -139,6 +158,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const consol = this.options.consolidation || null;
         const repo = this.options.repository!;
         const interruption = this.options.interruptionHandling || false;
+        const limits = this.options.limits || null;
         
         // Various checks for version errors
         const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
@@ -263,6 +283,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     consolidation: consolidation,
                     requirements: this.convert(requirements),
                     taints: taints,
+                    limits: limits,
                     provider: {
                         amiFamily: amiFamily,
                         subnetSelector: subnetTags,
@@ -374,18 +395,21 @@ export class KarpenterAddOn extends HelmAddOn {
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
+        
+        const clusterName = cluster.clusterName;
+        const clusterHash = md5.Md5.hashStr(clusterName);
 
         //Cfn output for Node Role in case of needing to add additional policies
         new CfnOutput(cluster.stack, 'Karpenter Instance Node Role', {
             value: karpenterNodeRole.roleName,
             description: "Karpenter add-on Node Role name",
-            exportName: "KarpenterNodeRoleName",
+            exportName: "KarpenterNodeRoleName"+clusterHash,
         });
         //Cfn output for Instance Profile for creating additional provisioners
         new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', { 
             value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
             description: "Karpenter add-on Instance Profile name",
-            exportName: "KarpenterInstanceProfileName", 
+            exportName: "KarpenterInstanceProfileName"+clusterHash, 
         });
 
         // Map Node Role to aws-auth

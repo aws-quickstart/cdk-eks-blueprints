@@ -97,7 +97,7 @@ export class DelegatingHostedZoneProvider implements ResourceProvider<r53.IHoste
             resourceName: this.options.delegatingRoleName
         });
 
-        const delegationRole = Role.fromRoleArn(stack, 'DelegationRole', delegationRoleArn);
+        const delegationRole = Role.fromRoleArn(stack, `${this.options.subdomain}-DelegationRole`, delegationRoleArn);
 
         // create the record
         new r53.CrossAccountZoneDelegationRecord(stack, `${this.options.subdomain}-delegate`, {
