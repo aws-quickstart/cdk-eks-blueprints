@@ -106,13 +106,14 @@ The CNI Configuration `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` when set to `true` he
 
 Following is the process we need to follow to get custom networking to work fine
 
-- Have a VPC created with a secondary CIDR range where you pods can be scheduled for custom networking. 
-- Create subnets associating to CIDR ranges of secondary CIDR you just created.
-- Create a blueprints stack as shown in usage section above with `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` flag set to true. Make sure the VPC you have created before should be passed as input to blueprints stack.
-- Retrieve your cluster security group id.
+- First run your blueprints stack with all intially needed minimal addons and along with `VpcCniAddOn` addon with `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` flag to false.
+- Create subnets associating the CIDR ranges of secondary CIDR created by blueprints stack with the VPC.
+- Update your blueprints stack setting the flag  `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` set to true for `VpcCniAddOn` addon.
+- Retrieve your cluster security group id using aws cli command.
 - Create an ENIConfig custom resource for each subnet that you want to deploy pods in.
+- Finally update your blueprints stack with all the remaining addons you might need for your day 2 operations like `KarpenterAddOn`, `VeleroAddOn` etc.
 
-Check out [cni custom networking ](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html#:~:text=custom%2Dnetworking%2Dcluster-,Step%202%3A%20Configure%20your%20VPC,-This%20tutorial%20requires) to learn more about the detailed technical stepd involved to get up and running.
+Check out [cni custom networking ](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html#:~:text=custom%2Dnetworking%2Dcluster-,Step%202%3A%20Configure%20your%20VPC,-This%20tutorial%20requires) to learn more about the detailed technical steps involved to get up and running.
 
 Note: We will be publishing a [EKS CDK Blueprints Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns) soon to demonstrate custom networking setup using VPC CNI Addon.
 
