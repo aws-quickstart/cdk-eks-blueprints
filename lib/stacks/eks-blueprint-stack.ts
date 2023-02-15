@@ -1,15 +1,15 @@
 import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { IKey } from "aws-cdk-lib/aws-kms";
 import { Construct } from 'constructs';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
+import { KmsKeyProvider } from "../resource-providers/kms-key";
 import { VpcProvider } from '../resource-providers/vpc';
 import * as spi from '../spi';
-import * as constraints from '../utils/constraints-utils';
 import * as utils from '../utils';
 import { cloneDeep } from '../utils';
-import { IKey } from "aws-cdk-lib/aws-kms";
-import {KmsKeyProvider} from "../resource-providers/kms-key";
+import * as constraints from '../utils/constraints-utils';
 
 export class EksBlueprintProps {
     /**
@@ -96,7 +96,7 @@ export const enum ControlPlaneLogType {
  * and allows creating a blueprint in an abstract state that can be applied to various instantiations
  * in accounts and regions.
  */
-export class BlueprintBuilder implements spi.AsyncStackBuilder {
+export class BlueprintBuilder<T extends EksBlueprint = EksBlueprint> implements spi.AsyncStackBuilder {
 
     props: Partial<EksBlueprintProps>;
     env: {
@@ -151,7 +151,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public clusterProvider(clusterProvider: spi.ClusterProvider) {
+    public clusterProvider(clusterProvider: spi.ClusterProvider): this {
         this.props = { ...this.props, ...{ clusterProvider: clusterProvider } };
         return this;
     }
@@ -181,13 +181,13 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
-    public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
+    public build(scope: Construct, id: string, stackProps?: cdk.StackProps): T {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
-            { ...{ env: this.env }, ...stackProps });
+            { ...{ env: this.env }, ...stackProps }) as T;
     }
 
-    public async buildAsync(scope: Construct, id: string, stackProps?: cdk.StackProps): Promise<EksBlueprint> {
-        return this.build(scope, id, stackProps).waitForAsyncTasks();
+    public async buildAsync(scope: Construct, id: string, stackProps?: cdk.StackProps): Promise<T> {
+        return this.build(scope, id, stackProps).waitForAsyncTasks() as Promise<T>;
     }
 }
 
