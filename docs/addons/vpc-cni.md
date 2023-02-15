@@ -100,6 +100,22 @@ v1.12.1-eksbuild.2
 
 Applies VPC CNI add-on to Amazon EKS cluster. 
 
+## Custom Networking
+
+The CNI Configuration `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` when set to `true` helps you achieve custom networking by allowing your pods to use subnets and security groups that are independent of your worker node's VPC configuration. 
+
+Following is the process we need to follow to get custom networking to work fine
+
+- Have a VPC created with a secondary CIDR range where you pods can be scheduled for custom networking. 
+- Create subnets associating to CIDR ranges of secondary CIDR you just created.
+- Create a blueprints stack as shown in usage section above with `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` flag set to true. Make sure the VPC you have created before should be passed as input to blueprints stack.
+- Retrieve your cluster security group id.
+- Create an ENIConfig custom resource for each subnet that you want to deploy pods in.
+
+Check out [cni custom networking ](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html#:~:text=custom%2Dnetworking%2Dcluster-,Step%202%3A%20Configure%20your%20VPC,-This%20tutorial%20requires) to learn more about the detailed technical stepd involved to get up and running.
+
+Note: We will be publishing a [EKS CDK Blueprints Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns) soon to demonstrate custom networking setup using VPC CNI Addon.
+
 ## References
 
 - Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values
