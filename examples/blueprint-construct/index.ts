@@ -124,6 +124,12 @@ export default class BlueprintConstruct {
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
                 interruptionHandling: true,
+                limits: {
+                    resources: {
+                        cpu: 20,
+                        memory: "64Gi",
+                    }
+                }
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
