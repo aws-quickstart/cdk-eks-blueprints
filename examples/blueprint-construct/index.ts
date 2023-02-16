@@ -5,7 +5,7 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { AckServiceName, HelmAddOn } from '../../lib';
-import { EmrEksTeamProps, BatchEksTeamProps, BatchEksAllocation } from '../../lib/teams';
+import { EmrEksTeamProps, BatchEksTeamProps, BatchAllocationStrategy, BatchEnvType } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
@@ -233,9 +233,16 @@ export default class BlueprintConstruct {
         const batchTeam: BatchEksTeamProps = {
             name: 'batch-a',
             namespace: 'aws-batch',
-            allocationStrategy: BatchEksAllocation.Best,
+            envName: 'batch-a-comp-env',
+            computeResources: {
+                envType: BatchEnvType.EC2,
+                allocationStrategy: BatchAllocationStrategy.BEST,
+                priority: 10,
+                minvCpus: 0,
+                maxvCpus: 128,
+                instanceTypes: ["m5", "t3.large"]
+            },
             jobQueueName: 'team-a-job-queue',
-            priority: 10
         };
 
         blueprints.EksBlueprint.builder()
