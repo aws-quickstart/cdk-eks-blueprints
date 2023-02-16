@@ -115,7 +115,7 @@ Following is the process we need to follow to get custom networking to work fine
 
 Check out [cni custom networking ](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html#:~:text=custom%2Dnetworking%2Dcluster-,Step%202%3A%20Configure%20your%20VPC,-This%20tutorial%20requires) to learn more about the detailed technical steps involved to get up and running.
 
-Note: We will be publishing a [EKS CDK Blueprints Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns) soon to demonstrate custom networking setup using VPC CNI Addon.
+Note : We will be publishing a [EKS CDK Blueprints Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns) soon to demonstrate custom networking setup using VPC CNI Addon.
 
 ## References
 
