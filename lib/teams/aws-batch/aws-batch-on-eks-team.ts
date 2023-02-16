@@ -68,9 +68,9 @@ export interface BatchEksTeamProps extends TeamProps {
     priority: number
 
     /**
-     * The minimum number of Amazon EC2 vCPUs that an environment should maintain. Defaults to zero.
+     * The minimum number of Amazon EC2 vCPUs that an environment should maintain.
      */
-    minvCpus?: number
+    minvCpus: number
 
     /**
      * The maximum number of Amazon EC2 vCPUs that an environment can reach.
@@ -114,6 +114,7 @@ export class BatchEksTeam extends ApplicationTeam {
   setup(clusterInfo: ClusterInfo): void {
     const computeResources = this.batchTeamProps.computeResources;
     const priority = computeResources.priority;
+    assert(computeResources.minvCpus < computeResources.maxvCpus, 'Max vCPU must be greater than Min vCPU');
     assert((priority >= 0) && (priority % 1 == 0), 'Priority must be a whole number.');
 
     const awsBatchAddOn = clusterInfo.getProvisionedAddOn('AwsBatchAddOn');
@@ -129,7 +130,7 @@ export class BatchEksTeam extends ApplicationTeam {
     const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeamProps.namespace!, computeResources);
     computeEnv.node.addDependency(statement);
 
-    // Submit a job queue
+    // Create a job queue
     const jobQueue = new batch.CfnJobQueue(clusterInfo.cluster.stack,'batch-eks-job-queue',{
       jobQueueName: this.batchTeamProps.jobQueueName!,
       priority: priority,
@@ -179,7 +180,7 @@ export class BatchEksTeam extends ApplicationTeam {
     envType: BatchEnvType;
     allocationStrategy: BatchAllocationStrategy;
     priority: number;
-    minvCpus?: number | undefined;
+    minvCpus: number;
     maxvCpus: number;
     instanceTypes: string[];
   }): batch.CfnComputeEnvironment {
@@ -205,7 +206,7 @@ export class BatchEksTeam extends ApplicationTeam {
       computeResources: {
         type: computeResources.envType,
         allocationStrategy: computeResources.allocationStrategy,
-        minvCpus: computeResources.minvCpus || undefined,
+        minvCpus: computeResources.minvCpus,
         maxvCpus: computeResources.maxvCpus,
         instanceTypes: computeResources.instanceTypes,
         subnets: cluster.vpc.publicSubnets.map((e: ec2.ISubnet) => {return e.subnetId;}),

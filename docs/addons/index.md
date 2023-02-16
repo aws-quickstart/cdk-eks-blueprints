@@ -15,6 +15,7 @@ The framework currently supports the following add-ons.
 | [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               |
 | [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                  |
 | [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
+| [`AWS Batch for EKS`](./aws-batch-on-eks)                              | Enables EKS cluster to be used with AWS Batch on EKS                                                                    |
 | [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
 | [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
 | [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |

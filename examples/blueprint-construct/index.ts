@@ -240,7 +240,7 @@ export default class BlueprintConstruct {
                 priority: 10,
                 minvCpus: 0,
                 maxvCpus: 128,
-                instanceTypes: ["m5", "t3.large"]
+                instanceTypes: ["m5", "c4.4xlarge"]
             },
             jobQueueName: 'team-a-job-queue',
         };
