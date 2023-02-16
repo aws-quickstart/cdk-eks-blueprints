@@ -44,9 +44,20 @@ export interface VpcCniAddOnProps {
   * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean.
   * Specifies that your pods may use subnets and security groups that are 
   * independent of your worker node's VPC configuration.
-  * Note : This environment variable is deprecated after v1.12.1+ version.
   */
   awsVpcK8sCniCustomNetworkCfg?: boolean;
+  /**
+  * `ENI_CONFIG_LABEL_DEF` Environment Variable. Type: String.
+  * Specifies node label key name. This should be used when 
+  * AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true.
+  */
+  eniConfigLabelDef?: boolean;
+  /**
+  * `ENI_CONFIG_ANNOTATION_DEF` Environment Variable. Type: String. 
+  * Specifies node annotation key name. This should be used when 
+  * AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true
+  */
+  eniConfigAnnotationDef?: boolean;
   /**
   * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Type: String.
   * Specifies the veth prefix used to generate the host-side veth device name 
@@ -128,6 +139,15 @@ export interface VpcCniAddOnProps {
   * should attempt to keep available for pod assignment on the node.
   */
   warmPrefixTarget?: number;
+  /**
+   * Secondary Subnet IDs for creating `ENIConfig`
+   */
+  subnetIds?: string[];
+  /**
+   * Corrosponding Availability Zones of the Secondary Subnet IDs 
+   * for creating `ENIConfig`
+   */
+  availabilityZones?: string[];
 }
 
 /**
