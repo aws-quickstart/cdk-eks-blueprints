@@ -37,7 +37,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
             // Creates Secondary CIDR and Secondary subnets if passed.
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
-            var secondarySubnets: Array<PrivateSubnet> = [];
+            const secondarySubnets: Array<PrivateSubnet> = [];
             if (this.secondaryCidr) {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
@@ -48,11 +48,11 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                             availabilityZone: vpc.availabilityZones[az],
                             cidrBlock: this.secondarySubnetCidrs[az],
                             vpcId: vpc.vpcId});
-                    };
+                    }
                     for(let secondarySubnet of secondarySubnets) {
                         Tags.of(secondarySubnet).add("kubernetes.io/role/internal-elb", "1", { applyToLaunchedInstances: true });
                         Tags.of(secondarySubnet).add("Name", `blueprint-construct-dev-PrivateSubnet-${secondarySubnet}`, { applyToLaunchedInstances: true });
-                    };
+                    }
                 }
             }
         }

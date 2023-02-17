@@ -1,6 +1,6 @@
-import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
-import { dependable, loadYaml, readYamlDocument } from "../../utils";
+import { loadYaml, readYamlDocument } from "../../utils";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
@@ -194,7 +194,7 @@ export class VpcCniAddOn extends CoreAddOn {
               };
     
               const kubectlProvider = new KubectlProvider(clusterInfo);
-              const eniConfigDeployment = kubectlProvider.addManifest(manifestDeployment);
+              kubectlProvider.addManifest(manifestDeployment);
             }
           }
           const addOnPromise = super.deploy(clusterInfo);
