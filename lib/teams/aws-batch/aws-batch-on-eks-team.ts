@@ -12,10 +12,8 @@ import { AutoScalingGroup } from "aws-cdk-lib/aws-autoscaling";
 import * as iam from "aws-cdk-lib/aws-iam";
 
 import * as assert from "assert";
-import { Batch } from "aws-sdk";
 
 const NAMESPACE = 'aws-batch';
-const COMPUTE_ENV = 'aws-batch-compute-env'
 
 /**
  * Enum for Allocation Strategy:
@@ -124,7 +122,7 @@ export class BatchEksTeam extends ApplicationTeam {
     }
 
     // Set AWS Batch namespace and necessary RBACs
-    const statement = this.setBatchEksNamespace(clusterInfo, this.batchTeamProps.namespace!);
+    const statement = this.setBatchEksResources(clusterInfo, this.batchTeamProps.namespace!);
 
     // Create compute environment
     const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeamProps.namespace!, computeResources);
@@ -152,7 +150,7 @@ export class BatchEksTeam extends ApplicationTeam {
    * @returns 
    */
 
-  private setBatchEksNamespace(clusterInfo: ClusterInfo, namespace: string): Construct {
+  private setBatchEksResources(clusterInfo: ClusterInfo, namespace: string): Construct {
 
     let doc = readYamlDocument(`${__dirname}/aws-batch-rbac-config.ytpl`);
 
