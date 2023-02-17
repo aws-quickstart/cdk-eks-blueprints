@@ -126,6 +126,7 @@ export class BatchEksTeam extends ApplicationTeam {
 
     // Create compute environment
     const computeEnv = this.setComputeEnvironment(clusterInfo, this.batchTeamProps.namespace!, computeResources);
+    computeEnv.node.addDependency(awsBatchAddOn);
     computeEnv.node.addDependency(statement);
 
     // Create a job queue
