@@ -51,13 +51,13 @@ export interface VpcCniAddOnProps {
   * Specifies node label key name. This should be used when 
   * AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true.
   */
-  eniConfigLabelDef?: boolean;
+  eniConfigLabelDef?: string;
   /**
   * `ENI_CONFIG_ANNOTATION_DEF` Environment Variable. Type: String. 
   * Specifies node annotation key name. This should be used when 
   * AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true
   */
-  eniConfigAnnotationDef?: boolean;
+  eniConfigAnnotationDef?: string;
   /**
   * `AWS_VPC_K8S_CNI_VETHPREFIX` Environment Variable. Type: String.
   * Specifies the veth prefix used to generate the host-side veth device name 
@@ -162,6 +162,7 @@ export class VpcCniAddOn extends CoreAddOn {
       saName: "vpc-cni",
       configurationValues: populateVpcCniConfigurationValues(props)  
     });
+    // Creating ENIConfigs per each Subnet ID passed using `eniConfig.yaml`
   }
 }
 

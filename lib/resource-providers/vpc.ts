@@ -1,4 +1,6 @@
+import { Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
 import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
@@ -7,14 +9,14 @@ import { ResourceContext, ResourceProvider } from "../spi";
 export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
     readonly secondaryCidrId?: string;
-    readonly secondaryMask1?: string;
+    readonly secondaryMasks?: string[];
     readonly secondaryMask2?: string;
     readonly secondaryMask3?: string;
 
-    constructor(vpcId?: string, secondaryCidrId?: string, secondaryMask1?: string, secondaryMask2?: string, secondaryMask3?: string) {
+    constructor(vpcId?: string, secondaryCidrId?: string, secondaryMasks?: string[], secondaryMask2?: string, secondaryMask3?: string) {
         this.vpcId = vpcId;
         this.secondaryCidrId = secondaryCidrId;
-        this.secondaryMask1 = secondaryMask1;
+        this.secondaryMasks = secondaryMasks;
         this.secondaryMask2 = secondaryMask2;
         this.secondaryMask3 = secondaryMask3;
     }
@@ -37,28 +39,25 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
             // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
             // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
+            // Creates Secondary CIDR and Secondary subnets if passed.
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
-            const subnet = vpc.privateSubnets[1];
+            var secondarySubnets: Array<PrivateSubnet> = [];
             if (this.secondaryCidrId) {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
                     cidrBlock: this.secondaryCidrId});
-                const selection = vpc.selectSubnets({
-                    subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS});
-                const secondarySubnet1 = new ec2.PrivateSubnet(context.scope, id + '-secondarySubnet1', {
-                    availabilityZone: selection.availabilityZones[0],
-                    cidrBlock: this.secondaryMask1!,
-                    vpcId: vpc.vpcId});
-                const subnetID = selection.subnetIds[0];
-                secondarySubnet1.addDefaultNatRoute(selection.subnetIds[0])
-                const secondarySubnet2 = new ec2.PrivateSubnet(context.scope, id + '-secondarySubnet2', {
-                    availabilityZone: selection.availabilityZones[0],
-                    cidrBlock: this.secondaryMask2!,
-                    vpcId: vpc.vpcId});
-                const secondarySubnet3 = new ec2.PrivateSubnet(context.scope, id + '-secondarySubnet3', {
-                    availabilityZone: selection.availabilityZones[0],
-                    cidrBlock: this.secondaryMask3!,
-                    vpcId: vpc.vpcId});
+                if (this.secondaryMasks) {
+                    for(let az in vpc.availabilityZones) {
+                        secondarySubnets[az] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[az], {
+                            availabilityZone: vpc.availabilityZones[az],
+                            cidrBlock: this.secondaryMasks![az],
+                            vpcId: vpc.vpcId});
+                    };
+                    for(let secondarySubnet of secondarySubnets) {
+                        Tags.of(secondarySubnet).add("kubernetes.io/role/internal-elb", "1", { applyToLaunchedInstances: true });
+                        Tags.of(secondarySubnet).add("Name", `blueprint-construct-dev-PrivateSubnet-${secondarySubnet}`, { applyToLaunchedInstances: true });
+                    };
+                }
             }
         }
         return vpc;
