@@ -8,17 +8,13 @@ import { ResourceContext, ResourceProvider } from "../spi";
  */
 export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
-    readonly secondaryCidrId?: string;
-    readonly secondaryMasks?: string[];
-    readonly secondaryMask2?: string;
-    readonly secondaryMask3?: string;
+    readonly secondaryCidr?: string;
+    readonly secondarySubnetCidrs?: string[];
 
-    constructor(vpcId?: string, secondaryCidrId?: string, secondaryMasks?: string[], secondaryMask2?: string, secondaryMask3?: string) {
+    constructor(vpcId?: string, secondaryCidr?: string, secondarySubnetCidrs?: string[]) {
         this.vpcId = vpcId;
-        this.secondaryCidrId = secondaryCidrId;
-        this.secondaryMasks = secondaryMasks;
-        this.secondaryMask2 = secondaryMask2;
-        this.secondaryMask3 = secondaryMask3;
+        this.secondaryCidr = secondaryCidr;
+        this.secondarySubnetCidrs = secondarySubnetCidrs;
     }
 
     provide(context: ResourceContext): ec2.IVpc {
@@ -42,15 +38,15 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // Creates Secondary CIDR and Secondary subnets if passed.
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
             var secondarySubnets: Array<PrivateSubnet> = [];
-            if (this.secondaryCidrId) {
+            if (this.secondaryCidr) {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
-                    cidrBlock: this.secondaryCidrId});
-                if (this.secondaryMasks) {
+                    cidrBlock: this.secondaryCidr});
+                if (this.secondarySubnetCidrs) {
                     for(let az in vpc.availabilityZones) {
                         secondarySubnets[az] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[az], {
                             availabilityZone: vpc.availabilityZones[az],
-                            cidrBlock: this.secondaryMasks![az],
+                            cidrBlock: this.secondarySubnetCidrs[az],
                             vpcId: vpc.vpcId});
                     };
                     for(let secondarySubnet of secondarySubnets) {

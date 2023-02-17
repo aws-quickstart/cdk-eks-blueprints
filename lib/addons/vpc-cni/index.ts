@@ -1,14 +1,14 @@
-import { Values } from "../../spi";
-import { CoreAddOn } from "../core-addon";
+import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
+import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { dependable, loadYaml, readYamlDocument } from "../../utils";
+import { Construct } from 'constructs';
+import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
  * User provided option for the Helm Chart
  */
-export interface VpcCniAddOnProps {
-  /**
-   * Version of the addon.
-   */
-  version?: string;
+export interface VpcCniAddOnProps extends CoreAddOnProps {
+
   /**
    * `ADDITIONAL_ENI_TAGS` Environment Variable. Type: String.
    * Metadata applied to ENI helps you categorize and organize your 
@@ -150,20 +150,56 @@ export interface VpcCniAddOnProps {
   availabilityZones?: string[];
 }
 
+const defaultProps: CoreAddOnProps = {
+  addOnName: 'vpc-cni',
+  version: 'v1.12.1-eksbuild.2',
+  saName: 'vpc-cni',
+  namespace: 'kube-system',
+  configurationValues: {}
+};
+
 /**
  * Implementation of VpcCni EKS add-on with Advanced Configurations.
  */
 export class VpcCniAddOn extends CoreAddOn {
     
-  constructor(props?: VpcCniAddOnProps) {
-    super({
-      addOnName: "vpc-cni",
-      version: props?.version ?? "v1.12.1-eksbuild.2",
-      saName: "vpc-cni",
-      configurationValues: populateVpcCniConfigurationValues(props)  
-    });
-    // Creating ENIConfigs per each Subnet ID passed using `eniConfig.yaml`
-  }
+      readonly vpcCniAddOnProps: VpcCniAddOnProps;
+      readonly id? : string;
+
+      constructor(props?: VpcCniAddOnProps) {
+        super({...defaultProps, ...props});
+        this.vpcCniAddOnProps = { ...defaultProps, ...props, };
+        (this.vpcCniAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
+      }
+
+      deploy(clusterInfo: ClusterInfo, props?: VpcCniAddOnProps): Promise<Construct> {
+  
+          const cluster = clusterInfo.cluster;
+          let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+          let doc: string;
+          if ((props?.subnetIds) && (props?.availabilityZones)) {
+            for (let subnetID in props?.subnetIds) {
+              doc = readYamlDocument(__dirname + '/eniConfig.yaml');
+              const manifest = doc.split("---").map(e => loadYaml(e));
+              const values: Values = {
+                  availabilityZone: this.vpcCniAddOnProps.availabilityZones![subnetID],
+                  clusterSecurityGroupId: clusterSecurityGroupId,
+                  subnetId: this.vpcCniAddOnProps.subnetIds![subnetID]
+              };
+              const manifestDeployment: ManifestDeployment = {
+                name: this.vpcCniAddOnProps.addOnName!,
+                namespace: this.vpcCniAddOnProps.namespace!,
+                manifest,
+                values,
+              };
+    
+              const kubectlProvider = new KubectlProvider(clusterInfo);
+              const eniConfigDeployment = kubectlProvider.addManifest(manifestDeployment);
+            }
+          }
+          const addOnPromise = super.deploy(clusterInfo);
+          return addOnPromise;
+      }
 }
 
 function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
