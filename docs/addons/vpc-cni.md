@@ -102,20 +102,9 @@ Applies VPC CNI add-on to Amazon EKS cluster.
 
 ## Custom Networking
 
-The CNI Configuration `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` when set to `true` helps you achieve custom networking by allowing your pods to use subnets and security groups that are independent of your worker node's VPC configuration. 
+Enabling custom networking does not modify existing nodes. Custom networking is a disruptive action. If you had any nodes in your cluster with running Pods before you switched to the custom CNI networking feature, you should cordon and drain the nodes to gracefully shutdown the Pods and then terminate the nodes. Only new nodes matching the ENIConfig label or annotations use custom networking, and hence the Pods scheduled on these new nodes can be assigned an IP from secondary CIDR.
 
-Following is the process we need to follow to get custom networking to work fine
-
-- First run your blueprints stack with all intially needed minimal addons and along with `VpcCniAddOn` addon with `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` flag to false.
-- Create subnets associating the CIDR ranges of secondary CIDR created by blueprints stack with the VPC.
-- Update your blueprints stack setting the flag  `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` set to true for `VpcCniAddOn` addon.
-- Retrieve your cluster security group id using aws cli command.
-- Create an ENIConfig custom resource for each subnet that you want to deploy pods in.
-- Finally update your blueprints stack with all the remaining addons you might need for your day 2 operations like `KarpenterAddOn`, `VeleroAddOn` etc.
-
-Check out [cni custom networking ](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html#:~:text=custom%2Dnetworking%2Dcluster-,Step%202%3A%20Configure%20your%20VPC,-This%20tutorial%20requires) to learn more about the detailed technical steps involved to get up and running.
-
-Note : We will be publishing a [EKS CDK Blueprints Pattern](https://github.com/aws-samples/cdk-eks-blueprints-patterns) soon to demonstrate custom networking setup using VPC CNI Addon.
+Please check our [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) for more information on custom networking.
 
 ## References
 
