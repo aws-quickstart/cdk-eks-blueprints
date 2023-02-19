@@ -55,7 +55,10 @@ export class ArgoApplication {
                     targetRevision: repository.targetRevision ?? 'HEAD'
                 },
                 syncPolicy: {
-                    automated: {}
+                    automated: {
+                        prune: true,
+                        selfHeal: true,
+                    }
                 }
             }
         };
