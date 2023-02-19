@@ -58,6 +58,7 @@ export class ArgoApplication {
                     automated: {
                         prune: true,
                         selfHeal: true,
+                        allowEmpty: true,
                     }
                 }
             }
