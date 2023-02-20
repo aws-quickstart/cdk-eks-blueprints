@@ -86,33 +86,4 @@ describe("ResourceProxy",() => {
         expect(nutil.isProxy(clusterProvider.props.securityGroup)).toBeTruthy();
     });
 
-
-    // test("When a stack is created with proxy for launchTemplateSpec in cluster provider, stack is created with proxy resolved", () => {
-    //     const app = new App();
-    //     const clusterProvider = new blueprints.GenericClusterProvider({
-    //         version: KubernetesVersion.V1_23,
-    //         managedNodeGroups: [
-    //             {
-    //                 id: "mng1",
-    //                 launchTemplateSpec: {
-    //                     id: "lt1",
-                        
-    //                 } 
-    //             }
-    //         ]
-    //     });
-
-    //     const builder = EksBlueprint.builder()
-    //         .clusterProvider(clusterProvider)
-    //         .account("123456789012")
-    //         .region("us-east-1");
-
-    //     const stack1 = builder.build(app, "resource-cluster");
-    //     const template = Template.fromStack(stack1);
-    //     const templateString = JSON.stringify(template.toJSON());
-    //     expect(templateString).toContain(':iam::123456789012:role/myrole');
-    //     expect(templateString).toContain('ControlPlaneSG');
-    //     expect(templateString).toContain(sgDescription);
-    //     expect(nutil.isProxy(clusterProvider.props.securityGroup)).toBeTruthy();
-    // });
 });

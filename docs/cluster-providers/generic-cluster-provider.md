@@ -74,7 +74,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
         {
             id: "mng1",
             nodeRole: blueprints.getResource(context => {
-                const role = new iam.Role(context.scope, 'NodeRole', { assumedBy: new new iam.ServicePrincipal("ec2.amazonaws.com")});
+                const role = new iam.Role(context.scope, 'NodeRole', { assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com")});
                 ... add policies such as AmazonEKSWorkerNodePolicy and AmazonEC2ContainerRegistryReadOnly 
                 return role;
             })

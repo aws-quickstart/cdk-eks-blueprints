@@ -5,7 +5,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, getResource, GlobalResources, HelmAddOn } from '../../lib';
+import { AckServiceName, GlobalResources, HelmAddOn, getResource } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -24,7 +24,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = false;
+        HelmAddOn.validateHelmVersions = true;
         HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  "debug";
 
