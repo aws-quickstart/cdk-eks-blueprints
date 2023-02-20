@@ -65,7 +65,7 @@ Example:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_23,
-    // if needed use this to register an auth role integrate with RBAC
+    // if needed use this to register an auth role to integrate with RBAC
     mastersRole: blueprints.getResource(context => {
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
     }),
