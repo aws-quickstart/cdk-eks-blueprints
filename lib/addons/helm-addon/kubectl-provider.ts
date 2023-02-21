@@ -55,6 +55,7 @@ export interface HelmChartConfiguration {
      * https://github.com/aws-samples/eks-blueprints-add-ons/blob/main/add-ons/appmesh-controller/Chart.yaml
      * Dependency mode requires the chart values to be wrapped within the chart name.
      * This value is only used to turn off dependency mode in case customers choose to copy the whole helm chart into their repo
+     * @default true
      */
     dependencyMode?: boolean
 }

@@ -19,8 +19,9 @@ export class ArgoApplication {
         const nameValues = [];
 
         for (let key in flatValues) {
-            // Avoid passing the undefined values and empty objects
+            // Avoid passing the undefined values
             if (flatValues[key] !== undefined) {
+                // Avoid passing the empty objects, e.g. {}
                 if (Object.getPrototypeOf(flatValues[key]) !== Object.prototype) {
                     nameValues.push({ name: key, value: `${flatValues[key]}` });
                 } else if (Object.getPrototypeOf(flatValues[key]) === Object.prototype && Object.keys(flatValues[key]).length != 0) {
