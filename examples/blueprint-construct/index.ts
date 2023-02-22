@@ -1,10 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, HelmAddOn } from '../../lib';
+import { AckServiceName, GlobalResources, HelmAddOn, getResource } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -168,6 +169,9 @@ export default class BlueprintConstruct {
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
+            mastersRole: getResource(context => {
+                return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+            }),
             managedNodeGroups: [
                 {
                     id: "mng1",
@@ -232,6 +236,11 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
+            .resourceProvider(GlobalResources.Vpc, {
+                provide(context: blueprints.ResourceContext) : IVpc {
+                    return new ec2.Vpc(context.scope, "my-vpc");
+                }
+            })
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
