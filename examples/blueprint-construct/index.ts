@@ -140,11 +140,7 @@ export default class BlueprintConstruct {
       }),
       new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
       new blueprints.addons.KubeviousAddOn(),
-      new blueprints.addons.EbsCsiDriverAddOn({
-        kmsKeys: [
-          "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
-        ],
-      }),
+      new blueprints.addons.EbsCsiDriverAddOn(),
       new blueprints.addons.EfsCsiDriverAddOn({ replicaCount: 1 }),
       new blueprints.addons.KedaAddOn({
         podSecurityContextFsGroup: 1001,
