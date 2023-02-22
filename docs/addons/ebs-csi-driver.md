@@ -13,24 +13,6 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ## Usage
 
-### Without KMS Key and encryption
-
-```typescript
-import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '@aws-quickstart/eks-blueprints';
-
-const app = new cdk.App();
-
-const addOn = new blueprints.addons.EbsCsiDriverAddOn();
-
-const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(addOn)
-  .build(app, 'my-stack-name');
-```
-
-### With KMS Key and encryption
-
 ```typescript
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
@@ -40,9 +22,14 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.EbsCsiDriverAddOn({
         kmsKeys: [
-          "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+          blueprints.getResource(
+            (context) =>
+              new kms.Key(context.scope, "ebs-csi-driver-key", {
+                alias: "ebs-csi-driver-key",
+              })
+          ),
         ],
-      });
+      }),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
