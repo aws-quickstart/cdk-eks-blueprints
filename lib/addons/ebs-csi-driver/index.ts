@@ -2,25 +2,41 @@ import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 
 /**
+ * Interface for EBS CSI Driver EKS add-on options
+ */
+interface IEbsCsiDriverAddOnOptions {
+  /**
+   * Version of the driver to deploy
+   */
+  version?: string;
+  /**
+   * List of KMS keys to be used for encryption
+   */
+  kmsKeys?: string[];
+}
+
+/**
  * Default values for the add-on
  */
 const defaultProps = {
-    addOnName: 'aws-ebs-csi-driver',
-    version: 'v1.14.0-eksbuild.1',
-    saName: 'ebs-csi-controller-sa'
+  addOnName: "aws-ebs-csi-driver",
+  version: "v1.14.0-eksbuild.1",
+  saName: "ebs-csi-controller-sa",
 };
 
 /**
- * Implementation of EBS CSI Driver EKS add-on.
+ * Implementation of EBS CSI Driver EKS add-on
  */
 export class EbsCsiDriverAddOn extends CoreAddOn {
+  constructor(options?: IEbsCsiDriverAddOnOptions) {
+    const { version, kmsKeys } = options || {};
 
-    constructor(version?: string, kmsKeys?: string[]) {
-        super({
-            addOnName: defaultProps.addOnName,
-            version: version ?? defaultProps.version,
-            saName: defaultProps.saName,
-            policyDocumentProvider: (partition: string) => getEbsDriverPolicyDocument(partition, kmsKeys)
-        });
-    }
+    super({
+      addOnName: defaultProps.addOnName,
+      version: version ?? defaultProps.version,
+      saName: defaultProps.saName,
+      policyDocumentProvider: (partition: string) =>
+        getEbsDriverPolicyDocument(partition, kmsKeys),
+    });
+  }
 }
