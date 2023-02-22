@@ -8,6 +8,7 @@ import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import * as cdk from 'aws-cdk-lib';
 import * as efs from 'aws-cdk-lib/aws-efs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 
 import * as semver from 'semver';
 import { EbsCsiDriverAddOn } from "../ebs-csi-driver";
@@ -78,6 +79,12 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
      * https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#core-stacks
      */
     notebookStack?: string,
+
+    /**
+     * Name of the certificate {@link NamedResourceProvider} to be used for certificate look up. 
+     * @see {@link ImportCertificateProvider} and {@link CreateCertificateProvider} for examples of certificate providers.
+     */
+    certificateResourceName?: string,
 }
 
 const JUPYTERHUB = 'jupyterhub';
@@ -173,15 +180,31 @@ export class JupyterHubAddOn extends HelmAddOn {
         const enableIngress = this.options.enableIngress || false;
         const ingressHosts = this.options.ingressHosts || [];
         const ingressAnnotations = this.options.ingressAnnotations;
+        const cert = this.options.certificateResourceName;
         setPath(values, "ingress.enabled", enableIngress);
 
         if (enableIngress){
-            setPath(values, "ingress.annotations", ingressAnnotations);
+            const presetAnnotations: any = {
+                'alb.ingress.kubernetes.io/scheme': 'internet-facing',
+                'alb.ingress.kubernetes.io/target-type': 'ip',
+                'kubernetes.io/ingress.class': 'alb',
+            };
+
+            if (cert){
+                presetAnnotations['alb.ingress.kubernetes.io/ssl-redirect'] = '443';
+                presetAnnotations['alb.ingress.kubernetes.io/listen-ports'] = '[{"HTTP": 80},{"HTTPS":443}]';
+                const certificate = clusterInfo.getResource<ICertificate>(cert);
+                presetAnnotations['alb.ingress.kubernetes.io/certificate-arn'] = certificate?.certificateArn;
+            } 
+
+            const annotations = { ...ingressAnnotations, ...presetAnnotations};
+            setPath(values, "ingress.annotations", annotations);
             setPath(values, "ingress.hosts", ingressHosts);
             setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
+            assert(!cert, 'Cert option is only supported if ingress is enabled.');
             setPath(values, "proxy.service", { 
                 "annotations": {
                     "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",

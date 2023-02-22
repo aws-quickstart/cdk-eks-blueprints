@@ -30,7 +30,6 @@ cdk --version # must produce 2.60.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
-npm install typescript@~4.8.4 # installs compatible version of typescript
 ```
 
 ## Configure and Deploy EKS Clusters
