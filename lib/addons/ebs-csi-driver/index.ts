@@ -1,3 +1,4 @@
+import * as kms from "aws-cdk-lib/aws-kms";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 
@@ -12,7 +13,7 @@ interface IEbsCsiDriverAddOnOptions {
   /**
    * List of KMS keys to be used for encryption
    */
-  kmsKeys?: string[];
+  kmsKeys?: kms.Key[];
 }
 
 /**

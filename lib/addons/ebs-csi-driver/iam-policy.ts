@@ -1,4 +1,5 @@
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
+import * as kms from "aws-cdk-lib/aws-kms";
 
 interface Statement {
   Effect: string;
@@ -13,7 +14,7 @@ interface Statement {
 
 export function getEbsDriverPolicyDocument(
   partition: string,
-  kmsKeys?: string[]
+  kmsKeys?: kms.Key[]
 ): PolicyDocument {
   const result: { Version: string; Statement: Statement[] } = {
     Version: "2012-10-17",
@@ -138,11 +139,12 @@ export function getEbsDriverPolicyDocument(
     ],
   };
   if (kmsKeys) {
+    const kmsKeysArns = kmsKeys.map((k) => k.keyArn);
     const kmsPolicy: Statement[] = [
       {
         Effect: "Allow",
         Action: ["kms:CreateGrant", "kms:ListGrants", "kms:RevokeGrant"],
-        Resource: kmsKeys,
+        Resource: kmsKeysArns,
         Condition: {
           Bool: {
             "kms:GrantIsForAWSResource": "true",
@@ -158,7 +160,7 @@ export function getEbsDriverPolicyDocument(
           "kms:GenerateDataKey*",
           "kms:DescribeKey",
         ],
-        Resource: kmsKeys,
+        Resource: kmsKeysArns,
       },
     ];
     result.Statement.push(...kmsPolicy);

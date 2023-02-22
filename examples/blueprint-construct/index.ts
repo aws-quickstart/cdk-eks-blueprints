@@ -11,6 +11,7 @@ import {
   PolicyStatement,
   Role,
 } from "aws-cdk-lib/aws-iam";
+import * as kms from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
 import * as blueprints from "../../lib";
 import {
@@ -150,7 +151,16 @@ export default class BlueprintConstruct {
       }),
       new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
       new blueprints.addons.KubeviousAddOn(),
-      new blueprints.addons.EbsCsiDriverAddOn(),
+      new blueprints.addons.EbsCsiDriverAddOn({
+        kmsKeys: [
+          blueprints.getResource(
+            (context) =>
+              new kms.Key(context.scope, "ebs-csi-driver-key", {
+                alias: "ebs-csi-driver-key",
+              })
+          ),
+        ],
+      }),
       new blueprints.addons.EfsCsiDriverAddOn({ replicaCount: 1 }),
       new blueprints.addons.KedaAddOn({
         podSecurityContextFsGroup: 1001,
