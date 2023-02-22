@@ -5,7 +5,7 @@ import { getEbsDriverPolicyDocument } from "./iam-policy";
 /**
  * Interface for EBS CSI Driver EKS add-on options
  */
-interface IEbsCsiDriverAddOnOptions {
+interface EbsCsiDriverAddOnProps {
   /**
    * Version of the driver to deploy
    */
@@ -29,7 +29,7 @@ const defaultProps = {
  * Implementation of EBS CSI Driver EKS add-on
  */
 export class EbsCsiDriverAddOn extends CoreAddOn {
-  constructor(options?: IEbsCsiDriverAddOnOptions) {
+  constructor(options?: EbsCsiDriverAddOnProps) {
     const { version, kmsKeys } = options || {};
 
     super({
