@@ -179,7 +179,7 @@ export class VpcCniAddOn extends CoreAddOn {
           let doc: string;
           if ((props?.subnetIds) && (props?.availabilityZones)) {
             for (let subnetID in props?.subnetIds) {
-              doc = readYamlDocument(__dirname + '/eniConfig.yaml');
+              doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
               const manifest = doc.split("---").map(e => loadYaml(e));
               const values: Values = {
                   availabilityZone: this.vpcCniAddOnProps.availabilityZones![subnetID],
