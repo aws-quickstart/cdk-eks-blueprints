@@ -4,7 +4,7 @@ import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Role } from "aws-cdk-lib/aws-iam";
 import * as blueprints from "../../lib";
 import { EksBlueprint, GlobalResources } from "../../lib";
-import { cloneDeep } from "../../lib/utils";
+import { cloneDeep, DummyProxy } from "../../lib/utils";
 import * as nutil from 'node:util/types';
 import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
 
@@ -26,6 +26,21 @@ describe("ResourceProxy",() => {
         expect(cloned.proxy).toBe(proxy);
     });
 
+    test("When object containing an array of proxies is cloned with cloneDeep, proxy array is resolved", () => {
+        
+        const proxy = new Proxy({}, new DummyProxy(arg => arg));
+        console.log(`proxy is ${nutil.isProxy(proxy)}`);
+        const values : blueprints.Values = {
+            id: 1,
+            array: [proxy, proxy, proxy]
+        };
+
+        const cloned = cloneDeep(values, (value => blueprints.utils.resolveTarget(value, "resolved")));
+
+        expect(cloned.array.length).toBe(values.array.length);
+        const actual = cloned.array[0];
+        expect(actual).toBe("resolved");
+    });
     test("When a stack is created with proxy for mastersRole in cluster provider, multiple stack can use it safely", () => {
         const app = new App();
         
