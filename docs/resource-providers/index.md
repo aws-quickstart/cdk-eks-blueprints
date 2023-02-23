@@ -136,8 +136,10 @@ blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider('my-alias-name')    
     //  Register hosted zone and give it a name of GlobalResources.HostedZone
     .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
+    .resourceProvider("internal-hosted-zone", new ImportHostedZoneProvider('hosted-zone-id2', 'myinternal.domain.com'))
     // Register certificate GlobalResources.Certificate name and reference the hosted zone registered in the previous step
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
+    .resourceProvider("private-ca", new CreateCertificateProvider('internal-wildcard-cert', '*.myinternal.domain.com', "internal-hosted-zone"))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
@@ -170,6 +172,52 @@ blueprints.EksBlueprint.builder()
     }))
     .teams(...)
     .build(app, 'stack-with-resource-providers');
+```
+## Using Resource Providers with CDK Constructs
+
+Some constructs used in the `EKSBlueprint` stack are standard CDK constructs that accept CDK resources. 
+
+For example, `GenericClusterProvider` (which is the basis for all cluster providers) allows passing resources like `IRole`, `SecurityGroup` and other properties that customers may find inconvenient to define with a builder pattern.
+
+Blueprints provide a convenience API to register such resources in a declarative manner.
+
+Example with an anonymous resource:
+
+```typescript
+const clusterProvider = new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_23,
+    mastersRole: blueprints.getResource(context => { // will generate a unique name for resource. designed for cases when resource is defined once and needed in a single place.
+        return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+    }),
+    managedNodeGroups: [
+        ...
+    ]
+});
+
+blueprints.EksBlueprint.builder()
+    .addOns(...addOns)
+    .clusterProvider(clusterProvider)
+    .build(scope, blueprintID, props);
+}
+```
+
+Example with a named resource: 
+
+```typescript
+const clusterProvider = new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_23,
+    mastersRole: blueprints.getNamedResource("my-role"),
+    managedNodeGroups: [
+        ...
+    ]
+});
+
+blueprints.EksBlueprint.builder()
+    .resourceProvider("my-role", new blueprints.LookupRoleProvider("SomeExistingRole")) // enables to look up this role from ClusterInfo under "my-role" in add-ons, etc.
+    .addOns(...addOns)
+    .clusterProvider(clusterProvider)
+    .build(scope, blueprintID, props);
+}
 ```
 
 ## Implementing Custom Resource Providers

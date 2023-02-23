@@ -16,7 +16,11 @@ Full list of configuration options:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_23,
-    serviceIpv4Cidr: "10.43.0.0/16"
+    serviceIpv4Cidr: "10.43.0.0/16",
+    // if needed use this to register an auth role integrate with RBAC
+    mastersRole: blueprints.getResource(context => {
+        return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+    }),
     managedNodeGroups: [
         {
             id: "mng1",
@@ -50,6 +54,44 @@ EksBlueprint.builder()
     .clusterProvider(clusterProvider)
     .build(app, blueprintID);
 ```
+
+
+The Cluster configuration and node group configuration exposes a number of options that require to supply an actual CDK resource. 
+For example cluster allows passing `mastersRole`, `securityGroup`, etc. to the cluster, while managed node group allow specifying `nodeRole`.
+
+All of such cases can be solved with [Resource Providers](../resource-providers/index.md#using-resource-providers-with-cdk-constructs).
+
+Example:
+```typescript
+const clusterProvider = new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_23,
+    // if needed use this to register an auth role to integrate with RBAC
+    mastersRole: blueprints.getResource(context => {
+        return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+    }),
+    securityGroup: blueprints.getNamedResource("my-cluster-security-group"), // assumed to be register as a resource provider under name my-cluster-security-group
+    managedNodeGroups: [
+        {
+            id: "mng1",
+            nodeRole: blueprints.getResource(context => {
+                const role = new iam.Role(context.scope, 'NodeRole', { assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com")});
+                ... add policies such as AmazonEKSWorkerNodePolicy and AmazonEC2ContainerRegistryReadOnly 
+                return role;
+            })
+        }
+});
+
+EksBlueprint.builder()
+    .resourceProvider("my-cluster-security-group", {
+        provide(context: blueprints.ResourceContext) : ec2.ISecurityGroup {
+            return ec2.SecurityGroup.fromSecurityGroupId(this, 'SG', 'sg-12345', { mutable: false }); // example for look up
+        }
+    })
+    .clusterProvider(clusterProvider)
+    .build(app, blueprintID);
+```
+
+    
 
 ## Configuration
 

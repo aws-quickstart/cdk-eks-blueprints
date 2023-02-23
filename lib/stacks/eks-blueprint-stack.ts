@@ -226,6 +226,8 @@ export class EksBlueprint extends cdk.Stack {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
 
+        blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
+
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
             version
@@ -311,6 +313,23 @@ export class EksBlueprint extends cdk.Stack {
 
         return result;
     }
+
+    /**
+     * Resolves all dynamic proxies, that substitutes resource provider proxies with the resolved values. 
+     * @param blueprintProps 
+     * @param resourceContext 
+     * @returns a copy of blueprint props with resolved values
+     */
+    private resolveDynamicProxies(blueprintProps: EksBlueprintProps, resourceContext: spi.ResourceContext) : EksBlueprintProps {
+        return utils.cloneDeep(blueprintProps, (value) => {
+            return utils.resolveTarget(value, resourceContext);
+        });
+    }
+
+    /**
+     * Validates input against basic defined constraints.
+     * @param blueprintProps 
+     */
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
         constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
