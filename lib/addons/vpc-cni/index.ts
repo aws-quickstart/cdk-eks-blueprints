@@ -3,6 +3,8 @@ import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { loadYaml, readYamlDocument } from "../../utils";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { ISubnet } from "aws-cdk-lib/aws-ec2";
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 /**
  * User provided option for the Helm Chart
@@ -142,12 +144,25 @@ export interface VpcCniAddOnProps extends CoreAddOnProps {
   /**
    * Secondary Subnet IDs for creating `ENIConfig`
    */
-  subnetIds?: string[];
+  customNetworkingConfig?: customNetworkingConfig;
+  // /**
+  //  * Corrosponding Availability Zones of the Secondary Subnet IDs 
+  //  * for creating `ENIConfig`
+  //  */
+  // availabilityZones?: string[];
+}
+
+
+export interface customNetworkingConfig {
   /**
-   * Corrosponding Availability Zones of the Secondary Subnet IDs 
-   * for creating `ENIConfig`
+   * Identifier for this VPC
    */
-  availabilityZones?: string[];
+  readonly vpcId: string;
+  /**
+   * Explicitly select individual subnets
+   * @default - Use all subnets in a selected group (all private subnets by default)
+   */
+  readonly subnets?: ISubnet[];
 }
 
 const defaultProps: CoreAddOnProps = {
@@ -173,18 +188,23 @@ export class VpcCniAddOn extends CoreAddOn {
       }
 
       deploy(clusterInfo: ClusterInfo, props?: VpcCniAddOnProps): Promise<Construct> {
-  
           const cluster = clusterInfo.cluster;
           let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
           let doc: string;
-          if ((props?.subnetIds) && (props?.availabilityZones)) {
-            for (let subnetID in props?.subnetIds) {
+          let vpc = undefined;
+          if ((props?.customNetworkingConfig?.vpcId) && (props?.customNetworkingConfig?.subnets)) {
+            vpc = ec2.Vpc.fromVpcAttributes(this, "vpc", {
+              vpcId(props?.customNetworkingConfig?.vpcId),
+              privateSubnetIds(props?.customNetworkingConfig?.subnets)});
+          }
+          if ((props?.customNetworkingConfig?.subnets)) {
+            for (let subnetID in props?.customNetworkingConfig.subnets) {
               doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
               const manifest = doc.split("---").map(e => loadYaml(e));
               const values: Values = {
-                  availabilityZone: this.vpcCniAddOnProps.availabilityZones![subnetID],
+                  availabilityZone: subnetID,
                   clusterSecurityGroupId: clusterSecurityGroupId,
-                  subnetId: this.vpcCniAddOnProps.subnetIds![subnetID]
+                  subnetId: subnetID  
               };
               const manifestDeployment: ManifestDeployment = {
                 name: this.vpcCniAddOnProps.addOnName!,
