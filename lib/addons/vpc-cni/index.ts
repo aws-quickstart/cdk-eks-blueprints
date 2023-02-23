@@ -4,12 +4,11 @@ import { loadYaml, readYamlDocument } from "../../utils";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { ISubnet } from "aws-cdk-lib/aws-ec2";
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 /**
  * User provided option for the Helm Chart
  */
-export interface VpcCniAddOnProps extends CoreAddOnProps {
+export interface VpcCniAddOnProps {
 
   /**
    * `ADDITIONAL_ENI_TAGS` Environment Variable. Type: String.
@@ -144,20 +143,11 @@ export interface VpcCniAddOnProps extends CoreAddOnProps {
   /**
    * Secondary Subnet IDs for creating `ENIConfig`
    */
-  customNetworkingConfig?: customNetworkingConfig;
-  // /**
-  //  * Corrosponding Availability Zones of the Secondary Subnet IDs 
-  //  * for creating `ENIConfig`
-  //  */
-  // availabilityZones?: string[];
+  customNetworkingConfig?: CustomNetworkingConfig;
 }
 
 
-export interface customNetworkingConfig {
-  /**
-   * Identifier for this VPC
-   */
-  readonly vpcId: string;
+export interface CustomNetworkingConfig {
   /**
    * Explicitly select individual subnets
    * @default - Use all subnets in a selected group (all private subnets by default)
@@ -178,48 +168,42 @@ const defaultProps: CoreAddOnProps = {
  */
 export class VpcCniAddOn extends CoreAddOn {
     
-      readonly vpcCniAddOnProps: VpcCniAddOnProps;
-      readonly id? : string;
+  readonly vpcCniAddOnProps: VpcCniAddOnProps;
+  readonly id? : string;
 
-      constructor(props?: VpcCniAddOnProps) {
-        super({...defaultProps, ...props});
-        this.vpcCniAddOnProps = { ...defaultProps, ...props, };
-        (this.vpcCniAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
-      }
+  constructor(props?: VpcCniAddOnProps) {
+    super({...defaultProps, ...props});
+    this.vpcCniAddOnProps = { ...defaultProps, ...props, };
+    (this.coreAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
+  }
 
-      deploy(clusterInfo: ClusterInfo, props?: VpcCniAddOnProps): Promise<Construct> {
-          const cluster = clusterInfo.cluster;
-          let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
-          let doc: string;
-          let vpc = undefined;
-          if ((props?.customNetworkingConfig?.vpcId) && (props?.customNetworkingConfig?.subnets)) {
-            vpc = ec2.Vpc.fromVpcAttributes(this, "vpc", {
-              vpcId(props?.customNetworkingConfig?.vpcId),
-              privateSubnetIds(props?.customNetworkingConfig?.subnets)});
-          }
-          if ((props?.customNetworkingConfig?.subnets)) {
-            for (let subnetID in props?.customNetworkingConfig.subnets) {
-              doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
-              const manifest = doc.split("---").map(e => loadYaml(e));
-              const values: Values = {
-                  availabilityZone: subnetID,
-                  clusterSecurityGroupId: clusterSecurityGroupId,
-                  subnetId: subnetID  
-              };
-              const manifestDeployment: ManifestDeployment = {
-                name: this.vpcCniAddOnProps.addOnName!,
-                namespace: this.vpcCniAddOnProps.namespace!,
-                manifest,
-                values,
-              };
-    
-              const kubectlProvider = new KubectlProvider(clusterInfo);
-              kubectlProvider.addManifest(manifestDeployment);
-            }
-          }
-          const addOnPromise = super.deploy(clusterInfo);
-          return addOnPromise;
+  deploy(clusterInfo: ClusterInfo, props?: VpcCniAddOnProps): Promise<Construct> {
+      const cluster = clusterInfo.cluster;
+      let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+      let doc: string;
+
+      if ((props?.customNetworkingConfig?.subnets)) {
+        for (let subnet of props?.customNetworkingConfig.subnets) {
+          doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
+          const manifest = doc.split("---").map(e => loadYaml(e));
+          const values: Values = {
+              availabilityZone: subnet.availabilityZone,
+              clusterSecurityGroupId: clusterSecurityGroupId,
+              subnetId: subnet.subnetId  
+          };
+          const manifestDeployment: ManifestDeployment = {
+            name: "EniCustomConfig",
+            namespace: this.coreAddOnProps.namespace!,
+            manifest,
+            values,
+          };
+          const kubectlProvider = new KubectlProvider(clusterInfo);
+          kubectlProvider.addManifest(manifestDeployment);
+        }
       }
+      const addOnPromise = super.deploy(clusterInfo);
+      return addOnPromise;
+  }
 }
 
 function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {

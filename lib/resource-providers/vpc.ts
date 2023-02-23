@@ -1,6 +1,6 @@
 import { Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
+import { ISubnet, PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
 import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
@@ -44,10 +44,15 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                     cidrBlock: this.secondaryCidr});
                 if (this.secondarySubnetCidrs) {
                     for(let az in vpc.availabilityZones) {
-                        secondarySubnets[az] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[az], {
-                            availabilityZone: vpc.availabilityZones[az],
-                            cidrBlock: this.secondarySubnetCidrs[az],
-                            vpcId: vpc.vpcId});
+                        if (this.secondarySubnetCidrs[az]) {
+                            secondarySubnets[az] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[az], {
+                                availabilityZone: vpc.availabilityZones[az],
+                                cidrBlock: this.secondarySubnetCidrs[az],
+                                vpcId: vpc.vpcId});
+                            context.add("blueprint-construct-secondary-subnet" + az,{
+                                provide(_context): ISubnet {return secondarySubnets[az];}
+                            });
+                        }
                     }
                     for(let secondarySubnet of secondarySubnets) {
                         Tags.of(secondarySubnet).add("kubernetes.io/role/internal-elb", "1", { applyToLaunchedInstances: true });
@@ -66,4 +71,16 @@ export class DirectVpcProvider implements ResourceProvider<ec2.IVpc> {
     provide(_context: ResourceContext): ec2.IVpc {
         return this.vpc;
     }    
+}
+
+/**
+ * Direct import secondary subnet provider, based on a known subnet ID. 
+ * Recommended method if secondary subnet id is known, as it avoids extra look-ups.
+ */
+export class LookupSubnetProvider implements ResourceProvider<ISubnet> {
+    constructor(private subnetId: string, private id?: string) { }
+
+    provide(context: ResourceContext): ec2.ISubnet {
+        return ec2.Subnet.fromSubnetAttributes(context.scope, `${this.subnetId}-secondarysubnet`, {subnetId: this.subnetId});
+    }
 }

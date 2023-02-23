@@ -5,11 +5,7 @@ import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/a
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-<<<<<<< HEAD
-import { AckServiceName, HelmAddOn, VpcProvider } from '../../lib';
-=======
-import { AckServiceName, GlobalResources, HelmAddOn, getResource } from '../../lib';
->>>>>>> e763b65b9a15d0653db3581b4cf8b95a282d0c1a
+import { AckServiceName, GlobalResources, HelmAddOn, getResource, VpcProvider } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -79,9 +75,13 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
-                enablePrefixDelegation: true,
-                awsVpcK8sCniCustomNetworkCfg: true,
-                eniConfigLabelDef: "topology.kubernetes.io/zone"
+                customNetworkingConfig: {
+                    subnets: [
+                        blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
+                        blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+                        blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
+                    ]   
+                }
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
@@ -92,25 +92,6 @@ export default class BlueprintConstruct {
                 skipVersionValidation: true,
                 serviceName: AckServiceName.S3
             }),
-            // new blueprints.addons.AckAddOn({
-            //     skipVersionValidation: true,
-            //     id: "ec2-ack",
-            //     createNamespace: false,
-            //     serviceName: AckServiceName.EC2
-            // }),
-            // new blueprints.addons.AckAddOn({
-            //     skipVersionValidation: true,
-            //     serviceName: AckServiceName.RDS,
-            //     id: "rds-ack",
-            //     name: "rds-chart",
-            //     chart: "rds-chart",
-            //     version: "v0.1.1",
-            //     release: "rds-chart",
-            //     repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
-            //     managedPolicyName: "AmazonRDSFullAccess",
-            //     createNamespace: false,
-            //     saName: "rds-chart"
-            // }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
@@ -245,6 +226,7 @@ export default class BlueprintConstruct {
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.30.32/27","10.64.0.64/27"],))
             .clusterProvider(clusterProvider)
+            // .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet123"))
             .resourceProvider(GlobalResources.Vpc, {
                 provide(context: blueprints.ResourceContext) : IVpc {
                     return new ec2.Vpc(context.scope, "my-vpc");
