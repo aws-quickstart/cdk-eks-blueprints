@@ -81,7 +81,11 @@ export default class BlueprintConstruct {
                         blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
                         blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
                     ]   
-                }
+                },
+                awsVpcK8sCniCustomNetworkCfg: true,
+                enablePrefixDelegation: true,
+                eniConfigLabelDef: "topology.kubernetes.io/zone"
+
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),

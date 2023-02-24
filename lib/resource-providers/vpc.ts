@@ -43,14 +43,14 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                     vpcId: vpc.vpcId,
                     cidrBlock: this.secondaryCidr});
                 if (this.secondarySubnetCidrs) {
-                    for(let az in vpc.availabilityZones) {
-                        if (this.secondarySubnetCidrs[az]) {
-                            secondarySubnets[az] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[az], {
-                                availabilityZone: vpc.availabilityZones[az],
-                                cidrBlock: this.secondarySubnetCidrs[az],
+                    for (let i = 0; i < vpc.availabilityZones.length; i++) {
+                        if (this.secondarySubnetCidrs[i]) {
+                            secondarySubnets[i] = new ec2.PrivateSubnet(context.scope, id + "private-subnet-" + vpc.availabilityZones[i], {
+                                availabilityZone: vpc.availabilityZones[i],
+                                cidrBlock: this.secondarySubnetCidrs[i],
                                 vpcId: vpc.vpcId});
-                            context.add("blueprint-construct-secondary-subnet" + az,{
-                                provide(_context): ISubnet {return secondarySubnets[az];}
+                            context.add("blueprint-construct-secondary-subnet" + i,{
+                                provide(_context): ISubnet {return secondarySubnets[i];}
                             });
                         }
                     }

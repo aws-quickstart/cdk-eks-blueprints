@@ -183,7 +183,7 @@ export class VpcCniAddOn extends CoreAddOn {
       let doc: string;
 
       if ((props?.customNetworkingConfig?.subnets)) {
-        for (let subnet of props?.customNetworkingConfig.subnets) {
+        for (let subnet of props.customNetworkingConfig.subnets) {
           doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
           const manifest = doc.split("---").map(e => loadYaml(e));
           const values: Values = {
@@ -219,12 +219,14 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
         AWS_VPC_ENI_MTU: props?.awsVpcEniMtu,
         AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER: props?.awsVpcK8sCniConfigureRpfilter,
         AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: props?.awsVpcK8sCniCustomNetworkCfg,
+        ENI_CONFIG_LABEL_DEF: props?.eniConfigLabelDef,
+        ENI_CONFIG_ANNOTATION_DEF: props?.eniConfigAnnotationDef,
         AWS_VPC_K8S_CNI_EXTERNALSNAT: props?.awsVpcK8sCniExternalSnat,
         AWS_VPC_K8S_CNI_LOGLEVEL: props?.awsVpcK8sCniLogLevel,
         AWS_VPC_K8S_CNI_LOG_FILE: props?.awsVpcK8sCniLogFile,
         AWS_VPC_K8S_CNI_RANDOMIZESNAT: props?.awsVpcK8sCniRandomizeSnat,
         AWS_VPC_K8S_CNI_VETHPREFIX: props?.awsVpcK8sCniVethPrefix,
-        AWS_VPC_K8S_PLUGIN_LOG_FILE: props?.awsVpcK8sCniLogFile,
+        AWS_VPC_K8S_PLUGIN_LOG_FILE: props?.awsVpcK8sPluginLogFile,
         AWS_VPC_K8S_PLUGIN_LOG_LEVEL: props?.awsVpcK8sPluginLogLevel,
         DISABLE_INTROSPECTION: props?.disableIntrospection,
         DISABLE_METRICS: props?.disableMetrics,
