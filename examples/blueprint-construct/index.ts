@@ -1,12 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, GlobalResources, HelmAddOn, getResource } from '../../lib';
-import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
@@ -24,8 +23,8 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
-        HelmAddOn.failOnVersionValidation = false;
+        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  "debug";
 
         // TODO: fix IAM user provisioning for admin user
@@ -82,7 +81,7 @@ export default class BlueprintConstruct {
                 id: "s3-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
-                serviceName: AckServiceName.S3
+                serviceName: blueprints.AckServiceName.S3
             }),
             // new blueprints.addons.AckAddOn({
             //     skipVersionValidation: true,
@@ -134,7 +133,12 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
-            new blueprints.addons.EbsCsiDriverAddOn(),
+            new blueprints.addons.EbsCsiDriverAddOn({
+                kmsKeys: [
+                  blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
+                ],
+              }
+            ),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
             new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
@@ -169,7 +173,7 @@ export default class BlueprintConstruct {
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
-            mastersRole: getResource(context => {
+            mastersRole: blueprints.getResource(context => {
                 return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
             }),
             managedNodeGroups: [
@@ -220,7 +224,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-      const dataTeam: EmrEksTeamProps = {
+      const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -236,7 +240,7 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .resourceProvider(GlobalResources.Vpc, {
+            .resourceProvider(blueprints.GlobalResources.Vpc, {
                 provide(context: blueprints.ResourceContext) : IVpc {
                     return new ec2.Vpc(context.scope, "my-vpc");
                 }
