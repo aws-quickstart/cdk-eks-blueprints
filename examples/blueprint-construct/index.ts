@@ -228,14 +228,9 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.30.32/27","10.64.0.64/27"],))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.0.32/27","10.64.0.64/27"],))
             .clusterProvider(clusterProvider)
             // .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet123"))
-            .resourceProvider(GlobalResources.Vpc, {
-                provide(context: blueprints.ResourceContext) : IVpc {
-                    return new ec2.Vpc(context.scope, "my-vpc");
-                }
-            })
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);

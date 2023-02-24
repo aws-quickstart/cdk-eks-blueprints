@@ -15,6 +15,26 @@ Amazon EKS VPC CNI Addon now supports advanced configurations which means we can
 
 ## Usage
 
+This add-on can used with two different patterns :
+
+Pattern # 1 : Simple and Easy. With all default values. This pattern wont create customer networking or setup any environment variables as part of Configuration Values.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.VpcCniAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+Pattern # 2 : Custom networking with new Secondary CIDR ranges. This pattern will first create Secondary CIDRs and Secondary Subnets with specified range of CIDRs as shown below in `resourceProvider` command. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with created secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
+
 ```typescript
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
@@ -23,22 +43,60 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.VpcCniAddOn({
-'v1.12.1-eksbuild.2',
-//Enabling prefix delegation to Primary ENIs.
-enablePrefixDelegation: true, 
-//Enables Custom Networking with Secondary CIDRs.
-awsVpcK8sCniCustomNetworkCfg: true
+  customNetworkingConfig: {
+      subnets: [
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
+      ]   
+  },
+  awsVpcK8sCniCustomNetworkCfg: true,
+  enablePrefixDelegation: true,
+  eniConfigLabelDef: "topology.kubernetes.io/zone"
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-//This required to create Secondary CIDR while creating your VPC.
-  .resourceProvider(blueprints.GlobalResources.Vpc,new VpcProvider(undefined,"10.64.0.0/24",))
+  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.0.32/27","10.64.0.64/27"],))
   .build(app, 'my-stack-name');
 ```
+
+Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
+
+Note : When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.VpcCniAddOn({
+  customNetworkingConfig: {
+      subnets: [
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
+      ]   
+  },
+  awsVpcK8sCniCustomNetworkCfg: true,
+  enablePrefixDelegation: true,
+  eniConfigLabelDef: "topology.kubernetes.io/zone"
+});
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .resourceProvider(blueprints.GlobalResources.Vpc, new DirectVpcProvider("YourVPCID"))
+  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet123"))
+  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet456"))
+  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet789"))
+  .build(app, 'my-stack-name');
+```
+
 ## Configuration Options
 
-   - `version`: Pass in the vpc-cni plugin version compatible with kubernetes-cluster version as shown below
+   - `version`: Pass in the optional vpc-cni plugin version compatible with kubernetes-cluster version as shown below
 ```bash
 # Assuming cluster version is 1.19, below command shows versions of the vpc-cni add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
@@ -80,9 +138,8 @@ False
 To validate that vpc-cni add-on is running, ensure that the pod is in Running state.
 
 ```
-$ kubectl get pods  -n kube-system|grep aws-node
-NAME              READY    STATUS    RESTARTS   AGE
-aws-node-xzk5n     1/1     Running   0          34d
+$ kubectl -n kube-system get ds aws-node -oyaml|grep AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG -A1
+
 ```
 
 ```bash
@@ -111,3 +168,4 @@ Please check our [Amazon EKS Best Practices Guide for Networking](https://aws.gi
 - Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values
 - Reference [VpcCniAddon](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/addons.VpcCniAddOn.html) to learn more about this addon
 - Reference [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) to learn about Amazon EKS networking best practices
+- Reference [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
