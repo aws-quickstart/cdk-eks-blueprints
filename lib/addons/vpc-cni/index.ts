@@ -177,13 +177,13 @@ export class VpcCniAddOn extends CoreAddOn {
     (this.coreAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
   }
 
-  deploy(clusterInfo: ClusterInfo, props?: VpcCniAddOnProps): Promise<Construct> {
+  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
       const cluster = clusterInfo.cluster;
       let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
       let doc: string;
 
-      if ((props?.customNetworkingConfig?.subnets)) {
-        for (let subnet of props.customNetworkingConfig.subnets) {
+      if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
+        for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
           doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
           const manifest = doc.split("---").map(e => loadYaml(e));
           const values: Values = {
@@ -192,7 +192,7 @@ export class VpcCniAddOn extends CoreAddOn {
               subnetId: subnet.subnetId  
           };
           const manifestDeployment: ManifestDeployment = {
-            name: "EniCustomConfig",
+            name: "EniCustomConfig" + subnet.availabilityZone,
             namespace: this.coreAddOnProps.namespace!,
             manifest,
             values,

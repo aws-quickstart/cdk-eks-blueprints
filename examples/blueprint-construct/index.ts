@@ -1,11 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, GlobalResources, HelmAddOn, getResource, VpcProvider } from '../../lib';
+import { AckServiceName, HelmAddOn, getResource, VpcProvider } from '../../lib';
 import { EmrEksTeamProps } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
@@ -83,9 +82,7 @@ export default class BlueprintConstruct {
                     ]   
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,
-                enablePrefixDelegation: true,
-                eniConfigLabelDef: "topology.kubernetes.io/zone"
-
+                eniConfigLabelDef: 'topology.kubernetes.io/zone'
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
@@ -230,7 +227,6 @@ export default class BlueprintConstruct {
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.0.32/27","10.64.0.64/27"],))
             .clusterProvider(clusterProvider)
-            // .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet123"))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);

@@ -35,6 +35,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 Pattern # 2 : Custom networking with new Secondary CIDR ranges. This pattern will first create Secondary CIDRs and Secondary Subnets with specified range of CIDRs as shown below in `resourceProvider` command. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with created secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
 
+Note: If you are using this approach, Please dont install any other addons other than addon other than VPC CNI at first place. Just install the Blueprints stack with only VPC CNI addon with below configurations for custom networking. Please remove any existing nodes and add a new node group and then install required Addons.
+
 ```typescript
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
@@ -51,8 +53,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
-  enablePrefixDelegation: true,
-  eniConfigLabelDef: "topology.kubernetes.io/zone"
+  eniConfigLabelDef: 'topology.kubernetes.io/zone'
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -63,7 +64,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
 
-Note : When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
+Note : 
+If you are using this approach, Please dont install any other addons other than addon other than VPC CNI at first place. Just install the Blueprints stack with only VPC CNI addon with below configurations for custom networking. Please remove any existing nodes and add a new node group and then install required Addons. Also when you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
 
 ```typescript
 import 'source-map-support/register';
@@ -81,8 +83,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
-  enablePrefixDelegation: true,
-  eniConfigLabelDef: "topology.kubernetes.io/zone"
+  eniConfigLabelDef: 'topology.kubernetes.io/zone'
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
