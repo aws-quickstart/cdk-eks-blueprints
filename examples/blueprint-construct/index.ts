@@ -5,9 +5,9 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { AckServiceName, HelmAddOn } from '../../lib';
-import { EmrEksTeamProps, BatchEksTeamProps, BatchAllocationStrategy, BatchEnvType } from '../../lib/teams';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
+import * as addonTeams from '../../lib/teams/';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -105,7 +105,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-                    { key: 'topology.kubernetes.io/zone', op: 'In', vals: ['us-west-2a','us-west-2b','us-west-2c']},
+                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
                     { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
                     { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
                 ],
@@ -115,11 +115,11 @@ export default class BlueprintConstruct {
                 securityGroupTags: {
                     "kubernetes.io/cluster/blueprint-construct-dev": "owned",
                 },
-                // taints: [{
-                //     key: "workload",
-                //     value: "test",
-                //     effect: "NoSchedule",
-                // }],
+                taints: [{
+                    key: "workload",
+                    value: "test",
+                    effect: "NoSchedule",
+                }],
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
@@ -217,7 +217,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-        const dataTeam: EmrEksTeamProps = {
+        const dataTeam: addonTeams.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -230,13 +230,13 @@ export default class BlueprintConstruct {
               ]
           };
 
-        const batchTeam: BatchEksTeamProps = {
+        const batchTeam: addonTeams.BatchEksTeamProps = {
             name: 'batch-a',
             namespace: 'aws-batch',
             envName: 'batch-a-comp-env',
             computeResources: {
-                envType: BatchEnvType.EC2,
-                allocationStrategy: BatchAllocationStrategy.BEST,
+                envType: addonTeams.BatchEnvType.EC2,
+                allocationStrategy: addonTeams.BatchAllocationStrategy.BEST,
                 priority: 10,
                 minvCpus: 0,
                 maxvCpus: 128,
