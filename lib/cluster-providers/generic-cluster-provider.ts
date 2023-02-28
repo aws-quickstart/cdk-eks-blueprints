@@ -14,6 +14,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import { FargateProfile } from "aws-cdk-lib/aws-eks";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -243,9 +244,10 @@ export class GenericClusterProvider implements ClusterProvider {
         });
 
         const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
-        fargateProfiles?.forEach(([key, options]) => this.addFargateProfile(cluster, key, options));
+        const fargateConstructs : FargateProfile[] = [];
+        fargateProfiles?.forEach(([key, options]) => fargateConstructs.push(this.addFargateProfile(cluster, key, options)));
 
-        return new ClusterInfo(cluster, version, nodeGroups, autoscalingGroups);
+        return new ClusterInfo(cluster, version, nodeGroups, autoscalingGroups, fargateConstructs);
     }
 
     /**
@@ -310,8 +312,8 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * Adds a fargate profile to the cluster
      */
-    addFargateProfile(cluster: eks.Cluster, name: string, profileOptions: eks.FargateProfileOptions) {
-        cluster.addFargateProfile(name, profileOptions);
+    addFargateProfile(cluster: eks.Cluster, name: string, profileOptions: eks.FargateProfileOptions): FargateProfile {
+        return cluster.addFargateProfile(name, profileOptions);
     }
 
     /**
