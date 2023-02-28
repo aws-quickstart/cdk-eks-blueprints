@@ -33,9 +33,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 2 : Custom networking with new Secondary CIDR ranges. This pattern will first create Secondary CIDRs and Secondary Subnets with specified range of CIDRs as shown below in `resourceProvider` command. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with created secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
-
-Note: If you are using this approach, Please dont install any other addons other than addon other than VPC CNI at first place. Just install the Blueprints stack with only VPC CNI addon with below configurations for custom networking. Please remove any existing nodes and add a new node group and then install required Addons.
+Pattern # 2 : Custom networking with new Secondary CIDR ranges. This pattern will first create Secondary CIDRs and Secondary Subnets with specified range of CIDRs as shown below in `resourceProvider` command. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with created secondary subnet ranges to solve IP exhaustion.
 
 ```typescript
 import 'source-map-support/register';
@@ -47,9 +45,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn({
   customNetworkingConfig: {
       subnets: [
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
           blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
           blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
@@ -58,14 +56,14 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/27","10.64.0.32/27","10.64.0.64/27"],))
+  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. We are also enabling prefix delegation to ENIs using the paramter `enablePrefixDelegation`.
+Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. 
 
 Note : 
-If you are using this approach, Please dont install any other addons other than addon other than VPC CNI at first place. Just install the Blueprints stack with only VPC CNI addon with below configurations for custom networking. Please remove any existing nodes and add a new node group and then install required Addons. Also when you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
+When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
 
 ```typescript
 import 'source-map-support/register';
@@ -77,9 +75,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn({
   customNetworkingConfig: {
       subnets: [
+          blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
           blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
           blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
@@ -160,7 +158,7 @@ Applies VPC CNI add-on to Amazon EKS cluster.
 
 ## Custom Networking
 
-Enabling custom networking does not modify existing nodes. Custom networking is a disruptive action. If you had any nodes in your cluster with running Pods before you switched to the custom CNI networking feature, you should cordon and drain the nodes to gracefully shutdown the Pods and then terminate the nodes. Only new nodes matching the ENIConfig label or annotations use custom networking, and hence the Pods scheduled on these new nodes can be assigned an IP from secondary CIDR.
+We are installing VPC CNI addon of CDK EKS blueprints ahead of your data plane node creation so we dont have a need to cordon and drain the nodes to gracefully shutdown the Pods and then terminate the nodes. VPC CNI addon will be first installed on Amazon EKS Control Plane, then data plan nodes will be deployed and then all the other day 2 operational addons you have opted in will be installed. This solves IP exhaustion via custom networking of VPC CNI addon out of the box without any manual intervention.
 
 Please check our [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) for more information on custom networking.
 
