@@ -193,7 +193,7 @@ export class VpcCniAddOn extends CoreAddOn {
               subnetId: subnet.subnetId  
           };
           const manifestDeployment: ManifestDeployment = {
-            name: "EniCustomConfig" + subnet.availabilityZone,
+            name: "EniCustomConfig" + subnet,
             namespace: this.coreAddOnProps.namespace!,
             manifest,
             values,
