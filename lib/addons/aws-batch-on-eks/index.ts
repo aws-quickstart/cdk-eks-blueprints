@@ -25,7 +25,7 @@ export class AwsBatchAddOn implements ClusterAddOn {
     );
     
     //Add the service role to the AwsAuth
-    const mappingRole = cluster.awsAuth.addRoleMapping(
+    cluster.awsAuth.addRoleMapping(
       batchEksServiceRole,
       {
         username: BATCH,
