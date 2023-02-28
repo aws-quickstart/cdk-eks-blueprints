@@ -8,7 +8,7 @@ Installing VPC CNI as [Amazon EKS add-on](https://docs.aws.amazon.com/eks/latest
 
 Amazon EKS automatically installs VPC CNI as self-managed add-on for every cluster. So if it is already running on your cluster, you can still install it as Amazon EKS add-on to start benefiting from the capabilities of Amazon EKS add-ons.
 
-Amazon EKS VPC CNI Addon now supports advanced configurations which means we can now pass configuration values as environment variables for setting up advanced configurations in Amazon VPC CNI. Please refer [Amazon EKS add-ons: Advanced configuration](https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/) for more informatoion.
+Amazon EKS VPC CNI Addon now supports advanced configurations which means we can now pass configuration values as a JSON blob for setting up advanced configurations in Amazon VPC CNI. Please refer [Amazon EKS add-ons: Advanced configuration](https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/) for more informatoion.
 
 ## Prerequisite
 - Amazon EKS add-ons are only available with Amazon EKS clusters running Kubernetes version 1.18 and later.
@@ -45,9 +45,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn({
   customNetworkingConfig: {
       subnets: [
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+          blueprints.getNamedResource("secondary-cidr-subnet-0"),
+          blueprints.getNamedResource("secondary-cidr-subnet-1"),
+          blueprints.getNamedResource("secondary-cidr-subnet-2"),
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
@@ -63,7 +63,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. 
 
 Note : 
-When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
+When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please register your secondary subnets in any arbitary name as shown below in `resourceProvider`.Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
 
 ```typescript
 import 'source-map-support/register';
@@ -75,9 +75,9 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn({
   customNetworkingConfig: {
       subnets: [
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
-          blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+          blueprints.getNamedResource("secondary-cidr-subnet-0"),
+          blueprints.getNamedResource("secondary-cidr-subnet-1"),
+          blueprints.getNamedResource("secondary-cidr-subnet-2"),
       ]   
   },
   awsVpcK8sCniCustomNetworkCfg: true,
@@ -86,10 +86,10 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-  .resourceProvider(blueprints.GlobalResources.Vpc, new DirectVpcProvider("YourVPCID"))
-  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet123"))
-  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet456"))
-  .resourceProvider("blueprint-construct-secondary-subnet1",new LookupSubnetProvider("subnet789"))
+  .resourceProvider(blueprints.GlobalResources.Vpc, new DirectVpcProvider(yourVpcId))
+  .resourceProvider("secondary-subnet-1", new LookupSubnetProvider(subnet1Id)
+  .resourceProvider("secondary-subnet-2", new LookupSubnetProvider(subnet2Id)
+  .resourceProvider("secondary-subnet-3", new LookupSubnetProvider(subnet3Id)
   .build(app, 'my-stack-name');
 ```
 

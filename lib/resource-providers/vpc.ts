@@ -49,7 +49,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                                 availabilityZone: vpc.availabilityZones[i],
                                 cidrBlock: this.secondarySubnetCidrs[i],
                                 vpcId: vpc.vpcId});
-                            context.add("blueprint-construct-secondary-subnet" + i,{
+                            context.add("secondary-cidr-subnet-" + i,{
                                 provide(_context): ISubnet {return secondarySubnets[i];}
                             });
                         }
@@ -78,7 +78,7 @@ export class DirectVpcProvider implements ResourceProvider<ec2.IVpc> {
  * Recommended method if secondary subnet id is known, as it avoids extra look-ups.
  */
 export class LookupSubnetProvider implements ResourceProvider<ISubnet> {
-    constructor(private subnetId: string, private id?: string) { }
+    constructor(private subnetId: string) { }
 
     provide(context: ResourceContext): ec2.ISubnet {
         return ec2.Subnet.fromSubnetAttributes(context.scope, `${this.subnetId}-secondarysubnet`, {subnetId: this.subnetId});

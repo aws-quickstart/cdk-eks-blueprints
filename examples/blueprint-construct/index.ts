@@ -88,9 +88,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
                     subnets: [
-                        blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
-                        blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
-                        blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
+                        blueprints.getNamedResource("secondary-cidr-subnet-0"),
+                        blueprints.getNamedResource("secondary-cidr-subnet-1"),
+                        blueprints.getNamedResource("secondary-cidr-subnet-2"),
                     ]   
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,

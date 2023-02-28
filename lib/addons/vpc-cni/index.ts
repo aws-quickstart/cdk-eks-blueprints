@@ -181,11 +181,10 @@ export class VpcCniAddOn extends CoreAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
       const cluster = clusterInfo.cluster;
       let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
-      let doc: string;
 
       if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
         for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
-          doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
+          const doc = readYamlDocument(__dirname + '/eniConfig.ytpl');
           const manifest = doc.split("---").map(e => loadYaml(e));
           const values: Values = {
               availabilityZone: subnet.availabilityZone,
