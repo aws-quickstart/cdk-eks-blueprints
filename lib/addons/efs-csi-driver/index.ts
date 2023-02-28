@@ -89,6 +89,8 @@ function populateValues(helmOptions: EfsCsiDriverProps, clusterName: string,
     setPath(values, "clusterName",  clusterName);
     setPath(values, "controller.serviceAccount.create",  false);
     setPath(values, "controller.serviceAccount.name",  serviceAccountName);
+    setPath(values, "node.serviceAccount.create",  false);
+    setPath(values, "node.serviceAccount.name",  serviceAccountName);
     setPath(values, "replicaCount",  helmOptions.replicaCount);
     setPath(values, "image.repository",  repository);
 

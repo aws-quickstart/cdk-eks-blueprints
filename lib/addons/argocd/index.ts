@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { Stack } from 'aws-cdk-lib';
 import * as bcrypt from "bcrypt";
 import { Construct } from "constructs";
 import * as dot from 'dot-object';
@@ -10,6 +11,7 @@ import { createNamespace, getSecretValue } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
+import { GitRepositoryReference } from "../../spi";
 
 
 /**
@@ -31,20 +33,29 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
     /**
      * If provided, the addon will bootstrap the app or apps in the provided repository.
      * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
-     * after the infrastructure and team provisioning is complete. 
+     * after the infrastructure and team provisioning is complete.
+     * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
+     * repository will be used for provisioning all `HelmAddOn` based AddOns.
      */
     bootstrapRepo?: spi.ApplicationRepository;
 
     /**
-     * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certifcate, and other paramters to pass 
+     * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
      * to the applications. 
      */
     bootstrapValues?: spi.Values,
 
+
+    /**
+     * Additional GitOps applications and repositories. If there is a split between infra and application repositories then
+     * bootstrap repo is expected to be leveraged for infrastructure and application deployments will contain additional applications.
+     */
+    workloadApplications?: spi.GitOpsApplicationDeployment[],
+
     /**
      * Optional admin password secret name as defined in AWS Secrets Manager (plaintext).
      * This allows to control admin password across the enterprise. Password will be retrieved and 
-     * stored as a non-reverisble bcrypt hash. 
+     * stored as a non-reversible bcrypt hash. 
      * Note: at present, change of password may require manual restart of argocd server. 
      */
     adminPasswordSecretName?: string;
@@ -92,7 +103,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
         if (promise === undefined) {
             throw new Error("ArgoCD addon must be registered before creating Argo managed add-ons for helm applications");
         }
-        const manifest = new ArgoApplication(this.options.bootstrapRepo).generate(deployment, wave);
+        const manifest = new ArgoApplication(deployment.repository ?? this.options.bootstrapRepo).generate(deployment, wave);
         const construct = clusterInfo.cluster.addManifest(deployment.name, manifest);
         promise.then(chart => {
             construct.node.addDependency(chart);
@@ -131,11 +142,11 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             dot.set('server', secretProviderClass.getVolumeMounts('blueprints-secret-inline'), defaultValues, true);
         }
 
-        if (this.options.bootstrapRepo) {
-            const repo = this.options.bootstrapRepo!;
-            dot.set("configs.repositories.bootstrap", { url: repo.repoUrl }, defaultValues, true);
-        }
-
+        this.getAllRepositories().forEach((repo, index) => {
+            const repoName = repo.name ?? index == 0 ? "bootstrap" : `bootstrap-${index}`;
+            dot.set(`configs.repositories.${repoName}`, { url: repo.repoUrl }, defaultValues, true);
+        });
+        
         let values = merge(defaultValues, this.options.values ?? {});
 
         this.chartNode = clusterInfo.cluster.addHelmChart("argocd-addon", {
@@ -165,26 +176,45 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     postDeploy(clusterInfo: spi.ClusterInfo, teams: spi.Team[]) {
         assert(teams != null);
         const appRepo = this.options.bootstrapRepo;
+        const shared = {
+            clusterName: clusterInfo.cluster.clusterName,
+            region: Stack.of(clusterInfo.cluster).region,
+            repoUrl: appRepo?.repoUrl,
+            targetRevision: appRepo?.targetRevision,
+        };
 
         if (appRepo) {
+            // merge with custom bootstrapValues with AddOnContexts and common values
+            const merged = { ...shared, ...Object.fromEntries(clusterInfo.getAddOnContexts().entries()), ...this.options.bootstrapValues };
+
             this.generate(clusterInfo, {
                 name: appRepo.name ?? "bootstrap-apps",
                 namespace: this.options.namespace!,
                 repository: appRepo,
-                values: this.options.bootstrapValues ?? {}
+                values: merged,
             });
         }
+
+        const workloadApps = this.options.workloadApplications;
+
+        if(workloadApps) {
+            workloadApps.forEach(app => {
+                const values =  { ...shared, ...app.values };
+                this.generate(clusterInfo, { ...app, ...{ values } });
+            }); 
+        }
+
         this.chartNode = undefined;
     }
 
     /**
      * @returns bcrypt hash of the admin secret provided from the AWS secret manager.
      */
-     protected async createAdminSecret(region: string): Promise<string> {
+    protected async createAdminSecret(region: string): Promise<string> {
         const secretValue = await getSecretValue(this.options.adminPasswordSecretName!, region);
         return bcrypt.hash(secretValue, 10);
     }
-    
+
     /**
      * Creates a service account that can access secrets
      * @param clusterInfo 
@@ -196,5 +226,31 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             namespace: this.options.namespace
         });
         return sa;
+    }
+
+    /**
+     * Returns all repositories defined in the options.
+     */
+    protected getAllRepositories(): GitRepositoryReference[] {
+        let result: GitRepositoryReference[] = [];
+        
+        const urls = new Set<string>();
+        const bootstrapRepo = this.options.bootstrapRepo;
+
+        if(bootstrapRepo) {
+            result.push({...bootstrapRepo, ...{ name : bootstrapRepo.name ?? "bootstrap"}});
+            urls.add(bootstrapRepo.repoUrl);
+        }
+
+        if(this.options.workloadApplications) {
+            this.options.workloadApplications.forEach(repo => {
+                if(repo.repository && !urls.has(repo.repository.repoUrl)) {
+                    result.push(repo.repository);
+                    urls.add(repo.repository.repoUrl);
+                }
+            });
+        }
+
+        return result;
     }
 }
