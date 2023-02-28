@@ -54,8 +54,8 @@ export class CoreAddOn implements ClusterAddOn {
         }
 
         // Create a service account if user provides namespace, PolicyDocument
-        if (this.coreAddOnProps?.policyDocumentProvider) {
-            const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
+        const policyDoc = this.providePolicyDocument(clusterInfo);
+        if (policyDoc) {
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
                 saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
@@ -75,5 +75,12 @@ export class CoreAddOn implements ClusterAddOn {
         }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
+    }
+
+    providePolicyDocument(clusterInfo: ClusterInfo) : PolicyDocument | undefined {
+        if(this.coreAddOnProps?.policyDocumentProvider) {
+            return this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
+        }
+        return undefined;
     }
 }

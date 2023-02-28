@@ -26,7 +26,7 @@ export interface KubeviousAddOnProps extends HelmAddOnUserProps {
  * Default props to be used when creating the Helm chart
  */
 const defaultProps: HelmAddOnProps & KubeviousAddOnProps = {
-    name: "blueprints-kubevious-addon",
+    name: "kubevious",
     namespace: "kubevious",
     chart: "kubevious",
     version: "1.1.2",

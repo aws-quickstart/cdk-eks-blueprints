@@ -1,13 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as kms from 'aws-cdk-lib/aws-kms';
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import * as blueprints from '../../lib';
-import { AckServiceName, HelmAddOn } from '../../lib';
+import * as blueprints from '../../lib'; 
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
-import * as addonTeams from '../../lib/teams/';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -23,8 +23,8 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        HelmAddOn.validateHelmVersions = true;
-        HelmAddOn.failOnVersionValidation = false;
+        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  "debug";
 
         // TODO: fix IAM user provisioning for admin user
@@ -42,12 +42,24 @@ export default class BlueprintConstruct {
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
             // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
-            //      path: 'envs/dev',
-            //      targetRevision: "deployable",
-            //      credentialsSecretName: 'github-ssh',
-            //      credentialsType: 'SSH'
+            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
+            //      path: 'chart',
+            //      targetRevision: "eks-blueprints-cdk",
             // },
+            // workloadApplications: [
+            //     {
+            //         name: "micro-services",
+            //         namespace: "argocd",
+            //         repository: {
+            //             repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
+            //             path: 'envs/dev',
+            //             targetRevision: "main",
+            //         },
+            //         values: {
+            //             domain: ""
+            //         }
+            //     }
+            // ],
             // adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
@@ -81,7 +93,7 @@ export default class BlueprintConstruct {
                 id: "s3-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
-                serviceName: AckServiceName.S3
+                serviceName: blueprints.AckServiceName.S3
             }),
             // new blueprints.addons.AckAddOn({
             //     skipVersionValidation: true,
@@ -133,7 +145,12 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
-            new blueprints.addons.EbsCsiDriverAddOn(),
+            new blueprints.addons.EbsCsiDriverAddOn({
+                kmsKeys: [
+                  blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
+                ],
+              }
+            ),
             new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
             new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
@@ -169,6 +186,9 @@ export default class BlueprintConstruct {
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_23,
+            mastersRole: blueprints.getResource(context => {
+                return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+            }),
             managedNodeGroups: [
                 {
                     id: "mng1",
@@ -217,7 +237,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-        const dataTeam: addonTeams.EmrEksTeamProps = {
+        const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -230,13 +250,13 @@ export default class BlueprintConstruct {
               ]
           };
 
-        const batchTeam: addonTeams.BatchEksTeamProps = {
+        const batchTeam: blueprints.BatchEksTeamProps = {
             name: 'batch-a',
             namespace: 'aws-batch',
             envName: 'batch-a-comp-env',
             computeResources: {
-                envType: addonTeams.BatchEnvType.EC2,
-                allocationStrategy: addonTeams.BatchAllocationStrategy.BEST,
+                envType: blueprints.BatchEnvType.EC2,
+                allocationStrategy: blueprints.BatchAllocationStrategy.BEST,
                 priority: 10,
                 minvCpus: 0,
                 maxvCpus: 128,
@@ -248,6 +268,11 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
+            .resourceProvider(blueprints.GlobalResources.Vpc, {
+                provide(context: blueprints.ResourceContext) : IVpc {
+                    return new ec2.Vpc(context.scope, "my-vpc");
+                }
+            })
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
