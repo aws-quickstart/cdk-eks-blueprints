@@ -3,7 +3,7 @@ import { ClusterAddOn } from "../..";
 import { ClusterInfo } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { createServiceAccount } from "../../utils";
+import { createServiceAccount, deployBeforeCapacity,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -27,6 +27,11 @@ export class CoreAddOnProps {
      * Namespace to create the ServiceAccount.
      */
     readonly namespace?: string;
+
+    /**
+     * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
+     */
+    readonly controlPlaneAddOn?: boolean;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -73,6 +78,10 @@ export class CoreAddOn implements ClusterAddOn {
         if (serviceAccount) {
             cfnAddon.node.addDependency(serviceAccount);
         }
+
+        if(this.coreAddOnProps.controlPlaneAddOn) {
+            deployBeforeCapacity(cfnAddon, clusterInfo);
+        }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
     }
@@ -83,4 +92,6 @@ export class CoreAddOn implements ClusterAddOn {
         }
         return undefined;
     }
+
+
 }

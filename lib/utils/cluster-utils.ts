@@ -3,6 +3,7 @@ import { Stack } from "aws-cdk-lib";
 import { AwsCustomResource, AwsCustomResourcePolicy } from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 import * as customResource from 'aws-cdk-lib/custom-resources';
+import { ClusterInfo } from "../spi";
 
 // Available Control Plane logging types
 const CONTROL_PLANE_LOG_TYPES = ['api','audit','authenticator','controllerManager','scheduler'];
@@ -124,4 +125,18 @@ interface Tag {
       resources: customResource.AwsCustomResourcePolicy.ANY_RESOURCE
     })
   });
+}
+
+/**
+ * Makes the provided construct run before any capacity (worker nodes) is provisioned on the clusster.
+ * Useful for control plane add-ons, such as VPC-CNI that must be provisioned before EC2 (or Fargate) capacity is added.
+ * @param construct identifies construct (such as core add-on) that should be provisioned before capacity
+ * @param clusterInfo cluster provisioning context
+ */
+export function deployBeforeCapacity(construct: Construct, clusterInfo: ClusterInfo) {
+    let allCapacity : Construct[]  = [];
+    allCapacity = allCapacity.concat(clusterInfo.nodeGroups ?? [])
+        .concat(clusterInfo.autoscalingGroups ?? [])
+        .concat(clusterInfo.fargateProfiles ?? []);
+    allCapacity.forEach(v => v.node.addDependency(construct));
 }
