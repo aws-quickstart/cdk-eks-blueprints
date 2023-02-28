@@ -160,6 +160,7 @@ const defaultProps: CoreAddOnProps = {
   version: 'v1.12.1-eksbuild.2',
   saName: 'vpc-cni',
   namespace: 'kube-system',
+  controlPlaneAddOn: true,
   configurationValues: {}
 };
 
@@ -171,7 +172,6 @@ export class VpcCniAddOn extends CoreAddOn {
   readonly vpcCniAddOnProps: VpcCniAddOnProps;
   readonly id? : string;
 
-<<<<<<< HEAD
   constructor(props?: VpcCniAddOnProps) {
     super({...defaultProps, ...props});
     this.vpcCniAddOnProps = { ...defaultProps, ...props, };
@@ -236,22 +236,13 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
         ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
         WARM_ENI_TARGET: props?.warmEniTarget,
         WARM_PREFIX_TARGET: props?.warmPrefixTarget
-=======
-    constructor(version?: string) {
-        super({
-            addOnName: "vpc-cni",
-            version: version ?? "v1.12.0-eksbuild.1",
-            saName: "vpc-cni",
-            controlPlaneAddOn: true
-        });
->>>>>>> origin/feature/control-plane-addons
     }
   };
 
   // clean up all undefined
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = JSON.stringify(values[key]));
+  Object.keys(values).forEach(key => values[key] = typeof values[key] == 'boolean' ?  JSON.stringify(values[key]):values[key]);
   
   return result;
 }

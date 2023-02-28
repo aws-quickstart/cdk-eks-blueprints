@@ -27,18 +27,15 @@ export class CoreAddOnProps {
      * Namespace to create the ServiceAccount.
      */
     readonly namespace?: string;
-<<<<<<< HEAD
     /**
      * ConfigurationValues field to pass custom configurations to Addon
      */
     readonly configurationValues?: Values;
-=======
 
     /**
      * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
      */
     readonly controlPlaneAddOn?: boolean;
->>>>>>> origin/feature/control-plane-addons
 }
 
 const DEFAULT_NAMESPACE = "kube-system";

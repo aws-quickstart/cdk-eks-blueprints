@@ -1,13 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as kms from 'aws-cdk-lib/aws-kms';
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { AckServiceName, HelmAddOn, getResource, VpcProvider } from '../../lib';
-import { EmrEksTeamProps } from '../../lib/teams';
+import { VpcProvider } from '../../lib';
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
@@ -25,7 +23,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.validateHelmVersions = false;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  "debug";
 
@@ -90,9 +88,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
                     subnets: [
+                        blueprints.getNamedResource("blueprint-construct-secondary-subnet0"),
                         blueprints.getNamedResource("blueprint-construct-secondary-subnet1"),
                         blueprints.getNamedResource("blueprint-construct-secondary-subnet2"),
-                        blueprints.getNamedResource("blueprint-construct-secondary-subnet3"),
                     ]   
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,
@@ -244,7 +242,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.32/26","10.64.0.64/26"],))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
