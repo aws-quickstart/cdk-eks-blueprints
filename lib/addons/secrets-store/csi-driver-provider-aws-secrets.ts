@@ -133,7 +133,7 @@ export class SecretProviderClass {
     /**
      * Optionally returns volume mounts for a pod or helm chart that supports volume mounts.
      */
-    public getVolumeMounts(volumeName: string, mountPath? : string): Values {
+    public getVolumeMounts(volumeName: string, mountPath?: string): Values {
         return {
             "volumes": [
                 {
