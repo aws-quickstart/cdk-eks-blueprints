@@ -17,7 +17,7 @@ Amazon EKS VPC CNI Addon now supports advanced configurations which means we can
 
 This add-on can used with two different patterns :
 
-Pattern # 1 : Simple and Easy. With all default values. This pattern wont create customer networking or setup any environment variables as part of Configuration Values.
+Pattern # 1 : Simple and Easy. With all default values. This pattern wont create custom networking or setup any environment variables as part of configuration Values.
 
 ```typescript
 import 'source-map-support/register';
@@ -34,6 +34,9 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 
 Pattern # 2 : Custom networking with new Secondary CIDR ranges. This pattern will first create Secondary CIDRs and Secondary Subnets with specified range of CIDRs as shown below in `resourceProvider` command. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with created secondary subnet ranges to solve IP exhaustion.
+
+Note: 
+- When you are passing secondary CIDRs to the VPC resource provider, then we create secondary subnets for the customer and register them under names secondary-cidr-subnet-${order} with the resource providers.
 
 ```typescript
 import 'source-map-support/register';
@@ -63,7 +66,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 Pattern # 3 : Custom networking with custom VPC and Secondary Subnets. This pattern will use the custom VPC ID and Secondary subnet IDs passed by the user to create the blueprints stack. Then the VPC CNI addon will setup custom networking based on the parameters `awsVpcK8sCniCustomNetworkCfg`, `eniConfigLabelDef: "topology.kubernetes.io/zone"` for your Amazon EKS cluster workloads with passed secondary subnet ranges to solve IP exhaustion. 
 
 Note : 
-When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please register your secondary subnets in any arbitary name as shown below in `resourceProvider`.Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
+- When you are passing secondary subnet ids to the VPC resource provider, then we register them under names secondary-cidr-subnet-${order} with the resource providers.
+- When you are passing your own Secondary subnets using this pattern, Please make sure the tag `Key: kubernetes.io/role/internal-elb", Value: "1"` is added to your secondary subnets. Please register your secondary subnets in any arbitary name as shown below in `resourceProvider`.Please check out [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.
 
 ```typescript
 import 'source-map-support/register';
@@ -91,7 +95,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .resourceProvider("secondary-subnet-2", new LookupSubnetProvider(subnet2Id)
   .resourceProvider("secondary-subnet-3", new LookupSubnetProvider(subnet3Id)
   .build(app, 'my-stack-name');
-```
+``` 
 
 ## Configuration Options
 
@@ -164,7 +168,7 @@ Please check our [Amazon EKS Best Practices Guide for Networking](https://aws.gi
 
 ## References
 
-- Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI Configuration Values
+- Reference [amazon-vpc-cni-k8s](https://github.com/aws/amazon-vpc-cni-k8s) to learn more about different VPC CNI configuration Values
 - Reference [VpcCniAddon](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/addons.VpcCniAddOn.html) to learn more about this addon
 - Reference [Amazon EKS Best Practices Guide for Networking](https://aws.github.io/aws-eks-best-practices/networking/index/) to learn about Amazon EKS networking best practices
 - Reference [Custom Networking Tutorial](https://docs.aws.amazon.com/eks/latest/userguide/cni-custom-network.html) to learn how custome networking is manually setup on your Amazon EKS cluster.

@@ -141,7 +141,7 @@ export interface VpcCniAddOnProps {
   */
   warmPrefixTarget?: number;
   /**
-   * Secondary Subnet IDs for creating `ENIConfig`
+   * CustomNetworkingConfig holding Secondary Subnet IDs for creating `ENIConfig`
    */
   customNetworkingConfig?: CustomNetworkingConfig;
 }
@@ -149,8 +149,7 @@ export interface VpcCniAddOnProps {
 
 export interface CustomNetworkingConfig {
   /**
-   * Explicitly select individual subnets
-   * @default - Use all subnets in a selected group (all private subnets by default)
+   * Secondary subnets of your VPC
    */
   readonly subnets?: ISubnet[];
 }

@@ -49,7 +49,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                                 availabilityZone: vpc.availabilityZones[i],
                                 cidrBlock: this.secondarySubnetCidrs[i],
                                 vpcId: vpc.vpcId});
-                            context.add("secondary-cidr-subnet-" + i,{
+                            context.add("secondary-cidr-subnet-" + i, {
                                 provide(_context): ISubnet {return secondarySubnets[i];}
                             });
                         }
