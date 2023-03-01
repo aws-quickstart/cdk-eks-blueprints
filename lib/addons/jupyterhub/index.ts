@@ -15,6 +15,26 @@ import { EbsCsiDriverAddOn } from "../ebs-csi-driver";
 import { EfsCsiDriverAddOn } from "../efs-csi-driver";
 
 /**
+ * Configuration options for exposing the JupyterHub proxy
+ */
+export enum jupyterHubServiceType {
+    /**
+     * Expose the service using AWS Application Load Balancer + Ingress controller
+     */
+    ALB,
+
+    /**
+     * Expose the service using AWS Network Load Balancer + LoadBalancer service
+     */
+    NLB,
+    
+    /**
+     * Use ClusterIP service type and allow customers to port-forward for localhost access
+     */
+    CLUSTERIP,
+}
+
+/**
  * Configuration options for the add-on.
  */
 export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
@@ -54,6 +74,12 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
         scope?: string[],
         usernameKey?: string,
     }
+
+    /**
+     * Configuration to set how the hub service will be exposed
+     * See enum jupyterHubService for choices
+     */
+    serviceType: jupyterHubServiceType,
 
     /**
      * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
@@ -175,37 +201,48 @@ export class JupyterHubAddOn extends HelmAddOn {
             });
         }
 
-        // Ingress instead of LoadBalancer service to expose the proxy - leverages AWS ALB
-        // If not, then it will not be exposed
-        const enableIngress = this.options.enableIngress || false;
+        // Proxy information - set either ALB, NLB (default) or ClusterIP service based on 
+        // provided configuration
+        const serviceType = this.options.serviceType;
         const ingressHosts = this.options.ingressHosts || [];
         const ingressAnnotations = this.options.ingressAnnotations;
         const cert = this.options.certificateResourceName;
-        setPath(values, "ingress.enabled", enableIngress);
 
-        if (enableIngress){
+        // Use Ingress and AWS ALB
+        if (serviceType == jupyterHubServiceType.ALB){
             const presetAnnotations: any = {
                 'alb.ingress.kubernetes.io/scheme': 'internet-facing',
                 'alb.ingress.kubernetes.io/target-type': 'ip',
                 'kubernetes.io/ingress.class': 'alb',
             };
-
             if (cert){
                 presetAnnotations['alb.ingress.kubernetes.io/ssl-redirect'] = '443';
                 presetAnnotations['alb.ingress.kubernetes.io/listen-ports'] = '[{"HTTP": 80},{"HTTPS":443}]';
                 const certificate = clusterInfo.getResource<ICertificate>(cert);
                 presetAnnotations['alb.ingress.kubernetes.io/certificate-arn'] = certificate?.certificateArn;
             } 
-
             const annotations = { ...ingressAnnotations, ...presetAnnotations};
             setPath(values, "ingress.annotations", annotations);
             setPath(values, "ingress.hosts", ingressHosts);
+            setPath(values, "ingress.enabled", true);
             setPath(values, "proxy.service", {"type" : "NodePort"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
             assert(!cert, 'Cert option is only supported if ingress is enabled.');
-            setPath(values, "proxy.service", {"type": "ClusterIP"});
+            // If we set SVC, set the proxy service type to ClusterIP and allow users to port-forward to localhost
+            if (serviceType == jupyterHubServiceType.CLUSTERIP){
+                setPath(values, "proxy.service", {"type": "ClusterIP"});
+            // We will use NLB 
+            } else {
+                setPath(values, "proxy.service", { 
+                    "annotations": {
+                        "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
+                        "service.beta.kubernetes.io/aws-load-balancer-scheme": "internet-facing",
+                        "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type": "ip",
+                    }
+                });
+            }
         }
 
         // Create Helm Chart

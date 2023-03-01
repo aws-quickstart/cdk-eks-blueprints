@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as kms from 'aws-cdk-lib/aws-kms';
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
@@ -165,7 +164,7 @@ export default class BlueprintConstruct {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '10Gi',
                 },
-                enableIngress: false,
+                serviceType: blueprints.jupyterHubServiceType.CLUSTERIP,
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
