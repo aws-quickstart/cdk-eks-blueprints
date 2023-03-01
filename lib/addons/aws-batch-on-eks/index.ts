@@ -8,9 +8,11 @@ const BATCH = 'aws-batch';
 export class AwsBatchAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
+    const roleNameforBatch = 'AWSServiceRoleForBatch';
+    const slrCheck = Role.fromRoleName(cluster.stack, 'BatchServiceLinkedRole', roleNameforBatch);
 
     // Create the service role used by AWS Batch on EKS if one doesn't exist
-    if (!Role.fromRoleName(cluster.stack, 'BatchServiceLinkedRole', 'AWSServiceRoleForBatch')){
+    if (slrCheck.roleName != roleNameforBatch){
       new CfnServiceLinkedRole(cluster.stack, 'BatchServiceRole', {
         awsServiceName: 'batch.amazonaws.com',
       });

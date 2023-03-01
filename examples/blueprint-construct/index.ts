@@ -268,7 +268,7 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
