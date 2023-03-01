@@ -2,7 +2,7 @@ import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from "constructs";
-import { ClusterInfo } from '../../spi';
+import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import merge from "ts-deepmerge";
 
@@ -78,7 +78,7 @@ export class ExternalDnsAddOn extends HelmAddOn {
 
         sa.node.addDependency(namespaceManifest);
 
-        let values = {
+        let values: Values = {
             provider: "aws",
             zoneIdFilters: hostedZones.map((hostedZone) => hostedZone!.hostedZoneId),
             aws: {

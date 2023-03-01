@@ -2,7 +2,7 @@ import { createNamespace } from "../../utils";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
 import { Construct } from "constructs";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { Duration } from "aws-cdk-lib";
 
@@ -81,7 +81,7 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
     );
 
     // Configure values.
-    let values = {
+    let values : Values = {
       serviceAccount: {
         name: serviceAccountName,
         create: false,

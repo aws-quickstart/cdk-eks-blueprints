@@ -1,5 +1,5 @@
 import * as cdk from "aws-cdk-lib";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { SecretsStoreAddOnProps } from ".";
@@ -14,16 +14,7 @@ export class CsiDriverProviderAws {
   deploy(clusterInfo: ClusterInfo): KubernetesManifest {
     const cluster = clusterInfo.cluster;
 
-    type chartValues = {
-      enableSecretRotation?: string,
-      rotationPollInterval?: string,
-      syncSecret?: {
-        enabled: string
-      },
-      grpcSupportedProviders: string
-    }
-
-    let values: chartValues = {
+    let values: Values = {
       grpcSupportedProviders: 'aws'
     };
 
