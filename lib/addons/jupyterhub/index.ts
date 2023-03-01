@@ -225,7 +225,7 @@ export class JupyterHubAddOn extends HelmAddOn {
             setPath(values, "ingress.annotations", annotations);
             setPath(values, "ingress.hosts", ingressHosts);
             setPath(values, "ingress.enabled", true);
-            setPath(values, "proxy.service", {"type" : "NodePort"});
+            setPath(values, "proxy.service", {"type" : "ClusterIP"});
         } else {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
