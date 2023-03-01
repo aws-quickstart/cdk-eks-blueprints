@@ -7,6 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib'; 
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
+import { VpcProvider } from '../../lib';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -259,11 +260,7 @@ export default class BlueprintConstruct {
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
             .clusterProvider(clusterProvider)
-<<<<<<< HEAD
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
-=======
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
->>>>>>> 25846d06622d411e3793145af304e446324a7f4a
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
