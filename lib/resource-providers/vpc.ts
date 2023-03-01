@@ -40,9 +40,6 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             const secondarySubnets: Array<PrivateSubnet> = [];
             let tempSecondarSubnet;
             if (this.secondaryCidr) {
-                new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
-                    vpcId: vpc.vpcId,
-                    cidrBlock: this.secondaryCidr});
                 const secondaryCidr = new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
                     cidrBlock: this.secondaryCidr});
