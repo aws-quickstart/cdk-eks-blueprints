@@ -97,22 +97,17 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 
 ## Using JupyterHub
 
-JupyterHub creates a public proxy that is exposed to a Kubernetes service:
+JupyterHub, by default, creates a proxy that is exposed to a `LoadBalancer` type Kubernetes service, which will integrate with AWS Load Balancer as indicated when running the following command:
 
 ```bash
 kubectl get svc -n jupyterhub
 NAME           TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)        AGE
 hub            ClusterIP      172.20.171.28   <none>                                                                    8081/TCP       26m
 proxy-api      ClusterIP      172.20.31.32    <none>                                                                    8001/TCP       26m
-proxy-public   ClusterIP   172.20.14.210   <none>                                                                       80/TCP   26m
+proxy-public   LoadBalancer   172.20.14.210   xxxxxxxx-1234567890.us-west-2.elb.amazonaws.com   80:32733/TCP   26m
 ```
 
-You can port-forward to expose to a localhost:
-```
-kubectl port-forward services/proxy-public -n jupyterhub 8080:80 
-```
-
-You can log into the JupyterHub portal by accessing `localhost:8080` in any browser. 
+You can log into the JupyterHub portal by accessing the Load Balancer endpoint in any browser. 
 
 ![JupyterHub Login](./../assets/images/jupyterhub-login-page.png)
 
