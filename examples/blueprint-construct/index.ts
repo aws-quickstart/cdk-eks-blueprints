@@ -268,12 +268,7 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .clusterProvider(clusterProvider)
-            .resourceProvider(blueprints.GlobalResources.Vpc, {
-                provide(context: blueprints.ResourceContext) : IVpc {
-                    return new ec2.Vpc(context.scope, "my-vpc");
-                }
-            })
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
