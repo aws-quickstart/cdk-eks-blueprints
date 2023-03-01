@@ -15,7 +15,7 @@ Full list of configuration options:
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_23,
+    version: KubernetesVersion.V1_24,
     serviceIpv4Cidr: "10.43.0.0/16",
     // if needed use this to register an auth role integrate with RBAC
     mastersRole: blueprints.getResource(context => {
@@ -64,7 +64,7 @@ All of such cases can be solved with [Resource Providers](../resource-providers/
 Example:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_23,
+    version: KubernetesVersion.V1_24,
     // if needed use this to register an auth role to integrate with RBAC
     mastersRole: blueprints.getResource(context => {
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
@@ -129,7 +129,7 @@ Upgrading Kubernetes versions via cluster configuration at present won't impact 
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_20,
+    version: KubernetesVersion.V1_24,
     managedNodeGroups: [
         {
             id: "managed-1",

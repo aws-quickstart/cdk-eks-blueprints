@@ -6,6 +6,7 @@ import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { IVpc } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import { FargateProfile } from "aws-cdk-lib/aws-eks";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -14,7 +15,6 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { FargateProfile } from "aws-cdk-lib/aws-eks";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -134,7 +134,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_23
+    version: eks.KubernetesVersion.V1_24
 };
 
 export class ClusterBuilder {
@@ -148,7 +148,7 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_21 } };
+        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_24 } };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
@@ -275,6 +275,12 @@ export class GenericClusterProvider implements ClusterProvider {
                 return new KubectlV23Layer(scope, "kubectllayer23");
             case eks.KubernetesVersion.V1_22:
                 return new KubectlV22Layer(scope, "kubectllayer22");
+        }
+        
+        const minor = version.version.split('.')[1];
+
+        if(minor && parseInt(minor, 10) > 24) {
+            return new KubectlV24Layer(scope, "kubectllayer24"); // for all versions above 1.24 use 1.24 kubectl (unless explicitly supported in CDK)
         }
         return undefined;
     }

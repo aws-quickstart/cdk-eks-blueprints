@@ -1,9 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as kms from 'aws-cdk-lib/aws-kms';
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger } from '../../lib/utils';
@@ -178,13 +177,13 @@ export default class BlueprintConstruct {
         });
         new blueprints.ExternalsSecretsAddOn();
        
-        const blueprintID = 'blueprint-construct-dev';
+        const blueprintID = 'test1';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_23,
+            version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
                 return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
             }),
@@ -251,6 +250,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
+            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider("vpc-01cc82f393c012804"))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

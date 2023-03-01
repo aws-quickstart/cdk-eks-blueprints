@@ -6,6 +6,8 @@ import { Logger } from "tslog";
 export const userLog = new Logger({
     stylePrettyLogs: true,
     name: "user",
+    hideLogPositionForProduction: true,
+    prettyLogTemplate: "{{logLevelName}} "
 });
 
 /**
