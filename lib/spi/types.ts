@@ -113,7 +113,6 @@ export enum GlobalResources {
     KmsKey = 'kms-key'
 }
 
-
 /**
  * Cluster info supplies required information on the cluster configuration, registered resources and add-ons
  * which could be leveraged by the framework, add-on implementations and teams.
