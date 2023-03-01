@@ -20,6 +20,7 @@ nav:
     - ADOT: 'addons/adot-addon.md'
     - AMP ADOT: 'addons/amp-addon.md'
     - AWS App Mesh: 'addons/app-mesh.md'
+    - AWS Batch for EKS: 'addons/aws-batch-on-eks.md'
     - ArgoCD: 'addons/argo-cd.md'
     - AWS For Fluent Bit: 'addons/aws-for-fluent-bit.md'
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'

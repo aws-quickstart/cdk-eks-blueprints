@@ -4,8 +4,7 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import * as blueprints from '../../lib';
-import { VpcProvider } from '../../lib';
+import * as blueprints from '../../lib'; 
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
 
@@ -160,7 +159,8 @@ export default class BlueprintConstruct {
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn()
+            new blueprints.EmrEksAddOn(),
+            new blueprints.AwsBatchAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -227,7 +227,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-      const dataTeam: blueprints.EmrEksTeamProps = {
+        const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -240,11 +240,30 @@ export default class BlueprintConstruct {
               ]
           };
 
+        const batchTeam: blueprints.BatchEksTeamProps = {
+            name: 'batch-a',
+            namespace: 'aws-batch',
+            envName: 'batch-a-comp-env',
+            computeResources: {
+                envType: blueprints.BatchEnvType.EC2,
+                allocationStrategy: blueprints.BatchAllocationStrategy.BEST,
+                priority: 10,
+                minvCpus: 0,
+                maxvCpus: 128,
+                instanceTypes: ["m5", "c4.4xlarge"]
+            },
+            jobQueueName: 'team-a-job-queue',
+        };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
             .clusterProvider(clusterProvider)
+<<<<<<< HEAD
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
+=======
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
+>>>>>>> 25846d06622d411e3793145af304e446324a7f4a
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
