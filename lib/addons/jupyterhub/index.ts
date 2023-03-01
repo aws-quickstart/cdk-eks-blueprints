@@ -82,12 +82,6 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
     serviceType: jupyterHubServiceType,
 
     /**
-     * Flag to use Ingress instead of LoadBalancer to expose JupyterHub
-     * @property {boolean} enableIngress - This will enable ALB and will require Load Balancer Controller add-on
-     */
-    enableIngress?: boolean,
-
-    /**
      * Ingress host - only if Ingress is enabled
      * It is a list of available hosts to be routed upon request
      */
