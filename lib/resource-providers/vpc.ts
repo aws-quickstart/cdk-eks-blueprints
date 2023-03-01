@@ -38,6 +38,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
             // Creates Secondary CIDR and Secondary subnets if passed.
             vpc = new ec2.Vpc(context.scope, id + "-vpc");
             const secondarySubnets: Array<PrivateSubnet> = [];
+            let tempSecondarSubnet;
             if (this.secondaryCidr) {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
@@ -53,7 +54,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                                 availabilityZone: vpc.availabilityZones[i],
                                 cidrBlock: this.secondarySubnetCidrs[i],
                                 vpcId: vpc.vpcId});
-                            secondarySubnets[i].addDependency.node(secondaryCidr)
+                            secondarySubnets[i].node.addDependency(secondaryCidr);
                             context.add("secondary-cidr-subnet-" + i, {
                                 provide(_context): ISubnet {return secondarySubnets[i];}
                             });
