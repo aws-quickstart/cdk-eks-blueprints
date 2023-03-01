@@ -176,7 +176,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         }
 
         // Ingress instead of LoadBalancer service to expose the proxy - leverages AWS ALB
-        // If not, then it will leverage AWS NLB
+        // If not, then it will not be exposed
         const enableIngress = this.options.enableIngress || false;
         const ingressHosts = this.options.ingressHosts || [];
         const ingressAnnotations = this.options.ingressAnnotations;
@@ -205,13 +205,7 @@ export class JupyterHubAddOn extends HelmAddOn {
             assert(!ingressHosts || ingressHosts.length == 0, 'Ingress Hosts CANNOT be assigned when ingress is disabled');
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
             assert(!cert, 'Cert option is only supported if ingress is enabled.');
-            setPath(values, "proxy.service", { 
-                "annotations": {
-                    "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
-                    "service.beta.kubernetes.io/aws-load-balancer-scheme": "internet-facing",
-                    "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type": "ip",
-                }
-            });
+            setPath(values, "proxy.service", {"type": "ClusterIP"});
         }
 
         // Create Helm Chart
