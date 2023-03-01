@@ -42,6 +42,10 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                 new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
                     vpcId: vpc.vpcId,
                     cidrBlock: this.secondaryCidr});
+                const secondaryCidr = new ec2.CfnVPCCidrBlock(context.scope, id + "-secondaryCidr", {
+                    vpcId: vpc.vpcId,
+                    cidrBlock: this.secondaryCidr});
+                secondaryCidr.node.addDependency(vpc);
                 if (this.secondarySubnetCidrs) {
                     for (let i = 0; i < vpc.availabilityZones.length; i++) {
                         if (this.secondarySubnetCidrs[i]) {
@@ -49,6 +53,7 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
                                 availabilityZone: vpc.availabilityZones[i],
                                 cidrBlock: this.secondarySubnetCidrs[i],
                                 vpcId: vpc.vpcId});
+                            secondarySubnets[i].addDependency.node(secondaryCidr)
                             context.add("secondary-cidr-subnet-" + i, {
                                 provide(_context): ISubnet {return secondarySubnets[i];}
                             });
