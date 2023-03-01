@@ -177,7 +177,7 @@ export default class BlueprintConstruct {
         });
         new blueprints.ExternalsSecretsAddOn();
        
-        const blueprintID = 'test1';
+        const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
@@ -250,7 +250,6 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider("vpc-01cc82f393c012804"))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
