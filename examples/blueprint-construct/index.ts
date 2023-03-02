@@ -164,7 +164,7 @@ export default class BlueprintConstruct {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '10Gi',
                 },
-                serviceType: blueprints.jupyterHubServiceType.CLUSTERIP,
+                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),

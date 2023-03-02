@@ -17,7 +17,7 @@ import { EfsCsiDriverAddOn } from "../efs-csi-driver";
 /**
  * Configuration options for exposing the JupyterHub proxy
  */
-export enum jupyterHubServiceType {
+export enum JupyterHubServiceType {
     /**
      * Expose the service using AWS Application Load Balancer + Ingress controller
      */
@@ -79,7 +79,7 @@ export interface JupyterHubAddOnProps extends HelmAddOnUserProps {
      * Configuration to set how the hub service will be exposed
      * See enum jupyterHubService for choices
      */
-    serviceType: jupyterHubServiceType,
+    serviceType: JupyterHubServiceType,
 
     /**
      * Ingress host - only if Ingress is enabled
@@ -203,7 +203,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         const cert = this.options.certificateResourceName;
 
         // Use Ingress and AWS ALB
-        if (serviceType == jupyterHubServiceType.ALB){
+        if (serviceType == JupyterHubServiceType.ALB){
             const presetAnnotations: any = {
                 'alb.ingress.kubernetes.io/scheme': 'internet-facing',
                 'alb.ingress.kubernetes.io/target-type': 'ip',
@@ -225,7 +225,7 @@ export class JupyterHubAddOn extends HelmAddOn {
             assert(!ingressAnnotations, 'Ingress annotations CANNOT be assigned when ingress is disabled');
             assert(!cert, 'Cert option is only supported if ingress is enabled.');
             // If we set SVC, set the proxy service type to ClusterIP and allow users to port-forward to localhost
-            if (serviceType == jupyterHubServiceType.CLUSTERIP){
+            if (serviceType == JupyterHubServiceType.CLUSTERIP){
                 setPath(values, "proxy.service", {"type": "ClusterIP"});
             // We will use NLB 
             } else {

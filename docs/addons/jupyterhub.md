@@ -39,7 +39,7 @@ const jupyterHubAddOn = new blueprints.addons.JupyterHubAddOn({
     scope: [], //list of OIDC provider scopes
     usernameKey: "<username key>",
   },
-  serviceType: blueprints.jupyterHubServiceType.ALB,
+  serviceType: blueprints.JupyterHubServiceType.ALB,
   ingressHosts: [jupyterDNSname],
   ingressAnnotations: {
     'external-dns.alpha.kubernetes.io/hostname': `${jupyterDNSname}`,
