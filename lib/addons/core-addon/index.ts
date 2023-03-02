@@ -1,9 +1,9 @@
 import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { createServiceAccount, deployBeforeCapacity,  } from "../../utils";
+import { createServiceAccount, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -27,6 +27,10 @@ export class CoreAddOnProps {
      * Namespace to create the ServiceAccount.
      */
     readonly namespace?: string;
+    /**
+     * ConfigurationValues field to pass custom configurations to Addon
+     */
+    readonly configurationValues?: Values;
 
     /**
      * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
@@ -45,6 +49,7 @@ export class CoreAddOn implements ClusterAddOn {
 
     constructor(coreAddOnProps: CoreAddOnProps) {
         this.coreAddOnProps = coreAddOnProps;
+        userLog.info(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -69,6 +74,7 @@ export class CoreAddOn implements ClusterAddOn {
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
+            configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"

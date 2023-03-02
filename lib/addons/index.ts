@@ -45,6 +45,7 @@ export * from './istio-control-plane';
 export * from './knative-operator';
 export * from './jupyterhub';
 export * from './emr-on-eks';
+export * from './aws-batch-on-eks';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

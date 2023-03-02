@@ -13,7 +13,7 @@ type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
-    version: 'v0.58.0-eksbuild.1',
+    version: 'v0.66.0-eksbuild.1',
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
     namespace: 'default'

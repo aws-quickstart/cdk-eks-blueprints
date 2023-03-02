@@ -1,12 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
+import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import * as blueprints from '../../lib';
+import * as blueprints from '../../lib'; 
 import { logger } from '../../lib/utils';
 import * as team from '../teams';
+import { VpcProvider } from '../../lib';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -84,7 +85,17 @@ export default class BlueprintConstruct {
                 }
             }),
             new blueprints.addons.VeleroAddOn(),
-            new blueprints.addons.VpcCniAddOn(),
+            new blueprints.addons.VpcCniAddOn({
+                customNetworkingConfig: {
+                    subnets: [
+                        blueprints.getNamedResource("secondary-cidr-subnet-0"),
+                        blueprints.getNamedResource("secondary-cidr-subnet-1"),
+                        blueprints.getNamedResource("secondary-cidr-subnet-2"),
+                    ]   
+                },
+                awsVpcK8sCniCustomNetworkCfg: true,
+                eniConfigLabelDef: 'topology.kubernetes.io/zone'
+            }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
@@ -94,25 +105,6 @@ export default class BlueprintConstruct {
                 skipVersionValidation: true,
                 serviceName: blueprints.AckServiceName.S3
             }),
-            // new blueprints.addons.AckAddOn({
-            //     skipVersionValidation: true,
-            //     id: "ec2-ack",
-            //     createNamespace: false,
-            //     serviceName: AckServiceName.EC2
-            // }),
-            // new blueprints.addons.AckAddOn({
-            //     skipVersionValidation: true,
-            //     serviceName: AckServiceName.RDS,
-            //     id: "rds-ack",
-            //     name: "rds-chart",
-            //     chart: "rds-chart",
-            //     version: "v0.1.1",
-            //     release: "rds-chart",
-            //     repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
-            //     managedPolicyName: "AmazonRDSFullAccess",
-            //     createNamespace: false,
-            //     saName: "rds-chart"
-            // }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
@@ -164,11 +156,12 @@ export default class BlueprintConstruct {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '10Gi',
                 },
-                enableIngress: false,
+                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
                 notebookStack: 'jupyter/datascience-notebook',
                 values: { prePuller: { hook: { enabled: false }}}
             }),
-            new blueprints.EmrEksAddOn()
+            new blueprints.EmrEksAddOn(),
+            new blueprints.AwsBatchAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -235,7 +228,7 @@ export default class BlueprintConstruct {
             }),
           ];
       
-      const dataTeam: blueprints.EmrEksTeamProps = {
+        const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -248,10 +241,26 @@ export default class BlueprintConstruct {
               ]
           };
 
+        const batchTeam: blueprints.BatchEksTeamProps = {
+            name: 'batch-a',
+            namespace: 'aws-batch',
+            envName: 'batch-a-comp-env',
+            computeResources: {
+                envType: blueprints.BatchEnvType.EC2,
+                allocationStrategy: blueprints.BatchAllocationStrategy.BEST,
+                priority: 10,
+                minvCpus: 0,
+                maxvCpus: 128,
+                instanceTypes: ["m5", "c4.4xlarge"]
+            },
+            jobQueueName: 'team-a-job-queue',
+        };
+
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
+            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
             .clusterProvider(clusterProvider)
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam))
+            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }

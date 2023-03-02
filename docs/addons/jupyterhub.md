@@ -39,7 +39,7 @@ const jupyterHubAddOn = new blueprints.addons.JupyterHubAddOn({
     scope: [], //list of OIDC provider scopes
     usernameKey: "<username key>",
   },
-  enableIngress?: true,
+  serviceType: blueprints.JupyterHubServiceType.ALB,
   ingressHosts: [jupyterDNSname],
   ingressAnnotations: {
     'external-dns.alpha.kubernetes.io/hostname': `${jupyterDNSname}`,
@@ -88,7 +88,10 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
   - Leverage EBS as persistent storage with storage type and capacity provided. If you provide this configuration, ***EBS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the JupyterHub add-on*** for it to work, as shown in above example. Otherwise it will not work.
   - Leverage EFS as persistent storage with the name, capacity and file system removal policy provided. If you provide this configuration, ***EFS CSI Driver add-on must be present in add-on array*** and ***must be in add-on array before the JupyterHub add-on*** for it to work, as shown in above example. Otherwise it will not work.
 3. (Optional) Leverage OIDC Provider as a way to manage authentication and authorization. If not provided, the default creates no user, and the user will be able to login with any arbitrary username and password. **It is highly recommended to leverage an Identity provider for any production use case.**
-4. If enabled, will front the JupyterHub UI with an Ingress using AWS Application Load Balancer. ***This requires AWS Load Balancer Controller add-on and it must be in add-on array before the JupyterHub add-on***. This will also look for any additional Ingress annotations provided by the user to be tagged.
+4. Exposes the proxy service in three different way based on configuration:
+  - Expose using Ingress controller and AWS Application Load Balancer. ***This requires AWS Load Balancer Controller add-on and it must be in add-on array before the JupyterHub add-on***. This will also look for any additional Ingress annotations provided by the user to be tagged.
+  - Expose using Loadbalancer Service and AWS Network Load Balancer. ***This requires AWS Load Balancer Controller add-on and it must be in add-on array before the JupyterHub add-on***.
+  - Expose using ClusterIP Service. 
 5. (Optional) Annotates Ingress with user-provided AWS Certificate Manager certificate name. It will be looked up and automatically tagged to be used with Ingress. It will require user to provide a DNS name and ***External DNS add-on to be added in add-on array before the JupyterHub add-on***.
 6. (Optional) User can choose a different notebook stack than the standard one provided. Jupyter team maintains a set of Docker image definition in a GitHub repository as explained [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 7. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
@@ -97,7 +100,7 @@ user-scheduler-7dbd789bc4-gcb8z   1/1     Running   0          23m
 
 ## Using JupyterHub
 
-JupyterHub, by default, creates a proxy that is exposed to a `LoadBalancer` type Kubernetes service, which will integrate with AWS Load Balancer as indicated when running the following command:
+JupyterHub, by default, creates a proxy service called `proxy-public` that will be accessible in different way based on the user configuration setting under `serviceType`. For example, if you set it as `NLB`, then it is exposed to a `LoadBalancer` type Kubernetes service, which will integrate with AWS Network Load Balancer as indicated when running the following command:
 
 ```bash
 kubectl get svc -n jupyterhub
