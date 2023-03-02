@@ -3,7 +3,7 @@ import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { createServiceAccount, deployBeforeCapacity,  } from "../../utils";
+import { createServiceAccount, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -49,6 +49,7 @@ export class CoreAddOn implements ClusterAddOn {
 
     constructor(coreAddOnProps: CoreAddOnProps) {
         this.coreAddOnProps = coreAddOnProps;
+        userLog.debug(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {

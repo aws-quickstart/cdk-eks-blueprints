@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_23;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_24;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -229,7 +229,7 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_23;
+        const version = blueprintProps.version ?? KubernetesVersion.V1_24;
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
         if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {

@@ -1,27 +1,21 @@
-import { Logger, LoggerWithoutCallSite } from "tslog";
+import { Logger } from "tslog";
 
 /**
  * User log is a logger for user info. Does not display callstack
  */
-export const userLog = new LoggerWithoutCallSite({
-    colorizePrettyLogs: true,
-    displayLogLevel: true,
+export const userLog = new Logger({
+    stylePrettyLogs: true,
     name: "user",
-    exposeStack: false,
-    displayFilePath: "hidden",
-    displayFunctionName: false,
-    displayDateTime: false,
-    displayLoggerName: false
-
+    hideLogPositionForProduction: true,
+    prettyLogTemplate: "{{logLevelName}} "
 });
 
 /**
  * Standard developer logger for troubleshooting. Will leverage sourcemap support.
  */
 export const logger = new Logger({
-    colorizePrettyLogs: true,
-    displayLogLevel: true,
+    stylePrettyLogs: true,
+    type: "pretty",
     name: "main",
-    overwriteConsole: true,
-    minLevel: "info"
+    minLevel: 4 // info 
 });

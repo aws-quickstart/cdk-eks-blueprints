@@ -44,7 +44,7 @@ export interface AwsNodeTerminationHandlerProps extends HelmAddOnUserProps {
 const defaultProps: AwsNodeTerminationHandlerProps = {
   chart: 'aws-node-termination-handler',
   repository: 'https://aws.github.io/eks-charts',
-  version: '0.20.2',
+  version: '0.21.0',
   release: 'blueprints-addon-aws-node-termination-handler',
   name: 'aws-node-termination-handler',
   namespace: 'kube-system',

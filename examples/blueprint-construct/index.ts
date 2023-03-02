@@ -1,11 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as kms from 'aws-cdk-lib/aws-kms';
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib'; 
-import { logger } from '../../lib/utils';
+import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { VpcProvider } from '../../lib';
 
@@ -25,7 +25,8 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel =  "debug";
+        logger.settings.minLevel =  3;
+        userLog.settings.minLevel = 2;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -176,7 +177,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_23,
+            version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
                 return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
             }),
@@ -258,7 +259,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/16",["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"],))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

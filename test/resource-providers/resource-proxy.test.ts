@@ -1,12 +1,12 @@
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
+import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Role } from "aws-cdk-lib/aws-iam";
+import * as nutil from 'node:util/types';
 import * as blueprints from "../../lib";
 import { EksBlueprint, GlobalResources } from "../../lib";
 import { cloneDeep } from "../../lib/utils";
-import * as nutil from 'node:util/types';
-import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
 
 describe("ResourceProxy",() => {
 
@@ -30,7 +30,7 @@ describe("ResourceProxy",() => {
         const app = new App();
         
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_23,
+            version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -60,7 +60,7 @@ describe("ResourceProxy",() => {
         
         const sgDescription = "My new security group";
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_23,
+            version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
