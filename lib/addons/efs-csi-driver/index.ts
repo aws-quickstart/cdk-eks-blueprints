@@ -1,10 +1,11 @@
-import { Construct } from "constructs";
-import {ClusterInfo, Values} from "../../spi";
-import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { EfsDriverPolicyDocument } from "./iam-policy";
-import { registries }  from "../../utils/registry-utils";
 import * as iam from "aws-cdk-lib/aws-iam";
-import {setPath} from "../../utils";
+import * as kms from "aws-cdk-lib/aws-kms";
+import { Construct } from "constructs";
+import { ClusterInfo, Values } from "../../spi";
+import { setPath } from "../../utils";
+import { registries } from "../../utils/registry-utils";
+import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { getEfsDriverPolicyStatements } from "./iam-policy";
 
 
 const EFS_CSI_DRIVER = "aws-efs-csi-driver";
@@ -25,6 +26,10 @@ export interface EfsCsiDriverProps extends HelmAddOnUserProps {
      * pods will be left of pending state
      */
     replicaCount?: number
+    /**
+     * List of KMS keys to be used for encryption
+     */
+    kmsKeys?: kms.Key[];
 
 }
 
@@ -56,7 +61,7 @@ export class EfsCsiDriverAddOn extends HelmAddOn {
             name: EFS_CSI_CONTROLLER_SA,
             namespace: this.options.namespace,
         });
-        EfsDriverPolicyDocument().Statement.forEach((statement) => {
+        getEfsDriverPolicyStatements().forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
 
