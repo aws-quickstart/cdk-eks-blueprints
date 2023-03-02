@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
+import { JupyterHubServiceType } from '../lib';
 
 describe('Unit tests for JupyterHub addon', () => {
 
@@ -16,7 +17,7 @@ describe('Unit tests for JupyterHub addon', () => {
                     storageClass: "gp2",
                     capacity: "4Gi",
                 },
-                enableIngress: false,
+                serviceType: JupyterHubServiceType.CLUSTERIP,
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -39,7 +40,7 @@ describe('Unit tests for JupyterHub addon', () => {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '100Gi',
                 },
-                enableIngress: false,
+                serviceType: JupyterHubServiceType.CLUSTERIP,
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -62,7 +63,7 @@ describe('Unit tests for JupyterHub addon', () => {
                     removalPolicy: cdk.RemovalPolicy.DESTROY,
                     capacity: '100Gi',
                 },
-                enableIngress: true,
+                serviceType: JupyterHubServiceType.ALB,
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 

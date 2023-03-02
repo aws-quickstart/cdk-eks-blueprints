@@ -5,7 +5,7 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib'; 
-import { logger } from '../../lib/utils';
+import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { VpcProvider } from '../../lib';
 
@@ -26,6 +26,7 @@ export default class BlueprintConstruct {
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  3;
+        userLog.settings.minLevel = 2;
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.

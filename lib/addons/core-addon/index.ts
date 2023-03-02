@@ -49,7 +49,7 @@ export class CoreAddOn implements ClusterAddOn {
 
     constructor(coreAddOnProps: CoreAddOnProps) {
         this.coreAddOnProps = coreAddOnProps;
-        userLog.info(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
+        userLog.debug(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
