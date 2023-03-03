@@ -91,9 +91,9 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .resourceProvider(blueprints.GlobalResources.Vpc, new DirectVpcProvider(yourVpcId))
-  .resourceProvider("secondary-subnet-1", new LookupSubnetProvider(subnet1Id)
-  .resourceProvider("secondary-subnet-2", new LookupSubnetProvider(subnet2Id)
-  .resourceProvider("secondary-subnet-3", new LookupSubnetProvider(subnet3Id)
+  .resourceProvider("secondary-cidr-subnet-0", new LookupSubnetProvider(subnet1Id)
+  .resourceProvider("secondary-cidr-subnet-1", new LookupSubnetProvider(subnet2Id)
+  .resourceProvider("secondary-cidr-subnet-2", new LookupSubnetProvider(subnet3Id)
   .build(app, 'my-stack-name');
 ``` 
 
