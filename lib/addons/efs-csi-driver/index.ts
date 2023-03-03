@@ -61,7 +61,7 @@ export class EfsCsiDriverAddOn extends HelmAddOn {
             name: EFS_CSI_CONTROLLER_SA,
             namespace: this.options.namespace,
         });
-        getEfsDriverPolicyStatements().forEach((statement) => {
+        getEfsDriverPolicyStatements(this.options?.kmsKeys).forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
 
