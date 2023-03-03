@@ -64,18 +64,18 @@ export default class BlueprintConstruct {
             // adminPasswordSecretName: "argo-admin-secret"
         });
         const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.addons.AppMeshAddOn(),
+            // new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
-            new blueprints.addons.XrayAdotAddOn(),
+           // new blueprints.addons.AmpAddOn(),
+           // new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
-            new blueprints.addons.IstioBaseAddOn(),
-            new blueprints.addons.IstioControlPlaneAddOn(),
-            new blueprints.addons.CalicoOperatorAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
+            // new blueprints.addons.IstioBaseAddOn(),
+            // new blueprints.addons.IstioControlPlaneAddOn(),
+            // new blueprints.addons.CalicoOperatorAddOn(),
+            // new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
             prodBootstrapArgo,
@@ -86,17 +86,17 @@ export default class BlueprintConstruct {
                 }
             }),
             new blueprints.addons.VeleroAddOn(),
-            new blueprints.addons.VpcCniAddOn({
-                customNetworkingConfig: {
-                    subnets: [
-                        blueprints.getNamedResource("secondary-cidr-subnet-0"),
-                        blueprints.getNamedResource("secondary-cidr-subnet-1"),
-                        blueprints.getNamedResource("secondary-cidr-subnet-2"),
-                    ]   
-                },
-                awsVpcK8sCniCustomNetworkCfg: true,
-                eniConfigLabelDef: 'topology.kubernetes.io/zone'
-            }),
+            // new blueprints.addons.VpcCniAddOn({
+            //     customNetworkingConfig: {
+            //         subnets: [
+            //             blueprints.getNamedResource("secondary-cidr-subnet-0"),
+            //             blueprints.getNamedResource("secondary-cidr-subnet-1"),
+            //             blueprints.getNamedResource("secondary-cidr-subnet-2"),
+            //         ]   
+            //     },
+            //     awsVpcK8sCniCustomNetworkCfg: true,
+            //     eniConfigLabelDef: 'topology.kubernetes.io/zone'
+            // }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
@@ -106,37 +106,37 @@ export default class BlueprintConstruct {
                 skipVersionValidation: true,
                 serviceName: blueprints.AckServiceName.S3
             }),
-            new blueprints.addons.KarpenterAddOn({
-                requirements: [
-                    { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
-                    { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
-                ],
-                subnetTags: {
-                    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-                },
-                securityGroupTags: {
-                    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-                },
-                taints: [{
-                    key: "workload",
-                    value: "test",
-                    effect: "NoSchedule",
-                }],
-                consolidation: { enabled: true },
-                ttlSecondsUntilExpired: 2592000,
-                weight: 20,
-                interruptionHandling: true,
-                limits: {
-                    resources: {
-                        cpu: 20,
-                        memory: "64Gi",
-                    }
-                }
-            }),
-            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
-            new blueprints.addons.KubeviousAddOn(),
+            // new blueprints.addons.KarpenterAddOn({
+            //     requirements: [
+            //         { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
+            //         { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+            //         { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
+            //         { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
+            //     ],
+            //     subnetTags: {
+            //         "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+            //     },
+            //     securityGroupTags: {
+            //         "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+            //     },
+            //     taints: [{
+            //         key: "workload",
+            //         value: "test",
+            //         effect: "NoSchedule",
+            //     }],
+            //     consolidation: { enabled: true },
+            //     ttlSecondsUntilExpired: 2592000,
+            //     weight: 20,
+            //     interruptionHandling: true,
+            //     limits: {
+            //         resources: {
+            //             cpu: 20,
+            //             memory: "64Gi",
+            //         }
+            //     }
+            // }),
+          //  new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
+            //new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn({
                 kmsKeys: [
                   blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
@@ -150,19 +150,19 @@ export default class BlueprintConstruct {
                 securityContextRunAsUser: 1001,
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
-            new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
-            new blueprints.EmrEksAddOn(),
-            new blueprints.AwsBatchAddOn(),
+            // new blueprints.addons.AWSPrivateCAIssuerAddon(),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
+            // new blueprints.EmrEksAddOn(),
+            // new blueprints.AwsBatchAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -171,7 +171,7 @@ export default class BlueprintConstruct {
         });
         new blueprints.ExternalsSecretsAddOn();
        
-        const blueprintID = 'blueprint-construct-dev';
+        const blueprintID = 'shapirov-blueprint';
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
@@ -191,24 +191,24 @@ export default class BlueprintConstruct {
                     maxSize: 3, 
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
-                {
-                    id: "mng2-customami",
-                    instanceTypes: [new ec2.InstanceType('t3.large')],
-                    nodeGroupCapacityType: CapacityType.SPOT,
-                    desiredSize: 0,
-                    minSize: 0,
-                    customAmi: {
-                        machineImage: ec2.MachineImage.genericLinux({
-                            'us-east-1': 'ami-08e520f5673ee0894',
-                            'us-west-2': 'ami-0403ff342ceb30967',
-                            'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': 'ami-07bda4b61dc470985',
-                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
-                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
-                        }),
-                        userData: userData,
-                    }
-                }
+                // {
+                //     id: "mng2-customami",
+                //     instanceTypes: [new ec2.InstanceType('t3.large')],
+                //     nodeGroupCapacityType: CapacityType.SPOT,
+                //     desiredSize: 0,
+                //     minSize: 0,
+                //     customAmi: {
+                //         machineImage: ec2.MachineImage.genericLinux({
+                //             'us-east-1': 'ami-08e520f5673ee0894',
+                //             'us-west-2': 'ami-0403ff342ceb30967',
+                //             'us-east-2': 'ami-07109d69738d6e1ee',
+                //             'us-west-1': 'ami-07bda4b61dc470985',
+                //             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                //             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
+                //         }),
+                //         userData: userData,
+                //     }
+                // }
             ]
         });
 
@@ -259,9 +259,9 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider("vpc-06795ec62eb45cf89"))
             .clusterProvider(clusterProvider)
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
+            //.teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
     }
