@@ -140,6 +140,11 @@ Please refer to following aws-controller-8s references for more information :
 19. EMRCONTAINERS
 20. SFN
 21. KINESIS
-21. CLOUDTRAIL
+22. CLOUDTRAIL
+23. ACM
+24. ROUTE53
+25. SQS
+26. SAGEMAKER
+27. EVENTBRIDGE
 
 *We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to ECR Gallery for ACK.*
