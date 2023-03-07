@@ -9,6 +9,7 @@
         "watch": "tsc -w",
         "test": "jest --verbose false --detectOpenHandles",
         "cdk": "cdk",
+        "examples": "cdk --app \"npx ts-node examples/examples.ts\"",
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "devDependencies": {
