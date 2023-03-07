@@ -80,6 +80,7 @@ export interface ApplicationRepository extends GitRepositoryReference {
 export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
+    removalPolicy: cdk.RemovalPolicy | undefined;
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
 
