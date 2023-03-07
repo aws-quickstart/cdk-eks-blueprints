@@ -117,7 +117,7 @@ Please refer to following aws-controller-8s references for more information :
 
 ## Supported AWS Services by ACK Addon
 
-*You can use this ACK Addon today to provision resources for below mentioned 22 AWS services :*
+*You can use this ACK Addon today to provision resources for below mentioned 22 AWS services:*
 
 1. IAM
 2. RDS
