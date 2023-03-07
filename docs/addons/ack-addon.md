@@ -147,4 +147,4 @@ Please refer to following aws-controller-8s references for more information :
 26. SAGEMAKER
 27. EVENTBRIDGE
 
-*We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to ECR Gallery for ACK.*
+*We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/).*
