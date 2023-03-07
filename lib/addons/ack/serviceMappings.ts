@@ -180,5 +180,4 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       version:  "v0.0.5",
       managedPolicyName: "AmazonEventBridgeFullAccess"
     }
-
 };
