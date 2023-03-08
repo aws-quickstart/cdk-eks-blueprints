@@ -30,16 +30,17 @@ export class KmsKeyProvider implements ResourceProvider<kms.IKey> {
 
   provide(context: ResourceContext): kms.IKey {
     const id = context.scope.node.id;
+    const keyId = `${id}-${this.aliasName ?? "default"}-KmsKey`;
     let key = undefined;
 
     if (this.aliasName) {
-      key = kms.Key.fromLookup(context.scope, `${id}-kms-key`, {
+      key = kms.Key.fromLookup(context.scope, keyId, {
         aliasName: this.aliasName,
       });
     }
 
     if (!key) {
-      key = new kms.Key(context.scope, `${id}-kms-key`, {
+      key = new kms.Key(context.scope, keyId, {
         description: `Secrets Encryption Key for EKS Cluster '${context.blueprintProps.id}'`,
         ...this.kmsKeyProps,
       });
