@@ -13,12 +13,12 @@ import { ResourceContext, ResourceProvider } from "../spi";
  *       .build(app, "east-test-1");
  * ```
  */
-export class KmsKeyProvider implements ResourceProvider<kms.IKey> {
+export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
   private readonly aliasName?: string;
   private readonly kmsKeyProps?: kms.KeyProps;
 
   /**
-   * Pass either en aliasName to lookup an existing or pass optional key props to create a new one.
+   * Configuration options for the KMS Key.
    *
    * @param aliasName The alias name to lookup an existing KMS Key in the deployment target, if omitted a key will be created.
    * @param kmsKeyProps The key props used
@@ -33,19 +33,33 @@ export class KmsKeyProvider implements ResourceProvider<kms.IKey> {
     const keyId = `${id}-${this.aliasName ?? "default"}-KmsKey`;
     let key = undefined;
 
-    if (this.aliasName) {
-      key = kms.Key.fromLookup(context.scope, keyId, {
-        aliasName: this.aliasName,
-      });
-    }
-
-    if (!key) {
-      key = new kms.Key(context.scope, keyId, {
-        description: `Secrets Encryption Key for EKS Cluster '${context.blueprintProps.id}'`,
-        ...this.kmsKeyProps,
-      });
-    }
+    key = new kms.Key(context.scope, keyId, {
+      description: `Secrets Encryption Key for EKS Cluster '${context.blueprintProps.id}'`,
+      ...this.kmsKeyProps,
+    });
 
     return key;
+  }
+}
+
+/**
+ * Pass an aliasName to lookup an existing KMS Key.
+ *
+ * @param aliasName The alias name to lookup an existing KMS Key in the deployment target, if omitted a key will be created.
+ */
+export class LookupKmsKeyProvider implements ResourceProvider<kms.IKey> {
+  private readonly aliasName: string;
+
+  public constructor(aliasName: string) {
+    this.aliasName = aliasName;
+  }
+
+  provide(context: ResourceContext): kms.IKey {
+    const id = context.scope.node.id;
+    const keyId = `${id}-${this.aliasName}-KmsKey`;
+
+    return kms.Key.fromLookup(context.scope, keyId, {
+      aliasName: this.aliasName,
+    });
   }
 }
