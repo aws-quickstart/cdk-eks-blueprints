@@ -1,11 +1,13 @@
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as efs from "aws-cdk-lib/aws-efs";
+import * as kms from "aws-cdk-lib/aws-kms";
 import * as cdk from "aws-cdk-lib/core";
 import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
 
 export interface CreateEfsFileSystemProps {
   readonly name?: string;
-  readonly efsProps?: Omit<efs.FileSystemProps, "vpc">;
+  readonly efsProps?: Omit<efs.FileSystemProps, "vpc" | "kmsKey">;
+  readonly kmsKeyResourceName?: string;
   readonly removalPolicy?: cdk.RemovalPolicy;
 }
 
@@ -36,13 +38,16 @@ export class CreateEfsFileSystemProvider
       this.options.name ?? "default"
     }-EfsSecurityGroup`;
     let efsFileSystem: efs.IFileSystem | undefined;
-
     const vpc = context.get(GlobalResources.Vpc) as ec2.IVpc;
     if (vpc === undefined) {
       throw new Error("VPC not found in context");
     }
     const removalPolicy = this.options.removalPolicy ?? context.removalPolicy;
     const clusterVpcCidr = vpc.vpcCidrBlock;
+    let kmsKey: kms.IKey | undefined;
+    if (this.options.kmsKeyResourceName) {
+      kmsKey = context.get(this.options.kmsKeyResourceName) as kms.IKey;
+    }
 
     const efsSG = new ec2.SecurityGroup(context.scope, securityGroupId, {
       vpc,
@@ -65,6 +70,7 @@ export class CreateEfsFileSystemProvider
         vpc,
         securityGroup: efsSG,
         removalPolicy,
+        kmsKey,
         ...this.options.efsProps,
       }
     );
