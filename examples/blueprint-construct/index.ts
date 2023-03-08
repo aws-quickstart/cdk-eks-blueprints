@@ -163,6 +163,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
+            new blueprints.AwsForFluentBitAddOn(),
         ];
 
         // Instantiated to for helm version check.

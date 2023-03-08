@@ -21,7 +21,7 @@ const defaultProps: AwsForFluentBitAddOnProps = {
     name: 'fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-for-fluent-bit",
-    version: '0.1.11',
+    version: '0.1.23',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'kube-system',
     values: {}
@@ -45,10 +45,7 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-
-        // Create the FluentBit namespace.
         const namespace = this.options.namespace;
-        createNamespace(this.options.namespace!, cluster, true);
 
         // Create the FluentBut service account.
         const serviceAccountName = 'aws-for-fluent-bit-sa';
@@ -71,6 +68,7 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
         };
 
         const helmChart = this.addHelmChart(clusterInfo, values);
+        helmChart.node.addDependency(sa);
         return Promise.resolve(helmChart);
     }
 }
