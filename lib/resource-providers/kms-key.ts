@@ -34,7 +34,8 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
     let key = undefined;
 
     key = new kms.Key(context.scope, keyId, {
-      description: `Secrets Encryption Key for EKS Cluster '${context.blueprintProps.id}'`,
+      alias: this.aliasName,
+      description: `Key for EKS Cluster '${context.blueprintProps.id}'`,
       ...this.kmsKeyProps,
     });
 
