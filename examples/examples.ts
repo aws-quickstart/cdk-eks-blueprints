@@ -20,7 +20,7 @@ const publicCluster = {
 };
 
 builder()
-    .clusterProvider(new bp.FargateClusterProvider())
+    .clusterProvider(new bp.FargateClusterProvider(publicCluster))
     .build(app, "fargate-blueprint");
 
 builder()
@@ -30,7 +30,7 @@ builder()
 builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
     .addOns(buildArgoBootstrap())
-    .build(app, 'argo-blueprint');
+    .build(app, 'argo-blueprint1');
 
 
 function buildArgoBootstrap() {
