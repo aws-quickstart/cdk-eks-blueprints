@@ -1,11 +1,11 @@
-import * as iam from "aws-cdk-lib/aws-iam";
-import * as kms from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
-import { ClusterInfo, Values } from "../../spi";
-import { setPath } from "../../utils";
-import { registries } from "../../utils/registry-utils";
+import {ClusterInfo, Values} from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { getEfsDriverPolicyStatements } from "./iam-policy";
+import { registries }  from "../../utils/registry-utils";
+import * as iam from "aws-cdk-lib/aws-iam";
+import {setPath} from "../../utils";
+import * as kms from "aws-cdk-lib/aws-kms";
 
 
 const EFS_CSI_DRIVER = "aws-efs-csi-driver";
