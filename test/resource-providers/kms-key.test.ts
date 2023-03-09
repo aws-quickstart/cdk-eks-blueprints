@@ -1,7 +1,7 @@
 import { App } from "aws-cdk-lib";
 import * as blueprints from "../../lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
-import { CreateKmsKeyProvider, LookupKmsKeyProvider } from "../../lib/resource-providers/kms-key";
+import { CreateKmsKeyProvider } from "../../lib/resource-providers/kms-key";
 import { GlobalResources } from "../../lib";
 
 describe("KmsKeyProvider", () => {
@@ -78,7 +78,7 @@ describe("KmsKeyProvider", () => {
     const stack = blueprints.EksBlueprint.builder()
       .resourceProvider(
         GlobalResources.KmsKey,
-        new LookupKmsKeyProvider("my-custom-eks-key")
+        new CreateKmsKeyProvider("my-custom-eks-key")
       )
       .account("123456789012")
       .region("us-east-1")
