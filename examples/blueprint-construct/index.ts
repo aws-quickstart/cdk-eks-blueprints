@@ -164,17 +164,7 @@ export default class BlueprintConstruct {
           ),
         ],
       }),
-      new blueprints.addons.EfsCsiDriverAddOn({
-        replicaCount: 1,
-        kmsKeys: [
-          blueprints.getResource(
-            (context) =>
-              new kms.Key(context.scope, "ebs-csi-driver-key", {
-                alias: "ebs-csi-driver-key",
-              })
-          ),
-        ],
-      }),
+      new blueprints.addons.EfsCsiDriverAddOn({ replicaCount: 1 }),
       new blueprints.addons.KedaAddOn({
         podSecurityContextFsGroup: 1001,
         securityContextRunAsGroup: 1001,
