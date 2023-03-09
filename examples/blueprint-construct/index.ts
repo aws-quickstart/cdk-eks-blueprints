@@ -146,7 +146,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.EfsCsiDriverAddOn({
               replicaCount: 1,
               kmsKeys: [
-                blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
+                blueprints.getResource( context => new kms.Key(context.scope, "efs-csi-driver-key", { alias: "efs-csi-driver-key"})),
               ],
             }),
             new blueprints.addons.KedaAddOn({
