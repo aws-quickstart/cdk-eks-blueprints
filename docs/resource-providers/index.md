@@ -1,18 +1,18 @@
 # Resource Providers
 
-## Terminology 
+## Terminology
 
 **Resource**
 A resource is a CDK construct that implements `IResource` interface from `aws-cdk-lib` which is a generic interface for any AWS resource. An example of a resource could be a hosted zone in Route53 [`IHostedZone`](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_route53.HostedZone.html), an ACM certificate [`ICertificate`](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_certificatemanager.ICertificate.html), a VPC or even a DynamoDB table which could be leveraged either in add-ons or teams.
 
 **ResourceProvider**
-A resource provider is a core Blueprints concept that enables customers to supply resources for add-ons, teams and/or post-deployment steps. Resources may be imported (e.g., if created outside of the platform) or created with the blueprint. 
+A resource provider is a core Blueprints concept that enables customers to supply resources for add-ons, teams and/or post-deployment steps. Resources may be imported (e.g., if created outside of the platform) or created with the blueprint.
 
 ## Use Cases
 
-`ClusterAddOn` and `Team` implementations require AWS resources that can be shared across several constructs. For example, `ExternalDnsAddOn` requires an array of hosted zones that will be used for integration with Route53. `NginxAddOn` requires a certificate and hosted zone (for DNS validation) in order to use TLS termination. VPC may be used inside add-ons and team constructs to look up VPC CIDR and subnets. 
+`ClusterAddOn` and `Team` implementations require AWS resources that can be shared across several constructs. For example, `ExternalDnsAddOn` requires an array of hosted zones that will be used for integration with Route53. `NginxAddOn` requires a certificate and hosted zone (for DNS validation) in order to use TLS termination. VPC may be used inside add-ons and team constructs to look up VPC CIDR and subnets.
 
-The Blueprints framework provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers. 
+The Blueprints framework provides ability to register a resource provider under an arbitrary name and make it available in the resource context, which is available to all add-ons and teams. With this capability, customers can either use existing resource providers or create their own and reference the provided resources inside add-ons, teams or other resource providers.
 
 Resource providers may depend on resources provided by other resource providers. For example, `CertificateResourceProvider` relies on a hosted zone resource, which is expected to be supplied by another provider.
 
@@ -20,9 +20,9 @@ Example use cases:
 
 1. As a platform user, I must create a VPC using my enterprise standards and leverage it for the EKS Blueprint. Solution: create an implementation of `ResourceProvider<IVpc>` (or leverage an existing one) and register it with the blueprint (see Usage).
 
-2. As a platform user, I need to use an existing hosted zone for all external DNS names used with ingress objects of my workloads. Solution: use a predefined `ImportHostedZoneProvider` or `LookupHostedZoneProvider` to reference the existing hosted zone. 
+2. As a platform user, I need to use an existing hosted zone for all external DNS names used with ingress objects of my workloads. Solution: use a predefined `ImportHostedZoneProvider` or `LookupHostedZoneProvider` to reference the existing hosted zone.
 
-3. As a platform user, I need to create an S3 bucket and use it in one or more `Team` implementations. Solution: create an implementation for an S3 Bucket resource provider and use the supplied resource inside teams. 
+3. As a platform user, I need to create an S3 bucket and use it in one or more `Team` implementations. Solution: create an implementation for an S3 Bucket resource provider and use the supplied resource inside teams.
 
 ## Contracts
 
@@ -119,7 +119,6 @@ export class ClusterInfo {
 }
 ```
 
-
 ## Usage
 
 **Registering Resource Providers for a Blueprint**
@@ -140,6 +139,8 @@ blueprints.EksBlueprint.builder()
     // Register certificate GlobalResources.Certificate name and reference the hosted zone registered in the previous step
     .resourceProvider(GlobalResources.Certificate, new CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', GlobalResources.HostedZone))
     .resourceProvider("private-ca", new CreateCertificateProvider('internal-wildcard-cert', '*.myinternal.domain.com', "internal-hosted-zone"))
+    // Create EFS file system and register it under the name of efs-file-system
+    .resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
@@ -173,9 +174,10 @@ blueprints.EksBlueprint.builder()
     .teams(...)
     .build(app, 'stack-with-resource-providers');
 ```
+
 ## Using Resource Providers with CDK Constructs
 
-Some constructs used in the `EKSBlueprint` stack are standard CDK constructs that accept CDK resources. 
+Some constructs used in the `EKSBlueprint` stack are standard CDK constructs that accept CDK resources.
 
 For example, `GenericClusterProvider` (which is the basis for all cluster providers) allows passing resources like `IRole`, `SecurityGroup` and other properties that customers may find inconvenient to define with a builder pattern.
 
@@ -201,7 +203,7 @@ blueprints.EksBlueprint.builder()
 }
 ```
 
-Example with a named resource: 
+Example with a named resource:
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
@@ -244,6 +246,7 @@ blueprints.EksBlueprint.builder()
 ```
 
 4. Use the resource inside a custom add-on:
+
 ```typescript
 class MyCustomAddOn implements blueprints.ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void | Promise<cdk.Construct> {
@@ -253,4 +256,3 @@ class MyCustomAddOn implements blueprints.ClusterAddOn {
 }
 
 ```
-
