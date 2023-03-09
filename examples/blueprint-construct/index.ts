@@ -5,17 +5,17 @@ import {
   KubernetesVersion,
   NodegroupAmiType,
 } from "aws-cdk-lib/aws-eks";
+import * as kms from "aws-cdk-lib/aws-kms";
 import {
   AccountRootPrincipal,
   PolicyStatement,
   Role,
 } from "aws-cdk-lib/aws-iam";
-import * as kms from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
 import * as blueprints from "../../lib";
-import { VpcProvider } from "../../lib";
 import { logger, userLog } from "../../lib/utils";
 import * as team from "../teams";
+import { VpcProvider } from "../../lib";
 
 const burnhamManifestDir = "./examples/teams/team-burnham/";
 const rikerManifestDir = "./examples/teams/team-riker/";
@@ -165,15 +165,15 @@ export default class BlueprintConstruct {
         ],
       }),
       new blueprints.addons.EfsCsiDriverAddOn({
-        replicaCount: 1,
         kmsKeys: [
           blueprints.getResource(
             (context) =>
-              new kms.Key(context.scope, "efs-csi-driver-key", {
-                alias: "efs-csi-driver-key",
+              new kms.Key(context.scope, "ebs-csi-driver-key", {
+                alias: "ebs-csi-driver-key",
               })
           ),
         ],
+        replicaCount: 1,
       }),
       new blueprints.addons.KedaAddOn({
         podSecurityContextFsGroup: 1001,
