@@ -20,7 +20,7 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
   /**
    * Configuration options for the KMS Key.
    *
-   * @param aliasName The alias name to lookup an existing KMS Key in the deployment target, if omitted a key will be created.
+   * @param aliasName The alias name for the KMS Key
    * @param kmsKeyProps The key props used
    */
   public constructor(aliasName?: string, kmsKeyProps?: kms.KeyProps) {
@@ -46,7 +46,7 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
 /**
  * Pass an aliasName to lookup an existing KMS Key.
  *
- * @param aliasName The alias name to lookup an existing KMS Key in the deployment target, if omitted a key will be created.
+ * @param aliasName The alias name to lookup an existing KMS Key
  */
 export class LookupKmsKeyProvider implements ResourceProvider<kms.IKey> {
   private readonly aliasName: string;
