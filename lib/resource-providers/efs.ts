@@ -1,3 +1,4 @@
+import { CfnOutput } from "aws-cdk-lib";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as efs from "aws-cdk-lib/aws-efs";
 import * as kms from "aws-cdk-lib/aws-kms";
@@ -74,6 +75,9 @@ export class CreateEfsFileSystemProvider
         ...this.options.efsProps,
       }
     );
+    new CfnOutput(context.scope, "EfsFileSystemId", {
+      value: efsFileSystem.fileSystemId,
+    });
     return efsFileSystem;
   }
 }
@@ -116,6 +120,9 @@ export class LookupEfsFileSystemProvider
     if (!efsFileSystem) {
       throw new Error("EFS file system not found");
     }
+    new CfnOutput(context.scope, "EfsFileSystemId", {
+      value: efsFileSystem.fileSystemId,
+    });
     return efsFileSystem;
   }
 }
