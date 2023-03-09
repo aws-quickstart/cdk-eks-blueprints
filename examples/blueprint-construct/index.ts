@@ -165,6 +165,7 @@ export default class BlueprintConstruct {
         ],
       }),
       new blueprints.addons.EfsCsiDriverAddOn({
+        replicaCount: 1,
         kmsKeys: [
           blueprints.getResource(
             (context) =>
@@ -173,7 +174,6 @@ export default class BlueprintConstruct {
               })
           ),
         ],
-        replicaCount: 1,
       }),
       new blueprints.addons.KedaAddOn({
         podSecurityContextFsGroup: 1001,
