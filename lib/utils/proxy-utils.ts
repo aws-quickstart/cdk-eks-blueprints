@@ -35,7 +35,7 @@ export class DummyProxy<T extends object> implements ProxyHandler<T> {
 
         return new Proxy({} as any, new DummyProxy((arg) => {
             return (this.source(arg) as any)[key];
-        }));; 
+        }));
     }
 }
 
