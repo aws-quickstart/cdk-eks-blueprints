@@ -19,7 +19,7 @@ export interface LookupEfsFileSystemProps {
 /**
  * EFS resource provider.
  *
- * @param name The name of the EFS file system to lookup an existing EFS file system in the deployment target. If omitted, a file system will be created.
+ * @param name The name of the EFS file system to create.
  * @param efsProps The props used for the file system.
  * @param removalPolicy The removal policy to use for the EFS file system.
  */
@@ -80,8 +80,8 @@ export class CreateEfsFileSystemProvider
 
 /**
  * Pass an EFS file system name and id to lookup an existing EFS file system.
- * @param name The name of the EFS file system to lookup an existing EFS file system in the deployment target. If omitted, a file system will be created.
- * @param fileSystemId The id of the EFS file system to lookup an existing EFS file system in the deployment target. If omitted, a file system will be created.
+ * @param name The name of the EFS file system to lookup an existing EFS file system.
+ * @param fileSystemId The id of the EFS file system to lookup an existing EFS file system.
  */
 export class LookupEfsFileSystemProvider
   implements ResourceProvider<efs.IFileSystem>
