@@ -3,9 +3,10 @@ import { Template } from "aws-cdk-lib/assertions";
 import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Role } from "aws-cdk-lib/aws-iam";
+import { Key } from "aws-cdk-lib/aws-kms";
 import * as nutil from 'node:util/types';
 import * as blueprints from "../../lib";
-import { EksBlueprint, GlobalResources } from "../../lib";
+import { AppMeshAddOn, EksBlueprint, GlobalResources, KmsKeyProvider } from "../../lib";
 import { cloneDeep } from "../../lib/utils";
 
 describe("ResourceProxy",() => {
@@ -86,4 +87,25 @@ describe("ResourceProxy",() => {
         expect(nutil.isProxy(clusterProvider.props.securityGroup)).toBeTruthy();
     });
 
+    test("When a stack is created with kms key, derefereced expression for keyArn can be passed to add-ons", () => {
+        const app = new App();
+        
+        const kmsKey: Key = blueprints.getNamedResource(GlobalResources.KmsKey);
+        
+        const builder = EksBlueprint.builder()
+            .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider())
+            .account("123456789012")
+            .region("us-east-1")
+            .addOns(new AppMeshAddOn( {
+                values: {
+                    kmsKeyArn: kmsKey.keyArn
+                }
+            }));
+
+        const stack1 = builder.build(app, "resource-deref-cluster");
+        const template = Template.fromStack(stack1);
+        
+        // Then
+        expect(JSON.stringify(template.toJSON())).toContain('kmsKeyArn');
+    });
 });
