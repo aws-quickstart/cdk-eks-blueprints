@@ -2,12 +2,15 @@ import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { Role } from "aws-cdk-lib/aws-iam";
+import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Key } from "aws-cdk-lib/aws-kms";
 import * as nutil from 'node:util/types';
 import * as blueprints from "../../lib";
 import { AppMeshAddOn, EksBlueprint, GlobalResources, KmsKeyProvider } from "../../lib";
-import { cloneDeep } from "../../lib/utils";
+import { cloneDeep, logger } from "../../lib/utils";
+
+
+beforeAll(() => logger.settings.minLevel = 2); // debug
 
 describe("ResourceProxy",() => {
 
@@ -87,10 +90,12 @@ describe("ResourceProxy",() => {
         expect(nutil.isProxy(clusterProvider.props.securityGroup)).toBeTruthy();
     });
 
-    test("When a stack is created with kms key, derefereced expression for keyArn can be passed to add-ons", () => {
+    test("When a stack is created with kms key, dereferenced expression for keyArn can be passed to add-ons", () => {
         const app = new App();
         
         const kmsKey: Key = blueprints.getNamedResource(GlobalResources.KmsKey);
+
+        const someRole: Role = blueprints.getResource( context => new Role(context.scope, "some-role", { assumedBy: new ServicePrincipal("sns.amazon.com")}));
         
         const builder = EksBlueprint.builder()
             .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider())
@@ -98,7 +103,8 @@ describe("ResourceProxy",() => {
             .region("us-east-1")
             .addOns(new AppMeshAddOn( {
                 values: {
-                    kmsKeyArn: kmsKey.keyArn
+                    kmsKeyArn: kmsKey.keyArn,
+                    someRole: someRole.roleArn 
                 }
             }));
 
@@ -106,6 +112,7 @@ describe("ResourceProxy",() => {
         const template = Template.fromStack(stack1);
         
         // Then
+        logger.debug(template.toJSON());
         expect(JSON.stringify(template.toJSON())).toContain('kmsKeyArn');
     });
 });

@@ -25,6 +25,7 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
+        //0: silly, 1: trace, 2: debug, 3: info, 4: warn, 5: error, 6: fatal
         logger.settings.minLevel =  3;
         userLog.settings.minLevel = 2;
 
