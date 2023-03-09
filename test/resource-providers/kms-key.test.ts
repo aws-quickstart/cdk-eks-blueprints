@@ -1,8 +1,11 @@
 import { App } from "aws-cdk-lib";
-import * as blueprints from "../../lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
-import { CreateKmsKeyProvider } from "../../lib/resource-providers/kms-key";
+import * as blueprints from "../../lib";
 import { GlobalResources } from "../../lib";
+import {
+  CreateKmsKeyProvider,
+  LookupKmsKeyProvider,
+} from "../../lib/resource-providers/kms-key";
 
 describe("KmsKeyProvider", () => {
   test("Stack created with defaults should have a KMS Key and secret encryption config", () => {
@@ -46,7 +49,7 @@ describe("KmsKeyProvider", () => {
     const stack = blueprints.EksBlueprint.builder()
       .resourceProvider(
         GlobalResources.KmsKey,
-        new CreateKmsKeyProvider("my-custom-eks-key")
+        new LookupKmsKeyProvider("my-custom-eks-key")
       )
       .account("123456789012")
       .region("us-east-1")
