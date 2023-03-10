@@ -367,7 +367,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const result = cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
 
         if(nodeGroup.enableSsmPermissions) {
-            result.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'))
+            result.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
         }
 
         return result;
