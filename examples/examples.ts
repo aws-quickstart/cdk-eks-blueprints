@@ -1,17 +1,31 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as kms  from 'aws-cdk-lib/aws-kms';
 import * as bp from '../lib';
 import * as bcrypt from 'bcrypt';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
+/**
+ * You can run these examples with the following command:
+ * <code>
+ * npm run examples list
+ * npm run examples deploy <blueprint-name>
+ * </code>
+ */
 const app = new cdk.App();
 
+const KMS_RESOURCE = "kms-key-22";
 const base = bp.EksBlueprint.builder()
     .account(process.env.CDK_DEFAULT_ACCOUNT)
     .region(process.env.CDK_DEFAULT_REGION)
-    .resourceProvider(bp.GlobalResources.Vpc, new bp.VpcProvider("default")); // saving time on VPC creation
+    .resourceProvider(bp.GlobalResources.Vpc, new bp.VpcProvider("default")) // saving time on VPC creation
+    .resourceProvider(KMS_RESOURCE, {
+        provide(context): cdk.aws_kms.Key {
+            return new kms.Key(context.scope, KMS_RESOURCE);
+        }
+    });
 
-
+const kmsKey: kms.Key = bp.getNamedResource(KMS_RESOURCE);
 const builder = () => base.clone();
 
 const publicCluster = {
@@ -39,6 +53,11 @@ function buildArgoBootstrap() {
             repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
             path: 'chart',
             targetRevision: "eks-blueprints-cdk",
+        },
+        bootstrapValues: {
+            spec: {
+                kmsKey: kmsKey.keyArn
+            }
         },
         workloadApplications: [
             {
