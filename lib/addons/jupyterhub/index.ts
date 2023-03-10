@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, dependable, setPath } from '../../utils';
+import { createNamespace, setPath } from '../../utils';
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
