@@ -19,7 +19,7 @@ export class MyVpcStack extends NestedStack {
     constructor(scope: Construct, id: string, props: NestedStackProps) {
         super(scope, id, props);
         this.vpc = new ec2.Vpc(this, 'test-vpc', {
-            cidr: '10.0.0.0/20',
+            ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/20'),
             natGateways: 0,
             maxAzs: 2,
             enableDnsHostnames: true,

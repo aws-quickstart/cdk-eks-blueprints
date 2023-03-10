@@ -1,8 +1,8 @@
+import { CfnJson, Tags } from "aws-cdk-lib";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { CfnJson, Tags } from "aws-cdk-lib";
-import { Construct } from "constructs";
 import { assert } from "console";
+import { Construct } from "constructs";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
 import { conflictsWith, createNamespace, createServiceAccount, setPath } from "../../utils";
@@ -42,9 +42,11 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
  * Version of the autoscaler, controls the image tag
  */
 const versionMap = new Map([
+    [KubernetesVersion.of("1.25"), "9.25.0"],
+    [KubernetesVersion.V1_24, "9.25.0"],
     [KubernetesVersion.V1_23, "9.21.0"],
     [KubernetesVersion.V1_22, "9.13.1"],
-    [KubernetesVersion.V1_21, "9.13.1"],
+    [KubernetesVersion.V1_24, "9.13.1"],
     [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],

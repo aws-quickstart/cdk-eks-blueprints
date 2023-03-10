@@ -1,9 +1,9 @@
 import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { createServiceAccount } from "../../utils";
+import { createServiceAccount, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -27,6 +27,15 @@ export class CoreAddOnProps {
      * Namespace to create the ServiceAccount.
      */
     readonly namespace?: string;
+    /**
+     * ConfigurationValues field to pass custom configurations to Addon
+     */
+    readonly configurationValues?: Values;
+
+    /**
+     * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
+     */
+    readonly controlPlaneAddOn?: boolean;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -40,6 +49,7 @@ export class CoreAddOn implements ClusterAddOn {
 
     constructor(coreAddOnProps: CoreAddOnProps) {
         this.coreAddOnProps = coreAddOnProps;
+        userLog.debug(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -54,8 +64,8 @@ export class CoreAddOn implements ClusterAddOn {
         }
 
         // Create a service account if user provides namespace, PolicyDocument
-        if (this.coreAddOnProps?.policyDocumentProvider) {
-            const policyDoc = this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
+        const policyDoc = this.providePolicyDocument(clusterInfo);
+        if (policyDoc) {
             serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
                 saNamespace, policyDoc);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
@@ -64,6 +74,7 @@ export class CoreAddOn implements ClusterAddOn {
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
             addonVersion: this.coreAddOnProps.version,
+            configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
             resolveConflicts: "OVERWRITE"
@@ -73,7 +84,20 @@ export class CoreAddOn implements ClusterAddOn {
         if (serviceAccount) {
             cfnAddon.node.addDependency(serviceAccount);
         }
+
+        if(this.coreAddOnProps.controlPlaneAddOn) {
+            deployBeforeCapacity(cfnAddon, clusterInfo);
+        }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
     }
+
+    providePolicyDocument(clusterInfo: ClusterInfo) : PolicyDocument | undefined {
+        if(this.coreAddOnProps?.policyDocumentProvider) {
+            return this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
+        }
+        return undefined;
+    }
+
+
 }

@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
-import { Cluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
+import { Cluster, FargateProfile, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
@@ -20,7 +20,7 @@ export interface HelmRepository {
 /**
  * Utility type for values passed to Helm or GitOps applications.
  */
- export type Values = {
+export type Values = {
     [key: string]: any;
 };
 
@@ -81,7 +81,7 @@ export class ResourceContext {
 
     private readonly resources: Map<string, cdk.IResource> = new Map();
 
-    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) {}
+    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
 
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
@@ -89,7 +89,7 @@ export class ResourceContext {
      * @param provider Implementation of the resource provider interface
      * @returns the provided resource
      */
-    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>) : T {
+    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>): T {
         const resource = provider.provide(this);
         assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
@@ -101,7 +101,7 @@ export class ResourceContext {
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
-    public get<T extends cdk.IResource = cdk.IResource>(name: string) : T | undefined {
+    public get<T extends cdk.IResource = cdk.IResource>(name: string): T | undefined {
         return <T>this.resources.get(name);
     }
 }
@@ -113,7 +113,6 @@ export enum GlobalResources {
     KmsKey = 'kms-key'
 }
 
-
 /**
  * Cluster info supplies required information on the cluster configuration, registered resources and add-ons
  * which could be leveraged by the framework, add-on implementations and teams.
@@ -124,17 +123,19 @@ export class ClusterInfo {
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private readonly orderedAddOns: string[];
     private resourceContext: ResourceContext;
+    private addonContext: Map<string, Values>;
 
     /**
      * Constructor for ClusterInfo
      * @param props
      */
     constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
-            readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[]) {
+        readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: FargateProfile[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
         this.orderedAddOns = [];
+        this.addonContext = new Map<string, Values>();
     }
 
     /**
@@ -159,8 +160,8 @@ export class ClusterInfo {
      * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
-        if(this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0){
-            const prev : Construct = Array.from(this.provisionedAddOns.values()).pop()!;
+        if (this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0) {
+            const prev: Construct = Array.from(this.provisionedAddOns.values()).pop()!;
             construct.node.addDependency(prev);
             const prevAddOn = Array.from(this.provisionedAddOns.keys()).pop()!;
             logger.debug(`Adding dependency from ${addOn} to ${prevAddOn}`);
@@ -177,7 +178,7 @@ export class ClusterInfo {
         return this.provisionedAddOns.get(addOn);
     }
 
-     /**
+    /**
      * Returns all provisioned addons
      * @returns scheduledAddOns: Map<string, cdk.Construct>
      */
@@ -194,7 +195,7 @@ export class ClusterInfo {
      */
     public addScheduledAddOn(addOn: string, promise: Promise<Construct>, ordered: boolean) {
         this.scheduledAddOns.set(addOn, promise);
-        if(ordered) {
+        if (ordered) {
             this.orderedAddOns.push(addOn);
         }
     }
@@ -245,4 +246,37 @@ export class ClusterInfo {
         assert(result, 'Required resource ' + name + ' is missing.');
         return result!;
     }
+
+    /**
+     * Update addonContext map
+     * @param addOn
+     * @param Values
+     */
+    public addAddOnContext(addOn: string, values: Values) {
+        this.addonContext.set(addOn, values);
+    }
+
+    /**
+    * Returns all addon contexts
+    * @returns addonContext: Map<string, Values>
+    */
+    public getAddOnContexts(): Map<string, Values> {
+        return this.addonContext;
+    }
+}
+
+/**
+ * Enum type for two different GitOps operating modes
+ */
+export enum GitOpsMode {
+    /**
+     * CDK deploys the `Application` resource for each AddOn enabled or customer workloads,
+     * and ArgoCD deploys the actual AddOn and workloads via GitOps based on the `Application` resource.
+     */
+    APPLICATION,
+    /**
+     * CDK deploys only one `Application` resource for the App of Apps, aka `bootstrap-apps`,
+     * and ArgoCD deploys all the AddOns based on the child `Application` defined in `bootstrap-apps`.
+     */
+    APP_OF_APPS
 }

@@ -8,7 +8,7 @@ import { GitRepositoryReference, Values } from ".";
 export interface GitOpsApplication {
     name: string,
     repository?: GitRepositoryReference,
-    namespace: string
+    namespace: string | undefined
 }
 
 /**

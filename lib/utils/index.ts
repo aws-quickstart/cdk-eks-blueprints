@@ -5,6 +5,7 @@ export * from './context-utils';
 export * from './log-utils';
 export * from './namespace-utils';
 export * from './object-utils';
+export * from './proxy-utils';
 export * from './registry-utils';
 export * from './sa-utils';
 export * from './secrets-manager-utils';

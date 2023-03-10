@@ -32,7 +32,7 @@ export interface EfsCsiDriverProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps: EfsCsiDriverProps = {
-    version: '2.3.6',
+    version: '2.3.9',
     namespace: "kube-system",
     repository: "https://kubernetes-sigs.github.io/aws-efs-csi-driver/",
     name: EFS_CSI_DRIVER,
@@ -89,6 +89,8 @@ function populateValues(helmOptions: EfsCsiDriverProps, clusterName: string,
     setPath(values, "clusterName",  clusterName);
     setPath(values, "controller.serviceAccount.create",  false);
     setPath(values, "controller.serviceAccount.name",  serviceAccountName);
+    setPath(values, "node.serviceAccount.create",  false);
+    setPath(values, "node.serviceAccount.name",  serviceAccountName);
     setPath(values, "replicaCount",  helmOptions.replicaCount);
     setPath(values, "image.repository",  repository);
 

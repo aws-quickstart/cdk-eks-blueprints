@@ -10,6 +10,7 @@ import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
 import {KmsKeyProvider} from "../resource-providers/kms-key";
+import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 export class EksBlueprintProps {
     /**
@@ -41,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_23;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_24;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -56,7 +57,6 @@ export class EksBlueprintProps {
      */
     readonly enableControlPlaneLogTypes?: ControlPlaneLogType[];
 
-
     /**
      * If set to true and no resouce provider for KMS key is defined (under GlobalResources.KmsKey),
      * a default KMS encryption key will be used for envelope encryption of Kubernetes secrets (AWS managed new KMS key).
@@ -66,6 +66,11 @@ export class EksBlueprintProps {
      * Default is true.
      */
     readonly useDefaultSecretEncryption? : boolean  = true;
+
+    /**
+     * GitOps modes to be enabled. If not specified, GitOps mode is not enabled.
+     */
+    readonly enableGitOpsMode?: spi.GitOpsMode;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -134,6 +139,11 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
 
     public enableControlPlaneLogTypes(...types: ControlPlaneLogType[]): this {
         this.props = { ...this.props, ...{ enableControlPlaneLogTypes: types } };
+        return this;
+    }
+
+    public enableGitOps(mode?: spi.GitOpsMode): this {
+        this.props = { ...this.props, ...{ enableGitOpsMode: mode ?? spi.GitOpsMode.APP_OF_APPS } };
         return this;
     }
 
@@ -219,12 +229,14 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_23;
+        const version = blueprintProps.version ?? KubernetesVersion.V1_24;
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
         if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
             kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
         }
+
+        blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);
 
         const clusterProvider = blueprintProps.clusterProvider ?? new MngClusterProvider({
             id: `${blueprintProps.name ?? blueprintProps.id}-ng`,
@@ -237,6 +249,12 @@ export class EksBlueprint extends cdk.Stack {
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
         if (enableLogTypes) {
             utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
+        }
+
+        if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
+            ArgoGitOpsFactory.enableGitOps();
+        } else if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APP_OF_APPS) {
+            ArgoGitOpsFactory.enableGitOpsAppOfApps();
         }
 
         const postDeploymentSteps = Array<spi.ClusterPostDeploy>();
@@ -311,6 +329,23 @@ export class EksBlueprint extends cdk.Stack {
 
         return result;
     }
+
+    /**
+     * Resolves all dynamic proxies, that substitutes resource provider proxies with the resolved values. 
+     * @param blueprintProps 
+     * @param resourceContext 
+     * @returns a copy of blueprint props with resolved values
+     */
+    private resolveDynamicProxies(blueprintProps: EksBlueprintProps, resourceContext: spi.ResourceContext) : EksBlueprintProps {
+        return utils.cloneDeep(blueprintProps, (value) => {
+            return utils.resolveTarget(value, resourceContext);
+        });
+    }
+
+    /**
+     * Validates input against basic defined constraints.
+     * @param blueprintProps 
+     */
     private validateInput(blueprintProps: EksBlueprintProps) {
         const teamNames = new Set<string>();
         constraints.validateConstraints(new BlueprintPropsConstraints, EksBlueprintProps.name, blueprintProps);
