@@ -52,11 +52,6 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const namespace = this.options.namespace!;
-        
-        // Create namespace
-        if (this.options.createNamespace) {
-            createNamespace(namespace, cluster, true);
-        }
 
         // Create the FluentBut service account.
         const serviceAccountName = 'aws-for-fluent-bit-sa';
@@ -64,6 +59,12 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
             name: serviceAccountName,
             namespace: namespace
         });
+
+        // Create namespace
+        if (this.options.createNamespace) {
+            const ns = createNamespace(namespace, cluster, true);
+            sa.node.addDependency(ns);
+        }
 
         // Apply additional IAM policies to the service account.
         const policies = this.options.iamPolicies || [];
