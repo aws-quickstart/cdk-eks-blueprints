@@ -33,7 +33,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 # Command to show versions of the UXP add-on
 aws eks describe-addon-versions 
     --addon-name upbound_universal-crossplane \
-    --kubernetes-version 1.23 \
+    --kubernetes-version 1.24 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 
