@@ -14,6 +14,7 @@ import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { Tags } from "aws-cdk-lib/core/lib/tag-aspect";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -350,16 +351,18 @@ export class GenericClusterProvider implements ClusterProvider {
             }
         };
 
-        if (nodeGroup.customAmi) {
-            // Create launch template if custom AMI is provided.
+        if (nodeGroup.launchTemplate) {
+            // Create launch template with provided launch template properties
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
-                machineImage: nodeGroup.customAmi?.machineImage,
-                userData: nodeGroup.customAmi?.userData,
+                machineImage: nodeGroup.launchTemplate?.machineImage,
+                userData: nodeGroup.launchTemplate?.userData,
             });
             utils.setPath(nodegroupOptions, "launchTemplateSpec", {
                 id: lt.launchTemplateId!,
                 version: lt.latestVersionNumber,
             });
+            const customTags = Object.entries(nodeGroup.launchTemplate.customTags ?? {});
+            customTags.forEach(([key, options]) => Tags.of(lt).add(key,options));
             delete nodegroupOptions.amiType;
             delete nodegroupOptions.releaseVersion;
         }

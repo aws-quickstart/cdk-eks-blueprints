@@ -193,12 +193,14 @@ export default class BlueprintConstruct {
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
-                    id: "mng2-customami",
+                    id: "mng2-launchtemplate",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
-                    desiredSize: 0,
-                    minSize: 0,
-                    customAmi: {
+                    diskSize: 25,
+                    desiredSize: 2,
+                    minSize: 2,
+                    maxSize: 3, 
+                    launchTemplate: {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
@@ -208,6 +210,12 @@ export default class BlueprintConstruct {
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
                         userData: userData,
+                        customTags: {
+                            "Name": "Mng2",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "SPOT"
+                        }
                     }
                 }
             ]
