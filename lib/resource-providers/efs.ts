@@ -112,9 +112,6 @@ export class LookupEfsFileSystemProvider
       }
     );
 
-    if (!efsFileSystem) {
-      throw new Error("EFS file system not found");
-    }
     new CfnOutput(context.scope, "EfsFileSystemId", {
       value: efsFileSystem.fileSystemId,
     });

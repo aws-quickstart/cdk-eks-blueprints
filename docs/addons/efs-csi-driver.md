@@ -35,7 +35,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `version`: Version of the EFS CSI Driver add-on to be installed. Version 2.2.3 will be installed by default if a value is not provided
 - `replicaCount`: Number of replicas to be deployed. If not provided, two replicas will be deployed. Note that the number of replicas
   should be less than or equal to the number of nodes in the cluster otherwise some pods will be left of pending state
-- `kmsKeys`: List of KMS keys to be used for encryption-at-rest
+- `kmsKeys`: List of KMS keys used for encryption-at-rest, so that the IAM policy can be updated to allow the EFS CSI driver to access the keys
 
 ## Validation
 
