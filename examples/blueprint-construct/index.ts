@@ -196,7 +196,6 @@ export default class BlueprintConstruct {
                     id: "mng2-launchtemplate",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
-                    diskSize: 25,
                     desiredSize: 2,
                     minSize: 2,
                     maxSize: 3, 
