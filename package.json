@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -9,6 +9,7 @@
         "watch": "tsc -w",
         "test": "jest --verbose false --detectOpenHandles",
         "cdk": "cdk",
+        "examples": "cdk --app \"npx ts-node examples/examples.ts\"",
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
     "devDependencies": {
