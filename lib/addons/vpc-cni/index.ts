@@ -156,7 +156,7 @@ export interface CustomNetworkingConfig {
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.12.2-eksbuild.1',
+  version: 'v1.12.5-eksbuild.2',
   saName: 'vpc-cni',
   namespace: 'kube-system',
   controlPlaneAddOn: true,
