@@ -4,9 +4,7 @@ import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { IVpc } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
-import { FargateProfile } from "aws-cdk-lib/aws-eks";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -15,6 +13,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -200,7 +199,7 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
@@ -244,7 +243,7 @@ export class GenericClusterProvider implements ClusterProvider {
         });
 
         const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
-        const fargateConstructs : FargateProfile[] = [];
+        const fargateConstructs : eks.FargateProfile[] = [];
         fargateProfiles?.forEach(([key, options]) => fargateConstructs.push(this.addFargateProfile(cluster, key, options)));
 
         return new ClusterInfo(cluster, version, nodeGroups, autoscalingGroups, fargateConstructs);
@@ -318,7 +317,7 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * Adds a fargate profile to the cluster
      */
-    addFargateProfile(cluster: eks.Cluster, name: string, profileOptions: eks.FargateProfileOptions): FargateProfile {
+    addFargateProfile(cluster: eks.Cluster, name: string, profileOptions: eks.FargateProfileOptions): eks.FargateProfile {
         return cluster.addFargateProfile(name, profileOptions);
     }
 
@@ -365,7 +364,13 @@ export class GenericClusterProvider implements ClusterProvider {
             delete nodegroupOptions.releaseVersion;
         }
 
-        return cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
+        const result = cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
+
+        if(nodeGroup.enableSsmPermissions) {
+            result.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
+        }
+
+        return result;
     }
 
     private validateInput(props: GenericClusterProviderProps) {

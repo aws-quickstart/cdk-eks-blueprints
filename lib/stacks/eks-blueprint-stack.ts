@@ -187,7 +187,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public clone(region?: string, account?: string): BlueprintBuilder {
-        return new BlueprintBuilder().withBlueprintProps({ ...this.props })
+        return new BlueprintBuilder().withBlueprintProps(this.props)
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 

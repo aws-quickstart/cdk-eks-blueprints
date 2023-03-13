@@ -25,8 +25,8 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel =  3;
-        userLog.settings.minLevel = 2;
+        logger.settings.minLevel =  3; // info
+        userLog.settings.minLevel = 2; // debug
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
