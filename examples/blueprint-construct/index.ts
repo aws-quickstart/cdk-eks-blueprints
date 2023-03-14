@@ -25,8 +25,8 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel =  3;
-        userLog.settings.minLevel = 2;
+        logger.settings.minLevel =  3; // info
+        userLog.settings.minLevel = 2; // debug
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -168,6 +168,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
+            new blueprints.AwsForFluentBitAddOn(),
         ];
 
         // Instantiated to for helm version check.
