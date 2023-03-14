@@ -132,7 +132,7 @@ blueprints.EksBlueprint.builder()
     //  Specify VPC for the cluster (if not set, a new VPC will be provisioned as per EKS Best Practices)
     .resourceProvider(GlobalResources.VPC, new VpcProvider(myVpcId)
     //  Specify KMS Key as cluster secrets encryption key
-    .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider('my-alias-name')    
+    .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider('my-alias-name')    
     //  Register hosted zone and give it a name of GlobalResources.HostedZone
     .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     .resourceProvider("internal-hosted-zone", new ImportHostedZoneProvider('hosted-zone-id2', 'myinternal.domain.com'))

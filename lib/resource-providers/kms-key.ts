@@ -7,7 +7,7 @@ import { ResourceContext, ResourceProvider } from "../spi";
  * @example
  * ```typescript
  *     const stack = blueprints.EksBlueprint.builder()
- *       .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider("my-custom-eks-key"))
+ *       .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider("my-custom-eks-key"))
  *       .account("123456789012")
  *       .region("us-east-1")
  *       .build(app, "east-test-1");
