@@ -74,6 +74,11 @@ export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemp
      * @default all private subnets
      */
     nodeGroupSubnets?: ec2.SubnetSelection;
+
+    /**
+     * If set to true will add AmazonSSMManagedInstanceCore to the node role.
+     */
+    enableSsmPermissions?: boolean;
 }
 
 /**

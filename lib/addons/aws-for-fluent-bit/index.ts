@@ -12,7 +12,12 @@ export interface AwsForFluentBitAddOnProps extends HelmAddOnUserProps {
     /**
      * Iam policies for the add-on.
      */
-    iamPolicies?: PolicyStatement[]
+    iamPolicies?: PolicyStatement[],
+
+    /**
+     * Create Namespace with the provided one (will not if namespace is kube-system)
+     */
+    createNamespace?: boolean
 }
 /**
  * Default props for the add-on.
@@ -21,9 +26,10 @@ const defaultProps: AwsForFluentBitAddOnProps = {
     name: 'fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-for-fluent-bit",
-    version: '0.1.11',
+    version: '0.1.23',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'kube-system',
+    createNamespace: false,
     values: {}
 };
 
@@ -45,10 +51,7 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-
-        // Create the FluentBit namespace.
-        const namespace = this.options.namespace;
-        createNamespace(this.options.namespace!, cluster, true);
+        const namespace = this.options.namespace!;
 
         // Create the FluentBut service account.
         const serviceAccountName = 'aws-for-fluent-bit-sa';
@@ -56,6 +59,12 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
             name: serviceAccountName,
             namespace: namespace
         });
+
+        // Create namespace
+        if (this.options.createNamespace) {
+            const ns = createNamespace(namespace, cluster, true);
+            sa.node.addDependency(ns);
+        }
 
         // Apply additional IAM policies to the service account.
         const policies = this.options.iamPolicies || [];
@@ -71,6 +80,7 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
         };
 
         const helmChart = this.addHelmChart(clusterInfo, values);
+        helmChart.node.addDependency(sa);
         return Promise.resolve(helmChart);
     }
 }
