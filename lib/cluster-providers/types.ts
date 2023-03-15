@@ -5,7 +5,7 @@ import { AutoScalingGroupCapacityOptions } from "aws-cdk-lib/aws-eks";
 /**
  * Configuration options for the custom AMI.
  */
-export interface LaunchTemplateProps {
+export interface CustomAmiProps {
     /**
      * The custom AMI for the node group.
      */
@@ -15,14 +15,6 @@ export interface LaunchTemplateProps {
      * The userData for worker node when using custom AMI. Only applicable when customAmi is used.
      */
     userData?: ec2.UserData;
-
-    /**
-     * Custom Tags for launch template which will propogate to worker nodes.
-     */
-    customTags?: {
-        [key: string]: string;
-    }
-
 }
 
 
@@ -68,10 +60,9 @@ export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemp
     amiReleaseVersion?: string;
 
     /**
-     * The Launch Template properties for the Nodes.
-     * `amiType` and `amiReleaseVersion` will be ignored if this is set.
+     * The custom AMI for the node group. `amiType` and `amiReleaseVersion` will be ignored if this is set.
      */
-    launchTemplate?: LaunchTemplateProps;
+    customAmi?: CustomAmiProps;
 
     /**
      * Select either SPOT or ON-DEMAND
