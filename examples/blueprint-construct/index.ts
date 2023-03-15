@@ -168,6 +168,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
+            new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
         ];
 
