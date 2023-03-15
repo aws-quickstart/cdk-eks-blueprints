@@ -143,7 +143,12 @@ export default class BlueprintConstruct {
                 ],
               }
             ),
-            new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
+            new blueprints.addons.EfsCsiDriverAddOn({
+              replicaCount: 1,
+              kmsKeys: [
+                blueprints.getResource( context => new kms.Key(context.scope, "efs-csi-driver-key", { alias: "efs-csi-driver-key"})),
+              ],
+            }),
             new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
                 securityContextRunAsGroup: 1001,
@@ -164,6 +169,7 @@ export default class BlueprintConstruct {
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.UpboundUniversalCrossplaneAddOn(),
+            new blueprints.AwsForFluentBitAddOn(),
         ];
 
         // Instantiated to for helm version check.

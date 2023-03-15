@@ -9,7 +9,7 @@ import * as constraints from '../utils/constraints-utils';
 import * as utils from '../utils';
 import { cloneDeep } from '../utils';
 import { IKey } from "aws-cdk-lib/aws-kms";
-import {KmsKeyProvider} from "../resource-providers/kms-key";
+import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 export class EksBlueprintProps {
@@ -233,7 +233,7 @@ export class EksBlueprint extends cdk.Stack {
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
         if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
-            kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new KmsKeyProvider());
+            kmsKeyResource = resourceContext.add(spi.GlobalResources.KmsKey, new CreateKmsKeyProvider());
         }
 
         blueprintProps = this.resolveDynamicProxies(blueprintProps, resourceContext);

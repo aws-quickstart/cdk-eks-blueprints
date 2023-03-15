@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, dependable, setPath } from '../../utils';
+import { createNamespace, setPath } from '../../utils';
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
@@ -135,7 +135,6 @@ export class JupyterHubAddOn extends HelmAddOn {
         this.options = this.props as JupyterHubAddOnProps;
     }
     
-    @dependable(AwsLoadBalancerControllerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values = this.options.values ?? {};
@@ -202,8 +201,10 @@ export class JupyterHubAddOn extends HelmAddOn {
         const ingressAnnotations = this.options.ingressAnnotations;
         const cert = this.options.certificateResourceName;
 
+        const albAddOnCheck = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn.name');
         // Use Ingress and AWS ALB
         if (serviceType == JupyterHubServiceType.ALB){
+            assert(albAddOnCheck, `Missing a dependency: ${AwsLoadBalancerControllerAddOn.name}. Please add it to your list of addons.`); 
             const presetAnnotations: any = {
                 'alb.ingress.kubernetes.io/scheme': 'internet-facing',
                 'alb.ingress.kubernetes.io/target-type': 'ip',
@@ -229,6 +230,7 @@ export class JupyterHubAddOn extends HelmAddOn {
                 setPath(values, "proxy.service", {"type": "ClusterIP"});
             // We will use NLB 
             } else {
+                assert(albAddOnCheck, `Missing a dependency: ${AwsLoadBalancerControllerAddOn.name}. Please add it to your list of addons.`); 
                 setPath(values, "proxy.service", { 
                     "annotations": {
                         "service.beta.kubernetes.io/aws-load-balancer-type": "nlb",

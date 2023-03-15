@@ -6,7 +6,7 @@ import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Key } from "aws-cdk-lib/aws-kms";
 import * as nutil from 'node:util/types';
 import * as blueprints from "../../lib";
-import { AppMeshAddOn, EksBlueprint, GlobalResources, KmsKeyProvider } from "../../lib";
+import { AppMeshAddOn, EksBlueprint, GlobalResources, CreateKmsKeyProvider } from "../../lib";
 import { cloneDeep, logger } from "../../lib/utils";
 
 
@@ -98,7 +98,7 @@ describe("ResourceProxy",() => {
         const someRole: Role = blueprints.getResource( context => new Role(context.scope, "some-role", { assumedBy: new ServicePrincipal("sns.amazon.com")}));
         
         const builder = EksBlueprint.builder()
-            .resourceProvider(GlobalResources.KmsKey, new KmsKeyProvider())
+            .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider())
             .account("123456789012")
             .region("us-east-1")
             .addOns(new AppMeshAddOn( {
