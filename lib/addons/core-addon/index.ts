@@ -2,8 +2,8 @@ import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
-import { PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { createServiceAccount, deployBeforeCapacity, userLog,  } from "../../utils";
+import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
+import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -64,10 +64,10 @@ export class CoreAddOn implements ClusterAddOn {
         }
 
         // Create a service account if user provides namespace, PolicyDocument
-        const policyDoc = this.providePolicyDocument(clusterInfo);
-        if (policyDoc) {
-            serviceAccount  = createServiceAccount(clusterInfo.cluster, this.coreAddOnProps.saName,
-                saNamespace, policyDoc);
+        const policies = this.provideManagedPolicies(clusterInfo);
+        if (policies) {
+            serviceAccount  = createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
+                saNamespace, ...policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
 
@@ -92,6 +92,12 @@ export class CoreAddOn implements ClusterAddOn {
         return Promise.resolve(cfnAddon);
     }
 
+    /**
+     * Template method with default implenentation to execute the supplied function of policyDocumentProvider.
+     * Allows overriding this method in subclasses for more complex cases of policies.
+     * @param clusterInfo 
+     * @returns 
+     */
     providePolicyDocument(clusterInfo: ClusterInfo) : PolicyDocument | undefined {
         if(this.coreAddOnProps?.policyDocumentProvider) {
             return this.coreAddOnProps.policyDocumentProvider(clusterInfo.cluster.stack.partition);
@@ -99,5 +105,21 @@ export class CoreAddOn implements ClusterAddOn {
         return undefined;
     }
 
+    /**
+     * Template method to return managed policies for the service account. 
+     * Allows overriding in subclasses to handle more complex cases of policies.
+     */
+    provideManagedPolicies(clusterInfo: ClusterInfo) : IManagedPolicy[] | undefined {
+        let result : IManagedPolicy[] | undefined;
+        const policyDocument = this.providePolicyDocument(clusterInfo);
+        
+        if(policyDocument) {
+            const policy = new ManagedPolicy(clusterInfo.cluster, `${this.coreAddOnProps.addOnName}-managed-policy`, {
+                document: policyDocument
+            });
+            result = [policy];
+        }
+        return result;
+    }
 
 }
