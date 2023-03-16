@@ -19,10 +19,8 @@ Before using gMaestro, you need to:
 
 ![GmaestroConfigFile](../assets/images/gmaestro-config-file.png)
 
-3. Create 3 secrets (as a plaintext) in AWS Secrets Manager copy their values from the following places:
+3. Create 1 secret (as a plaintext) in AWS Secrets Manager copy its value from the following place:
    1. Deployment section `MAESTRO_CLIENT_ID`
-   2. ConfigMap section `prometheus.configs.remote_write.basic_auth.password`.
-   3. ConfigMap section `loki.configs.clients.basic_auth.password`
 
 ## Installation
 
@@ -46,9 +44,7 @@ const addOn = new GmaestroAddOn({
         clientIdSecretName: "<client id secret name>", // Create and copy from gMaestro deployment yaml
         clientName: "<client name>",
         clusterName: "<cluster name>",
-        namespace: "<namespace>",
-        grafanaMetricsSecretName: "<grafana metrics secret name>", // Create and copy from gMaestro deployment yaml
-        grafanaLogsSecretName: "<grafana logs secret name>", // Create and copy from gMaestro deployment yaml
+        namespace: "<namespace>"
     });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -91,23 +87,14 @@ Copy from the Deployment section `MAESTRO_SERVICE_NAME` value
 
 The namespace where gMaestro will be installed. `default` namespace is used as default.
 
-#### `grafanaMetricsSecretName: string`
-
-The secret name from the Prerequisite section 3.ii.
-
-#### `grafanaLogsSecretName: string`
-
-The secret name from the Prerequisite section 3.iii.
-
-
 ## Security issue
 
 1. The implementation requires access to the AWS Secrets Manager at build time to retrieve secret values.
-2. The secret values will be stored as plain text in the resulting CloudFormation stack, meaning that any user with access to view CloudFormation stack can gain access to these secrets.
+2. The secret value will be stored as plain text in the resulting CloudFormation stack, meaning that any user with access to view CloudFormation stack can gain access to this secret.
 
-Note: These secrets are specific to gMaestro and don't affect customer account beyond the scope of the gMaestro add-on.
+Note: This secret is specific to gMaestro and don't affect customer account beyond the scope of the gMaestro add-on.
 
-This issue will be mitigated and updated in the following weeks.
+
 ## Support
 
 If you have questions about Gmaestro, catch us [on Slack](https://granulatecommunity.slack.com/archives/C03RK0HN2TU)!
