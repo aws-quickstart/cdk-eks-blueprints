@@ -25,8 +25,8 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel =  3;
-        userLog.settings.minLevel = 2;
+        logger.settings.minLevel =  3; // info
+        userLog.settings.minLevel = 2; // debug
 
         // TODO: fix IAM user provisioning for admin user
         // Setup platform team.
@@ -143,7 +143,12 @@ export default class BlueprintConstruct {
                 ],
               }
             ),
-            new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
+            new blueprints.addons.EfsCsiDriverAddOn({
+              replicaCount: 1,
+              kmsKeys: [
+                blueprints.getResource( context => new kms.Key(context.scope, "efs-csi-driver-key", { alias: "efs-csi-driver-key"})),
+              ],
+            }),
             new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
                 securityContextRunAsGroup: 1001,
@@ -163,6 +168,8 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
+            new blueprints.UpboundUniversalCrossplaneAddOn(),
+            new blueprints.AwsForFluentBitAddOn(),
         ];
 
         // Instantiated to for helm version check.

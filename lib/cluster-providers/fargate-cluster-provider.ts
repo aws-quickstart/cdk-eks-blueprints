@@ -16,7 +16,7 @@ export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
     /**
      * The Fargate for the cluster.
      */
-    fargateProfiles: Map<string, eks.FargateProfileOptions>,
+    fargateProfiles?: Map<string, eks.FargateProfileOptions>,
 
     /**
      * Subnets are passed to the cluster configuration.
