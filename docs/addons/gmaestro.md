@@ -15,11 +15,11 @@ Before using gMaestro, you need to:
 1. [Sign up](https://app.granulate.io/gMaestroSignup) to the gMaestro platform
 2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" 
 
-![GmaestroGenerateConfigFile](../assets/images/gmaestro-generate-config-file.png)
+![GmaestroGenerateConfigFile](assets/images/gmaestro-generate-config-file.png)
 
-![GmaestroConfigFile](../assets/images/gmaestro-config-file.png)
+![GmaestroConfigFile](assets/images/gmaestro-config-file.png)
 
-3. Create 1 secret (as a plaintext) in AWS Secrets Manager copy its value from the following place:
+3. Create a secret (as a plaintext) in AWS Secrets Manager copy its value from the following place:
    1. Deployment section `MAESTRO_CLIENT_ID`
 
 ## Installation
@@ -87,6 +87,7 @@ Copy from the Deployment section `MAESTRO_SERVICE_NAME` value
 
 The namespace where gMaestro will be installed. `default` namespace is used as default.
 
+
 ## Security issue
 
 1. The implementation requires access to the AWS Secrets Manager at build time to retrieve secret values.
@@ -94,6 +95,7 @@ The namespace where gMaestro will be installed. `default` namespace is used as d
 
 Note: This secret is specific to gMaestro and don't affect customer account beyond the scope of the gMaestro add-on.
 
+This issue will be mitigated and updated in the following weeks.
 
 ## Support
 
