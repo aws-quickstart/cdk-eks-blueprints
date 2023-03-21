@@ -4,3 +4,4 @@ export * from './kms-key';
 export * from './iam';
 export * from './utils';
 export * from './vpc';
+export * from './efs';

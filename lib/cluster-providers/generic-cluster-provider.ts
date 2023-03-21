@@ -14,7 +14,7 @@ import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
-import { Tags } from "aws-cdk-lib";
+import { Tags } from "aws-cdk-lib/core/lib";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
