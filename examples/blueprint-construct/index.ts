@@ -8,7 +8,6 @@ import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { VpcProvider } from '../../lib';
-import { Scope } from 'aws-cdk-lib/aws-ecs';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -40,6 +39,7 @@ export default class BlueprintConstruct {
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
+
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
@@ -182,7 +182,7 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
         const launchTemplateSpotOptions: ec2.LaunchTemplateSpotOptions = {
             blockDuration: cdk.Duration.minutes(30),
@@ -192,11 +192,6 @@ export default class BlueprintConstruct {
             validUntil: cdk.Expiration.after(cdk.Duration.days(90))
         };
         
-        //The private key is saved to AWS Systems Manager Parameter Store, with the name: `/ec2/keypair/spotKeyName`
-        const cfnKeyPair = new ec2.CfnKeyPair(scope, 'SpotKeyPair', {
-            keyName: 'spotKeyName',
-          });
-
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
@@ -225,7 +220,7 @@ export default class BlueprintConstruct {
                             "LaunchTemplate": "Custom",
                             "Instance": "SPOT"
                         },
-                        keyName: cfnKeyPair.keyName,
+                        keyName: "spotKeyName",
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
