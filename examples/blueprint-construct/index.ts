@@ -143,7 +143,12 @@ export default class BlueprintConstruct {
                 ],
               }
             ),
-            new blueprints.addons.EfsCsiDriverAddOn({replicaCount: 1}),
+            new blueprints.addons.EfsCsiDriverAddOn({
+              replicaCount: 1,
+              kmsKeys: [
+                blueprints.getResource( context => new kms.Key(context.scope, "efs-csi-driver-key", { alias: "efs-csi-driver-key"})),
+              ],
+            }),
             new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
                 securityContextRunAsGroup: 1001,
@@ -164,6 +169,7 @@ export default class BlueprintConstruct {
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.UpboundUniversalCrossplaneAddOn(),
+            new blueprints.AwsForFluentBitAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -193,13 +199,13 @@ export default class BlueprintConstruct {
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
                 },
                 {
-                    id: "mng2-launchtemplate",
+                    id: "mng2-customami",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     desiredSize: 2,
                     minSize: 2,
-                    maxSize: 3, 
-                    launchTemplate: {
+                    maxSize: 3,
+                    customAmi: {
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
@@ -209,12 +215,6 @@ export default class BlueprintConstruct {
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
                         userData: userData,
-                        customTags: {
-                            "Name": "Mng2",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "SPOT"
-                        }
                     }
                 }
             ]

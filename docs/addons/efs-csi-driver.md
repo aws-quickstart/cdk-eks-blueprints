@@ -1,7 +1,7 @@
 # EFS CSI Driver Amazon EKS Add-on
 
 The `EFS CSI Driver Amazon EKS Add-on` provides a CSI interface that allows Kubernetes clusters running on AWS to manage the lifecycle of Amazon EFS volumes for persistent storage.
-EFS CSI driver supports both dynamic and static provisioning of storage
+EFS CSI driver supports both dynamic and static provisioning of storage.
 
 A couple of things to note:
 
@@ -12,7 +12,7 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ## Prerequisites
 
-- The EFS file system itself must be created in AWS separately as the driver uses the EFS for storage, but it does not create it.
+- The EFS file system itself must be created in AWS separately as the driver uses the EFS for storage, but it does not create it. You can create an EFS file system using the `CreateEfsFileSystemProvider`, e.g.: `.resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))`
 
 ## Usage
 
@@ -35,7 +35,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `version`: Version of the EFS CSI Driver add-on to be installed. Version 2.2.3 will be installed by default if a value is not provided
 - `replicaCount`: Number of replicas to be deployed. If not provided, two replicas will be deployed. Note that the number of replicas
   should be less than or equal to the number of nodes in the cluster otherwise some pods will be left of pending state
-
+- `kmsKeys`: List of KMS keys used for encryption-at-rest, so that the IAM policy can be updated to allow the EFS CSI driver to access the keys
 
 ## Validation
 
@@ -51,8 +51,8 @@ efs-csi-node-2c29j                             3/3     Running   0          155m
 
 ```
 
-Additionally, the [driver documentation](https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html) shows how to create an EFS file system to test the driver 
+Additionally, the [driver documentation](https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html) shows how to create an EFS file system to test the driver
 
 ## Functionality
 
-Applies the EFS CSI Driver add-on to an Amazon EKS cluster. 
+Applies the EFS CSI Driver add-on to an Amazon EKS cluster.
