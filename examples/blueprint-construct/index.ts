@@ -8,6 +8,7 @@ import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { VpcProvider } from '../../lib';
+import { Scope } from 'aws-cdk-lib/aws-ecs';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -183,6 +184,19 @@ export default class BlueprintConstruct {
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
+        const launchTemplateSpotOptions: ec2.LaunchTemplateSpotOptions = {
+            blockDuration: cdk.Duration.minutes(30),
+            interruptionBehavior: ec2.SpotInstanceInterruption.STOP,
+            maxPrice: 10,
+            requestType: ec2.SpotRequestType.ONE_TIME,
+            validUntil: cdk.Expiration.after(cdk.Duration.days(90))
+        };
+        
+        //The private key is saved to AWS Systems Manager Parameter Store, with the name: `/ec2/keypair/spotKeyName`
+        const cfnKeyPair = new ec2.CfnKeyPair(scope, 'SpotKeyPair', {
+            keyName: 'spotKeyName',
+          });
+
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
@@ -205,6 +219,13 @@ export default class BlueprintConstruct {
                     desiredSize: 0,
                     minSize: 0, 
                     launchTemplate: {
+                        customTags: {
+                            "Name": "Mng2",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "SPOT"
+                        },
+                        keyName: cfnKeyPair.keyName,
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
@@ -213,13 +234,8 @@ export default class BlueprintConstruct {
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
+                        launchTemplateSpotOptions: launchTemplateSpotOptions,
                         userData: userData,
-                        customTags: {
-                            "Name": "Mng2",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "SPOT"
-                        }
                     }
                 }
             ]

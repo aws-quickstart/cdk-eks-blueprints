@@ -22,6 +22,14 @@ export interface LaunchTemplateProps {
     customTags?: {
         [key: string]: string;
     }
+    /** Spot market instance options.
+     * Options include such as blockDuration, interruptionBehavior, maxPrice, requestType, validUntil
+     */
+    launchTemplateSpotOptions?: ec2.LaunchTemplateSpotOptions 
+
+    /* Key Pair to be used with SPOT instances
+    */
+    keyName?: string;
 
 }
 
