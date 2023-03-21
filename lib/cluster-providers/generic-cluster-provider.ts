@@ -355,9 +355,7 @@ export class GenericClusterProvider implements ClusterProvider {
         if (nodeGroup.launchTemplate) {
             // Create launch template with provided launch template properties
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
-                keyName: nodeGroup.launchTemplate.keyName,
                 machineImage: nodeGroup.launchTemplate?.machineImage,
-                spotOptions: nodeGroup.launchTemplate.launchTemplateSpotOptions,
                 userData: nodeGroup.launchTemplate?.userData,
             });
             utils.setPath(nodegroupOptions, "launchTemplateSpec", {

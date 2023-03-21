@@ -183,14 +183,6 @@ export default class BlueprintConstruct {
 
         const userData = ec2.UserData.forLinux();
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
-
-        const launchTemplateSpotOptions: ec2.LaunchTemplateSpotOptions = {
-            blockDuration: cdk.Duration.minutes(30),
-            interruptionBehavior: ec2.SpotInstanceInterruption.STOP,
-            maxPrice: 10,
-            requestType: ec2.SpotRequestType.ONE_TIME,
-            validUntil: cdk.Expiration.after(cdk.Duration.days(90))
-        };
         
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
@@ -220,7 +212,6 @@ export default class BlueprintConstruct {
                             "LaunchTemplate": "Custom",
                             "Instance": "SPOT"
                         },
-                        keyName: "spotKeyName",
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
@@ -229,7 +220,6 @@ export default class BlueprintConstruct {
                             'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
                             'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                         }),
-                        launchTemplateSpotOptions: launchTemplateSpotOptions,
                         userData: userData,
                     }
                 }
