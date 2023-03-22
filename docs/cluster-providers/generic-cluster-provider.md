@@ -2,7 +2,7 @@
 
 The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity. 
 
-Today it is not possible for an Amazon EKS Cluster to propogate tags to EC2 instance worker nodes directly when you create an EKS cluster. You can create a launch template with custom tags on `managedNodeGroups` with `GenericClusterProvider` as shown in `mng2-launchtemplate`. This will allow you to propogate custom tags to your EC2 instance worker nodes.
+Today it is not possible for an Amazon EKS Cluster to propagate tags to EC2 instance worker nodes directly when you create an EKS cluster. You can create a launch template with custom tags on `managedNodeGroups` with `GenericClusterProvider` as shown in `mng2-launchtemplate`. This will allow you to propagate custom tags to your EC2 instance worker nodes.
 
 Note: If `launchTemplate` is passed with `managedNodeGroups`, `diskSize` is not allowed.
 
@@ -34,7 +34,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             maxSize: 3, 
             nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
             launchTemplate: {
-                // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+                // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
                 customTags: {
                     "Name": "Mng1",
                     "Type": "Managed-Node-Group",
@@ -59,7 +59,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                     'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                 }),
                 userData: userData,
-                // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+                // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
                 customTags: {
                     "Name": "Mng2",
                     "Type": "Managed-Node-Group",
