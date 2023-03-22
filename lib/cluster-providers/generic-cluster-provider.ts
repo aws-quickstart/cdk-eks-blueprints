@@ -3,7 +3,6 @@ import { KubectlV22Layer } from "@aws-cdk/lambda-layer-kubectl-v22";
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
-import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { IKey } from "aws-cdk-lib/aws-kms";

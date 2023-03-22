@@ -194,10 +194,18 @@ export default class BlueprintConstruct {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-                    diskSize: 25,
                     desiredSize: 2,
                     maxSize: 3, 
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+                    launchTemplate: {
+                        // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+                        customTags: {
+                            "Name": "Mng1",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "ONDEMAND"
+                        }
+                    }
                 },
                 {
                     id: "mng2-launchtemplate",
