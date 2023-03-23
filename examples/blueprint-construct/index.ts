@@ -39,6 +39,7 @@ export default class BlueprintConstruct {
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
+
         const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
             // TODO: enabling this cause stack deletion failure, known issue:
             // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
@@ -181,8 +182,8 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
-
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
+        
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
@@ -193,18 +194,32 @@ export default class BlueprintConstruct {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-                    diskSize: 25,
                     desiredSize: 2,
                     maxSize: 3, 
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+                    launchTemplate: {
+                        // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+                        customTags: {
+                            "Name": "Mng1",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "ONDEMAND"
+                        }
+                    }
                 },
                 {
-                    id: "mng2-customami",
+                    id: "mng2-launchtemplate",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     desiredSize: 0,
-                    minSize: 0,
-                    customAmi: {
+                    minSize: 0, 
+                    launchTemplate: {
+                        customTags: {
+                            "Name": "Mng2",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "SPOT"
+                        },
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
