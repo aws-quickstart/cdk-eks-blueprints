@@ -596,7 +596,7 @@ export default class BlueprintConstruct {
     blueprints.CodePipelineStack.builder()
       .name('blueprints-pipeline-test')
       .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
-      //   .owner('aws-samples')
+      .owner('aws-samples')
       .repository({
         repoUrl: 'blueprints-repo-codestar',
         codeStarConnectionArn: 'fill-in-codestar-arn',
