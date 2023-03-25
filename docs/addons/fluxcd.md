@@ -32,7 +32,7 @@ Verify if the namespace is created correctly
 ```bash
   kubectl get ns | grep "flux-system"
 ```
-There should be list the cert-manager namespace
+There should be list the flux-system namespace
 ```bash
 flux-system      Active   31m
 ```
