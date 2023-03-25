@@ -36,11 +36,11 @@ There should be list the flux-system namespace
 ```bash
 flux-system      Active   31m
 ```
-Verify if the pods are running correctly in cert-manager namespace
+Verify if the pods are running correctly in flux-system namespace
 ```bash
   kubectl get pods -n flux-system  
 ```
-There should list 3 pods starting with name cert-manager-
+There should list 3 pods starting with name flux-system
 For Eg:
 ```bash
 NAME                                          READY   STATUS    RESTARTS   AGE
