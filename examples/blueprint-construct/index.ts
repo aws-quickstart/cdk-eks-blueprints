@@ -23,7 +23,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.validateHelmVersions = false;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel =  3; // info
         userLog.settings.minLevel = 2; // debug
@@ -171,6 +171,7 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
+            new blueprints.FluxcdAddOn(),
         ];
 
         // Instantiated to for helm version check.

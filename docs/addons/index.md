@@ -28,9 +28,10 @@ The framework currently supports the following add-ons.
 | [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator).        |
 | [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage.                 |
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 |
-| [`EmrOnEksAddOn`](./emr-eks.md)                             | Enable EKS cluster to be used with EMR on EKS                                                                                          |
+| [`EmrOnEksAddOn`](./emr-eks.md)                             | Enable EKS cluster to be used with EMR on EKS          |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. |
-| [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.                                 |
+| [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.|  
+| [`FluxcdAddOn`](./fluxcd.md)                                   | Adds [Fluxcd](https://fluxcd.io/) Setting up Flux to manage one or more Kubernetes clusters.                                 |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               |
 | [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn.                                                                    |
 | [`KnativeAddOn`](./knative.md)                                         | Deploys the [KNative Operator](https://knative.dev/docs/install/operator/knative-with-operators/) to ease setting up the rest of KNatives CRDs                                                          |

@@ -1,4 +1,4 @@
-// lib/certmanager_addon.ts
+// lib/fluxcd_addon.ts
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
@@ -8,22 +8,22 @@ import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
  * User provided options for the Helm Chart
  */
 export interface FluxcdAddOnProps extends HelmAddOnUserProps {
-    /**
-     * To Create Namespace using CDK
-     */    
-    createNamespace?: boolean;
+  /**
+   * To Create Namespace using CDK
+   */    
+  createNamespace?: boolean;
 }
 
 /**
  * Default props to be used when creating the Helm chart
  */
 const defaultProps: HelmAddOnProps & FluxcdAddOnProps = {
-  name: "blueprints-fluxcd-addon",
+  name: "fluxcd-addon",
   namespace: "flux-system",
-  chart: "fluxcd-community",
+  chart: "flux2",
   version: "2.7.0",
-  release: "fluxcd-community",
-  repository:  "https://fluxcd-community.github.io/helm-charts",
+  release: "blueprints-fluxcd-addon",
+  repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
   createNamespace: true
 };
