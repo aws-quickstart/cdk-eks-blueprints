@@ -42,7 +42,6 @@ const app = new cdk.App();
 
 const addOn = new GmaestroAddOn({
         clientIdSecretName: "<client id secret name>", // Create and copy from gMaestro deployment yaml
-        clientName: "<client name>",
         clusterName: "<cluster name>",
         namespace: "<namespace>"
     });
@@ -74,10 +73,6 @@ Take the following parameter from the sample YAML file that was downloaded.
 #### `clientIdSecretName: string`
 
 The secret name from the Prerequisite section 3.i.
-
-#### `clientName: string`
-
-Copy from the ConfigMap section `prometheus.configs.scrape_configs.static_configs.labels.client_name` value
 
 #### `clusterName: string`
 
