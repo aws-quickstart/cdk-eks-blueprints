@@ -1,6 +1,10 @@
 # Generic Cluster Provider
 
-The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity.
+The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity. 
+
+Today it is not possible for an Amazon EKS Cluster to propagate tags to EC2 instance worker nodes directly when you create an EKS cluster. You can create a launch template with custom tags on `managedNodeGroups` with `GenericClusterProvider` as shown in `mng2-launchtemplate`. This will allow you to propagate custom tags to your EC2 instance worker nodes.
+
+Note: If `launchTemplate` is passed with `managedNodeGroups`, `diskSize` is not allowed.
 
 # Configuration
 
@@ -26,19 +30,42 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             id: "mng1",
             amiType: NodegroupAmiType.AL2_X86_64,
             instanceTypes: [new InstanceType('m5.2xlarge')],
-            diskSize: 50
+            desiredSize: 2,
+            maxSize: 3, 
+            nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+            launchTemplate: {
+                // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
+                customTags: {
+                    "Name": "Mng1",
+                    "Type": "Managed-Node-Group",
+                    "LaunchTemplate": "Custom",
+                    "Instance": "ONDEMAND"
+                }
+            }
         },
         {
-            id: "mng2-custom",
-            instanceTypes: [new InstanceType('m5.2xlarge')],
+            id: "mng2-launchtemplate",
+            instanceTypes: [new ec2.InstanceType('m5.2xlarge')],
             nodeGroupCapacityType: CapacityType.SPOT,
-            customAmi: {
+            desiredSize: 0,
+            minSize: 0,
+            launchTemplate: {
                 machineImage: ec2.MachineImage.genericLinux({
-                    'us-east-1': 'ami-0b297a512e2852b89',
-                    'us-west-2': 'ami-06a8c459c01f55c7b',
-                    'us-east-2': 'ami-093d9796e55a5b860'
+                    'us-east-1': 'ami-08e520f5673ee0894',
+                    'us-west-2': 'ami-0403ff342ceb30967',
+                    'us-east-2': 'ami-07109d69738d6e1ee',
+                    'us-west-1': 'ami-07bda4b61dc470985',
+                    'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                    'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
                 }),
                 userData: userData,
+                // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
+                customTags: {
+                    "Name": "Mng2",
+                    "Type": "Managed-Node-Group",
+                    "LaunchTemplate": "Custom",
+                    "Instance": "SPOT"
+                }
             }
         }
     ],
