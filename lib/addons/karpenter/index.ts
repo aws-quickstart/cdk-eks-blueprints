@@ -399,9 +399,6 @@ export class KarpenterAddOn extends HelmAddOn {
         const clusterName = cluster.clusterName;
         const clusterHash = md5.Md5.hashStr(clusterName);
 
-        const clusterName = cluster.clusterName;
-        const clusterHash = md5.Md5.hashStr(clusterName);
-
         //Cfn output for Node Role in case of needing to add additional policies
         new CfnOutput(cluster.stack, 'Karpenter Instance Node Role', {
             value: karpenterNodeRole.roleName,
