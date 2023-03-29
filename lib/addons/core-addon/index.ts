@@ -66,7 +66,7 @@ export class CoreAddOn implements ClusterAddOn {
         // Create a service account if user provides namespace, PolicyDocument
         const policies = this.provideManagedPolicies(clusterInfo);
         if (policies) {
-            serviceAccount  = createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
+            serviceAccount = createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
                 saNamespace, ...policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }

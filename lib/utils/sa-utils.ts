@@ -15,13 +15,12 @@ export function createServiceAccount(cluster: Cluster, name: string, namespace: 
 
 }
 
-export function createServiceAccountWithPolicy(cluster: Cluster, name: string, namespace: string, policy: IManagedPolicy): ServiceAccount {
+export function createServiceAccountWithPolicy(cluster: Cluster, name: string, namespace: string, ...policies: IManagedPolicy[]): ServiceAccount {
     const sa = cluster.addServiceAccount(`${name}-sa`, {
         name: name,
         namespace: namespace
     });
 
-    sa.role.addManagedPolicy(policy);
-    
+    policies.forEach(policy => sa.role.addManagedPolicy(policy));
     return sa;
 }
