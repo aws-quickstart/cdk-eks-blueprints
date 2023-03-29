@@ -288,9 +288,11 @@ describe('Unit tests for EKS Blueprint', () => {
                 }
             });
 
-        expect(()=> {
-            pipeline.build(app, "blueprints-pipeline-id");
-        }).toThrow("repository.owner field is required for the GitHub pipeline stack. Please provide value.");
+        expect(() => {
+            pipeline.build(app, 'blueprints-pipeline-id');
+        }).toThrow(
+            'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+        );
     });
 
     test('Pipeline Builder Creates correct pipeline. With CodeCommit as a repository.', () => {
@@ -352,18 +354,10 @@ describe('Unit tests for EKS Blueprint', () => {
   test('Pipeline Builder Creates correct pipeline. With Codestar Connection as a repository.', () => {
     const app = new cdk.App();
 
-    const blueprint = blueprints.EksBlueprint.builder()
-      .account('123567891')
-      .region('us-west-1')
-      .addOns(new blueprints.ArgoCDAddOn())
-      .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
-      .addOns(new blueprints.NginxAddOn())
-      .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
     const pipeline = blueprints.CodePipelineStack.builder()
       .name('blueprints-pipeline-codestar-test')
       .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
-      .owner('aws-samples')
+    //   .owner('aws-samples')
       .repository({
         repoUrl: 'blueprints-repo-codestar',
         codeStarConnectionArn: 'fill-in-codestar-arn',

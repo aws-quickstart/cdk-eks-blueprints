@@ -380,51 +380,53 @@ class CodePipeline {
     public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
         let codePipelineSource : cdkpipelines.CodePipelineSource | undefined = undefined;
 
-    switch (true) {
-      case isCodeCommitRepo(props.repository):
-        let codeCommitRepo = props.repository as CodeCommitSourceRepository;
-        codePipelineSource = cdkpipelines.CodePipelineSource.codeCommit(
-          codecommit.Repository.fromRepositoryName(
-            scope,
-            'cdk-eks-blueprints',
-            codeCommitRepo.codeCommitRepoName
-          ),
-          codeCommitRepo.targetRevision ?? 'master',
-          codeCommitRepo.codeCommitOptions
-        );
-        break;
+        switch (true) {
+          case isCodeCommitRepo(props.repository):{
+            let codeCommitRepo = props.repository as CodeCommitSourceRepository;
+            codePipelineSource = cdkpipelines.CodePipelineSource.codeCommit(
+              codecommit.Repository.fromRepositoryName(
+                scope,
+                'cdk-eks-blueprints',
+                codeCommitRepo.codeCommitRepoName
+              ),
+              codeCommitRepo.targetRevision ?? 'master',
+              codeCommitRepo.codeCommitOptions
+            );
+            break;
+          }
+          case isCodeStarConnection(props.repository):{
+            let codeStarConnection =
+              props.repository as CodeStarConnectionRepository;
+            const repoOwner = codeStarConnection.owner ?? props.owner;
+            codePipelineSource = cdkpipelines.CodePipelineSource.connection(
+              `${repoOwner}/${codeStarConnection.repoUrl}`,
+              codeStarConnection.targetRevision ?? 'main',
+              { connectionArn: codeStarConnection.codeStarConnectionArn }
+            );
+            break;
+          }
 
-      case isCodeStarConnection(props.repository):
-        let codeStarConnection =
-          props.repository as CodeStarConnectionRepository;
-        const repoOwner = codeStarConnection.owner ?? props.owner;
-        codePipelineSource = cdkpipelines.CodePipelineSource.connection(
-          `${repoOwner}/${codeStarConnection.repoUrl}`,
-          codeStarConnection.targetRevision ?? 'main',
-          { connectionArn: codeStarConnection.codeStarConnectionArn }
-        );
-        break;
+          default:{
+            let gitHubRepo = props.repository as GitHubSourceRepository;
+            let githubProps: cdkpipelines.GitHubSourceOptions | undefined =
+              undefined;
+            const gitHubOwner = gitHubRepo.owner ?? props.owner;
 
-      default:
-        let gitHubRepo = props.repository as GitHubSourceRepository;
-        let githubProps: cdkpipelines.GitHubSourceOptions | undefined =
-          undefined;
-        const gitHubOwner = gitHubRepo.owner ?? props.owner;
-
-        if (gitHubRepo.credentialsSecretName) {
-          githubProps = {
-            authentication: cdk.SecretValue.secretsManager(
-              gitHubRepo.credentialsSecretName!
-            ),
-          };
+            if (gitHubRepo.credentialsSecretName) {
+              githubProps = {
+                authentication: cdk.SecretValue.secretsManager(
+                  gitHubRepo.credentialsSecretName!
+                ),
+              };
+            }
+            codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
+              `${gitHubOwner}/${gitHubRepo.repoUrl}`,
+              gitHubRepo.targetRevision ?? 'main',
+              githubProps
+            );
+            break;
+          }
         }
-        codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
-          `${gitHubOwner}/${gitHubRepo.repoUrl}`,
-          gitHubRepo.targetRevision ?? 'main',
-          githubProps
-        );
-        break;
-    }
 
         return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
