@@ -39,30 +39,8 @@ export default class BlueprintConstruct {
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
-        const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
-            // TODO: enabling this cause stack deletion failure, known issue:
-            // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
-            // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
-            //      path: 'chart',
-            //      targetRevision: "eks-blueprints-cdk",
-            // },
-            // workloadApplications: [
-            //     {
-            //         name: "micro-services",
-            //         namespace: "argocd",
-            //         repository: {
-            //             repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
-            //             path: 'envs/dev',
-            //             targetRevision: "main",
-            //         },
-            //         values: {
-            //             domain: ""
-            //         }
-            //     }
-            // ],
-            // adminPasswordSecretName: "argo-admin-secret"
-        });
+        const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn();
+        
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CertManagerAddOn(),
