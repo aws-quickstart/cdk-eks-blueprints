@@ -4,20 +4,28 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { FluxGitRepository, GitRepositoryProps } from "./gitrepository"
+import { Cluster } from 'aws-cdk-lib/aws-ecs';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
 /**
  * User provided options for the Helm Chart
  */
-export interface FluxcdAddOnProps extends HelmAddOnUserProps {
+export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   /**
    * To Create Namespace using CDK
    */    
   createNamespace?: boolean;
+
+  /**
+   * Optional values for `GitRepository` Source to produce an Artifact for a Git repository revision.
+   */
+  gitRepositoryProps?: GitRepositoryProps;
 }
 
 /**
  * Default props to be used when creating the Helm chart
  */
-const defaultProps: HelmAddOnProps & FluxcdAddOnProps = {
+const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   name: "fluxcd-addon",
   namespace: "flux-system",
   chart: "flux2",
@@ -25,19 +33,26 @@ const defaultProps: HelmAddOnProps & FluxcdAddOnProps = {
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
-  createNamespace: true
+  createNamespace: true,
+  gitRepositoryProps: {
+    name: "samplerepo",
+    namespace: "flux-system",
+    interval: "5m0s",
+    url: "https://github.com/aws-samples/eks-blueprints-workloads.git",
+    branch: "master"
+  }
 };
 
 /**
  * Main class to instantiate the Helm chart
  */
-export class FluxcdAddOn extends HelmAddOn {
+export class FluxCDAddOn extends HelmAddOn {
 
-  readonly options: FluxcdAddOnProps;
+  readonly options: FluxCDAddOnProps;
 
-  constructor(props?: FluxcdAddOnProps) {
+  constructor(props?: FluxCDAddOnProps) {
     super({...defaultProps, ...props});
-    this.options = this.props as FluxcdAddOnProps;
+    this.options = this.props as FluxCDAddOnProps;
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
@@ -50,14 +65,20 @@ export class FluxcdAddOn extends HelmAddOn {
       const namespace = createNamespace(this.options.namespace! , cluster);
       const chart = this.addHelmChart(clusterInfo, values);
       chart.node.addDependency(namespace);
+
+      //Lets create a GitRepository resource as a source to Flux
+      const construct = createGitRepository(clusterInfo, this.options.gitRepositoryProps);
+      chart.node.addDependency(construct);
       return Promise.resolve(chart);
 
     } else {
       //Namespace is already created
       const chart = this.addHelmChart(clusterInfo, values);
+      //Lets create a GitRepository resource as a source to Flux
+      const construct = createGitRepository(clusterInfo, this.options.gitRepositoryProps);
+      chart.node.addDependency(construct);
       return Promise.resolve(chart);
     }
-    
   }
 }
 
@@ -65,7 +86,16 @@ export class FluxcdAddOn extends HelmAddOn {
  * populateValues populates the appropriate values used to customize the Helm chart
  * @param helmOptions User provided values to customize the chart
  */
-function populateValues(helmOptions: FluxcdAddOnProps): Values {
+function populateValues(helmOptions: FluxCDAddOnProps): Values {
   const values = helmOptions.values ?? {};
   return values;
+}
+
+/**
+ * createGitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
+ */
+function createGitRepository(clusterInfo: ClusterInfo, gitRepositoryProps?: GitRepositoryProps): KubernetesManifest {
+  const manifest = new FluxGitRepository().generate(gitRepositoryProps!);
+  const construct = clusterInfo.cluster.addManifest(gitRepositoryProps?.name!, manifest);
+  return construct;
 }

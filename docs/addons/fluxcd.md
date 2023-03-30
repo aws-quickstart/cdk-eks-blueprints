@@ -1,4 +1,4 @@
-# Fluxcd Add-on
+# FluxCD Add-on
 
 This add-on installs [fluxcd](https://fluxcd.io/).
 
@@ -12,7 +12,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.FluxcdAddOn()
+const addOn = new blueprints.addons.FluxCDAddOn()
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
