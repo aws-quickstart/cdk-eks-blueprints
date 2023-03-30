@@ -172,11 +172,19 @@ export default class BlueprintConstruct {
                     id: "mng1",
                     amiType: NodegroupAmiType.AL2_X86_64,
                     instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-                    diskSize: 25,
                     desiredSize: 2,
                     maxSize: 3, 
                     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+                    launchTemplate: {
+                        // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+                        customTags: {
+                            "Name": "Mng1",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "ONDEMAND"
+                        }
+                    }
                 },
                 {
                     id: "mng2-customami",
@@ -185,7 +193,13 @@ export default class BlueprintConstruct {
                     desiredSize: 0,
                     minSize: 0,
                     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    customAmi: {
+                    launchTemplate: {
+                        customTags: {
+                            "Name": "Mng2",
+                            "Type": "Managed-Node-Group",
+                            "LaunchTemplate": "Custom",
+                            "Instance": "SPOT"
+                        },
                         machineImage: ec2.MachineImage.genericLinux({
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',

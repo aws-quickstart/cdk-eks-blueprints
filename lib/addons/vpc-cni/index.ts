@@ -4,7 +4,7 @@ import { loadYaml, readYamlDocument } from "../../utils";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { ISubnet } from "aws-cdk-lib/aws-ec2";
-import { IManagedPolicy, ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { IManagedPolicy } from "aws-cdk-lib/aws-iam";
 
 /**
  * User provided option for the Helm Chart
@@ -167,6 +167,18 @@ export interface VpcCniAddOnProps {
   * should attempt to keep available for pod assignment on the node.
   */
   warmPrefixTarget?: number;
+
+  /**
+   * If specified, an IRSA account will be created for the VPC-CNI add-on with the IRSA role
+   * having the specified managed policies. When specified, the node role for the cluster provider can be configured 
+   * without the CNI policy. 
+   * 
+   * For IPv4 the required managed policy is AmazonEKS_CNI_Policy.
+   * @example
+   * serviceAccountPolicies: [ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
+   * 
+   */
+  serviceAccountPolicies?: IManagedPolicy[];
 }
 
 
@@ -228,7 +240,7 @@ export class VpcCniAddOn extends CoreAddOn {
   }
 
   provideManagedPolicies(_clusterInfo: ClusterInfo): IManagedPolicy[] | undefined {
-    return [ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")];
+    return this.vpcCniAddOnProps.serviceAccountPolicies;
   }
 }
 
