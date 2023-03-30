@@ -171,7 +171,13 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
-            new blueprints.FluxCDAddOn(),
+            new blueprints.FluxCDAddOn({
+                bootstrapRepo: {
+                    repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
+                    path: 'chart',
+                    targetRevision: "eks-blueprints-cdk",
+                },
+            }),
         ];
 
         // Instantiated to for helm version check.

@@ -4,8 +4,8 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { FluxGitRepository, GitRepositoryProps } from "./gitrepository"
-import { Cluster } from 'aws-cdk-lib/aws-ecs';
+import { FluxGitRepository } from "./gitrepository";
+import * as spi from "../../spi";
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
 /**
  * User provided options for the Helm Chart
@@ -19,7 +19,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   /**
    * Optional values for `GitRepository` Source to produce an Artifact for a Git repository revision.
    */
-  gitRepositoryProps?: GitRepositoryProps;
+  bootstrapRepo?: spi.ApplicationRepository;
 }
 
 /**
@@ -34,12 +34,10 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
   createNamespace: true,
-  gitRepositoryProps: {
-    name: "samplerepo",
-    namespace: "flux-system",
-    interval: "5m0s",
-    url: "https://github.com/aws-samples/eks-blueprints-workloads.git",
-    branch: "master"
+  bootstrapRepo: {
+    repoUrl: "https://github.com/aws-samples/eks-blueprints-add-ons.git",
+    name: "workloadsrepo", 
+    targetRevision: "eks-blueprints-cdk"
   }
 };
 
@@ -67,17 +65,17 @@ export class FluxCDAddOn extends HelmAddOn {
       chart.node.addDependency(namespace);
 
       //Lets create a GitRepository resource as a source to Flux
-      const construct = createGitRepository(clusterInfo, this.options.gitRepositoryProps);
-      chart.node.addDependency(construct);
-      return Promise.resolve(chart);
-
+      const construct = createGitRepository(clusterInfo, this.options);
+      construct.node.addDependency(chart);
+      return Promise.resolve(construct);
     } else {
       //Namespace is already created
       const chart = this.addHelmChart(clusterInfo, values);
+
       //Lets create a GitRepository resource as a source to Flux
-      const construct = createGitRepository(clusterInfo, this.options.gitRepositoryProps);
-      chart.node.addDependency(construct);
-      return Promise.resolve(chart);
+      const construct = createGitRepository(clusterInfo, this.options);
+      construct.node.addDependency(chart);
+      return Promise.resolve(construct);
     }
   }
 }
@@ -94,8 +92,10 @@ function populateValues(helmOptions: FluxCDAddOnProps): Values {
 /**
  * createGitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, gitRepositoryProps?: GitRepositoryProps): KubernetesManifest {
-  const manifest = new FluxGitRepository().generate(gitRepositoryProps!);
-  const construct = clusterInfo.cluster.addManifest(gitRepositoryProps?.name!, manifest);
+function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxGitRepository(fluxcdAddonProps.bootstrapRepo).generate(fluxcdAddonProps);
+  let manifestName: string | undefined;
+  manifestName = fluxcdAddonProps.bootstrapRepo?.name;
+  const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }
