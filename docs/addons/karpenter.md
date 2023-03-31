@@ -12,13 +12,9 @@ Karpenter works by:
 
 ## Prerequisites
 
-1. This add-on depends on [VPC CNI](vpc-cni.md) Add-on for cni support.
+1. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`.
 
-***VPC CNI add-on must be present in add-on array*** and ***must be in add-on array before the Karpenter add-on*** for it to work, as shown in below example. Otherwise will run into error `Assertion failed: Missing a dependency for VpcCniAddOn`.
-
-2. There is no support for utilizing both Cluster Autoscaler **and** Karpenter. Therefore, any addons list that has both will result in an error `Deploying <name of your stack> failed due to conflicting add-on: ClusterAutoscalerAddOn.`.
-
-3. (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
+2. (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
 
 ## Usage
 
@@ -53,12 +49,11 @@ const karpenterAddonProps = {
   weight: 20,
   interruptionHandling: true,
 }
-const vpcCniAddOn = new blueprints.addons.VpcCniAddOn();
+
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
-const addOns: Array<blueprints.ClusterAddOn> = [ vpcCniAddOn, karpenterAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(...addOns)
+  .addOns(karpenterAddOn)
   .build(app, 'my-stack-name');
 ```
 

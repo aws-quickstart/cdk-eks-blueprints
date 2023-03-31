@@ -283,8 +283,8 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   // clean up all undefined
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = typeof values[key] == 'boolean' ? JSON.stringify(values[key]) : values[key]);
-
+  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ?  JSON.stringify(values[key]):values[key]);
+ 
   return result;
 }
 
@@ -306,3 +306,4 @@ export function _kubectlApply() {
     return ctor;
   };
 }
+
