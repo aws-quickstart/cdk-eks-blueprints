@@ -12,7 +12,13 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.FluxCDAddOn()
+const addOn = new blueprints.addons.FluxCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
+        name: "workloadsrepo",
+        targetRevision: "eks-blueprints-cdk",
+    },
+}),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -52,6 +58,13 @@ notification-controller-55d8c759f5-zqd6f      1/1     Running   0          6m13s
 source-controller-58c66d55cd-4f6vh            1/1     Running   0          6m13s
 ```
 
+Verify if the `GitRepository` is created fine to bootstrap a git repo:
+```bash
+❯ kubectl get gitrepositories.source.toolkit.fluxcd.io -A
+NAMESPACE     NAME            URL                                                         AGE   READY   STATUS
+flux-system   workloadsrepo   https://github.com/aws-samples/eks-blueprints-add-ons.git   24m   True    stored artifact for revision 'eks-blueprints-cdk@sha1:65f1fbbb5165821f6f8bd14eba65a6d2f6cfe0fb'
+```
+
 ## Testing
 
 The Flux CLI is available as a binary executable for all major platforms, the binaries can be downloaded form GitHub releases page.
@@ -60,12 +73,4 @@ Install Fluxcd client
 ```bash
 curl -s https://fluxcd.io/install.sh | sudo bash
 . <(flux completion bash)
-```
-
-Run bootstrap for a Git repository and authenticate with your SSH agent:
-```bash
-  flux bootstrap git \
-  --url=ssh://git@<host>/<org>/<repository> \
-  --branch=<my-branch> \
-  --path=clusters/my-cluster
 ```
