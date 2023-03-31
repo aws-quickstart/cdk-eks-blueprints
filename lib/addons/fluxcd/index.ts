@@ -33,12 +33,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
-  createNamespace: true,
-  bootstrapRepo: {
-    repoUrl: "https://github.com/aws-samples/eks-blueprints-add-ons.git",
-    name: "workloadsrepo", 
-    targetRevision: "eks-blueprints-cdk"
-  }
+  createNamespace: true
 };
 
 /**

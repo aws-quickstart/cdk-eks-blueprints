@@ -174,7 +174,7 @@ export default class BlueprintConstruct {
             new blueprints.FluxCDAddOn({
                 bootstrapRepo: {
                     repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
-                    path: 'chart',
+                    name: "workloadsrepo",
                     targetRevision: "eks-blueprints-cdk",
                 },
             }),

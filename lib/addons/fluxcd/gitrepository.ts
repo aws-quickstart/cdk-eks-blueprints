@@ -1,16 +1,17 @@
 import { FluxCDAddOnProps } from '.';
 import { GitRepositoryReference } from '../../spi';
+import * as spi from "../../spi";
 
 /**
  * Flux GitRepository API defines a Source to produce an Artifact for a Git repository revision.
  */
 export class FluxGitRepository {
 
-    constructor(private readonly bootstrapRepo: GitRepositoryReference | undefined) {}
+    constructor(private readonly bootstrapRepo: spi.ApplicationRepository | undefined) {}
 
     public generate(fluxcdAddonProps: FluxCDAddOnProps) {
 
-        const repository = this.generateDefaultRepo();
+        const repository = fluxcdAddonProps.bootstrapRepo!;
         return {
             apiVersion: "source.toolkit.fluxcd.io/v1beta2",
             kind: "GitRepository",
@@ -27,21 +28,4 @@ export class FluxGitRepository {
             }
         };
     }
-
-    /**
-     * Creates an opinionated path.
-     * @param name
-     * @returns
-     */
-    generateDefaultRepo(): GitRepositoryReference {
-        if (this.bootstrapRepo) {
-            return {
-                name: this.bootstrapRepo.name,
-                repoUrl: this.bootstrapRepo.repoUrl,
-                targetRevision: this.bootstrapRepo.targetRevision
-            };
-        }
-        throw new Error("With Flux configuration management enabled either specify GitOps repository for FluxCD add-on.");
-    }
-
 }
