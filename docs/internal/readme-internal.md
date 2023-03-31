@@ -18,6 +18,22 @@ Build the project with `Typescript`.
 make build.
 ```
 
+## Submitting Pull Requests
+
+The below instructions apply regardless of whether PR is submitted from a fork or a branch.
+
+1. Make sure you IDE is configured to format modified lines only. Submitting fully formatted files makes it very hard to review, and such will be rejected.
+2. Tab size is 4 and spaces (be mindful that VSCode may not be the only IDE used). 
+3.  he following commands produce no errors and/or warnings:
+
+```
+npm i
+make build
+make lint
+make run-test
+cdk list
+```
+
 ## Triggering E2E Testing
 
 The CI system attached to the project will run all stacks under examples as end-to-end integration testing. 
