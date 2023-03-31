@@ -19,7 +19,7 @@ export interface VeleroAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     name: 'velero',
-    version: "3.1.2",
+    version: "3.1.5",
     namespace: "velero",
     createNamespace: true,
     chart: "velero",
