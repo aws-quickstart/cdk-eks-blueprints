@@ -53,7 +53,7 @@ const karpenterAddonProps = {
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(...karpenterAddOn)
+  .addOns(karpenterAddOn)
   .build(app, 'my-stack-name');
 ```
 
