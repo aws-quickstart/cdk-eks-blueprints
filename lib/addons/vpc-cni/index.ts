@@ -5,6 +5,8 @@ import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { ISubnet } from "aws-cdk-lib/aws-ec2";
 import { IManagedPolicy } from "aws-cdk-lib/aws-iam";
+import "reflect-metadata";
+import { KubernetesManifestProps } from "aws-cdk-lib/aws-eks";
 
 /**
  * User provided option for the Helm Chart
@@ -208,13 +210,15 @@ export class VpcCniAddOn extends CoreAddOn {
 
   constructor(props?: VpcCniAddOnProps) {
     super({ ...defaultProps, ...props });
-    this.vpcCniAddOnProps = { ...defaultProps, ...props, };
+    this.vpcCniAddOnProps = { ...defaultProps, ...props };
     (this.coreAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
   }
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+
+    
 
     if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
       for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
@@ -282,4 +286,23 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   Object.keys(values).forEach(key => values[key] = typeof values[key] == 'boolean' ? JSON.stringify(values[key]) : values[key]);
 
   return result;
+}
+
+export function _kubectlApply() {
+  return function <T extends { new(...args: any[]): any }>(constructor: T) {
+    const ctor: any = function (...args: any[]) {
+      const func: any = function() {
+        const props: KubernetesManifestProps = args.pop();
+        if(props.manifest[0].metadata?.name == "aws-node") {
+          args.push({...props, overwrite: true});
+        }
+        return new constructor(...args);
+      };
+
+      func.prototype = constructor.prototype;
+      return new func();
+    };
+    ctor.prototype = constructor.prototype;
+    return ctor;
+  };
 }
