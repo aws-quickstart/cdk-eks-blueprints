@@ -8,6 +8,10 @@ Please see the documentation below for details on automatic boostrapping with Fl
 
 Full Argo CD project documentation [can be found here](https://fluxcd.io/flux/).
 
+## Architecture Diagram
+        
+![FluxCD-Arch-Diag](../assets/images/fluxcd-architecture-diag.png)
+
 ## Usage
 
 ### Without Bootstrapping Repos:
