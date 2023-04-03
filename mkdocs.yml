@@ -29,7 +29,7 @@ nav:
     - AWS Load Balancer Controller: 'addons/aws-load-balancer-controller.md'
     - AWS Node Termination Handler: 'addons/aws-node-termination-handler.md'
     - AWS Private CA Issuer: 'addons/aws-privateca-issuer.md'
-    - Calico: 'addons/calico.md' 
+    - Calico: 'addons/calico.md'
     - Calico Operator: 'addons/calico-operator.md'
     - Certificate Manager: 'addons/cert-manager.md'
     - CloudWatch ADOT: 'addons/cloudwatch-adot-addon.md'
