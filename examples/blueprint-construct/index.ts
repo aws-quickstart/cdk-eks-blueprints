@@ -107,6 +107,33 @@ export default class BlueprintConstruct {
                 skipVersionValidation: true,
                 serviceName: blueprints.AckServiceName.S3
             }),
+            new blueprints.addons.FluxCDAddOn({ 
+                version: 'v0.38.1',          
+                // bootstrapRepo: [
+                //     {
+                //         repoUrl: 'https://github.com/dannyhuskien/fluxcd2.git',
+                //         name: 'frontend-application',
+                //         credentialsSecretName: 'github-flux2', //secret manager
+                //         credentialsType: 'USERNAME',
+                //         targetRevision: 'main',
+                //         path: './microservice-1',
+                //         gitRepoSpecInterval: '2m0s',
+                //         kustomizationSpecInterval: '2m0s',
+                //         kustomizationTargetNamespace: 'frontend-application-ns'
+                //     },
+                //     {
+                //         repoUrl: 'https://github.com/dannyhuskien/fluxcd2.git',
+                //         name: 'backend-application',
+                //         credentialsSecretName: 'github-flux2', //secret manager
+                //         credentialsType: 'USERNAME',
+                //         targetRevision: 'main',
+                //         path: './microservice-2',
+                //         gitRepoSpecInterval: '2m0s',
+                //         kustomizationSpecInterval: '2m0s',
+                //         kustomizationTargetNamespace: 'backend-application-ns'
+                //     }
+                // ],
+            }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
                     { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
