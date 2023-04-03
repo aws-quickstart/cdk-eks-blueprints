@@ -1,6 +1,5 @@
 
 # Amazon EKS Blueprints for CDK
-This is atest
 ![GitHub](https://img.shields.io/github/license/aws-quickstart/cdk-eks-blueprints)
 ![Build](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTWxBQzVUcTBvdSsvbE9mR0ZWeTJjbi96OUpBREorSG51UjMzQ1UyNXdmUzZ2dUJoTkhIODFJWjN2QjRGcnhWS0pYLzFQRU5uOThiUEp1WjEzS0htbUpVPSIsIml2UGFyYW1ldGVyU3BlYyI6IlRkUFRoTWtjdElBMkR5NEMiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
