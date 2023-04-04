@@ -31,14 +31,11 @@ The framework currently supports the following add-ons.
 | [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 |
 | [`EmrOnEksAddOn`](./emr-eks.md)                             | Enable EKS cluster to be used with EMR on EKS          |
 | [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. |
-<<<<<<< HEAD
 | [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.|  
 | [`FluxcdAddOn`](./fluxcd.md)                                   | Adds [Fluxcd](https://fluxcd.io/) Setting up Flux to manage one or more Kubernetes clusters.                                 |
-=======
 | [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.                                 |
 | [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster.
 | [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster.
->>>>>>> da641bd9b930dde52d49bd9f9e688bdd0fd4ee9b
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               |
 | [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster.
 | [`KedaAddOn`](./keda.md)                                      | Installs [Keda](https://github.com/kedacore/keda) into EKS cluster.
