@@ -54,17 +54,20 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
  * Pass an aliasName to lookup an existing KMS Key.
  *
  * @param aliasName The alias name to lookup an existing KMS Key
+ * @param keyId The key id for the KMS Key
  */
 export class LookupKmsKeyProvider implements ResourceProvider<kms.IKey> {
   private readonly aliasName: string;
+  private readonly keyId?: string;
 
-  public constructor(aliasName: string) {
+  public constructor(aliasName: string, keyId?: string) {
     this.aliasName = aliasName;
+    this.keyId = keyId;
   }
 
   provide(context: ResourceContext): kms.IKey {
     const id = context.scope.node.id;
-    const keyId = `${id}-${this.aliasName}-KmsKey`;
+    const keyId = this.keyId || `${id}-${this.aliasName}-KmsKey`;
 
     return kms.Key.fromLookup(context.scope, keyId, {
       aliasName: this.aliasName,
