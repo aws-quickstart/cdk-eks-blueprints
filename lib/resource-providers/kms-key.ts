@@ -15,29 +15,24 @@ import { ResourceContext, ResourceProvider } from "../spi";
  */
 export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
   private readonly aliasName?: string;
-  private readonly keyId?: string;
   private readonly kmsKeyProps?: kms.KeyProps;
 
   /**
    * Configuration options for the KMS Key.
    *
    * @param aliasName The alias name for the KMS Key
-   * @param keyId The key id for the KMS Key
    * @param kmsKeyProps The key props used
    */
-  public constructor(
-    aliasName?: string,
-    keyId?: string,
-    kmsKeyProps?: kms.KeyProps
-  ) {
+  public constructor(aliasName?: string, kmsKeyProps?: kms.KeyProps) {
     this.aliasName = aliasName;
-    this.keyId = keyId;
     this.kmsKeyProps = kmsKeyProps;
   }
 
   provide(context: ResourceContext): kms.IKey {
     const id = context.scope.node.id;
-    const keyId = this.keyId || `${id}-${this.aliasName ?? "default"}-KmsKey`;
+    const keyId = !this.aliasName
+      ? `${id}-kms-key`
+      : `${id}-${this.aliasName}-KmsKey`;
     let key = undefined;
 
     key = new kms.Key(context.scope, keyId, {
@@ -54,20 +49,17 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
  * Pass an aliasName to lookup an existing KMS Key.
  *
  * @param aliasName The alias name to lookup an existing KMS Key
- * @param keyId The key id for the KMS Key
  */
 export class LookupKmsKeyProvider implements ResourceProvider<kms.IKey> {
   private readonly aliasName: string;
-  private readonly keyId?: string;
 
-  public constructor(aliasName: string, keyId?: string) {
+  public constructor(aliasName: string) {
     this.aliasName = aliasName;
-    this.keyId = keyId;
   }
 
   provide(context: ResourceContext): kms.IKey {
     const id = context.scope.node.id;
-    const keyId = this.keyId || `${id}-${this.aliasName}-KmsKey`;
+    const keyId = `${id}-${this.aliasName}-KmsKey`;
 
     return kms.Key.fromLookup(context.scope, keyId, {
       aliasName: this.aliasName,
