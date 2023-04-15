@@ -72,6 +72,12 @@ const backstageBaseUrl = "http://backstage.{youralias}.people.aws.dev";
 const backstagePostgresHost = "...rds.amazonaws.com";
 const backstagePostgresPassword = "{db pw}";
 
+const subdomain: string = "{subdomain}.{parent domain}";
+const parentDnsAccountId = account;
+const parentDomain = "{parent domain}";
+const hostedZoneId = "{id}";
+const certificateResourceName = GlobalResources.Certificate;
+
 const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.ArgoCDAddOn(),
   new blueprints.CalicoOperatorAddOn(),
@@ -81,8 +87,12 @@ const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.VpcCniAddOn(),
   new blueprints.CoreDnsAddOn(),
   new blueprints.KubeProxyAddOn(),
+  new blueprints.ExternalDnsAddOn({
+    hostedZoneResources: [blueprints.GlobalResources.HostedZone]
+  }),
   new BackstageAddOn({
-    certificateArn:backstageCertificateArn,
+    subdomain: subdomain,
+    certificateResourceName: certificateResourceName,
     imageRegistry: backstageImageRegistry,
     imageRepository: backstageImageRepository,
     imageTag: backstageImageTag,
@@ -95,6 +105,8 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 const blueprint = blueprints.EksBlueprint.builder()
 .account(account)
 .region(region)
+.resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider(hostedZoneId, parentDomain))
+.resourceProvider(certificateResourceName, new blueprints.CreateCertificateProvider("elb-certificate", subdomain, GlobalResources.HostedZone))
 .addOns(...addOns)
 .teams()
 .build(app, 'backstage-eks-blueprints');
@@ -106,4 +118,4 @@ We need to remove as much manual, off-band setup as possible:
 - Database connectivity from cluster in a secure way, e.g.
     - create security groups for Backstage pods and database and setup inbound rule on the database SG?
     - use IRSA?
-- Create _A_ record from cdk, including ALB referencing
+- ~~Create _A_ record from cdk, including ALB referencing~~

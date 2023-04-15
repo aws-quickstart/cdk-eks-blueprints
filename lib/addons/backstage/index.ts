@@ -2,6 +2,8 @@ import { Construct } from 'constructs';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { setPath } from "../../utils";
 import { ClusterInfo, Values } from "../../spi";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { CfnOutput } from "aws-cdk-lib";
 
 /**
  * User provided options for the Helm Chart
@@ -11,8 +13,9 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
     name?: string, 
     createNamespace?: boolean,
     namespace?: string,
-    certificateArn: string,
-    imageRegistry:string,
+    subdomain: string,
+    certificateResourceName: string,
+    imageRegistry: string,
     imageRepository: string,
     imageTag?: string,
     baseUrl: string,
@@ -51,7 +54,7 @@ export class BackstageAddOn extends HelmAddOn {
   }
   
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    let values: Values = populateValues(this.options);
+    let values: Values = populateValues(clusterInfo, this.options);
     const chart = this.addHelmChart(clusterInfo, values);
 
     return Promise.resolve(chart);
@@ -62,13 +65,13 @@ export class BackstageAddOn extends HelmAddOn {
  * populateValues populates the appropriate values used to customize the Helm chart
  * @param helmOptions User provided values to customize the chart
  */
-function populateValues(helmOptions: BackstageAddOnProps): Values {
+function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnProps): Values {
   const values = helmOptions.values ?? {};
   
   const annotations = {
     "alb.ingress.kubernetes.io/scheme": "internet-facing",
     "alb.ingress.kubernetes.io/target-type": "ip",
-    "alb.ingress.kubernetes.io/certificate-arn": helmOptions.certificateArn
+    "alb.ingress.kubernetes.io/certificate-arn": clusterInfo.getResource<ICertificate>(helmOptions.certificateResourceName)?.certificateArn
   };
   
   const database = {
@@ -83,6 +86,7 @@ function populateValues(helmOptions: BackstageAddOnProps): Values {
   
   setPath(values, "ingress.enabled", true);
   setPath(values, "ingress.className", "alb");
+  setPath(values, "ingress.host", helmOptions.subdomain);
   setPath(values, "ingress.annotations", annotations);
 
   setPath(values, "backstage.image.registry", helmOptions.imageRegistry);
