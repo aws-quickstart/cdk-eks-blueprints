@@ -66,7 +66,7 @@ const account = '{account}';
 const region = '{region}';
 const backstageCertificateArn = "arn:aws:acm:...";
 const backstageImageRegistry = "{account}.dkr.ecr.{region}.amazonaws.com";
-const backstageImageRepository = "backstage";
+const backstageImageRepository = "backstage-addon";
 const backstageImageTag = "latest";
 const backstageBaseUrl = "http://backstage.{youralias}.people.aws.dev";
 const backstagePostgresHost = "...rds.amazonaws.com";
@@ -109,7 +109,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 .resourceProvider(certificateResourceName, new blueprints.CreateCertificateProvider("elb-certificate", subdomain, GlobalResources.HostedZone))
 .addOns(...addOns)
 .teams()
-.build(app, 'backstage-eks-blueprints');
+.build(app, 'backstage-addon-eks-blueprints');
 ```
 ## TODO
 

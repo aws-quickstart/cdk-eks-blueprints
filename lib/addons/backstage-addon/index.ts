@@ -2,6 +2,11 @@ import { Construct } from 'constructs';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { dependable, setPath } from "../../utils";
 import { ClusterInfo, Values } from "../../spi";
+import {
+    BackstageProps, DiagnosticProps, GlobalProps,
+    IngressProps, NetworkProps, MetricsProps,
+    PostgresProps, ServiceProps, ServiceAccountProps
+} from "./backstage-values";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 
 /**
@@ -18,10 +23,10 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
     imageRepository: string,
     imageTag?: string,
     baseUrl: string,
-    postgresHost: string,
+    postgresHost?: string,
     postgresPort?: number,
     postgresUser?: string,
-    postgresPassword: string
+    postgresPassword?: string
 }
 
 /**
@@ -29,10 +34,10 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
   name: "blueprints-backstage-addon",
-  namespace: "backstage",
-  chart: "backstage",
+  namespace: "backstage-addon",
+  chart: "backstage-addon",
   version: "0.17.0",
-  release: "backstage",
+  release: "backstage-addon",
   repository:  "https://backstage.github.io/charts",
   imageTag: "latest",
   postgresPort: 5432,
@@ -51,7 +56,7 @@ export class BackstageAddOn extends HelmAddOn {
     super({...defaultProps, ...props});
     this.options = this.props as BackstageAddOnProps;
   }
-  
+
   @dependable('AwsLoadBalancerControllerAddOn')
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     let values: Values = populateValues(clusterInfo, this.options);
@@ -89,15 +94,15 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnPro
   setPath(values, "ingress.host", helmOptions.subdomain);
   setPath(values, "ingress.annotations", annotations);
 
-  setPath(values, "backstage.image.registry", helmOptions.imageRegistry);
-  setPath(values, "backstage.image.repository", helmOptions.imageRepository);
-  setPath(values, "backstage.image.tag", helmOptions.imageTag);
+  setPath(values, "backstage-addon.image.registry", helmOptions.imageRegistry);
+  setPath(values, "backstage-addon.image.repository", helmOptions.imageRepository);
+  setPath(values, "backstage-addon.image.tag", helmOptions.imageTag);
 
-  setPath(values, "backstage.appConfig.app.baseUrl", helmOptions.baseUrl);
-  setPath(values, "backstage.appConfig.backend.baseUrl", helmOptions.baseUrl);
-  setPath(values, "backstage.appConfig.backend.database", database);
+  setPath(values, "backstage-addon.appConfig.app.baseUrl", helmOptions.baseUrl);
+  setPath(values, "backstage-addon.appConfig.backend.baseUrl", helmOptions.baseUrl);
+  setPath(values, "backstage-addon.appConfig.backend.database", database);
   
-  setPath(values, "backstage.command", ["node", "packages/backend", "--config", "app-config.yaml"]);
+  setPath(values, "backstage-addon.command", ["node", "packages/backend", "--config", "app-config.yaml"]);
   
   return values;
 }
