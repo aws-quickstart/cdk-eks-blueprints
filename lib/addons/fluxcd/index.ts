@@ -69,7 +69,7 @@ export class FluxCDAddOn extends HelmAddOn {
 
     //Lets create a GitRepository resource as a source to Flux
     if (this.options.bootstrapRepo) {
-      const construct = createGitRepository(clusterInfo, this.options);
+      const construct = createGitRepository(clusterInfo, this.options.bootstrapRepo, this.options);
       construct.node.addDependency(chart);
     }
     return Promise.resolve(chart);
@@ -79,10 +79,10 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * createGitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(fluxcdAddonProps.bootstrapRepo).generate(fluxcdAddonProps);
+function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps);
   let manifestName: string | undefined;
-  manifestName = fluxcdAddonProps.bootstrapRepo?.name;
+  manifestName = bootstrapRepo?.name;
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }
