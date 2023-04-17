@@ -20,6 +20,12 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
    * Optional values for `GitRepository` Source to produce an Artifact for a Git repository revision.
    */
   bootstrapRepo?: spi.ApplicationRepository;
+
+  /*
+  * Internal for Flux sync.
+  * Default `5m0s` */
+
+  fluxSyncInterval?: string;
 }
 
 /**
@@ -33,7 +39,8 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
-  createNamespace: true
+  createNamespace: true,
+  fluxSyncInterval: "5m0s"
 };
 
 /**

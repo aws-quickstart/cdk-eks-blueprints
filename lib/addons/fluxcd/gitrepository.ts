@@ -19,7 +19,7 @@ export class FluxGitRepository {
                 namespace: fluxcdAddonProps.namespace
             },
             spec: {
-                interval: "5m0s",
+                interval: fluxcdAddonProps.fluxSyncInterval,
                 url: repository.repoUrl,
                 ref: {
                     branch: repository.targetRevision,
