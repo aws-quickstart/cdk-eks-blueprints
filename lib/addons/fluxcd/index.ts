@@ -80,9 +80,8 @@ export class FluxCDAddOn extends HelmAddOn {
  * createGitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
 function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps);
-  let manifestName: string | undefined;
-  manifestName = bootstrapRepo?.name;
+  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!);
+  let manifestName: string | undefined = fluxcdAddonProps.name;
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }

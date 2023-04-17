@@ -8,18 +8,18 @@ export class FluxGitRepository {
 
     constructor(private readonly bootstrapRepo: spi.ApplicationRepository | undefined) {}
 
-    public generate(fluxcdAddonProps: FluxCDAddOnProps) {
+    public generate(namespace: string, fluxSyncInterval: string ) {
 
-        const repository = fluxcdAddonProps.bootstrapRepo!;
+        const repository = this.bootstrapRepo!;
         return {
             apiVersion: "source.toolkit.fluxcd.io/v1beta2",
             kind: "GitRepository",
             metadata: {
                 name: repository.name,
-                namespace: fluxcdAddonProps.namespace
+                namespace: namespace
             },
             spec: {
-                interval: fluxcdAddonProps.fluxSyncInterval,
+                interval: fluxSyncInterval,
                 url: repository.repoUrl,
                 ref: {
                     branch: repository.targetRevision,
