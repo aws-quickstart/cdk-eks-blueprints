@@ -50,7 +50,7 @@ export class FluxCDAddOn extends HelmAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    let values: Values = populateValues(this.options);
+    let values: Values = this.options.values ?? {};
     values = merge(values, this.props.values ?? {});
 
     if( this.options.createNamespace == true){
@@ -60,28 +60,23 @@ export class FluxCDAddOn extends HelmAddOn {
       chart.node.addDependency(namespace);
 
       //Lets create a GitRepository resource as a source to Flux
-      const construct = createGitRepository(clusterInfo, this.options);
-      construct.node.addDependency(chart);
-      return Promise.resolve(construct);
+      if (this.options.bootstrapRepo) {
+        const construct = createGitRepository(clusterInfo, this.options);
+        construct.node.addDependency(chart);
+        return Promise.resolve(construct);
+      }
     } else {
       //Namespace is already created
       const chart = this.addHelmChart(clusterInfo, values);
 
       //Lets create a GitRepository resource as a source to Flux
-      const construct = createGitRepository(clusterInfo, this.options);
-      construct.node.addDependency(chart);
-      return Promise.resolve(construct);
+      if (this.options.bootstrapRepo) {
+        const construct = createGitRepository(clusterInfo, this.options);
+        construct.node.addDependency(chart);
+        return Promise.resolve(construct);
+      }
     }
   }
-}
-
-/**
- * populateValues populates the appropriate values used to customize the Helm chart
- * @param helmOptions User provided values to customize the chart
- */
-function populateValues(helmOptions: FluxCDAddOnProps): Values {
-  const values = helmOptions.values ?? {};
-  return values;
 }
 
 /**

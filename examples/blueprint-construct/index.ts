@@ -172,11 +172,6 @@ export default class BlueprintConstruct {
             new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn({
-                bootstrapRepo: {
-                    repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
-                    name: "workloadsrepo",
-                    targetRevision: "eks-blueprints-cdk",
-                },
             }),
         ];
 

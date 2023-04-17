@@ -1,5 +1,4 @@
 import { FluxCDAddOnProps } from '.';
-import { GitRepositoryReference } from '../../spi';
 import * as spi from "../../spi";
 
 /**
