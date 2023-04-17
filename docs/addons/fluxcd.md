@@ -14,9 +14,9 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
     bootstrapRepo: {
-        repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
-        name: "workloadsrepo",
-        targetRevision: "eks-blueprints-cdk",
+        repoUrl: 'https://github.com/stefanprodan/podinfo',
+        name: "podinfo",
+        targetRevision: "master",
     },
 }),
 
@@ -74,3 +74,23 @@ Install Fluxcd client
 curl -s https://fluxcd.io/install.sh | sudo bash
 . <(flux completion bash)
 ```
+
+Run the below command to check on the GitRepository setup with Flux :
+
+```bash
+kubectl get gitrepository -A
+NAME      URL                                       AGE   READY   STATUS                                                                        
+podinfo   https://github.com/stefanprodan/podinfo   5s    True    stored artifact for revision 'master@sha1:132f4e719209eb10b9485302f8593fc0e680f4fc'
+```
+
+Run the below command to create a Kustomization using a source :
+
+```bash
+  flux create kustomization podinfo \
+    --namespace=flux-system \
+    --source=podinfo \
+    --path="./kustomize" \
+    --prune=true \
+    --interval=5m
+```
+
