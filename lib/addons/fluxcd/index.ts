@@ -52,30 +52,20 @@ export class FluxCDAddOn extends HelmAddOn {
     const cluster = clusterInfo.cluster;
     let values: Values = this.options.values ?? {};
     values = merge(values, this.props.values ?? {});
+    const chart = this.addHelmChart(clusterInfo, values);
 
     if( this.options.createNamespace == true){
       // Let CDK Create the Namespace
       const namespace = createNamespace(this.options.namespace! , cluster);
-      const chart = this.addHelmChart(clusterInfo, values);
       chart.node.addDependency(namespace);
-
-      //Lets create a GitRepository resource as a source to Flux
-      if (this.options.bootstrapRepo) {
-        const construct = createGitRepository(clusterInfo, this.options);
-        construct.node.addDependency(chart);
-        return Promise.resolve(construct);
-      }
-    } else {
-      //Namespace is already created
-      const chart = this.addHelmChart(clusterInfo, values);
-
-      //Lets create a GitRepository resource as a source to Flux
-      if (this.options.bootstrapRepo) {
-        const construct = createGitRepository(clusterInfo, this.options);
-        construct.node.addDependency(chart);
-        return Promise.resolve(construct);
-      }
     }
+
+    //Lets create a GitRepository resource as a source to Flux
+    if (this.options.bootstrapRepo) {
+      const construct = createGitRepository(clusterInfo, this.options);
+      construct.node.addDependency(chart);
+    }
+    return Promise.resolve(chart);
   }
 }
 
