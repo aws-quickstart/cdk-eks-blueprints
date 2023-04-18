@@ -3,7 +3,6 @@ import * as rds from "aws-cdk-lib/aws-rds";
 import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
 import {IClusterEngine, IDatabaseCluster, InstanceProps} from "aws-cdk-lib/aws-rds";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as kms from "aws-cdk-lib/aws-kms";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
 
 
