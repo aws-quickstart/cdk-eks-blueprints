@@ -1,9 +1,8 @@
 import { Construct } from 'constructs';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { setPath } from "../../utils";
+import { dependable, setPath } from "../../utils";
 import { ClusterInfo, Values } from "../../spi";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
-import { CfnOutput } from "aws-cdk-lib";
 
 /**
  * User provided options for the Helm Chart
@@ -53,6 +52,7 @@ export class BackstageAddOn extends HelmAddOn {
     this.options = this.props as BackstageAddOnProps;
   }
   
+  @dependable('AwsLoadBalancerControllerAddOn')
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     let values: Values = populateValues(clusterInfo, this.options);
     const chart = this.addHelmChart(clusterInfo, values);
