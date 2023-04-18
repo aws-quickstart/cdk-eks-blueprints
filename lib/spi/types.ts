@@ -110,7 +110,8 @@ export enum GlobalResources {
     Vpc = 'vpc',
     HostedZone = 'hosted-zone',
     Certificate = 'certificate',
-    KmsKey = 'kms-key'
+    KmsKey = 'kms-key',
+    Rds = 'rds'
 }
 
 /**
