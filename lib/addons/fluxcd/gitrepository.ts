@@ -1,4 +1,3 @@
-import { FluxCDAddOnProps } from '.';
 import * as spi from "../../spi";
 
 /**
@@ -6,7 +5,7 @@ import * as spi from "../../spi";
  */
 export class FluxGitRepository {
 
-    constructor(private readonly bootstrapRepo: spi.ApplicationRepository | undefined) {}
+    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
     public generate(namespace: string, fluxSyncInterval: string ) {
 
