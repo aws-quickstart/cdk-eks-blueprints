@@ -1,166 +1,166 @@
 export interface BackstageProps {
-    annotations?: {
-        [key: string]: string
-    },
+  annotations?: {
+    [key: string]: string
+  },
 
-    appConfig?: {
-        [key: string]: string
-    },
+  appConfig?: {
+    [key: string]: string
+  },
 
-    args?: string[],
+  args?: string[],
 
-    command?: string[],
+  command?: string[],
 
-    containerPorts?: {
-        [key: string]: string
-    },
+  containerPorts?: {
+    [key: string]: string
+  },
 
-    containerSecurityContext?: any,
+  containerSecurityContext?: any,
 
-    extraAppConfig?: string[],
-    extraContainers?: string[],
-    extraEnvVars?: string[],
-    extraEnvVarsSecrets?: string[],
-    extraVolumes?: string[],
+  extraAppConfig?: string[],
+  extraContainers?: string[],
+  extraEnvVars?: string[],
+  extraEnvVarsSecrets?: string[],
+  extraVolumes?: string[],
 
-    image: {
-        debug?: boolean,
-        pullPolicy?: string,
-        pullSecrets?: string[],
-        registry: string,
-        repository: string,
-        tag: string
-    }
+  image: {
+    debug?: boolean,
+    pullPolicy?: string,
+    pullSecrets?: string[],
+    registry: string,
+    repository: string,
+    tag: string
+  }
 
-    initContainers?: string[],
-    installDir?: string,
+  initContainers?: string[],
+  installDir?: string,
 
-    nodeSelector?: {
-        [key: string]: string
-    },
+  nodeSelector?: {
+    [key: string]: string
+  },
 
-    podAnnotations?: {
-        [key: string]: string
-    },
+  podAnnotations?: {
+    [key: string]: string
+  },
 
-    podSecurityContext?: {
-        [key: string]: string
-    },
+  podSecurityContext?: {
+    [key: string]: string
+  },
 
-    replicas?: number,
+  replicas?: number,
 
-    resources?: {
-        [key: string]: string
-    },
+  resources?: {
+    [key: string]: string
+  },
 
-    tolerations?: string[]
+  tolerations?: string[]
 }
 
 export interface DiagnosticProps {
-    args?: string[],
-    command?: string[],
-    enabled?: boolean,
+  args?: string[],
+  command?: string[],
+  enabled?: boolean,
 }
 
 export interface GlobalProps {
-    imagePullSecrets?: string[],
-    imageRegistry?: string,
+  imagePullSecrets?: string[],
+  imageRegistry?: string,
 }
 
 export interface IngressProps {
-    annotations?: {
-        [key: string]: string
-    },
+  annotations?: {
+    [key: string]: string
+  },
 
-    className?: string,
-    enabled?: boolean,
-    host?: string,
+  className?: string,
+  enabled?: boolean,
+  host?: string,
 
-    tls?: {
-        enabled: boolean,
-        secretName: string,
-    }
+  tls?: {
+    enabled: boolean,
+    secretName: string,
+  }
 }
 
 export interface MetricsProps {
-    serviceMonitor?: {
-        annotations?: {
-            [key: string]: string
-        },
-
-        enabled?: boolean,
-        interval?: string,
-
-        labels?: {
-            [key: string]: string
-        },
-
-        path?: string,
-    }
-}
-
-export interface NetworkProps {
-    egressRules?: {
-        customRules?: string[],
+  serviceMonitor?: {
+    annotations?: {
+      [key: string]: string
     },
 
     enabled?: boolean,
+    interval?: string,
+
+    labels?: {
+      [key: string]: string
+    },
+
+    path?: string,
+  };
+}
+
+export interface NetworkProps {
+  egressRules?: {
+    customRules?: string[],
+  },
+
+  enabled?: boolean,
 }
 
 export interface PostgresProps {
-    architecture?: "standalone" | "replication",
+  architecture?: "standalone" | "replication",
 
-    auth?: {
-        existingSecret?: string,
-        password?: string,
+  auth?: {
+    existingSecret?: string,
+    password?: string,
 
-        secretKeys?: {
-            adminPasswordKey?: string,
-            replicationPasswordKey?: string,
-            userPasswordKey?: string
-        },
+    secretKeys?: {
+      adminPasswordKey?: string,
+      replicationPasswordKey?: string,
+      userPasswordKey?: string
+    },
 
-        username?: string,
-    }
+    username?: string,
+  }
 
-    enabled?: boolean
+  enabled?: boolean
 }
 
 export interface ServiceProps {
-    annotations?: {
-        [key: string]: string
-    },
+  annotations?: {
+    [key: string]: string
+  },
 
-    clusterIp?: string,
-    externalTrafficPolicy?: string,
-    extraPorts?: string[],
-    loadBalancerIp?: string,
-    loadBalancerSourceRanges?: string[],
+  clusterIp?: string,
+  externalTrafficPolicy?: string,
+  extraPorts?: string[],
+  loadBalancerIp?: string,
+  loadBalancerSourceRanges?: string[],
 
-    nodePorts?: {
-        [key: string]: string
-    },
+  nodePorts?: {
+    [key: string]: string
+  },
 
-    ports?: {
-        name: string,
-        targetPort: string,
-        sessionAffinity?: string,
-    },
+  ports?: {
+    name: string,
+    targetPort: string,
+    sessionAffinity?: string,
+  },
 
-    type: string
+  type: string
 }
 
 export interface ServiceAccountProps {
-    annotations?: {
-        [key: string]: string
-    },
+  annotations?: {
+    [key: string]: string
+  },
 
-    automountServiceAccountToken?: boolean,
-    create?: boolean,
+  automountServiceAccountToken?: boolean,
+  create?: boolean,
 
-    labels?: {
-        [key: string]: string
-    },
+  labels?: {
+    [key: string]: string
+  },
 
-    name?: string,
+  name?: string,
 }

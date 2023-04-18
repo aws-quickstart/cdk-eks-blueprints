@@ -27,6 +27,16 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
     postgresPort?: number,
     postgresUser?: string,
     postgresPassword?: string
+
+    values: {
+        backstage: BackstageProps,
+        diagnosticMode: DiagnosticProps,
+        ingress: IngressProps,
+        metrics: MetricsProps,
+        networkPolicy: NetworkProps,
+        service: ServiceProps,
+        serviceAccount: ServiceAccountProps,
+    }
 }
 
 /**
@@ -65,6 +75,8 @@ export class BackstageAddOn extends HelmAddOn {
     return Promise.resolve(chart);
   }
 }
+
+
 
 /**
  * populateValues populates the appropriate values used to customize the Helm chart
