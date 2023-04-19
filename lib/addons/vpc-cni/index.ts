@@ -6,7 +6,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
 import { ISubnet } from "aws-cdk-lib/aws-ec2";
 import { IManagedPolicy } from "aws-cdk-lib/aws-iam";
 import "reflect-metadata";
-import { KubernetesManifestProps } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest, KubernetesManifestProps } from "aws-cdk-lib/aws-eks";
 
 /**
  * User provided option for the Helm Chart
@@ -210,6 +210,7 @@ export class VpcCniAddOn extends CoreAddOn {
 
   constructor(props?: VpcCniAddOnProps) {
     super({ ...defaultProps, ...props });
+    Reflect.decorate([_kubectlApply as ClassDecorator], KubernetesManifest);
     this.vpcCniAddOnProps = { ...defaultProps, ...props };
     (this.coreAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
   }
@@ -288,8 +289,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   return result;
 }
 
-export function _kubectlApply() {
-  return function <T extends { new(...args: any[]): any }>(constructor: T) {
+  export function _kubectlApply<T extends { new(...args: any[]): any }>(constructor: T) {
     const ctor: any = function (...args: any[]) {
       const func: any = function() {
         const props: KubernetesManifestProps = args.pop();
@@ -304,6 +304,4 @@ export function _kubectlApply() {
     };
     ctor.prototype = constructor.prototype;
     return ctor;
-  };
-}
-
+  }
