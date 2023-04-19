@@ -37,7 +37,7 @@ grafana-operator      Active   31m
 ```
 Verify if the pods are running correctly in flux-system namespace
 ```bash
-  kubectl get pods -n grafana-operator  
+kubectl get pods -n grafana-operator  
 ```
 There should list 3 pods starting with name flux-system
 For Eg:
