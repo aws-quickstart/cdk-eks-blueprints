@@ -36,7 +36,7 @@ export interface HelmChartConfiguration {
     /**
      * Helm repository
      */
-    repository: string,
+    repository?: string,
 
     /**
      * When global helm version validation is enabled with HelmAddOn.validateHelmVersions = true
@@ -63,7 +63,13 @@ export interface HelmChartConfiguration {
 /**
  * Extends helm chart configuration (repo/chart) with deployment parameters: values, timeout and wait.
  */
-export interface HelmChartDeployment extends Required<Omit<HelmChartConfiguration, "skipVersionValidation">> {
+export interface HelmChartDeployment extends Required<Omit<HelmChartConfiguration, "skipVersionValidation" | "repository">> {
+
+    /**
+     * Helm Repository
+     */
+    repository?: string;
+    
     /**
      * Deployment will wait for all pods to come up.
      */
