@@ -29,7 +29,7 @@ To validate that Grafana Operator is installed properly in the cluster, check if
 
 Verify if the namespace is created correctly
 ```bash
-  kubectl get ns | grep "grafana-operator"
+kubectl get ns | grep "grafana-operator"
 ```
 There should be list the grafana-operator namespace
 ```bash
