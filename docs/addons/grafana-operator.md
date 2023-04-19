@@ -21,7 +21,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you.
 
-- `values`: Arbitrary values to pass to the chart. Refer to the Grafana Operator [Helm Chart documentation](https://grafana-operator.github.io/grafana-operator/docs/installation/helm/) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
+- `values`: Arbitrary values to pass to the chart. Refer to the Grafana Operator [Helm Chart documentation](https://grafana-operator.github.io/grafana-operator/docs/installation/helm/) for additional details. It also supports all [standard helm configuration options.]( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
 ## Validation
 
@@ -57,7 +57,7 @@ replicaset.apps/grafana-operator-779956546b               1         1         1 
 
 ## Testing
 
-Please refer to the AWS Blog [Using Open Source Grafana Operator on your Kubernetes cluster to manage Amazon Managed Grafana] (https://aws.amazon.com/blogs/mt/using-open-source-grafana-operator-on-your-kubernetes-cluster-to-manage-amazon-managed-grafana/) on testing the following features :
+Please refer to the AWS Blog [Using Open Source Grafana Operator on your Kubernetes cluster to manage Amazon Managed Grafana](https://aws.amazon.com/blogs/mt/using-open-source-grafana-operator-on-your-kubernetes-cluster-to-manage-amazon-managed-grafana/) on testing the following features :
 
 - Setting up Grafana Identity to Amazon Managed Grafana.
 - Adding AWS data sources such as Amazon Managed Service For Prometheus, Amazon CloudWatch, AWS X-Ray.
