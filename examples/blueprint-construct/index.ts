@@ -171,6 +171,7 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
+            new blueprints.FluxCDAddOn(),
         ];
 
         // Instantiated to for helm version check.
