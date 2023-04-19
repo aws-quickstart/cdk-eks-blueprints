@@ -44,6 +44,7 @@ nav:
     - External Secrets: 'addons/external-secrets.md'
     - EMR on EKS: 'addons/emr-eks.md'
     - FluxCD: 'addons/fluxcd.md'
+    - GrafanaOperator: 'addons/grafana-operator.md'
     - Istio Base: 'addons/istio-base.md'
     - Istio Control Plane: 'addons/istio-control-plane.md'
     - JupyterHub: 'addons/jupyterhub.md'

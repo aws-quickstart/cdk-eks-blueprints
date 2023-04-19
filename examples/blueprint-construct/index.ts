@@ -172,6 +172,7 @@ export default class BlueprintConstruct {
             new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
+            new blueprints.GrafanaOperatorAddon(),
         ];
 
         // Instantiated to for helm version check.

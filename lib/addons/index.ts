@@ -20,6 +20,7 @@ export * from './external-dns';
 export * from './external-secrets';
 export * from './falco';
 export * from './fluxcd';
+export * from './grafana-operator';
 export * from './helm-addon';
 export * from './karpenter';
 export * from './kube-proxy';

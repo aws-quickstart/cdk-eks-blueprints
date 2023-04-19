@@ -28,7 +28,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you.
-- `values`: Arbitrary values to pass to the chart. Refer to the cert-manager [Helm Chart documentation](https://artifacthub.io/packages/helm/fluxcd-community/flux2) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
+- `values`: Arbitrary values to pass to the chart. Refer to the FluxCD [Helm Chart documentation](https://artifacthub.io/packages/helm/fluxcd-community/flux2) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
 ## Validation
 
