@@ -20,6 +20,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `createNamespace`: (boolean) If you want CDK to create the namespace for you.
+
 - `values`: Arbitrary values to pass to the chart. Refer to the Grafana Operator [Helm Chart documentation](https://grafana-operator.github.io/grafana-operator/docs/installation/helm/) for additional details. It also supports all standard helm configuration options ( for Eg: https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/index.md#standard-helm-add-on-configuration-options).
 
 ## Validation
