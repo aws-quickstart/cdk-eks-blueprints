@@ -42,6 +42,7 @@ export default class BlueprintConstruct {
         ]);
 
         const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
@@ -54,7 +55,6 @@ export default class BlueprintConstruct {
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
             new blueprints.addons.ArgoCDAddOn(),
             new blueprints.addons.SSMAgentAddOn(),
