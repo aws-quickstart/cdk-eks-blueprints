@@ -149,6 +149,7 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
+            new blueprints.GrafanaOperatorAddon(),
         ];
 
         // Instantiated to for helm version check.
