@@ -246,6 +246,10 @@ export class JupyterHubAddOn extends HelmAddOn {
 
         // Add dependency
         jupyterHubChart.node.addDependency(ns);
+
+        if(albAddOnCheck) {
+            jupyterHubChart.node.addDependency(albAddOnCheck);
+        }
         return Promise.resolve(jupyterHubChart);
     }
     /**
