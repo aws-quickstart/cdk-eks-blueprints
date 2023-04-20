@@ -11,7 +11,7 @@ describe('Unit tests for EKS Blueprint', () => {
         let app = new cdk.App();
         // WHEN
         let stack = new blueprints.EksBlueprint(app, { id: 'MyTestStack' });
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         // THEN
         assertBlueprint(stack);
 
@@ -20,7 +20,7 @@ describe('Unit tests for EKS Blueprint', () => {
             description: "My awesome description"
         });
 
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         // AND
         assertBlueprint(stack);
     });
@@ -131,7 +131,7 @@ describe('Unit tests for EKS Blueprint', () => {
             });
 
         const stack = pipeline.build(app, "blueprints-pipeline-id");
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
     });
 
@@ -180,7 +180,7 @@ describe('Unit tests for EKS Blueprint', () => {
                 }
             });
         const stack = pipeline.build(app, "blueprints-pipeline-id");
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         expect(stack.templateOptions.description).toContain("qs-1s1r465f2");
     });
 
@@ -235,7 +235,7 @@ describe('Unit tests for EKS Blueprint', () => {
             });
 
         const stack = pipeline.build(app, "blueprints-pipeline-id");
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
     });
 
@@ -342,7 +342,7 @@ describe('Unit tests for EKS Blueprint', () => {
             });
 
         const stack = pipeline.build(app, "blueprints-pipeline-id");
-        console.log(stack.templateOptions.description);
+        console.debug(stack.templateOptions.description);
         expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
     });
 
