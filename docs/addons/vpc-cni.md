@@ -99,7 +99,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## VPC-CNI Service Account and IRSA config
 
-VPC CNI add-on supports creation of an IRSA role for the add-on if the add-on configuration provides managed policies for the add-on. 
+VPC CNI add-on supports creation of an IRSA role for the add-on if the customer supplies managed policies for the add-on configuration (i.e. if the `serviceAccountPolicies` field is populated). 
 
 Example:
 
