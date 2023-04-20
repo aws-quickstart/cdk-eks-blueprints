@@ -66,8 +66,7 @@ export class CoreAddOn implements ClusterAddOn {
         // Create a service account if user provides namespace, PolicyDocument
         const policies = this.provideManagedPolicies(clusterInfo);
         if (policies) {
-            serviceAccount = createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
-                saNamespace, ...policies);
+            serviceAccount = this.createServiceAccount(clusterInfo, saNamespace, policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
 
@@ -92,8 +91,13 @@ export class CoreAddOn implements ClusterAddOn {
         return Promise.resolve(cfnAddon);
     }
 
+    createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, policies: IManagedPolicy[]): ServiceAccount {
+        return createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
+            saNamespace, ...policies);
+    }
+
     /**
-     * Template method with default implenentation to execute the supplied function of policyDocumentProvider.
+     * Template method with default implementation to execute the supplied function of policyDocumentProvider.
      * Allows overriding this method in subclasses for more complex cases of policies.
      * @param clusterInfo 
      * @returns 
