@@ -151,21 +151,38 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
 });
 
-test("Kubectl layer is correctly injected for EKS version 1.22", () => {
+test("Kubectl layer is correctly injected for EKS version 1.25", () => {
 
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_22).build(app, "stack-122");
-    
+      .account('123456789').region('us-west-2')
+      .version(KubernetesVersion.V1_25).build(app, "stack-125");
+
     const template = Template.fromStack(stack);
 
     template.hasResource("AWS::Lambda::LayerVersion", {
         Properties: {
-          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.22"),
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.25"),
         },
-      });
+    });
+});
+
+test("Kubectl layer is correctly injected for EKS version 1.24", () => {
+
+    const app = new cdk.App();
+
+    const stack = blueprints.EksBlueprint.builder()
+      .account('123456789').region('us-west-2')
+      .version(KubernetesVersion.V1_24).build(app, "stack-124");
+
+    const template = Template.fromStack(stack);
+
+    template.hasResource("AWS::Lambda::LayerVersion", {
+        Properties: {
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.24"),
+        },
+    });
 });
 
 test("Kubectl layer is correctly injected for EKS version 1.23", () => {
