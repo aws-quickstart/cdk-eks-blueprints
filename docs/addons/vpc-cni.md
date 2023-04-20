@@ -59,7 +59,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
+  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/24",["100.64.0.0/25","100.64.0.128/26","100.64.0.192/26"],))
   .build(app, 'my-stack-name');
 ```
 
