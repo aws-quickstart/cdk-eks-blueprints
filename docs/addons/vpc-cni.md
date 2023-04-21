@@ -15,7 +15,7 @@ Amazon EKS VPC CNI Addon now supports advanced configurations which means we can
 
 ## Usage
 
-This add-on can used with two different patterns :
+This add-on can be used with three different patterns :
 
 Pattern # 1 : Simple and Easy. With all default values. This pattern wont create custom networking or setup any environment variables as part of configuration Values.
 
@@ -59,7 +59,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"10.64.0.0/24",["10.64.0.0/25","10.64.0.128/26","10.64.0.192/26"],))
+  .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/24",["100.64.0.0/25","100.64.0.128/26","100.64.0.192/26"],))
   .build(app, 'my-stack-name');
 ```
 
@@ -96,6 +96,50 @@ const blueprint = blueprints.EksBlueprint.builder()
   .resourceProvider("secondary-cidr-subnet-2", new LookupSubnetProvider(subnet3Id)
   .build(app, 'my-stack-name');
 ``` 
+
+## VPC-CNI Service Account and IRSA config
+
+VPC CNI add-on supports creation of an IRSA role for the add-on if the customer supplies managed policies for the add-on configuration (i.e. if the `serviceAccountPolicies` field is populated). 
+
+Example:
+
+```typescript
+const vpcCniAddOn = new VpcCniAddOn({
+  serviceAccountPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
+});
+```
+
+The example above is using the CNI policy sufficient for ENI allocation for IPv4. Please consult the [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/cni-iam-role.html) for IPv6 policies. 
+
+**Note**: when using IRSA account with the VPC-CNI plug-in, the node instance role does not need the AmazonEKS_CNI_Policy. It can be removed from the node instance role by supplying a custom role. 
+
+Example blueprint with Node Instance Role without CNI policy:
+
+```typescript
+const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new iam.ServicePrincipal("ec2.amazonaws.com"),
+  [
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
+  ]);
+
+const clusterProvider = new blueprints.GenericClusterProvider({
+  version: KubernetesVersion.V1_24,
+  managedNodeGroups: [
+    {
+      id: "mng1",
+      instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+      nodeRole: blueprints.getNamedResource("node-role") as iam.Role
+    }
+  ]
+});
+
+blueprints.EksBlueprint.builder()
+    .addOns(...addOns)
+    .resourceProvider("node-role", nodeRole)
+    .clusterProvider(clusterProvider)
+    .build(scope, "blueprint", props);
+```
 
 ## Configuration Options
 

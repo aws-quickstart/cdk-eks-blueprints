@@ -48,8 +48,8 @@ const parentStack = blueprints.EksBlueprint.builder()
             new blueprints.CoreDnsAddOn(),
             new blueprints.MetricsServerAddOn,
             new blueprints.ClusterAutoScalerAddOn,
-            new blueprints.CertManagerAddOn,
             new blueprints.AwsLoadBalancerControllerAddOn,
+            new blueprints.CertManagerAddOn,
             new blueprints.EbsCsiDriverAddOn,
             new blueprints.KubeProxyAddOn,
             new blueprints.EmrEksAddOn)

@@ -22,6 +22,7 @@
         "experimentalDecorators": true,
         "skipLibCheck": true,
         "strictPropertyInitialization": false,
+        "skipDefaultLibCheck": true,
         "typeRoots": [
             "./node_modules/@types"
         ]
