@@ -9,15 +9,13 @@ import {
     PostgresProps, ServiceProps, ServiceAccountProps
 } from "./backstage-values";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
-import {forEach, keys} from "lodash";
-import {data} from "aws-cdk/lib/logging";
 
 /**
  * User provided options for the Helm Chart
  */
 export interface BackstageAddOnProps extends HelmAddOnUserProps {
     version?: string,
-    name?: string, 
+    name?: string,
     createNamespace?: boolean,
     namespace?: string,
     subdomain: string,
@@ -34,8 +32,10 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
     values: {
         backstage: BackstageProps,
         diagnosticMode: DiagnosticProps,
+        global: GlobalProps,
         ingress: IngressProps,
         metrics: MetricsProps,
+        postgres: PostgresProps,
         networkPolicy: NetworkProps,
         service: ServiceProps,
         serviceAccount: ServiceAccountProps,
@@ -88,7 +88,7 @@ export class BackstageAddOn extends HelmAddOn {
  */
 function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnProps): Values {
   const values = helmOptions.values ?? {};
-  
+
   const annotations = {
     "alb.ingress.kubernetes.io/scheme": "internet-facing",
     "alb.ingress.kubernetes.io/target-type": "ip",
@@ -128,7 +128,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnPro
     database.connection.user = values.user!;
     database.connection.password = values.password!;
   }
-  
+
   setPath(values, "ingress.enabled", true);
   setPath(values, "ingress.className", "alb");
   setPath(values, "ingress.host", helmOptions.subdomain);
@@ -141,8 +141,8 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnPro
   setPath(values, "backstage-addon.appConfig.app.baseUrl", helmOptions.baseUrl);
   setPath(values, "backstage-addon.appConfig.backend.baseUrl", helmOptions.baseUrl);
   setPath(values, "backstage-addon.appConfig.backend.database", database);
-  
+
   setPath(values, "backstage-addon.command", ["node", "packages/backend", "--config", "app-config.yaml"]);
-  
+
   return values;
 }
