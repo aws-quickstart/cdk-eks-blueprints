@@ -4,6 +4,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
+import { deployBeforeCapacity } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -106,9 +107,10 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
-        }, undefined, true);
+        }, undefined, false);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
+        deployBeforeCapacity(awsLoadBalancerControllerChart, clusterInfo);
         // return the Promise Construct for any teams that may depend on this
         return Promise.resolve(awsLoadBalancerControllerChart);
     }
