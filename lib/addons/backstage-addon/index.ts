@@ -1,13 +1,16 @@
 import { Construct } from 'constructs';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { dependable, setPath } from "../../utils";
-import { ClusterInfo, Values } from "../../spi";
+import {ClusterInfo, GlobalResources, Values} from "../../spi";
+import * as rds from "aws-cdk-lib/aws-rds";
 import {
     BackstageProps, DiagnosticProps, GlobalProps,
     IngressProps, NetworkProps, MetricsProps,
     PostgresProps, ServiceProps, ServiceAccountProps
 } from "./backstage-values";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import {forEach, keys} from "lodash";
+import {data} from "aws-cdk/lib/logging";
 
 /**
  * User provided options for the Helm Chart
@@ -68,6 +71,7 @@ export class BackstageAddOn extends HelmAddOn {
   }
 
   @dependable('AwsLoadBalancerControllerAddOn')
+  @dependable('ExternalSecretsAddOn')
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     let values: Values = populateValues(clusterInfo, this.options);
     const chart = this.addHelmChart(clusterInfo, values);
@@ -90,7 +94,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnPro
     "alb.ingress.kubernetes.io/target-type": "ip",
     "alb.ingress.kubernetes.io/certificate-arn": clusterInfo.getResource<ICertificate>(helmOptions.certificateResourceName)?.certificateArn
   };
-  
+
   const database = {
     "client": "pg",
     "connection": {
@@ -100,6 +104,30 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnPro
       "password": helmOptions.postgresPassword,
     }
   };
+
+  if ( helmOptions.postgresHost == undefined || helmOptions.postgresPort == undefined ||
+    helmOptions.postgresUser == undefined || helmOptions.postgresPassword == undefined ) {
+    // If helmOptions for postgres aren't defined
+    // Check the context
+
+    const context = clusterInfo.getResourceContext();
+    const rds = context.get(GlobalResources.Rds) as rds.DatabaseCluster;
+    if (rds == undefined) {
+      throw new Error("Please define an RDS Cluster as a resource provider");
+    }
+
+    const secret = rds.secret;
+    if (secret == undefined) {
+      throw new Error("RDS Cluster does not have a secret defined");
+    }
+
+    const values = secret.secretValue.toJSON();
+
+    database.connection.host = values.host!;
+    database.connection.port = values.port!;
+    database.connection.user = values.user!;
+    database.connection.password = values.password!;
+  }
   
   setPath(values, "ingress.enabled", true);
   setPath(values, "ingress.className", "alb");
