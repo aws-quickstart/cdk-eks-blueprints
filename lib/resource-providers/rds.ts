@@ -1,7 +1,7 @@
 import { CfnOutput } from "aws-cdk-lib";
 import * as rds from "aws-cdk-lib/aws-rds";
 import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
-import {IClusterEngine, IDatabaseCluster, InstanceProps} from "aws-cdk-lib/aws-rds";
+import {DatabaseCluster, IClusterEngine, InstanceProps} from "aws-cdk-lib/aws-rds";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
 
@@ -20,14 +20,14 @@ export interface AuroraClusterProps {
 }
 
 export class AuroraClusterProvider
-  implements ResourceProvider<rds.IDatabaseCluster> {
+  implements ResourceProvider<rds.DatabaseCluster> {
   readonly options: AuroraClusterProps;
 
   constructor(options: AuroraClusterProps) {
     this.options = options;
   }
 
-  provide(context: ResourceContext): IDatabaseCluster {
+  provide(context: ResourceContext): DatabaseCluster {
     const id = context.scope.node.id;
 
     const instanceProps: InstanceProps = this.options.instanceProps ?? {
@@ -48,6 +48,10 @@ export class AuroraClusterProvider
 
     new CfnOutput(context.scope, "AuroraInstanceId", {
       value: auroraInstance.clusterIdentifier
+    });
+
+    new CfnOutput(context.scope, "AuroraSecretIdentifier", {
+      value: auroraInstance.secret!.secretArn
     });
 
     return auroraInstance;
