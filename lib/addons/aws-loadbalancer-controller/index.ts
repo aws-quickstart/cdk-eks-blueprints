@@ -49,7 +49,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.5.1',
+    version: '1.5.2',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false,
@@ -106,7 +106,8 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
-        });
+        },
+        undefined, true);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
         // return the Promise Construct for any teams that may depend on this
