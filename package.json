@@ -12,6 +12,10 @@
         "examples": "cdk --app \"npx ts-node examples/examples.ts\"",
         "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rverma-nsl/cdk-eks-blueprints.git"
+    },
     "devDependencies": {
         "@types/dot-object": "^2.1.2",
         "@types/jest": "^29.5.1",

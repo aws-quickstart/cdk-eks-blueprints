@@ -3,8 +3,8 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
 
 jobs:
   build:
@@ -34,11 +34,11 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-              
-    - name: Install Deps         
+
+    - name: Install Deps
       run: make deps
-    
-    - name: Run Linter        
+
+    - name: Run Linter
       run: make lint
 
     - name: Build TSC
@@ -49,3 +49,6 @@ jobs:
 
     - name: Run CDK Synth
       run: make synth
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
