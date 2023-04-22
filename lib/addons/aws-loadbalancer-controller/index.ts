@@ -1,10 +1,10 @@
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import "reflect-metadata";
 import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { deployBeforeCapacity } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -68,6 +68,7 @@ function lookupImage(registry?: string, region?: string): Values {
     return { image: { repository: registry + "amazon/aws-load-balancer-controller" } };
 }
 
+@Reflect.metadata("ordered", true)
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
 
     readonly options: AwsLoadBalancerControllerProps;
@@ -107,10 +108,9 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
-        }, undefined, false);
+        }, undefined, true);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
-        deployBeforeCapacity(awsLoadBalancerControllerChart, clusterInfo);
         // return the Promise Construct for any teams that may depend on this
         return Promise.resolve(awsLoadBalancerControllerChart);
     }
