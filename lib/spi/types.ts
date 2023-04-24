@@ -160,12 +160,13 @@ export class ClusterInfo {
      * @param construct
      */
     public addProvisionedAddOn(addOn: string, construct: Construct) {
-        if (this.isOrderedAddOn(addOn) && this.provisionedAddOns.size > 0) {
-            const prev: Construct = Array.from(this.provisionedAddOns.values()).pop()!;
-            construct.node.addDependency(prev);
-            const prevAddOn = Array.from(this.provisionedAddOns.keys()).pop()!;
-            logger.debug(`Adding dependency from ${addOn} to ${prevAddOn}`);
-        }
+        this.orderedAddOns.forEach(e => {
+            const provisionedOrdered = this.provisionedAddOns.get(e);
+            if(provisionedOrdered) {
+                logger.debug(`Adding dependency from ${addOn} to ${e}`);
+                construct.node.addDependency(provisionedOrdered);
+            }
+        });
         this.provisionedAddOns.set(addOn, construct);
     }
 

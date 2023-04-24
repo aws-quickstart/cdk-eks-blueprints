@@ -10,7 +10,7 @@ import { AppMeshAddOn, EksBlueprint, GlobalResources, CreateKmsKeyProvider } fro
 import { cloneDeep, logger } from "../../lib/utils";
 
 
-beforeAll(() => logger.settings.minLevel = 2); // debug
+beforeAll(() => logger.settings.minLevel = 4); // debug
 
 describe("ResourceProxy",() => {
 
