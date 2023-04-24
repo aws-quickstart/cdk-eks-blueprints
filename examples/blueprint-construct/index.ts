@@ -262,7 +262,7 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider("vpc-05c806922f2c1d7b3","100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, "100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
             .resourceProvider("node-role", nodeRole)
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))

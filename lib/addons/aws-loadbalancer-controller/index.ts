@@ -35,7 +35,13 @@ export interface AwsLoadBalancerControllerProps extends HelmAddOnUserProps {
      * Name of ingressClass to the ALB controller will satisfy. If not provided
      * the value will be defaulted to "alb"
      */
-    ingressClass?: string
+    ingressClass?: string,
+
+    /**
+     * If false, disable the Service Mutator webhook which makes all new services of type LoadBalancer reconciled by the lb controller.
+     * @default false   
+     */
+    enableServiceMutatorWebhook?: boolean
 }
 
 
@@ -55,7 +61,8 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     enableWaf: false,
     enableWafv2: false,
     createIngressClassResource: true,
-    ingressClass: "alb"
+    ingressClass: "alb",
+    enableServiceMutatorWebhook: false
 };
 
 
@@ -105,10 +112,11 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             enableWafv2: this.options.enableWafv2,
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
+            enableServiceMutatorWebhook: this.options.enableServiceMutatorWebhook,
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
-        }, undefined, true);
+        }, undefined, false);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
         // return the Promise Construct for any teams that may depend on this
