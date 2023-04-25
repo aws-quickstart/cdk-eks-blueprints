@@ -72,11 +72,7 @@ export function isCodeCommitRepo(
     | CodeCommitSourceRepository
     | CodeStarConnectionRepository
 ): boolean {
-  if (Object.prototype.hasOwnProperty.call(repo, 'codeCommitRepoName')) {
-    return true;
-  } else {
-    return false;
-  }
+  return Object.prototype.hasOwnProperty.call(repo, 'codeCommitRepoName');
 }
 
 export function isCodeStarConnection(
@@ -85,11 +81,8 @@ export function isCodeStarConnection(
     | CodeCommitSourceRepository
     | CodeStarConnectionRepository
 ): boolean {
-  if (Object.prototype.hasOwnProperty.call(repo, 'codeStarConnectionArn')) {
-    return true;
-  } else {
-    return false;
-  }
+  return Object.prototype.hasOwnProperty.call(repo, 'codeStarConnectionArn');
+  
 }
 
 /**
