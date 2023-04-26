@@ -1,4 +1,5 @@
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";
@@ -57,7 +58,7 @@ export class AppMeshAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    override deploy(clusterInfo: ClusterInfo): void {
+    override deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const cluster = clusterInfo.cluster;
 
@@ -101,5 +102,6 @@ export class AppMeshAddOn extends HelmAddOn {
         
         const chart = this.addHelmChart(clusterInfo, values);
         chart.node.addDependency(sa);
+        return Promise.resolve(chart);
     }
 }

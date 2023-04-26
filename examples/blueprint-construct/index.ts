@@ -1,13 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { CapacityType, KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
-import { AccountRootPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import * as blueprints from '../../lib'; 
+import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
-import { VpcProvider } from '../../lib';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -25,14 +24,9 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel =  3; // info
+        logger.settings.minLevel = 3; // info
         userLog.settings.minLevel = 2; // debug
 
-        // TODO: fix IAM user provisioning for admin user
-        // Setup platform team.
-        //const account = props.env!.account!
-        // const platformTeam = new team.TeamPlatform(account)
-        // Teams for the cluster.
         const teams: Array<blueprints.Team> = [
             new team.TeamTroi,
             new team.TeamRiker(scope, teamManifestDirList[1]),
@@ -40,31 +34,15 @@ export default class BlueprintConstruct {
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
 
-        const prodBootstrapArgo = new blueprints.addons.ArgoCDAddOn({
-            // TODO: enabling this cause stack deletion failure, known issue:
-            // https://github.com/aws-quickstart/cdk-eks-blueprints/blob/main/docs/addons/argo-cd.md#known-issues
-            // bootstrapRepo: {
-            //      repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git',
-            //      path: 'chart',
-            //      targetRevision: "eks-blueprints-cdk",
-            // },
-            // workloadApplications: [
-            //     {
-            //         name: "micro-services",
-            //         namespace: "argocd",
-            //         repository: {
-            //             repoUrl: 'https://github.com/aws-samples/eks-blueprints-workloads.git',
-            //             path: 'envs/dev',
-            //             targetRevision: "main",
-            //         },
-            //         values: {
-            //             domain: ""
-            //         }
-            //     }
-            // ],
-            // adminPasswordSecretName: "argo-admin-secret"
-        });
+        const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new iam.ServicePrincipal("ec2.amazonaws.com"),
+        [
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
+        ]);
+
         const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
@@ -77,9 +55,8 @@ export default class BlueprintConstruct {
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
-            prodBootstrapArgo,
+            new blueprints.addons.ArgoCDAddOn(),
             new blueprints.addons.SSMAgentAddOn(),
             new blueprints.addons.NginxAddOn({
                 values: {
@@ -96,7 +73,8 @@ export default class BlueprintConstruct {
                     ]   
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,
-                eniConfigLabelDef: 'topology.kubernetes.io/zone'
+                eniConfigLabelDef: 'topology.kubernetes.io/zone',
+                serviceAccountPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
@@ -169,8 +147,9 @@ export default class BlueprintConstruct {
             }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
-            new blueprints.UpboundUniversalCrossplaneAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
+            new blueprints.FluxCDAddOn(),
+            new blueprints.GrafanaOperatorAddon(),
         ];
 
         // Instantiated to for helm version check.
@@ -182,12 +161,12 @@ export default class BlueprintConstruct {
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
-        
+        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
             mastersRole: blueprints.getResource(context => {
-                return new Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
+                return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
             }),
             managedNodeGroups: [
                 {
@@ -196,6 +175,7 @@ export default class BlueprintConstruct {
                     instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
                     desiredSize: 2,
                     maxSize: 3, 
+                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
                     launchTemplate: {
                         // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
@@ -208,11 +188,12 @@ export default class BlueprintConstruct {
                     }
                 },
                 {
-                    id: "mng2-launchtemplate",
+                    id: "mng2-customami",
                     instanceTypes: [new ec2.InstanceType('t3.large')],
                     nodeGroupCapacityType: CapacityType.SPOT,
                     desiredSize: 0,
-                    minSize: 0, 
+                    minSize: 0,
+                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
                     launchTemplate: {
                         customTags: {
                             "Name": "Mng2",
@@ -235,16 +216,16 @@ export default class BlueprintConstruct {
             ]
         });
 
-        const executionRolePolicyStatement: PolicyStatement [] = [
-            new PolicyStatement({
+        const executionRolePolicyStatement:iam. PolicyStatement [] = [
+            new iam.PolicyStatement({
               resources: ['*'],
               actions: ['s3:*'],
             }),
-            new PolicyStatement({
+            new iam.PolicyStatement({
               resources: ['*'],   
               actions: ['glue:*'],
             }),
-            new PolicyStatement({
+            new iam.PolicyStatement({
               resources: ['*'],
               actions: [
                 'logs:*',
@@ -282,7 +263,8 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, "100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
+            .resourceProvider("node-role", nodeRole)
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)

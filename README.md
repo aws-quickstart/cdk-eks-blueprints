@@ -44,14 +44,14 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.66.1
+npm install -g aws-cdk@2.72.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.66.1
+# must output 2.72.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.
@@ -141,6 +141,10 @@ This will provision the following:
 The ecosystem of tools that have developed around Kubernetes and the Cloud Native Computing Foundation (CNCF) provides cloud engineers with a wealth of choice when it comes to architecting their infrastructure. Determining the right mix of tools and services however, in addition to how they integrate, can be a challenge. As your Kubernetes estate grows, managing configuration for your clusters can also become a challenge.
 
 AWS customers are building internal platforms to tame this complexity, automate the management of their Kubernetes environments, and make it easy for developers to onboard their workloads. However, these platforms require investment of time and engineering resources to build. The goal of this QuickStart is to provide customers with a tool chain that can help them deploy a Well-Architected platform on top of EKS with ease. The `eks-blueprints` framework provides logical abstractions and prescriptive guidance for building a platform. Ultimately, we want to help EKS customers accelerate time to market for their own platform initiatives.
+
+## Contributing
+
+Please see [Internal Guidelines](docs/internal/readme-internal.md) for details on contributions. 
 
 ## Feedback
 

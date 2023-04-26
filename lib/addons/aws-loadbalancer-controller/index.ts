@@ -1,5 +1,6 @@
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import "reflect-metadata";
 import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -34,7 +35,13 @@ export interface AwsLoadBalancerControllerProps extends HelmAddOnUserProps {
      * Name of ingressClass to the ALB controller will satisfy. If not provided
      * the value will be defaulted to "alb"
      */
-    ingressClass?: string
+    ingressClass?: string,
+
+    /**
+     * If false, disable the Service Mutator webhook which makes all new services of type LoadBalancer reconciled by the lb controller.
+     * @default false   
+     */
+    enableServiceMutatorWebhook?: boolean
 }
 
 
@@ -49,24 +56,26 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.4.8',
+    version: '1.5.2',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false,
     createIngressClassResource: true,
-    ingressClass: "alb"
+    ingressClass: "alb",
+    enableServiceMutatorWebhook: false
 };
 
 
 function lookupImage(registry?: string, region?: string): Values {
-    if(registry ==  null) {
+    if (registry == null) {
         console.log("Unable to get ECR repository for AWS Loadbalancer Controller for region " + region) + ". Using default helm image";
         return {};
     }
-    
-    return { image : { repository: registry + "amazon/aws-load-balancer-controller" }};
+
+    return { image: { repository: registry + "amazon/aws-load-balancer-controller" } };
 }
 
+@Reflect.metadata("ordered", true)
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
 
     readonly options: AwsLoadBalancerControllerProps;
@@ -86,11 +95,11 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
-    
+
         const registry = registries.get(cluster.stack.region);
-        
+
         const image = lookupImage(registry, cluster.stack.region);
-        
+
         const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
             serviceAccount: {
@@ -103,10 +112,11 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             enableWafv2: this.options.enableWafv2,
             createIngressClassResource: this.options.createIngressClassResource,
             ingressClass: this.options.ingressClass,
+            enableServiceMutatorWebhook: this.options.enableServiceMutatorWebhook,
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
-        });
+        }, undefined, false);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
         // return the Promise Construct for any teams that may depend on this

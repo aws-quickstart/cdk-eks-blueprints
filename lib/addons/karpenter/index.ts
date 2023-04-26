@@ -2,10 +2,10 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, dependable, setPath, } from '../../utils';
+import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
 import * as md5 from 'ts-md5';
 import * as semver from 'semver';
 import * as assert from "assert";
@@ -117,7 +117,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.25.0',
+    version: 'v0.27.3',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -135,7 +135,6 @@ export class KarpenterAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @dependable('VpcCniAddOn')
     @conflictsWith('ClusterAutoScalerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
@@ -396,20 +395,19 @@ export class KarpenterAddOn extends HelmAddOn {
             path: '/'
         });
         
-        const clusterName = cluster.clusterName;
-        const clusterHash = md5.Md5.hashStr(clusterName);
+        const clusterId = Names.uniqueId(cluster);
 
         //Cfn output for Node Role in case of needing to add additional policies
         new CfnOutput(cluster.stack, 'Karpenter Instance Node Role', {
             value: karpenterNodeRole.roleName,
             description: "Karpenter add-on Node Role name",
-            exportName: "KarpenterNodeRoleName"+clusterHash,
+            exportName: clusterId+"KarpenterNodeRoleName",
         });
         //Cfn output for Instance Profile for creating additional provisioners
         new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', { 
             value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
             description: "Karpenter add-on Instance Profile name",
-            exportName: "KarpenterInstanceProfileName"+clusterHash, 
+            exportName: clusterId+"KarpenterInstanceProfileName", 
         });
 
         // Map Node Role to aws-auth
