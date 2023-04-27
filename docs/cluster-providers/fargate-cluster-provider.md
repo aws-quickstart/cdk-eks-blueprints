@@ -10,8 +10,12 @@ In the example below, the Fargate profile indicates that all Pods in the `dynatr
 const fargateProfiles: Map<string, eks.FargateProfileOptions> = new Map([
     ["dynatrace", { selectors: [{ namespace: "dynatrace" }] }]
 ]);
+const tags = {
+    "Name": "blueprints-example-cluster",
+    "Type": "generic-cluster"
+}
+const clusterProvider = new blueprints.FargateClusterProvider({ fargateProfiles, tags });
 
-const clusterProvider = new blueprints.FargateClusterProvider({ fargateProfiles });
 new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
 ```
 
@@ -24,6 +28,8 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | name                  | The name for the cluster.
 | fargateProfiles       | A map of Fargate profiles to use with the cluster.
 | vpcSubnets            | The subnets for the cluster.
-| privateCluster        | Public cluster, you will need to provide a list of subnets. There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
+| tags                  | Tags to propagate to Cluster.
+| privateCluster        | Public cluster, you will need to provide a list of subnets. There should be public and private subnets 
+for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
 
 You can find more details on the supported configuration options in the API documentation for the [FargateClusterProviderProps](../api/interfaces/FargateClusterProviderProps.html).
