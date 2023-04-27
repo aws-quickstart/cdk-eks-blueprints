@@ -20,6 +20,10 @@ Full list of configuration options:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_24,
+    tags: {
+        "Name": "blueprints-example-cluster",
+        "Type": "generic-cluster"
+    },
     serviceIpv4Cidr: "10.43.0.0/16",
     // if needed use this to register an auth role integrate with RBAC
     mastersRole: blueprints.getResource(context => {
@@ -92,6 +96,10 @@ Example:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_24,
+    tags: {
+        "Name": "blueprints-example-cluster",
+        "Type": "generic-cluster"
+    },
     // if needed use this to register an auth role to integrate with RBAC
     mastersRole: blueprints.getResource(context => {
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
@@ -134,6 +142,7 @@ The `GenericClusterProvider` supports the following configuration options.
 | vpc                   | VPC for the cluster.
 | vpcSubnets            | The subnets for control plane ENIs (subnet selection).
 | privateCluster        | If `true` Kubernetes API server is private.
+| tags                  | Tags to propagate to Cluster.
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
