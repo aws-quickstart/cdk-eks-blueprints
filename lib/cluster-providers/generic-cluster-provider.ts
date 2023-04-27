@@ -47,6 +47,13 @@ export interface GenericClusterProviderProps extends eks.ClusterOptions {
     fargateProfiles?: {
         [key: string]: eks.FargateProfileOptions;
     }
+
+    /**
+     * Tags for the cluster
+     */
+    tags?: {
+        [key: string]: string;
+    }
 }
 
 export class ManagedNodeGroupConstraints implements utils.ConstraintsType<ManagedNodeGroup> {
@@ -212,6 +219,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
+        const tags = this.props.tags;
 
         const defaultOptions: Partial<eks.ClusterProps> = {
             vpc,
@@ -222,6 +230,7 @@ export class GenericClusterProvider implements ClusterProvider {
             vpcSubnets,
             endpointAccess,
             kubectlLayer,
+            tags,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 

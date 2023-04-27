@@ -2,6 +2,7 @@ import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { defaultOptions, GenericClusterProvider } from './generic-cluster-provider';
+import { Tags } from "aws-cdk-lib";
 
 /**
  * Configuration options for the cluster provider.
@@ -29,6 +30,13 @@ export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
      * @default false
      */
     privateCluster?: boolean;
+
+    /**
+     * Tags for the cluster
+     */
+    tags?: {
+        [key: string]: string;
+    }
 }
 
 /**
@@ -47,6 +55,7 @@ export class FargateClusterProvider extends GenericClusterProvider {
      * @override
      */
     internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
+
         return new eks.FargateCluster(scope, id, clusterOptions);
     }    
 }

@@ -165,6 +165,10 @@ export default class BlueprintConstruct {
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_24,
+            tags: {
+                "Name": "blueprints-example-cluster",
+                "Type": "generic-cluster"
+            },
             mastersRole: blueprints.getResource(context => {
                 return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
             }),
