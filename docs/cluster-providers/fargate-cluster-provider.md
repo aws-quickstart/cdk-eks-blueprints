@@ -12,7 +12,7 @@ const fargateProfiles: Map<string, eks.FargateProfileOptions> = new Map([
 ]);
 const tags = {
     "Name": "blueprints-example-cluster",
-    "Type": "generic-cluster"
+    "Type": "fargate-cluster"
 }
 const clusterProvider = new blueprints.FargateClusterProvider({ fargateProfiles, tags });
 
