@@ -55,7 +55,6 @@ export class FargateClusterProvider extends GenericClusterProvider {
      * @override
      */
     internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
-
         return new eks.FargateCluster(scope, id, clusterOptions);
     }    
 }
