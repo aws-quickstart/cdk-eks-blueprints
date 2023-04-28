@@ -19,7 +19,7 @@ export interface LaunchTemplateProps {
     /**
      * Custom Tags for launch template which will propogate to worker nodes.
      */
-    customTags?: {
+    tags?: {
         [key: string]: string;
     }
 

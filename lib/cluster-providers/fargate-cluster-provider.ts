@@ -2,7 +2,6 @@ import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import { defaultOptions, GenericClusterProvider } from './generic-cluster-provider';
-import { Tags } from "aws-cdk-lib";
 
 /**
  * Configuration options for the cluster provider.

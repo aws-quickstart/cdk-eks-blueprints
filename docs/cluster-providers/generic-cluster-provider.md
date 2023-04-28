@@ -39,7 +39,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
             launchTemplate: {
                 // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
-                customTags: {
+                tags: {
                     "Name": "Mng1",
                     "Type": "Managed-Node-Group",
                     "LaunchTemplate": "Custom",
@@ -64,7 +64,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                 }),
                 userData: userData,
                 // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
-                customTags: {
+                tags: {
                     "Name": "Mng2",
                     "Type": "Managed-Node-Group",
                     "LaunchTemplate": "Custom",

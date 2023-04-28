@@ -183,7 +183,7 @@ export default class BlueprintConstruct {
                     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
                     launchTemplate: {
                         // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
-                        customTags: {
+                        tags: {
                             "Name": "Mng1",
                             "Type": "Managed-Node-Group",
                             "LaunchTemplate": "Custom",
@@ -199,7 +199,7 @@ export default class BlueprintConstruct {
                     minSize: 0,
                     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
                     launchTemplate: {
-                        customTags: {
+                        tags: {
                             "Name": "Mng2",
                             "Type": "Managed-Node-Group",
                             "LaunchTemplate": "Custom",

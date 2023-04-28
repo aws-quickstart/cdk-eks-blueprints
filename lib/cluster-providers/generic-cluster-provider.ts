@@ -372,8 +372,8 @@ export class GenericClusterProvider implements ClusterProvider {
                 id: lt.launchTemplateId!,
                 version: lt.latestVersionNumber,
             });
-            const customTags = Object.entries(nodeGroup.launchTemplate.customTags ?? {});
-            customTags.forEach(([key, options]) => Tags.of(lt).add(key,options));
+            const tags = Object.entries(nodeGroup.launchTemplate.tags ?? {});
+            tags.forEach(([key, options]) => Tags.of(lt).add(key,options));
             delete nodegroupOptions.amiType;
             delete nodegroupOptions.releaseVersion;
         }
