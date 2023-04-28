@@ -36,7 +36,9 @@ The `MngClusterProvider` supports the following configuration options.
 | customAmi             | The custom AMI and the userData for the node group, `amiType` and `amiReleaseVersion` will be ignored if this is set.
 | nodeGroupCapacityType | The capacity type for the node group (on demand or spot).
 | vpcSubnets            | The subnets for the cluster.
-| privateCluster        | If `true` Kubernetes API server is private. 
+| privateCluster        | If `true` Kubernetes API server is private.
+| tags                  | Tags to propagate to Cluster.
+| nodeGroupTags         | Tags to propagate to Node Group. 
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 

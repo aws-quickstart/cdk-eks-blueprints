@@ -19,6 +19,13 @@ export interface AsgClusterProviderProps extends eks.CommonClusterOptions, Autos
      */
     privateCluster?: boolean;
 
+    /**
+     * Tags for the cluster
+     */
+    tags?: {
+        [key: string]: string;
+    }
+
 }
 
 /**
@@ -30,7 +37,7 @@ export class AsgClusterProvider extends GenericClusterProvider {
         super({...defaultOptions, ...props, ...{
             autoscalingNodeGroups: [{
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-asg",
-                ...props as Omit<AutoscalingNodeGroup, "id">
+                ...props as Omit<AutoscalingNodeGroup, "id" | "tags">
             }]
         }});
     }
