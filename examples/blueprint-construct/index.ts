@@ -188,7 +188,8 @@ export default class BlueprintConstruct {
                             "Type": "Managed-Node-Group",
                             "LaunchTemplate": "Custom",
                             "Instance": "ONDEMAND"
-                        }
+                        },
+                        requireImdsv2: true
                     }
                 },
                 {

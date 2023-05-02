@@ -2,9 +2,11 @@
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
+import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -13,8 +15,6 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
-import { Tags } from "aws-cdk-lib";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -288,8 +288,8 @@ export class GenericClusterProvider implements ClusterProvider {
         
         const minor = version.version.split('.')[1];
 
-        if(minor && parseInt(minor, 10) > 24) {
-            return new KubectlV24Layer(scope, "kubectllayer24"); // for all versions above 1.24 use 1.24 kubectl (unless explicitly supported in CDK)
+        if(minor && parseInt(minor, 10) > 25) {
+            return new KubectlV25Layer(scope, "kubectllayer25"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
         }
         return undefined;
     }
