@@ -23,6 +23,10 @@ export interface LaunchTemplateProps {
         [key: string]: string;
     }
 
+    /**
+     * Whether IMDSv2 should be required on launched instances. (optional, default: false)
+     */
+    requireImdsv2?: boolean;
 }
 
 
