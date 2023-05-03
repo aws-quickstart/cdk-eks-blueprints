@@ -201,7 +201,7 @@ export class JupyterHubAddOn extends HelmAddOn {
         const ingressAnnotations = this.options.ingressAnnotations;
         const cert = this.options.certificateResourceName;
 
-        const albAddOnCheck = clusterInfo.getScheduledAddOn('AwsLoadBalancerControllerAddOn.name');
+        const albAddOnCheck = clusterInfo.getProvisionedAddOn(AwsLoadBalancerControllerAddOn.name);
         // Use Ingress and AWS ALB
         if (serviceType == JupyterHubServiceType.ALB){
             assert(albAddOnCheck, `Missing a dependency: ${AwsLoadBalancerControllerAddOn.name}. Please add it to your list of addons.`); 
