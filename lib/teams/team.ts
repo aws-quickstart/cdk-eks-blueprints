@@ -100,6 +100,7 @@ export class ApplicationTeam implements Team {
             namespaceLabels: teamProps.namespaceLabels,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
+            serviceAccountPolicies: teamProps.serviceAccountPolicies,
             userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
             teamManifestDir: teamProps.teamManifestDir
