@@ -1,9 +1,11 @@
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
+import merge from "ts-deepmerge";
 import { AwsLoadBalancerControllerAddOn } from "..";
-import { ClusterInfo } from "../../spi";
+import { ClusterInfo, Values } from "../../spi";
 import { dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
+import * as dot from 'dot-object';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 
@@ -91,20 +93,24 @@ export class NginxAddOn extends HelmAddOn {
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
         };
 
-        const values = { ...props.values ?? {} };
+        const values: Values = {};
 
         if (props.certificateResourceName) {
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
             presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificate?.certificateArn;
-            setPath(values, "controller.service.httpsPort.targetPort", "http");
-            setPath(values, "controller.service.httpPort.enable", "false");
+            setPath(values, "controller.service.httpPort.enable", false);
+            const httpPort = dot.pick("controller.service.httpsPort.targetPort", props.values ?? {});
+            if(httpPort === undefined) {
+               setPath(values, "controller.service.httpsPort.targetPort", 80);
+            }
         }
 
         const serviceAnnotations = { ...values.controller?.service?.annotations, ...presetAnnotations };
         setPath(values, 'controller.service.annotations', serviceAnnotations);
 
-        const nginxHelmChart = this.addHelmChart(clusterInfo, values);
+        const merged = merge(values, this.props.values ?? {});
+        const nginxHelmChart = this.addHelmChart(clusterInfo, merged);
 
         return Promise.resolve(nginxHelmChart);
     }
