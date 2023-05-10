@@ -11,7 +11,7 @@ export class FluxGitRepository {
 
         const repository = this.bootstrapRepo!;
         return {
-            apiVersion: "source.toolkit.fluxcd.io/v1",
+            apiVersion: "source.toolkit.fluxcd.io/v1beta2",
             kind: "GitRepository",
             metadata: {
                 name: repository.name,
