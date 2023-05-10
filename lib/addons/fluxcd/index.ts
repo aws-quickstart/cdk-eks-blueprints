@@ -38,13 +38,13 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   * Flux Kustomization Prune.
   * Default `true` */
 
-  fluxPrune: boolean;
+  fluxPrune?: boolean;
 
   /** 
   * Flux Kustomization Timeout.
   * Default `1m` */
 
-  fluxTimeout: string;
+  fluxTimeout?: string;
 }
 
 /**
