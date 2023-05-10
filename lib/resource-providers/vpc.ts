@@ -8,11 +8,13 @@ import { ResourceContext, ResourceProvider } from "../spi";
  */
 export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
+    readonly primaryCidr?: string;
     readonly secondaryCidr?: string;
     readonly secondarySubnetCidrs?: string[];
 
-    constructor(vpcId?: string, secondaryCidr?: string, secondarySubnetCidrs?: string[]) {
+    constructor(vpcId?: string, primaryCidr?: string, secondaryCidr?: string, secondarySubnetCidrs?: string[]) {
         this.vpcId = vpcId;
+        this.primaryCidr = primaryCidr;
         this.secondaryCidr = secondaryCidr;
         this.secondarySubnetCidrs = secondarySubnetCidrs;
     }
@@ -33,10 +35,18 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
 
         if (vpc == null) {
             // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
+            // If VPC CIDR range is not provided, uses `10.0.0.0/16` as the range and creates public and private subnets per Availability Zone.
             // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
             // Network routing for the private subnets will be configured to allow outbound access via a set of resilient NAT Gateways (one per AZ).
             // Creates Secondary CIDR and Secondary subnets if passed.
-            vpc = new ec2.Vpc(context.scope, id + "-vpc");
+            if (this.primaryCidr) {
+                vpc = new ec2.Vpc(context.scope, id + "-vpc",{
+                    ipAddresses: ec2.IpAddresses.cidr(this.primaryCidr)
+                });    
+            }
+            else {
+                vpc = new ec2.Vpc(context.scope, id + "-vpc");
+            }
         }
 
         
