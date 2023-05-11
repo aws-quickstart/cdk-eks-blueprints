@@ -1,8 +1,12 @@
-import { Construct } from 'constructs';
+import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { dependable, setPath } from "../../utils";
 import { ClusterInfo, Values } from "../../spi";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import * as rds from "aws-cdk-lib/aws-rds";
+import { CfnOutput } from 'aws-cdk-lib';
+
+const HTTPS = "https://";
 
 /**
  * User provided options for the Helm Chart
@@ -17,11 +21,8 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
     imageRegistry: string,
     imageRepository: string,
     imageTag?: string,
-    baseUrl: string,
-    postgresHost: string,
-    postgresPort?: number,
-    postgresUser?: string,
-    postgresPassword: string
+    databaseResourceName: string
+    databaseSecretTargetName: string
 }
 
 /**
@@ -35,8 +36,6 @@ const defaultProps = {
   release: "backstage",
   repository:  "https://backstage.github.io/charts",
   imageTag: "latest",
-  postgresPort: 5432,
-  postgresUser: "postgres",
   values: {}
 };
 
@@ -53,51 +52,65 @@ export class BackstageAddOn extends HelmAddOn {
   }
   
   @dependable('AwsLoadBalancerControllerAddOn')
+  @dependable('ExternalsSecretsAddOn')
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    let values: Values = populateValues(clusterInfo, this.options);
+    let values: Values = this.populateValues(clusterInfo, this.options);
     const chart = this.addHelmChart(clusterInfo, values);
+
+    new CfnOutput(clusterInfo.cluster.stack, 'Backstage base URL', {
+      value: HTTPS+this.options.subdomain,
+      description: "Backstage base URL",
+      exportName: "BackstageBaseUrl",
+    });
 
     return Promise.resolve(chart);
   }
-}
 
-/**
- * populateValues populates the appropriate values used to customize the Helm chart
- * @param helmOptions User provided values to customize the chart
- */
-function populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnProps): Values {
-  const values = helmOptions.values ?? {};
+  /**
+  * populateValues populates the appropriate values used to customize the Helm chart
+  * @param helmOptions User provided values to customize the chart
+  */
+  populateValues(clusterInfo: ClusterInfo, helmOptions: BackstageAddOnProps): Values {
+    const values = helmOptions.values ?? {};
+    
+    const annotations = {
+      "alb.ingress.kubernetes.io/scheme": "internet-facing",
+      "alb.ingress.kubernetes.io/target-type": "ip",
+      "alb.ingress.kubernetes.io/certificate-arn": clusterInfo.getResource<ICertificate>(helmOptions.certificateResourceName)?.certificateArn
+    };
   
-  const annotations = {
-    "alb.ingress.kubernetes.io/scheme": "internet-facing",
-    "alb.ingress.kubernetes.io/target-type": "ip",
-    "alb.ingress.kubernetes.io/certificate-arn": clusterInfo.getResource<ICertificate>(helmOptions.certificateResourceName)?.certificateArn
-  };
-  
-  const database = {
-    "client": "pg",
-    "connection": {
-      "host": helmOptions.postgresHost,
-      "port": helmOptions.postgresPort,
-      "user": helmOptions.postgresUser,
-      "password": helmOptions.postgresPassword,
+    const databaseInstance: rds.IDatabaseInstance  = clusterInfo.getRequiredResource(helmOptions.databaseResourceName);
+    if (databaseInstance === undefined) {
+        throw new Error("Database instance not found");
     }
-  };
   
-  setPath(values, "ingress.enabled", true);
-  setPath(values, "ingress.className", "alb");
-  setPath(values, "ingress.host", helmOptions.subdomain);
-  setPath(values, "ingress.annotations", annotations);
+    const databaseChartValues = {
+      "client": "pg",
+      "connection": {
+        "host": databaseInstance.dbInstanceEndpointAddress,
+        "port": databaseInstance.dbInstanceEndpointPort,
+        "user": "${POSTGRES_USER}",
+        "password": "${POSTGRES_PASSWORD}"
+      }
+    };
+    
+    setPath(values, "ingress.enabled", true);
+    setPath(values, "ingress.className", "alb");
+    setPath(values, "ingress.host", helmOptions.subdomain);
+    setPath(values, "ingress.annotations", annotations);
+  
+    setPath(values, "backstage.image.registry", helmOptions.imageRegistry);
+    setPath(values, "backstage.image.repository", helmOptions.imageRepository);
+    setPath(values, "backstage.image.tag", helmOptions.imageTag);
+  
+    setPath(values, "backstage.appConfig.app.baseUrl", HTTPS+helmOptions.subdomain);
+    setPath(values, "backstage.appConfig.backend.baseUrl", HTTPS+helmOptions.subdomain);
+    setPath(values, "backstage.appConfig.backend.database", databaseChartValues);
 
-  setPath(values, "backstage.image.registry", helmOptions.imageRegistry);
-  setPath(values, "backstage.image.repository", helmOptions.imageRepository);
-  setPath(values, "backstage.image.tag", helmOptions.imageTag);
-
-  setPath(values, "backstage.appConfig.app.baseUrl", helmOptions.baseUrl);
-  setPath(values, "backstage.appConfig.backend.baseUrl", helmOptions.baseUrl);
-  setPath(values, "backstage.appConfig.backend.database", database);
+    setPath(values, "backstage.extraEnvVarsSecrets", [helmOptions.databaseSecretTargetName]);
   
-  setPath(values, "backstage.command", ["node", "packages/backend", "--config", "app-config.yaml"]);
-  
-  return values;
+    setPath(values, "backstage.command", ["node", "packages/backend", "--config", "app-config.yaml"]);
+    
+    return values;
+  }
 }
