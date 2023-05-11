@@ -1,10 +1,12 @@
 
-import { KubectlV22Layer } from "@aws-cdk/lambda-layer-kubectl-v22";
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
+import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
+import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -13,8 +15,6 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
-import { Tags } from "aws-cdk-lib";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -46,6 +46,13 @@ export interface GenericClusterProviderProps extends eks.ClusterOptions {
      */
     fargateProfiles?: {
         [key: string]: eks.FargateProfileOptions;
+    }
+
+    /**
+     * Tags for the cluster
+     */
+    tags?: {
+        [key: string]: string;
     }
 }
 
@@ -212,6 +219,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
+        const tags = this.props.tags;
 
         const defaultOptions: Partial<eks.ClusterProps> = {
             vpc,
@@ -222,6 +230,7 @@ export class GenericClusterProvider implements ClusterProvider {
             vpcSubnets,
             endpointAccess,
             kubectlLayer,
+            tags,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
@@ -269,18 +278,18 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
         switch(version) {
-            case eks.KubernetesVersion.V1_24:
-                return new KubectlV24Layer(scope, "kubectllayer24");
             case eks.KubernetesVersion.V1_23:
                 return new KubectlV23Layer(scope, "kubectllayer23");
-            case eks.KubernetesVersion.V1_22:
-                return new KubectlV22Layer(scope, "kubectllayer22");
+            case eks.KubernetesVersion.V1_24:
+                return new KubectlV24Layer(scope, "kubectllayer24");
+            case eks.KubernetesVersion.V1_25:
+                return new KubectlV25Layer(scope, "kubectllayer25");
         }
         
         const minor = version.version.split('.')[1];
 
-        if(minor && parseInt(minor, 10) > 24) {
-            return new KubectlV24Layer(scope, "kubectllayer24"); // for all versions above 1.24 use 1.24 kubectl (unless explicitly supported in CDK)
+        if(minor && parseInt(minor, 10) > 25) {
+            return new KubectlV25Layer(scope, "kubectllayer25"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
         }
         return undefined;
     }
@@ -293,7 +302,8 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     addAutoScalingGroup(cluster: eks.Cluster, nodeGroup: AutoscalingNodeGroup): autoscaling.AutoScalingGroup {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
-        const instanceType = nodeGroup.instanceType ?? utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
+        const instanceTypeContext = utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
+        const instanceType = nodeGroup.instanceType ?? (typeof instanceTypeContext === 'string' ? new ec2.InstanceType(instanceTypeContext) : instanceTypeContext);
         const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
@@ -331,7 +341,8 @@ export class GenericClusterProvider implements ClusterProvider {
     addManagedNodeGroup(cluster: eks.Cluster, nodeGroup: ManagedNodeGroup): eks.Nodegroup {
         const capacityType = nodeGroup.nodeGroupCapacityType;
         const releaseVersion = nodeGroup.amiReleaseVersion;
-        const instanceTypes = nodeGroup.instanceTypes ?? [utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE)];
+        const instanceTypeContext = utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
+        const instanceTypes = nodeGroup.instanceTypes ?? ([typeof instanceTypeContext === 'string' ? new ec2.InstanceType(instanceTypeContext) : instanceTypeContext]);
         const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
         const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
@@ -356,13 +367,14 @@ export class GenericClusterProvider implements ClusterProvider {
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
                 machineImage: nodeGroup.launchTemplate?.machineImage,
                 userData: nodeGroup.launchTemplate?.userData,
+                requireImdsv2: nodeGroup.launchTemplate?.requireImdsv2,
             });
             utils.setPath(nodegroupOptions, "launchTemplateSpec", {
                 id: lt.launchTemplateId!,
                 version: lt.latestVersionNumber,
             });
-            const customTags = Object.entries(nodeGroup.launchTemplate.customTags ?? {});
-            customTags.forEach(([key, options]) => Tags.of(lt).add(key,options));
+            const tags = Object.entries(nodeGroup.launchTemplate.tags ?? {});
+            tags.forEach(([key, options]) => Tags.of(lt).add(key,options));
             delete nodegroupOptions.amiType;
             delete nodegroupOptions.releaseVersion;
         }

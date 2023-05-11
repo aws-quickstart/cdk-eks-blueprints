@@ -10,7 +10,7 @@ import { AppMeshAddOn, EksBlueprint, GlobalResources, CreateKmsKeyProvider } fro
 import { cloneDeep, logger } from "../../lib/utils";
 
 
-beforeAll(() => logger.settings.minLevel = 2); // debug
+beforeAll(() => logger.settings.minLevel = 4); // debug
 
 describe("ResourceProxy",() => {
 
@@ -115,4 +115,29 @@ describe("ResourceProxy",() => {
         logger.debug(template.toJSON());
         expect(JSON.stringify(template.toJSON())).toContain('kmsKeyArn');
     });
+
+    test("When a stack with a managed node group is created, IMDSv2 is required if specified via the launch template", () => {
+        const app = new App();
+
+        const genericClusterProvider = new blueprints.GenericClusterProvider({
+            version: KubernetesVersion.V1_24,
+            managedNodeGroups: [{
+                id: "mng1",
+                launchTemplate: {
+                    requireImdsv2: true,
+                },
+            }],
+        });
+
+        const stack = EksBlueprint.builder()
+                                  .clusterProvider(genericClusterProvider)
+                                  .account("123456789012")
+                                  .region("us-east-1")
+                                  .build(app, "cluster");
+
+        // Then
+        const template = Template.fromStack(stack);
+        expect(JSON.stringify(template.toJSON())).toContain("\"HttpTokens\":\"required\"");
+    });
+
 });

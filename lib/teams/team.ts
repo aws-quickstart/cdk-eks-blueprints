@@ -1,11 +1,11 @@
-import { KubernetesManifest, ServiceAccount} from 'aws-cdk-lib/aws-eks';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import { CfnOutput } from 'aws-cdk-lib';
+import { KubernetesManifest, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { IRole } from "aws-cdk-lib/aws-iam";
 import { CsiSecretProps, SecretProviderClass } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 import { ClusterInfo, Team, Values } from '../spi';
-import { applyYamlFromDir} from '../utils/yaml-utils';
+import { applyYamlFromDir } from '../utils/yaml-utils';
 import { DefaultTeamRoles } from './default-team-roles';
-import { IRole } from "aws-cdk-lib/aws-iam";
 
 /**
  * Team properties.
@@ -49,6 +49,16 @@ export class TeamProps {
     readonly serviceAccountName?: string;
 
     /**
+     * If specified, the IRSA account will be created for with the IRSA role
+     * having the specified managed policies. 
+     * 
+     * @example
+     * serviceAccountPolicies: [ManagedPolicy.fromAwsManagedPolicyName("")]
+     * 
+     */
+    readonly serviceAccountPolicies?: iam.IManagedPolicy[];
+
+    /**
      *  Team members who need to get access to the cluster
      */
     readonly users?: Array<iam.ArnPrincipal>;
@@ -90,6 +100,7 @@ export class ApplicationTeam implements Team {
             namespaceLabels: teamProps.namespaceLabels,
             namespaceHardLimits: teamProps.namespaceHardLimits,
             serviceAccountName: teamProps.serviceAccountName,
+            serviceAccountPolicies: teamProps.serviceAccountPolicies,
             userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
             teamManifestDir: teamProps.teamManifestDir
@@ -257,6 +268,10 @@ export class ApplicationTeam implements Team {
             namespace: this.teamProps.namespace
         });
         this.serviceAccount.node.addDependency(this.namespaceManifest);
+
+        if(this.teamProps.serviceAccountPolicies) {
+            this.teamProps.serviceAccountPolicies.forEach(policy => this.serviceAccount.role.addManagedPolicy(policy));
+        }
 
         const serviceAccountOutput = new CfnOutput(clusterInfo.cluster.stack, `${this.teamProps.name}-sa`, {
             value: serviceAccountName
