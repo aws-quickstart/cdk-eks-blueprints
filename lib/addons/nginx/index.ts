@@ -61,7 +61,7 @@ const defaultProps: NginxAddOnProps = {
     name: "nginx-ingress",
     chart: "nginx-ingress",
     release: "blueprints-addon-nginx",
-    version: "0.17.0",
+    version: "0.17.1",
     repository: "https://helm.nginx.com/stable",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
