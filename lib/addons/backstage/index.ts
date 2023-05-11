@@ -12,10 +12,6 @@ const HTTPS = "https://";
  * User provided options for the Helm Chart
  */
 export interface BackstageAddOnProps extends HelmAddOnUserProps {
-    version?: string,
-    name?: string, 
-    createNamespace?: boolean,
-    namespace?: string,
     subdomain: string,
     certificateResourceName: string,
     imageRegistry: string,
