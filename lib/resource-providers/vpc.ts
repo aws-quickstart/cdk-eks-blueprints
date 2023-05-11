@@ -4,6 +4,15 @@ import { ISubnet, PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
 import { ResourceContext, ResourceProvider } from "../spi";
 
 /**
+ * Interface for Mapping for fields such as Primary CIDR, Secondary CIDR, Secondary Subnet CIDR.
+ */
+interface VpcProps {
+   primaryCidr: string, 
+   secondaryCidr?: string,
+   secondarySubnetCidrs?: string[]
+}
+
+/**
  * VPC resource provider 
  */
 export class VpcProvider implements ResourceProvider<ec2.IVpc> {
@@ -12,11 +21,11 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly secondaryCidr?: string;
     readonly secondarySubnetCidrs?: string[];
 
-    constructor(vpcId?: string, primaryCidr?: string, secondaryCidr?: string, secondarySubnetCidrs?: string[]) {
+    constructor(vpcId?: string, private vpcProps?: VpcProps) {
         this.vpcId = vpcId;
-        this.primaryCidr = primaryCidr;
-        this.secondaryCidr = secondaryCidr;
-        this.secondarySubnetCidrs = secondarySubnetCidrs;
+        this.primaryCidr = vpcProps?.primaryCidr;
+        this.secondaryCidr = vpcProps?.secondaryCidr;
+        this.secondarySubnetCidrs = vpcProps?.secondarySubnetCidrs;
     }
 
     provide(context: ResourceContext): ec2.IVpc {
