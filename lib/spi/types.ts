@@ -47,7 +47,7 @@ export interface BlockDeviceMapping {
     ebs?: EbsVolumeMapping;
     noDevice?: string;
 }
-  
+
 export interface EbsVolumeMapping {
     deleteOnTermination?: boolean;
     iops?: number;
@@ -154,6 +154,7 @@ export enum GlobalResources {
     Certificate = 'certificate',
     KmsKey = 'kms-key',
     Amp = 'amp',
+    Rds = 'rds'
 }
 
 /**
