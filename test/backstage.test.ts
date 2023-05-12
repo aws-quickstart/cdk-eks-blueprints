@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
+import * as rds from "aws-cdk-lib/aws-rds";
 
 const backstageAddOnProps = {
     namespace: "test-namespace",
@@ -21,8 +22,7 @@ describe('Unit tests for Backstage addon', () => {
 
         blueprint.account("123567891").region('us-west-1')
             .addOns(new blueprints.ExternalsSecretsAddOn)
-            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
 
         expect(()=> {
             blueprint.build(app, 'backstage-missing-dependency-lb-controller');
@@ -36,8 +36,7 @@ describe('Unit tests for Backstage addon', () => {
 
         blueprint.account("123567891").region('us-west-1')
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
-            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
 
         expect(()=> {
             blueprint.build(app, 'backstage-missing-dependency-external-secret');
@@ -52,11 +51,31 @@ describe('Unit tests for Backstage addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .addOns(new blueprints.ExternalsSecretsAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
-            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
 
         expect(()=> {
             blueprint.build(app, 'backstage-database-resource-not-found');
         }).toThrow("Required resource "+backstageAddOnProps.databaseResourceName+" is missing.");
+    });
+
+    test("Stack creation succeds", () => {
+        const  databaseInstance = {
+            dbInstanceEndpointAddress: "test",
+            dbInstanceEndpointPort: "test"
+        } as rds.DatabaseInstance;
+        
+        jest.spyOn(blueprints.ClusterInfo.prototype, 'getRequiredResource').mockImplementation(() => databaseInstance);
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .addOns(new blueprints.ExternalsSecretsAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.BackstageAddOn(backstageAddOnProps))
+            .build(app, 'backstage-stack-succeeds');
+
+        expect(blueprint).toBeDefined();
     });
 });
