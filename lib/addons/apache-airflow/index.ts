@@ -2,7 +2,7 @@ import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from '../../spi/types';
 import { HelmAddOn } from '../helm-addon/index';
 import { Construct } from "constructs";
-import { setPath, createNamespace, createServiceAccount } from "../../utils";
+import { setPath, createNamespace } from "../../utils";
 import { Values } from "../../spi";
 import * as assert from "assert";
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
@@ -92,7 +92,7 @@ export class AirflowAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
 
         // Create Namespace
-        const ns = createNamespace(this.options.namespace!, cluster, true, true);
+        createNamespace(this.options.namespace!, cluster, true, true);
 
         // Create SA
         // const sa = createServiceAccount(cluster, 'airflow-sa', ns, );
@@ -164,7 +164,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: AirflowAddOnProps
             "port": "5432",
             "db": dbConfig.dbName,
             "sslmode": "disable"
-        })
+        });
         setPath(values, "postgresql.enabled", false);
     } else {
         assert(!dbConfig, 'DB Configuration is supported only if RDS is enabled.');
@@ -185,7 +185,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: AirflowAddOnProps
             "remote_log_conn_id": 'aws_s3_conn',
             "delete_worker_pods": 'False',
             "encrypt_s3_logs": 'True'
-        })
+        });
     } else {
         assert(!bucket, "S3 bucket is not necessary if Logging is not enabled.");
     }
