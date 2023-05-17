@@ -1,6 +1,5 @@
 import * as spi from '../spi';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 
 /**
  * S3 provider that imports S3 bucket into the current stack by name. 
