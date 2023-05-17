@@ -1,13 +1,18 @@
-import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { ClusterInfo } from '../../spi/types';
-import { HelmAddOn } from '../helm-addon/index';
 import { Construct } from "constructs";
-import { setPath, createNamespace } from "../../utils";
-import { Values } from "../../spi";
 import * as assert from "assert";
+
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
+
+import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { HelmAddOn } from '../helm-addon/index';
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { EfsCsiDriverAddOn } from "../efs-csi-driver";
-import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
+
+import { ClusterInfo } from '../../spi/types';
+import { Values } from "../../spi";
+import { setPath, createNamespace, createServiceAccount } from "../../utils";
 
 /**
  * User provided options for the Helm Chart
@@ -92,13 +97,9 @@ export class AirflowAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
 
         // Create Namespace
-        createNamespace(this.options.namespace!, cluster, true, true);
+        const ns = createNamespace(this.options.namespace!, cluster, true, true);
 
-        // Create SA
-        // const sa = createServiceAccount(cluster, 'airflow-sa', ns, );
-
-        let values: Values = populateValues(clusterInfo, this.options);
-        // values.node.addDependency(ns);
+        let values: Values = populateValues(clusterInfo, ns, this.options);
 
         const chart = this.addHelmChart(clusterInfo, values, false, false);
 
@@ -110,7 +111,7 @@ export class AirflowAddOn extends HelmAddOn {
  * populateValues populates the appropriate values used to customize the Helm chart
  * @param helmOptions User provided values to customize the chart
  */
-function populateValues(clusterInfo: ClusterInfo, helmOptions: AirflowAddOnProps): Values {
+function populateValues(clusterInfo: ClusterInfo, ns: KubernetesManifest, helmOptions: AirflowAddOnProps): Values {
     const values = helmOptions.values ?? {};
 
     const albAddOnCheck = clusterInfo.getScheduledAddOn(AwsLoadBalancerControllerAddOn.name);
@@ -173,6 +174,30 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: AirflowAddOnProps
     // If Logging with S3 is enabled
     if (helmOptions.enableLogging){
         assert(bucket, "Please provide the name of S3 bucket for Logging.");
+        const AirflowLoggingPolicy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:ListBucket"
+                    ],
+                    "Resource": [`arn:aws:s3:::${helmOptions.s3BucketName}`]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:GetObject",
+                        "s3:PutObject"
+                    ],
+                    "Resource": [`arn:aws:s3:::${helmOptions.s3BucketName}/*`]
+                }
+            ]
+        };
+        const airflowLoggingPolicyDocument = PolicyDocument.fromJson(AirflowLoggingPolicy);
+        const sa = createServiceAccount(clusterInfo.cluster, 'airflow-s3-logging-sa', helmOptions.namespace!, airflowLoggingPolicyDocument);
+        sa.node.addDependency(ns);
+
         setPath(values, "config.core.colored_console_log", 'True');
         setPath(values, "config.core.remote_logging", 'True');
         setPath(values, "config.logging", {
