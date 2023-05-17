@@ -275,15 +275,15 @@ export default class BlueprintConstruct {
     //      to use the user owned GitHub CodeStar conneciton on an owned repo, 
     //      this code is left for local testing.
     // 
-    //     blueprints.CodePipelineStack.builder()
-    //         .name('blueprints-pipeline-test')
-    //         .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
-    //         .owner('aws-samples')
-    //         .repository({
-    //             repoUrl: 'blueprints-repo-codestar',
-    //             codeStarConnectionArn: 'fill-in-codestar-arn',
-    //             targetRevision: 'main',
-    //         })
-    //         .build(scope, 'pipeline', props);
-    // }
+        blueprints.CodePipelineStack.builder()
+            .name('blueprints-pipeline-test')
+            .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+            .owner('aws-samples')
+            .repository({
+                repoUrl: 'blueprints-repo-codestar',
+                codeStarConnectionArn: 'fill-in-codestar-arn',
+                targetRevision: 'main',
+            })
+            .build(scope, 'pipeline', props);
+    }
 }
