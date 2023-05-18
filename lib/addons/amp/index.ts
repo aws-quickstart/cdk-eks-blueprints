@@ -18,11 +18,6 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
  * Configuration options for add-on.
  */
 export interface AmpAddOnProps {
-    // /**
-    //  * Name that will be used by the add-on to create the Workspace
-    //  * @default blueprints-amp-workspace
-    //  */
-    // workspaceName?: string;
     /** 
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
      */
