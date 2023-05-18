@@ -53,7 +53,6 @@ export interface FluxBootstrapValues {
   /** 
   * Internal for Flux sync.
   * Default `5m0s` */
-
   fluxSyncInterval?: string;
 
   /** 
