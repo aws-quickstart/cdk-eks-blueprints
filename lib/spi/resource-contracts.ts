@@ -1,9 +1,10 @@
 import { IResource } from 'aws-cdk-lib';
 import { ResourceContext } from './types';
+import { IConstruct } from 'constructs';
 
 /** 
  * Generic resource provider interface. 
  **/
- export declare interface ResourceProvider<T extends IResource = IResource> {
+ export declare interface ResourceProvider<T extends IConstruct = IResource> {
     provide(context: ResourceContext): T;
 }
