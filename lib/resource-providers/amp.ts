@@ -21,7 +21,7 @@ export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
 export class CreateAmpProvider extends ResourceProvider<aps.CfnWorkspace> {
 
     /**
-     * Creates the certificate provider.
+     * Creates the AMP workspace
      * @param name Name of this resource that other resource providers, add-ons and teams can use for look-up.
      * @param workspaceName Name of your AMP Workspace
      * @param workspaceTags Tags to be used to create AMP Workspace
