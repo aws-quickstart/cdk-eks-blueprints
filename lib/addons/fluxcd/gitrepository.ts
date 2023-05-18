@@ -18,7 +18,7 @@ export class FluxGitRepository {
             },
             spec: {
                 interval: fluxBootstrapValues.fluxSyncInterval,
-                url: fluxBootstrapValues.repoUrl,
+                url: .repoUrl,
                 ref: {
                     branch: fluxBootstrapValues.targetRevision,
                 },
