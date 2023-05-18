@@ -18,6 +18,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
 export interface AmpAddOnProps {
     /** 
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
+     *  Format : https://aps-workspaces.<region>.amazonaws.com/workspaces/<ws-workspaceid>/",
      */
     ampPrometheusEndpoint: string;
     /**
