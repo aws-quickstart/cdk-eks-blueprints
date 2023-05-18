@@ -3,7 +3,7 @@ import * as aps from 'aws-cdk-lib/aws-aps';
 import { CfnTag } from "aws-cdk-lib/core";
 
 /**
- * Certificate provider that imports certificate into the current stack by arn. 
+ * Returns the received remote write url for AMP
  */
 export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
 
