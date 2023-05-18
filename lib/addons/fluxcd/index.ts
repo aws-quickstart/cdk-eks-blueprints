@@ -47,7 +47,6 @@ export interface FluxBootstrapValues {
    * TargetRevision defines the revision of the source
    * to sync the application to. In case of Git, this can be
    * commit, tag, or branch. If omitted, will equal to HEAD.
-   * In case of Helm, this is a semver tag for the Chart's version.
    */
   targetRevision?: string
 
