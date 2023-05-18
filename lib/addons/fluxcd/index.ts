@@ -69,7 +69,6 @@ export interface FluxBootstrapValues {
   /** 
   * Flux Kustomization Timeout.
   * Default `1m` */
-
   fluxTimeout?: string;
 
   /** 
