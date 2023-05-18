@@ -1,33 +1,38 @@
 import * as spi from "../../spi";
+import { setPath } from "../../utils";
+import { FluxBootstrapValues } from ".";
 
 /**
  * Flux Kustomization API defines a pipeline for fetching, decrypting, building, validating and applying Kustomize overlays or plain Kubernetes manifests.
  */
 export class FluxKustomization {
 
-    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
+    constructor() {}
 
-    public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string) {
+    public generate(namespace: string, fluxBootstrapValues: FluxBootstrapValues) {
 
-        const repository = this.bootstrapRepo!;
-        return {
+        const kustomizationManifest =  {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
             kind: "Kustomization",
             metadata: {
-                name: repository.name,
+                name: fluxBootstrapValues.name,
                 namespace: namespace
             },
             spec: {
-                interval: fluxSyncInterval,
-                targetNamespace: fluxTargetNamespace,
+                interval: fluxBootstrapValues.fluxSyncInterval,
+                targetNamespace: fluxBootstrapValues.fluxTargetNamespace,
                 sourceRef: {
                     kind: "GitRepository",
-                    name: repository.name
+                    name: fluxBootstrapValues.name
                 },
-                path: repository.path,
-                prune: fluxPrune,
-                timeout: fluxTimeout,
+                path: fluxBootstrapValues.path,
+                prune: fluxBootstrapValues.fluxPrune,
+                timeout: fluxBootstrapValues.fluxTimeout,
             }
         };
+        if (fluxBootstrapValues.fluxSubstitutionVariables) {
+            setPath(kustomizationManifest, "spec.postBuild.substitute", fluxBootstrapValues.fluxSubstitutionVariables);
+        }
+        return kustomizationManifest;
     }
 }

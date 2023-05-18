@@ -48,7 +48,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.AmpAddOn({
+                prometheusRemoteWriteURL: blueprints.GlobalResources.Amp
+            }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
@@ -274,6 +276,7 @@ export default class BlueprintConstruct {
             }))
             .resourceProvider("node-role", nodeRole)
             .clusterProvider(clusterProvider)
+            .resourceProvider(blueprints.GlobalResources.Amp, new blueprints.CreateAmpProvider("blueprints-amp-workspace-name", "blueprints-amp-workspace"))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);

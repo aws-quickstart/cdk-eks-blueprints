@@ -5,3 +5,4 @@ export * from './iam';
 export * from './utils';
 export * from './vpc';
 export * from './efs';
+export * from './amp';

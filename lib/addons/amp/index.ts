@@ -18,20 +18,20 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
  * Configuration options for add-on.
  */
 export interface AmpAddOnProps {
-    /**
-     * Name that will be used by the add-on to create the Workspace
-     * @default blueprints-amp-workspace
-     */
-    workspaceName?: string;
+    // /**
+    //  * Name that will be used by the add-on to create the Workspace
+    //  * @default blueprints-amp-workspace
+    //  */
+    // workspaceName?: string;
     /** 
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
      */
      prometheusRemoteWriteURL?: string;
-    /**
-     * Tags to passed while creating AMP workspace
-     * @default Project
-     */
-     workspaceTags?: CfnTag[];
+    // /**
+    //  * Tags to passed while creating AMP workspace
+    //  * @default Project
+    //  */
+    //  workspaceTags?: CfnTag[];
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -81,18 +81,18 @@ export class AmpAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let doc: string;
-        let cfnWorkspace: aps.CfnWorkspace|undefined;
+        // let cfnWorkspace: aps.CfnWorkspace|undefined;
         
-        let cfnWorkspaceProps : CfnWorkspaceProps  = {
-            alias: this.ampAddOnProps.workspaceName,  
-            tags: this.ampAddOnProps.workspaceTags
-        };
+        // let cfnWorkspaceProps : CfnWorkspaceProps  = {
+        //     alias: this.ampAddOnProps.workspaceName,  
+        //     tags: this.ampAddOnProps.workspaceTags
+        // };
 
-        if (typeof(this.ampAddOnProps.prometheusRemoteWriteURL) == 'undefined' || this.ampAddOnProps.prometheusRemoteWriteURL == null ) {
-            cfnWorkspace = new aps.CfnWorkspace(cluster.stack, this.ampAddOnProps.workspaceName + "-amp-workspace", cfnWorkspaceProps);/* all optional props */ 
-            const ampUrlEndpoint = cfnWorkspace.attrPrometheusEndpoint;
-            this.ampAddOnProps.prometheusRemoteWriteURL = ampUrlEndpoint + 'api/v1/remote_write';
-        }
+        // if (typeof(this.ampAddOnProps.prometheusRemoteWriteURL) == 'undefined' || this.ampAddOnProps.prometheusRemoteWriteURL == null ) {
+        //     cfnWorkspace = new aps.CfnWorkspace(cluster.stack, this.ampAddOnProps.workspaceName + "-amp-workspace", cfnWorkspaceProps);/* all optional props */ 
+        //     const ampUrlEndpoint = cfnWorkspace.attrPrometheusEndpoint;
+        //     this.ampAddOnProps.prometheusRemoteWriteURL = ampUrlEndpoint + 'api/v1/remote_write';
+        // }
 
         // Applying manifest for configuring ADOT Collector for Amp.
         if (this.ampAddOnProps.deploymentMode == DeploymentMode.DAEMONSET) {
@@ -120,9 +120,9 @@ export class AmpAddOn implements ClusterAddOn {
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
         const statement = kubectlProvider.addManifest(manifestDeployment);
-        if (cfnWorkspace){
-            statement.node.addDependency(cfnWorkspace);
-        }
+        // if (cfnWorkspace){
+        //     statement.node.addDependency(cfnWorkspace);
+        // }
 
         return Promise.resolve(statement);
     }

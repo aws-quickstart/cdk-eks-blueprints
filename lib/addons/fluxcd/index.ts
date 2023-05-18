@@ -6,8 +6,8 @@ import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
-import * as spi from "../../spi";
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
+
 /**
  * User provided options for the Helm Chart
  */
@@ -17,10 +17,40 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
    */    
   createNamespace?: boolean;
 
+  /* Optional Additional Flux Bootstrap Values 
+  */
+
+  fluxBootstrapValues: FluxBootstrapValues;
+}
+
+/* Interface for mapping for Flux Bootstrap Variables for Kustomization and FluxGitRepository
+*/
+
+export interface FluxBootstrapValues {
+
   /**
-   * Optional values for `GitRepository` Source to produce an Artifact for a Git repository revision.
+   * Expected to support helm style repo at the moment
    */
-  bootstrapRepo?: spi.ApplicationRepository;
+  repoUrl?: string,
+
+  /**
+   * Path within the repository
+   */
+  path?: string,
+
+  /**
+   * Optional name for the bootstrap application
+   */
+  name?: string,
+
+  /**
+   * Optional target revision for the repository.
+   * TargetRevision defines the revision of the source
+   * to sync the application to. In case of Git, this can be
+   * commit, tag, or branch. If omitted, will equal to HEAD.
+   * In case of Helm, this is a semver tag for the Chart's version.
+   */
+  targetRevision?: string
 
   /** 
   * Internal for Flux sync.
@@ -45,6 +75,20 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   * Default `1m` */
 
   fluxTimeout?: string;
+
+  /** 
+  * Flux Substitution variables.
+  * Default `cluster_env: prod` */
+
+  fluxSubstitutionVariables?: FluxSubstitutionVariable[];
+}
+
+/**
+ * Interface for Mapping for Substitution Variables for Kustomization.
+ */
+export interface FluxSubstitutionVariable {
+  key: string,
+  value: string,
 }
 
 /**
@@ -59,10 +103,12 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
   createNamespace: true,
-  fluxSyncInterval: "5m0s",
-  fluxTargetNamespace: "default",
-  fluxPrune: true,
-  fluxTimeout: "1m"
+  fluxBootstrapValues: {
+    fluxSyncInterval: "5m0s",
+    fluxTargetNamespace: "default",
+    fluxPrune: true,
+    fluxTimeout: "1m"
+  }
 };
 
 /**
@@ -90,10 +136,10 @@ export class FluxCDAddOn extends HelmAddOn {
     }
 
     //Lets create a GitRepository resource as a source to Flux
-    if (this.options.bootstrapRepo) {
-      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options.bootstrapRepo, this.options);
+    if (this.options.fluxBootstrapValues.repoUrl) {
+      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options);
       gitRepositoryConstruct.node.addDependency(chart);
-      const kustomizationConstruct = createKustomization(clusterInfo, this.options.bootstrapRepo, this.options);
+      const kustomizationConstruct = createKustomization(clusterInfo, this.options);
       kustomizationConstruct.node.addDependency(gitRepositoryConstruct);
     }
     return Promise.resolve(chart);
@@ -103,8 +149,8 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!);
+function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxGitRepository().generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxBootstrapValues!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
@@ -113,8 +159,8 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.Applic
 /**
  * create Kustomization calls the FluxKustomization().generate to create Kustomization resource.
  */
-function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!);
+function createKustomization(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxKustomization().generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxBootstrapValues!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
