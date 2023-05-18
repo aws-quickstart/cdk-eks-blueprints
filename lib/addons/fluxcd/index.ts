@@ -74,7 +74,6 @@ export interface FluxBootstrapValues {
   /** 
   * Flux Substitution variables.
   * Default `cluster_env: prod` */
-
   fluxSubstitutionVariables?: FluxSubstitutionVariable[];
 }
 
