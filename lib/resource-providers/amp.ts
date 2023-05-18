@@ -5,7 +5,7 @@ import { CfnTag } from "aws-cdk-lib/core";
 /**
  * Certificate provider that imports certificate into the current stack by arn. 
  */
-export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
+export class ImportAmpProvider extends <aps.CfnWorkspace>{
 
     constructor(private readonly remoteWriteEndpoint: string, private readonly id: string) {}
 
