@@ -71,18 +71,6 @@ export class AmpAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let doc: string;
-        // let cfnWorkspace: aps.CfnWorkspace|undefined;
-        
-        // let cfnWorkspaceProps : CfnWorkspaceProps  = {
-        //     alias: this.ampAddOnProps.workspaceName,  
-        //     tags: this.ampAddOnProps.workspaceTags
-        // };
-
-        // if (typeof(this.ampAddOnProps.prometheusRemoteWriteURL) == 'undefined' || this.ampAddOnProps.prometheusRemoteWriteURL == null ) {
-        //     cfnWorkspace = new aps.CfnWorkspace(cluster.stack, this.ampAddOnProps.workspaceName + "-amp-workspace", cfnWorkspaceProps);/* all optional props */ 
-        //     const ampUrlEndpoint = cfnWorkspace.attrPrometheusEndpoint;
-        //     this.ampAddOnProps.prometheusRemoteWriteURL = ampUrlEndpoint + 'api/v1/remote_write';
-        // }
 
         // Applying manifest for configuring ADOT Collector for Amp.
         if (this.ampAddOnProps.deploymentMode == DeploymentMode.DAEMONSET) {
