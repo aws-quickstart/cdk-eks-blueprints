@@ -6,12 +6,14 @@ import { ResourceProvider } from '../spi';
 /**
  * Returns the received remote write url for AMP
  */
-export class ImportAmpProvider implements ResourceProvider<aps.CfnWorkspace>{
+export class ImportAmpProvider implements ResourceProvider<aps.CfnWorkspace> {
 
     constructor(private readonly remoteWriteEndpoint: string, private readonly id: string) {}
 
-    provide(context: spi.ResourceContext) : string {
-        return this.remoteWriteEndpoint;
+    provide(context: spi.ResourceContext) : aps.CfnWorkspace {
+        let cfnWorkspace: aps.CfnWorkspace;
+        cfnWorkspace?.attrPrometheusEndpoint = this.remoteWriteEndpoint;
+        return cfnWorkspace;
     }
 }
 
@@ -28,12 +30,10 @@ export class CreateAmpProvider implements ResourceProvider<aps.CfnWorkspace> {
      */
     constructor(readonly name: string, readonly workspaceName: string, readonly workspaceTags?: CfnTag[]) {}
 
-    provide(context: spi.ResourceContext) : string {
-        let cfnWorkspace: aps.CfnWorkspace|undefined;
-        cfnWorkspace = new aps.CfnWorkspace(context.scope, this.name, {
+    provide(context: spi.ResourceContext) : aps.CfnWorkspace {
+        return new aps.CfnWorkspace(context.scope, this.name, {
             alias: this.workspaceName,  
             tags: this.workspaceTags,
-          }); 
-        return cfnWorkspace.attrPrometheusEndpoint + 'api/v1/remote_write';     
+          });   
     }
 }

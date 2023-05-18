@@ -21,7 +21,7 @@ export interface AmpAddOnProps {
     /** 
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
      */
-     prometheusRemoteWriteURL?: string;
+    cfnWorkspace?: aps.CfnWorkspace;
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -82,7 +82,7 @@ export class AmpAddOn implements ClusterAddOn {
 
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
-            remoteWriteEndpoint: this.ampAddOnProps.prometheusRemoteWriteURL,
+            remoteWriteEndpoint: this.ampAddOnProps.cfnWorkspace?.attrPrometheusEndpoint + 'api/v1/remote_write',
             awsRegion: cluster.stack.region,
             deploymentMode: this.ampAddOnProps.deploymentMode,
             namespace: this.ampAddOnProps.namespace,
