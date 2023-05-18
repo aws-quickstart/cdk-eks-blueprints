@@ -19,7 +19,6 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 
   /* Optional Additional Flux Bootstrap Values 
   */
-
   fluxBootstrapValues: FluxBootstrapValues;
 }
 
