@@ -18,7 +18,7 @@ export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
  * Certificate provider that creates a new certificate. 
  * Expects a hosted zone to be registed for validation. 
  */
-export class CreateAmpProvider extends ResourceProvider<aps.CfnWorkspace> {
+export class CreateAmpProvider extends <aps.CfnWorkspace> {
 
     /**
      * Creates the certificate provider.
