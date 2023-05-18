@@ -59,13 +59,11 @@ export interface FluxBootstrapValues {
   /** 
   * Flux Kustomization Target Namespace.
   * Default `default` */
-
   fluxTargetNamespace?: string;
 
   /** 
   * Flux Kustomization Prune.
   * Default `true` */
-
   fluxPrune?: boolean;
 
   /** 
