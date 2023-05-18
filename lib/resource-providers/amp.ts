@@ -11,9 +11,9 @@ export class ImportAmpProvider implements ResourceProvider<aps.CfnWorkspace> {
     constructor(private readonly remoteWriteEndpoint: string, private readonly id: string) {}
 
     provide(context: spi.ResourceContext) : aps.CfnWorkspace {
-        let cfnWorkspace: aps.CfnWorkspace;
-        cfnWorkspace?.attrPrometheusEndpoint = this.remoteWriteEndpoint;
-        return cfnWorkspace;
+        return aps.CfnWorkspace({
+            attrPrometheusEndpoint: this.remoteWriteEndpoint,
+        });
     }
 }
 
