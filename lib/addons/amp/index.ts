@@ -22,11 +22,6 @@ export interface AmpAddOnProps {
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
      */
      prometheusRemoteWriteURL?: string;
-    // /**
-    //  * Tags to passed while creating AMP workspace
-    //  * @default Project
-    //  */
-    //  workspaceTags?: CfnTag[];
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
