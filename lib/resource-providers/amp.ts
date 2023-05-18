@@ -26,7 +26,7 @@ export class CreateAmpProvider extends ResourceProvider<aps.CfnWorkspace> {
      * @param workspaceName Name of your AMP Workspace
      * @param workspaceTags Tags to be used to create AMP Workspace
      */
-    // constructor(readonly name: string, readonly workspaceName: string, readonly workspaceTags?: CfnTag[]) {}
+    constructor(readonly name: string, readonly workspaceName: string, readonly workspaceTags?: CfnTag[]) {}
 
     provide(context: spi.ResourceContext) : string {
         let cfnWorkspace: aps.CfnWorkspace|undefined;
