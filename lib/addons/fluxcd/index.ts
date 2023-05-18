@@ -1,6 +1,7 @@
 // lib/fluxcd_addon.ts
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
+import * as spi from "../../spi";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
@@ -12,43 +13,42 @@ import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
  * User provided options for the Helm Chart
  */
 export interface FluxCDAddOnProps extends HelmAddOnUserProps {
+
+  /**
+   * Namespace where add-on will be deployed. 
+   * @default flux-system
+   */
+  namespace?: string;
+
+  /**
+  * Helm chart version to use to install.
+  * @default 2.7.0
+  */
+  version?: string;
+
+  /**
+   * If provided, the addon will bootstrap the app or apps in the provided repository.
+   * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
+   * after the infrastructure and team provisioning is complete.
+   * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
+   * repository will be used for provisioning all `HelmAddOn` based AddOns.
+   */
+  bootstrapRepo?: spi.ApplicationRepository;
+
+  /**
+   * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
+   * to the applications. 
+   */
+  bootstrapValues?: spi.Values,
+
+  /**
+   * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
+   */
+  values?: spi.Values;
   /**
    * To Create Namespace using CDK
    */    
   createNamespace?: boolean;
-
-  /* Optional Additional Flux Bootstrap Values 
-  */
-  fluxBootstrapValues: FluxBootstrapValues;
-}
-
-/* Interface for mapping for Flux Bootstrap Variables for Kustomization and FluxGitRepository
-*/
-
-export interface FluxBootstrapValues {
-
-  /**
-   * Expected to support helm style repo at the moment
-   */
-  repoUrl?: string,
-
-  /**
-   * Path within the repository
-   */
-  path?: string,
-
-  /**
-   * Optional name for the bootstrap application
-   */
-  name?: string,
-
-  /**
-   * Optional target revision for the repository.
-   * TargetRevision defines the revision of the source
-   * to sync the application to. In case of Git, this can be
-   * commit, tag, or branch. If omitted, will equal to HEAD.
-   */
-  targetRevision?: string
 
   /** 
   * Internal for Flux sync.
@@ -69,19 +69,6 @@ export interface FluxBootstrapValues {
   * Flux Kustomization Timeout.
   * Default `1m` */
   fluxTimeout?: string;
-
-  /** 
-  * Flux Substitution variables.
-  * Default `cluster_env: prod` */
-  fluxSubstitutionVariables?: FluxSubstitutionVariable[];
-}
-
-/**
- * Interface for Mapping for Substitution Variables for Kustomization.
- */
-export interface FluxSubstitutionVariable {
-  key: string,
-  value: string,
 }
 
 /**
@@ -96,12 +83,10 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
   createNamespace: true,
-  fluxBootstrapValues: {
-    fluxSyncInterval: "5m0s",
-    fluxTargetNamespace: "default",
-    fluxPrune: true,
-    fluxTimeout: "1m",
-  }
+  fluxSyncInterval: "5m0s",
+  fluxTargetNamespace: "default",
+  fluxPrune: true,
+  fluxTimeout: "1m",
 };
 
 /**
@@ -129,10 +114,10 @@ export class FluxCDAddOn extends HelmAddOn {
     }
 
     //Lets create a GitRepository resource as a source to Flux
-    if (this.options.fluxBootstrapValues.repoUrl) {
-      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options);
+    if (this.options.bootstrapRepo?.repoUrl) {
+      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options.bootstrapRepo, this.options);
       gitRepositoryConstruct.node.addDependency(chart);
-      const kustomizationConstruct = createKustomization(clusterInfo, this.options);
+      const kustomizationConstruct = createKustomization(clusterInfo, this.options.bootstrapRepo, this.options);
       kustomizationConstruct.node.addDependency(gitRepositoryConstruct);
     }
     return Promise.resolve(chart);
@@ -142,8 +127,8 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository().generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxBootstrapValues!);
+function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
@@ -152,8 +137,8 @@ function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDA
 /**
  * create Kustomization calls the FluxKustomization().generate to create Kustomization resource.
  */
-function createKustomization(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxKustomization().generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxBootstrapValues!);
+function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;

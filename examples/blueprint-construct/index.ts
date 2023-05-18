@@ -155,15 +155,14 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn({
-                fluxBootstrapValues: {
+                bootstrapRepo : {
                     repoUrl: 'https://github.com/stefanprodan/podinfo',
                     name: "podinfo",
                     targetRevision: "master",
                     path: "./kustomize",
-                    fluxSubstitutionVariables: [{
-                        key: "region",
-                        value: "us-east1"
-                    }],
+                },
+                bootstrapValues: {
+                    "region": "us-east-1"
                 },
             }),
             new blueprints.GrafanaOperatorAddon(),

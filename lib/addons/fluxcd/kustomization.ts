@@ -1,37 +1,40 @@
 import { setPath } from "../../utils";
-import { FluxBootstrapValues } from ".";
+import * as spi from "../../spi";
 
 /**
  * Flux Kustomization API defines a pipeline for fetching, decrypting, building, validating and applying Kustomize overlays or plain Kubernetes manifests.
  */
 export class FluxKustomization {
 
-    constructor() {}
+    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
-    public generate(namespace: string, fluxBootstrapValues: FluxBootstrapValues) {
+    public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values) {
 
-        const kustomizationManifest =  {
+        const repository = this.bootstrapRepo!;
+        const kustomizationManifest = {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
             kind: "Kustomization",
             metadata: {
-                name: fluxBootstrapValues.name,
+                name: repository.name,
                 namespace: namespace
             },
             spec: {
-                interval: fluxBootstrapValues.fluxSyncInterval,
-                targetNamespace: fluxBootstrapValues.fluxTargetNamespace,
+                interval: fluxSyncInterval,
+                targetNamespace: fluxTargetNamespace,
                 sourceRef: {
                     kind: "GitRepository",
-                    name: fluxBootstrapValues.name
+                    name: repository.name
                 },
-                path: fluxBootstrapValues.path,
-                prune: fluxBootstrapValues.fluxPrune,
-                timeout: fluxBootstrapValues.fluxTimeout,
+                path: repository.path,
+                prune: fluxPrune,
+                timeout: fluxTimeout,
             }
         };
-        if (fluxBootstrapValues.fluxSubstitutionVariables) {
-            setPath(kustomizationManifest, "spec.postBuild.substitute", fluxBootstrapValues.fluxSubstitutionVariables);
+        if (bootstrapValues) {
+            setPath(kustomizationManifest, "spec.postBuild.substitute", bootstrapValues);
         }
         return kustomizationManifest;
     }
 }
+
+
