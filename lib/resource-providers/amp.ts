@@ -34,6 +34,6 @@ export class CreateAmpProvider implements ResourceProvider<aps.CfnWorkspace> {
         return new aps.CfnWorkspace(context.scope, this.name, {
             alias: this.workspaceName,  
             tags: this.workspaceTags,
-          });   
+        });   
     }
 }
