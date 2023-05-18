@@ -8,7 +8,7 @@ export class ImportS3Provider implements spi.ResourceProvider<s3.IBucket> {
 
     /**
      * @param s3BucketName name of the S3 Bucket to look up
-     * @param id  optional id for the structure (for tracking). set to s3bucketname by default
+     * @param id optional id for the structure (for tracking). set to s3bucketname by default
      */
     constructor(private readonly s3BucketName: string, private readonly id: string) {}
 
@@ -24,7 +24,7 @@ export class CreateS3Provider implements spi.ResourceProvider<s3.IBucket> {
 
     /**
      * Creates the S3 provider.
-     * @param name Name of the S3 Bucket. This must be 
+     * @param name Name of the S3 Bucket. This must be globally unique.
      */
     constructor(readonly name : string, readonly id : string) {}
 
