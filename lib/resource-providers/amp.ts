@@ -1,11 +1,12 @@
 import * as spi from '../spi';
 import * as aps from 'aws-cdk-lib/aws-aps';
 import { CfnTag } from "aws-cdk-lib/core";
+import { ResourceProvider } from '../spi';
 
 /**
  * Returns the received remote write url for AMP
  */
-export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
+export class ImportAmpProvider implements ResourceProvider<aps.CfnWorkspace>{
 
     constructor(private readonly remoteWriteEndpoint: string, private readonly id: string) {}
 
@@ -17,7 +18,7 @@ export class ImportAmpProvider extends ResourceProvider<aps.CfnWorkspace>{
 /**
  * Creates new AMP Workspace with provided AMP Workspace name 
  */
-export class CreateAmpProvider extends ResourceProvider<aps.CfnWorkspace> {
+export class CreateAmpProvider implements ResourceProvider<aps.CfnWorkspace> {
 
     /**
      * Creates the AMP workspace

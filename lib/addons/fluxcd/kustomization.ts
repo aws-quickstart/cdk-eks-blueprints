@@ -1,4 +1,3 @@
-import * as spi from "../../spi";
 import { setPath } from "../../utils";
 import { FluxBootstrapValues } from ".";
 
