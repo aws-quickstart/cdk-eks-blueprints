@@ -1,10 +1,8 @@
 import * as aps from 'aws-cdk-lib/aws-aps';
-import { CfnWorkspaceProps } from 'aws-cdk-lib/aws-aps';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
-import { CfnTag } from "aws-cdk-lib/core";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
 /**
