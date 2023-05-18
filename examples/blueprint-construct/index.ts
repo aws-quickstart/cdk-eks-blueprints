@@ -43,6 +43,7 @@ export default class BlueprintConstruct {
         ]);
 
         const ampWorkspaceName = "blueprints-amp-workspace";
+        const ampPrometheusEndpoint = (blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace).attrPrometheusEndpoint;
 
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
@@ -52,7 +53,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn({
-                cfnWorkspace: blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace,
+                ampPrometheusEndpoint: ampPrometheusEndpoint,
             }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
@@ -153,7 +154,18 @@ export default class BlueprintConstruct {
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
-            new blueprints.FluxCDAddOn(),
+            new blueprints.FluxCDAddOn({
+                fluxBootstrapValues: {
+                    repoUrl: 'https://github.com/stefanprodan/podinfo',
+                    name: "podinfo",
+                    targetRevision: "master",
+                    path: "./kustomize",
+                    fluxSubstitutionVariables: [{
+                        key: "region",
+                        value: "us-east1"
+                    }],
+                },
+            }),
             new blueprints.GrafanaOperatorAddon(),
         ];
 

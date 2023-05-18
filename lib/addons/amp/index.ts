@@ -19,7 +19,7 @@ export interface AmpAddOnProps {
     /** 
      * Remote Write URL of the AMP Workspace to be used for setting up remote write.
      */
-    cfnWorkspace?: aps.CfnWorkspace;
+    ampPrometheusEndpoint: string;
     /**
      * Modes supported : `deployment`, `daemonset`, `statefulSet`, and `sidecar`
      * @default deployment
@@ -48,7 +48,7 @@ export const enum DeploymentMode {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    workspaceName: 'blueprints-amp-workspace',
+    ampPrometheusEndpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-sample/",
     deploymentMode: DeploymentMode.DEPLOYMENT,
     name: 'adot-collector-amp',
     namespace: 'default'
@@ -79,8 +79,9 @@ export class AmpAddOn implements ClusterAddOn {
         }
 
         const manifest = doc.split("---").map(e => loadYaml(e));
+        const attrPrometheusEndpoint = this.ampAddOnProps.ampPrometheusEndpoint + 'api/v1/remote_write';
         const values: Values = {
-            remoteWriteEndpoint: this.ampAddOnProps.cfnWorkspace?.attrPrometheusEndpoint + 'api/v1/remote_write',
+            remoteWriteEndpoint: attrPrometheusEndpoint,
             awsRegion: cluster.stack.region,
             deploymentMode: this.ampAddOnProps.deploymentMode,
             namespace: this.ampAddOnProps.namespace,

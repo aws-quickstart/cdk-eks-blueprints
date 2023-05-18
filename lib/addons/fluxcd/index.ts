@@ -100,7 +100,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
     fluxSyncInterval: "5m0s",
     fluxTargetNamespace: "default",
     fluxPrune: true,
-    fluxTimeout: "1m"
+    fluxTimeout: "1m",
   }
 };
 
