@@ -13,7 +13,7 @@ export class FluxKustomization {
 
         const kustomizationManifest =  {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
-            kind: "",
+            kind: "Kustomization",
             metadata: {
                 name: fluxBootstrapValues.name,
                 namespace: namespace
