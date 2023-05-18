@@ -98,9 +98,6 @@ export class AmpAddOn implements ClusterAddOn {
 
         const kubectlProvider = new KubectlProvider(clusterInfo);
         const statement = kubectlProvider.addManifest(manifestDeployment);
-        // if (cfnWorkspace){
-        //     statement.node.addDependency(cfnWorkspace);
-        // }
 
         return Promise.resolve(statement);
     }
