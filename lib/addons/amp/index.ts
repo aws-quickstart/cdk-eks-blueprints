@@ -1,4 +1,3 @@
-import * as aps from 'aws-cdk-lib/aws-aps';
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
 import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
