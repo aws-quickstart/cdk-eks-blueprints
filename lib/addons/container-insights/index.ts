@@ -14,15 +14,11 @@ const defaultProps = {
     name: "adot-exporter-for-eks-on-ec2",
     namespace: undefined, // the chart will choke if this value is set
     chart: "adot-exporter-for-eks-on-ec2",
-    version: "0.1.0",
+    version: "0.10.0",
     release: "adot-eks-addon",
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };
 
-
-/**
- * @deprecated Use CloudWatchAdotAddOn.
- */
 export class ContainerInsightsAddOn extends HelmAddOn {
 
     constructor(props?: ContainerInsightAddonProps) {
@@ -47,6 +43,19 @@ export class ContainerInsightsAddOn extends HelmAddOn {
             clusterName: cluster.clusterName,
             fluentbit: {
                 enabled: true
+            },
+            adotCollector:{
+                daemonSet: {
+                    service: {
+                        metrics: {
+                            receivers: ["awscontainerinsightreceiver"],
+                            exporters: ["awsemf"],
+                        }
+                    },
+                    cwexporters: {
+                        logStreamName: "EKSNode",
+                    }
+                }
             }
         };
 
