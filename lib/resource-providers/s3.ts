@@ -2,9 +2,9 @@ import * as spi from '../spi';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 
 /**
- * S3 provider that imports S3 bucket into the current stack by name. 
+ * S3 Bucket provider that imports an S3 Bucket into the current stack by name. 
  */
-export class ImportS3Provider implements spi.ResourceProvider<s3.IBucket> {
+export class ImportS3BucketProvider implements spi.ResourceProvider<s3.IBucket> {
 
     /**
      * @param s3BucketName name of the S3 Bucket to look up
@@ -18,9 +18,9 @@ export class ImportS3Provider implements spi.ResourceProvider<s3.IBucket> {
 }
 
 /**
- * S3 provider that creates a new S3 Bucket. 
+ * S3 Bucket provider that creates a new S3 Bucket. 
  */
-export class CreateS3Provider implements spi.ResourceProvider<s3.IBucket> {
+export class CreateS3BucketProvider implements spi.ResourceProvider<s3.IBucket> {
 
     /**
      * Creates the S3 provider.

@@ -111,7 +111,6 @@ export enum GlobalResources {
     HostedZone = 'hosted-zone',
     Certificate = 'certificate',
     KmsKey = 'kms-key',
-    S3 = 's3',
 }
 
 /**
