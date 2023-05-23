@@ -66,8 +66,12 @@ export class ContainerInsightsAddOn extends HelmAddOn {
             fluentbit: {
                 enabled: true
             },
-            adotCollector:{
+            serviceAccount: {
+                create: false,
+            },
+            adotCollector: {
                 daemonSet: {
+                    createNamespace: false,
                     service: {
                         metrics: {
                             receivers: ["awscontainerinsightreceiver"],
@@ -75,9 +79,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
                         }
                     },
                     serviceAccount: {
-                        annotations: {
-                            "eks.amazonaws.com/role-arn":  sa.role.roleArn
-                        }
+                        create: false,
                     },
                     cwexporters: {
                         logStreamName: "EKSNode",
@@ -89,6 +91,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
         values = merge(values, this.props.values ?? {});
         
         const chart = this.addHelmChart(clusterInfo, values, true, false);
+        chart.node.addDependency(sa);
         return Promise.resolve(chart);
     }
 }
