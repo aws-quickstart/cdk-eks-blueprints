@@ -175,7 +175,7 @@ test("Mng cluster provider correctly initializes managed node group", () => {
     const app = new cdk.App();
 
     const clusterProvider = new MngClusterProvider({
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         clusterName: "my-cluster",
         forceUpdate:true,
         labels: { "mylabel": "value" },
@@ -210,7 +210,7 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
 
     const clusterProvider = new AsgClusterProvider({
         id: "asg1",
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         clusterName: "my-cluster",
         blockDevices: [
             {
@@ -242,6 +242,24 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     expect(blueprint.getClusterInfo().autoscalingGroups).toBeDefined();
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
 });
+
+test("Kubectl layer is correctly injected for EKS version 1.26", () => {
+
+    const app = new cdk.App();
+
+    const stack = blueprints.EksBlueprint.builder()
+        .account('123456789').region('us-west-2')
+        .version(KubernetesVersion.V1_26).build(app, "stack-126");
+    
+    const template = Template.fromStack(stack);
+
+    template.hasResource("AWS::Lambda::LayerVersion", {
+        Properties: {
+          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.26"),
+        },
+      });
+});
+
 
 test("Kubectl layer is correctly injected for EKS version 1.25", () => {
 
@@ -275,23 +293,6 @@ test("Kubectl layer is correctly injected for EKS version 1.24", () => {
             Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.24"),
         },
     });
-});
-
-test("Kubectl layer is correctly injected for EKS version 1.23", () => {
-
-    const app = new cdk.App();
-
-    const stack = blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_23).build(app, "stack-123");
-    
-    const template = Template.fromStack(stack);
-
-    template.hasResource("AWS::Lambda::LayerVersion", {
-        Properties: {
-          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.23"),
-        },
-      });
 });
 
 
