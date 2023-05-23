@@ -1,4 +1,3 @@
-import { IResource } from 'aws-cdk-lib';
 import { ResourceContext } from './types';
 import { IConstruct } from 'constructs';
 
