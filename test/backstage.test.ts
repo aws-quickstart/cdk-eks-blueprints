@@ -58,19 +58,23 @@ describe('Unit tests for Backstage addon', () => {
         }).toThrow("Required resource "+backstageAddOnProps.databaseResourceName+" is missing.");
     });
 
-    test("Stack creation succeds", () => {
-        const  databaseInstance = {
-            dbInstanceEndpointAddress: "test",
-            dbInstanceEndpointPort: "test"
-        } as rds.DatabaseInstance;
-        
-        jest.spyOn(blueprints.ClusterInfo.prototype, 'getRequiredResource').mockImplementation(() => databaseInstance);
+    test("Stack creation succeeds", () => {
+
+        class DatabaseInstanceProviderMock implements blueprints.ResourceProvider<rds.IDatabaseInstance> {
+            provide(_: blueprints.ResourceContext): rds.IDatabaseInstance {
+                return {
+                    dbInstanceEndpointAddress: "test",
+                    dbInstanceEndpointPort: "test"
+                } as rds.IDatabaseInstance;
+            }
+        }
 
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .resourceProvider(backstageAddOnProps.databaseResourceName, new DatabaseInstanceProviderMock())
             .addOns(new blueprints.ExternalsSecretsAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.BackstageAddOn(backstageAddOnProps))

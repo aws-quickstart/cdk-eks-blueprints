@@ -31,7 +31,6 @@ const defaultProps = {
   version: "0.17.0",
   release: "backstage",
   repository:  "https://backstage.github.io/charts",
-  imageTag: "latest",
   values: {}
 };
 
@@ -54,7 +53,7 @@ export class BackstageAddOn extends HelmAddOn {
     const chart = this.addHelmChart(clusterInfo, values);
 
     new CfnOutput(clusterInfo.cluster.stack, 'Backstage base URL', {
-      value: HTTPS+this.options.subdomain,
+      value: HTTPS + this.options.subdomain,
       description: "Backstage base URL",
       exportName: "BackstageBaseUrl",
     });
