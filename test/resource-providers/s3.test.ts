@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { Match, Template } from "aws-cdk-lib/assertions";
+import { Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
 import { GlobalResources } from "../../lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -41,6 +41,6 @@ describe("S3BucketProvider", () => {
       .build(app, "east-test-1");
 
     const bucket = <s3.IBucket>stack.node.tryFindChild('imported-s3-bucket');
-    expect(bucket.bucketName == 'my-s3-imported-bucket-name')
+    expect(bucket.bucketName == 'my-s3-imported-bucket-name');
   });
 });
