@@ -207,6 +207,7 @@ export default class BlueprintConstruct {
                             "Instance": "SPOT"
                         },
                         machineImage: ec2.MachineImage.genericLinux({
+                            'eu-west-1': 'ami-00805477850d62b8c',
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
@@ -277,5 +278,6 @@ export default class BlueprintConstruct {
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
+
     }
 }

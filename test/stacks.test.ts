@@ -288,9 +288,11 @@ describe('Unit tests for EKS Blueprint', () => {
                 }
             });
 
-        expect(()=> {
-            pipeline.build(app, "blueprints-pipeline-id");
-        }).toThrow("repository.owner field is required for the GitHub pipeline stack. Please provide value.");
+        expect(() => {
+            pipeline.build(app, 'blueprints-pipeline-id');
+        }).toThrow(
+            'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+        );
     });
 
     test('Pipeline Builder Creates correct pipeline. With CodeCommit as a repository.', () => {
@@ -341,9 +343,31 @@ describe('Unit tests for EKS Blueprint', () => {
                 }
             });
 
-        const stack = pipeline.build(app, "blueprints-pipeline-id");
-        console.debug(stack.templateOptions.description);
-        expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
+        const stack = pipeline.build(app, 'blueprints-pipeline-id');
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain('Blueprints tracking (qs');
+    });
+
+    // Codestar Connection test
+
+    test('Pipeline Builder Creates correct pipeline. With Codestar Connection as a repository.', () => {
+        const app = new cdk.App();
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+        .name('blueprints-pipeline-codestar-test')
+        .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+        //   .owner('aws-samples')
+        .repository({
+            repoUrl: 'blueprints-repo-codestar',
+            codeStarConnectionArn: 'fill-in-codestar-arn',
+            targetRevision: 'main',
+        });
+
+        expect(() => {
+        pipeline.build(app, 'blueprints-pipeline-id');
+        }).toThrow(
+        'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+        );
     });
 
     test("Nested stack add-on creates correct nested stack", async () => {
