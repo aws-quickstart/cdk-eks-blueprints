@@ -119,7 +119,7 @@ const defaultProps: HelmAddOnProps = {
     version: '2.0.0',
     chart: JUPYTERHUB,
     release: RELEASE,
-    repository: 'https://jupyterhub.github.io/helm-chart/',
+    repository: 'https://hub.jupyter.org/helm-chart/',
     values: {}
 };
 
