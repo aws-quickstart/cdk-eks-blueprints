@@ -7,7 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
-import * as amp from 'aws-cdk-lib/aws-aps';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -43,7 +43,7 @@ export default class BlueprintConstruct {
         ]);
 
         const ampWorkspaceName = "blueprints-amp-workspace";
-        const ampPrometheusEndpoint = (blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace).attrPrometheusEndpoint;
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
@@ -53,7 +53,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
             new blueprints.addons.AmpAddOn({
-                ampPrometheusEndpoint: ampPrometheusEndpoint,
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
             }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
