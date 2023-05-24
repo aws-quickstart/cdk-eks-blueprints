@@ -10,7 +10,7 @@ export interface RdsInstanceProps {
   readonly rdsProps?: Omit<rds.DatabaseInstanceProps, "vpc" | "vpcSubnets">;
 }
 
-export class RdsInstanceProps
+export class RdsInstanceProvider
   implements ResourceProvider<rds.DatabaseInstance> {
   readonly options: RdsInstanceProps;
 
@@ -28,7 +28,10 @@ export class RdsInstanceProps
 
     const instanceProps: rds.DatabaseInstanceProps = {
       ...this.options.rdsProps,
-      vpc: rdsVpc
+      vpc: rdsVpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      }
     } as rds.DatabaseInstanceProps;
 
     let rdsInstance: rds.DatabaseInstance = new rds.DatabaseInstance(
