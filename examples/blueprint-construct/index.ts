@@ -141,16 +141,16 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
