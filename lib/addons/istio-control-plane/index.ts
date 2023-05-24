@@ -14,7 +14,7 @@ const defaultProps = {
     release: "istiod",
     namespace: "istio-system",
     chart: "istiod",
-    version: "1.17.1",
+    version: "1.17.2",
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 

@@ -32,6 +32,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | updatePolicy      | Update policy for the Autoscaling Group.
 | vpcSubnets        | The subnets for the cluster.
 | privateCluster    | If `true` Kubernetes API server is private. 
+| tags              | Tags to propagate to Cluster.
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 

@@ -1,10 +1,10 @@
-import { CoreAddOn, CoreAddOnProps } from "../core-addon";
-import { ClusterInfo } from "../../spi";
-import { getAdotCollectorPolicyDocument } from "./iam-policy";
-import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { Construct } from 'constructs';
+import { ClusterInfo } from "../../spi";
+import { dependable, loadYaml, readYamlDocument } from "../../utils";
 import { CertManagerAddOn } from "../cert-manager";
+import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { getAdotCollectorPolicyDocument } from "./iam-policy";
 
 /**
  * Configuration options for the Adot add-on.
@@ -13,7 +13,7 @@ type AdotCollectorAddOnProps = CoreAddOnProps;
 
 const defaultProps = {
     addOnName: 'adot',
-    version: 'v0.66.0-eksbuild.1',
+    version: 'v0.70.0-eksbuild.1',
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
     namespace: 'default'

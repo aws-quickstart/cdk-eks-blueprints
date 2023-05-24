@@ -15,6 +15,7 @@ export function getAddOnNameOrId(addOn: ClusterAddOn): string {
 export function isOrderedAddOn(addOn: ClusterAddOn) : boolean {
     return Reflect.getMetadata("ordered", addOn.constructor) ?? Reflect.getMetadata("ordered", addOn) ?? false;
 }
+
 /**
  * Decorator function that accepts a list of AddOns and
  * ensures addons are scheduled to be added as well as

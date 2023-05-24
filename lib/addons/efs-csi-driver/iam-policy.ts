@@ -26,7 +26,8 @@ export function getEfsDriverPolicyStatements(
     {
       "Effect": "Allow",
       "Action": [
-        "elasticfilesystem:CreateAccessPoint"
+        "elasticfilesystem:CreateAccessPoint",
+        "elasticfilesystem:TagResource",
       ],
       "Resource": "*",
       "Condition": {

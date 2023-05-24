@@ -29,6 +29,13 @@ export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
      * @default false
      */
     privateCluster?: boolean;
+
+    /**
+     * Tags for the cluster
+     */
+    tags?: {
+        [key: string]: string;
+    }
 }
 
 /**

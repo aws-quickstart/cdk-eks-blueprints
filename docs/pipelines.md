@@ -75,6 +75,25 @@ const blueprint = blueprints.EksBlueprint.builder()
     })
 ```
 
+### Using AWS CodeStar connection as CodePipeline repository source.
+
+```typescript
+import * as blueprints from '@aws-quickstart/eks-blueprints'
+
+const blueprint = blueprints.EksBlueprint.builder()
+    ...; // configure your blueprint builder
+
+ blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
+    .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+    .owner('aws-samples')
+    .repository({
+        repoUrl: 'blueprints-repo-codestar', // repository name 
+        codeStarConnectionArn: 'fill-in-codestar-arn', // CodeStar connection ARN
+        targetRevision: 'main', // optional, default is "main"
+    })
+```
+
 ## Creating stages
 
 Once our pipeline is created, we need to define `stages` for the pipeline. To do so, we can leverage `blueprints.StackStage` convenience class and builder support for it. Let's continue leveraging the pipeline builder defined in the previous step.

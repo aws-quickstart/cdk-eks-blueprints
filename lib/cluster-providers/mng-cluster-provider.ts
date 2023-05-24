@@ -28,6 +28,20 @@ export interface MngClusterProviderProps extends eks.CommonClusterOptions, Omit<
      */
     privateCluster?: boolean;
 
+    /**
+     * Tags for the Cluster.
+     */
+    tags?: {
+        [key: string]: string;
+    }
+
+    /**
+     * Tags for the node group.
+     */
+    nodeGroupTags?: {
+        [key: string]: string;
+    }
+
 }
 
 /**
@@ -38,8 +52,9 @@ export class MngClusterProvider extends GenericClusterProvider {
     constructor(props?: MngClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
             managedNodeGroups: [{
-                ...props as Omit<ManagedNodeGroup, "id">,
+                ...props as Omit<ManagedNodeGroup, "id" | "tags">,
                 id: props?.id ?? props?.clusterName ?? "eks-blueprints-mng",
+                tags: props?.nodeGroupTags,
             }]
         }});
     }

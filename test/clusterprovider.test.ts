@@ -2,10 +2,14 @@ import * as cdk from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { BlockDeviceVolume, EbsDeviceVolumeType } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as eks from 'aws-cdk-lib/aws-eks';
 import { SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as blueprints from '../lib';
 import { AsgClusterProvider, MngClusterProvider } from '../lib';
+
+const addAutoScalingGroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addAutoScalingGroupCapacity');
+const addNodegroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addNodegroupCapacity');
 
 test("Generic cluster provider correctly registers managed node groups", async () => {
     const app = new cdk.App();
@@ -39,6 +43,58 @@ test("Generic cluster provider correctly registers managed node groups", async (
         .addOns(new blueprints.ClusterAutoScalerAddOn)
         .buildAsync(app, 'stack-with-resource-providers');
     
+    expect(addNodegroupCapacityMock).toBeCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+            "instanceTypes": expect.any(Array<ec2.InstanceType>),
+        }),
+    );
+
+    expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
+    expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
+});
+
+test("Generic cluster provider correctly registers managed node groups with instance type as string", async () => {
+    const app = new cdk.App();
+
+    app.node.setContext("eks.default.instance-type", "m5.large");
+
+    const clusterProvider = blueprints.clusterBuilder()
+    .withCommonOptions({
+        serviceIpv4Cidr: "10.43.0.0/16"
+    })
+    .managedNodeGroup({
+        id: "mng1",
+        maxSize: 2,
+        nodeGroupCapacityType: CapacityType.SPOT
+    })
+    .managedNodeGroup({
+        id: "mng2",
+        maxSize:1
+    })
+    .fargateProfile("fp1", {
+        selectors: [
+            {
+                namespace: "default"
+            }
+        ]
+    }).build();
+
+    expect(clusterProvider.props.serviceIpv4Cidr).toBe("10.43.0.0/16");
+
+    const blueprint =  await blueprints.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .clusterProvider(clusterProvider)
+        .addOns(new blueprints.ClusterAutoScalerAddOn)
+        .buildAsync(app, 'stack-with-resource-providers');
+
+    expect(addNodegroupCapacityMock).toBeCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+            "instanceTypes": expect.any(Array<ec2.InstanceType>),
+        }),
+    );
+
     expect(blueprint.getClusterInfo().nodeGroups).toBeDefined();
     expect(blueprint.getClusterInfo().nodeGroups!.length).toBe(2);
 });
@@ -75,8 +131,44 @@ test("Generic cluster provider correctly registers autoscaling node groups", () 
         .addOns(new blueprints.ClusterAutoScalerAddOn)
         .build(app, 'stack-with-resource-providers');
     
+    expect(addAutoScalingGroupCapacityMock).toBeCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+            "instanceType": expect.any(ec2.InstanceType),
+        }),
+    );
+
     expect(blueprint.getClusterInfo().autoscalingGroups).toBeDefined();
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(2);
+});
+
+test("Generic cluster provider correctly registers autoscaling node groups with instance type as string", () => {
+    const app = new cdk.App();
+
+    app.node.setContext("eks.default.instance-type", "m5.large");
+
+    const clusterProvider = blueprints.clusterBuilder()
+    .autoscalingGroup({
+        id: "mng1",
+        maxSize: 2,
+        allowAllOutbound: true,
+    }).build();
+
+    const blueprint =  blueprints.EksBlueprint.builder()
+        .account('123456789').region('us-west-1')
+        .clusterProvider(clusterProvider)
+        .addOns(new blueprints.ClusterAutoScalerAddOn)
+        .build(app, 'stack-with-resource-providers');
+
+    expect(addAutoScalingGroupCapacityMock).toBeCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+            "instanceType": expect.any(ec2.InstanceType),
+        }),
+    );
+
+    expect(blueprint.getClusterInfo().autoscalingGroups).toBeDefined();
+    expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
 });
 
 test("Mng cluster provider correctly initializes managed node group", () => {
@@ -151,21 +243,38 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
 });
 
-test("Kubectl layer is correctly injected for EKS version 1.22", () => {
+test("Kubectl layer is correctly injected for EKS version 1.25", () => {
 
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_22).build(app, "stack-122");
-    
+      .account('123456789').region('us-west-2')
+      .version(KubernetesVersion.V1_25).build(app, "stack-125");
+
     const template = Template.fromStack(stack);
 
     template.hasResource("AWS::Lambda::LayerVersion", {
         Properties: {
-          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.22"),
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.25"),
         },
-      });
+    });
+});
+
+test("Kubectl layer is correctly injected for EKS version 1.24", () => {
+
+    const app = new cdk.App();
+
+    const stack = blueprints.EksBlueprint.builder()
+      .account('123456789').region('us-west-2')
+      .version(KubernetesVersion.V1_24).build(app, "stack-124");
+
+    const template = Template.fromStack(stack);
+
+    template.hasResource("AWS::Lambda::LayerVersion", {
+        Properties: {
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.24"),
+        },
+    });
 });
 
 test("Kubectl layer is correctly injected for EKS version 1.23", () => {

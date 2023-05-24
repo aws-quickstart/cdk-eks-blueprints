@@ -37,7 +37,7 @@ export interface EfsCsiDriverProps extends HelmAddOnUserProps {
  * Defaults options for the add-on
  */
 const defaultProps: EfsCsiDriverProps = {
-    version: '2.4.1',
+    version: '2.4.3',
     namespace: "kube-system",
     repository: "https://kubernetes-sigs.github.io/aws-efs-csi-driver/",
     name: EFS_CSI_DRIVER,

@@ -30,7 +30,9 @@ export class CreateKmsKeyProvider implements ResourceProvider<kms.IKey> {
 
   provide(context: ResourceContext): kms.IKey {
     const id = context.scope.node.id;
-    const keyId = `${id}-${this.aliasName ?? "default"}-KmsKey`;
+    const keyId = !this.aliasName
+      ? `${id}-kms-key`
+      : `${id}-${this.aliasName}-KmsKey`;
     let key = undefined;
 
     key = new kms.Key(context.scope, keyId, {
