@@ -393,57 +393,269 @@ describe('Unit tests for EKS Blueprint', () => {
       .addOns(new blueprints.NginxAddOn())
       .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
-    const pipeline = blueprints.CodePipelineStack.builder()
-      .name('blueprints-pipeline-inaction')
-      .repository({
-        codeCommitRepoName: 'eks-blueprints-cc',
-        name: 'my-iac-pipeline',
-      })
-      .stage({
-        id: 'us-east-1-blueprints',
-        stackBuilder: blueprint.clone('us-east-1'),
-      })
-      .wave({
-        id: 'dev',
-        stages: [
-          {
-            id: 'dev-east-1',
-            stackBuilder: blueprint.clone('us-east-1').id('dev-east-1'),
-          },
-          {
-            id: 'dev-east-2',
-            stackBuilder: blueprint.clone('us-east-2').id('dev-east-2'),
-          },
-        ],
-      })
-      .stage({
-        id: 'us-east-2-blueprints',
-        stackBuilder: blueprint.clone('us-east-2'),
-      })
-      .wave({
-        id: 'test',
-        stages: [
-          {
-            id: 'test-east-1',
-            stackBuilder: blueprint.clone('us-east-1').id('test-east-1'),
-          },
-          {
-            id: 'test-east-2',
-            stackBuilder: blueprint.clone('us-east-2').id('test-east-2'),
-          },
-        ],
-      })
-      .stage({
-        id: 'prod-blueprints',
-        stackBuilder: blueprint.clone('us-west-2'),
-        stageProps: {
-          pre: [
-            new ManualApprovalStep('prod-blueprints-approval', {
-              comment: 'Approval step for production deployment.',
-            }),
-          ],
-        },
-      });
+    test('Pipeline Builder Creates correct pipeline', () => {
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .owner('shapirov103')
+            .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline'
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
+    });
+
+    test('Pipeline Builder creates multi-account pipeline', () => {
+
+        const app = new cdk.App();
+        const devTestAccount = "123456789012";
+        const prodAccount = "123456789013";
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account(devTestAccount)
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .owner('shapirov103')
+            .enableCrossAccountKeys()
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline'
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('dev-east-2')},
+                ]
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1', devTestAccount).id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2', devTestAccount).id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2', prodAccount),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("qs-1s1r465f2");
+    });
+
+    test('Pipeline Builder Creates correct pipeline. With repository.owner property.', () => {
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline',
+                owner: 'shapirov103',
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        const stack = pipeline.build(app, "blueprints-pipeline-id");
+        console.log(stack.templateOptions.description);
+        expect(stack.templateOptions.description).toContain("Blueprints tracking (qs");
+    });
+
+    test("Stack creation fails due to missing owner property for GitHub Repository", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                repoUrl: 'git@github',
+                credentialsSecretName: 'github-token',
+                name: 'my-iac-pipeline',
+                // owner: 'shapirov103',
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
+
+        expect(() => {
+            pipeline.build(app, 'blueprints-pipeline-id');
+        }).toThrow(
+            'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+        );
+    });
+
+    test('Pipeline Builder Creates correct pipeline. With CodeCommit as a repository.', () => {
+
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder()
+            .account("123567891")
+            .region('us-west-1')
+            .addOns(new blueprints.ArgoCDAddOn)
+            .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
+            .addOns(new blueprints.NginxAddOn)
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const pipeline = blueprints.CodePipelineStack.builder()
+            .name("blueprints-pipeline-inaction")
+            .repository({
+                codeCommitRepoName: 'eks-blueprints-cc',
+                name: 'my-iac-pipeline'
+            })
+            .stage({
+                id: 'us-east-1-blueprints',
+                stackBuilder: blueprint.clone('us-east-1'),
+            })
+            .wave( {
+                id: "dev",
+                stages: [
+                    { id: "dev-east-1", stackBuilder: blueprint.clone('us-east-1').id('dev-east-1')},
+                    { id: "dev-east-2", stackBuilder: blueprint.clone('us-east-2').id('dev-east-2')},
+                ]
+            })
+            .stage({
+                id: 'us-east-2-blueprints',
+                stackBuilder: blueprint.clone('us-east-2')
+            })
+            .wave( {
+                id: "test",
+                stages: [
+                    { id: "test-east-1", stackBuilder: blueprint.clone('us-east-1').id('test-east-1')},
+                    { id: "test-east-2", stackBuilder: blueprint.clone('us-east-2').id('test-east-2')},
+                ]
+            })
+            .stage({
+                id: 'prod-blueprints',
+                stackBuilder: blueprint.clone('us-west-2'),
+                stageProps: {
+                    pre: [new ManualApprovalStep("prod-blueprints-approval", { comment: "Approval step for production deployment."})]
+                }
+            });
 
     const stack = pipeline.build(app, 'blueprints-pipeline-id');
     console.log(stack.templateOptions.description);
@@ -456,18 +668,10 @@ describe('Unit tests for EKS Blueprint', () => {
   test('Pipeline Builder Creates correct pipeline. With Codestar Connection as a repository.', () => {
     const app = new cdk.App();
 
-    const blueprint = blueprints.EksBlueprint.builder()
-      .account('123567891')
-      .region('us-west-1')
-      .addOns(new blueprints.ArgoCDAddOn())
-      .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
-      .addOns(new blueprints.NginxAddOn())
-      .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
     const pipeline = blueprints.CodePipelineStack.builder()
       .name('blueprints-pipeline-codestar-test')
       .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
-      .owner('aws-samples')
+    //   .owner('aws-samples')
       .repository({
         repoUrl: 'blueprints-repo-codestar',
         codeStarConnectionArn: 'fill-in-codestar-arn',
