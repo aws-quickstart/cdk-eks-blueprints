@@ -44,7 +44,7 @@ builder()
 builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
     .addOns(buildArgoBootstrap())
-    .build(app, 'argo-blueprint');
+    .build(app, 'argo-blueprint1');
     
 builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
