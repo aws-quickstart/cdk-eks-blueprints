@@ -19,9 +19,11 @@ describe("AuroraClusterProvider", () => {
       .resourceProvider(
         GlobalResources.Rds,
         new AuroraClusterProvider({
-          auroraEngine: DatabaseClusterEngine.auroraPostgres(
-            { version: AuroraPostgresEngineVersion.VER_14_6 }
-          ),
+          clusterProps: {
+            engine: DatabaseClusterEngine.auroraPostgres(
+              { version: AuroraPostgresEngineVersion.VER_14_6 }
+            ),
+          },
           name: "aurora-rp-test-no-vpc"
         })
       )
@@ -49,20 +51,18 @@ describe("AuroraClusterProvider", () => {
         GlobalResources.Vpc,
         new VpcProvider(
           undefined,
-          "10.0.0.0/16",
-          [
-            "10.0.1.0/24",
-            "10.0.2.0/24",
-            "10.0.3.0/24"
-          ]
-        )
+          {
+            primaryCidr: "10.0.0.0/16",
+          })
       )
       .resourceProvider(
         GlobalResources.Rds,
         new AuroraClusterProvider({
-          auroraEngine: DatabaseClusterEngine.auroraPostgres(
-            { version: AuroraPostgresEngineVersion.VER_14_6 }
-          ),
+          clusterProps: {
+            engine: DatabaseClusterEngine.auroraPostgres(
+              { version: AuroraPostgresEngineVersion.VER_14_6 }
+            ),
+          },
           name: "aurora-rp-test-w-vpc"
         })
       )
@@ -82,7 +82,41 @@ describe("AuroraClusterProvider", () => {
   });
 
   test("Stack created with arbitrary user props passed to aurora should be honoured", () => {
+    const app = new App();
 
+    const stack = blueprints.EksBlueprint.builder()
+      .resourceProvider(
+        GlobalResources.Vpc,
+        new VpcProvider(
+          undefined,
+          {
+            primaryCidr: "10.0.0.0/16",
+          })
+      )
+      .resourceProvider(
+        GlobalResources.Rds,
+        new AuroraClusterProvider({
+          clusterProps: {
+            engine: DatabaseClusterEngine.auroraPostgres(
+              { version: AuroraPostgresEngineVersion.VER_14_6 }
+            ),
+          },
+          name: "aurora-rp-test-w-vpc"
+        })
+      )
+      .account("1234567889")
+      .region("us-east-1")
+      .build(app, 'aurora-test-w-vpc');
+
+    const template = Template.fromStack(stack);
+
+    template.hasResource("AWS::RDS::DBCluster", {
+      Properties: {
+        Engine: Match.anyValue(),
+        EngineVersion: Match.anyValue(),
+        VpcSecurityGroupIds: Match.anyValue()
+      }
+    });
   });
 });
 
@@ -129,12 +163,9 @@ describe("RDSInstanceProvider", () => {
         GlobalResources.Vpc,
         new VpcProvider(
           undefined,
-          "10.0.0.0/16",
-          [
-            "10.0.1.0/24",
-            "10.0.2.0/24",
-            "10.0.3.0/24"
-          ]
+          {
+            primaryCidr: "10.0.0.0/16"
+          },
         )
       )
       .resourceProvider(
@@ -172,12 +203,9 @@ describe("RDSInstanceProvider", () => {
         GlobalResources.Vpc,
         new VpcProvider(
           undefined,
-          "10.0.0.0/16",
-          [
-            "10.0.1.0/24",
-            "10.0.2.0/24",
-            "10.0.3.0/24"
-          ]
+          {
+            primaryCidr: "10.0.0.0/16"
+          },
         )
       )
       .resourceProvider(
