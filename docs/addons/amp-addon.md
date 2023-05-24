@@ -34,14 +34,15 @@ Pattern # 2 : Overriding property values for Name and Tags for a custom AMP Work
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 const ampWorkspaceName = "blueprints-amp-workspace";
-const ampPrometheusEndpoint = (blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace).attrPrometheusEndpoint;
+const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
 const addOn = new blueprints.addons.AmpAddOn({
-    ampPrometheusEndpoint: ampPrometheusEndpoint,
+    ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
     deploymentMode: DeploymentMode.DEPLOYMENT,
     namespace: 'default',
     name: 'adot-collector-amp'
@@ -91,14 +92,15 @@ Pattern # 4 : Overriding property values for different deployment Modes. This pa
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 const ampWorkspaceName = "blueprints-amp-workspace";
-const ampPrometheusEndpoint = (blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace).attrPrometheusEndpoint;
+const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
 const addOn = new blueprints.addons.AmpAddOn({
-    ampPrometheusEndpoint: ampPrometheusEndpoint,
+    ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
     deploymentMode: DeploymentMode.DAEMONSET,
     namespace: 'default',
     name: 'adot-collector-amp'

@@ -27,7 +27,7 @@ export class FluxKustomization {
                 },
                 path: repository.path,
                 prune: fluxPrune,
-                timeout: fluxTimeout,
+                timeout: fluxTimeout
             }
         };
         if (bootstrapValues) {
