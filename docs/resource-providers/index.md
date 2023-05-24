@@ -141,6 +141,8 @@ blueprints.EksBlueprint.builder()
     .resourceProvider("private-ca", new CreateCertificateProvider('internal-wildcard-cert', '*.myinternal.domain.com', "internal-hosted-zone"))
     // Create EFS file system and register it under the name of efs-file-system
     .resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))
+    // Create an S3 bucket and register it
+    .resourceProvider("s3-bucket", new CreateS3BucketProvider('s3-bucket-l1lk3k4jb4b2', 's3-bucket'))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
@@ -200,7 +202,6 @@ blueprints.EksBlueprint.builder()
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
     .build(scope, blueprintID, props);
-}
 ```
 
 Example with a named resource:
@@ -219,18 +220,17 @@ blueprints.EksBlueprint.builder()
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
     .build(scope, blueprintID, props);
-}
 ```
 
 ## Implementing Custom Resource Providers
 
-1. Select the type of the resource that you need. Let's say it will be an S3 Bucket. Note: it must be one of the derivatives/implementations of `IResource` interface.
+1. Select the type of the resource that you need. Let's say it will be an FSx File System. Note: it must be one of the derivatives/implementations of `IResource` interface.
 2. Implement ResourceProvider interface:
 
 ```typescript
-class MyResourceProvider implements blueprints.ResourceProvider<s3.IBucket> {
+class MyResourceProvider implements blueprints.ResourceProvider<fsx.IFileSystem> {
     provide(context: blueprints.ResourceContext): s3.IBucket {
-        return new s3.Bucket(context.scope, "mybucket");
+        return new fsx.LustreFileSystem(context.scope, "FsxLustreFileSystem");
     }
 }
 ```
@@ -239,7 +239,7 @@ class MyResourceProvider implements blueprints.ResourceProvider<s3.IBucket> {
 
 ```typescript
 blueprints.EksBlueprint.builder()
-    .resourceProvider("mybucket" ,new MyResourceProvider())
+    .resourceProvider("FsxLustreFileSystem" ,new MyResourceProvider())
     .addOns(...)
     .teams(...)
     .build();
@@ -250,8 +250,8 @@ blueprints.EksBlueprint.builder()
 ```typescript
 class MyCustomAddOn implements blueprints.ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void | Promise<cdk.Construct> {
-        const myBucket: s3.IBucket = clusterInfo.getRequiredResource('mybucket'); // will fail if mybucket does not exist
-        // do something with the bucket
+        const myFsxfileSystem: fsx.LustreFileSystem = clusterInfo.getRequiredResource('FsxLustreFileSystem'); // will fail if the file system does not exist
+        // do something with the file system
     }
 }
 
