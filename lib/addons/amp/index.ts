@@ -48,7 +48,7 @@ export const enum DeploymentMode {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    ampPrometheusEndpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-sample/",
+    ampPrometheusEndpoint: "ws-sample-workspace",
     deploymentMode: DeploymentMode.DEPLOYMENT,
     name: 'adot-collector-amp',
     namespace: 'default'
