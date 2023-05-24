@@ -1,4 +1,4 @@
-import { Cluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { ICluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { CfnJson, Names } from "aws-cdk-lib";
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
@@ -9,7 +9,7 @@ import { Construct } from 'constructs';
  * @param clusterInfo 
  * @returns sa
  */
-export function createServiceAccount(cluster: Cluster, name: string, namespace: string, policyDocument: iam.PolicyDocument): ServiceAccount {
+export function createServiceAccount(cluster: ICluster, name: string, namespace: string, policyDocument: iam.PolicyDocument): ServiceAccount {
     const policy = new iam.ManagedPolicy(cluster, `${name}-managed-policy`, {
         document: policyDocument
     });
@@ -18,7 +18,7 @@ export function createServiceAccount(cluster: Cluster, name: string, namespace: 
 
 }
 
-export function createServiceAccountWithPolicy(cluster: Cluster, name: string, namespace: string, ...policies: iam.IManagedPolicy[]): ServiceAccount {
+export function createServiceAccountWithPolicy(cluster: ICluster, name: string, namespace: string, ...policies: iam.IManagedPolicy[]): ServiceAccount {
     const sa = cluster.addServiceAccount(`${name}-sa`, {
         name: name,
         namespace: namespace

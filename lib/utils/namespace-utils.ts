@@ -11,7 +11,7 @@ import { Values } from "../spi";
   * @param prune 
   * @returns KubernetesManifest
   */
-export function createNamespace(name: string, cluster: eks.Cluster, overwrite?: boolean, prune?: boolean, annotations?: Values, labels? : Values) {
+export function createNamespace(name: string, cluster: eks.ICluster, overwrite?: boolean, prune?: boolean, annotations?: Values, labels? : Values) {
     return new KubernetesManifest(cluster.stack, `${name}-namespace-struct`, {
         cluster: cluster,
         manifest: [{
