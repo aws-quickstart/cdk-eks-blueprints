@@ -396,12 +396,6 @@ class CodePipeline {
     let codePipelineSource: cdkpipelines.CodePipelineSource | undefined =
       undefined;
 
-<<<<<<< HEAD
-=======
-    public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
-        let codePipelineSource : cdkpipelines.CodePipelineSource | undefined = undefined;
-
->>>>>>> origin
         switch (true) {
           case isCodeCommitRepo(props.repository):{
             let codeCommitRepo = props.repository as CodeCommitSourceRepository;
