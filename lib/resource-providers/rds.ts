@@ -1,22 +1,59 @@
 import { CfnOutput } from "aws-cdk-lib";
-import * as rds from "aws-cdk-lib/aws-rds";
-import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
-import {DatabaseCluster, IClusterEngine, InstanceProps} from "aws-cdk-lib/aws-rds";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
+import * as rds from "aws-cdk-lib/aws-rds";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
 
 
 export interface RdsInstanceProps {
   readonly name?: string;
-  readonly rdsProps?: Omit<rds.DatabaseInstanceProps, "storageEncryptionKey">;
-  readonly rdsEncryptionKeyResourceName?: string;
+  readonly rdsProps?: Omit<rds.DatabaseInstanceProps, "vpc" | "vpcSubnets">;
+}
+
+export class RdsInstanceProps
+  implements ResourceProvider<rds.DatabaseInstance> {
+  readonly options: RdsInstanceProps;
+
+  constructor(options: RdsInstanceProps) {
+    this.options = options;
+  }
+
+  provide(context: ResourceContext): rds.DatabaseInstance {
+    const id = context.scope.node.id;
+
+    const rdsVpc = context.get(GlobalResources.Vpc) as IVpc ?? new ec2.Vpc(
+        context.scope,
+        `${this.options.name}-${id}-Vpc`
+    );
+
+    const instanceProps: rds.DatabaseInstanceProps = {
+      ...this.options.rdsProps,
+      vpc: rdsVpc
+    } as rds.DatabaseInstanceProps;
+
+    let rdsInstance: rds.DatabaseInstance = new rds.DatabaseInstance(
+      context.scope,
+      this.options.name || `${id}-RDSInstance`,
+      instanceProps
+    );
+
+    new CfnOutput(context.scope, "RDSInstanceId", {
+      value: rdsInstance.instanceIdentifier
+    });
+
+    new CfnOutput(context.scope, "AuroraSecretIdentifier", {
+      value: rdsInstance.secret!.secretArn
+    });
+
+    return rdsInstance;
+  }
 }
 
 export interface AuroraClusterProps {
   readonly name?: string;
-  readonly clusterProps?: Omit<rds.DatabaseClusterProps, "engine" | "instanceProps">
-  readonly instanceProps?: InstanceProps;
-  readonly auroraEngine: IClusterEngine;
+  readonly clusterProps?: Omit<rds.DatabaseClusterProps, "instanceProps">
+  readonly instanceProps?: Omit<rds.InstanceProps, "vpc" | "vpcSubnets" | "securityGroups">;
+  readonly auroraEngine: rds.IClusterEngine;
 }
 
 export class AuroraClusterProvider
@@ -27,23 +64,25 @@ export class AuroraClusterProvider
     this.options = options;
   }
 
-  provide(context: ResourceContext): DatabaseCluster {
+  provide(context: ResourceContext): rds.DatabaseCluster {
     const id = context.scope.node.id;
 
-    const instanceProps: InstanceProps = this.options.instanceProps ?? {
+    const instanceProps: rds.InstanceProps = {
+      ...this.options.instanceProps,
       vpc: context.get(GlobalResources.Vpc) as IVpc ?? new ec2.Vpc(
         context.scope,
         `${this.options.name}-${id}-Vpc`
       ),
     };
 
+    const clusterProps: rds.DatabaseClusterProps = {
+      ...this.options.clusterProps, instanceProps, ...this.options.auroraEngine
+    } as rds.DatabaseClusterProps;
+
     let auroraInstance = new rds.DatabaseCluster(
       context.scope,
       this.options.name || `${id}-AuroraInstance`,
-      {
-        engine: this.options.auroraEngine,
-        instanceProps: instanceProps
-      }
+      clusterProps
     );
 
     new CfnOutput(context.scope, "AuroraInstanceId", {
