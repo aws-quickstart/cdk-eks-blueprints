@@ -98,8 +98,8 @@ export class BackstageAddOn extends HelmAddOn {
     setPath(values, "backstage.image.repository", helmOptions.imageRepository);
     setPath(values, "backstage.image.tag", helmOptions.imageTag);
   
-    setPath(values, "backstage.appConfig.app.baseUrl", HTTPS+helmOptions.subdomain);
-    setPath(values, "backstage.appConfig.backend.baseUrl", HTTPS+helmOptions.subdomain);
+    setPath(values, "backstage.appConfig.app.baseUrl", HTTPS + helmOptions.subdomain);
+    setPath(values, "backstage.appConfig.backend.baseUrl", HTTPS + helmOptions.subdomain);
     setPath(values, "backstage.appConfig.backend.database", databaseChartValues);
 
     setPath(values, "backstage.extraEnvVarsSecrets", [helmOptions.databaseSecretTargetName]);
