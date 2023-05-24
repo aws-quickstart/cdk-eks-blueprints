@@ -56,7 +56,6 @@ export interface AuroraClusterProps {
   readonly name?: string;
   readonly clusterProps?: Omit<rds.DatabaseClusterProps, "instanceProps">
   readonly instanceProps?: Omit<rds.InstanceProps, "vpc" | "vpcSubnets" | "securityGroups">;
-  readonly auroraEngine: rds.IClusterEngine;
 }
 
 export class AuroraClusterProvider
@@ -79,7 +78,7 @@ export class AuroraClusterProvider
     };
 
     const clusterProps: rds.DatabaseClusterProps = {
-      ...this.options.clusterProps, instanceProps, ...this.options.auroraEngine
+      ...this.options.clusterProps, instanceProps
     } as rds.DatabaseClusterProps;
 
     let auroraInstance = new rds.DatabaseCluster(
