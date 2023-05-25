@@ -1,12 +1,14 @@
+import assert = require("assert");
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Stack } from "aws-cdk-lib";
+import { Cluster } from "aws-cdk-lib/aws-eks";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 
 export class EmrEksAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    const cluster = clusterInfo.cluster;
-    
+    assert(clusterInfo.cluster instanceof Cluster, "EmrEksAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");
+    const cluster: Cluster = clusterInfo.cluster;
 
     /*
     * Create the service role used by EMR on EKS 
@@ -35,6 +37,5 @@ export class EmrEksAddOn implements ClusterAddOn {
     );
   
     return Promise.resolve(emrOnEksSlr);
-
   }
 }

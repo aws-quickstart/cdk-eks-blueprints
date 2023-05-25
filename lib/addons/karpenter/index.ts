@@ -137,7 +137,8 @@ export class KarpenterAddOn extends HelmAddOn {
 
     @conflictsWith('ClusterAutoScalerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        const cluster = clusterInfo.cluster;
+        assert(clusterInfo.cluster instanceof Cluster, "KarpenterAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");
+        const cluster : Cluster = clusterInfo.cluster;
         const endpoint = cluster.clusterEndpoint;
         const name = cluster.clusterName;
         
