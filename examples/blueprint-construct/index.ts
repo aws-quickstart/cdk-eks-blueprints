@@ -135,16 +135,16 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
@@ -164,7 +164,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -207,6 +207,7 @@ export default class BlueprintConstruct {
                             "Instance": "SPOT"
                         },
                         machineImage: ec2.MachineImage.genericLinux({
+                            'eu-west-1': 'ami-00805477850d62b8c',
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
@@ -267,11 +268,16 @@ export default class BlueprintConstruct {
 
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, "100.64.0.0/16", ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]))
+            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, {
+                primaryCidr: "10.2.0.0/16", 
+                secondaryCidr: "100.64.0.0/16",
+                secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
+            }))
             .resourceProvider("node-role", nodeRole)
             .clusterProvider(clusterProvider)
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
+
     }
 }
