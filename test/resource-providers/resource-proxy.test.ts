@@ -34,7 +34,7 @@ describe("ResourceProxy",() => {
         const app = new App();
         
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -64,7 +64,7 @@ describe("ResourceProxy",() => {
         
         const sgDescription = "My new security group";
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -120,7 +120,7 @@ describe("ResourceProxy",() => {
         const app = new App();
 
         const genericClusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             managedNodeGroups: [{
                 id: "mng1",
                 launchTemplate: {

@@ -15,6 +15,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -141,7 +142,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_24
+    version: eks.KubernetesVersion.V1_25
 };
 
 export class ClusterBuilder {
@@ -155,7 +156,7 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_24 } };
+        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_25 } };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
@@ -284,12 +285,14 @@ export class GenericClusterProvider implements ClusterProvider {
                 return new KubectlV24Layer(scope, "kubectllayer24");
             case eks.KubernetesVersion.V1_25:
                 return new KubectlV25Layer(scope, "kubectllayer25");
+            case eks.KubernetesVersion.V1_26:
+                    return new KubectlV26Layer(scope, "kubectllayer26");
         }
         
         const minor = version.version.split('.')[1];
 
-        if(minor && parseInt(minor, 10) > 25) {
-            return new KubectlV25Layer(scope, "kubectllayer25"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
+        if(minor && parseInt(minor, 10) > 26) {
+            return new KubectlV26Layer(scope, "kubectllayer26"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
         }
         return undefined;
     }

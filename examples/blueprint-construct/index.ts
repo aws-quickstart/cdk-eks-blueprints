@@ -135,16 +135,16 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
@@ -164,7 +164,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
