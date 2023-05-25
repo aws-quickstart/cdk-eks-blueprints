@@ -142,7 +142,11 @@ blueprints.EksBlueprint.builder()
     // Create EFS file system and register it under the name of efs-file-system
     .resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))
     // Create an S3 bucket and register it
-    .resourceProvider("s3-bucket", new CreateS3BucketProvider('s3-bucket-l1lk3k4jb4b2', 's3-bucket'))
+    .resourceProvider('blueprint-s3', new blueprints.CreateS3BucketProvider({
+        name: `bucket-name`, // This bucket name must be globally unique 
+        id: 'blueprints-s3-bucket-id',
+        s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+    }))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
