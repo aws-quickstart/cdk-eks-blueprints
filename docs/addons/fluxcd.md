@@ -19,6 +19,9 @@ const addOn = new blueprints.addons.FluxCDAddOn({
         targetRevision: "master",
         path: "./kustomize"
     },
+    bootstrapValues: {
+        "region": "us-east-1"
+    },
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()

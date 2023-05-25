@@ -45,6 +45,11 @@ builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
     .addOns(buildArgoBootstrap())
     .build(app, 'argo-blueprint1');
+    
+builder()
+    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+    .addOns(buildFluxBootstrap())
+    .build(app, 'flux-blueprint');
 
 
 function buildArgoBootstrap() {
@@ -80,6 +85,20 @@ function buildArgoBootstrap() {
                 }
             }
         }
+    });
+}
+
+function buildFluxBootstrap() {
+    return new bp.addons.FluxCDAddOn({
+        bootstrapRepo : {
+            repoUrl: 'https://github.com/stefanprodan/podinfo',
+            name: "podinfo",
+            targetRevision: "master",
+            path: "./kustomize",
+        },
+        bootstrapValues: {
+            "region": "us-east-1"
+        },
     });
 }
 

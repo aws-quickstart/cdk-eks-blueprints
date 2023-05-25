@@ -7,6 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -41,6 +42,9 @@ export default class BlueprintConstruct {
             iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
         ]);
 
+        const ampWorkspaceName = "blueprints-amp-workspace";
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -48,7 +52,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.AmpAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+            }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
@@ -275,6 +281,7 @@ export default class BlueprintConstruct {
             }))
             .resourceProvider("node-role", nodeRole)
             .clusterProvider(clusterProvider)
+            .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
