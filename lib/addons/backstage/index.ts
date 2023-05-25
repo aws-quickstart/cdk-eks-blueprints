@@ -12,14 +12,43 @@ const HTTPS = "https://";
  * User provided options for the Helm Chart
  */
 export interface BackstageAddOnProps extends HelmAddOnUserProps {
-    subdomain: string,
-    certificateResourceName: string,
-    imageRegistry: string,
-    imageRepository: string,
-    imageTag?: string,
-    databaseResourceName: string
-    databaseSecretTargetName: string
-}
+    /**
+     * The subdomain that will be assigned to the Backstage application.
+     */
+    subdomain: string;
+
+    /**
+     * The resource name of the certificate to be assigned to the Load Balancer.
+     */
+    certificateResourceName: string;
+
+    /**
+     * The registry URL of the Backstage application's Docker image.
+     */
+    imageRegistry: string;
+
+    /**
+     * The repository name in the "imageRegistry".
+     */
+    imageRepository: string;
+
+    /**
+     * The tag of the Backstage application's Docker image.
+     * @default 'latest'
+     */
+    imageTag?: string;
+
+    /**
+     * The resource name of the database.
+     */
+    databaseResourceName: string;
+
+    /**
+     * The name of the Kubernetes Secret which will be created by the add-on and
+     * injected with the database credentials.
+     */
+    databaseSecretTargetName: string;
+};
 
 /**
  * Default props to be used when creating the Helm chart
@@ -31,6 +60,7 @@ const defaultProps = {
   version: "0.17.0",
   release: "backstage",
   repository:  "https://backstage.github.io/charts",
+  imageTag: "latest",
   values: {}
 };
 
