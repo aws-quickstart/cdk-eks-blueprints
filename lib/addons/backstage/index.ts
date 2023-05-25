@@ -48,7 +48,7 @@ export interface BackstageAddOnProps extends HelmAddOnUserProps {
      * injected with the database credentials.
      */
     databaseSecretTargetName: string;
-};
+}
 
 /**
  * Default props to be used when creating the Helm chart
