@@ -33,7 +33,9 @@ export class CreateS3BucketProvider implements spi.ResourceProvider<s3.IBucket> 
      * Creates the S3 provider.
      * @param name Name of the S3 Bucket. This must be globally unique.
      */
-    constructor(options: CreateS3BucketProps) {}
+    constructor(options: CreateS3BucketProps) {
+        this.options = options;
+    }
 
     provide(context: spi.ResourceContext) : s3.IBucket {
         return new s3.Bucket(context.scope, this.options.id, {
