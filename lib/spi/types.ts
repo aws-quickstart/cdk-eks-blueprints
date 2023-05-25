@@ -1,8 +1,8 @@
 import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
-import { Cluster, FargateProfile, ICluster, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
-import { Construct } from 'constructs';
+import * as eks from 'aws-cdk-lib/aws-eks';
+import { Construct, IConstruct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { logger } from "../utils/log-utils";
@@ -79,7 +79,7 @@ export interface ApplicationRepository extends GitRepositoryReference {
  */
 export class ResourceContext {
 
-    private readonly resources: Map<string, cdk.IResource> = new Map();
+    private readonly resources: Map<string, IConstruct> = new Map();
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
 
@@ -89,7 +89,7 @@ export class ResourceContext {
      * @param provider Implementation of the resource provider interface
      * @returns the provided resource
      */
-    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>): T {
+    public add<T extends IConstruct>(name: string, provider: ResourceProvider<T>): T {
         const resource = provider.provide(this);
         assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
@@ -101,7 +101,7 @@ export class ResourceContext {
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
-    public get<T extends cdk.IResource = cdk.IResource>(name: string): T | undefined {
+    public get<T extends IConstruct = IConstruct>(name: string): T | undefined {
         return <T>this.resources.get(name);
     }
 }
@@ -129,8 +129,8 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props
      */
-    constructor(readonly cluster: ICluster, readonly version: KubernetesVersion,
-        readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: FargateProfile[]) {
+    constructor(readonly cluster: eks.ICluster, readonly version: eks.KubernetesVersion,
+        readonly nodeGroups?: eks.Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: eks.FargateProfile[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();

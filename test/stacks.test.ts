@@ -420,7 +420,7 @@ test("Building blueprint with builder properly clones properties", () => {
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_24
+        version: KubernetesVersion.V1_25
     });
 
     expect(blueprint.props.addOns).toHaveLength(1);
@@ -442,7 +442,7 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     expect(blueprint.props.addOns).toHaveLength(1);
 
     blueprint.withBlueprintProps({
-        version: KubernetesVersion.V1_24
+        version: KubernetesVersion.V1_25
     });
 
     const stack = blueprint.build(app, "builder-version-test1");

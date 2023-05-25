@@ -124,7 +124,7 @@ const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new ia
   ]);
 
 const clusterProvider = new blueprints.GenericClusterProvider({
-  version: KubernetesVersion.V1_24,
+  version: KubernetesVersion.V1_25,
   managedNodeGroups: [
     {
       id: "mng1",
