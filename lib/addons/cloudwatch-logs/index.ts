@@ -12,11 +12,6 @@ import { getCloudWatchLogsPolicyDocument } from "./iam-policy";
  */
 export interface CloudWatchLogsAddonProps extends HelmAddOnUserProps {
     /**
-     * Iam policies for the add-on.
-     */
-    policyDocumentProvider?: (partition: string) => PolicyDocument;
-
-    /**
      * Create Namespace with the provided one (will not if namespace is kube-system)
      */
     createNamespace?: boolean
@@ -25,6 +20,11 @@ export interface CloudWatchLogsAddonProps extends HelmAddOnUserProps {
      * Name of the service account for fluent bit.
      */
     serviceAccountName?: string;
+
+    /**
+     * CloudWatch Log Group Name.
+     */
+    logGroupPrefix?: string;
 
     /**
      * CloudWatch Log retention days
@@ -43,6 +43,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     namespace: 'aws-for-fluent-bit',
     createNamespace: true,
     serviceAccountName: 'aws-fluent-bit-for-cw-sa',
+    logGroupPrefix: 'aws/eks/blueprints-construct-dev', 
     logRetentionDays: 90,
     values: {}
 };
@@ -101,8 +102,8 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: CloudWatchLogsAdd
     setPath(values, "cloudWatch.enabled", false);
     setPath(values, "cloudWatchLogs.enabled", true);
     setPath(values, "cloudWatchLogs.region", clusterInfo.cluster.stack.region);
-    setPath(values, "cloudWatchLogs.logGroupName", `/aws/eks/${clusterInfo.cluster.clusterName}/workloads`);
-    setPath(values, "cloudWatchLogs.logGroupTemplate", `/aws/eks/${clusterInfo.cluster.clusterName}/$kubernetes['namespace_name']`);
+    setPath(values, "cloudWatchLogs.logGroupName", `${helmOptions.logGroupPrefix}/workloads`);
+    setPath(values, "cloudWatchLogs.logGroupTemplate", `${helmOptions.logGroupPrefix}/$kubernetes['namespace_name']`);
     setPath(values, "cloudWatchLogs.logStreamTemplate", "$kubernetes['container_name'].$kubernetes['pod_name']");
     setPath(values, "cloudWatchLogs.log_key", "log");
     setPath(values, "cloudWatchLogs.log_retention_days", helmOptions.logRetentionDays);

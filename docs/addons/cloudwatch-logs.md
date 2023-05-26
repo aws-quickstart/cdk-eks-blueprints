@@ -46,7 +46,7 @@ NAME                                                                       DESIR
 daemonset.apps/blueprints-addon-aws-fluent-bit-for-cw-aws-for-fluent-bit   2         2         2       2            2           <none>          3h53m
 ```
 
-Navigate to Log groups in Amazon CloudWatch console to see log groups starting with `/aws/eks/<your-cluster-name>/`.
+Navigate to Log groups in Amazon CloudWatch console to see log groups starting with `/aws/eks/<your-cluster-name>/workload`.
 
 ## Functionality
 
