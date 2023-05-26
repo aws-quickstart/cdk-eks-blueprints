@@ -7,6 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -41,6 +42,9 @@ export default class BlueprintConstruct {
             iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
         ]);
 
+        const ampWorkspaceName = "blueprints-amp-workspace";
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -48,7 +52,9 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.AmpAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+            }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
@@ -135,16 +141,16 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
@@ -164,7 +170,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -207,6 +213,7 @@ export default class BlueprintConstruct {
                             "Instance": "SPOT"
                         },
                         machineImage: ec2.MachineImage.genericLinux({
+                            'eu-west-1': 'ami-00805477850d62b8c',
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
@@ -278,8 +285,10 @@ export default class BlueprintConstruct {
                 s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
             }))
             .clusterProvider(clusterProvider)
+            .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
+
     }
 }

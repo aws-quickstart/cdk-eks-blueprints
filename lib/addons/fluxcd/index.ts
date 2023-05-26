@@ -1,49 +1,73 @@
 // lib/fluxcd_addon.ts
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
+import * as spi from "../../spi";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
-import * as spi from "../../spi";
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
+
 /**
  * User provided options for the Helm Chart
  */
 export interface FluxCDAddOnProps extends HelmAddOnUserProps {
+
+  /**
+   * Namespace where add-on will be deployed. 
+   * @default flux-system
+   */
+  namespace?: string;
+
+  /**
+  * Helm chart version to use to install.
+  * @default 2.7.0
+  */
+  version?: string;
+
+  /**
+   * If provided, the addon will bootstrap the app or apps in the provided repository.
+   * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
+   * after the infrastructure and team provisioning is complete.
+   * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
+   * repository will be used for provisioning all `HelmAddOn` based AddOns.
+   */
+  bootstrapRepo?: spi.ApplicationRepository;
+
+  /**
+   * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
+   * to the applications. 
+   */
+  bootstrapValues?: spi.Values,
+
+  /**
+   * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
+   */
+  values?: spi.Values;
   /**
    * To Create Namespace using CDK
    */    
   createNamespace?: boolean;
 
-  /**
-   * Optional values for `GitRepository` Source to produce an Artifact for a Git repository revision.
-   */
-  bootstrapRepo?: spi.ApplicationRepository;
-
   /** 
   * Internal for Flux sync.
   * Default `5m0s` */
-
   fluxSyncInterval?: string;
 
   /** 
   * Flux Kustomization Target Namespace.
   * Default `default` */
-
   fluxTargetNamespace?: string;
 
   /** 
   * Flux Kustomization Prune.
   * Default `true` */
-
   fluxPrune?: boolean;
 
   /** 
   * Flux Kustomization Timeout.
   * Default `1m` */
-
   fluxTimeout?: string;
 }
 
@@ -90,7 +114,7 @@ export class FluxCDAddOn extends HelmAddOn {
     }
 
     //Lets create a GitRepository resource as a source to Flux
-    if (this.options.bootstrapRepo) {
+    if (this.options.bootstrapRepo?.repoUrl) {
       const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options.bootstrapRepo, this.options);
       gitRepositoryConstruct.node.addDependency(chart);
       const kustomizationConstruct = createKustomization(clusterInfo, this.options.bootstrapRepo, this.options);
@@ -114,7 +138,7 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.Applic
  * create Kustomization calls the FluxKustomization().generate to create Kustomization resource.
  */
 function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!);
+  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;

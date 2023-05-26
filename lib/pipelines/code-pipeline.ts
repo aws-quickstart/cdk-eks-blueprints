@@ -51,12 +51,38 @@ export interface CodeCommitSourceRepository
     codeCommitOptions?: cdkpipelines.CodeCommitSourceOptions;
 }
 
-export function isCodeCommitRepo(repo: GitHubSourceRepository | CodeCommitSourceRepository): boolean{
-    if (Object.prototype.hasOwnProperty.call(repo, "codeCommitRepoName")) {
-        return true;
-    } else {
-        return false;
-    }
+export interface CodeStarConnectionRepository
+  extends Omit<
+    ApplicationRepository,
+    'credentialsType' | 'credentialsSecretName '
+  > {
+  /**
+   * The ARN of the CodeStar Connection.
+   */
+  codeStarConnectionArn: string;
+  /**
+   * The owner of the repository for the pipeline
+   */
+  owner?: string;
+}
+
+export function isCodeCommitRepo(
+  repo:
+    | GitHubSourceRepository
+    | CodeCommitSourceRepository
+    | CodeStarConnectionRepository
+): boolean {
+  return Object.prototype.hasOwnProperty.call(repo, 'codeCommitRepoName');
+}
+
+export function isCodeStarConnection(
+  repo:
+    | GitHubSourceRepository
+    | CodeCommitSourceRepository
+    | CodeStarConnectionRepository
+): boolean {
+  return Object.prototype.hasOwnProperty.call(repo, 'codeStarConnectionArn');
+  
 }
 
 /**
@@ -87,10 +113,13 @@ export type PipelineProps = {
      */
     codeBuildPolicies?: PolicyStatement[];
 
-    /**
-     * Repository for the pipeline (GitHub or CodeCommitRepository).
-     */
-    repository: GitHubSourceRepository | CodeCommitSourceRepository;
+  /**
+   * Repository for the pipeline (GitHub or CodeCommitRepository).
+   */
+  repository:
+    | GitHubSourceRepository
+    | CodeCommitSourceRepository
+    | CodeStarConnectionRepository;
 
     /**
      * Pipeline stages and options.
@@ -198,13 +227,21 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-    public repository(repo: GitHubSourceRepository | CodeCommitSourceRepository): CodePipelineBuilder {
-        this.props.repository = repo as GitHubSourceRepository;
-        if (isCodeCommitRepo(repo)) {
-            this.props.repository = repo as CodeCommitSourceRepository;
-        }
-        return this;
+  public repository(
+    repo:
+      | GitHubSourceRepository
+      | CodeCommitSourceRepository
+      | CodeStarConnectionRepository
+  ): CodePipelineBuilder {
+    this.props.repository = repo as GitHubSourceRepository;
+    if (isCodeCommitRepo(repo)) {
+      this.props.repository = repo as CodeCommitSourceRepository;
     }
+    if (isCodeStarConnection(repo)) {
+      this.props.repository = repo as CodeStarConnectionRepository;
+    }
+    return this;
+  }
 
     /**
      * Adds standalone pipeline stages (in the order of invocation and elements in the input array)
@@ -229,19 +266,27 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-    build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
-        assert(this.props.name, "name field is required for the pipeline stack. Please provide value.");
-        assert(this.props.stages, "Stage field is required for the pipeline stack. Please provide value.");
-        if (this.props.repository) {
-            let gitHubRepo = this.props.repository as GitHubSourceRepository;
-            if (!(isCodeCommitRepo(this.props.repository))) {
-                assert((this.props.owner || gitHubRepo.owner),
-                    "repository.owner field is required for the GitHub pipeline stack. Please provide value.");
-            }
-        }
-        const fullProps = this.props as PipelineProps;
-        return new CodePipelineStack(scope, fullProps, id, stackProps);
+  build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
+    assert(
+      this.props.name,
+      'name field is required for the pipeline stack. Please provide value.'
+    );
+    assert(
+      this.props.stages,
+      'Stage field is required for the pipeline stack. Please provide value.'
+    );
+    if (this.props.repository) {
+      let gitHubRepo = this.props.repository as GitHubSourceRepository;
+      if (!isCodeCommitRepo(this.props.repository)) {
+        assert(
+          this.props.owner || gitHubRepo.owner,
+          'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+        );
+      }
     }
+    const fullProps = this.props as PipelineProps;
+    return new CodePipelineStack(scope, fullProps, id, stackProps);
+  }
 }
 
 
@@ -328,27 +373,52 @@ class CodePipeline {
     public static build(scope: Construct, props: PipelineProps) : cdkpipelines.CodePipeline {
         let codePipelineSource : cdkpipelines.CodePipelineSource | undefined = undefined;
 
-        if (isCodeCommitRepo(props.repository)) {
+        switch (true) {
+          case isCodeCommitRepo(props.repository):{
             let codeCommitRepo = props.repository as CodeCommitSourceRepository;
             codePipelineSource = cdkpipelines.CodePipelineSource.codeCommit(
-                codecommit.Repository.fromRepositoryName(
-                    scope, 'cdk-eks-blueprints', codeCommitRepo.codeCommitRepoName),
-                    codeCommitRepo.targetRevision ?? 'master',
-                    codeCommitRepo.codeCommitOptions);
-        } else {
+              codecommit.Repository.fromRepositoryName(
+                scope,
+                'cdk-eks-blueprints',
+                codeCommitRepo.codeCommitRepoName
+              ),
+              codeCommitRepo.targetRevision ?? 'master',
+              codeCommitRepo.codeCommitOptions
+            );
+            break;
+          }
+          case isCodeStarConnection(props.repository):{
+            let codeStarConnection =
+              props.repository as CodeStarConnectionRepository;
+            const repoOwner = codeStarConnection.owner ?? props.owner;
+            codePipelineSource = cdkpipelines.CodePipelineSource.connection(
+              `${repoOwner}/${codeStarConnection.repoUrl}`,
+              codeStarConnection.targetRevision ?? 'main',
+              { connectionArn: codeStarConnection.codeStarConnectionArn }
+            );
+            break;
+          }
+
+          default:{
             let gitHubRepo = props.repository as GitHubSourceRepository;
-            let githubProps : cdkpipelines.GitHubSourceOptions | undefined = undefined;
+            let githubProps: cdkpipelines.GitHubSourceOptions | undefined =
+              undefined;
             const gitHubOwner = gitHubRepo.owner ?? props.owner;
 
             if (gitHubRepo.credentialsSecretName) {
-                githubProps = {
-                    authentication: cdk.SecretValue.secretsManager(gitHubRepo.credentialsSecretName!)
-                };
+              githubProps = {
+                authentication: cdk.SecretValue.secretsManager(
+                  gitHubRepo.credentialsSecretName!
+                ),
+              };
             }
             codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
-                `${gitHubOwner}/${gitHubRepo.repoUrl}`,
-                gitHubRepo.targetRevision ?? 'main',
-                githubProps);
+              `${gitHubOwner}/${gitHubRepo.repoUrl}`,
+              gitHubRepo.targetRevision ?? 'main',
+              githubProps
+            );
+            break;
+          }
         }
 
         return new cdkpipelines.CodePipeline(scope, props.name, {
