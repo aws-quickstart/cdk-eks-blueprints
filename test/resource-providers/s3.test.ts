@@ -12,7 +12,9 @@ describe("S3BucketProvider", () => {
       .resourceProvider(GlobalResources.Vpc, new blueprints.VpcProvider())
       .resourceProvider(
         "my-s3-bucket",
-        new blueprints.CreateS3BucketProvider("name-of-my-s3-bucket", "s3-bucket")
+        new blueprints.CreateS3BucketProvider({
+          id: "s3-bucket", name: "name-of-my-s3-bucket"
+          })
       )
       .account("123456789012")
       .region("us-east-1")
