@@ -45,6 +45,14 @@ export default class BlueprintConstruct {
         const ampWorkspaceName = "blueprints-amp-workspace";
         const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
+        const apacheAirflowS3Bucket = new blueprints.CreateS3BucketProvider({
+            id: 'apache-airflow-s3-bucket-id',
+            s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+        });
+        const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
+            name: 'blueprints-apache-airflow-efs',    
+        });
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -156,6 +164,10 @@ export default class BlueprintConstruct {
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
+            new blueprints.ApacheAirflowAddOn({
+                enableLogging: true,
+                s3Bucket: 'apache-airflow-s3-bucket-provider',
+            })
         ];
 
         // Instantiated to for helm version check.
@@ -280,10 +292,8 @@ export default class BlueprintConstruct {
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
             .resourceProvider("node-role", nodeRole)
-            .resourceProvider('blueprint-s3', new blueprints.CreateS3BucketProvider({
-                id: 'blueprints-s3-bucket-id',
-                s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
-            }))
+            .resourceProvider('apache-airflow-s3-bucket-provider', apacheAirflowS3Bucket)
+            .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
             .clusterProvider(clusterProvider)
             .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))

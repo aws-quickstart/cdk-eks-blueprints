@@ -21,7 +21,7 @@ import { IFileSystem } from "aws-cdk-lib/aws-efs";
  */
 export interface AirflowAddOnProps extends HelmAddOnUserProps {
     /**
-     * Enable Load Balancer
+     * Enable Load Balancer for Ingress - default is false
      */
     enableAlb?: boolean,
 
@@ -32,13 +32,18 @@ export interface AirflowAddOnProps extends HelmAddOnUserProps {
     certificateResourceName?: string,
 
     /**
+     * Enable Logging with S3  - default is false
+     */
+    enableLogging?: boolean,
+
+    /**
      * Names of the S3 Bucket provider named resources (@see CreateS3BucketProvider, @see ImportS3BucketProvider).
      * S3 Bucket provider is registered as named resource providers with the EksBlueprintProps.
      */
     s3Bucket?: string,
 
     /**
-     * Enable EFS for persistent storage of DAGs
+     * Enable EFS for persistent storage of DAGs - default is false
      */
     enableEfs?: boolean,
 
@@ -48,25 +53,6 @@ export interface AirflowAddOnProps extends HelmAddOnUserProps {
      * This is required if EFS is enabled
      */
     efsFileSystem?: string,
-
-    /**
-     * TODO: Enable RDS
-     */
-    // enableRds?: boolean,
-
-    /**
-     * TODO: DB Configurations for RDS instance access - must have RDS enabled
-     */
-    // dbConfig?: {
-    //     username: string,
-    //     password: string,
-    //     dbName: string 
-    // }
-    
-    /**
-     * Enable Logging with S3
-     */
-    enableLogging?: boolean,
 }
 
 const AIRFLOW = 'airflow';
@@ -75,13 +61,16 @@ const RELEASE = 'blueprints-addon-apache-airflow';
 /**
  * Default props to be used when creating the Helm chart
  */
- const defaultProps: HelmAddOnProps = {
+ const defaultProps: AirflowAddOnProps = {
     name: AIRFLOW,
     namespace: AIRFLOW,
     chart: AIRFLOW,
     version: "1.9.0",
     release: RELEASE,
     repository:  "https://airflow.apache.org",
+    enableAlb: false,
+    enableEfs: false,
+    enableLogging: false,
     values: {}
 };
 
@@ -94,7 +83,7 @@ export class ApacheAirflowAddOn extends HelmAddOn {
     readonly options: AirflowAddOnProps;
 
     constructor(props?: AirflowAddOnProps) {
-        super({...defaultProps, ...props});
+        super({...defaultProps  as any, ...props});
         this.options = this.props as AirflowAddOnProps;
     }
 
@@ -275,28 +264,3 @@ function setUpLogging(clusterInfo: ClusterInfo, values: Values, ns: KubernetesMa
     
     return values;
 }
-
-/**
- * TODO: Helper function to set up the Metadata DB with RDS
-*/
-// function setUpDatabase(values: Values, dbConfig: {username: string; password: string; dbName: string;} | undefined): Values {
-    
-//     // Assert that the DB configurations are provided.
-//     assert(dbConfig, 'Please provide DB Configurations for RDS');
-
-//     // Set helm custom values
-//     setPath(values, "data.metadataConnection", {
-//         "user": dbConfig.username,
-//         "pass": dbConfig.password,
-//         "protocol": "postgresql",
-//         "host": "",
-//         "port": "5432",
-//         "db": dbConfig.dbName,
-//         "sslmode": "disable"
-//     });
-
-//     // Disabling local postgresql for RDS implementation
-//     setPath(values, "postgresql.enabled", false);
-
-//     return values
-// }
