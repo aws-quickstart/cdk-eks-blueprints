@@ -22,6 +22,7 @@ The framework currently supports the following add-ons.
 | [`AWS Private CA Issuer`](./aws-privateca-issuer)                      | Installs AWS Private CA Issuer into your cluster.                                                                        |
 | [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager to your EKS cluster.                                                             |
 | [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                       |
+| [`CloudWatchLogsAddOn`](./cloudwatch-logs.md)                       | Adds Fluent log processor and forwarder to forward dataplane and application logs to Amazon CloudWatch.                                          |
 | [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                              |
 | [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler.                                                                                                  |
 | [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             |
