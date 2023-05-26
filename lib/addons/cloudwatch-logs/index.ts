@@ -43,7 +43,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     namespace: 'aws-for-fluent-bit',
     createNamespace: true,
     serviceAccountName: 'aws-fluent-bit-for-cw-sa',
-    logGroupPrefix: 'aws/eks/blueprints-construct-dev', 
+    logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
     logRetentionDays: 90,
     values: {}
 };
