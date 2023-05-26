@@ -22,6 +22,31 @@ export function clusterBuilder() {
 }
 
 /**
+ * Function that contains logic to map the correct kunbectl layer based on the passed in version. 
+ * @param scope in whch the kubectl layer must be created
+ * @param version EKS version
+ * @returns ILayerVersion or undefined
+ */
+export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVersion): ILayerVersion | undefined {
+    switch(version) {
+        case eks.KubernetesVersion.V1_23:
+            return new KubectlV23Layer(scope, "kubectllayer23");
+        case eks.KubernetesVersion.V1_24:
+            return new KubectlV24Layer(scope, "kubectllayer24");
+        case eks.KubernetesVersion.V1_25:
+            return new KubectlV25Layer(scope, "kubectllayer25");
+        case eks.KubernetesVersion.V1_26:
+                return new KubectlV26Layer(scope, "kubectllayer26");
+    }
+    
+    const minor = version.version.split('.')[1];
+
+    if(minor && parseInt(minor, 10) > 26) {
+        return new KubectlV26Layer(scope, "kubectllayer26"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
+    }
+    return undefined;
+}
+/**
  * Properties for the generic cluster provider, containing definitions of managed node groups,
  * auto-scaling groups, fargate profiles.
  */
@@ -278,23 +303,7 @@ export class GenericClusterProvider implements ClusterProvider {
      * @returns 
      */
     protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
-        switch(version) {
-            case eks.KubernetesVersion.V1_23:
-                return new KubectlV23Layer(scope, "kubectllayer23");
-            case eks.KubernetesVersion.V1_24:
-                return new KubectlV24Layer(scope, "kubectllayer24");
-            case eks.KubernetesVersion.V1_25:
-                return new KubectlV25Layer(scope, "kubectllayer25");
-            case eks.KubernetesVersion.V1_26:
-                    return new KubectlV26Layer(scope, "kubectllayer26");
-        }
-        
-        const minor = version.version.split('.')[1];
-
-        if(minor && parseInt(minor, 10) > 26) {
-            return new KubectlV26Layer(scope, "kubectllayer26"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
-        }
-        return undefined;
+       return selectKubectlLayer(scope, version);
     }
 
     /**

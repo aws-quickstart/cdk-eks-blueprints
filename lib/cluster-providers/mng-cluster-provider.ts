@@ -74,5 +74,5 @@ export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): ek
     if(clusterInfo.autoscalingGroups != undefined && clusterInfo.autoscalingGroups.length > 0) {
         return clusterInfo.autoscalingGroups;
     }
-    throw new Error(`${source} is supported with EKS EC2 only`);
+    throw new Error(`${source} is supported with EKS EC2 only and is not supported for imported clusters`);
 }
