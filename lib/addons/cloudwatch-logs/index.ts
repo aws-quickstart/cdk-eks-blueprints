@@ -1,7 +1,7 @@
-import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { setPath } from "../../utils";
+import merge from "ts-deepmerge";
+import { conflictsWith, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
@@ -62,8 +62,10 @@ export class CloudWatchLogsAddon extends HelmAddOn {
         this.options = this.props;
     }
 
+    @conflictsWith('AwsForFluentBitAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         let values: Values = populateValues(clusterInfo, this.options);
+        values = merge(values, this.props.values ?? {});
         const cluster = clusterInfo.cluster;
         const namespace = this.options.namespace!;
 
