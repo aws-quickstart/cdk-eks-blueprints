@@ -153,7 +153,8 @@ export default class BlueprintConstruct {
             // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
-            new blueprints.AwsForFluentBitAddOn(),
+            // Commenting due to conflicts with `CloudWatchLogsAddon`
+            // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
             new blueprints.CloudWatchLogsAddon(),
