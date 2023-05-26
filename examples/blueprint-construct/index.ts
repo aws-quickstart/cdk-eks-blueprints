@@ -280,6 +280,10 @@ export default class BlueprintConstruct {
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
             .resourceProvider("node-role", nodeRole)
+            .resourceProvider('blueprint-s3', new blueprints.CreateS3BucketProvider({
+                id: 'blueprints-s3-bucket-id',
+                s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+            }))
             .clusterProvider(clusterProvider)
             .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
