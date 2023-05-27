@@ -22,7 +22,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 
   /**
   * Helm chart version to use to install.
-  * @default 2.7.0
+  * @default 2.8.0
   */
   version?: string;
 
@@ -78,7 +78,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   name: "fluxcd-addon",
   namespace: "flux-system",
   chart: "flux2",
-  version: "2.7.0",
+  version: "2.8.0",
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
@@ -86,7 +86,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   fluxSyncInterval: "5m0s",
   fluxTargetNamespace: "default",
   fluxPrune: true,
-  fluxTimeout: "1m",
+  fluxTimeout: "1m"
 };
 
 /**

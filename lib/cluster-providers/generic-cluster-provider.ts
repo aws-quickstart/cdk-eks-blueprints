@@ -6,7 +6,7 @@ import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { AccountRootPrincipal, ManagedPolicy, Role } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -15,6 +15,7 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -141,7 +142,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_24
+    version: eks.KubernetesVersion.V1_25
 };
 
 export class ClusterBuilder {
@@ -155,7 +156,7 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_24 } };
+        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_25 } };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
@@ -217,6 +218,9 @@ export class GenericClusterProvider implements ClusterProvider {
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
+        const mastersRole = this.props.mastersRole ?? new Role(scope, `${clusterName}-AccessRole`, {
+            assumedBy: new AccountRootPrincipal() 
+        });
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
         const tags = this.props.tags;
@@ -231,6 +235,7 @@ export class GenericClusterProvider implements ClusterProvider {
             endpointAccess,
             kubectlLayer,
             tags,
+            mastersRole,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
@@ -284,12 +289,14 @@ export class GenericClusterProvider implements ClusterProvider {
                 return new KubectlV24Layer(scope, "kubectllayer24");
             case eks.KubernetesVersion.V1_25:
                 return new KubectlV25Layer(scope, "kubectllayer25");
+            case eks.KubernetesVersion.V1_26:
+                    return new KubectlV26Layer(scope, "kubectllayer26");
         }
         
         const minor = version.version.split('.')[1];
 
-        if(minor && parseInt(minor, 10) > 25) {
-            return new KubectlV25Layer(scope, "kubectllayer25"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
+        if(minor && parseInt(minor, 10) > 26) {
+            return new KubectlV26Layer(scope, "kubectllayer26"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
         }
         return undefined;
     }

@@ -43,10 +43,10 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
  */
 const versionMap = new Map([
     [KubernetesVersion.of("1.25"), "9.25.0"],
-    [KubernetesVersion.V1_24, "9.25.0"],
+    [KubernetesVersion.V1_25, "9.25.0"],
     [KubernetesVersion.V1_23, "9.21.0"],
     [KubernetesVersion.V1_22, "9.13.1"],
-    [KubernetesVersion.V1_24, "9.13.1"],
+    [KubernetesVersion.V1_25, "9.13.1"],
     [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],

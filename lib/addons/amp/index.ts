@@ -48,7 +48,6 @@ export const enum DeploymentMode {
  * Defaults options for the add-on
  */
 const defaultProps = {
-    ampPrometheusEndpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-sample/",
     deploymentMode: DeploymentMode.DEPLOYMENT,
     name: 'adot-collector-amp',
     namespace: 'default'
@@ -61,7 +60,7 @@ export class AmpAddOn implements ClusterAddOn {
 
     readonly ampAddOnProps: AmpAddOnProps;
 
-    constructor(props?: AmpAddOnProps) {
+    constructor(props: AmpAddOnProps) {
         this.ampAddOnProps = { ...defaultProps, ...props };
     }
 

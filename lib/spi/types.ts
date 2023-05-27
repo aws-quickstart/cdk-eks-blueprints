@@ -101,7 +101,7 @@ export class ResourceContext {
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
-    public get<T extends cdk.IResource = cdk.IResource>(name: string): T | undefined {
+    public get<T extends IConstruct = IConstruct>(name: string): T | undefined {
         return <T>this.resources.get(name);
     }
 }

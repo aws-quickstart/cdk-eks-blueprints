@@ -7,7 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
-import * as amp from 'aws-cdk-lib/aws-aps';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -43,7 +43,7 @@ export default class BlueprintConstruct {
         ]);
 
         const ampWorkspaceName = "blueprints-amp-workspace";
-        const ampPrometheusEndpoint = (blueprints.getNamedResource(ampWorkspaceName) as unknown as amp.CfnWorkspace).attrPrometheusEndpoint;
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
@@ -156,17 +156,6 @@ export default class BlueprintConstruct {
             new blueprints.AwsBatchAddOn(),
             new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
-            // new blueprints.FluxCDAddOn({
-            //     bootstrapRepo : {
-            //         repoUrl: 'https://github.com/stefanprodan/podinfo',
-            //         name: "podinfo",
-            //         targetRevision: "master",
-            //         path: "./kustomize",
-            //     },
-            //     bootstrapValues: {
-            //         "region": "us-east-1"
-            //     },
-            // }),
             new blueprints.GrafanaOperatorAddon(),
         ];
 
@@ -182,7 +171,7 @@ export default class BlueprintConstruct {
         userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -225,6 +214,7 @@ export default class BlueprintConstruct {
                             "Instance": "SPOT"
                         },
                         machineImage: ec2.MachineImage.genericLinux({
+                            'eu-west-1': 'ami-00805477850d62b8c',
                             'us-east-1': 'ami-08e520f5673ee0894',
                             'us-west-2': 'ami-0403ff342ceb30967',
                             'us-east-2': 'ami-07109d69738d6e1ee',
@@ -291,10 +281,15 @@ export default class BlueprintConstruct {
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
             .resourceProvider("node-role", nodeRole)
+            .resourceProvider('blueprint-s3', new blueprints.CreateS3BucketProvider({
+                id: 'blueprints-s3-bucket-id',
+                s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+            }))
             .clusterProvider(clusterProvider)
             .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
+
     }
 }
