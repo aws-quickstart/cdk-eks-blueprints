@@ -51,6 +51,7 @@ export * from './jupyterhub';
 export * from './emr-on-eks';
 export * from './aws-batch-on-eks';
 export * from './upbound-universal-crossplane';
+export * from './apache-airflow';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
