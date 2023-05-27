@@ -21,6 +21,11 @@ import { IFileSystem } from "aws-cdk-lib/aws-efs";
  */
 export interface AirflowAddOnProps extends HelmAddOnUserProps {
     /**
+     * Namespace
+     */
+    namespace?: string,
+    
+    /**
      * Enable Load Balancer for Ingress - default is false
      */
     enableAlb?: boolean,
@@ -197,7 +202,7 @@ function populateValues(clusterInfo: ClusterInfo, ns: KubernetesManifest, helmOp
                 kind: "PersistentVolumeClaim",
                 metadata: { 
                     name: AIRFLOWPVC,
-                    namespace: `${ns}` 
+                    namespace: `${helmOptions.namespace!}` 
                 },
                 spec: {
                     accessModes: ["ReadWriteMany"],
