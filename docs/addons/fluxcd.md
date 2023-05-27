@@ -17,6 +17,10 @@ const addOn = new blueprints.addons.FluxCDAddOn({
         repoUrl: 'https://github.com/stefanprodan/podinfo',
         name: "podinfo",
         targetRevision: "master",
+        path: "./kustomize"
+    },
+    bootstrapValues: {
+        "region": "us-east-1"
     },
 }),
 
@@ -35,19 +39,26 @@ const blueprint = blueprints.EksBlueprint.builder()
 To validate that fluxcd is installed properly in the cluster, check if the namespace is created and fluxcd pods are running.
 
 Verify if the namespace is created correctly
+
 ```bash
   kubectl get ns | grep "flux-system"
 ```
+
 There should be list the flux-system namespace
+
 ```bash
 flux-system      Active   31m
 ```
+
 Verify if the pods are running correctly in flux-system namespace
+
 ```bash
   kubectl get pods -n flux-system  
 ```
+
 There should list 3 pods starting with name flux-system
 For Eg:
+
 ```bash
 NAME                                          READY   STATUS    RESTARTS   AGE
 helm-controller-65cc46469f-v4hnr              1/1     Running   0          6m13s
@@ -56,13 +67,6 @@ image-reflector-controller-68979dfd49-t4dpj   1/1     Running   0          6m13s
 kustomize-controller-767677f7f5-7j26b         1/1     Running   0          6m13s
 notification-controller-55d8c759f5-zqd6f      1/1     Running   0          6m13s
 source-controller-58c66d55cd-4f6vh            1/1     Running   0          6m13s
-```
-
-Verify if the `GitRepository` is created fine to bootstrap a git repo:
-```bash
-❯ kubectl get gitrepositories.source.toolkit.fluxcd.io -A
-NAMESPACE     NAME            URL                                                         AGE   READY   STATUS
-flux-system   workloadsrepo   https://github.com/aws-samples/eks-blueprints-add-ons.git   24m   True    stored artifact for revision 'eks-blueprints-cdk@sha1:65f1fbbb5165821f6f8bd14eba65a6d2f6cfe0fb'
 ```
 
 ## Testing
@@ -75,7 +79,7 @@ curl -s https://fluxcd.io/install.sh | sudo bash
 . <(flux completion bash)
 ```
 
-Run the below command to check on the GitRepository setup with Flux :
+Run the below command to check on the `GitRepository` setup with Flux :
 
 ```bash
 kubectl get gitrepository -A
@@ -83,14 +87,11 @@ NAME      URL                                       AGE   READY   STATUS
 podinfo   https://github.com/stefanprodan/podinfo   5s    True    stored artifact for revision 'master@sha1:132f4e719209eb10b9485302f8593fc0e680f4fc'
 ```
 
-Run the below command to create a Kustomization using a source :
+Run the below command to check on the `Kustomization` setup with Flux :
 
 ```bash
-  flux create kustomization podinfo \
-    --namespace=flux-system \
-    --source=podinfo \
-    --path="./kustomize" \
-    --prune=true \
-    --interval=5m
+❯ kubectl get kustomizations.kustomize.toolkit.fluxcd.io -A
+NAMESPACE     NAME      AGE   READY   STATUS
+flux-system   podinfo   12m   True    Applied revision: master@sha1:073f1ec5aff930bd3411d33534e91cbe23302324
 ```
 

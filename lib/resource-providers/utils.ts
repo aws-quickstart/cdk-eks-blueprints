@@ -2,6 +2,7 @@ import { IResource } from 'aws-cdk-lib/core';
 import { DummyProxy } from '../utils/proxy-utils';
 import { ResourceContext } from '../spi';
 import { v4 as uuid } from 'uuid';
+import { IConstruct } from 'constructs';
 
 /**
  * Creates a proxy to the named resource provider. This proxy will resolve to the type of the 
@@ -18,7 +19,7 @@ import { v4 as uuid } from 'uuid';
  * @param resourceName 
  * @returns 
  */
-export function getNamedResource<T extends IResource = IResource>(resourceName : string) : T {
+export function getNamedResource<T extends IConstruct = IConstruct>(resourceName : string) : T {
     return new Proxy({} as T, new DummyProxy((resourceContext: ResourceContext) => {
         return resourceContext.get(resourceName) as T;
     }));
