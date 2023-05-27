@@ -167,6 +167,8 @@ export default class BlueprintConstruct {
             new blueprints.ApacheAirflowAddOn({
                 enableLogging: true,
                 s3Bucket: 'apache-airflow-s3-bucket-provider',
+                enableEfs: true,
+                efsFileSystem: 'apache-airflow-efs-provider'
             })
         ];
 

@@ -6,7 +6,7 @@ import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 
-import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { HelmAddOnUserProps } from "../helm-addon";
 import { HelmAddOn } from '../helm-addon/index';
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { EfsCsiDriverAddOn } from "../efs-csi-driver";
@@ -57,6 +57,8 @@ export interface AirflowAddOnProps extends HelmAddOnUserProps {
 
 const AIRFLOW = 'airflow';
 const RELEASE = 'blueprints-addon-apache-airflow';
+const AIRFLOWSC = 'apache-airflow-sc'
+const AIRFLOWPVC = 'efs-apache-airflow-pvc'
 
 /**
  * Default props to be used when creating the Helm chart
@@ -174,13 +176,49 @@ function populateValues(clusterInfo: ClusterInfo, ns: KubernetesManifest, helmOp
         const efs = clusterInfo.getRequiredResource<IFileSystem>(helmOptions.efsFileSystem!);
         assert(efs, "Please provide the name of EFS File System.");
 
+        // Need to create a storage class and pvc for the EFS
+        const efsResources = new KubernetesManifest(clusterInfo.cluster, 'apache-airflow-efs-sc', {
+            cluster: clusterInfo.cluster,
+            manifest: [{
+                apiVersion: "storage.k8s.io/v1",
+                kind: "StorageClass",
+                metadata: { name: AIRFLOWSC },
+                provisioner: "efs.csi.aws.com",
+                parameters: {
+                    provisioningMode: "efs-ap",
+                    fileSystemId: `${efs.fileSystemId}`,
+                    directoryPerms: "700",
+                    gidRangeStart: "1000",
+                    gidRangeEnd: "2000",
+                }
+            },
+            {
+                apiVersion: "v1",
+                kind: "PersistentVolumeClaim",
+                metadata: { 
+                    name: AIRFLOWPVC,
+                    namespace: `${ns}` 
+                },
+                spec: {
+                    accessModes: ["ReadWriteMany"],
+                    storageClassName: AIRFLOWSC,
+                    resources: {
+                        requests: {
+                            storage: '10Gi'
+                        }
+                    }
+                }
+            }],
+            overwrite: true,
+        });
+
         // Set helm custom values for persistent storage of DAGs
         setPath(values, "dags.persistence", {
             enabled: true,
             size: "10Gi",
-            storageClassName: "efs-sc",
+            storageClassName: AIRFLOWSC,
             accessMode: "ReadWriteMany",
-            existingClaim: ``
+            existingClaim: AIRFLOWPVC
         });
     }
 
