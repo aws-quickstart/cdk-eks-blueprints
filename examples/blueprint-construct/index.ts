@@ -57,7 +57,7 @@ export default class BlueprintConstruct {
             // }),
             // new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
-            // new blueprints.addons.ContainerInsightsAddOn(),
+            new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -207,7 +207,7 @@ export default class BlueprintConstruct {
                             "LaunchTemplate": "Custom",
                             "Instance": "ONDEMAND"
                         },
-                        requireImdsv2: true
+                        requireImdsv2: false
                     }
                 },
                 {

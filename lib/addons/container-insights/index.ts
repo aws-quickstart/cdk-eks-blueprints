@@ -5,8 +5,7 @@ import { assertEC2NodeGroup } from "../..";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
-import { createNamespace } from "../../utils";
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { conflictsWith, createNamespace } from "../../utils";
 
 export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
     values?: ValuesSchema
@@ -16,7 +15,7 @@ const defaultProps = {
     name: "adot-exporter-for-eks-on-ec2",
     namespace: undefined, // the chart will choke if this value is set
     chart: "adot-exporter-for-eks-on-ec2",
-    version: "0.10.0",
+    version: "0.15.0",
     release: "adot-eks-addon",
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };
@@ -30,6 +29,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
     /**
      * @override
      */
+    @conflictsWith("AdotCollectorAddOn")
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;        
         const nodeGroups = assertEC2NodeGroup(clusterInfo, ContainerInsightsAddOn.name);
@@ -63,9 +63,6 @@ export class ContainerInsightsAddOn extends HelmAddOn {
         let values: ValuesSchema = {
             awsRegion: cluster.stack.region,
             clusterName: cluster.clusterName,
-            fluentbit: {
-                enabled: true
-            },
             serviceAccount: {
                 create: false,
             },
