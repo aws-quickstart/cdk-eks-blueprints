@@ -62,8 +62,8 @@ export interface AirflowAddOnProps extends HelmAddOnUserProps {
 
 const AIRFLOW = 'airflow';
 const RELEASE = 'blueprints-addon-apache-airflow';
-const AIRFLOWSC = 'apache-airflow-sc'
-const AIRFLOWPVC = 'efs-apache-airflow-pvc'
+const AIRFLOWSC = 'apache-airflow-sc';
+const AIRFLOWPVC = 'efs-apache-airflow-pvc';
 
 /**
  * Default props to be used when creating the Helm chart
@@ -182,7 +182,7 @@ function populateValues(clusterInfo: ClusterInfo, ns: KubernetesManifest, helmOp
         assert(efs, "Please provide the name of EFS File System.");
 
         // Need to create a storage class and pvc for the EFS
-        const efsResources = new KubernetesManifest(clusterInfo.cluster, 'apache-airflow-efs-sc', {
+        new KubernetesManifest(clusterInfo.cluster, 'apache-airflow-efs-sc', {
             cluster: clusterInfo.cluster,
             manifest: [{
                 apiVersion: "storage.k8s.io/v1",
