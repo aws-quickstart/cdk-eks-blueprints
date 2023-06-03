@@ -1,0 +1,39 @@
+kind: Tackle
+apiVersion: tackle.konveyor.io/v1alpha1
+metadata:
+  name: "{{konveyorName}}"
+  namespace: "{{namespace}}"
+spec:
+  cache_data_volume_size: "{{cacheDataVolumeSize}}"
+  hub_bucket_volume_size: "{{hubBucketVolumeSize}}"
+  rwx_supported: "{{rwxSupported}}"
+  feature_auth_required: "{{featureAuthRequired}}"
+  feature_isolate_namespace: "{{featureIsolateNamespace}}"
+  hub_database_volume_size: "{{hubDatabaseVolumeSize}}"
+  keycloak_database_data_volume_size: "{{keycloakDatabaseDataVolumeSize}}"
+  pathfinder_database_data_volume_size: "{{pathfinderDatabaseDataVolumeSize}}"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ingressName}}"
+  namespace: "{{namespace}}"
+  annotations:      
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: "{{certificateArn}}"
+spec:
+  ingressClassName: alb
+  tls:
+  - hosts:
+      - "{{subdomain}}"
+  rules:
+  - http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: "{{serviceName}}"
+              port:
+                number: 8080
