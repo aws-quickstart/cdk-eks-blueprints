@@ -83,21 +83,7 @@ export const instanaProps = {
     endpointHost: "<INSTANA_ENDPOINT_HOST_URL>",// Mandatory Parameter
     endpointPort: "<INSTANA_ENDPOINT_HOST_PORT>",// Mandatory Parameter
     env: {
-    },
-    configuration_yaml:`
-    com.instana.plugin.host:
-          tags:
-            - 'dev'
-            - 'app1'
-      com.instana.plugin.javatrace:
-        instrumentation:
-          enabled: true
-          opentracing: true
-          sdk:
-            packages:
-              - 'com.instana.backend'
-              - 'com.instana.frontend'
-    `
+    }
   }
 };
 
