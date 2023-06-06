@@ -40,7 +40,22 @@ Example implementations:
 class VpcResourceProvider implements ResourceProvider<IVpc> {
     provide(context: ResourceContext): IVpc {
         const scope = context.scope; // stack
-        ...
+        return new Vpc(scope, '<vpc-name>', {
+            availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c'], // VPC spans all AZs
+            subnetConfiguration: [{
+                cidrMask: 24,
+                name: 'private',
+                subnetType: SubnetType.PRIVATE_WITH_EGRESS
+            }, {
+                cidrMask: 24,
+                name: 'public',
+                subnetType: SubnetType.PUBLIC
+            }],
+            natGatewaySubnets: {
+                availabilityZones: ['us-east-1b'] // NAT gateway only in 1 AZ 
+                subnetType: SubnetType.PUBLIC
+            }
+        });
     }
 }
 
@@ -124,6 +139,7 @@ export class ClusterInfo {
 **Registering Resource Providers for a Blueprint**
 
 Note: `GlobalResources.HostedZone` and `GlobalResources.Certificate` are provided for convenience as commonly referenced constants.
+Full list of Resource Providers can be found [here](https://aws-quickstart.github.io/cdk-eks-blueprints/api/modules/resources.html).
 
 ```typescript
 const myVpcId = ...;  // e.g. app.node.tryGetContext('my-vpc', 'default)  will look up property my-vpc in the cdk.json
@@ -229,7 +245,7 @@ blueprints.EksBlueprint.builder()
 ## Implementing Custom Resource Providers
 
 1. Select the type of the resource that you need. Let's say it will be an FSx File System. Note: it must be one of the derivatives/implementations of `IResource` interface.
-2. Implement ResourceProvider interface:
+2. Implement [`ResourceProvider`](https://aws-quickstart.github.io/cdk-eks-blueprints/api/interfaces/ResourceProvider.html) interface:
 
 ```typescript
 class MyResourceProvider implements blueprints.ResourceProvider<fsx.IFileSystem> {
