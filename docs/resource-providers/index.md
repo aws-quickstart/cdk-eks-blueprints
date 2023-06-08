@@ -40,7 +40,23 @@ Example implementations:
 class VpcResourceProvider implements ResourceProvider<IVpc> {
     provide(context: ResourceContext): IVpc {
         const scope = context.scope; // stack
-        return new Vpc(scope, '<vpc-name>', {
+        ...
+    }
+}
+
+class DynamoDbTableResourceProvider implements ResourceProvider<ITable> {
+    provide(context: ResourceContext): ITable {
+        ...
+    }
+}
+
+/**
+ * Example implementation of a VPC Provider that creates a NAT Gateway 
+ * which is available in all 3 AZs of the VPC while only being in one
+ */
+class OtherVpcResourceProvider implements ResourceProvider<IVpc> {
+    provide(context: ResourceContext): IVpc {
+        return new Vpc(context.scope, '<vpc-name>', {
             availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c'], // VPC spans all AZs
             subnetConfiguration: [{
                 cidrMask: 24,
@@ -56,12 +72,6 @@ class VpcResourceProvider implements ResourceProvider<IVpc> {
                 subnetType: SubnetType.PUBLIC
             }
         });
-    }
-}
-
-class DynamoDbTableResourceProvider implements ResourceProvider<ITable> {
-    provide(context: ResourceContext): ITable {
-        ...
     }
 }
 
