@@ -62,8 +62,8 @@ export interface AirflowAddOnProps extends HelmAddOnUserProps {
 
 const AIRFLOW = 'airflow';
 const RELEASE = 'blueprints-addon-apache-airflow';
-const AIRFLOWSC = 'apache-airflow-sc'
-const AIRFLOWPVC = 'efs-apache-airflow-pvc'
+const AIRFLOWSC = 'apache-airflow-sc';
+const AIRFLOWPVC = 'efs-apache-airflow-pvc';
 
 /**
  * Default props to be used when creating the Helm chart
@@ -216,6 +216,8 @@ function populateValues(clusterInfo: ClusterInfo, ns: KubernetesManifest, helmOp
             }],
             overwrite: true,
         });
+
+        efsResources.node.addDependency(ns);
 
         // Set helm custom values for persistent storage of DAGs
         setPath(values, "dags.persistence", {
