@@ -35,11 +35,11 @@ There should be list the grafana-operator namespace
 ```bash
 grafana-operator      Active   31m
 ```
-Verify if the pods are running correctly in flux-system namespace
+Verify if everything is running correctly in the grafana-operator namespace
 ```bash
-kubectl get pods -n grafana-operator  
+kubectl get all -n grafana-operator  
 ```
-There should list 3 pods starting with name flux-system
+This should list 1 pod, 1 service, 1 deployment, and 1 replica-set starting with name grafana-operator 
 For Eg:
 ```bash
 NAME                                                READY   STATUS    RESTARTS   AGE
