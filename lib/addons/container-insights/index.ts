@@ -47,7 +47,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
             serviceAccountNamespace = this.props.namespace;
         }
         else {
-            serviceAccountNamespace = "amazon-metrics"
+            serviceAccountNamespace = "amazon-metrics";
         }
 
         const ns = createNamespace(serviceAccountNamespace, cluster, true);
@@ -57,7 +57,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
         });
 
         // Apply Managed IAM policy to the service account.
-        sa.role.addManagedPolicy(policy)
+        sa.role.addManagedPolicy(policy);
         sa.node.addDependency(ns);
 
         let values: ValuesSchema = {
