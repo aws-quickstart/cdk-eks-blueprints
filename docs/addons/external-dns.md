@@ -16,12 +16,12 @@ const app = new cdk.App();
 const hostedZoneName = ...
 
 const addOn = new blueprints.addons.ExternalDnsAddOn({
-    hostedZoneProviders: [hostedZoneName]; // can be multiple
+    hostedZoneResources: [hostedZoneName]; // can be multiple
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
-  .resourceProvider(hostedZoneName, new blueprints.addons.LookupHostedZoneProvider(hostedZoneName))
+  .resourceProvider(hostedZoneName, new blueprints.LookupHostedZoneProvider(hostedZoneName))
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -75,8 +75,8 @@ blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
     .resourceProvider("MyHostedZone1", new blueprints.LookupHostedZoneProvider(myDomainName))
     .addOns(new blueprints.addons.ExternalDnsAddOn({
-        hostedZoneProviders: ["MyHostedZone1"];
-    })
+        hostedZoneResources: ["MyHostedZone1"];
+    }))
     .build(...);
 ```
 
@@ -86,10 +86,10 @@ If the hosted zone ID is known, then the recommended approach is to use a `Impor
 const myHostedZoneId = "";
 blueprints.EksBlueprint.builder()
     //  Register hosted zone1 under the name of MyHostedZone1
-    .resourceProvider("MyHostedZone1",  new blueprints.addons.ImportHostedZoneProvider(myHostedZoneId))
+    .resourceProvider("MyHostedZone1",  new blueprints.ImportHostedZoneProvider(myHostedZoneId))
     .addOns(new blueprints.addons.ExternalDnsAddOn({
-        hostedZoneProviders: ["MyHostedZone1"];
-    })
+        hostedZoneResources: ["MyHostedZone1"];
+    }))
     .build(...);
 ```
 
@@ -128,10 +128,10 @@ blueprints.EksBlueprint.builder()
         parentAccountId: parentDnsAccountId,
         delegatingRoleName: 'DomainOperatorRole',
         wildcardSubdomain: true
-    })
+    }))
     .addOns(new blueprints.addons.ExternalDnsAddOn({
-        hostedZoneProviders: ["MyHostedZone1"];
-    })
+        hostedZoneResources: ["MyHostedZone1"];
+    }))
 
 ```
 
