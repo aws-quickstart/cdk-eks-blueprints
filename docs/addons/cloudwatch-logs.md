@@ -16,9 +16,9 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.CloudWatchLogsAddon({
-	namespace: 'aws-for-fluent-bit',
+  namespace: 'aws-for-fluent-bit',
   createNamespace: true,
-	serviceAccountName: 'aws-fluent-bit-for-cw-sa',
+  serviceAccountName: 'aws-fluent-bit-for-cw-sa',
   logGroupPrefix: '/aws/eks/<your-cluster-name>',
   logRetentionDays: 90 
 });
