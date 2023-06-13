@@ -166,7 +166,10 @@ export default class BlueprintConstruct {
             // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
-            new blueprints.CloudWatchLogsAddon(),
+            new blueprints.CloudWatchLogsAddon({
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logRetentionDays: 30
+            }),
             new blueprints.ApacheAirflowAddOn({
                 enableLogging: true,
                 s3Bucket: 'apache-airflow-s3-bucket-provider',

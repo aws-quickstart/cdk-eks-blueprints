@@ -24,7 +24,7 @@ export interface CloudWatchLogsAddonProps extends HelmAddOnUserProps {
     /**
      * CloudWatch Log Group Name.
      */
-    logGroupPrefix?: string;
+    logGroupPrefix: string;
 
     /**
      * CloudWatch Log retention days
@@ -57,9 +57,9 @@ export class CloudWatchLogsAddon extends HelmAddOn {
 
     readonly options: CloudWatchLogsAddonProps;
 
-    constructor(props?: CloudWatchLogsAddonProps) {
+    constructor(props: CloudWatchLogsAddonProps) {
         super({ ...defaultProps as any, ...props });
-        this.options = this.props;
+        this.options = { ...defaultProps, ...this.props };
     }
 
     @conflictsWith('AwsForFluentBitAddOn')
