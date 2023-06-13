@@ -1,7 +1,10 @@
-# Paralus on EKS
+# Paralus Amazon EKS Addon
+
 The Paralus project is a free, open source tool that enables controlled, audited access to Kubernetes infrastructure. It comes with just-in-time service account creation and user-level credential management that integrates with your RBAC and SSO. [Learn more ..](https://www.paralus.io/)
 
-This pattern deploys the following resources:
+Paralus Blueprint Addon deploys paralus controller on your EKS cluster using [paralus construct](https://github.com/aws-samples/cdk-eks-blueprints-patterns/tree/main/lib/paralus-construct) implemented with the EKS Bleuprints [CDK](https://aws.amazon.com/cdk/). Detailed documentation on the same can be accessed from [here](https://github.com/aws-samples/cdk-eks-blueprints-patterns/blob/main/docs/patterns/paralus.md).
+
+Paralus Addon deploys the following resources:
 
 - Creates EKS Cluster Control plane with public endpoint (for demo purpose only) with a managed node group
 - Deploys supporting add-ons:  AwsLoadBalancerController, VpcCni, KubeProxy, EbsCsiDriverAddOn
@@ -9,78 +12,86 @@ This pattern deploys the following resources:
 
 NOTE: By default paralus installs few dependent modules like postgres, kratos and also comes with a dashboard. At it's core paralus works atop domain based routing, inter service communication and hence above supporting Add-Ons are required. 
 
-## Prerequisites:
+## These features makes kubernetes rbac management centralized with a seamless experience
 
-Ensure that you have installed the following tools on your machine.
+- Creation of custom [roles, users, and groups](https://www.paralus.io/docs/usage/roles).
+- Dynamic and immediate changing and revoking of permissions.
+- Ability to control access via [pre-configured roles](https://www.paralus.io/docs/usage/) across clusters, namespaces, projects, and more.
+- Seamless integration with [Identity Providers (IdPs)](https://www.paralus.io/docs/single-sign-on/) allowing the use of external authentication engines for users and group definitions, such as GitHub, Google, Azure AD, Okta, and others.
+- [Automatic logging](https://www.paralus.io/docs/usage/audit-logs) of all user actions performed for audit and compliance purposes.
+- Interact with Paralus either with a modern web GUI (default), a CLI tool called [pctl](https://www.paralus.io/docs/usage/cli), or [Paralus API](https://www.paralus.io/docs/references/api-reference).
+  
+<p align="center">
+  <a href="https://paralus.io">
+    <img alt="Kubernetes Goat" src="https://raw.githubusercontent.com/paralus/paralus/main/paralus.gif" width="600" />
+  </a>
+</p>
 
-1. [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-2. [kubectl](https://Kubernetes.io/docs/tasks/tools/)
-3. [cdk](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install)
-4. [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
 
+## Prerequisite
 
-## Deploy EKS Cluster with Amazon EKS Blueprints for CDK
+You must have a domain and access to updating it's DNS records as paralus works atop domain based routing.
 
-Clone the repository
+## Usage
 
-```sh
-git clone https://github.com/aws-samples/cdk-eks-blueprints-patterns.git
+Run the following command to install the paralus-eks-blueprints-addon dependency in your project.
+
+```
+npm i @paralus/paralus-eks-blueprints-addon
 ```
 
-Update fqdn information for your installation
+# Sample EKS Blueprint using Paralus addon
 
 ```
-    fqdn": {
-        "domain": <yourdomain.com>,
-        "hostname": "console-eks",
-        "coreConnectorSubdomain": "*.core-connector.eks",
-        "userSubdomain": "*.user.eks"
-    }
+import { App } from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { ParalusAddOn } from '../dist';
+
+const app = new App();
+
+blueprints.EksBlueprint.builder()
+     .addOns(
+        new blueprints.AwsLoadBalancerControllerAddOn(),
+        new blueprints.VpcCniAddOn(),
+        new blueprints.KubeProxyAddOn(),
+        new blueprints.EbsCsiDriverAddOn(),
+        new blueprints.CertManagerAddOn(),
+        new ParalusAddOn({
+         namespace: 'paralus-system',
+         /**
+         * Values to pass to the chart as per https://github.com/paralus/helm-charts/blob/main/charts/ztka/values.yaml.
+         */
+         // update this to your domain, as paralus works based on domain based routing
+         values: {
+            fqdn": {
+                "domain": <yourdomain.com>,
+                "hostname": "console-eks",
+                "coreConnectorSubdomain": "*.core-connector.eks",
+                "userSubdomain": "*.user.eks"
+            }        
+         }
+     }))
+     .teams()
+     .build(app, 'paralus-test-blueprint');
 ```
 
-Updating npm
+## AddOn Options
 
-```sh
-npm install -g npm@latest
-```
-
-To view patterns and deploy paralus pattern
-
-```sh
-cdk list
-cdk bootstrap
-cdk deploy paralus-blueprint
-```
-
-
-## Verify the resources
-
-Run update-kubeconfig command. You should be able to get the command from CDK output message. More information can be found at https://aws-quickstart.github.io/cdk-eks-blueprints/getting-started/#cluster-access
-```sh
-aws eks update-kubeconfig --name <your cluster name> --region <your region> --role-arn arn:aws:iam::378123694894:role/paralus-blueprint-paralusblueprintMastersRoleF3287-EI3XEBO1107B
-```
-
-Let’s verify the resources created by Steps above.
-```sh
-kubectl get nodes # Output shows the EKS Managed Node group nodes
-
-kubectl get ns | grep paralus # Output shows paralus namespace
-
-kubectl get pods --namespace=paralus-system  # Output shows paralus pods
-
-blueprints-addon-paralus-contour-contour-7857f4cd9-kqhgp   1/1     Running                 
-blueprints-addon-paralus-contour-envoy-mx8z7               2/2     Running                 
-blueprints-addon-paralus-fluent-bit-525tt                  1/1     Running                 
-blueprints-addon-paralus-kratos-588775bc47-wf5gf           2/2     Running                 
-blueprints-addon-paralus-kratos-courier-0                  2/2     Running                 
-blueprints-addon-paralus-postgresql-0                      1/1     Running                 
-dashboard-6d8b54d78b-d8cks                                 1/1     Running                 
-paralus-66d9bbf698-qznzl                                   2/2     Running                 
-prompt-54d45cff79-h9x95                                    2/2     Running   
-relay-server-79448564cb-nf5tj                              2/2     Running              
-```
-
-[Learn more](https://www.paralus.io/docs/architecture/core-components) about the various components that are deployed as part of paralus.
+| Option                  | Description                                         | Default                       |
+|-------------------------|-----------------------------------------------------|-------------------------------|
+| `deploy.contour.enable`                | Deploy and use Contour as the default ingress                                | true                            |
+| `deploy.kratos.enable`                | Deploy and use Kratos                                | true                            |
+| `deploy.postgresql.enable`  | Deploy and use postgres database             | false                            |
+| `deploy.postgresql.dsn`  | DSN of your existing postgres database for paralus to use             | ""                            |
+| `deploy.fluentbit.enable`       | Deploy and use fluentbit for auditlogs with database storage    | ""                            |
+| `paralus.initialize.adminEmail`       | Admin email to access paralus    | "admin@paralus.local"                            |
+| `paralus.initialize.org`             | Organization name using paralus    | "ParalusOrg"                     |
+| `auditLogs.storage`               | Default storage of auditlogs               | "database"                     |
+| `fqdn.domain`               | Root domain               | "paralus.local"                     |
+| `fqdn.hostname`               | subdomain used for viewing dashboard               | "console"                     |
+| `fqdn.coreConnectorSubdomain`               | a wildcard subdomain used for controller cluster to target cluster communication               | "*.core-connector"                     |
+| `fqdn.userSubdomain`               | a wildcard subdomain used for controller cluster to end user communication               | "*.user"                     |
+| `values`                | Configuration values passed to the chart. [See options](https://github.com/paralus/helm-charts/tree/main/charts/ztka#values). | {}                            |
 
 ## Configure DNS Settings 
 Once Paralus is installed continue with following steps to configure DNS settings, reset default password and start using paralus
@@ -113,32 +124,11 @@ You can now access dashboard with http://console-eks.<yourdomain.com> ( refers t
 
 Note: you can also refer to this [paralus eks blogpost](https://www.paralus.io/blog/eks-quickstart#configuring-dns-settings)
 
-## Paralus Features & Usage 
-https://www.paralus.io/docs/usage/
-
-## Configuring centralized kubectl access to clusters
-Kubectl is one of the most widely used tools to work with Kubernetes. The command line tool allows you to deploy applications, inspect and manage resources. It basically authenticates with the control plane for your cluster and makes API calls to the Kubernetes API. In short if you are working with Kubernetes - you will use kubectl the most.
-
-In most modern day scenarios, there are multiple users who are accessing various clusters. This makes it all more important to ensure that every user or group has access to only those resources that they are allowed to. Few ways to achieve this is using namespaces and role based access control. While these are good, most enterprise grade application deployments require something more robust.
-
-That’s where Paralus comes in. It allows you to configure centralized kubectl access to multiple clusters all from a single dashboard. It allows you to create groups, assign projects and users and provide access. In this blog post, we’ll show you how to import different clusters to Paralus and configure access to them. All of this with zero trust principles built in. [Read More](https://www.paralus.io/blog/centralized-kubectl-access#the-use-case)
-
-## Cleanup
-
-To clean up your EKS Blueprints, run the following commands:
-
-
-```sh
-cdk destroy paralus-blueprint 
-
-```
-
-## Troubleshooting
-If postgres pvc is not getting a volume allocated, it probably is due to the iam permissions. Please refer this https://docs.aws.amazon.com/eks/latest/userguide/csi-iam-role.html to assign approriate policies to kubernetes sa
-
 ## Disclaimer 
 This pattern relies on an open source NPM package paralus-eks-blueprints-addon. Please refer to the package npm site for more information.
 https://www.npmjs.com/package/@paralus/paralus-eks-blueprints-addon
 
 If you have any questions about the npm package or find any defect, please post in the source repo at 
 https://github.com/paralus/eks-blueprints-addon
+
+Paralus is maintained and supported by [Rafay](https://rafay.co)
