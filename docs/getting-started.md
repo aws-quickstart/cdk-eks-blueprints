@@ -77,7 +77,7 @@ For application of the EKS Blueprints Framework with [AWS Organizations](https:/
 [Bootstrap](https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html) your environment with the following command. 
 
 ```bash
-cdk bootstrap
+cdk bootstrap aws://<your-account-number>/<region-to-bootstrap>
 ```
 
 Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.

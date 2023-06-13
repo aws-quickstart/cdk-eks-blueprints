@@ -195,7 +195,7 @@ const defaultProps: CoreAddOnProps = {
   version: 'v1.12.6-eksbuild.2',
   saName: 'aws-node',
   namespace: 'kube-system',
-  controlPlaneAddOn: true,
+  controlPlaneAddOn: false,
   configurationValues: {}
 };
 
