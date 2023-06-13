@@ -90,6 +90,11 @@ export function isCodeStarConnection(
  */
 export type PipelineProps = {
 
+  /**
+   * Application name (optional, default to the app set in the cdk.json)
+   */
+  application?: string;
+
     /**
      * The name for the pipeline.
      */
@@ -202,6 +207,11 @@ export class CodePipelineBuilder implements StackBuilder {
         this.props = { crossAccountKeys: false, stages: [], waves: []};
     }
 
+    public application(app: string): CodePipelineBuilder {
+      this.props.application = app;
+      return this;
+    }
+
     public name(name: string): CodePipelineBuilder {
         this.props.name = name;
         return this;
@@ -266,27 +276,27 @@ export class CodePipelineBuilder implements StackBuilder {
         return this;
     }
 
-  build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
-    assert(
-      this.props.name,
-      'name field is required for the pipeline stack. Please provide value.'
-    );
-    assert(
-      this.props.stages,
-      'Stage field is required for the pipeline stack. Please provide value.'
-    );
-    if (this.props.repository) {
-      let gitHubRepo = this.props.repository as GitHubSourceRepository;
-      if (!isCodeCommitRepo(this.props.repository)) {
-        assert(
-          this.props.owner || gitHubRepo.owner,
-          'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
-        );
+    build(scope: Construct, id: string, stackProps?: cdk.StackProps): cdk.Stack {
+      assert(
+        this.props.name,
+        'name field is required for the pipeline stack. Please provide value.'
+      );
+      assert(
+        this.props.stages,
+        'Stage field is required for the pipeline stack. Please provide value.'
+      );
+      if (this.props.repository) {
+        let gitHubRepo = this.props.repository as GitHubSourceRepository;
+        if (!isCodeCommitRepo(this.props.repository)) {
+          assert(
+            this.props.owner || gitHubRepo.owner,
+            'repository.owner field is required for the GitHub or CodeStar connection pipeline stack. Please provide value.'
+          );
+        }
       }
+      const fullProps = this.props as PipelineProps;
+      return new CodePipelineStack(scope, fullProps, id, stackProps);
     }
-    const fullProps = this.props as PipelineProps;
-    return new CodePipelineStack(scope, fullProps, id, stackProps);
-  }
 }
 
 
@@ -421,6 +431,8 @@ class CodePipeline {
           }
         }
 
+        const app = props.application ? `--app '${props.application}'` : "";
+
         return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
@@ -430,7 +442,7 @@ class CodePipeline {
                 'npm install -g aws-cdk@2.81.0',
                 'npm install',
               ],
-              commands: ['npm run build', 'npx cdk synth']
+              commands: ['npm run build', 'npx cdk synth ' + app]
             }),
             crossAccountKeys: props.crossAccountKeys,
             codeBuildDefaults: {
