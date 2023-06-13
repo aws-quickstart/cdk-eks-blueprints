@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
