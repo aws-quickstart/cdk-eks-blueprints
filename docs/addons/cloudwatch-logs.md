@@ -4,7 +4,7 @@ Fluent Bit is an open source Log Processor and Forwarder which allows you to col
 
 AWS provides a Fluent Bit image with plugins for CloudWatch Logs, Kinesis Data Firehose, Kinesis Data Stream and Amazon OpenSearch Service.
 
-This add-on will take care of handling both node and application level logging. THis add-on is configured to stream the worker node logs to CloudWatch Logs. The [AWS for Fluent Bit image](https://gallery.ecr.aws/aws-observability/aws-for-fluent-bit) is available on the Amazon ECR Public Gallery. For more details, see [AWS for Fluent Bit GitHub repository](https://github.com/aws/aws-for-fluent-bit).
+This add-on will take care of handling both node and application level logging. It is configured to stream the worker node logs to CloudWatch Logs. The [AWS for Fluent Bit image](https://gallery.ecr.aws/aws-observability/aws-for-fluent-bit) is available on the Amazon ECR Public Gallery. For more details, see [AWS for Fluent Bit GitHub repository](https://github.com/aws/aws-for-fluent-bit).
 
 ## Usage
 
