@@ -70,7 +70,7 @@ The framework currently supports the following add-ons.
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  | ✅ | ✅ |
 | [`XrayAddOn`](./xray.md)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                                   | NA | NA
 | [`XrayAdotAddOn`](./xray-adot-addon.md)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 | ✅ | ✅ |
-                                                                 |
+| [`GmaestroAddOn`](./gmaestro.md) | Adds [gMaestro](https://app.granulate.io/gMaestroSignup) cost optimization solution for EKS cluster.                                                                         |
 
 # Standard Helm Add-On Configuration Options
 
