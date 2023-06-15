@@ -1,7 +1,7 @@
 ## VPC Resourcer Providers
 
 ### VpcProvider
-If given a VPC id, looks up the corresponding vpc and provides it. Otherwise, creates a VPC with the optionally provided CIDRs and subnet CIDRs or the default values and provides it to the stack.
+If given a VPC id, looks up the corresponding VPC and provides it. Otherwise, creates a new VPC with the optionally provided CIDRs and subnet CIDRs or the default values and provides it to the stack.
 
 Example Implementations:
 ```typescript

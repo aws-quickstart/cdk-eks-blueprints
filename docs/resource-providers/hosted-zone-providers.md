@@ -23,7 +23,7 @@ blueprints.EksBlueprint.builder()
 ```
 
 ### DelegatingHostedZoneProvider
-Convenience approach to create a global hosted zone record in a centralized account and subdomain records in workload accounts and provide it to the stack.
+Convenient approach to create a global hosted zone record in a centralized account and subdomain records in workload accounts and provide it to the stack.
 
 Example Implementation:
 ```typescript
