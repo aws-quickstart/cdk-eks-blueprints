@@ -50,6 +50,31 @@ class DynamoDbTableResourceProvider implements ResourceProvider<ITable> {
     }
 }
 
+/**
+ * Example implementation of a VPC Provider that creates a NAT Gateway 
+ * which is available in all 3 AZs of the VPC while only being in one
+ */
+class OtherVpcResourceProvider implements ResourceProvider<IVpc> {
+    provide(context: ResourceContext): IVpc {
+        return new Vpc(context.scope, '<vpc-name>', {
+            availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c'], // VPC spans all AZs
+            subnetConfiguration: [{
+                cidrMask: 24,
+                name: 'private',
+                subnetType: SubnetType.PRIVATE_WITH_EGRESS
+            }, {
+                cidrMask: 24,
+                name: 'public',
+                subnetType: SubnetType.PUBLIC
+            }],
+            natGatewaySubnets: {
+                availabilityZones: ['us-east-1b'] // NAT gateway only in 1 AZ 
+                subnetType: SubnetType.PUBLIC
+            }
+        });
+    }
+}
+
 ```
 
 Access to registered resources from other resource providers and/or add-ons and teams:
@@ -124,15 +149,16 @@ export class ClusterInfo {
 **Registering Resource Providers for a Blueprint**
 
 Note: `GlobalResources.HostedZone` and `GlobalResources.Certificate` are provided for convenience as commonly referenced constants.
+Full list of Resource Providers can be found [here](https://aws-quickstart.github.io/cdk-eks-blueprints/api/modules/resources.html).
 
 ```typescript
 const myVpcId = ...;  // e.g. app.node.tryGetContext('my-vpc', 'default)  will look up property my-vpc in the cdk.json
 
 blueprints.EksBlueprint.builder()
     //  Specify VPC for the cluster (if not set, a new VPC will be provisioned as per EKS Best Practices)
-    .resourceProvider(GlobalResources.VPC, new VpcProvider(myVpcId)
+    .resourceProvider(GlobalResources.VPC, new VpcProvider(myVpcId))
     //  Specify KMS Key as cluster secrets encryption key
-    .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider('my-alias-name')    
+    .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider('my-alias-name'))    
     //  Register hosted zone and give it a name of GlobalResources.HostedZone
     .resourceProvider(GlobalResources.HostedZone, new ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
     .resourceProvider("internal-hosted-zone", new ImportHostedZoneProvider('hosted-zone-id2', 'myinternal.domain.com'))
@@ -141,6 +167,12 @@ blueprints.EksBlueprint.builder()
     .resourceProvider("private-ca", new CreateCertificateProvider('internal-wildcard-cert', '*.myinternal.domain.com', "internal-hosted-zone"))
     // Create EFS file system and register it under the name of efs-file-system
     .resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))
+    // Create an S3 bucket and register it
+    .resourceProvider('blueprint-s3', new blueprints.CreateS3BucketProvider({
+        name: `bucket-name`, // This bucket name must be globally unique 
+        id: 'blueprints-s3-bucket-id',
+        s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+    }))
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({hostedZoneResources: [GlobalResources.HostedZone]}))
@@ -200,7 +232,6 @@ blueprints.EksBlueprint.builder()
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
     .build(scope, blueprintID, props);
-}
 ```
 
 Example with a named resource:
@@ -219,18 +250,17 @@ blueprints.EksBlueprint.builder()
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
     .build(scope, blueprintID, props);
-}
 ```
 
 ## Implementing Custom Resource Providers
 
-1. Select the type of the resource that you need. Let's say it will be an S3 Bucket. Note: it must be one of the derivatives/implementations of `IResource` interface.
-2. Implement ResourceProvider interface:
+1. Select the type of the resource that you need. Let's say it will be an FSx File System. Note: it must be one of the derivatives/implementations of `IResource` interface.
+2. Implement [`ResourceProvider`](https://aws-quickstart.github.io/cdk-eks-blueprints/api/interfaces/ResourceProvider.html) interface:
 
 ```typescript
-class MyResourceProvider implements blueprints.ResourceProvider<s3.IBucket> {
+class MyResourceProvider implements blueprints.ResourceProvider<fsx.IFileSystem> {
     provide(context: blueprints.ResourceContext): s3.IBucket {
-        return new s3.Bucket(context.scope, "mybucket");
+        return new fsx.LustreFileSystem(context.scope, "FsxLustreFileSystem");
     }
 }
 ```
@@ -239,7 +269,7 @@ class MyResourceProvider implements blueprints.ResourceProvider<s3.IBucket> {
 
 ```typescript
 blueprints.EksBlueprint.builder()
-    .resourceProvider("mybucket" ,new MyResourceProvider())
+    .resourceProvider("FsxLustreFileSystem" ,new MyResourceProvider())
     .addOns(...)
     .teams(...)
     .build();
@@ -250,8 +280,8 @@ blueprints.EksBlueprint.builder()
 ```typescript
 class MyCustomAddOn implements blueprints.ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void | Promise<cdk.Construct> {
-        const myBucket: s3.IBucket = clusterInfo.getRequiredResource('mybucket'); // will fail if mybucket does not exist
-        // do something with the bucket
+        const myFsxfileSystem: fsx.LustreFileSystem = clusterInfo.getRequiredResource('FsxLustreFileSystem'); // will fail if the file system does not exist
+        // do something with the file system
     }
 }
 

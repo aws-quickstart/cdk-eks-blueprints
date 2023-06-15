@@ -14,7 +14,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.ClusterAutoscalerAddOn();
+const addOn = new blueprints.addons.ClusterAutoScalerAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)

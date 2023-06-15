@@ -34,24 +34,15 @@ Pattern # 2 : Overriding property values for Name and Tags for a custom AMP Work
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
+const ampWorkspaceName = "blueprints-amp-workspace";
+const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
 const addOn = new blueprints.addons.AmpAddOn({
-    workspaceName: 'sample-AMP-Workspace',
-    workspaceTag: [{
-            key: 'Name',
-            value: 'Sample-AMP-Workspace',
-        },
-        {
-            key: 'Environment',
-            value: 'Development',
-        },
-        {
-            key: 'Department',
-            value: 'Operations',
-    }],
+    ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
     deploymentMode: DeploymentMode.DEPLOYMENT,
     namespace: 'default',
     name: 'adot-collector-amp'
@@ -59,9 +50,23 @@ const addOn = new blueprints.addons.AmpAddOn({
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
+  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName,{
+    {
+        key: 'Name',
+        value: 'Sample-AMP-Workspace',
+    },
+    {
+        key: 'Environment',
+        value: 'Development',
+    },
+    {
+        key: 'Department',
+        value: 'Operations',
+    }
+  }))
   .build(app, 'my-stack-name');
 ```
-Pattern # 3 : Passing on AMP Remote Write Endpoint URL of an existing AMP workspace to be used to remote write metrics. This pattern does not create an AMP workspace. Deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `deployment` as the mode to remote write metrics to AMP workspace of the URL passed as input. This pattern ignores any other property values passed if `prometheusRemoteWriteURL` is present.
+Pattern # 3 : Passing on AMP Remote Endpoint of an existing AMP workspace to be used to remote write metrics. This pattern does not create an AMP workspace. Deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `deployment` as the mode to remote write metrics to AMP workspace of the URL passed as input. This pattern ignores any other property values passed if `ampPrometheusEndpoint` is present.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -69,8 +74,10 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
+const ampPrometheusEndpoint = "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-e859f589-7eed-43c1-a82b-58f44119f17d";
+
 const addOn = new blueprints.addons.AmpAddOn({
-    prometheusRemoteWriteURL: 'https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-e859f589-7eed-43c1-a82b-58f44119f17d/api/v1/remote_write',
+    ampPrometheusEndpoint: ampPrometheusEndpoint,
     deploymentMode: DeploymentMode.DEPLOYMENT,
     namespace: 'default',
     name: 'adot-collector-amp'
@@ -85,24 +92,15 @@ Pattern # 4 : Overriding property values for different deployment Modes. This pa
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
+const ampWorkspaceName = "blueprints-amp-workspace";
+const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
 
 const addOn = new blueprints.addons.AmpAddOn({
-    workspaceName: 'sample-AMP-Workspace',
-    workspaceTag: [{
-            key: 'Name',
-            value: 'Sample-AMP-Workspace',
-        },
-        {
-            key: 'Environment',
-            value: 'Development',
-        },
-        {
-            key: 'Department',
-            value: 'Operations',
-    }],
+    ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
     deploymentMode: DeploymentMode.DAEMONSET,
     namespace: 'default',
     name: 'adot-collector-amp'
@@ -110,8 +108,23 @@ const addOn = new blueprints.addons.AmpAddOn({
     // deploymentMode: DeploymentMode.STATEFULSET
     // deploymentMode: DeploymentMode.SIDECAR
 })
+
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
+  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName,{
+    {
+        key: 'Name',
+        value: 'Sample-AMP-Workspace',
+    },
+    {
+        key: 'Environment',
+        value: 'Development',
+    },
+    {
+        key: 'Department',
+        value: 'Operations',
+    }
+  }))
   .build(app, 'my-stack-name');
 ```
 
@@ -143,7 +156,7 @@ To test whether Amazon Managed Service for Prometheus received the metrics, Plea
 For instructions on installing awscurl, see [awscurl](https://github.com/okigan/awscurl).
 
 ```bash
-AMP_WORKSPACE_NAME="sample-AMP-Workspace" 
+AMP_WORKSPACE_NAME="blueprints-amp-workspace" 
 # The above should be replaced with your AMP workspace name if you are passing remote write URL specified in Pattern #3.
 WORKSPACE_ID=$(aws amp list-workspaces \
   --alias $AMP_WORKSPACE_NAME --region=${AWS_REGION} --query 'workspaces[0].[workspaceId]' --output text)

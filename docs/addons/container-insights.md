@@ -10,6 +10,8 @@ CloudWatch does not automatically create all possible metrics from the log data,
 
 Metrics collected by Container Insights are charged as custom metrics. For more information about [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), see Amazon CloudWatch Pricing.
 
+Also it is important to note that this add-on can not co-exist with `adot-addon` on same EKS cluster. `adot-addon` and this add-on is mutually exclusive due to `adot-collector-sa` service account.
+
 ## Usage
 
 Add the following as an add-on to your main.ts file to add Containers Insights to your cluster
@@ -34,7 +36,7 @@ Once the Container Insights add-on has been installed in your cluster, validate 
 
 ```bash
 kubectl get all -n amazon-cloudwatch 
-kubectl get all -n amzn-cloudwatch-metrics
+kubectl get all -n amazon-metrics
 ```
 
 You should see output similar to the following respectively (assuming two node cluster): 
@@ -48,11 +50,11 @@ NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE  
 daemonset.apps/fluent-bit   2         2         2       2            2           <none>          100s
 
 NAME                                 READY   STATUS    RESTARTS   AGE
-pod/adot-collector-daemonset-b2rpc   1/1     Running   0          106s
-pod/adot-collector-daemonset-k6tfw   1/1     Running   2          106s
+pod/adot-collector-daemonset-k7n4p   1/1     Running   0          2m4s
+pod/adot-collector-daemonset-qjdps   1/1     Running   0          114s
 
 NAME                                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-daemonset.apps/adot-collector-daemonset   2         2         2       2            2           <none>          106s
+daemonset.apps/adot-collector-daemonset   2         2         2       2            2           <none>          73m
 ```
 
 To enable or disable control plane logs with the console, run the following command in your terminal.

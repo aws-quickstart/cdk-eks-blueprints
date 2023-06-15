@@ -7,6 +7,7 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -41,6 +42,17 @@ export default class BlueprintConstruct {
             iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
         ]);
 
+        const ampWorkspaceName = "blueprints-amp-workspace";
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+
+        const apacheAirflowS3Bucket = new blueprints.CreateS3BucketProvider({
+            id: 'apache-airflow-s3-bucket-id',
+            s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+        });
+        const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
+            name: 'blueprints-apache-airflow-efs',    
+        });
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -48,9 +60,12 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.AmpAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+            }),
             new blueprints.addons.XrayAdotAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -147,9 +162,20 @@ export default class BlueprintConstruct {
             // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
-            new blueprints.AwsForFluentBitAddOn(),
+            // Commenting due to conflicts with `CloudWatchLogsAddon`
+            // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
+            new blueprints.CloudWatchLogsAddon({
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logRetentionDays: 30
+            }),
+            new blueprints.ApacheAirflowAddOn({
+                enableLogging: true,
+                s3Bucket: 'apache-airflow-s3-bucket-provider',
+                enableEfs: true,
+                efsFileSystem: 'apache-airflow-efs-provider'
+            })
         ];
 
         // Instantiated to for helm version check.
@@ -189,7 +215,7 @@ export default class BlueprintConstruct {
                             "LaunchTemplate": "Custom",
                             "Instance": "ONDEMAND"
                         },
-                        requireImdsv2: true
+                        requireImdsv2: false
                     }
                 },
                 {
@@ -274,7 +300,10 @@ export default class BlueprintConstruct {
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
             .resourceProvider("node-role", nodeRole)
+            .resourceProvider('apache-airflow-s3-bucket-provider', apacheAirflowS3Bucket)
+            .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
             .clusterProvider(clusterProvider)
+            .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);

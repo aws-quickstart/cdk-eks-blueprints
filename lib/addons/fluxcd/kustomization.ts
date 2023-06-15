@@ -1,3 +1,4 @@
+import { setPath } from "../../utils";
 import * as spi from "../../spi";
 
 /**
@@ -7,10 +8,10 @@ export class FluxKustomization {
 
     constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
-    public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string) {
+    public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values) {
 
         const repository = this.bootstrapRepo!;
-        return {
+        const kustomizationManifest = {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
             kind: "Kustomization",
             metadata: {
@@ -26,8 +27,14 @@ export class FluxKustomization {
                 },
                 path: repository.path,
                 prune: fluxPrune,
-                timeout: fluxTimeout,
+                timeout: fluxTimeout
             }
         };
+        if (bootstrapValues) {
+            setPath(kustomizationManifest, "spec.postBuild.substitute", bootstrapValues);
+        }
+        return kustomizationManifest;
     }
 }
+
+
