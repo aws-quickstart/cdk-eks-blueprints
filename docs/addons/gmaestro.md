@@ -34,7 +34,7 @@ $ npm i @granulate/gmaestro-eks-blueprints-addon
 
 ```typescript
 import 'source-map-support/register';
-import * as CDK from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 import {GmaestroAddOn} from '@granulate/gmaestro-eks-blueprints-addon';
 
