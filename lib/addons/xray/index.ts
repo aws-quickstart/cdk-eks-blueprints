@@ -22,10 +22,10 @@ export class XrayAddOn implements ClusterAddOn {
         });
 
         // Apply manifest
-        const doc = readYamlDocument(__dirname + '/xray-ds.yaml');
+        const doc = readYamlDocument(__dirname + '/xray-ds.ytpl');
         const docArray = doc.replace(/{{cluster_name}}/g, cluster.clusterName).replace(/{{region_name}}/g, cluster.stack.region);
         const manifest = docArray.split("---").map(e => loadYaml(e));
-        const statement = new KubernetesManifest(cluster.stack, "xray-daemon", {
+        new KubernetesManifest(cluster.stack, "xray-daemon", {
             cluster,
             manifest,
             overwrite: true

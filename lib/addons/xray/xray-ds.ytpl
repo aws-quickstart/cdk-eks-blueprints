@@ -95,8 +95,8 @@ spec:
 # need to replace the placeholders {{cluster_name}} and {{region_name}}
 apiVersion: v1
 data:
-  cluster.name: {{cluster_name}}
-  logs.region: {{region_name}}
+  cluster.name: "{{cluster_name}}"
+  logs.region: "{{region_name}}"
 kind: ConfigMap
 metadata:
   name: cluster-info
