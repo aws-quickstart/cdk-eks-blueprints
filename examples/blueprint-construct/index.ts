@@ -64,6 +64,7 @@ export default class BlueprintConstruct {
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
             }),
             new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
