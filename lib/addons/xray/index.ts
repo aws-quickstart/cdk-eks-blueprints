@@ -6,7 +6,7 @@ import { loadYaml, readYamlDocument } from "../../utils";
 
 /**
  * Implementation of AWS X-Ray add-on for EKS Blueprints. Installs xray daemonset and exposes 
- * an internal ClusterIP service for tracing on port 25888 (UDP).
+ * an internal ClusterIP service for tracing on port 2000 (UDP).
  */
 export class XrayAddOn implements ClusterAddOn {
 
