@@ -147,7 +147,7 @@ export class KonveyorAddOn implements ClusterAddOn {
         konveyorOperatorStatement.node.addDependency(waitOLMDeployment);
 
         // load Tackle and Ingress resources
-        const doc = readYamlDocument("/Users/freschri/Library/CloudStorage/WorkDocsDrive-Documents/code/Backstage/blueprints_patterns/cdk-eks-blueprints-patterns/lib/konveyor/tackle-manifest.ytpl");
+        const doc = readYamlDocument(__dirname + "/tackle-manifest.ytpl");
         const konveyorManifest = doc.split("---").map(e => loadYaml(e));
         
         const certificateArn = clusterInfo.getResource<ICertificate>(this.props.certificateResourceName)?.certificateArn;

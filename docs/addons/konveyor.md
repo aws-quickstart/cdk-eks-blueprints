@@ -2,6 +2,8 @@
 
 This add-on installs [Konveyor](https://konveyor.github.io/).
 
+Konveyor helps large organizations modernize enterprise java applications to Kubernetes. It serves as a platform providing a view of an organization's applications, allowing Assessment and Analysis capabilities to be executed at scale to help Architects get a better feel of the issues present in application source code in regard to deploying to a new environment such as Kubernetes, or other technologies.
+
 ## Dependencies
 
 The add-on depends on the following components:
