@@ -2,6 +2,7 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Construct } from 'constructs';
 import { loadYaml } from "../../utils/yaml-utils";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import * as assert from "assert";
 
 const OLMDownloadURL = "https://github.com/operator-framework/operator-lifecycle-manager/releases/download/";
 
@@ -34,9 +35,12 @@ export class OlmAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void | Promise<Construct> {
       let previousResource: Construct;
       const resources: Construct[] = [];
+
+      /* eslint-disable */
+      const request = require('sync-request');
+      const kubectlProvider = new KubectlProvider(clusterInfo);
+
       this.manifestUrls!.map((manifestUrl, urlIndex) => {
-        /* eslint-disable */
-        const request = require('sync-request');
         const response = request('GET', manifestUrl);
         // workaround: KubectlProvider is based on Lambda, which fails if the manifests are too large, so we:
         // 1. break the YAMLs
@@ -53,7 +57,6 @@ export class OlmAddOn implements ClusterAddOn {
             values: {}
           };
   
-          const kubectlProvider = new KubectlProvider(clusterInfo);
           const resource = kubectlProvider.addManifest(manifestDeployment);
   
           if (previousResource != undefined) {
@@ -66,6 +69,8 @@ export class OlmAddOn implements ClusterAddOn {
         resources.push(...batchResources);
       });
 
-      return Promise.resolve(resources[0]);
+      assert(resources.length > 0, "No OLM manifest found");
+
+      return Promise.resolve(resources.at(-1)!);
     }
 }

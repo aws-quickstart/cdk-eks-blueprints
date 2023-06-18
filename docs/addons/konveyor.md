@@ -12,7 +12,6 @@ The add-on depends on the following components:
 - [EBS CSI Driver Amazon EKS add-on](https://aws-quickstart.github.io/cdk-eks-blueprints/addons/ebs-csi-driver/) (_EbsCsiDriverAddOn_), to provide Persistent Volumes (PVs) fulfilling Konveyor's Persistent Volume Claims (PVCs)
 - a subdomain for the Konveyor application
 - a certificate for the subdomain, made available by the either _CreateCertificateProvider_ or _ImportCertificateProvider_, to be assigned to the load balancer
-- 
 
 ## Setup
 
