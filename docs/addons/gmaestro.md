@@ -43,7 +43,6 @@ const app = new cdk.App();
 const addOn = new GmaestroAddOn({
         clientIdSecretName: "<client id secret name>", // Create and copy from gMaestro deployment yaml
         clusterName: "<cluster name>",
-        namespace: "<namespace>"
     });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -77,6 +76,10 @@ The secret name from the Prerequisite section 3.i.
 #### `clusterName: string`
 
 Copy from the Deployment section `MAESTRO_SERVICE_NAME` value
+
+#### `createNamespace: boolean`
+
+If you want CDK to create the namespace for you
 
 #### `namespace: string` (optional)
 
