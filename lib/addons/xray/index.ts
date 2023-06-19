@@ -13,18 +13,14 @@ export class XrayAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         const nodeGroups = assertEC2NodeGroup(clusterInfo, XrayAddOn.name);
-        const cloudwatchPolicy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');
-        const xrayPolicy = ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess');
 
         nodeGroups.forEach(nodeGroup => {
-            nodeGroup.role.addManagedPolicy(cloudwatchPolicy);
-            nodeGroup.role.addManagedPolicy(xrayPolicy);
+            nodeGroup.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess'));
         });
 
         // Apply manifest
-        const doc = readYamlDocument(__dirname + '/xray-ds.ytpl');
-        const docArray = doc.replace(/{{cluster_name}}/g, cluster.clusterName).replace(/{{region_name}}/g, cluster.stack.region);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
+        const doc = readYamlDocument(__dirname + '/xray-ds.yaml');
+        const manifest = doc.split("---").map(e => loadYaml(e));
         new KubernetesManifest(cluster.stack, "xray-daemon", {
             cluster,
             manifest,
