@@ -19,36 +19,6 @@ metadata:
   labels:
     name: amazon-cloudwatch
 ---
-# create role binding for XRay SDK to read config map
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: container-insights-discovery-role
-  namespace: amazon-cloudwatch
-rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - cluster-info
-  resources:
-  - configmaps
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: service-users-cloudwatch-discovery-role-binding
-  namespace: amazon-cloudwatch
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: container-insights-discovery-role
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts
----
 # Deploy XRay daemon as daemon set
 apiVersion: apps/v1
 kind: DaemonSet
