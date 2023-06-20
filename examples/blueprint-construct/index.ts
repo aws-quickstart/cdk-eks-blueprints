@@ -64,6 +64,7 @@ export default class BlueprintConstruct {
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
             }),
             new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
@@ -175,15 +176,14 @@ export default class BlueprintConstruct {
                 s3Bucket: 'apache-airflow-s3-bucket-provider',
                 enableEfs: true,
                 efsFileSystem: 'apache-airflow-efs-provider'
-            })
+            }),
+            new blueprints.ExternalsSecretsAddOn(),
         ];
 
         // Instantiated to for helm version check.
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
-        new blueprints.ExternalsSecretsAddOn();
-       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
