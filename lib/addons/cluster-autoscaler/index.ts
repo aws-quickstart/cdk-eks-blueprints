@@ -1,11 +1,10 @@
 import { CfnJson, Tags } from "aws-cdk-lib";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { assert } from "console";
 import { Construct } from "constructs";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
-import { conflictsWith, createNamespace, createServiceAccount, setPath } from "../../utils";
+import { conflictsWith, createNamespace, createServiceAccount, logger, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -41,12 +40,13 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
 /**
  * Version of the autoscaler, controls the image tag
  */
-const versionMap = new Map([
-    [KubernetesVersion.of("1.25"), "9.25.0"],
-    [KubernetesVersion.V1_25, "9.25.0"],
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_26, "9.29.0"],
+    [KubernetesVersion.V1_25, "9.29.0"],
+    [KubernetesVersion.V1_24, "9.25.0"],
     [KubernetesVersion.V1_23, "9.21.0"],
     [KubernetesVersion.V1_22, "9.13.1"],
-    [KubernetesVersion.V1_25, "9.13.1"],
+    [KubernetesVersion.V1_21, "9.13.1"],
     [KubernetesVersion.V1_20, "9.9.2"],
     [KubernetesVersion.V1_19, "9.4.0"],
     [KubernetesVersion.V1_18, "9.4.0"],
@@ -66,8 +66,10 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
 
         if(this.options.version?.trim() === 'auto') {
             this.options.version = versionMap.get(clusterInfo.version);
-            assert(this.options.version, "Unable to auto-detect cluster autoscaler version. Applying latest. Provided EKS cluster version: " 
-                + clusterInfo.version?.version ?? clusterInfo.version);
+            if(!this.options.version) {
+                this.options.version = versionMap.values().next().value;
+                logger.warn(`Unable to auto-detect cluster autoscaler version. Applying latest: ${this.options.version}`);
+            }
         } 
 
         const cluster = clusterInfo.cluster;
