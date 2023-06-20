@@ -176,15 +176,14 @@ export default class BlueprintConstruct {
                 s3Bucket: 'apache-airflow-s3-bucket-provider',
                 enableEfs: true,
                 efsFileSystem: 'apache-airflow-efs-provider'
-            })
+            }),
+            new blueprints.ExternalsSecretsAddOn(),
         ];
 
         // Instantiated to for helm version check.
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
-        new blueprints.ExternalsSecretsAddOn();
-       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
