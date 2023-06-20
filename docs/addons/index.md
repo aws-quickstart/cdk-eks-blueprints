@@ -8,60 +8,66 @@ Within the context of the `eks-blueprints` framework, an add-on is abstracted as
 
 The framework currently supports the following add-ons.
 
-| Add-on                                                                 | Description                                                                                                                           |
-|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [`ACKAddOn`](./adot-addon)                                             | Adds ACK (AWS Controllers for Kubernetes .                                                                 |
-| [`AdotAddOn`](./adot-addon)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                 |
-| [`AmpAdotAddOn`](./amp-addon)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               |
-| [`AppMeshAddOn`](./app-mesh)                                           | Adds an AppMesh controller and CRDs.                                                  |
-| [`ArgoCDAddOn`](./argo-cd)                                             | Provisions Argo CD into your cluster.                                                                                                 |
-| [`AWS Batch for EKS`](./aws-batch-on-eks)                              | Enables EKS cluster to be used with AWS Batch on EKS                                                                    |
-| [`AWS for Fluent Bit`](./aws-for-fluent-bit)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        |
-| [`AWS Load Balancer Controller`](./aws-load-balancer-controller)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        |
-| [`AWS Node Termination Handler`](./aws-node-termination-handler)       | Provisions Node Termination Handler into your cluster.                                                                        |
-| [`AWS Private CA Issuer`](./aws-privateca-issuer)                      | Installs AWS Private CA Issuer into your cluster.                                                                        |
-| [`CertManagerAddOn`](./cert-manager)                                   | Adds Certificate Manager to your EKS cluster.                                                             |
-| [`CalicoOperatorAddOn`](./calico-operator)                             | Adds the Calico CNI/Network policy cluster.                                                                                       |
-| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                              |
-| [`ClusterAutoscalerAddOn`](./cluster-autoscaler)                       | Adds the standard cluster autoscaler.                                                                                                  |
-| [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             |
-| [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications.  |
-| [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator).        |
-| [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage.                 |
-| [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 |
-| [`EmrOnEksAddOn`](./emr-eks.md)                             | Enable EKS cluster to be used with EMR on EKS          |
-| [`ExternalDnsAddOn`](./external-dns)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. |
-| [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.|  
-| [`FluxcdAddOn`](./fluxcd.md)                                   | Setting up [Fluxcd](https://fluxcd.io/) to manage one or more Kubernetes clusters.                                 |
-| [`GrafanaOperatorAddon`](./grafana-operator.md)                                   | Deploys [GrafanaOperatorAddon](https://github.com/grafana-operator/grafana-operator#:~:text=The%20grafana%2Doperator%20is%20a,an%20easy%20and%20scalable%20way)  on your EKS Cluster to manage Amazon Managed Grafana and other external Grafana instances.                                 |
-| [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster.
-| [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster.
-| [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster.
-| [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               |
-| [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster.
-| [`KedaAddOn`](./keda.md)                                      | Installs [Keda](https://github.com/kedacore/keda) into EKS cluster.
-| [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn.                                                                    |
-| [`KnativeAddOn`](./knative.md)                                         | Deploys the [KNative Operator](https://knative.dev/docs/install/operator/knative-with-operators/) to ease setting up the rest of KNatives CRDs                                                          |
-| [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.                                                                
-| [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                |
-| [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |                  |
-| [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                         |
-| [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         |
-| [`KubeStateMetricsAddOn`](./kube-state-metrics.md)                  | Adds [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) into the EKS cluster.                                          |
-| [`MetricsServerAddOn`](./metrics-server)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      |
-| [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               |
-| [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller                                                                                                          |
-| [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                                    |
-| [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more.  |
-| [`PrometheusNodeExporterAddOn`](./prometheus-node-exporter.md)      | Adds [prometheus-node-exporter](https://github.com/prometheus/node_exporter) to the EKS Cluster. Prometheus Node Exporter enables you to measure various machine resources such as memory, disk and CPU utilization.  |
-| [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster.                                           |
-| [`Snyk`](https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon)  | Adds the [Snyk Monitor](https://github.com/snyk/kubernetes-monitor) to the EKS Cluster.                                                |
-| [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes.                  |
-| [`UpboundUniversalCrossplaneAddOn`](./upbound-universal-crossplane.md)                                      | Allows Elastic Kubernetes Service (Amazon EKS) clusters to manage the lifecycle of Crossplane distribution.                  |
-| [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.                                              |
-| [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  |
-| [`XrayAddOn`](./xray)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                                   |
-| [`XrayAdotAddOn`](./xray-adot-addon)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 |
+| Addon | Description | x86_64/amd64 | arm64 |
+|-------|:-----------:|:------------:|:-----:|
+| [`ACKAddOn`](./ack-addon.md)                                             | Adds ACK (AWS Controllers for Kubernetes .                                                                 | ✅ |
+| [`AdotAddOn`](./adot-addon.md)                                            | Adds AWS Distro for OpenTelemetry (ADOT) Operator.                                                                 | ✅ | ✅ |
+| [`AmpAdotAddOn`](./amp-addon.md)                                          | Deploys ADOT Collector for Prometheus to remote write metrics from AMP.               | ✅ | ✅ |
+| [`AppMeshAddOn`](./app-mesh.md)                                           | Adds an AppMesh controller and CRDs.                                                  | ✅ |
+| [`ApacheAirflowAddOn`](./apache-airflow.md)                                           | This add-on is an implementation of Apache Airflow on EKS using the official helm chart.                                                  | ✅ |
+| [`ArgoCDAddOn`](./argo-cd.md)                                             | Provisions Argo CD into your cluster.                                                                                                 | ✅ | ✅ |
+| [`AWS Batch for EKS`](./aws-batch-on-eks.md)                              | Enables EKS cluster to be used with AWS Batch on EKS                                                                    | ✅ | ✅ |
+| [`AWS for Fluent Bit`](./aws-for-fluent-bit.md)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        | ✅ | ✅
+| [`AWS Load Balancer Controller`](./aws-load-balancer-controller.md)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        | ✅ | ✅ |
+| [`AWS Node Termination Handler`](./aws-node-termination-handler.md)       | Provisions Node Termination Handler into your cluster.                                                                        | ✅ |
+| [`AWS Private CA Issuer`](./aws-privateca-issuer.md)                      | Installs AWS Private CA Issuer into your cluster.                                                                        | ✅ |
+| [`Backstage`](./backstage.md)                      | Installs Backstage.                                                                        | ✅ |
+| [`CertManagerAddOn`](./cert-manager.md)                                   | Adds Certificate Manager to your EKS cluster.                                                             | ✅ | ✅ |
+| [`CalicoOperatorAddOn`](./calico-operator.md)                             | Adds the Calico CNI/Network policy cluster.                                                                                       | ✅ | ✅ |
+| [`CloudWatchAdotAddOn`](./cloudwatch-adot-addon.md)                       | Adds Cloudwatch exporter based on ADOT operator integrating monitoring with CloudWatch.                                                              | ✅ | ✅
+| [`CloudWatchLogsAddOn`](./cloudwatch-logs.md)                       | Adds AWS for Fluent Bit to the cluster that exports logs to CloudWatch.                   | ✅ | ✅ 
+| [`ClusterAutoscalerAddOn`](./cluster-autoscaler.md)                       | Adds the standard cluster autoscaler.                                                          | ✅ | ✅
+| [`ContainerInsightsAddOn`](./container-insights.md)                       | Adds support for container insights.                                                          | ✅ | ✅                                         |
+| [`CoreDnsAddOn`](./coredns.md)                                         | Adds CoreDNS Amazon EKS add-on. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.             | ✅ | ✅ |
+| [`DatadogAddOn`](./datadog.md) | Adds [Datadog](https://www.datadoghq.com/) Amazon EKS add-on. Datadog is the monitoring and security platform for cloud applications.  |                         ✅ | ✅
+| [`Dynatrace`](https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon)           | Adds the [Dynatrace](https://www.dynatrace.com/) [OneAgent Operator](https://github.com/Dynatrace/dynatrace-oneagent-operator).        | ✅ | 
+| [`EbsCsiDriverAddOn`](./ebs-csi-driver.md)                             | Adds EBS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EBS volumes for persistent storage.                 | ✅ | ✅ |
+| [`EfsCsiDriverAddOn`](./efs-csi-driver.md)                             | Adds EFS CSI Driver Amazon EKS add-on. This driver manages the lifecycle of Amazon EFS volumes for persistent storage.                 | ✅ | ✅ |
+| [`EmrOnEksAddOn`](./emr-eks.md)                             | Enable EKS cluster to be used with EMR on EKS          | ✅ | ✅ |
+| [`ExternalDnsAddOn`](./external-dns.md)                                   | Adds [External DNS](https://github.com/kubernetes-sigs/external-dns) support for AWS to the cluster, integrating with Amazon Route 53. | ✅ |
+| [`ExternalSecretsAddOn`](./external-secrets.md)                        | Adds [External Secrets Operator](https://github.com/external-secrets/external-secrets) to the cluster.| ✅ | ✅ |
+| [`FluxcdAddOn`](./fluxcd.md)                                   | Setting up [Fluxcd](https://fluxcd.io/) to manage one or more Kubernetes clusters.                                 | ✅ | ✅
+| [`GrafanaOperatorAddon`](./grafana-operator.md)                                   | Deploys [GrafanaOperatorAddon](https://github.com/grafana-operator/grafana-operator#:~:text=The%20grafana%2Doperator%20is%20a,an%20easy%20and%20scalable%20way)  on your EKS Cluster to manage Amazon Managed Grafana and other external Grafana instances.                                 | ✅ | ✅ |
+| [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster. | ✅ | ✅ |
+| [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster. | ✅ | ✅ |
+| [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster. | ✅ | ✅ |
+| [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               | ✅ | ✅ |
+| [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster. | ✅ | 
+| [`KedaAddOn`](./keda.md)                                      | Installs [Keda](https://github.com/kedacore/keda) into EKS cluster. | ✅ | ✅ |
+| [`Keptn`](https://github.com/keptn-sandbox/keptn-eks-blueprints-addon)           | [Keptn](https://keptn.sh/) Control Plane and Execution Plane AddOn.                                                                    | ✅ |  
+| [`KnativeAddOn`](./knative-operator.md)                                         | Deploys the [KNative Operator](https://knative.dev/docs/install/operator/knative-with-operators/) to ease setting up the rest of KNatives CRDs                                                          | ✅ | ✅ 
+| [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.                                                  | ✅ |               
+| [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                | ✅ | 
+| [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |  ✅ | 
+| [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                         | ✅ | ✅ |
+| [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         | ✅ | ✅ |
+| [`KubeStateMetricsAddOn`](./kube-state-metrics.md)                  | Adds [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) into the EKS cluster.                                          | ✅ | ✅ |
+| [`MetricsServerAddOn`](./metrics-server.md)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      | ✅ | ✅ |
+| [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               | ✅ | 
+| [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller  | ✅ | ✅ |                                                                                                        |
+| [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                                    | ✅ | ✅ |
+| [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more.  | ✅ | 
+| [`PrometheusNodeExporterAddOn`](./prometheus-node-exporter.md)      | Adds [prometheus-node-exporter](https://github.com/prometheus/node_exporter) to the EKS Cluster. Prometheus Node Exporter enables you to measure various machine resources such as memory, disk and CPU utilization.  | ✅ | ✅ |
+| [`Rafay`](./rafay.md) | Adds [Rafay’s Kubernetes Operations Platform (KOP)](https://rafay.co) to the EKS Cluster.  Rafay allows you to deploy, operate, and manage the lifecycle of Kubernetes clusters | ✅ |
+| [`SecretsStoreAddOn`](./secrets-store.md)                              | Adds AWS Secrets Manager and Config Provider for Secret Store CSI Driver to the EKS Cluster.                                           | ✅ | ✅ |
+| [`Snyk`](https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon)  | Adds the [Snyk Monitor](https://github.com/snyk/kubernetes-monitor) to the EKS Cluster.                                                | ✅ |
+| [`SSMAgentAddOn`](./ssm-agent.md)                                      | Adds [Amazon SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) to worker nodes.                  | ✅ | 
+| [`UpboundUniversalCrossplaneAddOn`](./upbound-universal-crossplane.md)                                      | Allows Elastic Kubernetes Service (Amazon EKS) clusters to manage the lifecycle of Crossplane distribution.                  | ✅ | 
+| [`VpcCniAddOn`](./vpc-cni.md)                                          | Adds the Amazon VPC CNI Amazon EKS addon to support native VPC networking for Amazon EKS.                                              | ✅ | ✅ |
+| [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  | ✅ | ✅ |
+| [`XrayAddOn`](./xray.md)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                                   | NA | NA
+| [`XrayAdotAddOn`](./xray-adot-addon.md)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 | ✅ | ✅ |
+                                                                 |
 
 # Standard Helm Add-On Configuration Options
 
