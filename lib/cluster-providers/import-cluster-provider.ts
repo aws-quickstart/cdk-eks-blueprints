@@ -1,6 +1,6 @@
 import { ClusterInfo, ClusterProvider, selectKubectlLayer } from "../";
 import { IVpc } from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib//aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
 
