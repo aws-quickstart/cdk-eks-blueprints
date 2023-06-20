@@ -133,7 +133,7 @@ export default class BlueprintConstruct {
                     }
                 }
             }),
-            // new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
+            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn({
                 kmsKeys: [
