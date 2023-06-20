@@ -5,6 +5,9 @@ import { IKey } from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
 
 
+/**
+ * Properties object for the ImportClusterProvider.
+ */
 export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, "vpc"> {
     /**
      * This property is needed as it drives selection of certain add-on versions as well as kubectl layer. 
@@ -12,10 +15,21 @@ export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, 
     version: eks.KubernetesVersion;
 }
 
+/**
+ * Importing cluster into the blueprint enabling limited blueprinting capabilities such as adding certain addons, 
+ * teams.
+ */
 export class ImportClusterProvider implements ClusterProvider {
 
     constructor(private readonly props: ImportClusterProviderProps) { }
 
+    /**
+     * Implements contract method to create a cluster, by importing an existing cluster.
+     * @param scope 
+     * @param vpc 
+     * @param _secretsEncryptionKey 
+     * @returns 
+     */
     createCluster(scope: Construct, vpc: IVpc, _secretsEncryptionKey?: IKey | undefined): ClusterInfo {
         const props = { ...this.props, vpc };
 
