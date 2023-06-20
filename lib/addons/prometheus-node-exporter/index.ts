@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & PrometheusNodeExporterAddOnProps = {
   name: "prometheus-node-exporter",
   namespace: "prometheus-node-exporter",
   chart: "prometheus-node-exporter",
-  version: "4.17.3",
+  version: "4.17.5",
   release: "prometheus-node-exporter",
   repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},
