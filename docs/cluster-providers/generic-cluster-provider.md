@@ -104,7 +104,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
     mastersRole: blueprints.getResource(context => {
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
     }),
-    securityGroup: blueprints.getNamedResource("my-cluster-security-group"), // assumed to be register as a resource provider under name my-cluster-security-group
+    securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup, // assumed to be register as a resource provider under name my-cluster-security-group
     managedNodeGroups: [
         {
             id: "mng1",
@@ -119,7 +119,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 EksBlueprint.builder()
     .resourceProvider("my-cluster-security-group", {
         provide(context: blueprints.ResourceContext) : ec2.ISecurityGroup {
-            return ec2.SecurityGroup.fromSecurityGroupId(this, 'SG', 'sg-12345', { mutable: false }); // example for look up
+            return ec2.SecurityGroup.fromSecurityGroupId(context.scope, 'SG', 'sg-12345', { mutable: false }); // example for look up
         }
     })
     .clusterProvider(clusterProvider)
