@@ -40,6 +40,12 @@ const defaultIamPolicy: iam.PolicyStatement = new iam.PolicyStatement({
     "secretsmanager:DescribeSecret",
     "secretsmanager:ListSecretVersionIds",
     "secretsmanager:ListSecrets",
+    "ssm:DescribeParameters",
+    "ssm:GetParameter",
+    "ssm:GetParameters",
+    "ssm:GetParametersByPath",
+    "ssm:GetParameterHistory",
+    "kms:Decrypt"
   ],
   resources: ["*"],
 });
