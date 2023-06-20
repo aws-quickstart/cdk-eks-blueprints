@@ -119,6 +119,9 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
+                amiSelector: {
+                    "karpenter.sh/discovery/MyClusterName": '*',
+                },
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
@@ -130,7 +133,7 @@ export default class BlueprintConstruct {
                     }
                 }
             }),
-            new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
+            // new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
             new blueprints.addons.EbsCsiDriverAddOn({
                 kmsKeys: [
