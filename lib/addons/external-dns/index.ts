@@ -22,9 +22,9 @@ const defaultProps = {
     name: 'external-dns',
     chart: 'external-dns',
     namespace: 'external-dns',
-    repository: 'https://charts.bitnami.com/bitnami',
+    repository: 'https://kubernetes-sigs.github.io/external-dns/',
     release: 'blueprints-addon-external-dns',
-    version: '6.20.3',
+    version: '1.12.0',
     values: {},
 };
 
