@@ -64,7 +64,9 @@ export default class BlueprintConstruct {
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
             }),
             new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -161,23 +163,27 @@ export default class BlueprintConstruct {
             // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
-            new blueprints.AwsForFluentBitAddOn(),
+            // Commenting due to conflicts with `CloudWatchLogsAddon`
+            // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
+            new blueprints.CloudWatchLogsAddon({
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logRetentionDays: 30
+            }),
             new blueprints.ApacheAirflowAddOn({
                 enableLogging: true,
                 s3Bucket: 'apache-airflow-s3-bucket-provider',
                 enableEfs: true,
                 efsFileSystem: 'apache-airflow-efs-provider'
-            })
+            }),
+            new blueprints.ExternalsSecretsAddOn(),
         ];
 
         // Instantiated to for helm version check.
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
-        new blueprints.ExternalsSecretsAddOn();
-       
         const blueprintID = 'blueprint-construct-dev';
 
         const userData = ec2.UserData.forLinux();
@@ -209,7 +215,7 @@ export default class BlueprintConstruct {
                             "LaunchTemplate": "Custom",
                             "Instance": "ONDEMAND"
                         },
-                        requireImdsv2: true
+                        requireImdsv2: false
                     }
                 },
                 {
