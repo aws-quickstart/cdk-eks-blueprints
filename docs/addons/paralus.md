@@ -2,13 +2,11 @@
 
 The Paralus project is a free, open source tool that enables controlled, audited access to Kubernetes infrastructure. It comes with just-in-time service account creation and user-level credential management that integrates with your RBAC and SSO. [Learn more ..](https://www.paralus.io/)
 
-Paralus Blueprint Addon deploys paralus controller on your EKS cluster using [paralus construct](https://github.com/aws-samples/cdk-eks-blueprints-patterns/tree/main/lib/paralus-construct) implemented with the EKS Bleuprints [CDK](https://aws.amazon.com/cdk/). Detailed documentation on the same can be accessed from [here](https://github.com/aws-samples/cdk-eks-blueprints-patterns/blob/main/docs/patterns/paralus.md).
+Paralus Blueprint Addon deploys paralus controller on your EKS cluster using [paralus construct](https://github.com/aws-samples/cdk-eks-blueprints-patterns/tree/main/lib/paralus-construct) implemented with the EKS Blueprints [CDK](https://aws.amazon.com/cdk/). Detailed documentation on the same can be accessed from [here](https://github.com/aws-samples/cdk-eks-blueprints-patterns/blob/main/docs/patterns/paralus.md).
 
-Paralus Addon deploys the following resources:
+Paralus add-on depends on the following add-ons:
 
-- Creates EKS Cluster Control plane with public endpoint (for demo purpose only) with a managed node group
-- Deploys supporting add-ons:  AwsLoadBalancerController, VpcCni, KubeProxy, EbsCsiDriverAddOn
-- Deploy Paralus on the EKS cluster
+AwsLoadBalancerController, VpcCni, KubeProxy, EbsCsiDriverAddOn
 
 NOTE: By default paralus installs few dependent modules like postgres, kratos and also comes with a dashboard. At it's core paralus works atop domain based routing, inter service communication and hence above supporting Add-Ons are required. 
 
@@ -124,11 +122,7 @@ You can now access dashboard with http://console-eks.<yourdomain.com> ( refers t
 
 Note: you can also refer to this [paralus eks blogpost](https://www.paralus.io/blog/eks-quickstart#configuring-dns-settings)
 
-## Disclaimer 
-This pattern relies on an open source NPM package paralus-eks-blueprints-addon. Please refer to the package npm site for more information.
-https://www.npmjs.com/package/@paralus/paralus-eks-blueprints-addon
-
-If you have any questions about the npm package or find any defect, please post in the source repo at 
-https://github.com/paralus/eks-blueprints-addon
+## Support
+If you have any questions about Paralus, get in touch with the team [on Slack](https://join.slack.com/t/paralus/shared_invite/zt-1a9x6y729-ySmAq~I3tjclEG7nDoXB0A).
 
 Paralus is maintained and supported by [Rafay](https://rafay.co)
