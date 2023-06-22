@@ -24,7 +24,7 @@ const defaultProps = {
     namespace: 'external-dns',
     repository: 'https://kubernetes-sigs.github.io/external-dns/',
     release: 'blueprints-addon-external-dns',
-    version: '1.12.0',
+    version: '1.13.0',
     values: {},
 };
 
