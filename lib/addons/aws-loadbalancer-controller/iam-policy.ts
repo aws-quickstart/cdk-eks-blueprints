@@ -198,6 +198,28 @@ export const AwsLoadbalancerControllerIamPolicy = (partition: string) => {
             {
                 "Effect": "Allow",
                 "Action": [
+                    "elasticloadbalancing:AddTags"
+                ],
+                "Resource": [
+                    `arn:${partition}:elasticloadbalancing:*:*:targetgroup/*/*`,
+                    `arn:${partition}:elasticloadbalancing:*:*:loadbalancer/net/*/*`,
+                    `arn:${partition}:elasticloadbalancing:*:*:loadbalancer/app/*/*`
+                ],
+                "Condition": {
+                    "StringEquals": {
+                        "elasticloadbalancing:CreateAction": [
+                            "CreateTargetGroup",
+                            "CreateLoadBalancer"
+                        ]
+                    },
+                    "Null": {
+                        "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                    }
+                }
+            },
+            {
+                "Effect": "Allow",
+                "Action": [
                     "elasticloadbalancing:RegisterTargets",
                     "elasticloadbalancing:DeregisterTargets"
                 ],
