@@ -38,7 +38,6 @@
         "@aws-cdk/lambda-layer-kubectl-v25": "^2.0.3",
         "@aws-cdk/lambda-layer-kubectl-v26": "^2.0.0",
         "@aws-sdk/client-secrets-manager": "^3.316.0",
-        "@instana/aws-eks-blueprint-addon": "^1.0.4",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
