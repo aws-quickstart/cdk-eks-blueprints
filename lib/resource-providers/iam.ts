@@ -58,6 +58,6 @@ export class LookupOpenIdConnectProvider implements spi.ResourceProvider<iam.IOp
             context.scope,
             this.id,
             `arn:aws:iam::${context.scope.account}:oidc-provider/${this.url.substring(httpsPrefix.length)}`
-        )
+        );
     }
 }

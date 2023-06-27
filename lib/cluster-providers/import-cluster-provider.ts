@@ -57,13 +57,22 @@ export class ImportClusterProvider implements ClusterProvider {
      * which in some cases may require trust policy for the account root principal.
      * @returns the cluster provider with the import cluster configuration
      */
-    public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: IRole) : 
+    public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: IRole): 
         Promise<ClusterProvider> {
 
         const sdkCluster = await getCluster(clusterName, process.env.CDK_DEFAULT_REGION!);
+        return this.fromClusterAttributes(sdkCluster, kubectlRole);
+    }
 
+    /**
+     * Creates a cluster provider for an existing cluster based on the passed result of the describe cluster command.
+     * @param sdkCluster 
+     * @param kubectlRole 
+     * @returns 
+     */
+    public static fromClusterAttributes(sdkCluster: sdk.Cluster, kubectlRole: IRole): ClusterProvider {
         return new ImportClusterProvider({
-            clusterName,
+            clusterName: sdkCluster.name!,
             version: eks.KubernetesVersion.of(sdkCluster.version!),
             clusterEndpoint: sdkCluster.endpoint,
             openIdConnectProvider: getResource(context =>
@@ -81,7 +90,7 @@ export class ImportClusterProvider implements ClusterProvider {
  * @returns 
  */
 export async function getCluster(clusterName: string, region: string): Promise<sdk.Cluster> {
-    const client = new sdk.EKSClient({ region: process.env.CDK_DEFAULT_REGION });
+    const client = new sdk.EKSClient({ region });
     const input: sdk.DescribeClusterRequest = {
         name: clusterName
     };
