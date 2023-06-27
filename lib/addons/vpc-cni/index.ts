@@ -180,6 +180,12 @@ export interface VpcCniAddOnProps {
    * 
    */
   serviceAccountPolicies?: iam.IManagedPolicy[];
+
+  /**
+   * Version of the add-on to use. Must match the version of the cluster where it
+   * will be deployed.
+   */
+  version?: string;
 }
 
 
