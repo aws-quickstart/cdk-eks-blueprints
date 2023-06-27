@@ -2,12 +2,12 @@ import { ClusterInfo, ClusterProvider } from "../spi";
 import { selectKubectlLayer } from "./generic-cluster-provider";
 import { IVpc } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
-import { Role } from "aws-cdk-lib/aws-iam";
+import { IRole } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import * as sdk from "@aws-sdk/client-eks";
 import { Construct } from "constructs";
 import { getResource } from "../resource-providers/utils";
-import { LookupOpenIdConnectProvider, LookupRoleProvider } from "../resource-providers";
+import { LookupOpenIdConnectProvider } from "../resource-providers";
 import { logger } from "../utils";
 
 
@@ -57,7 +57,7 @@ export class ImportClusterProvider implements ClusterProvider {
      * which in some cases may require trust policy for the account root principal.
      * @returns the cluster provider with the import cluster configuration
      */
-    public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: Role) : 
+    public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: IRole) : 
         Promise<ClusterProvider> {
 
         const sdkCluster = await getCluster(clusterName, process.env.CDK_DEFAULT_REGION!);
@@ -69,8 +69,7 @@ export class ImportClusterProvider implements ClusterProvider {
             openIdConnectProvider: getResource(context =>
                 new LookupOpenIdConnectProvider(sdkCluster.identity!.oidc!.issuer!).provide(context)),
             clusterCertificateAuthorityData: sdkCluster.certificateAuthority?.data,
-            kubectlRoleArn: getResource(context =>
-                new LookupRoleProvider('awsqs-kubernetes-helm').provide(context)).roleArn,
+            kubectlRoleArn: kubectlRole.roleArn,
         });
     }
 }
