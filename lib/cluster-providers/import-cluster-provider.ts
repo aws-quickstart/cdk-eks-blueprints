@@ -60,7 +60,7 @@ export class ImportClusterProvider implements ClusterProvider {
     public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: IRole): 
         Promise<ClusterProvider> {
 
-        const sdkCluster = await getCluster(clusterName, process.env.CDK_DEFAULT_REGION!);
+        const sdkCluster = await describeCluster(clusterName, process.env.CDK_DEFAULT_REGION!);
         return this.fromClusterAttributes(sdkCluster, kubectlRole);
     }
 
@@ -89,7 +89,7 @@ export class ImportClusterProvider implements ClusterProvider {
  * @param region 
  * @returns 
  */
-export async function getCluster(clusterName: string, region: string): Promise<sdk.Cluster> {
+export async function describeCluster(clusterName: string, region: string): Promise<sdk.Cluster> {
     const client = new sdk.EKSClient({ region });
     const input: sdk.DescribeClusterRequest = {
         name: clusterName
