@@ -37,6 +37,7 @@
         "@aws-cdk/lambda-layer-kubectl-v24": "^2.0.202",
         "@aws-cdk/lambda-layer-kubectl-v25": "^2.0.3",
         "@aws-cdk/lambda-layer-kubectl-v26": "^2.0.0",
+        "@aws-sdk/client-eks": "^3.360.0",
         "@aws-sdk/client-secrets-manager": "^3.316.0",
         "@types/assert": "^1.5.6",
         "@types/bcrypt": "^5.0.0",
