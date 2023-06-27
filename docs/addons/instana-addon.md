@@ -60,7 +60,7 @@ To use AWS Secret Manager Secrets follow these steps:
      }
     ```
 
-2. Go to project/bin/main.ts
+2. Go to project/bin/<your-main-file>.ts
     ```typescript
     import 'source-map-support/register';
     import * as cdk from 'aws-cdk-lib';
