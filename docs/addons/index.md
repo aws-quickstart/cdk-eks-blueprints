@@ -39,6 +39,7 @@ The framework currently supports the following add-ons.
 | [`FluxcdAddOn`](./fluxcd.md)                                   | Setting up [Fluxcd](https://fluxcd.io/) to manage one or more Kubernetes clusters.                                 | ✅ | ✅
 | [`GrafanaOperatorAddon`](./grafana-operator.md)                                   | Deploys [GrafanaOperatorAddon](https://github.com/grafana-operator/grafana-operator#:~:text=The%20grafana%2Doperator%20is%20a,an%20easy%20and%20scalable%20way)  on your EKS Cluster to manage Amazon Managed Grafana and other external Grafana instances.                                 | ✅ | ✅ |
 | [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster. | ✅ | ✅ |
+| [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster. | ✅ | ✅ |
 | [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster. | ✅ | ✅ |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               | ✅ | ✅ |
 | [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster. | ✅ | 
