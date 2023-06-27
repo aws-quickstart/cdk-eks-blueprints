@@ -34,51 +34,65 @@ Go to your Instana installation (Instana User Interface), click ... More > Agent
 ## AWS Secret Manager Secrets (Optional)
 If you wish to use AWS Secret Manager Secrets to pass Instana props (key, endpoint, and port), then you will be required to setup Secrets first.
 
-To create AWS Secret Manager secrets, you can follow these steps:
-
-1. Log in to the AWS Management Console and open the AWS Secret Manager service.
-2. Search and Select AWS Secrets Manager service.
-3. Select the type of secret as 'Other type of secret'
-4. Under the Key/value pairs add following keys and their values:
+```shell
+export SECRET_NAME=<aws_secret_name>
+export INSTANA_AGENT_KEY=<instana_key>
+export INSTANA_ENDPOINT_HOST_URL=<instana_host_endpoint>
+export INSTANA_ENDPOINT_HOST_PORT=<instana_port>"
+aws secretsmanager create-secret \
+  --name $SECRET_NAME \
+  --secret-string "{\"INSTANA_AGENT_KEY\":\"${INSTANA_AGENT_KEY}\",
+    \"INSTANA_ENDPOINT_HOST_URL\":\"${INSTANA_ENDPOINT_HOST_URL}\",
+    \"INSTANA_ENDPOINT_HOST_PORT\":\"${INSTANA_ENDPOINT_HOST_PORT}\"
+   }"
 ```
-INSTANA_AGENT_KEY=<instana key>
-INSTANA_ENDPOINT_HOST_URL=<instana backend host>
-INSTANA_ENDPOINT_HOST_PORT=<instana backend port>
-```
-5. Assign a name to the Secret (eg. *instana-secret-param*).
+secret_name = AWS Secret Manager Secret name (eg. *instana-secret-params*).
 
 ## Usage : Using AWS Secret Manager Secrets 
-```typescript
-import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '@aws-quickstart/eks-blueprints';
-import { loadYaml } from '@aws-quickstart/eks-blueprints/dist/utils';
-import { InstanaOperatorAddon } from '@instana/aws-eks-blueprint-addon';
+To use AWS Secret Manager Secrets follow these steps:
 
-const app = new cdk.App();
+1. The actual settings for the secret name (```secretParamName```) are expected to be specified in the CDK context. Generically it is inside the cdk.context.json file of the current directory or in `~/.cdk.json` in your home directory.
 
-export const instanaProps = {
-	// In this example, the secret is called instana-secret-param
-    secretParamName: '<instana-secret-param>'
-};
+	 Example settings: Update the context in `cdk.json` file located in `cdk-eks-blueprints-patterns` directory
+	 ```json
+	"context": {
+         "secretParamName": "instana-secret-params"
+     }
+    ```
 
-const yamlObject = loadYaml(JSON.stringify(instanaProps));
-
-// AddOns for the cluster.
-const addOns: Array<blueprints.ClusterAddOn> = [
-    new InstanaOperatorAddon(yamlObject)
-];
-
-const account = '<aws account id>';
-const region = '<aws region>';
-
-blueprints.EksBlueprint.builder()
-    .account(account)
-    .region(region)
-    .addOns(...addOns)
-    .useDefaultSecretEncryption(true)
-    .build(app, '<eks cluster name>');
-```
+2. Go to project/bin/main.ts
+    ```typescript
+    import 'source-map-support/register';
+    import * as cdk from 'aws-cdk-lib';
+    import * as blueprints from '@aws-quickstart/eks-blueprints';
+    import { loadYaml } from '@aws-quickstart/eks-blueprints/dist/utils';
+    import { InstanaOperatorAddon } from '@instana/aws-eks-blueprint-addon';
+    
+    const app = new cdk.App();
+	const instanaSecretName = app.node.tryGetContext('<instana-secret-param>');
+    
+    export const instanaProps = {
+    	// In this example, the secret is called instana-secret-param
+        secretParamName: instanaSecretName
+    };
+    
+    const yamlObject = loadYaml(JSON.stringify(instanaProps));
+    
+    // AddOns for the cluster.
+    const addOns: Array<blueprints.ClusterAddOn> = [
+        new InstanaOperatorAddon(yamlObject)
+    ];
+    
+    const account = '<aws account id>';
+    const region = '<aws region>';
+    
+    blueprints.EksBlueprint.builder()
+        .account(account)
+        .region(region)
+        .addOns(...addOns)
+        .useDefaultSecretEncryption(true)
+        .build(app, '<eks cluster name>');
+    ```
 
 ## Usage : Using Secrets in the Code
 ```typescript
