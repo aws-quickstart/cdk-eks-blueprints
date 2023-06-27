@@ -53,19 +53,18 @@ export class ImportClusterProvider implements ClusterProvider {
      * creates an import cluster provider. 
      * @param clusterName name of the cluster
      * @param region target rego
-     * @param version version of the cluster to be imported
      * @param kubectlRole iam Role that provides access to the cluster API (kubectl). The CDK custom resource should be able to assume the role
      * which in some cases may require trust policy for the account root principal.
      * @returns the cluster provider with the import cluster configuration
      */
-    public static async fromClusterLookup(clusterName: string, region: string, version: eks.KubernetesVersion, kubectlRole: Role) : 
+    public static async fromClusterLookup(clusterName: string, region: string, kubectlRole: Role) : 
         Promise<ClusterProvider> {
 
         const sdkCluster = await getCluster(clusterName, process.env.CDK_DEFAULT_REGION!);
 
         return new ImportClusterProvider({
             clusterName,
-            version: version,
+            version: eks.KubernetesVersion.of(sdkCluster.version!),
             clusterEndpoint: sdkCluster.endpoint,
             openIdConnectProvider: getResource(context =>
                 new LookupOpenIdConnectProvider(sdkCluster.identity!.oidc!.issuer!).provide(context)),
