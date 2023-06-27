@@ -193,7 +193,7 @@ cdk destroy
 ```
 
 ## Disclaimer 
-This pattern relies on an open source NPM package eks-blueprints-cdk-kubeflow-ext. Please refer to the package npm site for more information.
+This pattern relies on an open source NPM package [aws-eks-blueprint-addon](https://www.npmjs.com/package/%40instana/aws-eks-blueprint-addon). Please refer to the package npm site for more information.
 ```
 https://www.npmjs.com/package/@instana/aws-eks-blueprint-addon'
 ```
