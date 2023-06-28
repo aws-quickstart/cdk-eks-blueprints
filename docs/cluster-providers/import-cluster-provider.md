@@ -15,6 +15,9 @@ Make sure VPC is set to the VPC of the imported cluster, otherwise the blueprint
 **Note:** `blueprints.describeCluster() is an asynchronous function, you should either use `await` or handle promise resolution chain. 
 
 ```typescript
+const clusterName = "quickstart-cluster";
+const region = "us-east-2";
+
 const sdkCluster = await blueprints.describeCluster(clusterName, region); // get cluster information using EKS APIs
 
 /**
@@ -24,6 +27,8 @@ const importClusterProvider = blueprints.ImportClusterProvider.fromClusterAttrib
     sdkCluster, 
     blueprints.getResource(context => new blueprints.LookupRoleProvider(kubectlRoleName).provide(context))
 );
+
+const vpcId = sdkCluster.resourcesVpcConfig?.vpcId;
 
 blueprints.EksBlueprint.builder()
     .clusterProvider(importClusterProvider)
@@ -36,8 +41,12 @@ blueprints.EksBlueprint.builder()
 This option is convenient if you already know the VPC Id of the target cluster. It also requires `eks:DescribeCluster` permission at build-time:
 
 ```typescript
+const clusterName = "quickstart-cluster";
+const region = "us-east-2";
+
 const kubectlRole: iam.IRole = blueprints.getNamedResource('my-role');
-const importClusterProvider2 = await blueprints.ImportClusterProvider.fromClusterLookup(clusterName, 'us-east-1', kubectlRole); // note await here
+
+const importClusterProvider2 = await blueprints.ImportClusterProvider.fromClusterLookup(clusterName, region, kubectlRole); // note await here
 
 const vpcId = ...; // you can always get it with blueprints.describeCluster(clusterName, region);
 
@@ -56,12 +65,12 @@ OIDC provider is expected to be passed in as well if you are planning to leverag
 ```typescript
 
 const importClusterProvider3 = new ImportClusterProvider({
-    clusterName: myClusterName,
+    clusterName: 'my-existing-cluster',
     version: KubernetesVersion.V1_26,
-    clusterEndpoint: clusterEndpoint,
+    clusterEndpoint: 'https://B792B88BC60999B1A37D.gr7.us-east-2.eks.amazonaws.com',
     openIdConnectProvider: getResource(context =>
-        new LookupOpenIdConnectProvider(oidcIssuerUrl).provide(context)),
-    clusterCertificateAuthorityData: certificateAuthorityData,
+        new LookupOpenIdConnectProvider('https://oidc.eks.us-east-2.amazonaws.com/id/B792B88BC60999B1A37D').provide(context)),
+    clusterCertificateAuthorityData: 'S0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCasdd234................',
     kubectlRoleArn: 'arn:...',
 });
 
@@ -86,3 +95,14 @@ The `ImportClusterProvider` supports the following configuration options:
 | kubectlRoleArn                   | An IAM role with cluster administrator and "system:masters" permissions.
 
 
+## Known Limitations
+
+The following add-ons will not work with the `ImportClusterProvider` due to the inability (at present) of the imported clusters to modify `aws-auth` ConfigMap and mutate cluster authentication:
+* `ClusterAutoScalerAddOn`
+* `AwsBatchAddOn`
+* `EmrEksAddOn`
+* `KarpenterAddOn`
+
+Teams can be added to the cluster and will perform all of the team functionality except cluster access due to the same inability to mutate cluster access. 
+
+At the moment, there are no examples to add extra capacity to the imported clusters like node groups. 
