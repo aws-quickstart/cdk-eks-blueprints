@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
-import { Cluster, FargateProfile, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks';
 import { Construct, IConstruct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
@@ -130,8 +130,8 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
-        readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: FargateProfile[]) {
+    constructor(readonly cluster: eks.ICluster, readonly version: eks.KubernetesVersion,
+        readonly nodeGroups?: eks.Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: eks.FargateProfile[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();

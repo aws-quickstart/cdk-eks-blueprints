@@ -7,7 +7,7 @@ import { getEbsDriverPolicyDocument } from "./iam-policy";
 /**
  * Interface for EBS CSI Driver EKS add-on options
  */
-interface EbsCsiDriverAddOnProps {
+export interface EbsCsiDriverAddOnProps {
     /**
      * Version of the driver to deploy
      */
