@@ -1,4 +1,5 @@
 import * as spi from "../../spi";
+import { setPath } from "../../utils";
 
 /**
  * Flux GitRepository API defines a Source to produce an Artifact for a Git repository revision.
@@ -7,10 +8,10 @@ export class FluxGitRepository {
 
     constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
-    public generate(namespace: string, fluxSyncInterval: string ) {
+    public generate(namespace: string, fluxSyncInterval: string, fluxVerifyMode: string, fluxVerifySecretRefName: string) {
 
         const repository = this.bootstrapRepo!;
-        return {
+        const gitManifest =  {
             apiVersion: "source.toolkit.fluxcd.io/v1beta2",
             kind: "GitRepository",
             metadata: {
@@ -25,5 +26,10 @@ export class FluxGitRepository {
                 },
             }
         };
+        if (fluxVerifySecretRefName) {
+            setPath(gitManifest, "spec.verify.mode", fluxVerifyMode);
+            setPath(gitManifest, "spec.verify.secretRef.name", fluxVerifySecretRefName);
+        }
+        return gitManifest;
     }
 }

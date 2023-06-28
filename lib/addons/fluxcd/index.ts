@@ -51,6 +51,15 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   createNamespace?: boolean;
 
   /** 
+  * Flux Verify mode
+  * Default `head` */
+  fluxVerifyMode?: string;
+
+  /** 
+  * Flux Verify SecretRef */
+  fluxVerifySecretRefName?: string;
+
+  /** 
   * Internal for Flux sync.
   * Default `5m0s` */
   fluxSyncInterval?: string;
@@ -81,6 +90,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   version: "2.8.0",
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
+  fluxVerifyMode: "head",
   values: {},
   createNamespace: true,
   fluxSyncInterval: "5m0s",
@@ -128,7 +138,7 @@ export class FluxCDAddOn extends HelmAddOn {
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
 function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!);
+  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxVerifyMode!, fluxcdAddonProps.fluxVerifySecretRefName!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
