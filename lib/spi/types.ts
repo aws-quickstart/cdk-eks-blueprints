@@ -25,6 +25,15 @@ export type Values = {
 };
 
 /**
+ * Utility type for Kubernetes taints passed to Helm or GitOps applications.
+ */
+export type Taint = {
+    key: string,
+    value: string,
+    effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
+};
+
+/**
  * Interface that includes a reference to a Git repository for reuse, without credentials
  * and other access information.
  */

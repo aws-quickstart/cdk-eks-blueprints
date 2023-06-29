@@ -1,7 +1,7 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
-import { ClusterInfo, Values } from '../../spi';
+import { ClusterInfo, Values, Taint } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
@@ -22,22 +22,14 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
      */
-    taints?: {
-        key: string,
-        value: string,
-        effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    }[],
+    taints?: Taint[],
 
     /**
      * Provisioned nodes will have these taints, but pods do not need to tolerate these taints to be provisioned by this\
      * provisioner. These taints are expected to be temporary and some other entity (e.g. a DaemonSet) is responsible for
      * removing the taint after it has finished initializing the node.
      */
-    startupTaints?: {
-        key: string,
-        value: string,
-        effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    }[],
+    startupTaints?: Taint[],
 
     /**
      * Labels applied to all nodes
