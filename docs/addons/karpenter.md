@@ -88,8 +88,8 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
-2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose approrpriate sizing).
-3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterempty`, so if you provide both properties, the addon will throw an error.
+2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose appropriate sizing).
+3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterEmpty`, so if you provide both properties, the addon will throw an error.
 4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
 5. Interruption Handling, which is a native way to handle interruption due to involuntary interruption events, is supported on versions 0.19.0 and later. For interruption handling in the earlier versions, Karpenter supports using AWS Node Interruption Handler (which you will need to add as an add-on and ***must be in add-on array after the Karpenter add-on*** for it to work.
 

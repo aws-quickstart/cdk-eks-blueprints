@@ -1,7 +1,7 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
-import { ClusterInfo } from '../../spi';
+import { ClusterInfo, Values } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
@@ -37,21 +37,17 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
         key: string,
         value: string,
         effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    },
+    }[],
 
     /**
      * Labels applied to all nodes
      */
-    labels?: {
-        [key: string]: string
-    },
+    labels?: Values,
 
     /**
      * Annotations applied to all nodes
      */
-    annotations?: {
-        [key: string]: string
-    }
+    annotations?: Values,
 
     /**
      * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
@@ -66,16 +62,12 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
      */
-    subnetTags?: {
-        [key: string]: string
-    }
+    subnetTags?: Values,
 
     /**
      * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
      */
-    securityGroupTags?: {
-        [key: string]: string
-    }
+    securityGroupTags?: Values,
 
     /**
      * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
@@ -85,9 +77,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * AMI Selector
      */
-    amiSelector?: {
-        [key: string]: string
-    }
+    amiSelector?: Values,
 
     /**
      * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
