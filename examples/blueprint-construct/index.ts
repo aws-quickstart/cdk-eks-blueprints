@@ -357,9 +357,13 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
                     volume: ec2.BlockDeviceVolume.ebs(50, ebsDeviceProps),
                 }
             ],
-            machineImage: ec2.MachineImage.lookup({
-                name: 'Windows_Server-2019-English-Full-EKS_Optimized-1.24-*',
-                owners: ['amazon'],
+            machineImage: ec2.MachineImage.genericWindows({
+                'us-east-1': 'ami-0e80b8d281637c6c1',
+                'us-east-2': 'ami-039ecff89038848a6',
+                'us-west-1': 'ami-0c0815035bf1efb6e',
+                'us-west-2': 'ami-029e1340b254a7667',
+                'eu-west-1': 'ami-09af50f599f7f882c',
+                'eu-west-2': 'ami-0bf1fec1eaef78230',
             }),
             securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup,
             tags: {
