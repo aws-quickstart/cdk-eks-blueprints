@@ -71,6 +71,35 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                     "Instance": "SPOT"
                 }
             }
+        },
+        // Below is a Managed Windows Node Group Sample.
+        {
+            id: "mng3-windowsami",
+            amiType: NodegroupAmiType.AL2_X86_64,
+            instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+            desiredSize: 0,
+            minSize: 0, 
+            nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+            launchTemplate: {
+                blockDevices: [
+                    {
+                        deviceName: "/dev/sda1",
+                        volume: ec2.BlockDeviceVolume.ebs(50, ebsDeviceProps),
+                    }
+                ],
+                machineImage: ec2.MachineImage.lookup({
+                    name: 'Windows_Server-2019-English-Full-EKS_Optimized-1.24-*',
+                    owners: ['amazon'],
+                }),
+                securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup,
+                tags: {
+                    "Name": "Mng3",
+                    "Type": "Managed-WindowsNode-Group",
+                    "LaunchTemplate": "WindowsLT",
+                    "kubernetes.io/cluster/blueprint-construct-dev": "owned"
+                },
+                userData: windowsUserData,
+            }
         }
     ],
     fargateProfiles: {
@@ -176,4 +205,4 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 });
 ```
 
-Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-linux-ami-versions.html) for information ion the AMI release version that matches Kubernetes versions.
+Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-amis.html) for information ion the AMI release version that matches Kubernetes versions.
