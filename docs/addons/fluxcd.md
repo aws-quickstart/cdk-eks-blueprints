@@ -33,7 +33,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 Please follow the below steps if you are looking to setup FluxCD addon to read secrets and sync private Git repos:
 
-1. Please use the following CLI command to create a AWS Secrets Manager secret for `GIT_BEARER_TOKEN`.
+1. Please use the following CLI command to create a AWS Secrets Manager secret for `bearer-token-auth`.
 
 ```bash
 export SECRET_NAME=bearer-token-auth
@@ -46,7 +46,7 @@ aws secretsmanager create-secret \
   --region $AWS_REGION
 ```
 
-2. Below shows the snippet showing the usage of adding `ExternalsSecretsAddOn` to read secrets from AWS Secrets Manager and configuring `FluxCDAddOn` to read private repositories.
+2. Below is the snippet showing the usage of adding `ExternalsSecretsAddOn` to read secrets from AWS Secrets Manager and configuring `FluxCDAddOn` to read private repositories.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -64,14 +64,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
         targetRevision: "<<YOUR_TARGET_REVISION>>",
         path: "<<YOUR_FLUX_SYNC_PATH>>",
         fluxVerifyMode: "head",
-        // This is the name of your kubernetes secret to be created by `ExternalSecret` shown in step 3.
+        // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
         fluxSecretRefName: "repository-creds" 
     },
     bootstrapValues: {
         "region": "us-east-1"
     },
   }),
-    new ExternalOperatorSecretAddon(),
+  new ExternalOperatorSecretAddon(),
 ];
 
 
@@ -146,7 +146,7 @@ export class ExternalOperatorSecretAddon implements blueprints.ClusterAddOn {
                             {
                                 secretKey: "bearerToken",
                                 remoteRef: {
-                                    key: "GIT_BEARER_TOKEN"
+                                    key: "bearer-token-auth"
                                 },
                             },
                         ],
