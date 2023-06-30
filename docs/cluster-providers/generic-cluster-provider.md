@@ -23,7 +23,7 @@ windowsUserData.addCommands(`
     $ErrorActionPreference = 'Stop'
     $EKSBootstrapScriptPath = "C:\\\\Program Files\\\\Amazon\\\\EKS\\\\Start-EKSBootstrap.ps1"
     Try {
-    & $EKSBootstrapScriptPath -EKSClusterName 'blueprint-construct-dev'
+    & $EKSBootstrapScriptPath -EKSClusterName '<YOUR_CLUSTER_NAME>'
     } Catch {
     Throw $_
     }
