@@ -286,7 +286,7 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
             },
             requireImdsv2: false
         }
-    }
+    };
 }
 
 function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
@@ -319,7 +319,7 @@ function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
             }),
             userData: userData,
         }
-    }
+    };
 }
 
 function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
@@ -370,7 +370,7 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
             },
             userData: windowsUserData,
         }
-    }
+    };
 }
 
 
