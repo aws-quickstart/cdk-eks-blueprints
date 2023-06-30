@@ -328,7 +328,6 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
     
     const windowsUserData = ec2.UserData.forWindows();
     windowsUserData.addCommands(`
-    <powershell>
       $ErrorActionPreference = 'Stop'
       $EKSBootstrapScriptPath = "C:\\\\Program Files\\\\Amazon\\\\EKS\\\\Start-EKSBootstrap.ps1"
       Try {
@@ -336,7 +335,6 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
       } Catch {
         Throw $_
       }
-    </powershell>
     `);
     const ebsDeviceProps: ec2.EbsDeviceProps = {
         deleteOnTermination: false,
