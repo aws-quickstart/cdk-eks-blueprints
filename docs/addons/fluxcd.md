@@ -173,7 +173,7 @@ data:
   bearerToken: <<BASE64 ENCODED SECRET OF YOUR_GIT_BEARER_TOKEN STORE in AWS SECRETS MANAGER>>
 ```
 
-As pointed, If you are looking to use `secretRef` to reference a secret for FluxCD addon to sync private Git repos, please make sure the referenced secret is already created in the namespace ahead of time in AWS Secrets Manager as shown above. You can use [External Secrets Addon](./external-secrets.md) to learn more about external secrets operator which allows integration with third-party secret stores like AWS Secrets Manager, AWS Systems Manager Parameter Store and inject the values into the EKS cluster as Kubernetes Secrets.
+As pointed, if you are looking to use `secretRef` to reference a secret for FluxCD addon to sync private Git repos, please make sure the referenced secret is already created in the namespace ahead of time in AWS Secrets Manager as shown above. You can use [External Secrets Addon](./external-secrets.md) to learn more about external secrets operator which allows integration with third-party secret stores like AWS Secrets Manager, AWS Systems Manager Parameter Store and inject the values into the EKS cluster as Kubernetes Secrets.
 
 ## Configuration Options
 
