@@ -8,8 +8,6 @@ import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
-import { utils } from '../../lib';
-
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
