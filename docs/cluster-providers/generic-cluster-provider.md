@@ -18,6 +18,20 @@ Full list of configuration options:
 ## Usage 
 
 ```typescript
+const windowsUserData = ec2.UserData.forWindows();
+windowsUserData.addCommands(`
+    $ErrorActionPreference = 'Stop'
+    $EKSBootstrapScriptPath = "C:\\\\Program Files\\\\Amazon\\\\EKS\\\\Start-EKSBootstrap.ps1"
+    Try {
+    & $EKSBootstrapScriptPath -EKSClusterName '<YOUR_CLUSTER_NAME>'
+    } Catch {
+    Throw $_
+    }
+`);
+const ebsDeviceProps: ec2.EbsDeviceProps = {
+    deleteOnTermination: false,
+    volumeType: ec2.EbsDeviceVolumeType.GP2
+};
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_25,
     tags: {
@@ -70,6 +84,39 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                     "LaunchTemplate": "Custom",
                     "Instance": "SPOT"
                 }
+            }
+        },
+        // Below is a Managed Windows Node Group Sample.
+        {
+            id: "mng3-windowsami",
+            amiType: NodegroupAmiType.AL2_X86_64,
+            instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+            desiredSize: 0,
+            minSize: 0, 
+            nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+            launchTemplate: {
+                blockDevices: [
+                    {
+                        deviceName: "/dev/sda1",
+                        volume: ec2.BlockDeviceVolume.ebs(50, ebsDeviceProps),
+                    }
+                ],
+            machineImage: ec2.MachineImage.genericWindows({
+                'us-east-1': 'ami-0e80b8d281637c6c1',
+                'us-east-2': 'ami-039ecff89038848a6',
+                'us-west-1': 'ami-0c0815035bf1efb6e',
+                'us-west-2': 'ami-029e1340b254a7667',
+                'eu-west-1': 'ami-09af50f599f7f882c',
+                'eu-west-2': 'ami-0bf1fec1eaef78230',
+            }),
+                securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup,
+                tags: {
+                    "Name": "Mng3",
+                    "Type": "Managed-WindowsNode-Group",
+                    "LaunchTemplate": "WindowsLT",
+                    "kubernetes.io/cluster/<YOUR_CLUSTER_NAME>": "owned"
+                },
+                userData: windowsUserData,
             }
         }
     ],
@@ -176,4 +223,4 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 });
 ```
 
-Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-linux-ami-versions.html) for information ion the AMI release version that matches Kubernetes versions.
+Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-amis.html) for information ion the AMI release version that matches Kubernetes versions.

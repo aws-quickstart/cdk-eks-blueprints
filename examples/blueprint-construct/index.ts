@@ -12,6 +12,7 @@ import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
 const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
+const blueprintID = 'blueprint-construct-dev';
 
 export interface BlueprintConstructProps {
     /**
@@ -184,10 +185,6 @@ export default class BlueprintConstruct {
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
-        const blueprintID = 'blueprint-construct-dev';
-
-        const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
             version: KubernetesVersion.V1_25,
@@ -199,51 +196,9 @@ export default class BlueprintConstruct {
                 return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
             }),
             managedNodeGroups: [
-                {
-                    id: "mng1",
-                    amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-                    desiredSize: 2,
-                    maxSize: 3, 
-                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-                    launchTemplate: {
-                        // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
-                        tags: {
-                            "Name": "Mng1",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "ONDEMAND"
-                        },
-                        requireImdsv2: false
-                    }
-                },
-                {
-                    id: "mng2-customami",
-                    instanceTypes: [new ec2.InstanceType('t3.large')],
-                    nodeGroupCapacityType: CapacityType.SPOT,
-                    desiredSize: 0,
-                    minSize: 0,
-                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    launchTemplate: {
-                        tags: {
-                            "Name": "Mng2",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "SPOT"
-                        },
-                        machineImage: ec2.MachineImage.genericLinux({
-                            'eu-west-1': 'ami-00805477850d62b8c',
-                            'us-east-1': 'ami-08e520f5673ee0894',
-                            'us-west-2': 'ami-0403ff342ceb30967',
-                            'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': 'ami-07bda4b61dc470985',
-                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
-                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
-                        }),
-                        userData: userData,
-                    }
-                }
+                addGenericNodeGroup(),
+                addCustomNodeGroup(),
+                addWindowsNodeGroup()
             ]
         });
 
@@ -310,3 +265,114 @@ export default class BlueprintConstruct {
 
     }
 }
+
+function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
+
+    return {
+        id: "mng1",
+        amiType: NodegroupAmiType.AL2_X86_64,
+        instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+        desiredSize: 2,
+        maxSize: 3, 
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        launchTemplate: {
+            // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+            tags: {
+                "Name": "Mng1",
+                "Type": "Managed-Node-Group",
+                "LaunchTemplate": "Custom",
+                "Instance": "ONDEMAND"
+            },
+            requireImdsv2: false
+        }
+    };
+}
+
+function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
+    
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+
+    return {
+        id: "mng2-customami",
+        instanceTypes: [new ec2.InstanceType('t3.large')],
+        nodeGroupCapacityType: CapacityType.SPOT,
+        desiredSize: 0,
+        minSize: 0,
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        launchTemplate: {
+            tags: {
+                "Name": "Mng2",
+                "Type": "Managed-Node-Group",
+                "LaunchTemplate": "Custom",
+                "Instance": "SPOT"
+            },
+            machineImage: ec2.MachineImage.genericLinux({
+                'eu-west-1': 'ami-00805477850d62b8c',
+                'us-east-1': 'ami-08e520f5673ee0894',
+                'us-west-2': 'ami-0403ff342ceb30967',
+                'us-east-2': 'ami-07109d69738d6e1ee',
+                'us-west-1': 'ami-07bda4b61dc470985',
+                'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
+            }),
+            userData: userData,
+        }
+    };
+}
+
+function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
+    
+    const windowsUserData = ec2.UserData.forWindows();
+    windowsUserData.addCommands(`
+      $ErrorActionPreference = 'Stop'
+      $EKSBootstrapScriptPath = "C:\\\\Program Files\\\\Amazon\\\\EKS\\\\Start-EKSBootstrap.ps1"
+      Try {
+        & $EKSBootstrapScriptPath -EKSClusterName 'blueprint-construct-dev'
+      } Catch {
+        Throw $_
+      }
+    `);
+    const ebsDeviceProps: ec2.EbsDeviceProps = {
+        deleteOnTermination: false,
+        volumeType: ec2.EbsDeviceVolumeType.GP2
+    };
+
+    return {
+        id: "mng3-windowsami",
+        amiType: NodegroupAmiType.AL2_X86_64,
+        instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+        desiredSize: 0,
+        minSize: 0, 
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        launchTemplate: {
+            blockDevices: [
+                {
+                    deviceName: "/dev/sda1",
+                    volume: ec2.BlockDeviceVolume.ebs(50, ebsDeviceProps),
+                }
+            ],
+            machineImage: ec2.MachineImage.genericWindows({
+                'us-east-1': 'ami-0e80b8d281637c6c1',
+                'us-east-2': 'ami-039ecff89038848a6',
+                'us-west-1': 'ami-0c0815035bf1efb6e',
+                'us-west-2': 'ami-029e1340b254a7667',
+                'eu-west-1': 'ami-09af50f599f7f882c',
+                'eu-west-2': 'ami-0bf1fec1eaef78230',
+            }),
+            securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup,
+            tags: {
+                "Name": "Mng3",
+                "Type": "Managed-WindowsNode-Group",
+                "LaunchTemplate": "WindowsLT",
+                "kubernetes.io/cluster/blueprint-construct-dev": "owned"
+            },
+            userData: windowsUserData,
+        }
+    };
+}
+
+
+
+

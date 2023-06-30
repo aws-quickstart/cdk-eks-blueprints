@@ -27,6 +27,28 @@ export interface VpcCniAddOnProps {
   annotatePodIp?: boolean;
 
   /**
+   * `AWS_EC2_ENDPOINT` Environment Variable. Type: string.
+   * Specifies the EC2 endpoint to use. This is useful if you 
+   * are using a custom endpoint for EC2.  
+   */
+  awsEc2Endpoint?: string;
+
+  /**
+   * `AWS_EXTERNAL_SERVICE_CIDRS` Environment Variable. Type: string.
+   * Specify a comma-separated list of IPv4 CIDRs that must be routed 
+   * via main routing table. This is required for secondary ENIs to reach 
+   * endpoints outside of VPC that are backed by a service. 
+   */
+  awsExternalServiceCidrs?: string;
+
+  /**
+   * `AWS_MANAGE_ENIS_NON_SCHEDULABLE` Environment Variable. Type: Boolean.
+   * Specifies whether IPAMD should allocate or deallocate ENIs on a non-schedulable 
+   * node.
+   */
+  awsManageEnisNonSchedulable?: boolean;
+
+  /**
    * `AWS_VPC_CNI_NODE_PORT_SUPPORT` Environment Variable. Type: Boolean.
    * Specifies whether NodePort services are enabled on a worker node's primary 
    * network interface. 
@@ -41,14 +63,6 @@ export interface VpcCniAddOnProps {
   awsVpcEniMtu?: number;
 
   /**
-  * `AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER` Environment Variable. Type: Boolean.
-  * Specifies whether ipamd should configure rp filter for primary interface. 
-  * Setting this to false will require rp filter to be configured through init 
-  * container.
-  */
-  awsVpcK8sCniConfigureRpfilter?: boolean;
-
-  /**
   * `AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG` Environment Variable. Type: Boolean.
   * Specifies that your pods may use subnets and security groups that are 
   * independent of your worker node's VPC configuration.
@@ -61,6 +75,12 @@ export interface VpcCniAddOnProps {
   * for the CNI.
   */
   awsVpcK8sCniVethPrefix?: string;
+
+  /**
+  * `AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS` Environment Variable. Type: String.
+  Specify a comma-separated list of IPv4 CIDRs to exclude from SNAT.
+  */
+  awsVpcK8sExcludeSnatCidrs?: string;
 
   /**
   * `AWS_VPC_K8S_CNI_LOGLEVEL` Environment Variable. Type: String.
@@ -102,9 +122,21 @@ export interface VpcCniAddOnProps {
   awsVpcK8sPluginLogLevel?: string;
 
   /**
+   * `CLUSTER_ENDPOINT` Environment Variable. Type: String.
+   * Specifies the cluster endpoint to use for connecting to 
+   * the api-server without relying on kube-proxy. 
+   */
+  clusterEndpoint?: string;
+
+  /**
    * CustomNetworkingConfig holding Secondary Subnet IDs for creating `ENIConfig`
    */
   customNetworkingConfig?: CustomNetworkingConfig;
+
+  /**
+   * `DISABLE_LEAKED_ENI_CLEANUP` Environment Variable. Type: Boolean.
+   */
+  disableLeakedEniCleanup?: boolean;
 
   /**
    * `DISABLE_INTROSPECTION` Environment Variable. Type: Boolean.
@@ -126,6 +158,28 @@ export interface VpcCniAddOnProps {
   disablenetworkResourceProvisioning?: boolean;
 
   /**
+  * `DISABLE_TCP_EARLY_DEMUX` Environment Variable. Type: Boolean.
+  * If ENABLE_POD_ENI is set to true, for the kubelet to connect via TCP
+  * to pods that are using per pod security groups, DISABLE_TCP_EARLY_DEMUX 
+  * should be set to true for amazon-k8s-cni-init the container under initcontainers.
+  */
+  disableTcpEarlyDemux?: boolean;
+
+  /**
+  * `ENABLE_BANDWIDTH_PLUGIN` Environment Variable. Type: Boolean.
+  * Setting ENABLE_BANDWIDTH_PLUGIN to true will update 10-aws.conflist to 
+  * include upstream bandwidth plugin as a chained plugin.
+  */
+  enableBandwidthPlugin?: boolean;
+
+  /**
+  * `ENABLE_NFTABLES` Environment Variable. Type: Boolean.
+  * VPC CNI uses iptables-legacy by default. Setting ENABLE_NFTABLES 
+  * to true will update VPC CNI to use iptables-nft
+  */
+  enableNftables?: boolean;
+
+  /**
    * `ENABLE_POD_ENI` Environment Variable. Type: Boolean.
   * Setting ENABLE_POD_ENI to true will allow IPAMD to add the 
   * vpc.amazonaws.com/has-trunk-attached label to the node if the instance 
@@ -139,6 +193,13 @@ export interface VpcCniAddOnProps {
    * ENABLE_PREFIX_DELEGATION to true will start allocating a prefix (/28 for IPv4 and /80 for IPv6) instead of a secondary IP in the ENIs subnet. 
   */
   enablePrefixDelegation?: boolean;
+
+  /**
+  * `ENABLE_V6_EGRESS` Environment Variable. Type: Boolean.
+  * Specifies whether PODs in an IPv4 cluster support IPv6 egress. 
+  * If env is set to true, range fd00::ac:00/118 is reserved for IPv6 egress.
+  */
+  enableV6Egress?: boolean;
 
   /**
   * `ENI_CONFIG_LABEL_DEF` Environment Variable. Type: String.
@@ -155,12 +216,45 @@ export interface VpcCniAddOnProps {
   eniConfigAnnotationDef?: string;
 
   /**
+   * `INTROSPECTION_BIND_ADDRESS` Environment Variable. Type: String. 
+   * Specifies the bind address for the introspection endpoint.
+  */
+  introspectionBindAddress?: string;
+
+  /**
+  * `MAX_ENI` Environment Variable. Format integer.
+  * Specifies the maximum number of ENIs that will be attached to the node. 
+  */
+  maxEni?: number;  
+
+  /**
+  * `MINIMUM_IP_TARGET` Environment Variable. Format integer.
+  * Specifies the number of total IP addresses that the ipamd 
+  * daemon should attempt to allocate for pod assignment on the node.
+  */
+  minimumIpTarget?: number; 
+
+  /**
+   * `POD_SECURITY_GROUP_ENFORCING_MODE` Environment Variable. Type: String. 
+   * Once ENABLE_POD_ENI is set to true, this value controls how the traffic 
+   * of pods with the security group behaves.
+  */
+  podSecurityGroupEnforcingMode?: string;
+
+  /**
   * `WARM_ENI_TARGET` Environment Variable. Format integer.
   * Specifies the number of free elastic network interfaces (and all of their 
   * available IP addresses) that the ipamd daemon should attempt to keep 
   * available for pod assignment on the node. 
   */
   warmEniTarget?: number;
+
+  /**
+  * `WARM_IP_TARGET` Environment Variable. Format integer.
+  * Specifies the number of free IP addresses that the ipamd daemon 
+  * should attempt to keep available for pod assignment on the node.
+  */
+  warmIpTarget?: number;
 
   /**
   * `WARM_PREFIX_TARGET` Environment Variable. Format integer.
@@ -198,7 +292,7 @@ export interface CustomNetworkingConfig {
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.12.6-eksbuild.2',
+  version: 'v1.13.0-eksbuild.1',
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
@@ -281,12 +375,15 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
 
   const result: Values = {
     env: {
+      AWS_EC2_ENDPOINT: props?.awsEc2Endpoint,
       ADDITIONAL_ENI_TAGS: props?.additionalEniTags,
       ANNOTATE_POD_IP: props?.annotatePodIp,
+      AWS_EXTERNAL_SERVICE_CIDR: props?.awsExternalServiceCidrs,
+      AWS_MANAGE_ENIS_NON_SCHEDULABLE: props?.awsManageEnisNonSchedulable,
       AWS_VPC_CNI_NODE_PORT_SUPPORT: props?.awsVpcCniNodePortSupport,
       AWS_VPC_ENI_MTU: props?.awsVpcEniMtu,
-      AWS_VPC_K8S_CNI_CONFIGURE_RPFILTER: props?.awsVpcK8sCniConfigureRpfilter,
       AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: props?.awsVpcK8sCniCustomNetworkCfg,
+      AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS: props?.awsVpcK8sExcludeSnatCidrs,
       ENI_CONFIG_LABEL_DEF: props?.eniConfigLabelDef,
       ENI_CONFIG_ANNOTATION_DEF: props?.eniConfigAnnotationDef,
       AWS_VPC_K8S_CNI_EXTERNALSNAT: props?.awsVpcK8sCniExternalSnat,
@@ -296,12 +393,23 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       AWS_VPC_K8S_CNI_VETHPREFIX: props?.awsVpcK8sCniVethPrefix,
       AWS_VPC_K8S_PLUGIN_LOG_FILE: props?.awsVpcK8sPluginLogFile,
       AWS_VPC_K8S_PLUGIN_LOG_LEVEL: props?.awsVpcK8sPluginLogLevel,
+      CLUSTER_ENDPOINT: props?.clusterEndpoint,
+      DISABLE_LEAKED_ENI_CLEANUP: props?.disableLeakedEniCleanup,
       DISABLE_INTROSPECTION: props?.disableIntrospection,
       DISABLE_METRICS: props?.disableMetrics,
       DISABLE_NETWORK_RESOURCE_PROVISIONING: props?.disablenetworkResourceProvisioning,
+      DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
+      ENABLE_BANDWIDTH_PLUGIN: props?.enableBandwidthPlugin,
+      ENABLE_NFTABLES: props?.enableNftables,
       ENABLE_POD_ENI: props?.enablePodEni,
       ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
+      ENABLE_V6_EGRESS: props?.enableV6Egress,
+      INTROSPECTION_BIND_ADDRESS: props?.introspectionBindAddress,
+      MAX_ENI: props?.maxEni,
+      MINIMUM_IP_TARGET: props?.minimumIpTarget,
+      POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode,
       WARM_ENI_TARGET: props?.warmEniTarget,
+      WARM_IP_TARGET: props?.warmIpTarget,
       WARM_PREFIX_TARGET: props?.warmPrefixTarget
     }
   };

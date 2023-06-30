@@ -13,21 +13,167 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-    bootstrapRepo: {
-        repoUrl: 'https://github.com/stefanprodan/podinfo',
-        name: "podinfo",
-        targetRevision: "master",
-        path: "./kustomize"
-    },
-    bootstrapValues: {
-        "region": "us-east-1"
-    },
+  bootstrapRepo: {
+      repoUrl: 'https://github.com/stefanprodan/podinfo',
+      name: "podinfo",
+      targetRevision: "master",
+      path: "./kustomize"
+  },
+  bootstrapValues: {
+      "region": "us-east-1"
+  },
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
+
+## Secret Management for private Git repositories with FluxCD
+
+Please follow the below steps if you are looking to setup FluxCD addon to read secrets and sync private Git repos:
+
+1. Please use the following CLI command to create a AWS Secrets Manager secret for `bearer-token-auth`.
+
+```bash
+export SECRET_NAME=bearer-token-auth
+export GIT_BEARER_TOKEN=<YOUR_GIT_BEARER_TOKEN>
+export AWS_REGION=<YOUR_AWS_REGION>
+aws secretsmanager create-secret \
+  --name $SECRET_NAME \
+  --description "Your GIT BEARER TOKEN SECRET" \
+  --secret-string "${GIT_BEARER_TOKEN}" \
+  --region $AWS_REGION
+```
+
+2. Below is the snippet showing the usage of adding `ExternalsSecretsAddOn` to read secrets from AWS Secrets Manager and configuring `FluxCDAddOn` to read private repositories.
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { ExternalOperatorSecretAddon } from './externaloperatorsecretaddon';
+
+const app = new cdk.App();
+
+const addOns: Array<blueprints.ClusterAddOn> = [
+  new blueprints.addons.ExternalsSecretsAddOn(),
+  new blueprints.addons.FluxCDAddOn({
+    bootstrapRepo: {
+        repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
+        name: "<<YOUR_FLUX_APP_NAME>>",
+        targetRevision: "<<YOUR_TARGET_REVISION>>",
+        path: "<<YOUR_FLUX_SYNC_PATH>>",
+        fluxVerifyMode: "head",
+        // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
+        fluxSecretRefName: "repository-creds" 
+    },
+    bootstrapValues: {
+        "region": "us-east-1"
+    },
+  }),
+  new ExternalOperatorSecretAddon(),
+];
+
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOns)
+  .build(app, 'my-stack-name');
+```
+
+3. Below is the code snippet `externaloperatorsecretaddon.ts` which shows the mechanism to setup `ClusterSecretStore` and `ExternalSecret` to read AWS Secrets Manager `bearer-token-auth` secret which is a GIT BEARER Token to sync private repositories :
+
+```typescript
+import 'source-map-support/register';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import * as eks from "aws-cdk-lib/aws-eks";
+import { Construct } from 'constructs';
+import { dependable } from '@aws-quickstart/eks-blueprints/dist/utils';
+
+export class ExternalOperatorSecretAddon implements blueprints.ClusterAddOn {
+    id?: string | undefined;
+    @dependable(blueprints.addons.ExternalsSecretsAddOn.name)
+    deploy(clusterInfo: blueprints.ClusterInfo): void | Promise<Construct> {
+        const cluster = clusterInfo.cluster;
+        const secretStore = new eks.KubernetesManifest(clusterInfo.cluster.stack, "ClusterSecretStore", {
+            cluster: cluster,
+            manifest: [
+                {
+                    apiVersion: "external-secrets.io/v1beta1",
+                    kind: "ClusterSecretStore",
+                    metadata: {
+                        name: "secret-manager-store",
+                        namespace: "default"
+                    },
+                    spec: {
+                        provider: {
+                            aws: {
+                                service: "SecretsManager",
+                                region: clusterInfo.cluster.stack.region,
+                                auth: {
+                                    jwt: {
+                                        serviceAccountRef: {
+                                            name: "external-secrets-sa",
+                                            namespace: "external-secrets",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        });
+        
+        const externalSecret = new eks.KubernetesManifest(clusterInfo.cluster.stack, "ExternalSecret", {
+            cluster: cluster,
+            manifest: [
+                {
+                    apiVersion: "external-secrets.io/v1beta1",
+                    kind: "ExternalSecret",
+                    metadata: {
+                        name: "git-admin-credentials",
+                        namespace: "flux-system"
+                    },
+                    spec: {
+                        secretStoreRef: {
+                            name: "secret-manager-store",
+                            kind: "ClusterSecretStore",
+                        },
+                        target: {
+                            name: "repository-creds"
+                        },
+                        data: [
+                            {
+                                secretKey: "bearerToken",
+                                remoteRef: {
+                                    key: "bearer-token-auth"
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        });
+        externalSecret.node.addDependency(secretStore);
+        return Promise.resolve(secretStore);
+    }
+}
+```
+
+4. Upon execution of the above blueprint, the above `ExternalSecret` Kubernetes resource will take care of creating a Kubernetes Secret as shown below in `flux-system` namespace :
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repository-creds
+  namespace: flux-system
+type: Opaque
+data:
+  bearerToken: <<BASE64 ENCODED SECRET OF YOUR_GIT_BEARER_TOKEN STORE in AWS SECRETS MANAGER>>
+```
+
+As pointed, if you are looking to use `secretRef` to reference a secret for FluxCD addon to sync private Git repos, please make sure the referenced secret is already created in the namespace ahead of time in AWS Secrets Manager as shown above. You can use [External Secrets Addon](./external-secrets.md) to learn more about external secrets operator which allows integration with third-party secret stores like AWS Secrets Manager, AWS Systems Manager Parameter Store and inject the values into the EKS cluster as Kubernetes Secrets.
 
 ## Configuration Options
 

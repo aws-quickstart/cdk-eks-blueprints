@@ -148,37 +148,33 @@ blueprints.EksBlueprint.builder()
 # Assuming cluster version is 1.19, below command shows versions of the vpc-cni add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
     --addon-name vpc-cni \
-    --kubernetes-version 1.23 \
+    --kubernetes-version 1.25 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 # Output
-v1.12.1-eksbuild.2
+v1.13.2-eksbuild.1
 False
-v1.12.1-eksbuild.1
+v1.13.0-eksbuild.1
 False
+v1.12.6-eksbuild.2
+False
+v1.12.6-eksbuild.1
+False
+v1.12.5-eksbuild.2
+False
+v1.12.5-eksbuild.1
+False
+v1.12.2-eksbuild.1
+True
 v1.12.0-eksbuild.2
 False
-v1.12.0-eksbuild.1
+v1.11.5-eksbuild.1
 False
 v1.11.4-eksbuild.3
 False
-v1.11.4-eksbuild.2
+v1.10.4-eksbuild.3
 False
-v1.11.4-eksbuild.1
-False
-v1.11.3-eksbuild.3
-False
-v1.11.3-eksbuild.2
-False
-v1.11.3-eksbuild.1
-False
-v1.11.2-eksbuild.3
-False
-...
-...
-v1.7.5-eksbuild.1
-False
-v1.6.3-eksbuild.2
+v1.0.0-eksbuild.preview
 False
 ```  
 # Validation
@@ -197,7 +193,7 @@ aws eks describe-addon \
     --query "addon.addonVersion" \
     --output text
 # Output
-v1.12.1-eksbuild.2
+v1.13.0-eksbuild.1
 ```
 
 ## Functionality

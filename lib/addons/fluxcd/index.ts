@@ -51,6 +51,10 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   createNamespace?: boolean;
 
   /** 
+  * Flux SecretRef */
+  fluxSecretRefName?: string;
+
+  /** 
   * Internal for Flux sync.
   * Default `5m0s` */
   fluxSyncInterval?: string;
@@ -128,7 +132,7 @@ export class FluxCDAddOn extends HelmAddOn {
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
 function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!);
+  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
