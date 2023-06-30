@@ -8,7 +8,7 @@ export class FluxGitRepository {
 
     constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
-    public generate(namespace: string, fluxSyncInterval: string, fluxVerifyMode: string, fluxVerifySecretRefName: string) {
+    public generate(namespace: string, fluxSyncInterval: string, fluxSecretRefName: string) {
 
         const repository = this.bootstrapRepo!;
         const gitManifest =  {
@@ -26,9 +26,8 @@ export class FluxGitRepository {
                 },
             }
         };
-        if (fluxVerifySecretRefName) {
-            setPath(gitManifest, "spec.verify.mode", fluxVerifyMode);
-            setPath(gitManifest, "spec.verify.secretRef.name", fluxVerifySecretRefName);
+        if (fluxSecretRefName) {
+            setPath(gitManifest, "spec.secretRef.name", fluxSecretRefName);
         }
         return gitManifest;
     }
