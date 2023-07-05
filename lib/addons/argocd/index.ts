@@ -96,7 +96,7 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             repository: this.options.repository!
         });
         if (this.options.bootstrapRepo){
-            validateConstraints(new spi.ApplicationRepositoryConstraints, "ArgoCDAddOnProps.bootstrapRepo", this.options.bootstrapRepo)
+            validateConstraints(new spi.ApplicationRepositoryConstraints, "ArgoCDAddOnProps.bootstrapRepo", this.options.bootstrapRepo);
         }
     }
 

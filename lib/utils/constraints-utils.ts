@@ -86,7 +86,7 @@ export class GenericRegexConstraint implements Constraint {
         
         if (value != undefined)
             z.string()
-                .regex(this.regex ?? new RegExp('*'), { message: `${key} (${identifier}) must match regular expression ${this.regex}.`})
+                .regex(this.regex ?? new RegExp('.*'), { message: `${key} (${identifier}) must match regular expression ${this.regex}.`})
                 .parse(value);
         
     }
@@ -94,7 +94,7 @@ export class GenericRegexConstraint implements Constraint {
 }
 
 export class DomainNameConstraint extends GenericRegexConstraint {
-    constructor () { super(new RegExp('[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')) }
+    constructor () { super(new RegExp('[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')); }
 }
 
 export class CompositeConstraint implements Constraint {
@@ -102,7 +102,7 @@ export class CompositeConstraint implements Constraint {
     
     validate(key: string, value: any, identifier: string) {
         this.constraints.forEach(constraint => {
-            constraint.validate(key, value, identifier)
+            constraint.validate(key, value, identifier);
         });
     }
 
