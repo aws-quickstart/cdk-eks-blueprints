@@ -37,6 +37,12 @@ export class CoreAddOnProps {
      * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
      */
     readonly controlPlaneAddOn?: boolean;
+
+
+    /** 
+     * Map between kubernetes versions and addOn versions for auto selection.
+     */
+    readonly versionMap?: Map<KubernetesVersion, string>;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -70,10 +76,16 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccount = this.createServiceAccount(clusterInfo, saNamespace, policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
+        let version: string = this.coreAddOnProps.version;
+
+        if (this.coreAddOnProps.versionMap) {
+            version = this.coreAddOnProps.version != "auto" ? this.coreAddOnProps.version : this.provideVersion(clusterInfo, this.coreAddOnProps.versionMap);
+        }
+        userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} is at version ${version}`);
 
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
-            addonVersion: this.coreAddOnProps.version,
+            addonVersion: version,
             configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
@@ -128,20 +140,11 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     provideVersion(clusterInfo: ClusterInfo, versionMap: Map<KubernetesVersion, string>) : string {
-        if (this.coreAddOnProps.version?.trim() === 'auto') {
-            const maybeVersion: string | undefined = versionMap.get(clusterInfo.version);
-            if(!maybeVersion) {
-                this.coreAddOnProps.version = versionMap.values().next().value;
-                logger.warn(`Unable to auto-detect kube-proxy version. Applying latest: ${this.version}`);
-            } else {
-                this.coreAddOnProps.version = maybeVersion;
-            }
-        }
         let version: string;
         if(!versionMap.get(clusterInfo.version)) {
-            version = this.coreAddOnProps.version
+            version = versionMap.values().next().value;
         } else {
-            version = versionMap.get(clusterInfo.version)!
+            version = versionMap.get(clusterInfo.version)!;
         }
 
         return version;

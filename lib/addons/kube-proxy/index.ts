@@ -1,7 +1,4 @@
-import { CfnAddon, KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { Construct } from "constructs";
-import { ClusterInfo } from "../../spi";
-import { logger } from "../../utils";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { CoreAddOn } from "../core-addon";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
@@ -21,31 +18,8 @@ export class KubeProxyAddOn extends CoreAddOn {
         super({
             addOnName: "kube-proxy",
             version: version ?? "auto",
-            saName: "kube-proxy"
+            saName: "kube-proxy",
+            versionMap: versionMap,
         });
-    }
-
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        if (this.version?.trim() === 'auto') {
-            const maybeVersion: string | undefined = versionMap.get(clusterInfo.version);
-            if(!maybeVersion) {
-                this.version = versionMap.values().next().value;
-                logger.warn(`Unable to auto-detect kube-proxy version. Applying latest: ${this.version}`);
-            } else {
-                this.version = maybeVersion;
-            }
-        }
-
-        let addOnProps = {
-            addonName: this.coreAddOnProps.addOnName,
-            addonVersion: this.version,
-            configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
-            clusterName: clusterInfo.cluster.clusterName,
-            resolveConflicts: "OVERWRITE"
-        };
-
-        const cfnAddon = new CfnAddon(clusterInfo.cluster.stack, this.coreAddOnProps.addOnName + "-addOn", addOnProps);
-        // Instantiate the Add-on
-        return Promise.resolve(cfnAddon);
     }
 }
