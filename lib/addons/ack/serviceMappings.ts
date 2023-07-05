@@ -47,137 +47,137 @@ export enum AckServiceName {
 export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.IAM]: {
       chart: "iam-chart",
-      version:  "1.2.2",
+      version:  "v1.1.0",
       managedPolicyName: "IAMFullAccess"
     },
     [AckServiceName.RDS]: {
       chart: "rds-chart",
-      version:  "1.1.5",
+      version:  "v1.0.0",
       managedPolicyName: "AmazonRDSFullAccess"
     },
     [AckServiceName.EC2]: {
       chart: "ec2-chart",
-      version:  "1.0.3",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonRDSFullAccess"
     },
     [AckServiceName.S3]: {
       chart: "s3-chart",
-      version:  "1.0.4",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonS3FullAccess"
     },
     [AckServiceName.DYNAMODB]: {
       chart: "dynamodb-chart",
-      version:  "1.1.2",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonDynamoDBFullAccess"
     },
     [AckServiceName.ECR]: {
       chart: "ecr-chart",
-      version:  "1.0.5",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonEC2ContainerRegistryFullAccess"
     },
     [AckServiceName.SNS]: {
       chart: "sns-chart",
-      version:  "1.0.2",
+      version:  "v0.0.7",
       managedPolicyName: "AmazonSNSFullAccess"
     },
     [AckServiceName.APIGATEWAYV2]: {
       chart: "apigatewayv2-chart",
-      version:  "1.0.4",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonAPIGatewayAdministrator"
     },
     [AckServiceName.ELASTICACHE]: {
       chart: "elasticache-chart",
-      version:  "0.0.26",
+      version:  "v0.0.22",
       managedPolicyName: "AmazonElastiCacheFullAccess"
     },
     [AckServiceName.OPENSEARCHSERVICE]: {
       chart: "opensearchservice-chart",
-      version:  "0.0.16",
+      version:  "v0.0.14",
       managedPolicyName: "AmazonOpenSearchServiceFullAccess"
     },
     [AckServiceName.MQ]: {
       chart: "mq-chart",
-      version:  "0.0.28",
+      version:  "v0.0.26",
       managedPolicyName: "AmazonMQFullAccess"
     },
     [AckServiceName.LAMBDA]: {
       chart: "lambda-chart",
-      version:  "1.1.0",
+      version:  "v0.1.6",
       managedPolicyName: "AWSLambda_FullAccess"
     },
     [AckServiceName.KMS]: {
       chart: "kms-chart",
-      version:  "1.0.5",
+      version:  "v1.0.1",
       managedPolicyName: "AWSKeyManagementServicePowerUser"
     },
     [AckServiceName.MEMORYDB]: {
       chart: "memorydb-chart",
-      version:  "1.0.1",
+      version:  "v0.0.7",
       managedPolicyName: "AmazonMemoryDBFullAccess"
     },
     [AckServiceName.EKS]: {
       chart: "eks-chart",
-      version:  "1.0.3",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonEKSClusterPolicy"
     },
     [AckServiceName.APPLICATIONAUTOSCALING]: {
       chart: "applicationautoscaling-chart",
-      version:  "1.0.5",
+      version:  "v1.0.1",
       managedPolicyName: "AutoScalingFullAccess"
     },
     [AckServiceName.ELASTICSEARCHSERVICE]: {
       chart: "elasticsearchservice-chart",
-      version:  "0.0.2",
+      version:  "v0.0.2",
       managedPolicyName: "AmazonElasticsearchServiceRolePolicy"
     },
     [AckServiceName.PROMETHEUSSERVICE]: {
       chart: "prometheusservice-chart",
-      version:  "1.2.3",
+      version:  "v1.0.1",
       managedPolicyName: "AmazonPrometheusFullAccess"
     },
     [AckServiceName.EMRCONTAINERS]: {
       chart: "emrcontainers-chart",
-      version:  "1.0.2",
+      version:  "v1.0.0",
       managedPolicyName: "AmazonEMRContainersServiceRolePolicy"
     },
     [AckServiceName.SFN]: {
       chart: "sfn-chart",
-      version:  "1.0.3",
+      version:  "v1.0.0",
       managedPolicyName: "AWSStepFunctionsFullAccess"
     },
     [AckServiceName.KINESIS]: {
       chart: "kinesis-chart",
-      version:  "0.0.7",
+      version:  "v0.0.4",
       managedPolicyName: "AmazonKinesisFullAccess"
     },
     [AckServiceName.CLOUDTRAIL]: {
       chart: "cloudtrail-chart",
-      version:  "1.0.3",
+      version:  "v1.0.0",
       managedPolicyName: "AWSCloudTrail_FullAccess"
     },
     [AckServiceName.ACM]: {
       chart: "acm-chart",
-      version:  "0.0.7",
+      version:  "v0.0.4",
       managedPolicyName: "AWSCertificateManagerFullAccess"
     },
     [AckServiceName.ROUTE53]: {
       chart: "route53-chart",
-      version:  "0.0.5",
+      version:  "v0.0.2",
       managedPolicyName: "AmazonRoute53FullAccess"
     },
     [AckServiceName.SQS]: {
       chart: "sqs-chart",
-      version:  "1.0.4",
+      version:  "v0.0.3",
       managedPolicyName: "AmazonSQSFullAccess"
     },
     [AckServiceName.SAGEMAKER]: {
       chart: "sagemaker-chart",
-      version:  "1.2.2",
+      version:  "v1.1.0",
       managedPolicyName: "AmazonSageMakerFullAccess"
     },
     [AckServiceName.EVENTBRIDGE]: {
       chart: "eventbridge-chart",
-      version:  "1.0.2",
+      version:  "v0.0.5",
       managedPolicyName: "AmazonEventBridgeFullAccess"
     }
 };
