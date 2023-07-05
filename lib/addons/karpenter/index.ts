@@ -1,7 +1,7 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
-import { ClusterInfo } from '../../spi';
+import { ClusterInfo, Values, Taint } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
@@ -20,6 +20,28 @@ import { Cluster } from 'aws-cdk-lib/aws-eks';
  */
 interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
+     * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
+     */
+    taints?: Taint[],
+
+    /**
+     * Provisioned nodes will have these taints, but pods do not need to tolerate these taints to be provisioned by this\
+     * provisioner. These taints are expected to be temporary and some other entity (e.g. a DaemonSet) is responsible for
+     * removing the taint after it has finished initializing the node.
+     */
+    startupTaints?: Taint[],
+
+    /**
+     * Labels applied to all nodes
+     */
+    labels?: Values,
+
+    /**
+     * Annotations applied to all nodes
+     */
+    annotations?: Values,
+
+    /**
      * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
      * deploy a Provisioner with default values.
      */
@@ -29,30 +51,25 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
         vals: string[],
     }[]
 
-    taints?: {
-        key: string,
-        value: string,
-        effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
-    }[]
-
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
      */
-    subnetTags?: {
-        [key: string]: string
-    }
+    subnetTags?: Values,
 
     /**
      * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
      */
-    securityGroupTags?: {
-        [key: string]: string
-    }
+    securityGroupTags?: Values,
 
     /**
      * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
      */
     amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
+
+    /**
+     * AMI Selector
+     */
+    amiSelector?: Values,
 
     /**
      * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
@@ -117,7 +134,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.27.3',
+    version: 'v0.28.0',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -151,7 +168,11 @@ export class KarpenterAddOn extends HelmAddOn {
         const subnetTags = this.options.subnetTags || {};
         const sgTags = this.options.securityGroupTags || {};
         const taints = this.options.taints || [];
+        const startupTaints = this.options.startupTaints || [];
+        const labels = this.options.labels || {};
+        const annotations = this.options.annotations || {};
         const amiFamily = this.options.amiFamily;
+        const amiSelector = this.options.amiSelector;
         const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
         const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
         const weight = this.options.weight || null;
@@ -280,21 +301,37 @@ export class KarpenterAddOn extends HelmAddOn {
                 kind: 'Provisioner',
                 metadata: { name: 'default' },
                 spec: {
-                    consolidation: consolidation,
-                    requirements: this.convert(requirements),
-                    taints: taints,
-                    limits: limits,
-                    provider: {
-                        amiFamily: amiFamily,
-                        subnetSelector: subnetTags,
-                        securityGroupSelector: sgTags,
+                    providerRef: {
+                        name: "default"
                     },
+                    taints: taints,
+                    startupTaints: startupTaints,
+                    labels: labels,
+                    annotations: annotations,
+                    requirements: this.convert(requirements),
+                    limits: limits,
+                    consolidation: consolidation,
                     ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                     ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
                     weight: weight,
                 },
             });
             provisioner.node.addDependency(karpenterChart);
+
+            const nodeTemplate = cluster.addManifest('default-node-template', {
+                apiVersion: "karpenter.k8s.aws/v1alpha1",
+                kind: "AWSNodeTemplate",
+                metadata: {
+                    name: "default"
+                },
+                spec: {
+                    amiFamily: amiFamily,
+                    amiSelector: amiSelector,
+                    subnetSelector: subnetTags,
+                    securityGroupSelector: sgTags,
+                },
+            });
+            nodeTemplate.node.addDependency(provisioner);
         }
 
         return Promise.resolve(karpenterChart);

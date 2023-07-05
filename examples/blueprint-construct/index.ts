@@ -120,6 +120,9 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
+                amiSelector: {
+                    "karpenter.sh/discovery/MyClusterName": '*',
+                },
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
