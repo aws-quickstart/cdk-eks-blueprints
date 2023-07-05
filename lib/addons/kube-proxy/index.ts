@@ -17,15 +17,12 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
  */
 export class KubeProxyAddOn extends CoreAddOn {
 
-    version: string;
-
     constructor(version?: string) {
         super({
             addOnName: "kube-proxy",
             version: version ?? "auto",
             saName: "kube-proxy"
         });
-        this.version = version ?? "auto";
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {

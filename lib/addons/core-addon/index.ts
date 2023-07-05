@@ -3,6 +3,7 @@ import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
@@ -124,6 +125,26 @@ export class CoreAddOn implements ClusterAddOn {
             result = [policy];
         }
         return result;
+    }
+
+    provideVersion(clusterInfo: ClusterInfo, versionMap: Map<KubernetesVersion, string>) : string {
+        if (this.coreAddOnProps.version?.trim() === 'auto') {
+            const maybeVersion: string | undefined = versionMap.get(clusterInfo.version);
+            if(!maybeVersion) {
+                this.coreAddOnProps.version = versionMap.values().next().value;
+                logger.warn(`Unable to auto-detect kube-proxy version. Applying latest: ${this.version}`);
+            } else {
+                this.coreAddOnProps.version = maybeVersion;
+            }
+        }
+        let version: string;
+        if(!versionMap.get(clusterInfo.version)) {
+            version = this.coreAddOnProps.version
+        } else {
+            version = versionMap.get(clusterInfo.version)!
+        }
+
+        return version;
     }
 
 }
