@@ -7,7 +7,7 @@ import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { createNamespace, getSecretValue } from '../../utils';
+import { createNamespace, getSecretValue, validateConstraints } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
@@ -95,6 +95,9 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
             version: this.options.version!,
             repository: this.options.repository!
         });
+        if (this.options.bootstrapRepo){
+            validateConstraints(new spi.ApplicationRepositoryConstraints, "ArgoCDAddOnProps.bootstrapRepo", this.options.bootstrapRepo)
+        }
     }
 
     generate(clusterInfo: spi.ClusterInfo, deployment: spi.GitOpsApplicationDeployment, wave = 0): Construct {

@@ -6,7 +6,7 @@ import { Construct, IConstruct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { logger } from "../utils/log-utils";
-
+import * as constraints from '../utils/constraints-utils';
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
  */
@@ -81,6 +81,10 @@ export interface ApplicationRepository extends GitRepositoryReference {
      */
     credentialsType?: "USERNAME" | "TOKEN" | "SSH"
 
+}
+
+export class ApplicationRepositoryConstraints implements constraints.ConstraintsType<ApplicationRepository> {
+    credentialsSecretName = new constraints.DomainNameConstraint()
 }
 
 /**

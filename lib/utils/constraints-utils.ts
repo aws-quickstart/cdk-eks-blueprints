@@ -79,6 +79,35 @@ export class ArrayConstraint implements Constraint {
     }
 }
 
+export class GenericRegexConstraint implements Constraint {
+    constructor (readonly regex?: RegExp) { }
+
+    validate(key: string, value: any, identifier: string) {
+        
+        if (value != undefined)
+            z.string()
+                .regex(this.regex ?? new RegExp('*'), { message: `${key} (${identifier}) must match regular expression ${this.regex}.`})
+                .parse(value);
+        
+    }
+
+}
+
+export class DomainNameConstraint extends GenericRegexConstraint {
+    constructor () { super(new RegExp('[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')) }
+}
+
+export class CompositeConstraint implements Constraint {
+    constructor (readonly constraints: Array<Constraint>) { }
+    
+    validate(key: string, value: any, identifier: string) {
+        this.constraints.forEach(constraint => {
+            constraint.validate(key, value, identifier)
+        });
+    }
+
+}
+
 /**
  * The type that derives from a generic input structure, retaining the keys. Enables to define mapping between the input structure keys and constraints.
  */
