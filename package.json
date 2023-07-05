@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.9.2",
+    "version": "1.10.0",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,10 +21,10 @@
         "@types/uuid": "^9.0.1",
         "@typescript-eslint/eslint-plugin": "^5.59.0",
         "@typescript-eslint/parser": "^5.59.0",
-        "aws-cdk": "^2.83.1",
+        "aws-cdk": "^2.86.0",
         "copyfiles": "^2.4.1",
         "eslint": "^8.38.0",
-        "jest": "^29.5.0",
+        "jest": "^29.6.0",
         "json-schema-to-typescript": "^13.0.1",
         "lint": "^1.1.2",
         "ts-jest": "^29.1.0",
@@ -43,14 +43,14 @@
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
         "@types/uuid": "^9.0.1",
-        "aws-cdk-lib": "2.83.1",
+        "aws-cdk-lib": "2.86.0",
         "bcrypt": "^5.1.0",
         "constructs": "^10.2.33",
         "dot-object": "^2.1.4",
         "js-yaml": "4.1.0",
         "lodash": "4.17.21",
         "reflect-metadata": "^0.1.13",
-        "semver": "^7.5.0",
+        "semver": "^7.5.3",
         "simple-base": "^1.0.0",
         "sync-request": "6.1.0",
         "ts-deepmerge": "^6.0.3",
@@ -59,5 +59,8 @@
         "uuid": "^9.0.0",
         "yaml": "^2.2.1",
         "zod": "^3.21.4"
+    },
+    "overrides": {
+        "semver": "^7.5.3"
     }
 }
