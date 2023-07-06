@@ -38,7 +38,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     name: 'aws-for-fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-fluent-bit-for-cw",
-    version: '0.1.24',
+    version: '0.1.27',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'aws-for-fluent-bit',
     createNamespace: true,
