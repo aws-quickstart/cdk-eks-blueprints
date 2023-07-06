@@ -4,6 +4,11 @@
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "homepage": "https://aws-quickstart.github.io/cdk-eks-blueprints/",
+    "repository": {
+        "url": "https://github.com/aws-quickstart/cdk-eks-blueprints.git",
+        "type": "git"
+    },
     "scripts": {
         "build": "rm -rf dist && tsc",
         "watch": "tsc -w",
