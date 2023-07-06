@@ -47,6 +47,7 @@ nav:
     - EMR on EKS: 'addons/emr-eks.md'
     - FluxCD: 'addons/fluxcd.md'
     - Grafana Operator: 'addons/grafana-operator.md'
+    - IBM Instana: 'addons/instana-addon.md'
     - Istio Base: 'addons/istio-base.md'
     - Istio Control Plane: 'addons/istio-control-plane.md'
     - JupyterHub: 'addons/jupyterhub.md'
