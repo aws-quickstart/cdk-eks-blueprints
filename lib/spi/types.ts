@@ -86,7 +86,7 @@ export interface ApplicationRepository extends GitRepositoryReference {
  * Adds Constraints to application repository
  */
 export class ApplicationRepositoryConstraints implements constraints.ConstraintsType<ApplicationRepository> {
-    credentialsSecretName = new constraints.DomainNameConstraint();
+    credentialsSecretName = new constraints.DomainNameStringConstraint();
 }
 
 /**
