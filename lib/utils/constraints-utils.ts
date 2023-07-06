@@ -78,8 +78,10 @@ export class ArrayConstraint implements Constraint {
                 .parse(value.length);
     }
 }
-
-export class GenericRegexConstraint implements Constraint {
+/**
+ * Checks whether a given string matches the regex.  If not, a detailed Zod Error is thrown.
+ */
+export class GenericRegexStringConstraint implements Constraint {
     constructor (readonly regex?: RegExp) { }
 
     validate(key: string, value: any, identifier: string) {
@@ -93,10 +95,16 @@ export class GenericRegexConstraint implements Constraint {
 
 }
 
-export class DomainNameConstraint extends GenericRegexConstraint {
+/**
+ * Checks whether a given string matches the regex for RFC 1123.  If not, a detailed Zod Error is thrown.
+ */
+export class DomainNameStringConstraint extends GenericRegexStringConstraint {
     constructor () { super(new RegExp('[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')); }
 }
 
+/**
+ * Contains a list of constraints and checks whether a given value meets each constraint.  If not, a detailed Zod Error is thrown for that constraint.
+ */
 export class CompositeConstraint implements Constraint {
     constructor (readonly constraints: Array<Constraint>) { }
     

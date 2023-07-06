@@ -21,7 +21,7 @@ Constructor:
 new StringConstraint(minValue, maxValue);
 ```
 
-API reference ['here'](/docs/api/classes/utils.StringConstraint.html)
+API reference ['here'](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/utils.StringConstraint.html)
 
 If given string length falls outside of these inclusive bounds throws detailed Zod error
 
@@ -32,7 +32,7 @@ Constructor:
 new UrlStringConstraint(minValue, maxValue);
 ```
 
-API reference ['here'](/docs/api/classes/utils.UrlStringConstraint.html)
+API reference ['here'](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/utils.UrlStringConstraint.html)
 
 If given string length falls outside of these inclusive bounds, or does not follow a proper URL format it throws detailed Zod error
 
@@ -43,7 +43,7 @@ Constructor:
 new NumberConstraint(minValue, maxValue);
 ```
 
-API reference ['here'](/docs/api/classes/utils.NumberConstraint.html)
+API reference ['here'](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/utils.NumberConstraint.html)
 
 If given number falls outside of these inclusive bounds throws detailed Zod error.
 
@@ -54,7 +54,7 @@ Constructor:
 new utils.ArrayConstraint(minValue, maxValue);
 ```
 
-API reference ['here'](/docs/api/classes/utils.ArrayConstraint.html)
+API reference ['here'](https://aws-quickstart.github.io/cdk-eks-blueprints/api/classes/utils.ArrayConstraint.html)
 
 If given array length falls outside of these inclusive bounds throws detailed Zod error.
 

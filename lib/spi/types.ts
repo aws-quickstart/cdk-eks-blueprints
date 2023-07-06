@@ -82,7 +82,9 @@ export interface ApplicationRepository extends GitRepositoryReference {
     credentialsType?: "USERNAME" | "TOKEN" | "SSH"
 
 }
-
+/**
+ * Adds Constraints to application repository
+ */
 export class ApplicationRepositoryConstraints implements constraints.ConstraintsType<ApplicationRepository> {
     credentialsSecretName = new constraints.DomainNameConstraint();
 }
