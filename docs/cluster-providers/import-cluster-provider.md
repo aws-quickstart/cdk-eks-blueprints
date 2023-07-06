@@ -12,12 +12,13 @@ Recommended option is to get the cluster information through the `DescribeCluste
 
 Make sure VPC is set to the VPC of the imported cluster, otherwise the blueprint by default will create a new VPC, which will be redundant and cause problems with some of the add-ons. 
 
-**Note:** `blueprints.describeCluster() is an asynchronous function, you should either use `await` or handle promise resolution chain. 
+**Note:** `blueprints.describeCluster()` is an asynchronous function, you should either use `await` or handle promise resolution chain. 
 
 ```typescript
 const clusterName = "quickstart-cluster";
 const region = "us-east-2";
 
+const kubectlRoleName = "MyClusterAuthConfigRole"; // this is the role registered in the aws-auth config map in the target cluster 
 const sdkCluster = await blueprints.describeCluster(clusterName, region); // get cluster information using EKS APIs
 
 /**
@@ -72,6 +73,7 @@ const importClusterProvider3 = new ImportClusterProvider({
         new LookupOpenIdConnectProvider('https://oidc.eks.us-east-2.amazonaws.com/id/B792B88BC60999B1A37D').provide(context)),
     clusterCertificateAuthorityData: 'S0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCasdd234................',
     kubectlRoleArn: 'arn:...',
+    clusterSecurityGroupId: 'sg...';
 });
 
 const vpcId = ...; 

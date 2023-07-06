@@ -79,6 +79,8 @@ export class ImportClusterProvider implements ClusterProvider {
                 new LookupOpenIdConnectProvider(sdkCluster.identity!.oidc!.issuer!).provide(context)),
             clusterCertificateAuthorityData: sdkCluster.certificateAuthority?.data,
             kubectlRoleArn: kubectlRole.roleArn,
+            clusterSecurityGroupId: sdkCluster.resourcesVpcConfig?.clusterSecurityGroupId,
+            securityGroupIds: sdkCluster.resourcesVpcConfig?.securityGroupIds
         });
     }
 }
