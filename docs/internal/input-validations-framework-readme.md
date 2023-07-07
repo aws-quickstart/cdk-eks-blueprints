@@ -58,6 +58,34 @@ API reference ['here'](https://aws-quickstart.github.io/cdk-eks-blueprints/api/c
 
 If given array length falls outside of these inclusive bounds throws detailed Zod error.
 
+## GenericRegexStringContraint
+
+Constructor:
+```typescript
+new GenericRegexStringConstraint(new RegExp(regexString));
+```
+
+If given string does not match the regular expression throws detailed Zod error.
+
+## CompositeConstraint
+
+Constructor:
+```typescript
+new CompositeConstraint(...constraints);
+```
+
+If given value does not comply with each of the constraints in the list throws detailed Zod error for first failure.
+
+## InternetHostStringConstraint
+
+Constructor:
+```typescript
+new InternetHostStringConstraint();
+```
+
+If given string does not match RFC 1123 standards throws detailed Zod error.
+
+
 ## validateConstraints Function
 
 ```typescript

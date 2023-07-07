@@ -55,7 +55,17 @@ const notUrlError = new z.ZodError([{
     path: []
 }]);
 
+const badRegexError = new z.ZodError([{
+    validation: "regex",
+    code: "invalid_string",
+    message: "",
+    path: []
+}]);
+
 const longName = 'eks-blueprint-with-an-extra-kind-of-very-long-name-that-is-definitely-not-going-to-work';
+const argoLongName = 'way-too-long-argocd-secret-name-that-is-not-going-to-work-please-dont-work-please-dont';
+const argoBadName = 'name_with-underscore';
+const argoLongAndBadName = 'way_too-long-and-bad-argocd-secret-name-that-is-not-going-to-work-please-dont';
 
 const blueprintBase = blueprints.EksBlueprint.builder().addOns(...addOns);
 
@@ -123,6 +133,15 @@ function createFargateProfile(fargateProfileName: string) {
     });
 }
 
+function createArgoAddon(credentialsSecretName: string) {
+    return new blueprints.ArgoCDAddOn({
+        bootstrapRepo: {
+            repoUrl: "fakerepo.com",
+            credentialsSecretName: credentialsSecretName,
+        },
+    });
+}
+
 function getConstraintsDataSet(): DataError[] {
 
     let result: [Executable, ZodError][] = [];
@@ -147,6 +166,11 @@ function getConstraintsDataSet(): DataError[] {
 
     result.push([() => createManyAutoScalingGroup(6000), tooBigNumber5000]);
     result.push([() => singleErrorInArray("Name", 6000), tooBigNumber5000]);
+
+    result.push([() => createArgoAddon(argoBadName), badRegexError]);
+    result.push([() => createArgoAddon(argoLongName), tooBigString63]);
+    result.push([() => createArgoAddon(""), tooSmallString1]);
+    result.push([() => createArgoAddon(argoLongAndBadName), badRegexError]);
 
     return result;
 }

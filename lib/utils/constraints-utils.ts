@@ -96,17 +96,13 @@ export class GenericRegexStringConstraint implements Constraint {
 }
 
 /**
- * Checks whether a given string matches the regex for RFC 1123.  If not, a detailed Zod Error is thrown.
- */
-export class DomainNameStringConstraint extends GenericRegexStringConstraint {
-    constructor () { super(new RegExp('[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')); }
-}
-
-/**
  * Contains a list of constraints and checks whether a given value meets each constraint.  If not, a detailed Zod Error is thrown for that constraint.
  */
 export class CompositeConstraint implements Constraint {
-    constructor (readonly constraints: Array<Constraint>) { }
+    readonly constraints: Array<Constraint>;
+    constructor (...constraints: Array<Constraint>) { 
+        this.constraints = constraints;
+    }
     
     validate(key: string, value: any, identifier: string) {
         this.constraints.forEach(constraint => {
@@ -114,6 +110,18 @@ export class CompositeConstraint implements Constraint {
         });
     }
 
+}
+
+/**
+ * Checks whether a given string matches the regex for RFC 1123.  If not, a detailed Zod Error is thrown.
+ */
+export class InternetHostStringConstraint extends CompositeConstraint {
+    constructor () { 
+        super(
+            new GenericRegexStringConstraint(new RegExp('^(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]*$')), 
+            new StringConstraint(1,63),
+        ); 
+    }
 }
 
 /**
