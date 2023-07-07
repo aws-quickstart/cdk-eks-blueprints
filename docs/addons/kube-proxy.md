@@ -20,7 +20,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.KubeProxyAddOn('v1.19.6-eksbuild.2'); // optionally specify the image version to pull or empty constructor
+const addOn = new blueprints.addons.KubeProxyAddOn('v1.27.1-eksbuild.1'); // optionally specify the image version to pull or empty constructor for auto selection
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
@@ -28,19 +28,19 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 ## Configuration Options
 
-   - `version`: Pass in the kube-proxy plugin version compatible with kubernetes-cluster version as shown below
+   - `version`: Optionally pass in the kube-proxy plugin version compatible with kubernetes-cluster version as shown below
 ```bash
-# Assuming cluster version is 1.20, below command shows versions of the Kube-proxy add-on available for the specified cluster's version.
+# Assuming cluster version is 1.27, below command shows versions of the Kube-proxy add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
     --addon-name kube-proxy \
-    --kubernetes-version 1.19 \
+    --kubernetes-version 1.27 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 # Output
-v1.19.6-eksbuild.2
-True
-v1.18.8-eksbuild.1
+v1.27.3-eksbuild.1
 False
+v1.27.1-eksbuild.1
+True
 ```
 # Validation
 To validate that kube-proxy add-on is running, ensure that the pod is in Running state
@@ -57,7 +57,7 @@ aws eks describe-addon \
     --query "addon.addonVersion" \
     --output text
 # Output
-v1.19.6-eksbuild.2
+v1.27.1-eksbuild.1
 ```
 ## Functionality
 
