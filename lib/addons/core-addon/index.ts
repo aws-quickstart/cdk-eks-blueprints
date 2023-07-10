@@ -3,6 +3,7 @@ import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
@@ -36,6 +37,12 @@ export class CoreAddOnProps {
      * Indicates that add-on must be installed before any capacity is added for worker nodes (incuding Fargate).
      */
     readonly controlPlaneAddOn?: boolean;
+
+
+    /** 
+     * Map between kubernetes versions and addOn versions for auto selection.
+     */
+    readonly versionMap?: Map<KubernetesVersion, string>;
 }
 
 const DEFAULT_NAMESPACE = "kube-system";
@@ -69,10 +76,16 @@ export class CoreAddOn implements ClusterAddOn {
             serviceAccount = this.createServiceAccount(clusterInfo, saNamespace, policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
         }
+        let version: string = this.coreAddOnProps.version;
+
+        if (this.coreAddOnProps.versionMap) {
+            version = this.coreAddOnProps.version != "auto" ? this.coreAddOnProps.version : this.provideVersion(clusterInfo, this.coreAddOnProps.versionMap);
+        }
+        userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
 
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
-            addonVersion: this.coreAddOnProps.version,
+            addonVersion: version,
             configurationValues: JSON.stringify(this.coreAddOnProps.configurationValues),
             clusterName: clusterInfo.cluster.clusterName,
             serviceAccountRoleArn: serviceAccountRoleArn,
@@ -124,6 +137,11 @@ export class CoreAddOn implements ClusterAddOn {
             result = [policy];
         }
         return result;
+    }
+
+    provideVersion(clusterInfo: ClusterInfo, versionMap: Map<KubernetesVersion, string>) : string {
+        let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
+        return version;
     }
 
 }
