@@ -78,6 +78,51 @@ export class ArrayConstraint implements Constraint {
                 .parse(value.length);
     }
 }
+/**
+ * Checks whether a given string matches the regex.  If not, a detailed Zod Error is thrown.
+ */
+export class GenericRegexStringConstraint implements Constraint {
+    constructor (readonly regex?: RegExp) { }
+
+    validate(key: string, value: any, identifier: string) {
+        
+        if (value != undefined)
+            z.string()
+                .regex(this.regex ?? new RegExp('.*'), { message: `${key} (${identifier}) must match regular expression ${this.regex}.`})
+                .parse(value);
+        
+    }
+
+}
+
+/**
+ * Contains a list of constraints and checks whether a given value meets each constraint.  If not, a detailed Zod Error is thrown for that constraint.
+ */
+export class CompositeConstraint implements Constraint {
+    readonly constraints: Array<Constraint>;
+    constructor (...constraints: Array<Constraint>) { 
+        this.constraints = constraints;
+    }
+    
+    validate(key: string, value: any, identifier: string) {
+        this.constraints.forEach(constraint => {
+            constraint.validate(key, value, identifier);
+        });
+    }
+
+}
+
+/**
+ * Checks whether a given string matches the regex for RFC 1123.  If not, a detailed Zod Error is thrown.
+ */
+export class InternetHostStringConstraint extends CompositeConstraint {
+    constructor () { 
+        super(
+            new GenericRegexStringConstraint(new RegExp('^(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]*$')), 
+            new StringConstraint(1,63),
+        ); 
+    }
+}
 
 /**
  * The type that derives from a generic input structure, retaining the keys. Enables to define mapping between the input structure keys and constraints.
