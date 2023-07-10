@@ -81,7 +81,6 @@ export class CoreAddOn implements ClusterAddOn {
         if (this.coreAddOnProps.versionMap) {
             version = this.coreAddOnProps.version != "auto" ? this.coreAddOnProps.version : this.provideVersion(clusterInfo, this.coreAddOnProps.versionMap);
         }
-        userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
 
         let addOnProps = {
             addonName: this.coreAddOnProps.addOnName,
@@ -141,6 +140,7 @@ export class CoreAddOn implements ClusterAddOn {
 
     provideVersion(clusterInfo: ClusterInfo, versionMap: Map<KubernetesVersion, string>) : string {
         let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
+        userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
         return version;
     }
 
