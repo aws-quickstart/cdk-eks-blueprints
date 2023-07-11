@@ -393,8 +393,11 @@ export class GenericClusterProvider implements ClusterProvider {
             });
             const tags = Object.entries(nodeGroup.launchTemplate.tags ?? {});
             tags.forEach(([key, options]) => Tags.of(lt).add(key,options));
-            delete nodegroupOptions.amiType;
-            delete nodegroupOptions.releaseVersion;
+            if (nodeGroup.launchTemplate?.machineImage) {
+                delete nodegroupOptions.amiType;
+                delete nodegroupOptions.releaseVersion;
+                delete nodeGroup.amiReleaseVersion;
+            }
         }
 
         const result = cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
