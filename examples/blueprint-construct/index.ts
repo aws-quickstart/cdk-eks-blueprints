@@ -302,8 +302,8 @@ function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
         amiType: NodegroupAmiType.AL2_X86_64,
         instanceTypes: [new ec2.InstanceType('t3.large')],
         nodeGroupCapacityType: CapacityType.SPOT,
-        desiredSize: 1,
-        minSize: 1,
+        desiredSize: 0,
+        minSize: 0,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         launchTemplate: {
             tags: {
