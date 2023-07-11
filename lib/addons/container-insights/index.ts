@@ -1,7 +1,7 @@
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+//import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import merge from "ts-deepmerge";
-import { assertEC2NodeGroup } from "../..";
+//import { assertEC2NodeGroup } from "../..";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
@@ -32,12 +32,12 @@ export class ContainerInsightsAddOn extends HelmAddOn {
     @conflictsWith("AdotCollectorAddOn")
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;        
-        const nodeGroups = assertEC2NodeGroup(clusterInfo, ContainerInsightsAddOn.name);
+ /*        const nodeGroups = assertEC2NodeGroup(clusterInfo, ContainerInsightsAddOn.name);
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');
         
         nodeGroups.forEach(nodeGroup => {
             nodeGroup.role.addManagedPolicy(policy);
-        });
+        }); */
 
         // Create an adot-collector service account.
         const serviceAccountName = "adot-collector-sa";
@@ -57,7 +57,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
         });
 
         // Apply Managed IAM policy to the service account.
-        sa.role.addManagedPolicy(policy);
+        //sa.role.addManagedPolicy(policy);
         sa.node.addDependency(ns);
 
         let values: ValuesSchema = {
