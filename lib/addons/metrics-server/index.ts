@@ -1,33 +1,60 @@
-import { ClusterInfo } from "../../spi";
-import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { Construct } from 'constructs';
+import merge from 'ts-deepmerge';
+import { ClusterInfo, Values } from '../../spi';
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
+import { createNamespace } from '../../utils';
 
 /**
  * Configuration options for the add-on.
  */
-type MetricsServerAddOnProps = HelmAddOnUserProps;
+
+export interface MetricsServerAddOnProps extends HelmAddOnUserProps {
+    /**
+     * To Create Namespace using CDK
+     */
+    createNamespace?: boolean;
+}
 
 /**
  * Defaults options for the add-on
  */
-const defaultProps: HelmAddOnProps = {
-    chart: "metrics-server",
-    repository: "https://kubernetes-sigs.github.io/metrics-server",
-    version: "3.10.0",
+const defaultProps: HelmAddOnProps & MetricsServerAddOnProps = {
+    chart: 'metrics-server',
+    repository: 'https://kubernetes-sigs.github.io/metrics-server',
+    version: '3.10.0',
     release: 'blueprints-addon-metrics-server',
     name: 'metrics-server',
-    namespace: 'kube-system'
+    namespace: 'kube-system',
+    createNamespace: false,
 };
 
 export class MetricsServerAddOn extends HelmAddOn {
-
-    private options: MetricsServerAddOnProps;
+    readonly options: MetricsServerAddOnProps;
 
     constructor(props?: MetricsServerAddOnProps) {
         super({ ...defaultProps, ...props });
-        this.options = this.props;
+        this.options = this.props as MetricsServerAddOnProps;
     }
 
-    deploy(clusterInfo: ClusterInfo): void {
-        this.addHelmChart(clusterInfo, this.options.values);
+    // deploy(clusterInfo: ClusterInfo): void {
+    //     this.addHelmChart(clusterInfo, this.options.values);
+    // }
+
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        const cluster = clusterInfo.cluster;
+        let values: Values = this.options ?? {};
+        values = merge(values, this.props.values ?? {});
+
+        if (this.options.createNamespace == true) {
+            // Let CDK Create the Namespace
+            const namespace = createNamespace(this.options.namespace!, cluster);
+            const chart = this.addHelmChart(clusterInfo, values);
+            chart.node.addDependency(namespace);
+            return Promise.resolve(chart);
+        } else {
+            //Namespace is already created
+            const chart = this.addHelmChart(clusterInfo, values);
+            return Promise.resolve(chart);
+        }
     }
 }
