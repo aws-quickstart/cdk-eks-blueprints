@@ -49,7 +49,6 @@ export class KubeStateMetricsAddOn extends HelmAddOn {
     if (this.options.createNamespace == true) {
         // Let CDK Create the Namespace
         const namespace = createNamespace(this.options.namespace!, cluster);
-        const chart = this.addHelmChart(clusterInfo, values);
         chart.node.addDependency(namespace);
     }
     return Promise.resolve(chart);
