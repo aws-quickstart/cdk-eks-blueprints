@@ -36,25 +36,17 @@ export class MetricsServerAddOn extends HelmAddOn {
         this.options = this.props as MetricsServerAddOnProps;
     }
 
-    // deploy(clusterInfo: ClusterInfo): void {
-    //     this.addHelmChart(clusterInfo, this.options.values);
-    // }
-
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values: Values = this.options ?? {};
         values = merge(values, this.props.values ?? {});
+        const chart = this.addHelmChart(clusterInfo, values);
 
         if (this.options.createNamespace == true) {
             // Let CDK Create the Namespace
             const namespace = createNamespace(this.options.namespace!, cluster);
-            const chart = this.addHelmChart(clusterInfo, values);
             chart.node.addDependency(namespace);
-            return Promise.resolve(chart);
-        } else {
-            //Namespace is already created
-            const chart = this.addHelmChart(clusterInfo, values);
-            return Promise.resolve(chart);
         }
+        return Promise.resolve(chart);
     }
 }

@@ -45,20 +45,14 @@ export class KubeStateMetricsAddOn extends HelmAddOn {
     const cluster = clusterInfo.cluster;
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
-
-    if( this.options.createNamespace == true){
-      // Let CDK Create the Namespace
-      const namespace = createNamespace(this.options.namespace! , cluster);
-      const chart = this.addHelmChart(clusterInfo, values);
-      chart.node.addDependency(namespace);
-      return Promise.resolve(chart);
-
-    } else {
-      //Namespace is already created
-      const chart = this.addHelmChart(clusterInfo, values);
-      return Promise.resolve(chart);
+    const chart = this.addHelmChart(clusterInfo, values);
+    if (this.options.createNamespace == true) {
+        // Let CDK Create the Namespace
+        const namespace = createNamespace(this.options.namespace!, cluster);
+        const chart = this.addHelmChart(clusterInfo, values);
+        chart.node.addDependency(namespace);
     }
-    
+    return Promise.resolve(chart);
   }
 }
 
