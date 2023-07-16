@@ -191,6 +191,11 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
 
+    public cloneEnv(env? : cdk.Environment): BlueprintBuilder {
+        return new BlueprintBuilder().withBlueprintProps(this.props)
+            .account(env?.account ?? this.env.account).region(env?.region ?? this.env.region);
+    }
+
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
