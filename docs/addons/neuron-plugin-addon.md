@@ -17,16 +17,20 @@ const addOn = new blueprints.addons.NeuronPluginAddon();
 const clusterProvider = new blueprints.GenericClusterProvider({
   version: KubernetesVersion.V1_25,
   managedNodeGroups: [
-    new ManagedNodeGroup({
-      id: "mng1",
+    inferentiaNodeGroup()
+  ]
+});
+
+function inferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+  return {
+    id: "mng1",
       amiType: NodegroupAmiType.AL2_X86_64_GPU,
       instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
       desiredSize: 1,
       maxSize: 2, 
       nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-    })
-  ]
-});
+  };
+}
 
 const blueprint = blueprints.EksBlueprint.builder()
   .clusterProvider(clusterProvider)
