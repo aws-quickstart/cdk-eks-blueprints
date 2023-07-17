@@ -1,5 +1,4 @@
-name: Check Markdown links
-
+name: 'Check Markdown links'
 on:
   push:
     branches:
