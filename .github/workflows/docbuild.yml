@@ -13,4 +13,5 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+      - run: npx typedoc --out docs/api lib/index.ts
+      - run: mkdocs gh-deploy
