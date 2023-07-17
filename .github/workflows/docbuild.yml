@@ -1,9 +1,7 @@
-name: ci
+name: 'Release Website Publish'
 on:
-  push:
-    branches:
-      - master
-      - main
+  release:
+    types: [published]
 permissions:
   contents: write
 jobs:
