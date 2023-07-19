@@ -201,7 +201,7 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-                addWindowsNodeGroup()
+                // addWindowsNodeGroup() //  commented out to check the impact on e2e
             ]
         });
 
