@@ -4,7 +4,7 @@
 
 The Argo CD add-on allows platform administrators to combine cluster provisioning and workload bootstrapping in a single step and enables use cases such as replicating an existing running production cluster in a different region in a matter of minutes. This is important for business continuity and disaster recovery cases as well as for cross-regional availability and geographical expansion.
 
-Please see the documentation below for details on automatic boostrapping with ArgoCD add-on. If you prefer manual bootstrapping (once your cluster is deployed with this add-on included), you can find instructions on getting started with Argo CD in our [Getting Started](../getting-started.md/#deploy-workloads-with-argocd) guide.
+Please see the documentation below for details on automatic boostrapping with ArgoCD add-on. If you prefer manual bootstrapping (once your cluster is deployed with this add-on included), you can find instructions on getting started with Argo CD in our [Getting Started](../getting-started.md#deploy-workloads-with-argocd) guide.
 
 Full Argo CD project documentation [can be found here](https://argo-cd.readthedocs.io/en/stable/).
 

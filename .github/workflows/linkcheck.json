@@ -19,6 +19,7 @@
       { "pattern": "https://helm.datadoghq.com" },
       { "pattern": "https://sqs" },
       { "pattern": "www.rsa-2048.example.com" },
-      { "pattern": "rsa-2048.example.com"}
+      { "pattern": "rsa-2048.example.com" },
+      { "pattern": "https://ingress-red-saas.instana.io/" }
     ]
 }
