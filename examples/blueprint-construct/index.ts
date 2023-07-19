@@ -326,7 +326,7 @@ function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
+export function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng3-windowsami",
