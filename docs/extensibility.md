@@ -8,7 +8,7 @@ The following abstractions can be leveraged to add new features to the framework
 - [Add-on](./core-concepts.md#add-on). Customers and partners can implement new add-ons which could be leveraged exactly the same way as the core add-ons (supplied by the framework).
 - [Resource Provider](./core-concepts.md#resource-provider). This construct allows customers to create resources that can be reused across multiple add-ons and/or teams. For example, IAM roles, VPC, hosted zone. 
 - [Cluster Provider](./cluster-providers/index.md). This construct allows creation of custom code that provisions an EKS cluster with node groups. It can be leveraged to extend behavior such as control plane customization, custom settings for node groups.
-- [Team](./teams.md). This abstraction allows to create team templates for application and platform teams and set custom setting for network isolation, policies (network, security), software wiring (auto injection of proxies, team specific service mesh configuration) and other extensions pertinent to the teams. 
+- [Team](./teams/teams.md). This abstraction allows to create team templates for application and platform teams and set custom setting for network isolation, policies (network, security), software wiring (auto injection of proxies, team specific service mesh configuration) and other extensions pertinent to the teams. 
 
 ## Add-on Extensions
 
