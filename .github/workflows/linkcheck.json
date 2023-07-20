@@ -13,15 +13,13 @@
       }
     ],
     "ignorePatterns": [
-      {
-        "pattern": [
-            "localhost"
-        ]
-      },
-      {
-        "pattern": [
-            "127.0.0.1"
-        ]
-      }
+      { "pattern": "localhost" },
+      { "pattern": "127.0.0.1" },
+      { "pattern": "../api" },
+      { "pattern": "https://helm.datadoghq.com" },
+      { "pattern": "https://sqs" },
+      { "pattern": "www.rsa-2048.example.com" },
+      { "pattern": "rsa-2048.example.com" },
+      { "pattern": "https://ingress-red-saas.instana.io/" }
     ]
 }

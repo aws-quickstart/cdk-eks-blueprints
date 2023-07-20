@@ -84,7 +84,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/provisioners/#specrequirements), [AMI type](https://karpenter.sh/v0.12.1/aws/provisioning/#amazon-machine-image-ami-family),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/docs/concepts/node-templates/#specsubnetselector), and [Security Group Selector](https://karpenter.sh/docs/concepts/node-templates/#specsecuritygroupselector). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
+5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/provisioners/#specrequirements), [AMI type](https://karpenter.sh/docs/concepts/instance-types/),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/v0.26/concepts/node-templates/#specsubnetselector), and [Security Group Selector](https://karpenter.sh/v0.28/concepts/node-templates/#specsecuritygroupselector). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
 
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
@@ -95,7 +95,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 ## Using Karpenter
 
-To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://karpenter.sh/docs/provisioner/). A single provisioner is capable of handling many different pod shapes.
+To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://karpenter.sh/docs/concepts/provisioners/). A single provisioner is capable of handling many different pod shapes.
 
 This can be done in 2 ways:
 
@@ -225,7 +225,7 @@ requirements: [
 
 The property is changed to align with the naming convention of the provisioner, and to allow multiple operators (In vs NotIn). The values correspond similarly between the two, with type change being the only difference.
 
-2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/v0.16.0/upgrade-guide/#custom-resource-definition-crd-upgrades) for details.
+2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/v0.28/upgrade-guide/) for details.
 
 3. Starting with v0.17.0, Karpenter's Helm chart package is stored in OCI (Open Container Initiative) registry. With this change, [charts.karpenter.sh](https://charts.karpenter.sh/) is no longer updated to preserve older versions. You have to adjust for the following:
 

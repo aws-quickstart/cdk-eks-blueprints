@@ -190,7 +190,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_26,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -201,7 +201,7 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-                addWindowsNodeGroup()
+                addWindowsNodeGroup() //  commented out to check the impact on e2e
             ]
         });
 

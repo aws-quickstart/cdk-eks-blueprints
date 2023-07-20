@@ -95,7 +95,7 @@ This is the entry point to use the framework. This function can validate either 
 
 ## How to use the constraints-utils.ts
 
-You need two things when utilizing constraints-utils.ts and the following examples are from ['here'](/lib/stacks/eks-blueprint-stack.ts)
+You need two things when utilizing constraints-utils.ts and the following examples are from ['here'](../../lib/stacks/eks-blueprint-stack.ts)
 
 First you need a class with specified keys assigned to given constraints. 
 
