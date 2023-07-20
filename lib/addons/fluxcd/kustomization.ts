@@ -6,7 +6,7 @@ import * as spi from "../../spi";
  */
 export class FluxKustomization {
 
-    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
+    constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
 
     public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values) {
 
@@ -25,7 +25,7 @@ export class FluxKustomization {
                     kind: "GitRepository",
                     name: repository.name
                 },
-                path: repository.path,
+                path: repository.repository?.path,
                 prune: fluxPrune,
                 timeout: fluxTimeout
             }

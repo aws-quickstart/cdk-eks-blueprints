@@ -73,6 +73,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   * Flux Kustomization Timeout.
   * Default `1m` */
   fluxTimeout?: string;
+    workloadApplications?: spi.GitOpsApplicationDeployment[];
 }
 
 /**
@@ -123,6 +124,27 @@ export class FluxCDAddOn extends HelmAddOn {
       gitRepositoryConstruct.node.addDependency(chart);
       const kustomizationConstruct = createKustomization(clusterInfo, this.options.bootstrapRepo, this.options);
       kustomizationConstruct.node.addDependency(gitRepositoryConstruct);
+        //Lets create a GitRepository resource as a source to Flux
+        if (this.options.bootstrapRepo?.repoUrl) {
+            const bootstrapRepo: spi.GitOpsApplicationDeployment = {
+                name: this.options.bootstrapRepo.name ?? "bootstrap-apps",
+                namespace: this.options.namespace!,
+                repository: this.options.bootstrapRepo,
+                values: this.options.bootstrapValues ?? {},
+            };
+            const gitRepositoryConstruct = createGitRepository(clusterInfo, bootstrapRepo, this.options);
+            gitRepositoryConstruct.node.addDependency(chart);
+            const kustomizationConstruct = createKustomization(clusterInfo, bootstrapRepo, this.options);
+            kustomizationConstruct.node.addDependency(gitRepositoryConstruct);
+        }
+        if (this.options.workloadApplications) {
+            this.options.workloadApplications.forEach(app => {
+                const gitRepoConstruct = createGitRepository(clusterInfo, app, this.options);
+                gitRepoConstruct.node.addDependency(chart);
+                const kustomizationConstruct = createKustomization(clusterInfo, app, this.options);
+                kustomizationConstruct.node.addDependency(gitRepoConstruct);
+            });
+        }
     }
     return Promise.resolve(chart);
   }
@@ -136,6 +158,11 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.Applic
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
+function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+    const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
+    let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
+    const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
+    return construct;
 }
 
 /**
@@ -146,4 +173,9 @@ function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.Applic
   let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
-}
+}function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+    const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
+    let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
+    const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
+    return construct;
