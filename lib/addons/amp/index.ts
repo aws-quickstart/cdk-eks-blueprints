@@ -92,7 +92,7 @@ export class AmpAddOn implements ClusterAddOn {
         const manifest = doc.split("---").map(e => {
             let object = loadYaml(e);
 
-            if (typeof this.ampAddOnProps.openTelemetryCollectorManifestPath !== undefined && object.kind == "OpenTelemetryCollector"){
+            if (this.ampAddOnProps.openTelemetryCollectorManifestPath !== undefined && object.kind === "OpenTelemetryCollector"){
                 object = readYamlDocument(this.ampAddOnProps.openTelemetryCollectorManifestPath!);
                 object = loadYaml(object);
             }
