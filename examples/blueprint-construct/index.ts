@@ -190,7 +190,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_26,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -201,7 +201,7 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-                // addWindowsNodeGroup() //  commented out to check the impact on e2e
+                addWindowsNodeGroup() //  commented out to check the impact on e2e
             ]
         });
 
@@ -326,7 +326,7 @@ function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-export function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
+function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng3-windowsami",
