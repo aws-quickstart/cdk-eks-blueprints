@@ -1,0 +1,19 @@
+syntax="proto3";
+package codegen;
+
+message AddResourceProviderRequest {
+    string name = 1;
+    ResourceProvider resource_provider = 2;
+}
+
+message ResourceProvider {
+    oneof resource_provider {
+        VpcProvider vpc_provider = 1;
+    };
+
+}
+
+message VpcProvider{
+    optional string vpcId = 1;
+
+}

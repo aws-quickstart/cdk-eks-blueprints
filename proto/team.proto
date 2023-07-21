@@ -1,0 +1,26 @@
+syntax="proto3";
+package codegen;
+
+message AddTeamsRequest {
+    repeated Team teams = 1;
+}
+
+message Team {
+    oneof team {
+        GenericTeam generic_team = 1;
+        PlatformTeam platform_team = 2;
+        ApplicationTeam application_team = 3;
+    };
+}
+
+message GenericTeam {
+    string name = 1;
+}
+
+message PlatformTeam {
+    string name = 1;
+}
+
+message ApplicationTeam {
+    string name = 1;
+}

@@ -1,0 +1,26 @@
+syntax="proto3";
+package codegen;
+
+message AddClusterProviderRequest {
+    ClusterProvider cluster_provider = 1;
+
+}
+
+message ClusterProvider {
+    oneof cluster_provider {
+        AsgClusterProvider asg_cluster_provider = 1;
+        MngClusterProvider mng_cluster_provider = 2;
+    };
+}
+
+message AsgClusterProvider {
+    optional string name = 1;
+    string version = 2;
+    string id = 3;
+}
+
+message MngClusterProvider {
+    optional string name = 1; 
+    string version = 2;
+}
+
