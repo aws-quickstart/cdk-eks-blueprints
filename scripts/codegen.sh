@@ -1,3 +1,5 @@
+#!/bin/bash
+set -aue
 PROTO_DIR=../proto
 TS_DIR=../lib/codegen
 PROTO_FILE=../proto/cluster.proto
