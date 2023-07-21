@@ -25,7 +25,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const karpenterAddonProps = {
+const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
   requirements: [
       { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
       { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
@@ -51,9 +51,7 @@ const karpenterAddonProps = {
   ttlSecondsUntilExpired: 2592000,
   weight: 20,
   interruptionHandling: true,
-}
-
-const karpenterAddOn = new blueprints.addons.KarpenterAddOn(karpenterAddonProps);
+});
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(karpenterAddOn)
