@@ -2,6 +2,7 @@
 import * as _m0 from "protobufjs/minimal";
 
 export interface AddTeamsRequest {
+  clusterName: string;
   teams: Team[];
 }
 
@@ -24,13 +25,16 @@ export interface ApplicationTeam {
 }
 
 function createBaseAddTeamsRequest(): AddTeamsRequest {
-  return { teams: [] };
+  return { clusterName: "", teams: [] };
 }
 
 export const AddTeamsRequest = {
   encode(message: AddTeamsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
     for (const v of message.teams) {
-      Team.encode(v!, writer.uint32(10).fork()).ldelim();
+      Team.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -47,6 +51,13 @@ export const AddTeamsRequest = {
             break;
           }
 
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.teams.push(Team.decode(reader, reader.uint32()));
           continue;
       }
@@ -59,11 +70,17 @@ export const AddTeamsRequest = {
   },
 
   fromJSON(object: any): AddTeamsRequest {
-    return { teams: Array.isArray(object?.teams) ? object.teams.map((e: any) => Team.fromJSON(e)) : [] };
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      teams: Array.isArray(object?.teams) ? object.teams.map((e: any) => Team.fromJSON(e)) : [],
+    };
   },
 
   toJSON(message: AddTeamsRequest): unknown {
     const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
     if (message.teams?.length) {
       obj.teams = message.teams.map((e) => Team.toJSON(e));
     }
@@ -76,6 +93,7 @@ export const AddTeamsRequest = {
 
   fromPartial<I extends Exact<DeepPartial<AddTeamsRequest>, I>>(object: I): AddTeamsRequest {
     const message = createBaseAddTeamsRequest();
+    message.clusterName = object.clusterName ?? "";
     message.teams = object.teams?.map((e) => Team.fromPartial(e)) || [];
     return message;
   },

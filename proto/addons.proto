@@ -2,7 +2,8 @@ syntax="proto3";
 package codegen;
 
 message AddAddonsRequest {
-    repeated Addon addons = 1;
+    string cluster_name = 1;
+    repeated Addon addons = 2;
 }
 
 message Addon {

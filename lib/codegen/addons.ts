@@ -2,6 +2,7 @@
 import * as _m0 from "protobufjs/minimal";
 
 export interface AddAddonsRequest {
+  clusterName: string;
   addons: Addon[];
 }
 
@@ -20,13 +21,16 @@ export interface KubeProxyAddOn {
 }
 
 function createBaseAddAddonsRequest(): AddAddonsRequest {
-  return { addons: [] };
+  return { clusterName: "", addons: [] };
 }
 
 export const AddAddonsRequest = {
   encode(message: AddAddonsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
     for (const v of message.addons) {
-      Addon.encode(v!, writer.uint32(10).fork()).ldelim();
+      Addon.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -43,6 +47,13 @@ export const AddAddonsRequest = {
             break;
           }
 
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.addons.push(Addon.decode(reader, reader.uint32()));
           continue;
       }
@@ -55,11 +66,17 @@ export const AddAddonsRequest = {
   },
 
   fromJSON(object: any): AddAddonsRequest {
-    return { addons: Array.isArray(object?.addons) ? object.addons.map((e: any) => Addon.fromJSON(e)) : [] };
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      addons: Array.isArray(object?.addons) ? object.addons.map((e: any) => Addon.fromJSON(e)) : [],
+    };
   },
 
   toJSON(message: AddAddonsRequest): unknown {
     const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
     if (message.addons?.length) {
       obj.addons = message.addons.map((e) => Addon.toJSON(e));
     }
@@ -72,6 +89,7 @@ export const AddAddonsRequest = {
 
   fromPartial<I extends Exact<DeepPartial<AddAddonsRequest>, I>>(object: I): AddAddonsRequest {
     const message = createBaseAddAddonsRequest();
+    message.clusterName = object.clusterName ?? "";
     message.addons = object.addons?.map((e) => Addon.fromPartial(e)) || [];
     return message;
   },

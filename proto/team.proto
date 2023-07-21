@@ -2,7 +2,8 @@ syntax="proto3";
 package codegen;
 
 message AddTeamsRequest {
-    repeated Team teams = 1;
+    string cluster_name = 1;
+    repeated Team teams = 2;
 }
 
 message Team {

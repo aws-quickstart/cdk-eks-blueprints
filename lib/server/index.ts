@@ -9,14 +9,17 @@ import { ClusterAddOn, ClusterProvider, ResourceProvider, Team } from "../spi";
 import { AckAddOn, AckServiceName } from "../addons";
 import { ApplicationTeam, PlatformTeam } from "../teams";
 import { AsgClusterProvider, MngClusterProvider } from "../cluster-providers";
+import { BlueprintBuilder } from "../stacks";
 
 const server = new Server();
 const app = new cdk.App();
-const builder = EksBlueprint.builder();
+let builders: Array<BlueprintBuilder>;
 
 class ClusterServer implements pb.ClusterServiceServer {
     [name: string]: import("@grpc/grpc-js").UntypedHandleCall;
     createCluster: handleUnaryCall<pb.CreateClusterRequest, pb.APIResponse> = (call, callback) => {
+        const num = builders.push(EksBlueprint.builder());
+        const builder = builders.at(num)!;
         const response = pb.APIResponse.create();
         builder.id(call.request.id);
         const name = call.request.name ?? call.request.id;
@@ -27,6 +30,7 @@ class ClusterServer implements pb.ClusterServiceServer {
     };
     addAddons: handleUnaryCall<pb.AddAddonsRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
         const addons: Array<ClusterAddOn> = [];
         call.request.addons.forEach(addon => {
             if(addon.ackAddOn) {
@@ -37,10 +41,13 @@ class ClusterServer implements pb.ClusterServiceServer {
             }
 
         });
+        builder.addOns(...addons);
         callback(null, response);
     }
     addTeams: handleUnaryCall<pb.AddTeamsRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
+        builders.find
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
         const teams: Array<Team> = [];
         call.request.teams.forEach(team => {
             if(team.applicationTeam){
@@ -60,6 +67,7 @@ class ClusterServer implements pb.ClusterServiceServer {
     };
     addClusterProvider: handleUnaryCall<pb.AddClusterProviderRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
         const reqClusterProvider = call.request.clusterProvider;
         let clusterProvider: ClusterProvider | undefined;
         let type: string = "";
@@ -87,6 +95,7 @@ class ClusterServer implements pb.ClusterServiceServer {
     };
     addResourceProvider: handleUnaryCall<pb.AddResourceProviderRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
         const reqResourceProvider = call.request.resourceProvider; 
         let resourceProvider: ResourceProvider | undefined;
         let name = call.request.name
@@ -98,8 +107,10 @@ class ClusterServer implements pb.ClusterServiceServer {
         response.message = `Added Resource provider to cluster: ${name}`
         callback(null, response)
     };
+    cloneCluster: handleUnaryCall<codegen.codegen.CloneClusterRequest, codegen.codegen.APIResponse>;
     buildCluster: handleUnaryCall<pb.BuildClusterRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
         const name = call.request.clusterName;
         const account = call.request.account ?? process.env.CDK_DEFAULT_ACCOUNT!;
         const region =  call.request.region ?? process.env.CDK_DEFAULT_REGION!;

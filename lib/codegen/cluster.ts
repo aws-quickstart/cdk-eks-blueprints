@@ -32,6 +32,10 @@ export interface BuildClusterRequest {
   region?: string | undefined;
 }
 
+export interface CloneClusterRequest {
+  clusterName: string;
+}
+
 function createBaseAPIResponse(): APIResponse {
   return { message: "" };
 }
@@ -255,6 +259,64 @@ export const BuildClusterRequest = {
   },
 };
 
+function createBaseCloneClusterRequest(): CloneClusterRequest {
+  return { clusterName: "" };
+}
+
+export const CloneClusterRequest = {
+  encode(message: CloneClusterRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CloneClusterRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCloneClusterRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CloneClusterRequest {
+    return { clusterName: isSet(object.clusterName) ? String(object.clusterName) : "" };
+  },
+
+  toJSON(message: CloneClusterRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CloneClusterRequest>, I>>(base?: I): CloneClusterRequest {
+    return CloneClusterRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<CloneClusterRequest>, I>>(object: I): CloneClusterRequest {
+    const message = createBaseCloneClusterRequest();
+    message.clusterName = object.clusterName ?? "";
+    return message;
+  },
+};
+
 export type ClusterServiceService = typeof ClusterServiceService;
 export const ClusterServiceService = {
   createCluster: {
@@ -313,6 +375,15 @@ export const ClusterServiceService = {
     responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => APIResponse.decode(value),
   },
+  cloneCluster: {
+    path: "/codegen.ClusterService/CloneCluster",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CloneClusterRequest) => Buffer.from(CloneClusterRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => CloneClusterRequest.decode(value),
+    responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => APIResponse.decode(value),
+  },
 } as const;
 
 export interface ClusterServiceServer extends UntypedServiceImplementation {
@@ -322,6 +393,7 @@ export interface ClusterServiceServer extends UntypedServiceImplementation {
   addResourceProvider: handleUnaryCall<AddResourceProviderRequest, APIResponse>;
   addAddons: handleUnaryCall<AddAddonsRequest, APIResponse>;
   buildCluster: handleUnaryCall<BuildClusterRequest, APIResponse>;
+  cloneCluster: handleUnaryCall<CloneClusterRequest, APIResponse>;
 }
 
 export interface ClusterServiceClient extends Client {
@@ -411,6 +483,21 @@ export interface ClusterServiceClient extends Client {
   ): ClientUnaryCall;
   buildCluster(
     request: BuildClusterRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  cloneCluster(
+    request: CloneClusterRequest,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  cloneCluster(
+    request: CloneClusterRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  cloneCluster(
+    request: CloneClusterRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: APIResponse) => void,

@@ -2,6 +2,7 @@
 import * as _m0 from "protobufjs/minimal";
 
 export interface AddClusterProviderRequest {
+  clusterName: string;
   clusterProvider: ClusterProvider | undefined;
 }
 
@@ -22,13 +23,16 @@ export interface MngClusterProvider {
 }
 
 function createBaseAddClusterProviderRequest(): AddClusterProviderRequest {
-  return { clusterProvider: undefined };
+  return { clusterName: "", clusterProvider: undefined };
 }
 
 export const AddClusterProviderRequest = {
   encode(message: AddClusterProviderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
     if (message.clusterProvider !== undefined) {
-      ClusterProvider.encode(message.clusterProvider, writer.uint32(10).fork()).ldelim();
+      ClusterProvider.encode(message.clusterProvider, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -45,6 +49,13 @@ export const AddClusterProviderRequest = {
             break;
           }
 
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.clusterProvider = ClusterProvider.decode(reader, reader.uint32());
           continue;
       }
@@ -58,12 +69,16 @@ export const AddClusterProviderRequest = {
 
   fromJSON(object: any): AddClusterProviderRequest {
     return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
       clusterProvider: isSet(object.clusterProvider) ? ClusterProvider.fromJSON(object.clusterProvider) : undefined,
     };
   },
 
   toJSON(message: AddClusterProviderRequest): unknown {
     const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
     if (message.clusterProvider !== undefined) {
       obj.clusterProvider = ClusterProvider.toJSON(message.clusterProvider);
     }
@@ -76,6 +91,7 @@ export const AddClusterProviderRequest = {
 
   fromPartial<I extends Exact<DeepPartial<AddClusterProviderRequest>, I>>(object: I): AddClusterProviderRequest {
     const message = createBaseAddClusterProviderRequest();
+    message.clusterName = object.clusterName ?? "";
     message.clusterProvider = (object.clusterProvider !== undefined && object.clusterProvider !== null)
       ? ClusterProvider.fromPartial(object.clusterProvider)
       : undefined;

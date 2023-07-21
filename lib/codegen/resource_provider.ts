@@ -2,6 +2,7 @@
 import * as _m0 from "protobufjs/minimal";
 
 export interface AddResourceProviderRequest {
+  clusterName: string;
   name: string;
   resourceProvider: ResourceProvider | undefined;
 }
@@ -15,16 +16,19 @@ export interface VpcProvider {
 }
 
 function createBaseAddResourceProviderRequest(): AddResourceProviderRequest {
-  return { name: "", resourceProvider: undefined };
+  return { clusterName: "", name: "", resourceProvider: undefined };
 }
 
 export const AddResourceProviderRequest = {
   encode(message: AddResourceProviderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
     if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+      writer.uint32(18).string(message.name);
     }
     if (message.resourceProvider !== undefined) {
-      ResourceProvider.encode(message.resourceProvider, writer.uint32(18).fork()).ldelim();
+      ResourceProvider.encode(message.resourceProvider, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -41,10 +45,17 @@ export const AddResourceProviderRequest = {
             break;
           }
 
-          message.name = reader.string();
+          message.clusterName = reader.string();
           continue;
         case 2:
           if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
             break;
           }
 
@@ -61,6 +72,7 @@ export const AddResourceProviderRequest = {
 
   fromJSON(object: any): AddResourceProviderRequest {
     return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
       name: isSet(object.name) ? String(object.name) : "",
       resourceProvider: isSet(object.resourceProvider) ? ResourceProvider.fromJSON(object.resourceProvider) : undefined,
     };
@@ -68,6 +80,9 @@ export const AddResourceProviderRequest = {
 
   toJSON(message: AddResourceProviderRequest): unknown {
     const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
     if (message.name !== "") {
       obj.name = message.name;
     }
@@ -83,6 +98,7 @@ export const AddResourceProviderRequest = {
 
   fromPartial<I extends Exact<DeepPartial<AddResourceProviderRequest>, I>>(object: I): AddResourceProviderRequest {
     const message = createBaseAddResourceProviderRequest();
+    message.clusterName = object.clusterName ?? "";
     message.name = object.name ?? "";
     message.resourceProvider = (object.resourceProvider !== undefined && object.resourceProvider !== null)
       ? ResourceProvider.fromPartial(object.resourceProvider)

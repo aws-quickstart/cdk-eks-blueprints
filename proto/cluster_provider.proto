@@ -2,8 +2,8 @@ syntax="proto3";
 package codegen;
 
 message AddClusterProviderRequest {
-    ClusterProvider cluster_provider = 1;
-
+    string cluster_name = 1;
+    ClusterProvider cluster_provider = 2;
 }
 
 message ClusterProvider {

@@ -2,8 +2,9 @@ syntax="proto3";
 package codegen;
 
 message AddResourceProviderRequest {
-    string name = 1;
-    ResourceProvider resource_provider = 2;
+    string cluster_name = 1;
+    string name = 2;
+    ResourceProvider resource_provider = 3;
 }
 
 message ResourceProvider {
