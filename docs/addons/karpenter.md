@@ -51,6 +51,9 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
   ttlSecondsUntilExpired: 2592000,
   weight: 20,
   interruptionHandling: true,
+  tags: {
+    schedule: 'always-on'
+  }
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -82,7 +85,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/provisioners/#specrequirements), [AMI type](https://karpenter.sh/docs/concepts/instance-types/),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/v0.26/concepts/node-templates/#specsubnetselector), and [Security Group Selector](https://karpenter.sh/v0.28/concepts/node-templates/#specsecuritygroupselector). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
+5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/provisioners/#specrequirements), [AMI type](https://karpenter.sh/docs/concepts/instance-types/),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/v0.26/concepts/node-templates/#specsubnetselector), [Security Group Selector](https://karpenter.sh/v0.28/concepts/node-templates/#specsecuritygroupselector) and [Tags](https://karpenter.sh/v0.28/concepts/node-templates/#spectags). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
 
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
@@ -90,6 +93,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterEmpty`, so if you provide both properties, the addon will throw an error.
 4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
 5. Interruption Handling, which is a native way to handle interruption due to involuntary interruption events, is supported on versions 0.19.0 and later. For interruption handling in the earlier versions, Karpenter supports using AWS Node Interruption Handler (which you will need to add as an add-on and ***must be in add-on array after the Karpenter add-on*** for it to work.
+6. Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domain (such as "karpenter.sh", "karpenter.k8s.aws", and "kubernetes.io/cluster").
 
 ## Using Karpenter
 
