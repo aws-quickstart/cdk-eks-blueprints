@@ -11,9 +11,19 @@ export interface Addon {
   kubeProxyAddOn?: KubeProxyAddOn | undefined;
 }
 
+export interface AddAckAddOnRequest {
+  clusterName: string;
+  ackAddOn: AckAddOn | undefined;
+}
+
 export interface AckAddOn {
   id?: string | undefined;
   serviceName: string;
+}
+
+export interface AddKubeProxyAddOnRequest {
+  clusterName: string;
+  kubeProxyAddOn: KubeProxyAddOn | undefined;
 }
 
 export interface KubeProxyAddOn {
@@ -174,6 +184,83 @@ export const Addon = {
   },
 };
 
+function createBaseAddAckAddOnRequest(): AddAckAddOnRequest {
+  return { clusterName: "", ackAddOn: undefined };
+}
+
+export const AddAckAddOnRequest = {
+  encode(message: AddAckAddOnRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.ackAddOn !== undefined) {
+      AckAddOn.encode(message.ackAddOn, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddAckAddOnRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddAckAddOnRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.ackAddOn = AckAddOn.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddAckAddOnRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      ackAddOn: isSet(object.ackAddOn) ? AckAddOn.fromJSON(object.ackAddOn) : undefined,
+    };
+  },
+
+  toJSON(message: AddAckAddOnRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.ackAddOn !== undefined) {
+      obj.ackAddOn = AckAddOn.toJSON(message.ackAddOn);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddAckAddOnRequest>, I>>(base?: I): AddAckAddOnRequest {
+    return AddAckAddOnRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddAckAddOnRequest>, I>>(object: I): AddAckAddOnRequest {
+    const message = createBaseAddAckAddOnRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.ackAddOn = (object.ackAddOn !== undefined && object.ackAddOn !== null)
+      ? AckAddOn.fromPartial(object.ackAddOn)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseAckAddOn(): AckAddOn {
   return { id: undefined, serviceName: "" };
 }
@@ -245,6 +332,83 @@ export const AckAddOn = {
     const message = createBaseAckAddOn();
     message.id = object.id ?? undefined;
     message.serviceName = object.serviceName ?? "";
+    return message;
+  },
+};
+
+function createBaseAddKubeProxyAddOnRequest(): AddKubeProxyAddOnRequest {
+  return { clusterName: "", kubeProxyAddOn: undefined };
+}
+
+export const AddKubeProxyAddOnRequest = {
+  encode(message: AddKubeProxyAddOnRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.kubeProxyAddOn !== undefined) {
+      KubeProxyAddOn.encode(message.kubeProxyAddOn, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddKubeProxyAddOnRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddKubeProxyAddOnRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.kubeProxyAddOn = KubeProxyAddOn.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddKubeProxyAddOnRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      kubeProxyAddOn: isSet(object.kubeProxyAddOn) ? KubeProxyAddOn.fromJSON(object.kubeProxyAddOn) : undefined,
+    };
+  },
+
+  toJSON(message: AddKubeProxyAddOnRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.kubeProxyAddOn !== undefined) {
+      obj.kubeProxyAddOn = KubeProxyAddOn.toJSON(message.kubeProxyAddOn);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddKubeProxyAddOnRequest>, I>>(base?: I): AddKubeProxyAddOnRequest {
+    return AddKubeProxyAddOnRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddKubeProxyAddOnRequest>, I>>(object: I): AddKubeProxyAddOnRequest {
+    const message = createBaseAddKubeProxyAddOnRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.kubeProxyAddOn = (object.kubeProxyAddOn !== undefined && object.kubeProxyAddOn !== null)
+      ? KubeProxyAddOn.fromPartial(object.kubeProxyAddOn)
+      : undefined;
     return message;
   },
 };

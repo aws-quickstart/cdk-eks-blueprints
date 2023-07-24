@@ -16,11 +16,25 @@ export interface GenericTeam {
   name: string;
 }
 
+export interface AddPlatformTeamRequest {
+  clusterName: string;
+  props: TeamProps | undefined;
+}
+
 export interface PlatformTeam {
   name: string;
 }
 
 export interface ApplicationTeam {
+  name: string;
+}
+
+export interface AddApplicationTeamRequest {
+  clusterName: string;
+  props: TeamProps | undefined;
+}
+
+export interface TeamProps {
   name: string;
 }
 
@@ -253,6 +267,83 @@ export const GenericTeam = {
   },
 };
 
+function createBaseAddPlatformTeamRequest(): AddPlatformTeamRequest {
+  return { clusterName: "", props: undefined };
+}
+
+export const AddPlatformTeamRequest = {
+  encode(message: AddPlatformTeamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.props !== undefined) {
+      TeamProps.encode(message.props, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddPlatformTeamRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddPlatformTeamRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.props = TeamProps.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddPlatformTeamRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      props: isSet(object.props) ? TeamProps.fromJSON(object.props) : undefined,
+    };
+  },
+
+  toJSON(message: AddPlatformTeamRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.props !== undefined) {
+      obj.props = TeamProps.toJSON(message.props);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddPlatformTeamRequest>, I>>(base?: I): AddPlatformTeamRequest {
+    return AddPlatformTeamRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddPlatformTeamRequest>, I>>(object: I): AddPlatformTeamRequest {
+    const message = createBaseAddPlatformTeamRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.props = (object.props !== undefined && object.props !== null)
+      ? TeamProps.fromPartial(object.props)
+      : undefined;
+    return message;
+  },
+};
+
 function createBasePlatformTeam(): PlatformTeam {
   return { name: "" };
 }
@@ -364,6 +455,141 @@ export const ApplicationTeam = {
 
   fromPartial<I extends Exact<DeepPartial<ApplicationTeam>, I>>(object: I): ApplicationTeam {
     const message = createBaseApplicationTeam();
+    message.name = object.name ?? "";
+    return message;
+  },
+};
+
+function createBaseAddApplicationTeamRequest(): AddApplicationTeamRequest {
+  return { clusterName: "", props: undefined };
+}
+
+export const AddApplicationTeamRequest = {
+  encode(message: AddApplicationTeamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.props !== undefined) {
+      TeamProps.encode(message.props, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddApplicationTeamRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddApplicationTeamRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.props = TeamProps.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddApplicationTeamRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      props: isSet(object.props) ? TeamProps.fromJSON(object.props) : undefined,
+    };
+  },
+
+  toJSON(message: AddApplicationTeamRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.props !== undefined) {
+      obj.props = TeamProps.toJSON(message.props);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddApplicationTeamRequest>, I>>(base?: I): AddApplicationTeamRequest {
+    return AddApplicationTeamRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddApplicationTeamRequest>, I>>(object: I): AddApplicationTeamRequest {
+    const message = createBaseAddApplicationTeamRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.props = (object.props !== undefined && object.props !== null)
+      ? TeamProps.fromPartial(object.props)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseTeamProps(): TeamProps {
+  return { name: "" };
+}
+
+export const TeamProps = {
+  encode(message: TeamProps, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TeamProps {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTeamProps();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TeamProps {
+    return { name: isSet(object.name) ? String(object.name) : "" };
+  },
+
+  toJSON(message: TeamProps): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<TeamProps>, I>>(base?: I): TeamProps {
+    return TeamProps.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<TeamProps>, I>>(object: I): TeamProps {
+    const message = createBaseTeamProps();
     message.name = object.name ?? "";
     return message;
   },

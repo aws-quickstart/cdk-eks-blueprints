@@ -11,6 +11,12 @@ export interface ResourceProvider {
   vpcProvider?: VpcProvider | undefined;
 }
 
+export interface AddVpcProviderRequest {
+  clusterName: string;
+  name: string;
+  vpcProvider: VpcProvider | undefined;
+}
+
 export interface VpcProvider {
   vpcId?: string | undefined;
 }
@@ -160,6 +166,98 @@ export const ResourceProvider = {
 
   fromPartial<I extends Exact<DeepPartial<ResourceProvider>, I>>(object: I): ResourceProvider {
     const message = createBaseResourceProvider();
+    message.vpcProvider = (object.vpcProvider !== undefined && object.vpcProvider !== null)
+      ? VpcProvider.fromPartial(object.vpcProvider)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseAddVpcProviderRequest(): AddVpcProviderRequest {
+  return { clusterName: "", name: "", vpcProvider: undefined };
+}
+
+export const AddVpcProviderRequest = {
+  encode(message: AddVpcProviderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.vpcProvider !== undefined) {
+      VpcProvider.encode(message.vpcProvider, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddVpcProviderRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddVpcProviderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.vpcProvider = VpcProvider.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddVpcProviderRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      name: isSet(object.name) ? String(object.name) : "",
+      vpcProvider: isSet(object.vpcProvider) ? VpcProvider.fromJSON(object.vpcProvider) : undefined,
+    };
+  },
+
+  toJSON(message: AddVpcProviderRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.vpcProvider !== undefined) {
+      obj.vpcProvider = VpcProvider.toJSON(message.vpcProvider);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddVpcProviderRequest>, I>>(base?: I): AddVpcProviderRequest {
+    return AddVpcProviderRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddVpcProviderRequest>, I>>(object: I): AddVpcProviderRequest {
+    const message = createBaseAddVpcProviderRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.name = object.name ?? "";
     message.vpcProvider = (object.vpcProvider !== undefined && object.vpcProvider !== null)
       ? VpcProvider.fromPartial(object.vpcProvider)
       : undefined;

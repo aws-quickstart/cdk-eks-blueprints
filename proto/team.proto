@@ -18,10 +18,24 @@ message GenericTeam {
     string name = 1;
 }
 
+message AddPlatformTeamRequest{
+    string cluster_name = 1;
+    TeamProps props = 2;
+}
+
 message PlatformTeam {
     string name = 1;
 }
 
 message ApplicationTeam {
     string name = 1;
+}
+
+message AddApplicationTeamRequest{
+    string cluster_name = 1;
+    TeamProps props = 2;
+}
+
+message TeamProps {
+    string name  = 1;
 }

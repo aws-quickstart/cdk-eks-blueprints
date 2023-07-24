@@ -11,10 +11,20 @@ export interface ClusterProvider {
   mngClusterProvider?: MngClusterProvider | undefined;
 }
 
+export interface AddAsgClusterProviderRequest {
+  clusterName: string;
+  asgClusterProvider: AsgClusterProvider | undefined;
+}
+
 export interface AsgClusterProvider {
   name?: string | undefined;
   version: string;
   id: string;
+}
+
+export interface AddMngClusterProviderRequest {
+  clusterName: string;
+  mngClusterProvider: MngClusterProvider | undefined;
 }
 
 export interface MngClusterProvider {
@@ -182,6 +192,85 @@ export const ClusterProvider = {
   },
 };
 
+function createBaseAddAsgClusterProviderRequest(): AddAsgClusterProviderRequest {
+  return { clusterName: "", asgClusterProvider: undefined };
+}
+
+export const AddAsgClusterProviderRequest = {
+  encode(message: AddAsgClusterProviderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.asgClusterProvider !== undefined) {
+      AsgClusterProvider.encode(message.asgClusterProvider, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddAsgClusterProviderRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddAsgClusterProviderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.asgClusterProvider = AsgClusterProvider.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddAsgClusterProviderRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      asgClusterProvider: isSet(object.asgClusterProvider)
+        ? AsgClusterProvider.fromJSON(object.asgClusterProvider)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AddAsgClusterProviderRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.asgClusterProvider !== undefined) {
+      obj.asgClusterProvider = AsgClusterProvider.toJSON(message.asgClusterProvider);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddAsgClusterProviderRequest>, I>>(base?: I): AddAsgClusterProviderRequest {
+    return AddAsgClusterProviderRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddAsgClusterProviderRequest>, I>>(object: I): AddAsgClusterProviderRequest {
+    const message = createBaseAddAsgClusterProviderRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.asgClusterProvider = (object.asgClusterProvider !== undefined && object.asgClusterProvider !== null)
+      ? AsgClusterProvider.fromPartial(object.asgClusterProvider)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseAsgClusterProvider(): AsgClusterProvider {
   return { name: undefined, version: "", id: "" };
 }
@@ -268,6 +357,85 @@ export const AsgClusterProvider = {
     message.name = object.name ?? undefined;
     message.version = object.version ?? "";
     message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseAddMngClusterProviderRequest(): AddMngClusterProviderRequest {
+  return { clusterName: "", mngClusterProvider: undefined };
+}
+
+export const AddMngClusterProviderRequest = {
+  encode(message: AddMngClusterProviderRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.mngClusterProvider !== undefined) {
+      MngClusterProvider.encode(message.mngClusterProvider, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddMngClusterProviderRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddMngClusterProviderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.mngClusterProvider = MngClusterProvider.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddMngClusterProviderRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      mngClusterProvider: isSet(object.mngClusterProvider)
+        ? MngClusterProvider.fromJSON(object.mngClusterProvider)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AddMngClusterProviderRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.mngClusterProvider !== undefined) {
+      obj.mngClusterProvider = MngClusterProvider.toJSON(message.mngClusterProvider);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddMngClusterProviderRequest>, I>>(base?: I): AddMngClusterProviderRequest {
+    return AddMngClusterProviderRequest.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AddMngClusterProviderRequest>, I>>(object: I): AddMngClusterProviderRequest {
+    const message = createBaseAddMngClusterProviderRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.mngClusterProvider = (object.mngClusterProvider !== undefined && object.mngClusterProvider !== null)
+      ? MngClusterProvider.fromPartial(object.mngClusterProvider)
+      : undefined;
     return message;
   },
 };
