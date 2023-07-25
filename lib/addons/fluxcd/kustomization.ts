@@ -8,15 +8,15 @@ export class FluxKustomization {
 
     constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
 
-    public generate(namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values) {
-
+    public generate(name: string, namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string) {
+        
         const repository = this.bootstrapRepo!;
         const kustomizationManifest = {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
             kind: "Kustomization",
             metadata: {
-                name: repository.name,
-                namespace: namespace
+                name,
+                namespace
             },
             spec: {
                 interval: fluxSyncInterval,

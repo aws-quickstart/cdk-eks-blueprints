@@ -48,13 +48,13 @@ Custom values to pass to the chart. Config options: https://github.com/kubecost/
 #### `customPrometheus: string` (optional)
 
 Kubecost comes bundled with a Prometheus installation. However, if you wish to integrate with an external Prometheus deployment, provide your local Prometheus service address with this format `http://..svc`.
-Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/custom-prom.html
+Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/install-and-configure/install/custom-prom
 
 #### `installPrometheusNodeExporter: boolean` (optional)
 
 Set to false to use an existing Node Exporter DaemonSet.
 Note: this requires your existing Node Exporter endpoint to be visible from the namespace where Kubecost is installed.
-https://github.com/kubecost/docs/blob/main/getting-started.md#using-an-existing-node-exporter
+https://docs.kubecost.com/install-and-configure/install/getting-started#using-an-existing-node-exporter
 
 #### `repository: string`, `release: string`, `chart: string` (optional)
 
@@ -62,8 +62,8 @@ Additional options for customers who may need to supply their own private Helm r
 
 ## Support
 
-If you have any questions about Kubecost, get in touch with the team [on Slack](https://docs.kubecost.com/support-channels.html).
+If you have any questions about Kubecost, get in touch with the team [on Slack](https://docs.kubecost.com/kubecost-cloud/receiving-kubecost-cloud-support).
 
 ## License
 
-The Kubecost Blueprints AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-blueprints-addon)
+The Kubecost Blueprints AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/kubecost/kubecost-eks-blueprints-addon/)

@@ -46,7 +46,7 @@ Configuration can also be supplied via context variables (specify in cdk.json, c
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `AsgClusterProviderProps` to each cluster blueprint.
 
-You can find more details on the supported configuration options in the API documentation for the [AsgClusterProviderProps](../api/interfaces/AsgClusterProviderProps.html).
+You can find more details on the supported configuration options in the API documentation for the [AsgClusterProviderProps](../api/interfaces/clusters.AsgClusterProviderProps.html).
 
 ## Bottlerocket ASG
 

@@ -118,8 +118,9 @@ spec:
 
 After the above ingresses applied (ideally through a GitOps engine) you can now navigate to the specified hosts respectively:
 
-[http://riker.dev.my-domain.com](http://riker.dev.my-domain.com)
-[http://troi.dev.my-domain.com](http://troi.dev.my-domain.com)
+  `http://riker.dev.my-domain.com`
+  `http://troi.dev.my-domain.com`
+
 
 ## TLS Termination and Certificates
 

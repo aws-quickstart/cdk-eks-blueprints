@@ -135,7 +135,7 @@ done
 7) Purge the SQS queue to test scale in event
 Replace ${AWS_REGION} with your target region
 ```shell
-aws sqs purge-queue --queue-url https://sqs.${AWS_REGION}.amazonaws.com/CCOUNT_NUMBER/sqs-consumer  
+aws sqs purge-queue --queue-url "https://sqs.${AWS_REGION}.amazonaws.com/CCOUNT_NUMBER/sqs-consumer"  
 ```
 6) Verify if the nginx pod is scaledd in from 2 to 1 after teh cool down perion set (500 in this case)
 ```shell

@@ -31,6 +31,9 @@ list:
 	$(DEPS)
 	$(CDK) list
 
+markdown-link-check:
+	find docs -name "*.md" | xargs -n 1 markdown-link-check -q -c .github/workflows/linkcheck.json
+
 run-test:
 	npm test
 

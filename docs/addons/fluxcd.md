@@ -6,6 +6,8 @@ Flux is a declarative, GitOps-based continuous delivery tool that can be integra
 
 ## Usage
 
+### Single bootstrap repo path
+
 ```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
@@ -14,15 +16,45 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
   bootstrapRepo: {
-      repoUrl: 'https://github.com/stefanprodan/podinfo',
-      name: "podinfo",
-      targetRevision: "master",
-      path: "./kustomize"
+      repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+      name: "aws-observability-accelerator",
+      targetRevision: "main",
+      path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
+  },
+  bootstrapValues: {
+      "region": "us-east-1"
+  }
+})
+...
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+### Multiple bootstrap repo paths
+
+Multiple bootstrap repo paths are useful when you want to create multiple Kustomizations, pointing to different paths, e.g. to deploy manifests from specific subfolders in your repository:
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.FluxCDAddOn({
+  bootstrapRepo: {
+      repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+      name: "aws-observability-accelerator",
+      targetRevision: "main",
+      path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
   },
   bootstrapValues: {
       "region": "us-east-1"
   },
-}),
+  additionalFluxKustomizationPaths: ["./artifacts/grafana-operator-manifests/eks/java"]
+})
+...
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
