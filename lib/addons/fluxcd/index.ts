@@ -150,7 +150,6 @@ export class FluxCDAddOn extends HelmAddOn {
                 kustomizationConstruct.node.addDependency(gitRepoConstruct);
             });
         }
-    }
     return Promise.resolve(chart);
   }
 }
@@ -158,15 +157,6 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  if (fluxcdAddonProps.bootstrapRepo === undefined) {
-    throw new Error("Missing Git repository");
-  }
-  
-  const manifest = new FluxGitRepository(fluxcdAddonProps.bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
-  let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
-  const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
-  return construct;
 function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
     const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
     let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
@@ -177,12 +167,6 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOps
 /**
  * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
  */
-function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
-  let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
-  const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
-  return construct;
-}function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
 function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
     const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
     let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
