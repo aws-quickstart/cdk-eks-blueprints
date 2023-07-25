@@ -44,6 +44,8 @@ message BuildClusterRequest {
 
 message CloneClusterRequest {
     string cluster_name = 1;
-    optional string region = 2;
-    optional string account = 3;
+    string new_cluster_id = 2;
+    optional string new_cluster_name = 3;
+    optional string region = 4;
+    optional string account = 5;
 }

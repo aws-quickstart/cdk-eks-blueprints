@@ -16,9 +16,6 @@ const app = new cdk.App();
 let builders: Array<BlueprintBuilder>;
 
 class ClusterServer implements pb.ClusterServiceServer {
-
-
-
     [name: string]: import("@grpc/grpc-js").UntypedHandleCall;
     createCluster: handleUnaryCall<pb.CreateClusterRequest, pb.APIResponse> = (call, callback) => {
         const num = builders.push(EksBlueprint.builder());
@@ -40,6 +37,7 @@ class ClusterServer implements pb.ClusterServiceServer {
             serviceName: call.request.ackAddOn?.serviceName as AckServiceName
         }));
 
+        response.message = `Added AckAddOn to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addKubeProxyAddOn: handleUnaryCall<codegen.codegen.AddKubeProxyAddOnRequest, codegen.codegen.APIResponse> = (call, callback) => {
@@ -48,6 +46,7 @@ class ClusterServer implements pb.ClusterServiceServer {
 
         builder.addOns(new KubeProxyAddOn(call.request.kubeProxyAddOn?.version));
 
+        response.message = `Added KubeProxyAddOn to cluster: ${builder.props.name}`;
         callback(null, response);
     };
 
@@ -65,6 +64,7 @@ class ClusterServer implements pb.ClusterServiceServer {
 
         });
         builder.addOns(...addons);
+        response.message = `Added ${addons.length} Addons to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addPlatformTeam: handleUnaryCall<codegen.codegen.AddPlatformTeamRequest, codegen.codegen.APIResponse> = (call, callback) => {
@@ -73,6 +73,7 @@ class ClusterServer implements pb.ClusterServiceServer {
         const team = new PlatformTeam(call.request.props!);
         builder.teams(team);
 
+        response.message = `Added Platform Team ${team.name} to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addApplicationTeam: handleUnaryCall<codegen.codegen.AddApplicationTeamRequest, codegen.codegen.APIResponse> = (call, callback) => {
@@ -81,6 +82,7 @@ class ClusterServer implements pb.ClusterServiceServer {
         const team = new ApplicationTeam(call.request.props!);
         builder.teams(team);
 
+        response.message = `Added Application Team ${team.name} to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addTeams: handleUnaryCall<pb.AddTeamsRequest, pb.APIResponse> = (call, callback) => {
@@ -109,6 +111,7 @@ class ClusterServer implements pb.ClusterServiceServer {
             version: eks.KubernetesVersion.of(call.request.mngClusterProvider?.version ?? "undefined"),
         }));
 
+        response.message = `Added MngClusterProvider to cluster: ${builder.props.name}`;
         callback(null, response);
     };
 
@@ -121,6 +124,7 @@ class ClusterServer implements pb.ClusterServiceServer {
             id: call.request.asgClusterProvider?.id ?? call.request.clusterName,
         }));
 
+        response.message = `Added AsgClusterProvider to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addClusterProvider: handleUnaryCall<pb.AddClusterProviderRequest, pb.APIResponse> = (call, callback) => {
@@ -157,6 +161,7 @@ class ClusterServer implements pb.ClusterServiceServer {
 
         builder.resourceProvider(call.request.name, new VpcProvider(call.request.vpcProvider?.vpcId));
 
+        response.message = `Added VpcProvider to cluster: ${builder.props.name}`;
         callback(null, response);
     };
     addResourceProvider: handleUnaryCall<pb.AddResourceProviderRequest, pb.APIResponse> = (call, callback) => {
@@ -176,8 +181,12 @@ class ClusterServer implements pb.ClusterServiceServer {
     cloneCluster: handleUnaryCall<codegen.codegen.CloneClusterRequest, codegen.codegen.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
         let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
-        builders.push(builder.clone(call.request.region, call.request.account));
+        const num = builders.push(builder.clone(call.request.region, call.request.account));
+        let new_builder = builders.at(num);
+        new_builder?.id(call.request.newClusterId);
+        new_builder?.name(call.request.newClusterName?? new_builder.props.id ?? "");
 
+        response.message = `Cloned cluster ${builder.name} to ${new_builder?.props.name}`;
         callback(null, response);
     };
     buildCluster: handleUnaryCall<pb.BuildClusterRequest, pb.APIResponse> = (call, callback) => {

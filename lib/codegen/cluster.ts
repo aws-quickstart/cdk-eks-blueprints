@@ -38,6 +38,8 @@ export interface BuildClusterRequest {
 
 export interface CloneClusterRequest {
   clusterName: string;
+  newClusterId: string;
+  newClusterName?: string | undefined;
   region?: string | undefined;
   account?: string | undefined;
 }
@@ -266,7 +268,7 @@ export const BuildClusterRequest = {
 };
 
 function createBaseCloneClusterRequest(): CloneClusterRequest {
-  return { clusterName: "", region: undefined, account: undefined };
+  return { clusterName: "", newClusterId: "", newClusterName: undefined, region: undefined, account: undefined };
 }
 
 export const CloneClusterRequest = {
@@ -274,11 +276,17 @@ export const CloneClusterRequest = {
     if (message.clusterName !== "") {
       writer.uint32(10).string(message.clusterName);
     }
+    if (message.newClusterId !== "") {
+      writer.uint32(18).string(message.newClusterId);
+    }
+    if (message.newClusterName !== undefined) {
+      writer.uint32(26).string(message.newClusterName);
+    }
     if (message.region !== undefined) {
-      writer.uint32(18).string(message.region);
+      writer.uint32(34).string(message.region);
     }
     if (message.account !== undefined) {
-      writer.uint32(26).string(message.account);
+      writer.uint32(42).string(message.account);
     }
     return writer;
   },
@@ -302,10 +310,24 @@ export const CloneClusterRequest = {
             break;
           }
 
-          message.region = reader.string();
+          message.newClusterId = reader.string();
           continue;
         case 3:
           if (tag !== 26) {
+            break;
+          }
+
+          message.newClusterName = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.region = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
             break;
           }
 
@@ -323,6 +345,8 @@ export const CloneClusterRequest = {
   fromJSON(object: any): CloneClusterRequest {
     return {
       clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      newClusterId: isSet(object.newClusterId) ? String(object.newClusterId) : "",
+      newClusterName: isSet(object.newClusterName) ? String(object.newClusterName) : undefined,
       region: isSet(object.region) ? String(object.region) : undefined,
       account: isSet(object.account) ? String(object.account) : undefined,
     };
@@ -332,6 +356,12 @@ export const CloneClusterRequest = {
     const obj: any = {};
     if (message.clusterName !== "") {
       obj.clusterName = message.clusterName;
+    }
+    if (message.newClusterId !== "") {
+      obj.newClusterId = message.newClusterId;
+    }
+    if (message.newClusterName !== undefined) {
+      obj.newClusterName = message.newClusterName;
     }
     if (message.region !== undefined) {
       obj.region = message.region;
@@ -349,6 +379,8 @@ export const CloneClusterRequest = {
   fromPartial<I extends Exact<DeepPartial<CloneClusterRequest>, I>>(object: I): CloneClusterRequest {
     const message = createBaseCloneClusterRequest();
     message.clusterName = object.clusterName ?? "";
+    message.newClusterId = object.newClusterId ?? "";
+    message.newClusterName = object.newClusterName ?? undefined;
     message.region = object.region ?? undefined;
     message.account = object.account ?? undefined;
     return message;
