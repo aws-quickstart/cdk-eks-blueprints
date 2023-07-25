@@ -66,6 +66,7 @@ nav:
     - New Relic: 'addons/newrelic.md'
     - Nginx: 'addons/nginx.md'
     - OPA Gatekeeper: 'addons/opa-gatekeeper.md'
+    - Paralus: 'addons/paralus.md'
     - Pixie: 'addons/pixie.md'
     - Prometheus Node Exporter: 'addons/prometheus-node-exporter.md'
     - Rafay: 'addons/rafay.md'
