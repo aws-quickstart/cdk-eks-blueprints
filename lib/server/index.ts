@@ -13,13 +13,13 @@ import { BlueprintBuilder } from "../stacks";
 
 const server = new Server();
 const app = new cdk.App();
-let builders: Array<BlueprintBuilder>;
+let builders: Array<BlueprintBuilder> = [];
 
 class ClusterServer implements pb.ClusterServiceServer {
     [name: string]: import("@grpc/grpc-js").UntypedHandleCall;
     createCluster: handleUnaryCall<pb.CreateClusterRequest, pb.APIResponse> = (call, callback) => {
-        const num = builders.push(EksBlueprint.builder());
-        const builder = builders.at(num)!;
+        builders.push(EksBlueprint.builder().id(call.request.id));
+        let builder = builders.find(builder => builder.props.id == call.request.id)!;
         const response = pb.APIResponse.create();
         builder.id(call.request.id);
         const name = call.request.name ?? call.request.id;
