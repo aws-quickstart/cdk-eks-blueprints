@@ -1,6 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as blueprints from '../lib';
 
 test("Cluster autoscaler correctly is using correct defaults if EKS version is not defined in the version map", () => {

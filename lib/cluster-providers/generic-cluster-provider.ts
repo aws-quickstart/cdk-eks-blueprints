@@ -248,7 +248,7 @@ export class GenericClusterProvider implements ClusterProvider {
         if(builder.versionCalled) {
            version = builder.props.version!;
         } else {
-            version = this.props.version!
+            version = this.props.version!;
         }
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
