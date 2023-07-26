@@ -249,7 +249,7 @@ test("Kubectl layer is correctly injected for EKS version 1.26", () => {
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_26).build(app, "stack-126");
+        .version("1.26").build(app, "stack-126");
     
     const template = Template.fromStack(stack);
 
@@ -267,7 +267,7 @@ test("Kubectl layer is correctly injected for EKS version 1.25", () => {
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version(KubernetesVersion.V1_25).build(app, "stack-125");
+      .version("1.25").build(app, "stack-125");
 
     const template = Template.fromStack(stack);
 
@@ -284,7 +284,7 @@ test("Kubectl layer is correctly injected for EKS version 1.24", () => {
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version(KubernetesVersion.V1_24).build(app, "stack-124");
+      .version("1.24").build(app, "stack-124");
 
     const template = Template.fromStack(stack);
 
@@ -301,7 +301,7 @@ test("Kubectl layer is correctly injected for EKS version 1.21 and below", () =>
 
     const stackV122 = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_21).build(app, "stack-122");
+        .version("1.21").build(app, "stack-122");
     
     const template = Template.fromStack(stackV122);
     template.resourceCountIs("AWS::Lambda::LayerVersion", 0);
