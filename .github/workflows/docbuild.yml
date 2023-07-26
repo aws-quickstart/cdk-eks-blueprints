@@ -9,9 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
       - uses: actions/setup-python@v4
         with:
           python-version: 3.x
       - run: pip install mkdocs-material
+      - run: npm install
       - run: npx typedoc --out docs/api lib/index.ts
       - run: mkdocs gh-deploy
