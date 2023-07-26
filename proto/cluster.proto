@@ -1,0 +1,51 @@
+syntax="proto3";
+package codegen;
+import "team.proto";
+import "cluster_provider.proto";
+import "resource_provider.proto";
+import "addons.proto";
+
+service ClusterService {
+    rpc CreateCluster (CreateClusterRequest) returns (APIResponse);
+    rpc BuildCluster (BuildClusterRequest) returns (APIResponse);
+    rpc CloneCluster (CloneClusterRequest) returns (APIResponse);
+
+    rpc AddPlatformTeam(AddPlatformTeamRequest) returns (APIResponse);
+    rpc AddApplicationTeam(AddApplicationTeamRequest) returns (APIResponse);
+    rpc AddTeams (AddTeamsRequest) returns (APIResponse);
+
+    rpc AddMngClusterProvider(AddMngClusterProviderRequest) returns (APIResponse);
+    rpc AddAsgClusterProvider(AddAsgClusterProviderRequest) returns (APIResponse);
+    rpc AddClusterProvider (AddClusterProviderRequest) returns (APIResponse);
+
+    rpc AddVpcProvider (AddVpcProviderRequest) returns (APIResponse);
+    rpc AddResourceProvider (AddResourceProviderRequest) returns (APIResponse);
+
+    rpc AddAckAddOn (AddAckAddOnRequest) returns (APIResponse);
+    rpc AddKubeProxyAddOn (AddKubeProxyAddOnRequest) returns (APIResponse);
+    rpc AddAddons (AddAddonsRequest) returns (APIResponse);
+}
+
+message APIResponse{
+    string message = 1;
+}
+
+message CreateClusterRequest {
+    string id = 1;
+    optional string name = 2;
+}
+
+
+message BuildClusterRequest {
+    string cluster_name = 1;
+    optional string account = 2;
+    optional string region = 3;
+}
+
+message CloneClusterRequest {
+    string cluster_name = 1;
+    string new_cluster_id = 2;
+    optional string new_cluster_name = 3;
+    optional string region = 4;
+    optional string account = 5;
+}

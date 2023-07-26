@@ -1,0 +1,32 @@
+syntax="proto3";
+package codegen;
+
+message AddAddonsRequest {
+    string cluster_name = 1;
+    repeated Addon addons = 2;
+}
+
+message Addon {
+    oneof addon {
+        AckAddOn ack_add_on = 1;
+        KubeProxyAddOn kube_proxy_add_on = 2;
+    };
+}
+
+message AddAckAddOnRequest {
+    string cluster_name = 1;
+    AckAddOn ack_add_on = 2;
+}
+
+message AckAddOn{
+    optional string id = 1;
+    string serviceName = 2;
+}
+
+message AddKubeProxyAddOnRequest {
+    string cluster_name = 1;
+    KubeProxyAddOn kube_proxy_add_on = 2;
+}
+message KubeProxyAddOn {
+    optional string version = 1;
+}

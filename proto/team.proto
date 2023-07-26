@@ -1,0 +1,41 @@
+syntax="proto3";
+package codegen;
+
+message AddTeamsRequest {
+    string cluster_name = 1;
+    repeated Team teams = 2;
+}
+
+message Team {
+    oneof team {
+        GenericTeam generic_team = 1;
+        PlatformTeam platform_team = 2;
+        ApplicationTeam application_team = 3;
+    };
+}
+
+message GenericTeam {
+    string name = 1;
+}
+
+message AddPlatformTeamRequest{
+    string cluster_name = 1;
+    TeamProps props = 2;
+}
+
+message PlatformTeam {
+    string name = 1;
+}
+
+message ApplicationTeam {
+    string name = 1;
+}
+
+message AddApplicationTeamRequest{
+    string cluster_name = 1;
+    TeamProps props = 2;
+}
+
+message TeamProps {
+    string name  = 1;
+}
