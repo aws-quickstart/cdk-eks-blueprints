@@ -1,8 +1,8 @@
 syntax="proto3";
 package codegen;
-import "team.proto";
-import "cluster_provider.proto";
-import "resource_provider.proto";
+import "teams.proto";
+import "cluster_providers.proto";
+import "resource_providers.proto";
 import "addons.proto";
 
 service ClusterService {

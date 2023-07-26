@@ -17,9 +17,9 @@ import {
   AddAsgClusterProviderRequest,
   AddClusterProviderRequest,
   AddMngClusterProviderRequest,
-} from "./cluster_provider";
-import { AddResourceProviderRequest, AddVpcProviderRequest } from "./resource_provider";
-import { AddApplicationTeamRequest, AddPlatformTeamRequest, AddTeamsRequest } from "./team";
+} from "./cluster_providers";
+import { AddResourceProviderRequest, AddVpcProviderRequest } from "./resource_providers";
+import { AddApplicationTeamRequest, AddPlatformTeamRequest, AddTeamsRequest } from "./teams";
 
 export interface APIResponse {
   message: string;
