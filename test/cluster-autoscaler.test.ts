@@ -46,7 +46,7 @@ test("Cluster autoscaler correctly is using correct version for 1.26 specified a
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.of("1.27"))
+        .version(KubernetesVersion.of("1.26"))
         .addOns(new blueprints.ClusterAutoScalerAddOn())
         .build(app, "ca-stack-127");
 
