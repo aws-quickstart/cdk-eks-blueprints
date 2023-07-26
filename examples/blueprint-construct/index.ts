@@ -132,6 +132,9 @@ export default class BlueprintConstruct {
                         cpu: 20,
                         memory: "64Gi",
                     }
+                },
+                tags: {
+                    schedule: 'always-on'
                 }
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
