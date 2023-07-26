@@ -128,6 +128,79 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
+Pattern # 5 : Configuring rules into AMP. This pattern creates recording rules and/or alerting rules, based on the YAML files provided. A workspace ARN is also required as input.
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+const ampWorkspaceName = "blueprints-amp-workspace";
+const ampWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+const attrPrometheusEndpoint = ampWorkspace.attrPrometheusEndpoint;
+const ampWorkspaceArn = ampWorkspace.attrArn;
+
+const addOn = new blueprints.addons.AmpAddOn({
+    ampPrometheusEndpoint: attrPrometheusEndpoint,
+    ampRules: {
+        ampWorkspaceArn: ampWorkspaceArn,
+        ruleFilePaths: [
+            __dirname + '/../common/resources/amp-config/alerting-rules.yml',
+            __dirname + '/../common/resources/amp-config/recording-rules.yml'
+        ]
+    }
+})
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
+  .build(app, 'my-stack-name');
+```
+
+Pattern # 6 : Configuring the [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector). This pattern enables you to configure the Collector by providing a  manifest describing an OpenTelemetryCollector resource:
+
+```yaml
+kubectl apply -f - <<EOF
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: sidecar-for-my-app
+spec:
+  mode: sidecar
+  config: |
+    ...
+    {{javaScrapeSampleLimit}}
+    ...
+    {{javaPrometheusMetricsEndpoint}}
+```
+
+The `openTelemetryCollectorManifestParameterMap` parameter allows you to define a map where the keys can be used (in double curly braces) within the OpenTelemetryCollector manifest as e.g. {{javaScrapeSampleLimit}}, to be replaced by the corresponding values.
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+const ampWorkspaceName = "blueprints-amp-workspace";
+const attrPrometheusEndpoint = blueprints.getNamedResource(ampWorkspaceName).attrPrometheusEndpoint;
+
+const addOn = new blueprints.addons.AmpAddOn({
+    ampPrometheusEndpoint: attrPrometheusEndpoint,
+    openTelemetryCollectorManifestPath: __dirname + '/../common/resources/otel-collector-config.yml',
+    openTelemetryCollectorManifestParameterMap: {
+        javaScrapeSampleLimit: 1000,
+        javaPrometheusMetricsEndpoint: "/metrics"
+    }
+})
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
+  .build(app, 'my-stack-name');
+```
+
 ## Validation
 
 To validate that AMP add-on is installed properly, ensure that the required kubernetes resources are running in the cluster:
