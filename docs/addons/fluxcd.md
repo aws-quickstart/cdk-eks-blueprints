@@ -57,9 +57,49 @@ const addOn = new blueprints.addons.FluxCDAddOn({
 ...
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .addOns(addOn)
-  .build(app, 'my-stack-name');
+    .addOns(addOn)
+    .build(app, 'my-stack-name');
 ```
+
+## Workload Repositories
+
+1. To add workload repositories as well as the bootstrap repository, please follow this example below 
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.FluxCDAddOn({
+    bootstrapRepo: {
+        repoUrl: 'https://github.com/stefanprodan/podinfo',
+        name: "podinfo",
+        targetRevision: "master",
+        path: "./kustomize"
+    },
+    bootstrapValues: {
+        "region": "us-east-1"
+    },
+    workloadApplications: [
+        {
+            name: "nginx",
+            namespace: "default",
+            repository: {
+                repoUrl: 'https://github.com/zjaco13/flux-tester',
+                targetRevision: "main",
+                path: "./infra",
+            },
+            values: {},
+        }
+    ],
+}),
+
+const blueprint = blueprints.EksBlueprint.builder()
+    .addOns(addOn)
+    .build(app, 'my-stack-name');
+```
+
 
 ## Secret Management for private Git repositories with FluxCD
 
