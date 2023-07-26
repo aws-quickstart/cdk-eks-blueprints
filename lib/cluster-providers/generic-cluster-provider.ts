@@ -2,6 +2,7 @@
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
+// import {KubectlV27Layer} from "@aws-cdk/lambda-layer-kubectl-v27";
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
@@ -16,6 +17,7 @@ import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
 import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
+import { BlueprintBuilder } from "../stacks";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -36,7 +38,9 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
         case eks.KubernetesVersion.V1_25:
             return new KubectlV25Layer(scope, "kubectllayer25");
         case eks.KubernetesVersion.V1_26:
-                return new KubectlV26Layer(scope, "kubectllayer26");
+            return new KubectlV26Layer(scope, "kubectllayer26");
+        case eks.KubernetesVersion.V1_27:
+            //return new KubectlV27Layer(scope, "kubectllayer27");
     }
     
     const minor = version.version.split('.')[1];
@@ -50,7 +54,7 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
  * Properties for the generic cluster provider, containing definitions of managed node groups,
  * auto-scaling groups, fargate profiles.
  */
-export interface GenericClusterProviderProps extends eks.ClusterOptions {
+export interface GenericClusterProviderProps extends Partial<eks.ClusterOptions> {
 
     /**
      * Whether API server is private.
@@ -207,7 +211,7 @@ export class ClusterBuilder {
     build() {
         return new GenericClusterProvider({
             ...this.props,
-            version: this.props.version!,
+            version: this.props.version,
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups,
             autoscalingNodeGroups: this.autoscalingNodeGroups,
@@ -236,10 +240,16 @@ export class GenericClusterProvider implements ClusterProvider {
     createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
         const id = scope.node.id;
 
+        const builder = scope as unknown as BlueprintBuilder;
         // Props for the cluster.
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
-        const version = this.props.version;
+        let version: eks.KubernetesVersion;
+        if(builder.versionCalled) {
+           version = builder.props.version!;
+        } else {
+            version = this.props.version!
+        }
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
@@ -247,7 +257,7 @@ export class GenericClusterProvider implements ClusterProvider {
             assumedBy: new AccountRootPrincipal() 
         });
 
-        const kubectlLayer = this.getKubectlLayer(scope, version);
+        const kubectlLayer = this.getKubectlLayer(scope, version!);
         const tags = this.props.tags;
 
         const defaultOptions: Partial<eks.ClusterProps> = {

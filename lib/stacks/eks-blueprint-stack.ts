@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_25;
+    readonly version?: KubernetesVersion = KubernetesVersion.V1_27;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -108,6 +108,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         account?: string,
         region?: string
     };
+    versionCalled: boolean = false;
 
     constructor() {
         this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
@@ -132,8 +133,15 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public version(version: KubernetesVersion): this {
-        this.props = { ...this.props, ...{ version } };
+    public version(version: string): this {
+        let versionKV: KubernetesVersion;
+        if (version == "auto") {
+            versionKV = KubernetesVersion.V1_27;
+        } else {
+            versionKV = KubernetesVersion.of(version);
+        }
+        this.props = { ...this.props, ...{ version: versionKV } };
+        this.versionCalled = true;
         return this;
     }
 
