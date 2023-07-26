@@ -1,8 +1,5 @@
 name: 'Release Website Publish'
 on:
-  push:
-    branches: 
-    - "fix/releaseGHAction"
   release:
     types: [published]
 permissions:
