@@ -133,14 +133,16 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public version(version: string): this {
-        let versionKV: KubernetesVersion;
-        if (version == "auto") {
-            versionKV = KubernetesVersion.V1_27;
-        } else {
-            versionKV = KubernetesVersion.of(version);
+    public version(version: string | KubernetesVersion): this {
+        if (typeof version === 'string') {
+            if (version == "auto") {
+               version = KubernetesVersion.V1_27;
+            } else {
+                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.")
+            }
         }
-        this.props = { ...this.props, ...{ version: versionKV } };
+
+        this.props = { ...this.props, ...{ version: version } };
         this.versionCalled = true;
         return this;
     }

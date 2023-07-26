@@ -249,7 +249,7 @@ test("Kubectl layer is correctly injected for EKS version 1.26", () => {
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version("1.26").build(app, "stack-126");
+        .version(KubernetesVersion.V1_26).build(app, "stack-126");
     
     const template = Template.fromStack(stack);
 
@@ -267,7 +267,7 @@ test("Kubectl layer is correctly injected for EKS version 1.25", () => {
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version("1.25").build(app, "stack-125");
+      .version(KubernetesVersion.V1_25).build(app, "stack-125");
 
     const template = Template.fromStack(stack);
 
@@ -284,7 +284,7 @@ test("Kubectl layer is correctly injected for EKS version 1.24", () => {
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version("1.24").build(app, "stack-124");
+      .version(KubernetesVersion.V1_24).build(app, "stack-124");
 
     const template = Template.fromStack(stack);
 
@@ -301,8 +301,32 @@ test("Kubectl layer is correctly injected for EKS version 1.21 and below", () =>
 
     const stackV122 = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version("1.21").build(app, "stack-122");
+        .version(KubernetesVersion.V1_22).build(app, "stack-122");
     
     const template = Template.fromStack(stackV122);
     template.resourceCountIs("AWS::Lambda::LayerVersion", 0);
+});
+
+test("Version function errors for random string", () => {
+    expect(() => blueprints.EksBlueprint.builder().version("1.28")).toThrow("Only valid options are \"auto\", or a KubernetesVersion.");
+});
+
+test("Build fails if no version is set in builder or node group", () => {
+    const app = new cdk.App();
+    const clusterProvider = new blueprints.GenericClusterProvider({
+        clusterName: "my-cluster",
+    });
+    expect(() => {
+        blueprints.EksBlueprint.builder()
+        .clusterProvider(clusterProvider).build(app, "stack-fail");
+    }).toThrow("Version was not specified in builder, must be specified here");
+});
+
+test("Kubernetes Version gets set correctly for \"auto\"", () => {
+    const app = new cdk.App();
+    const stack = blueprints.EksBlueprint.builder()
+    .account('123456789').region('us-west-2')
+    .version("auto").build(app, "stack-auto");
+
+    expect(stack.getClusterInfo().version.version).toBe("1.27");
 });
