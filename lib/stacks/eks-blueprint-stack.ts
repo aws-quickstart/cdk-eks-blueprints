@@ -138,7 +138,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
             if (version == "auto") {
                version = KubernetesVersion.V1_27;
             } else {
-                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.")
+                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.");
             }
         }
 
