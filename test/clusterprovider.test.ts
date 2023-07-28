@@ -319,7 +319,7 @@ test("Build fails if no version is set in builder or node group", () => {
     expect(() => {
         blueprints.EksBlueprint.builder()
         .clusterProvider(clusterProvider).build(app, "stack-fail");
-    }).toThrow("Version was not specified in builder, must be specified here");
+    }).toThrow("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
 });
 
 test("Kubernetes Version gets set correctly for \"auto\"", () => {

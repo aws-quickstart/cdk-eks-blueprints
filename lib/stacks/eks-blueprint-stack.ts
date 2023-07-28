@@ -108,7 +108,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         account?: string,
         region?: string
     };
-    versionCalled: boolean = false;
 
     constructor() {
         this.props = { addOns: new Array<spi.ClusterAddOn>(), teams: new Array<spi.Team>(), resourceProviders: new Map() };
@@ -143,7 +142,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         }
 
         this.props = { ...this.props, ...{ version: version } };
-        this.versionCalled = true;
         return this;
     }
 
@@ -259,7 +257,7 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, blueprintProps.version);
         this.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;

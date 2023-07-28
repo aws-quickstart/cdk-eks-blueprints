@@ -237,21 +237,17 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined, blueprintVersion: eks.KubernetesVersion | undefined): ClusterInfo {
         const id = scope.node.id;
 
-        const builder = scope as unknown as BlueprintBuilder;
         // Props for the cluster.
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
-        let version: eks.KubernetesVersion;
-        if(builder.versionCalled) {
-           version = builder.props.version!;
-        } else if (!this.props.version){
-            throw new Error("Version was not specified in builder, must be specified here");
-        } else {
-            version = this.props.version;
+        if(!blueprintVersion && !this.props.version) {
+            throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
         }
+        const version: eks.KubernetesVersion = blueprintVersion || this.props.version || eks.KubernetesVersion.V1_27
+
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
@@ -259,7 +255,7 @@ export class GenericClusterProvider implements ClusterProvider {
             assumedBy: new AccountRootPrincipal() 
         });
 
-        const kubectlLayer = this.getKubectlLayer(scope, version!);
+        const kubectlLayer = this.getKubectlLayer(scope, version);
         const tags = this.props.tags;
 
         const defaultOptions: Partial<eks.ClusterProps> = {
