@@ -71,6 +71,8 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
+const nginxDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/nginx/nginx.json"
+
 const addOn = new blueprints.addons.FluxCDAddOn({
     bootstrapRepo: {
         repoUrl: 'https://github.com/stefanprodan/podinfo',
@@ -83,20 +85,25 @@ const addOn = new blueprints.addons.FluxCDAddOn({
     },
     workloadApplications: [
         {
-            name: "nginx",
-            namespace: "default",
+            name: "nginx-grafanadashboard",
+            namespace: "grafana-operator",
             repository: {
-                repoUrl: 'https://github.com/zjaco13/flux-tester',
+                repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
                 targetRevision: "main",
-                path: "./infra",
+                path: "./artifacts/grafana-operator-manifests/eks/nginx"
             },
-            values: {},
+            values: {
+                "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
+            },
         }
     ],
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
-    .addOns(addOn)
+    .addOns(
+        blueprints.addons.GrafanaOperatorAddon,
+        addOn,
+    )
     .build(app, 'my-stack-name');
 ```
 
