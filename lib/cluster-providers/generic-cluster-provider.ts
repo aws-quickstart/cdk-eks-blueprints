@@ -17,7 +17,6 @@ import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
 import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
-import { BlueprintBuilder } from "../stacks";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -246,7 +245,7 @@ export class GenericClusterProvider implements ClusterProvider {
         if(!blueprintVersion && !this.props.version) {
             throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
         }
-        const version: eks.KubernetesVersion = blueprintVersion || this.props.version || eks.KubernetesVersion.V1_27
+        const version: eks.KubernetesVersion = blueprintVersion || this.props.version || eks.KubernetesVersion.V1_27;
 
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
