@@ -37,6 +37,9 @@ markdown-link-check:
 run-test:
 	npm test
 
+run-server:
+	$(CDK) -a "npx ts-node lib/server/index.ts" synth
+
 synth:
 	$(DEPS)
 	$(CDK) synth
