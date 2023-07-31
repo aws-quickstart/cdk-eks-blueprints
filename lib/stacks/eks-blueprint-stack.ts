@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion = KubernetesVersion.V1_27;
+    readonly version: KubernetesVersion | string = KubernetesVersion.V1_25;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -133,14 +133,6 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public version(version: string | KubernetesVersion): this {
-        if (typeof version === 'string') {
-            if (version == "auto") {
-               version = KubernetesVersion.V1_27;
-            } else {
-                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.");
-            }
-        }
-
         this.props = { ...this.props, ...{ version: version } };
         return this;
     }
@@ -206,7 +198,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
-        return new EksBlueprint(scope, { ...this.props, ...{ id } },
+        return new EksBlueprint(scope, { ...this.props, ...{version: this.props.version!}, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
 
@@ -243,7 +235,15 @@ export class EksBlueprint extends cdk.Stack {
             vpcResource = resourceContext.add(spi.GlobalResources.Vpc, new VpcProvider());
         }
 
-        const version = blueprintProps.version ?? KubernetesVersion.V1_25;
+        let version = blueprintProps.version;
+        if (typeof version === 'string') {
+            if (version == "auto") {
+               version = KubernetesVersion.V1_27;
+            } else {
+                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.");
+            }
+        }
+
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
 
         if (!kmsKeyResource && blueprintProps.useDefaultSecretEncryption != false) {
@@ -257,7 +257,7 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, blueprintProps.version);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version);
         this.clusterInfo.setResourceContext(resourceContext);
 
         let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
@@ -373,3 +373,4 @@ export class EksBlueprint extends cdk.Stack {
         }
     }
 }
+
