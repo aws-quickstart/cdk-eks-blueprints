@@ -9,6 +9,6 @@ import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
  * ClusterProvider is the interface to which all Cluster Providers should conform.
  */
 export declare interface ClusterProvider {
-    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey?: IKey, blueprintVersion?: KubernetesVersion): ClusterInfo;
+    createCluster(scope: Construct, vpc: IVpc, secretsEncryptionKey?: IKey, kubernetesVersion?: KubernetesVersion): ClusterInfo;
 }
 

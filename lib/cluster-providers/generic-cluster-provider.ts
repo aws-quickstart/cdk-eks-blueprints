@@ -236,16 +236,16 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined, blueprintVersion: eks.KubernetesVersion | undefined): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined, kubernetesVersion: eks.KubernetesVersion | undefined): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
-        if(!blueprintVersion && !this.props.version) {
+        if(!kubernetesVersion && !this.props.version) {
             throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
         }
-        const version: eks.KubernetesVersion = blueprintVersion || this.props.version || eks.KubernetesVersion.V1_27;
+        const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_27;
 
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
