@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version: KubernetesVersion | string = KubernetesVersion.V1_25;
+    readonly version?: KubernetesVersion | string = KubernetesVersion.V1_25;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -198,7 +198,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
     }
 
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
-        return new EksBlueprint(scope, { ...this.props, ...{version: this.props.version!}, ...{ id } },
+        return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
     }
 
@@ -240,7 +240,7 @@ export class EksBlueprint extends cdk.Stack {
             if (version == "auto") {
                version = KubernetesVersion.V1_27;
             } else {
-                throw new Error("Only valid options are \"auto\", or a KubernetesVersion.");
+                throw new Error("Only valid option for passing in a string to version is \"auto\".");
             }
         }
 

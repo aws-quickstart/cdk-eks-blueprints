@@ -7,6 +7,7 @@ import { SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as blueprints from '../lib';
 import { AsgClusterProvider, MngClusterProvider } from '../lib';
+import { version } from 'os';
 
 const addAutoScalingGroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addAutoScalingGroupCapacity');
 const addNodegroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addNodegroupCapacity');
@@ -61,7 +62,8 @@ test("Generic cluster provider correctly registers managed node groups with inst
 
     const clusterProvider = blueprints.clusterBuilder()
     .withCommonOptions({
-        serviceIpv4Cidr: "10.43.0.0/16"
+        serviceIpv4Cidr: "10.43.0.0/16",
+        version: KubernetesVersion.V1_27
     })
     .managedNodeGroup({
         id: "mng1",
@@ -308,7 +310,8 @@ test("Kubectl layer is correctly injected for EKS version 1.21 and below", () =>
 });
 
 test("Version function errors for random string", () => {
-    expect(() => blueprints.EksBlueprint.builder().version("1.28")).toThrow("Only valid options are \"auto\", or a KubernetesVersion.");
+    const app = new cdk.App();
+    expect(() => blueprints.EksBlueprint.builder().version("1.28").build(app, "stack-fail-1")).toThrow("Only valid option for passing in a string to version is \"auto\".");
 });
 
 test("Build fails if no version is set in builder or node group", () => {
@@ -318,7 +321,7 @@ test("Build fails if no version is set in builder or node group", () => {
     });
     expect(() => {
         blueprints.EksBlueprint.builder()
-        .clusterProvider(clusterProvider).build(app, "stack-fail");
+        .clusterProvider(clusterProvider).build(app, "stack-fail-2");
     }).toThrow("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
 });
 
@@ -327,6 +330,17 @@ test("Kubernetes Version gets set correctly for \"auto\"", () => {
     const stack = blueprints.EksBlueprint.builder()
     .account('123456789').region('us-west-2')
     .version("auto").build(app, "stack-auto");
+
+    expect(stack.getClusterInfo().version.version).toBe("1.27");
+});
+
+
+test("Kubernetes Version gets set correctly in NodeGroup", () => {
+    const app = new cdk.App();
+    const stack = blueprints.EksBlueprint.builder()
+    .account('123456789').region('us-west-2')
+    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_27}))
+    .build(app, "stack-auto");
 
     expect(stack.getClusterInfo().version.version).toBe("1.27");
 });

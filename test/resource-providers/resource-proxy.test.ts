@@ -42,6 +42,7 @@ describe("ResourceProxy",() => {
 
         const builder = EksBlueprint.builder()
             .clusterProvider(clusterProvider)
+            .version("auto")
             .account("123456789012")
             .region("us-east-1");
 
@@ -78,6 +79,7 @@ describe("ResourceProxy",() => {
 
         const builder = EksBlueprint.builder()
             .clusterProvider(clusterProvider)
+            .version("auto")
             .account("123456789012")
             .region("us-east-1");
 
@@ -99,6 +101,7 @@ describe("ResourceProxy",() => {
         
         const builder = EksBlueprint.builder()
             .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider())
+            .version("auto")
             .account("123456789012")
             .region("us-east-1")
             .addOns(new AppMeshAddOn( {
@@ -133,6 +136,7 @@ describe("ResourceProxy",() => {
                                   .clusterProvider(genericClusterProvider)
                                   .account("123456789012")
                                   .region("us-east-1")
+                                  .version("auto")
                                   .build(app, "cluster");
 
         // Then

@@ -18,6 +18,7 @@ describe("S3BucketProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -40,6 +41,7 @@ describe("S3BucketProvider", () => {
       .resourceProvider("my-s3-bucket", s3Bucket)
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     const bucket = <s3.IBucket>stack.node.tryFindChild('imported-s3-bucket');

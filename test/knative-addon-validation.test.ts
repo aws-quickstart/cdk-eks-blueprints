@@ -13,6 +13,7 @@ test("Generic cluster with kNative Eventing deployment", async () => {
 
     const blueprint = await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-east-1')
+        .version("auto")
         .addOns(...addons)
         .build(app, 'knative-stack');
 
