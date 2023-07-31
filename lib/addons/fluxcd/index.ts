@@ -154,7 +154,7 @@ function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDA
 function createKustomizations(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest[] {
   let fluxKustomizationPaths = fluxcdAddonProps.bootstrapRepo?.path ? [fluxcdAddonProps.bootstrapRepo?.path] : ["."];
 
-  if (typeof fluxcdAddonProps.additionalFluxKustomizationPaths !== undefined){
+  if (fluxcdAddonProps.additionalFluxKustomizationPaths){
     fluxKustomizationPaths = fluxKustomizationPaths.concat(fluxcdAddonProps.additionalFluxKustomizationPaths as string[]);
   }
 
