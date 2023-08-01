@@ -103,7 +103,7 @@ Namespace to deploy Pixie to. Default: `pl`
 
 #### `cloudAddr?: string` (optional)
 
-The address of Pixie Cloud. This should only be modified if you have deployed your own self-hosted Pixie Cloud. By default, it will be set to [Community Cloud for Pixie](https://work.withpixie.dev).
+The address of Pixie Cloud. This should only be modified if you have deployed your own self-hosted Pixie Cloud. By default, it will be set to [Community Cloud for Pixie](https://work.withpixie.ai).
 
 #### `devCloudNamespace?: string` (optional)
 

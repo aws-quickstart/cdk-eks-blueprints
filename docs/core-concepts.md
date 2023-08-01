@@ -24,7 +24,7 @@ A `cluster` is simply an EKS cluster. The `eks-blueprints` framework provides fo
 
 Each `ClusterProvider` provides additional configuration options as well. For example, the `MngClusterProvider` allows you to configure instance types, min and max instance counts, and amiType, among other options. 
 
-See our [`Cluster Providers`](../cluster-providers) documentation page for detailed information. 
+See our [`Cluster Providers`](./cluster-providers/index.md) documentation page for detailed information. 
 
 ## Resource Provider
 
@@ -46,13 +46,13 @@ See our [`Add-ons`](./addons/index.md) documentation page for detailed informati
 
 `Teams` allow you to configure the logical grouping of users that have access to your EKS clusters, in addition to the access permissions they are granted. The framework currently supports two types of `teams`: `ApplicationTeam` and `PlatformTeam`. `ApplicationTeam` members are granted access to specific namespaces. `PlatformTeam` members are granted administrative access to your clusters. 
 
-See our [`Teams`](../teams) documentation page for detailed information. 
+See our [`Teams`](./teams/teams.md) documentation page for detailed information. 
 
 ## Pipeline
 
 `Pipelines` allow you to configure `Continuous Delivery` (CD) pipelines for your cluster `blueprints` that are directly integrated with your Git provider.
 
-See our [`Pipelines`](../pipelines) documentation page for detailed information. 
+See our [`Pipelines`](./pipelines.md) documentation page for detailed information. 
 
 ## Application
 
