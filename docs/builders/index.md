@@ -1,6 +1,6 @@
 # Builders
 
-The `eks-blueprints` framework allows customers to use builders to configure required addons as you prepare a blueprint for setting EKS cluster with required day 2 operational tooling
+The `eks-blueprints` framework allows customers to use builders to configure required addons as they prepare a blueprint for setting EKS cluster with required day 2 operational tooling
 
 The framework currently provides support for the following Builders:
 
