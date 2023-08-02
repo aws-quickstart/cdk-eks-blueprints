@@ -65,6 +65,11 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   fluxTargetNamespace?: string;
 
   /** 
+  * Flux Kustomization paths within the repository;
+  * Flux Kustomizations will be created for bootstrapRepo.path and for the paths specified in this array */
+  additionalFluxKustomizationPaths?: string[];
+
+  /** 
   * Flux Kustomization Prune.
   * Default `true` */
   fluxPrune?: boolean;
@@ -119,10 +124,11 @@ export class FluxCDAddOn extends HelmAddOn {
 
     //Lets create a GitRepository resource as a source to Flux
     if (this.options.bootstrapRepo?.repoUrl) {
-      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options.bootstrapRepo, this.options);
+      const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options);
       gitRepositoryConstruct.node.addDependency(chart);
-      const kustomizationConstruct = createKustomization(clusterInfo, this.options.bootstrapRepo, this.options);
-      kustomizationConstruct.node.addDependency(gitRepositoryConstruct);
+
+      const kustomizationConstructs = createKustomizations(clusterInfo, this.options);
+      kustomizationConstructs.map(kustomizationConstruct => kustomizationConstruct.node.addDependency(gitRepositoryConstruct));
     }
     return Promise.resolve(chart);
   }
@@ -131,19 +137,42 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
+function createGitRepository(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
+  if (fluxcdAddonProps.bootstrapRepo === undefined) {
+    throw new Error("Missing Git repository");
+  }
+  
+  const manifest = new FluxGitRepository(fluxcdAddonProps.bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
   let manifestName: string | undefined = fluxcdAddonProps.name + 'gitrepository';
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }
 
 /**
- * create Kustomization calls the FluxKustomization().generate to create Kustomization resource.
+ * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
  */
-function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.ApplicationRepository, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-  const manifest = new FluxKustomization(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!);
-  let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization';
-  const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
-  return construct;
+function createKustomizations(clusterInfo: ClusterInfo, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest[] {
+  let fluxKustomizationPaths = fluxcdAddonProps.bootstrapRepo?.path ? [fluxcdAddonProps.bootstrapRepo?.path] : ["."];
+
+  if (fluxcdAddonProps.additionalFluxKustomizationPaths){
+    fluxKustomizationPaths = fluxKustomizationPaths.concat(fluxcdAddonProps.additionalFluxKustomizationPaths as string[]);
+  }
+
+  const constructs: KubernetesManifest[] = [];
+  const fluxKustomization = new FluxKustomization(fluxcdAddonProps.bootstrapRepo!);
+  fluxKustomizationPaths.map((fluxKustomizationPath, index) => {
+    const manifest =fluxKustomization.generate(
+      fluxcdAddonProps.bootstrapRepo!.name! + "-" + index,
+      fluxcdAddonProps.namespace!,
+      fluxcdAddonProps.fluxSyncInterval!,
+      fluxcdAddonProps.fluxTargetNamespace!,
+      fluxcdAddonProps.fluxPrune!,
+      fluxcdAddonProps.fluxTimeout!,
+      fluxcdAddonProps.bootstrapValues!,
+      fluxKustomizationPath);
+    let manifestName: string | undefined = fluxcdAddonProps.name + 'kustomization' + index;
+    constructs.push(clusterInfo.cluster.addManifest(manifestName!, manifest));
+  });
+
+  return constructs;
 }
