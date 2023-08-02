@@ -163,7 +163,7 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOps
 }
 
 /**
- * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
+ * create Kustomizations calls the FluxKustomization().generate to create Kustomization resource.
  */
 function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
     const manifest = new FluxKustomization(bootstrapRepo).generate(bootstrapRepo.name, fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!, fluxcdAddonProps.fluxPrune!, fluxcdAddonProps.fluxTimeout!, fluxcdAddonProps.bootstrapValues!, bootstrapRepo.repository?.path!);
@@ -171,6 +171,10 @@ function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOps
     const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
     return construct;
 }
+
+/**
+ * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
+ */
 function createKustomizations(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest[] {
   let fluxKustomizationPaths = fluxcdAddonProps.bootstrapRepo?.path ? [fluxcdAddonProps.bootstrapRepo?.path] : ["."];
 
