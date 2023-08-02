@@ -25,7 +25,7 @@ export class FluxKustomization {
                     kind: "GitRepository",
                     name: repository.name
                 },
-                path: repository.repository?.path,
+                path: fluxKustomizationPath,
                 prune: fluxPrune,
                 timeout: fluxTimeout
             }
