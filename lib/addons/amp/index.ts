@@ -25,6 +25,21 @@ export interface AmpRules {
     ruleFilePaths: string[];
 }
 
+export interface OpenTelemetryCollector {
+     /**
+     * An alternative OpenTelemetryCollector if you need further cusomisation.
+     * If not provided, the default will be used.
+     */
+     manifestPath: string;
+     /**
+     * This parameter is optional and holds an object of type Values, with keys and values.
+     * The same key literals will need to be used within the manifest between double curly braces {{}} and the add-on will replace them with the related values.
+     * The following keys are already in use by the add-on and will be replaced in your manifest with configured values, if you want to use them:
+     * remoteWriteEndpoint, awsRegion, deploymentMode, namespace, clusterName. To use any of those you can just include e.g. {{remoteWriteEndpoint}} inside the manifest.
+     */
+     manifestParameterMap?: Values;
+}
+
 /**
  * Configuration options for add-on.
  */
@@ -50,21 +65,16 @@ export interface AmpAddOnProps {
      */
     name?: string;
     /** 
-     * AMP rules.
+     * AMP rules providing AMP workspace ARN and paths to files encoding recording and/or alerting rules following the same format as a rules file in standalone Prometheus.
+     * This parameter is optional and if not provided, no rules will be applied.
      */
     ampRules?: AmpRules;
      /**
-     * An alternative OpenTelemetryCollector if you need further cusomisation.
+     * An alternative OpenTelemetryCollector if you need further customisation.
+     * If you need to configure rules, please do not use the rule_files field like in standalone Prometheus, but rather use the ampRules parameter.
      * If not provided, the default will be used.
      */
-    openTelemetryCollectorManifestPath?: string;
-     /**
-     * This parameter can be provided in case an alternative OpenTelemetryCollector is set via the openTelemetryCollectorManifestPath parameter.
-     * It holds an object of type Values, with keys and values. The same key literals will need to be used within the manifest between double curly braces {{}} and the add-on will replace them with the related values.
-     * The following keys are already in use by the add-on and will be replaced in your manifest with configured values, if you want to use them:
-     * remoteWriteEndpoint, awsRegion, deploymentMode, namespace, clusterName. To use any of those you can just include e.g. {{remoteWriteEndpoint}} inside the manifest.
-     */
-     openTelemetryCollectorManifestParameterMap?: Values;
+    openTelemetryCollector?: OpenTelemetryCollector;
 }
 
 export const enum DeploymentMode {
@@ -110,8 +120,8 @@ export class AmpAddOn implements ClusterAddOn {
         const manifest = doc.split("---").map(e => {
             let object = loadYaml(e);
 
-            if (this.ampAddOnProps.openTelemetryCollectorManifestPath !== undefined && object.kind === "OpenTelemetryCollector"){
-                object = readYamlDocument(this.ampAddOnProps.openTelemetryCollectorManifestPath!);
+            if (this.ampAddOnProps.openTelemetryCollector?.manifestPath !== undefined && object.kind === "OpenTelemetryCollector"){
+                object = readYamlDocument(this.ampAddOnProps.openTelemetryCollector.manifestPath!);
                 object = loadYaml(object);
             }
             return object;
@@ -123,7 +133,7 @@ export class AmpAddOn implements ClusterAddOn {
             deploymentMode: this.ampAddOnProps.deploymentMode,
             namespace: this.ampAddOnProps.namespace,
             clusterName: cluster.clusterName,
-            ...this.ampAddOnProps.openTelemetryCollectorManifestParameterMap
+            ...this.ampAddOnProps.openTelemetryCollector?.manifestParameterMap
          };
          
          const manifestDeployment: ManifestDeployment = {

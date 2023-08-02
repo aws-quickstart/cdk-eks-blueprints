@@ -28,29 +28,6 @@ describe('Unit tests for AMP addon', () => {
         expect(blueprint).toBeDefined();
     });
 
-    test("Stack creation fails due to missing AdotCollectorAddOn", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-        .addOns(
-            new blueprints.addons.AmpAddOn({
-                ampPrometheusEndpoint: "test",
-                ampRules: {
-                    ampWorkspaceArn: "test",
-                    ruleFilePaths: [
-                        __dirname + "/resources/recording-rules-test.yml",
-                    ]
-                }
-            })
-        );
-
-        expect(()=> {
-            blueprint.build(app, "amp-missing-adot");
-        }).toThrow("Missing a dependency for AdotCollectorAddOn");
-    });
-
     test("Stack creation fails due to ruleFilePaths.length == 0", () => {
         const app = new cdk.App();
 

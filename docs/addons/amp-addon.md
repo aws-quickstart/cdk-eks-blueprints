@@ -158,10 +158,26 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-Pattern # 6 : Configuring the [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector). This pattern enables you to configure the Collector by providing a  manifest describing an OpenTelemetryCollector resource:
+The recording rules and alerting rules files should be placed in the same repository that is using this add-on. They should also follow the same format as rules files in standalone Prometheus, like explained in [the AMP User Guide](https://docs.aws.amazon.com/prometheus/latest/userguide/AMP-ruler-rulesfile.html):
 
 ```yaml
-kubectl apply -f - <<EOF
+groups:
+  - name: test
+    rules:
+    - record: metric:recording_rule
+      expr: avg(rate(container_cpu_usage_seconds_total[5m]))
+  - name: alert-test
+    rules:
+    - alert: metric:alerting_rule
+      expr: avg(rate(container_cpu_usage_seconds_total[5m])) > 0
+      for: 2m
+```
+
+An example of rules configuration can be found in the data section of the [EKS monitoring rules file](https://github.com/aws-observability/terraform-aws-observability-accelerator/blob/main/modules/eks-monitoring/rules.tf) in the aws-observability repository.
+
+Pattern # 6 : Configuring the [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector). This pattern enables you to configure the Collector by providing a manifest describing an OpenTelemetryCollector resource:
+
+```yaml
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
@@ -175,7 +191,9 @@ spec:
     {{javaPrometheusMetricsEndpoint}}
 ```
 
-The `openTelemetryCollectorManifestParameterMap` parameter allows you to define a map where the keys can be used (in double curly braces) within the OpenTelemetryCollector manifest as e.g. {{javaScrapeSampleLimit}}, to be replaced by the corresponding values.
+This pattern is useful when you need to customise the configuration of the OpenTelemetryCollector, e.g. to add specific scraping targets and parameters in the Prometheus receiver configuration, for a job capturing metrics of a Java workload.
+
+The optional `openTelemetryCollector.manifestParameterMap` parameter allows you to define a map where the keys can be used (in double curly braces) within the OpenTelemetryCollector manifest as e.g. {{javaScrapeSampleLimit}}, to be replaced by the corresponding values.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -188,18 +206,22 @@ const attrPrometheusEndpoint = blueprints.getNamedResource(ampWorkspaceName).att
 
 const addOn = new blueprints.addons.AmpAddOn({
     ampPrometheusEndpoint: attrPrometheusEndpoint,
-    openTelemetryCollectorManifestPath: __dirname + '/../common/resources/otel-collector-config.yml',
-    openTelemetryCollectorManifestParameterMap: {
-        javaScrapeSampleLimit: 1000,
-        javaPrometheusMetricsEndpoint: "/metrics"
+    openTelemetryCollector: {
+        manifestPath: __dirname + '/../common/resources/otel-collector-config.yml',
+        manifestParameterMap: {
+            javaScrapeSampleLimit: 1000,
+            javaPrometheusMetricsEndpoint: "/metrics"
+        }
     }
-})
+});
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
   .build(app, 'my-stack-name');
 ```
+
+If you need to configure rules, please do not use the rule_files field like in standalone Prometheus, but rather use the ampRules parameter.
 
 ## Validation
 
