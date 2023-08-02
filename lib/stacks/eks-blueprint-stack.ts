@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion | string = KubernetesVersion.V1_25;
+    readonly version?: KubernetesVersion | "auto" = KubernetesVersion.V1_25;
 
     /**
      * Named resource providers to leverage for cluster resources.
@@ -132,7 +132,7 @@ export class BlueprintBuilder implements spi.AsyncStackBuilder {
         return this;
     }
 
-    public version(version: string | KubernetesVersion): this {
+    public version(version: "auto" | KubernetesVersion): this {
         this.props = { ...this.props, ...{ version: version } };
         return this;
     }
@@ -236,12 +236,8 @@ export class EksBlueprint extends cdk.Stack {
         }
 
         let version = blueprintProps.version;
-        if (typeof version === 'string') {
-            if (version == "auto") {
-               version = KubernetesVersion.V1_27;
-            } else {
-                throw new Error("Only valid option for passing in a string to version is \"auto\".");
-            }
+        if (version == "auto") {
+            version = KubernetesVersion.V1_27;
         }
 
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);

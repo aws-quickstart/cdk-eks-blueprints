@@ -308,11 +308,6 @@ test("Kubectl layer is correctly injected for EKS version 1.21 and below", () =>
     template.resourceCountIs("AWS::Lambda::LayerVersion", 0);
 });
 
-test("Version function errors for random string", () => {
-    const app = new cdk.App();
-    expect(() => blueprints.EksBlueprint.builder().version("1.28").build(app, "stack-fail-1")).toThrow("Only valid option for passing in a string to version is \"auto\".");
-});
-
 test("Build fails if no version is set in builder or node group", () => {
     const app = new cdk.App();
     const clusterProvider = new blueprints.GenericClusterProvider({
