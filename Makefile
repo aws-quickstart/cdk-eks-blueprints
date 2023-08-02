@@ -38,7 +38,11 @@ run-test:
 	npm test
 
 run-server:
+	$(DEPS)
 	$(CDK) -a "npx ts-node lib/server/index.ts" synth
+
+codegen:
+	bash scripts/codegen.sh
 
 synth:
 	$(DEPS)
