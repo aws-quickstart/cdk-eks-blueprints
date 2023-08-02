@@ -1,12 +1,12 @@
 # Argo CD Add-on
 
-[Argo CD](https://argoproj.github.io/argo-cd/) is a declarative, GitOps continuous delivery tool for Kubernetes. The Argo CD add-on provisions [Argo CD](https://argoproj.github.io/argo-cd/) into an EKS cluster, and can optionally bootstrap your workloads from public and private Git repositories. 
+[Argo CD](https://argo-cd.readthedocs.io/en/stable/) is a declarative, GitOps continuous delivery tool for Kubernetes. The Argo CD add-on provisions [Argo CD](https://argo-cd.readthedocs.io/en/stable/) into an EKS cluster, and can optionally bootstrap your workloads from public and private Git repositories. 
 
 The Argo CD add-on allows platform administrators to combine cluster provisioning and workload bootstrapping in a single step and enables use cases such as replicating an existing running production cluster in a different region in a matter of minutes. This is important for business continuity and disaster recovery cases as well as for cross-regional availability and geographical expansion.
 
-Please see the documentation below for details on automatic boostrapping with ArgoCD add-on. If you prefer manual bootstrapping (once your cluster is deployed with this add-on included), you can find instructions on getting started with Argo CD in our [Getting Started](/getting-started/#deploy-workloads-with-argocd) guide.
+Please see the documentation below for details on automatic boostrapping with ArgoCD add-on. If you prefer manual bootstrapping (once your cluster is deployed with this add-on included), you can find instructions on getting started with Argo CD in our [Getting Started](../getting-started.md#deploy-workloads-with-argocd) guide.
 
-Full Argo CD project documentation [can be found here](https://argoproj.github.io/argo-cd/).
+Full Argo CD project documentation [can be found here](https://argo-cd.readthedocs.io/en/stable/).
 
 ## Usage
 
@@ -26,12 +26,12 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-The above will create an `argocd` namespace and install all Argo CD components. In order to bootstrap workloads you will need to change the default ArgoCD admin password and add repositories as specified in the [Getting Started](https://argoproj.github.io/argo-cd/getting_started/#port-forwarding) documentation.
+The above will create an `argocd` namespace and install all Argo CD components. In order to bootstrap workloads you will need to change the default ArgoCD admin password and add repositories as specified in the [Getting Started](https://argo-cd.readthedocs.io/en/stable/getting_started/#port-forwarding) documentation.
 
 ## Functionality
 
 1. Creates the namespace specified in the construction parameter (`argocd` by default).
-2. Deploys the [`argo-cd`](https://argoproj.github.io/argo-helm) Helm chart into the cluster.
+2. Deploys the [`argo-cd`](https://argoproj.github.io/argo-helm/) Helm chart into the cluster.
 3. Allows to specify `ApplicationRepository` selecting the required authentication method as SSH Key, username/password or username/token. Credentials are expected to be set in AWS Secrets Manager and replicated to the desired region. If bootstrap repository is specified, creates the initial bootstrap application which may be leveraged to bootstrap workloads and/or other add-ons through GitOps.
 4. Allows setting the initial admin password through AWS Secrets Manager, replicating to the desired region. 
 5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
@@ -55,7 +55,7 @@ You can change the admin password through the Secrets Manager, but it will requi
 
 ## Bootstrapping 
 
-The Blueprints framework provides an approach to bootstrap workloads and/or additional add-ons from a customer GitOps repository. In a general case, the bootstrap GitOps repository may contains an [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) that points to all workloads and add-ons.  
+The Blueprints framework provides an approach to bootstrap workloads and/or additional add-ons from a customer GitOps repository. In a general case, the bootstrap GitOps repository may contains an [App of Apps](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) that points to all workloads and add-ons.  
 
 In order to enable bootstrapping, the add-on allows passing an `ApplicationRepository` at construction time. The following repository types are supported at present:
 
@@ -124,7 +124,7 @@ The application promotion process in the above example is handled entirely throu
 
 By default all AddOns defined in a blueprint are deployed to the cluster via CDK. You can opt-in to deploy them following the GitOps model via ArgoCD. You will need a repository contains all the AddOns you would like to deploy via ArgoCD, such as, [eks-blueprints-add-ons](https://github.com/aws-samples/eks-blueprints-add-ons). You then configure ArgoCD bootstrapping with this repository as shown above.
 
-There are two types of GitOps deployments via ArgoCD depending on whether you would like to adopt the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) strategy:
+There are two types of GitOps deployments via ArgoCD depending on whether you would like to adopt the [App of Apps](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) strategy:
 
 - CDK deploys the `Application` resource for each AddOn enabled, and ArgoCD deploys the actual AddOn via GitOps based on the `Application` resource. Example:
 
@@ -270,7 +270,7 @@ import * as bcrypt from "bcrypt";
      }))
 ```
 
-For more information, please refer to the [ArgoCD official documentation](https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd).
+For more information, please refer to the [ArgoCD official documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).
 ## Known Issues
 
 1. Destruction of the cluster with provisioned applications may cause cloud formation to get stuck on deleting ArgoCD namespace. This happens because the server component that handles Application CRD resource is destroyed before it has a chance to clean up applications that were provisioned through GitOps (of which CFN is unaware). To address this issue at the moment, App of Apps application should be destroyed manually before destroying the stack. 

@@ -6,11 +6,11 @@ The framework currently provides support for the following Cluster Providers:
 
 | Cluster Provider  | Description                                                                       |
 |-------------------|-----------------------------------------------------------------------------------|
-| [`GenericClusterProvider`](./generic-cluster-provider) | Provisions an EKS cluster with one or more managed or Auto Scaling groups as well as Fargate Profiles.
-| [`AsgClusterProvider`](./asg-cluster-provider) | Provisions an EKS cluster with an Auto Scaling group used for compute capacity.
-| [`MngClusterProvider`](./mng-cluster-provider) | Provisions an EKS cluster with a Managed Node group for compute capacity.
-| [`FargateClusterProvider`](./fargate-cluster-provider) | Provisions an EKS cluster which leverages AWS Fargate to run Kubernetes pods.
-| [`ImportClusterProvider`](./import-cluster-provider) | Imports an existing EKS cluster into the blueprint allowing capabilities to add (certain) add-ons and teams.
+| [`GenericClusterProvider`](./generic-cluster-provider.md) | Provisions an EKS cluster with one or more managed or Auto Scaling groups as well as Fargate Profiles.
+| [`AsgClusterProvider`](./asg-cluster-provider.md) | Provisions an EKS cluster with an Auto Scaling group used for compute capacity.
+| [`MngClusterProvider`](./mng-cluster-provider.md) | Provisions an EKS cluster with a Managed Node group for compute capacity.
+| [`FargateClusterProvider`](./fargate-cluster-provider.md) | Provisions an EKS cluster which leverages AWS Fargate to run Kubernetes pods.
+| [`ImportClusterProvider`](./import-cluster-provider.md) | Imports an existing EKS cluster into the blueprint allowing capabilities to add (certain) add-ons and teams.
 
 By default, the framework will leverage the `MngClusterProvider` which creates a single managed node group.
 
