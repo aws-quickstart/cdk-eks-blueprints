@@ -23,9 +23,6 @@ export default class SingleNewEksConstruct {
         const region = process.env.COA_AWS_REGION! || process.env.CDK_DEFAULT_REGION!;
         
         const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-            new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.CloudWatchLogsAddon({
                 logGroupPrefix: `/aws/eks/${stackId}`,
                 logRetentionDays: 30
@@ -37,7 +34,7 @@ export default class SingleNewEksConstruct {
         ObservabilityBuilder.builder()
             .account(account)
             .region(region)
-            .addNewClusterObservabilityBuilderAddOns()
+            .addNativeObservabilityBuilderAddOns()
             .addOns(...addOns)
             .build(scope, stackId);
     }
@@ -106,7 +103,7 @@ export default class ExistingEksMixedobservabilityConstruct {
         ObservabilityBuilder.builder()
             .account(account)
             .region(region)
-            .addExistingClusterObservabilityBuilderAddOns()
+            .addMixedObservabilityBuilderAddOns()
             .clusterProvider(importClusterProvider)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(vpcId)) 
             .addOns(...addOns)

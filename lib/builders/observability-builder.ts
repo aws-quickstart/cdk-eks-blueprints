@@ -5,19 +5,44 @@ import { Construct } from 'constructs';
 
 export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
 
-    public addNewClusterObservabilityBuilderAddOns(): ObservabilityBuilder {
-        return this.addOns(
-            new blueprints.addons.VpcCniAddOn(),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.PrometheusNodeExporterAddOn(),
-            new blueprints.addons.KubeStateMetricsAddOn());
-    }
-
-    public addExistingClusterObservabilityBuilderAddOns(): ObservabilityBuilder {
+    public addNativeObservabilityBuilderAddOns(): ObservabilityBuilder {
         return this.addOns(
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-            new blueprints.addons.CertManagerAddOn());
+            new blueprints.addons.CertManagerAddOn(),
+            new blueprints.addons.CoreDnsAddOn(),
+            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.KubeStateMetricsAddOn(),
+            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.PrometheusNodeExporterAddOn(),
+            new blueprints.addons.VpcCniAddOn());
+    }
+
+    public addMixedObservabilityBuilderAddOns(): ObservabilityBuilder {
+        return this.addOns(
+            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+            new blueprints.addons.AdotCollectorAddOn(),
+            new blueprints.addons.CertManagerAddOn(),
+            new blueprints.addons.CoreDnsAddOn(),
+            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.KubeStateMetricsAddOn(),
+            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.PrometheusNodeExporterAddOn(),
+            new blueprints.addons.VpcCniAddOn());
+    }
+
+    public addOpenSourceObservabilityBuilderAddOns(): ObservabilityBuilder {
+        return this.addOns(
+            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+            new blueprints.addons.AdotCollectorAddOn(),
+            new blueprints.addons.CertManagerAddOn(),
+            new blueprints.addons.CoreDnsAddOn(),
+            new blueprints.addons.ExternalsSecretsAddOn(),
+            new blueprints.addons.GrafanaOperatorAddon(),
+            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.KubeStateMetricsAddOn(),
+            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.PrometheusNodeExporterAddOn(),
+            new blueprints.addons.VpcCniAddOn());
     }
 
     public static builder(): ObservabilityBuilder {
