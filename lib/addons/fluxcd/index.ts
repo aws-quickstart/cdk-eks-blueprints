@@ -166,18 +166,18 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOps
  * create Kustomizations calls the FluxKustomization().generate to create Kustomization resource.
  */
 function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps, fluxKustomizationPath?: string, manifestNameAddOns?: string, fluxKustomization?: FluxKustomization): KubernetesManifest {
-    fluxKustomization = fluxKustomization ?? new FluxKustomization(bootstrapRepo)
+    fluxKustomization = fluxKustomization ?? new FluxKustomization(bootstrapRepo);
     const manifest = fluxKustomization.generate(
-        bootstrapRepo.name, 
-        fluxcdAddonProps.namespace!, 
-        fluxcdAddonProps.fluxSyncInterval!, 
-        bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!, 
-        fluxcdAddonProps.fluxPrune!, 
-        fluxcdAddonProps.fluxTimeout!, 
-        bootstrapRepo.values, 
-        fluxKustomizationPath ?? bootstrapRepo.repository?.path!
+        bootstrapRepo.name,
+        fluxcdAddonProps.namespace!,
+        fluxcdAddonProps.fluxSyncInterval!,
+        bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!,
+        fluxcdAddonProps.fluxPrune!,
+        fluxcdAddonProps.fluxTimeout!,
+        bootstrapRepo.values,
+        fluxKustomizationPath ?? bootstrapRepo.repository?.path ?? ".",
     );
-    let manifestName: string | undefined = fluxcdAddonProps.name + '-kustomization-' + bootstrapRepo.name + (manifestNameAddOns ? "-"+manifestNameAddOns: "") ;
+    let manifestName: string | undefined = fluxcdAddonProps.name + '-kustomization-' + bootstrapRepo.name + (manifestNameAddOns ? "-" + manifestNameAddOns : "");
     const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
     return construct;
 }
@@ -195,7 +195,7 @@ function createKustomizations(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOp
   const constructs: KubernetesManifest[] = [];
   const fluxKustomization = new FluxKustomization(bootstrapRepo);
   fluxKustomizationPaths.map((fluxKustomizationPath, index) => {
-        constructs.push(createKustomization(clusterInfo, bootstrapRepo, fluxcdAddonProps, fluxKustomizationPath, "" + index, fluxKustomization))
+        constructs.push(createKustomization(clusterInfo, bootstrapRepo, fluxcdAddonProps, fluxKustomizationPath, "" + index, fluxKustomization));
   });
 
   return constructs;
