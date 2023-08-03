@@ -50,6 +50,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
+const version = 'auto';
 
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn(),
@@ -65,6 +66,7 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
+    .version(version)
     .addOns(...addOns)
     .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
     .build(app, 'eks-blueprint');

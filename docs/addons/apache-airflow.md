@@ -36,6 +36,7 @@ const addOn = [new blueprints.EfsCsiDriverAddOn(),
 ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .resourceProvider('apache-airflow-s3-bucket-provider', apacheAirflowS3Bucket)
   .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
   .addOns(addOn)

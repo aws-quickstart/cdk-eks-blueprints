@@ -52,6 +52,7 @@ blueprints.EksBlueprint.builder()
     }))
     .region(process.env.AWS_REGION)
     .account(process.env.AWS_ACCOUNT)
+    .version("auto")
     .build(app, 'demo-cluster');
 ```
 
@@ -81,6 +82,7 @@ blueprints.EksBlueprint.builder()
     }))
     .region(process.env.AWS_REGION)
     .account(process.env.AWS_ACCOUNT)
+    .version("auto")
     .build(app, 'demo-cluster');
 ```
 

@@ -25,6 +25,7 @@ const kedaParams = {
 const addOn = new blueprints.addons.KedaAddOn(kedaParams)
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

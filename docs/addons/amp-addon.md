@@ -49,6 +49,7 @@ const addOn = new blueprints.addons.AmpAddOn({
 })
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName,{
     {
@@ -84,6 +85,7 @@ const addOn = new blueprints.addons.AmpAddOn({
 })
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -110,6 +112,7 @@ const addOn = new blueprints.addons.AmpAddOn({
 })
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName,{
     {

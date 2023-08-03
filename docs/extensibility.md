@@ -204,6 +204,7 @@ class MyAddOn extends HelmAddOn {
 }
 
 blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(new MyAddOn())
     .build(app, 'my-extension-test-blueprint');
 ```

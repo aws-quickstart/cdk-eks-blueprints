@@ -20,6 +20,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.AdotCollectorAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

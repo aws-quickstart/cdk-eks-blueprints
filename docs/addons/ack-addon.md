@@ -21,6 +21,7 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -40,6 +41,7 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -66,6 +68,7 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

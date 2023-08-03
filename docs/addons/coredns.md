@@ -24,6 +24,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.CoreDnsAddOn("v1.8.0-eksbuild.1"); // optionally specify image version to pull or empty constructor
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

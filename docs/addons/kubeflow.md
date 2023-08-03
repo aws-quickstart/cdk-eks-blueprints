@@ -37,6 +37,7 @@ const addOn = new KubeflowAddOn(
 );
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
