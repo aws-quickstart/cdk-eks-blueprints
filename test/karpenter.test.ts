@@ -79,6 +79,7 @@ describe('Unit tests for Karpenter addon', () => {
     const blueprint = blueprints.EksBlueprint.builder();
 
     const stack = await blueprint
+      .version("auto")
       .account("123567891")
       .region("us-west-1")
       .addOns(
