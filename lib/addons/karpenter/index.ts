@@ -281,6 +281,7 @@ export class KarpenterAddOn extends HelmAddOn {
                 clusterName: name,
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
 <<<<<<< HEAD
+<<<<<<< HEAD
                 interruptionQueueName: interruption ? stackName : "",
             };
             setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
@@ -291,6 +292,8 @@ export class KarpenterAddOn extends HelmAddOn {
             };
             setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
 =======
+=======
+>>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
 =======
 >>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
                 interruptionQueueName: interruption ? stackName : "",
