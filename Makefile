@@ -37,6 +37,16 @@ markdown-link-check:
 run-test:
 	npm test
 
+run-server:
+	$(DEPS)
+	$(CDK) -a "npx ts-node lib/server/index.ts" synth --output=lib/server/cdk.out
+
+deploy-server:
+	$(CDK) -a lib/server/cdk.out/ deploy --output=lib/server/cdk.out
+
+codegen:
+	bash scripts/codegen.sh
+
 synth:
 	$(DEPS)
 	$(CDK) synth
