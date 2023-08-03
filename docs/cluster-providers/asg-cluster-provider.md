@@ -9,6 +9,7 @@ const props: AsgClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto",
     instanceType: new InstanceType('m5.large'),
     machineImageType: eks.MachineImageType.AMAZON_LINUX_2,
     updatePolicy: UpdatePolicy.Rolling
@@ -27,6 +28,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | minSize           | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize           | Max cluster size, must be greater than minSize (default 3).
 | desiredSize       | Desired cluster size, must be greater or equal to minSize (default `min-size`).
+| version           | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | instanceType      | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 | machineImageType  | Machine Image Type for the Autoscaling Group.
 | updatePolicy      | Update policy for the Autoscaling Group.
@@ -57,6 +59,7 @@ const props: AsgClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto",
     instanceType: new InstanceType('m5.large'),
     machineImageType: eks.MachineImageType.BOTTLEROCKET,
     updatePolicy: UpdatePolicy.Rolling

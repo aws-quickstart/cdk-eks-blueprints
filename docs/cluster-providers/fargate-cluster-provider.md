@@ -42,6 +42,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | Prop                  | Description |
 |-----------------------|-------------|
 | name                  | The name for the cluster.
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | fargateProfiles       | A map of Fargate profiles to use with the cluster.
 | vpcSubnets            | The subnets for the cluster.
 | tags                  | Tags to propagate to Cluster.

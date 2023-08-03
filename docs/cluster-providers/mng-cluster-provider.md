@@ -9,6 +9,7 @@ const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto"
     instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
@@ -27,6 +28,7 @@ The `MngClusterProvider` supports the following configuration options.
 |-----------------------|-------------|
 | name                  | The name for the cluster. @Deprecated
 | clusterName           | Cluster name
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | minSize               | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize               | Max cluster size, must be greater than minSize (default 3).
 | desiredSize           | Desired cluster size, must be greater or equal to minSize (default `min-size`).

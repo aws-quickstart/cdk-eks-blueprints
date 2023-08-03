@@ -40,6 +40,7 @@ import { KastenK10AddOn } from '@kastenhq/kasten-eks-blueprints-addon';
 const app = new App();
 
 blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(new blueprints.ClusterAutoScalerAddOn)
     .addOns(new KastenK10AddOn)
     .build(app, 'eks-with-kastenk10');

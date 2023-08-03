@@ -99,10 +99,12 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
+const version = 'auto';
 
 blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
+    .version(version)
     .addOns(...addOns)
     .build(app, 'eks-blueprint');
 ```

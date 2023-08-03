@@ -11,6 +11,7 @@ describe("KmsKeyProvider", () => {
 
     const stack = new blueprints.EksBlueprint(app, {
       id: "east-test-1",
+      version: "auto",
     });
 
     // When
@@ -50,6 +51,7 @@ describe("KmsKeyProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -82,6 +84,7 @@ describe("KmsKeyProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -118,6 +121,7 @@ describe("KmsKeyProvider", () => {
     const stack = blueprints.EksBlueprint.builder()
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .useDefaultSecretEncryption(false)
       .build(app, "east-test-1");
 

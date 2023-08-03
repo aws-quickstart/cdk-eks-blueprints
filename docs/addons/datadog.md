@@ -30,8 +30,9 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 const account = '<aws account id>'
 const region = '<aws region>'
 const props = { env: { account, region } }
+const version = 'auto';
 
-new blueprints.EksBlueprint(app, { id: '<eks cluster name>', addOns}, props)
+new blueprints.EksBlueprint(app, { id: '<eks cluster name>', addOns, version}, props)
 ```
 
 ### Using AWS Secrets Manager
@@ -60,8 +61,9 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 const account = '<aws account id>'
 const region = '<aws region>'
 const props = { env: { account, region } }
+const version = 'auto'
 
-new blueprints.EksBlueprint(app, { id: '<eks cluster name>', addOns}, props)
+new blueprints.EksBlueprint(app, { id: '<eks cluster name>', addOns, version}, props)
 ```
 
 ## AddOn Options

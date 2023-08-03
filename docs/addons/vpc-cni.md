@@ -29,6 +29,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -58,6 +59,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/24",["100.64.0.0/25","100.64.0.128/26","100.64.0.192/26"],))
   .build(app, 'my-stack-name');
@@ -89,6 +91,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(yourVpcId))
   .resourceProvider("secondary-cidr-subnet-0", new LookupSubnetProvider(subnet1Id)

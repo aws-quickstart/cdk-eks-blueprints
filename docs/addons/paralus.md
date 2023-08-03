@@ -71,6 +71,7 @@ blueprints.EksBlueprint.builder()
          }
      }))
      .teams()
+     .version("auto")
      .build(app, 'paralus-test-blueprint');
 ```
 

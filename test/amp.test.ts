@@ -8,7 +8,7 @@ describe('Unit tests for AMP addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder();
 
-        blueprint.account("123567891").region('us-west-1')
+        blueprint.account("123567891").region('us-west-1').version("auto")
         .addOns(new blueprints.addons.AwsLoadBalancerControllerAddOn())
         .addOns(new blueprints.addons.CertManagerAddOn())
         .addOns(new blueprints.addons.AdotCollectorAddOn())
@@ -33,7 +33,7 @@ describe('Unit tests for AMP addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder();
 
-        blueprint.account("123567891").region('us-west-1')
+        blueprint.account("123567891").region('us-west-1').version("auto")
         .addOns(new blueprints.addons.AwsLoadBalancerControllerAddOn())
         .addOns(new blueprints.addons.CertManagerAddOn())
         .addOns(new blueprints.addons.AdotCollectorAddOn())

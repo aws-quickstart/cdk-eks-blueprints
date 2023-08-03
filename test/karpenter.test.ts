@@ -10,6 +10,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.KarpenterAddOn(), new blueprints.ClusterAutoScalerAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -24,6 +25,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.KarpenterAddOn({
                 version: "0.15.0",
                 weight: 30
@@ -41,6 +43,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.KarpenterAddOn({
                 version: "0.14.0",
                 consolidation: { enabled: true },
@@ -58,6 +61,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.KarpenterAddOn({
                 ttlSecondsAfterEmpty: 30,
                 consolidation: { enabled: true },
@@ -75,6 +79,7 @@ describe('Unit tests for Karpenter addon', () => {
     const blueprint = blueprints.EksBlueprint.builder();
 
     const stack = await blueprint
+      .version("auto")
       .account("123567891")
       .region("us-west-1")
       .addOns(

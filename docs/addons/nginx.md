@@ -24,6 +24,7 @@ const nginxAddOn = new blueprints.addons.NginxAddOn({ externalDnsHostname })
 const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, nginxAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(...addOns)
   .build(app, 'my-stack-name');
 ```
@@ -69,6 +70,7 @@ blueprints.EksBlueprint.builder()
         hostedZoneProviders: ["MyHostedZone1"];
     })
     .addOns(new blueprints.NginxAddOn({ internetFacing: true, backendProtocol: "tcp", externaDnsHostname: subdomain, crossZoneEnabled: false })
+    .version("auto")
     .build(...);
 ```
 
@@ -143,6 +145,7 @@ blueprints.EksBlueprint.builder()
         externalDnsHostname: 'my.domain.com'
     }))
     .teams(...)
+    .version("auto")
     .build(app, 'stack-with-cert-provider');
 ```
 
@@ -163,6 +166,7 @@ blueprints.EksBlueprint.builder()
         externalDnsHostname: 'my.domain.com'
     }))
     .teams(...)
+    .version("auto")
     .build(app, 'stack-with-resource-providers');
 ```
 ## Functionality

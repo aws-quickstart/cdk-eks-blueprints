@@ -22,6 +22,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.ArgoCDAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -102,6 +103,7 @@ const prodBootstrapArgo = new ArgoCDAddOn({
 });
 
 const blueprint = EksBlueprint.builder()
+    .version("auto")
     .addOns(secretStoreAddOn)
     .account(account);
 
@@ -148,6 +150,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
     ];
 
     blueprints.EksBlueprint.builder()
+        .version("auto")
         .addOns(...addOns)
         .enableGitOps(blueprints.GitOpsMode.APPLICATION)
         .build(scope, stackID);
@@ -175,6 +178,7 @@ There are two types of GitOps deployments via ArgoCD depending on whether you wo
     ];
 
     blueprints.EksBlueprint.builder()
+        .version("auto")
         .addOns(...addOns)
         .enableGitOps(blueprints.GitOpsMode.APP_OF_APPS)
         .build(scope, stackID);

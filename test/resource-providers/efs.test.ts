@@ -20,6 +20,7 @@ describe("EfsFileSystemProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -48,6 +49,7 @@ describe("EfsFileSystemProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -82,6 +84,7 @@ describe("EfsFileSystemProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When
@@ -114,6 +117,7 @@ describe("EfsFileSystemProvider", () => {
       )
       .account("123456789012")
       .region("us-east-1")
+      .version("auto")
       .build(app, "east-test-1");
 
     // When

@@ -48,6 +48,7 @@ export default class RafayConstruct extends Construct {
             new rafayAddOn.RafayClusterAddOn(rafayConfig)
         ];
          blueprints.EksBlueprint.builder()
+            .version("auto")
             .account(process.env.CDK_DEFAULT_ACCOUNT!)
             .region(process.env.CDK_DEFAULT_REGION)
             .addOns(...addOns)

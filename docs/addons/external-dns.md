@@ -20,6 +20,7 @@ const addOn = new blueprints.addons.ExternalDnsAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(hostedZoneName, new blueprints.LookupHostedZoneProvider(hostedZoneName))
   .addOns(addOn)
@@ -90,6 +91,7 @@ blueprints.EksBlueprint.builder()
     .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneResources: ["MyHostedZone1"];
     }))
+    .version("auto")
     .build(...);
 ```
 
@@ -132,6 +134,7 @@ blueprints.EksBlueprint.builder()
     .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneResources: ["MyHostedZone1"];
     }))
+    .version("auto")
 
 ```
 

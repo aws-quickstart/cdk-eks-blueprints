@@ -185,7 +185,7 @@ The `GenericClusterProvider` supports the following configuration options.
 | managedNodeGroups     | Zero or more managed node groups.
 | autoscalingNodeGroups | Zero or more autoscaling node groups (mutually exclusive with managed node groups).
 | fargateProfiles       | Zero or more Fargate profiles.
-| version               | Kubernetes version for the control plane.
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | vpc                   | VPC for the cluster.
 | vpcSubnets            | The subnets for control plane ENIs (subnet selection).
 | privateCluster        | If `true` Kubernetes API server is private.

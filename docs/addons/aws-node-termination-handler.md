@@ -27,6 +27,7 @@ const clusterProvider = new blueprints.AsgClusterProvider({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .clusterProvider(clusterProvider)
   .addOns(addOn)
   .build(app, 'my-stack-name');
