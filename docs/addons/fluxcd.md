@@ -97,7 +97,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             },
         }
     ],
-}),
+});
 
 const blueprint = blueprints.EksBlueprint.builder()
     .addOns(
