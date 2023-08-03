@@ -1,6 +1,14 @@
 # Observability Builder
 
-The `ObservabilityBuilder` allows you to get started with a builder class to configure required addons as you prepare a blueprint for setting up Observability on an existing EKS cluster or a new EKS cluster.
+The `ObservabilityBuilder` allows you to get started with a builder class to configure required addons as you prepare a blueprint for setting up observability on an existing EKS cluster or a new EKS cluster.
+
+## Supported Methods
+ 
+`ObservabilityBuilder` supports following methods for setting up observability on Amazon EKS :
+
+- `addNativeObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with AWS native services
+- `addOpenSourceObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with AWS managed open source services
+- `addMixedObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with a combination of AWS native and AWS managed open source services
 
 ## Usage 
 
