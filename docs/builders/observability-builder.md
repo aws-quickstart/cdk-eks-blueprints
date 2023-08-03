@@ -6,9 +6,9 @@ The `ObservabilityBuilder` allows you to get started with a builder class to con
  
 `ObservabilityBuilder` supports following methods for setting up observability on Amazon EKS :
 
-- `addNativeObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with AWS native services
-- `addOpenSourceObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with AWS managed open source services
-- `addMixedObservabilityBuilderAddOns`: This method helps you prepare a blueprint for setting up observability with a combination of AWS native and AWS managed open source services
+- `enableNativePatternAddOns`: This method helps you prepare a blueprint for setting up observability with AWS native services
+- `enableMixedPatternAddOns`: This method helps you prepare a blueprint for setting up observability with AWS managed open source services
+- `enableOpenSourcePatternAddOns`: This method helps you prepare a blueprint for setting up observability with a combination of AWS native and AWS managed open source services
 
 ## Usage 
 
@@ -35,7 +35,7 @@ export default class SingleNewEksConstruct {
                 logGroupPrefix: `/aws/eks/${stackId}`,
                 logRetentionDays: 30
             }),
-            new blueprints.addons.ContainerInsightsAddOn(),
+            new blueprints.addons.VpcCniAddOn(),
             new blueprints.addons.XrayAddOn()
         ];
 
@@ -103,7 +103,7 @@ export default class ExistingEksMixedobservabilityConstruct {
                 logGroupPrefix: `/aws/eks/${stackId}`,
                 logRetentionDays: 30
             }),
-            new blueprints.addons.AdotCollectorAddOn(),
+            new blueprints.addons.VpcCniAddOn(),
             cloudWatchAdotAddOn,
             new blueprints.addons.XrayAdotAddOn(),
         ];
