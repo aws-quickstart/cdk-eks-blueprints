@@ -42,7 +42,7 @@ export class EksBlueprintProps {
     /**
      * Kubernetes version (must be initialized for addons to work properly)
      */
-    readonly version?: KubernetesVersion | "auto" = KubernetesVersion.V1_25;
+    readonly version?: KubernetesVersion | "auto";
 
     /**
      * Named resource providers to leverage for cluster resources.
