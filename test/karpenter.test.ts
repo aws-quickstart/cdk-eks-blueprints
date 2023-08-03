@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -67,5 +68,42 @@ describe('Unit tests for Karpenter addon', () => {
             blueprint.build(app, 'stack-with-conflicting-karpenter-props');
         }).toThrow("Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.");
     });
+
+  test("Stack creation succeeds with custom values overrides", async () => {
+    const app = new cdk.App();
+
+    const blueprint = blueprints.EksBlueprint.builder();
+
+    const stack = await blueprint
+      .account("123567891")
+      .region("us-west-1")
+      .addOns(
+        new blueprints.KarpenterAddOn({
+          version: 'v0.29.2',
+          values: {
+            settings: {
+              aws: {
+                enableENILimitedPodDensity: true,
+                interruptionQueueName: "override-queue-name",
+              },
+            },
+          },
+        })
+      )
+      .buildAsync(app, "stack-with-values-overrides");
+
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
+      Chart: "karpenter",
+    });
+    const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
+    const properties = Object.values(karpenter).pop();
+    const values = properties?.Properties?.Values;
+    expect(values).toBeDefined();
+    const valuesStr = JSON.stringify(values);
+    expect(valuesStr).toContain("defaultInstanceProfile");
+    expect(valuesStr).toContain("override-queue-name");
+    expect(valuesStr).toContain("enableENILimitedPodDensity");
+  });
 });
 

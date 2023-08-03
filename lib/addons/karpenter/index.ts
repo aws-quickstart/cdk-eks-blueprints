@@ -276,12 +276,13 @@ export class KarpenterAddOn extends HelmAddOn {
 
         // Add helm chart
         if (semver.gte(this.options.version!, '0.19.0')){
-            setPath(values, "settings.aws", {
+            const awsSettings = {
                 clusterEndpoint: endpoint,
                 clusterName: name,
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
                 interruptionQueueName: stackName
-            });
+            };
+            setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
         } else {
             setPath(values, "clusterEndpoint", endpoint);
             setPath(values, "clusterName", name);
