@@ -1,17 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { JupyterHubServiceType } from '../lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
-describe('Unit tests for JupyterHub addon', () => {
+describe('Unit tests for Karpenter addon', () => {
 
-    test("Stack creation fails due to no EBS CSI add-on", () => {
+    test("Stack creation fails due to conflicting add-ons", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
             .version("auto")
-<<<<<<< HEAD
             .addOns(new blueprints.KarpenterAddOn(), new blueprints.ClusterAutoScalerAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -74,44 +73,6 @@ describe('Unit tests for JupyterHub addon', () => {
         }).toThrow("Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.");
     });
 
-  test("Stack creation succeeds with custom values overrides", async () => {
-    const app = new cdk.App();
-
-    const blueprint = blueprints.EksBlueprint.builder();
-
-    const stack = await blueprint
-      .version("auto")
-      .account("123567891")
-      .region("us-west-1")
-      .addOns(
-        new blueprints.KarpenterAddOn({
-          version: 'v0.29.2',
-          values: {
-            settings: {
-              aws: {
-                enableENILimitedPodDensity: true,
-                interruptionQueueName: "override-queue-name",
-              },
-            },
-          },
-        })
-      )
-      .buildAsync(app, "stack-with-values-overrides");
-
-    const template = Template.fromStack(stack);
-    template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
-      Chart: "karpenter",
-    });
-    const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
-    const properties = Object.values(karpenter).pop();
-    const values = properties?.Properties?.Values;
-    expect(values).toBeDefined();
-    const valuesStr = JSON.stringify(values);
-    expect(valuesStr).toContain("defaultInstanceProfile");
-    expect(valuesStr).toContain("override-queue-name");
-    expect(valuesStr).toContain("enableENILimitedPodDensity");
-  });
-
     test("Stack creates with interruption enabled", () => {
         const app = new cdk.App();
 
@@ -150,103 +111,42 @@ describe('Unit tests for JupyterHub addon', () => {
                 },
             });
         }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
-    })
-});
-=======
-            .addOns(
-                new blueprints.AwsLoadBalancerControllerAddOn,
-                new blueprints.JupyterHubAddOn({
-                ebsConfig: {
-                    storageClass: "gp2",
-                    capacity: "4Gi",
-                },
-<<<<<<< HEAD
-                serviceType: JupyterHubServiceType.CLUSTERIP,
-            }))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-=======
-            });
-        }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
     });
->>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
-});
->>>>>>> 1a24a266 (lint fix)
+  test("Stack creation succeeds with custom values overrides", async () => {
+    const app = new cdk.App();
 
-        expect(()=> {
-            blueprint.build(app, 'stack-with-no-ebs-csi-addon');
-        }).toThrow("Missing a dependency: EbsCsiDriverAddOn. Please add it to your list of addons.");
+    const blueprint = blueprints.EksBlueprint.builder();
+
+    const stack = await blueprint
+      .version("auto")
+      .account("123567891")
+      .region("us-west-1")
+      .addOns(
+        new blueprints.KarpenterAddOn({
+          version: 'v0.29.2',
+          values: {
+            settings: {
+              aws: {
+                enableENILimitedPodDensity: true,
+                interruptionQueueName: "override-queue-name",
+              },
+            },
+          },
+        })
+      )
+      .buildAsync(app, "stack-with-values-overrides");
+
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
+      Chart: "karpenter",
     });
-
-    test("Stack creation fails due to no EFS CSI add-on", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .version("auto")
-            .addOns(
-                new blueprints.AwsLoadBalancerControllerAddOn,
-                new blueprints.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '100Gi',
-                },
-                serviceType: JupyterHubServiceType.CLUSTERIP,
-            }))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-no-efs-csi-addon');
-        }).toThrow("Missing a dependency: EfsCsiDriverAddOn. Please add it to your list of addons.");
-    });
->>>>>>> 5d9468bb (PR Fixes)
-
-    test("Stack creation fails due to no AWS Load Balancer Controller add-on when using ALB", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .version("auto")
-            .addOns(
-                new blueprints.EfsCsiDriverAddOn,
-                new blueprints.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '100Gi',
-                },
-                serviceType: JupyterHubServiceType.ALB,
-            }))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-no-aws-load-balancer-controller-addon');
-        }).toThrow("Missing a dependency: AwsLoadBalancerControllerAddOn. Please add it to your list of addons.");
-    });
-
-    test("Stack creation fails due to no AWS Load Balancer Controller add-on when using NLB", () => {
-        const app = new cdk.App();
-
-        const blueprint = blueprints.EksBlueprint.builder();
-
-        blueprint.account("123567891").region('us-west-1')
-            .version("auto")
-            .addOns(
-                new blueprints.EfsCsiDriverAddOn,
-                new blueprints.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '100Gi',
-                },
-                serviceType: JupyterHubServiceType.NLB,
-            }))
-            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
-
-        expect(()=> {
-            blueprint.build(app, 'stack-with-no-aws-load-balancer-controller-addon');
-        }).toThrow("Missing a dependency: AwsLoadBalancerControllerAddOn. Please add it to your list of addons.");
-    });
+    const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
+    const properties = Object.values(karpenter).pop();
+    const values = properties?.Properties?.Values;
+    expect(values).toBeDefined();
+    const valuesStr = JSON.stringify(values);
+    expect(valuesStr).toContain("defaultInstanceProfile");
+    expect(valuesStr).toContain("override-queue-name");
+    expect(valuesStr).toContain("enableENILimitedPodDensity");
+  });
 });
