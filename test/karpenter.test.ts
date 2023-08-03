@@ -148,7 +148,7 @@ describe('Unit tests for Karpenter addon', () => {
                 Properties: {
                     QueueName: "karpenter-without-interruption",
                 },
-            })
+            });
         }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
     });
 >>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
