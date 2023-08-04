@@ -10,13 +10,13 @@ describe('Unit tests for EKS Blueprint', () => {
     test('Usage tracking created', () => {
         let app = new cdk.App();
         // WHEN
-        let stack = new blueprints.EksBlueprint(app, { id: 'MyTestStack' });
+        let stack = new blueprints.EksBlueprint(app, { id: 'MyTestStack', version: "auto"});
         console.debug(stack.templateOptions.description);
         // THEN
         assertBlueprint(stack);
 
         app = new cdk.App();
-        stack = new blueprints.EksBlueprint(app, { id: 'MyOtherTestStack' }, {
+        stack = new blueprints.EksBlueprint(app, { id: 'MyOtherTestStack', version: "auto" }, {
             description: "My awesome description"
         });
 
@@ -33,6 +33,7 @@ describe('Unit tests for EKS Blueprint', () => {
 
         blueprint.account("123567891").region('us-west-1')
             .addOns(new blueprints.NginxAddOn)
+            .version("auto")
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow("Missing a dependency for AwsLoadBalancerControllerAddOn for stack-with-missing-deps");
@@ -44,6 +45,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.AwsNodeTerminationHandlerAddOn);
 
         expect(() => blueprint.build(app, 'stack-with-missing-deps')).toThrow('AWS Node Termination Handler is only supported for self-managed nodes');
@@ -55,6 +57,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -72,7 +75,8 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint3 = blueprints.EksBlueprint.builder().withBlueprintProps({
             addOns: [new blueprints.ArgoCDAddOn],
             name: 'my-blueprint3',
-            id: 'my-blueprint3-id'
+            id: 'my-blueprint3-id',
+            version: "auto"
         });
 
         const stack3 = await blueprint3.buildAsync(new cdk.App(), 'stack-3');
@@ -86,6 +90,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder()
             .account("123567891")
             .region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -144,6 +149,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder()
             .account(devTestAccount)
             .region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -191,6 +197,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder()
             .account("123567891")
             .region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -245,6 +252,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder()
             .account("123567891")
             .region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -302,6 +310,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder()
             .account("123567891")
             .region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ArgoCDAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.NginxAddOn)
@@ -380,6 +389,7 @@ describe('Unit tests for EKS Blueprint', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(vpcAddOn)
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -394,6 +404,7 @@ test("Named resource providers are correctly registered and discovered", async (
 
     const blueprint =  await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
+        .version("auto")
         .resourceProvider(blueprints.GlobalResources.HostedZone, new blueprints.ImportHostedZoneProvider('hosted-zone-id1', 'my.domain.com'))
         .resourceProvider(blueprints.GlobalResources.Certificate, new blueprints.CreateCertificateProvider('domain-wildcard-cert', '*.my.domain.com', blueprints.GlobalResources.HostedZone))
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
@@ -416,6 +427,7 @@ test("Named resource providers are correctly registered and discovered", async (
 
 test("Building blueprint with builder properly clones properties", () => {
     const blueprint = blueprints.EksBlueprint.builder().name("builer-test1")
+        .version("auto")
         .addOns(new blueprints.AppMeshAddOn);
     expect(blueprint.props.addOns).toHaveLength(1);
 
@@ -438,6 +450,7 @@ test("Building blueprint with version correctly passes k8s version to the cluste
     const app = new cdk.App();
 
     const blueprint = blueprints.EksBlueprint.builder().name("builer-version-test1")
+        .version("auto")
         .addOns(new blueprints.ClusterAutoScalerAddOn);
     expect(blueprint.props.addOns).toHaveLength(1);
 
@@ -459,6 +472,7 @@ test("Account and region are correctly initialized when not explicitly set on th
     process.env.CDK_DEFAULT_REGION  = 'us-west-2';
 
     const blueprint = blueprints.EksBlueprint.builder().name("region-test1")
+        .version("auto")
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn);
 
     const stack = blueprint.build(app, "region-test1");
@@ -481,6 +495,7 @@ test("Missing account and region are not causing failure in blueprint stack", as
     process.env.CDK_DEFAULT_REGION = undefined;
 
     const blueprint = blueprints.EksBlueprint.builder().name("region-test2")
+        .version("auto")
         .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
         .addOns(new blueprints.addons.ClusterAutoScalerAddOn);
 

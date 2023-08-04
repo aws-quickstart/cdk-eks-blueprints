@@ -23,6 +23,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.KubeProxyAddOn('v1.27.1-eksbuild.1'); // optionally specify the image version to pull or empty constructor for auto selection
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

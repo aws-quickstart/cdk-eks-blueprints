@@ -89,6 +89,7 @@ To use AWS Secret Manager Secrets follow these steps:
     blueprints.EksBlueprint.builder()
         .account(account)
         .region(region)
+        .version("auto")
         .addOns(...addOns)
         .useDefaultSecretEncryption(true)
         .build(app, '<eks cluster name>');
@@ -125,6 +126,7 @@ const region = '<aws region>';
 blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
+    .version("auto")
     .addOns(...addOns)
     .useDefaultSecretEncryption(true)
     .build(app, '<eks cluster name>');

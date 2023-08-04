@@ -57,6 +57,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
 ...
 
 const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(addOn)
     .build(app, 'my-stack-name');
 ```
@@ -100,8 +101,9 @@ const addOn = new blueprints.addons.FluxCDAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(
-        blueprints.addons.GrafanaOperatorAddon,
+        new blueprints.addons.GrafanaOperatorAddon,
         addOn,
     )
     .build(app, 'my-stack-name');
@@ -155,6 +157,7 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOns)
   .build(app, 'my-stack-name');
 ```

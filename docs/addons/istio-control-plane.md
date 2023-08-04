@@ -25,6 +25,7 @@ const istioControlPlane = new blueprints.addons.IstioControlPlaneAddOn()
 const addOns: Array<blueprints.ClusterAddOn> = [ istioBase, istioControlPlane ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(...addOns)
   .build(app, 'my-stack-name');
 ```
@@ -72,6 +73,7 @@ const istioControlPlane = new blueprints.addons.IstioControlPlaneAddOn(IstioCont
 const addOns: Array<blueprints.ClusterAddOn> = [ istioBase, istioControlPlane ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(...addOns)
   .build(app, 'my-stack-name');
 

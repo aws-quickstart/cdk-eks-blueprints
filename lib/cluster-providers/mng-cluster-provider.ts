@@ -9,7 +9,7 @@ import { ManagedNodeGroup } from "./types";
 /**
  * Configuration options for the cluster provider.
  */
-export interface MngClusterProviderProps extends eks.CommonClusterOptions, Omit<ManagedNodeGroup, "id"> {
+export interface MngClusterProviderProps extends Partial<eks.CommonClusterOptions>, Omit<ManagedNodeGroup, "id"> {
     /**
     * The name for the cluster.
     * @deprecated use #clusterName

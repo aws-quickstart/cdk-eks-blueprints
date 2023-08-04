@@ -6,7 +6,7 @@ import { defaultOptions, GenericClusterProvider } from './generic-cluster-provid
 /**
  * Configuration options for the cluster provider.
  */
-export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
+export interface FargateClusterProviderProps extends Partial<eks.CommonClusterOptions> {
 
     /**
     * The name for the cluster.
@@ -57,5 +57,5 @@ export class FargateClusterProvider extends GenericClusterProvider {
      */
     internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.FargateCluster(scope, id, clusterOptions);
-    }
+    }    
 }

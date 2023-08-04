@@ -19,6 +19,7 @@ const addOns = [
 ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(...addOns)
     .build(app, 'my-stack-name');
 ```

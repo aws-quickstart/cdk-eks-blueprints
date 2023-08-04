@@ -21,6 +21,7 @@ describe('Unit tests for Backstage addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ExternalsSecretsAddOn)
             .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
 
@@ -35,6 +36,7 @@ describe('Unit tests for Backstage addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
 
@@ -49,6 +51,7 @@ describe('Unit tests for Backstage addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(new blueprints.ExternalsSecretsAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)
             .addOns(new blueprints.BackstageAddOn(backstageAddOnProps));
@@ -74,6 +77,7 @@ describe('Unit tests for Backstage addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .resourceProvider(backstageAddOnProps.databaseResourceName, new DatabaseInstanceProviderMock())
             .addOns(new blueprints.ExternalsSecretsAddOn)
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn)

@@ -23,6 +23,7 @@ const app = new cdk.App();
 const addOn = new KubecostAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

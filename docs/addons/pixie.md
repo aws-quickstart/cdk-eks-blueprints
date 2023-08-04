@@ -43,11 +43,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
     }),
 ];
 
+const version = "auto";
+
 new blueprints.EksBlueprint(
     app, 
     {
         id: 'my-stack-name', 
         addOns,
+        version,
     },
     {
         env:{
@@ -72,12 +75,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
         deployKeySecretName: "pixie-deploy-key-secret", // Name of secret in Secrets Manager. 
     }),
 ];
+const version = "auto";
 
 new blueprints.EksBlueprint(
     app,
     {
         id: 'my-stack-name',
         addOns,
+        version,
     },
     {
         env:{
