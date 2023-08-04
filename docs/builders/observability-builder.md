@@ -42,7 +42,7 @@ export default class SingleNewEksConstruct {
         ObservabilityBuilder.builder()
             .account(account)
             .region(region)
-            .addNativeObservabilityBuilderAddOns()
+            .enableNativePatternAddOns()
             .addOns(...addOns)
             .build(scope, stackId);
     }
@@ -111,7 +111,7 @@ export default class ExistingEksMixedobservabilityConstruct {
         ObservabilityBuilder.builder()
             .account(account)
             .region(region)
-            .addMixedObservabilityBuilderAddOns()
+            .enableMixedPatternAddOns()
             .clusterProvider(importClusterProvider)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(vpcId)) 
             .addOns(...addOns)
