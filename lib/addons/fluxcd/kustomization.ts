@@ -8,7 +8,7 @@ export class FluxKustomization {
 
     constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
 
-    public generate(name: string, namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string) {
+    public generate(name: string, namespace: string, fluxSyncInterval: string,  fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string) {
         
         const repository = this.bootstrapRepo!;
         const kustomizationManifest = {
@@ -20,7 +20,6 @@ export class FluxKustomization {
             },
             spec: {
                 interval: fluxSyncInterval,
-                targetNamespace: fluxTargetNamespace,
                 sourceRef: {
                     kind: "GitRepository",
                     name: repository.name
@@ -32,6 +31,9 @@ export class FluxKustomization {
         };
         if (bootstrapValues) {
             setPath(kustomizationManifest, "spec.postBuild.substitute", bootstrapValues);
+        }
+        if (fluxTargetNamespace) {
+            setPath(kustomizationManifest, "spec.targetNamespace", fluxTargetNamespace);
         }
         return kustomizationManifest;
     }

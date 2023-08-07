@@ -61,7 +61,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 
   /** 
   * Flux Kustomization Target Namespace.
-  * Default `default` */
+  * Note: when set, this parameter will override all the objects that are part of the Kustomization, please see https://fluxcd.io/flux/components/kustomize/kustomization/#target-namespace */
   fluxTargetNamespace?: string;
 
   /** 
@@ -98,7 +98,6 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   values: {},
   createNamespace: true,
   fluxSyncInterval: "5m0s",
-  fluxTargetNamespace: "default",
   fluxPrune: true,
   fluxTimeout: "1m"
 };
@@ -168,14 +167,14 @@ function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOps
 function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps, fluxKustomizationPath?: string, manifestNameAddOns?: string, fluxKustomization?: FluxKustomization): KubernetesManifest {
     fluxKustomization = fluxKustomization ?? new FluxKustomization(bootstrapRepo);
     const manifest = fluxKustomization.generate(
-        bootstrapRepo.name,
+        bootstrapRepo.name + (manifestNameAddOns ? "-" + manifestNameAddOns : ""),
         fluxcdAddonProps.namespace!,
         fluxcdAddonProps.fluxSyncInterval!,
-        bootstrapRepo.namespace ?? fluxcdAddonProps.fluxTargetNamespace!,
         fluxcdAddonProps.fluxPrune!,
         fluxcdAddonProps.fluxTimeout!,
         bootstrapRepo.values,
         fluxKustomizationPath ?? bootstrapRepo.repository?.path ?? ".",
+        fluxcdAddonProps.fluxTargetNamespace
     );
     let manifestName: string | undefined = fluxcdAddonProps.name + '-kustomization-' + bootstrapRepo.name + (manifestNameAddOns ? "-" + manifestNameAddOns : "");
     const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
