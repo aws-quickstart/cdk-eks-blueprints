@@ -99,6 +99,9 @@ nav:
     - KMS Key Resource Providers: 'resource-providers/kms-key-providers.md'
     - S3 Bucket Resource Providers: 'resource-providers/s3-providers.md'
     - VPC Resource Providers: 'resource-providers/vpc-providers.md'
+  - Builders:
+    - Overview: 'builders/index.md'
+    - Observability Builder: 'builders/observability-builder.md'
   - Extensibility: 'extensibility.md'
   - API Reference: 'api'
 markdown_extensions:
