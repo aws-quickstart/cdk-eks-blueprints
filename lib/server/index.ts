@@ -6,7 +6,7 @@ import * as codegen from "../codegen";
 import pb = codegen.codegen;
 import { VpcProvider } from "../resource-providers";
 import { ClusterAddOn, ClusterProvider, ResourceProvider, Team } from "../spi";
-import { AckAddOn, AckServiceName, KubeProxyAddOn } from "../addons";
+import { AckAddOn, AckServiceName, KubeProxyAddOn, CoreDnsAddOn } from "../addons";
 import { ApplicationTeam, PlatformTeam } from "../teams";
 import { AsgClusterProvider, MngClusterProvider } from "../cluster-providers";
 import { BlueprintBuilder } from "../stacks";
@@ -49,7 +49,15 @@ class ClusterServer implements pb.ClusterServiceServer {
         response.message = `Added KubeProxyAddOn to cluster: ${builder.props.name}`;
         callback(null, response);
     };
+    addCoreDnsAddOn: handleUnaryCall<codegen.codegen.AddCoreDNSAddOnRequest, codegen.codegen.APIResponse> = (call, callback) => {
+        const response = pb.APIResponse.create();
+        let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;
 
+        builder.addOns(new CoreDnsAddOn(call.request.coreDnsAddOn?.version));
+
+        response.message = `Added CoreDNSAddOn to cluster: ${builder.props.name}`;
+        callback(null, response);
+    }
     addAddons: handleUnaryCall<pb.AddAddonsRequest, pb.APIResponse> = (call, callback) => {
         const response = pb.APIResponse.create();
         let builder = builders.find(builder => builder.props.name == call.request.clusterName)!;

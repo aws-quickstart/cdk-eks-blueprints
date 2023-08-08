@@ -96,9 +96,8 @@ export const AddClusterProviderRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddClusterProviderRequest>, I>>(base?: I): AddClusterProviderRequest {
-    return AddClusterProviderRequest.fromPartial(base ?? {});
+    return AddClusterProviderRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddClusterProviderRequest>, I>>(object: I): AddClusterProviderRequest {
     const message = createBaseAddClusterProviderRequest();
     message.clusterName = object.clusterName ?? "";
@@ -177,9 +176,8 @@ export const ClusterProvider = {
   },
 
   create<I extends Exact<DeepPartial<ClusterProvider>, I>>(base?: I): ClusterProvider {
-    return ClusterProvider.fromPartial(base ?? {});
+    return ClusterProvider.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ClusterProvider>, I>>(object: I): ClusterProvider {
     const message = createBaseClusterProvider();
     message.asgClusterProvider = (object.asgClusterProvider !== undefined && object.asgClusterProvider !== null)
@@ -258,9 +256,8 @@ export const AddAsgClusterProviderRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddAsgClusterProviderRequest>, I>>(base?: I): AddAsgClusterProviderRequest {
-    return AddAsgClusterProviderRequest.fromPartial(base ?? {});
+    return AddAsgClusterProviderRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddAsgClusterProviderRequest>, I>>(object: I): AddAsgClusterProviderRequest {
     const message = createBaseAddAsgClusterProviderRequest();
     message.clusterName = object.clusterName ?? "";
@@ -349,9 +346,8 @@ export const AsgClusterProvider = {
   },
 
   create<I extends Exact<DeepPartial<AsgClusterProvider>, I>>(base?: I): AsgClusterProvider {
-    return AsgClusterProvider.fromPartial(base ?? {});
+    return AsgClusterProvider.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AsgClusterProvider>, I>>(object: I): AsgClusterProvider {
     const message = createBaseAsgClusterProvider();
     message.name = object.name ?? undefined;
@@ -427,9 +423,8 @@ export const AddMngClusterProviderRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddMngClusterProviderRequest>, I>>(base?: I): AddMngClusterProviderRequest {
-    return AddMngClusterProviderRequest.fromPartial(base ?? {});
+    return AddMngClusterProviderRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddMngClusterProviderRequest>, I>>(object: I): AddMngClusterProviderRequest {
     const message = createBaseAddMngClusterProviderRequest();
     message.clusterName = object.clusterName ?? "";
@@ -504,9 +499,8 @@ export const MngClusterProvider = {
   },
 
   create<I extends Exact<DeepPartial<MngClusterProvider>, I>>(base?: I): MngClusterProvider {
-    return MngClusterProvider.fromPartial(base ?? {});
+    return MngClusterProvider.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MngClusterProvider>, I>>(object: I): MngClusterProvider {
     const message = createBaseMngClusterProvider();
     message.name = object.name ?? undefined;

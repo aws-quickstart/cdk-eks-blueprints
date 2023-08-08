@@ -102,9 +102,8 @@ export const AddTeamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddTeamsRequest>, I>>(base?: I): AddTeamsRequest {
-    return AddTeamsRequest.fromPartial(base ?? {});
+    return AddTeamsRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddTeamsRequest>, I>>(object: I): AddTeamsRequest {
     const message = createBaseAddTeamsRequest();
     message.clusterName = object.clusterName ?? "";
@@ -191,9 +190,8 @@ export const Team = {
   },
 
   create<I extends Exact<DeepPartial<Team>, I>>(base?: I): Team {
-    return Team.fromPartial(base ?? {});
+    return Team.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Team>, I>>(object: I): Team {
     const message = createBaseTeam();
     message.genericTeam = (object.genericTeam !== undefined && object.genericTeam !== null)
@@ -257,9 +255,8 @@ export const GenericTeam = {
   },
 
   create<I extends Exact<DeepPartial<GenericTeam>, I>>(base?: I): GenericTeam {
-    return GenericTeam.fromPartial(base ?? {});
+    return GenericTeam.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenericTeam>, I>>(object: I): GenericTeam {
     const message = createBaseGenericTeam();
     message.name = object.name ?? "";
@@ -331,9 +328,8 @@ export const AddPlatformTeamRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddPlatformTeamRequest>, I>>(base?: I): AddPlatformTeamRequest {
-    return AddPlatformTeamRequest.fromPartial(base ?? {});
+    return AddPlatformTeamRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddPlatformTeamRequest>, I>>(object: I): AddPlatformTeamRequest {
     const message = createBaseAddPlatformTeamRequest();
     message.clusterName = object.clusterName ?? "";
@@ -392,9 +388,8 @@ export const PlatformTeam = {
   },
 
   create<I extends Exact<DeepPartial<PlatformTeam>, I>>(base?: I): PlatformTeam {
-    return PlatformTeam.fromPartial(base ?? {});
+    return PlatformTeam.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PlatformTeam>, I>>(object: I): PlatformTeam {
     const message = createBasePlatformTeam();
     message.name = object.name ?? "";
@@ -450,9 +445,8 @@ export const ApplicationTeam = {
   },
 
   create<I extends Exact<DeepPartial<ApplicationTeam>, I>>(base?: I): ApplicationTeam {
-    return ApplicationTeam.fromPartial(base ?? {});
+    return ApplicationTeam.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ApplicationTeam>, I>>(object: I): ApplicationTeam {
     const message = createBaseApplicationTeam();
     message.name = object.name ?? "";
@@ -524,9 +518,8 @@ export const AddApplicationTeamRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddApplicationTeamRequest>, I>>(base?: I): AddApplicationTeamRequest {
-    return AddApplicationTeamRequest.fromPartial(base ?? {});
+    return AddApplicationTeamRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddApplicationTeamRequest>, I>>(object: I): AddApplicationTeamRequest {
     const message = createBaseAddApplicationTeamRequest();
     message.clusterName = object.clusterName ?? "";
@@ -585,9 +578,8 @@ export const TeamProps = {
   },
 
   create<I extends Exact<DeepPartial<TeamProps>, I>>(base?: I): TeamProps {
-    return TeamProps.fromPartial(base ?? {});
+    return TeamProps.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TeamProps>, I>>(object: I): TeamProps {
     const message = createBaseTeamProps();
     message.name = object.name ?? "";

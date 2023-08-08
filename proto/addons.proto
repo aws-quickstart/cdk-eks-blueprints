@@ -30,3 +30,12 @@ message AddKubeProxyAddOnRequest {
 message KubeProxyAddOn {
     optional string version = 1;
 }
+
+message AddCoreDNSAddOnRequest {
+    string cluster_name = 1;
+    CoreDNSAddOn core_dns_add_on = 2;
+}
+
+message CoreDNSAddOn {
+    optional string version = 1;
+}

@@ -47,6 +47,10 @@ deploy-server:
 codegen:
 	bash scripts/codegen.sh
 
+clean-server:
+	rm -rf lib/server/cdk.out
+
+
 synth:
 	$(DEPS)
 	$(CDK) synth
