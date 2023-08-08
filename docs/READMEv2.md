@@ -6,30 +6,27 @@ make run-server
 ```
 
 ### Run a client
-Clone the client [github repo](https://github.com/zjaco13/multi-lang-eks-blueprints-cdk) and change directories to the client language you would like to use
+Clone the client [github repo](https://github.com/zjaco13/multi-lang-eks-blueprints-cdk)
 ```bash
 git clone https://github.com/zjaco13/multi-lang-eks-blueprints-cdk.git
-cd multi-lang-eks-blueprints-cdk/sdks
-cd go
-# cd rust
-# cd python
+cd multi-lang-eks-blueprints-cdk
 ```
 
 Run the example for the chosen client
 
 go:
 ```bash
-go run example/main.go
+make go-example
 ```
 
 rust:
 ```bash
-cargo run --example client-example
+make rust-example
 ```
 
 python:
 ```bash
-python3 test.py
+make python-example
 ```
 
 ### Deploy the built cluster
