@@ -160,7 +160,7 @@ function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: 
     throw new Error("Missing Git repository");
   }
   
-  const manifest = new FluxGitRepository(fluxcdGitRepo.repository).generate(fluxcdGitRepo.namespace ?? namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
+  const manifest = new FluxGitRepository(fluxcdGitRepo.repository).generate(fluxcdGitRepo.name, fluxcdGitRepo.namespace ?? namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
   let manifestName: string | undefined = name + 'gitrepository' + fluxcdGitRepo.name;
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
