@@ -6,7 +6,7 @@ import { setPath } from "../../utils";
  */
 export class FluxGitRepository {
 
-    constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
+    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
     public generate(namespace: string, fluxSyncInterval: string, fluxSecretRefName: string) {
 
@@ -20,9 +20,9 @@ export class FluxGitRepository {
             },
             spec: {
                 interval: fluxSyncInterval,
-                url: repository.repository?.repoUrl,
+                url: repository.repoUrl,
                 ref: {
-                    branch: repository.repository?.targetRevision,
+                    branch: repository.targetRevision,
                 },
             }
         };
