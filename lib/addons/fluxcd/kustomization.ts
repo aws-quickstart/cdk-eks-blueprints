@@ -6,9 +6,9 @@ import * as spi from "../../spi";
  */
 export class FluxKustomization {
 
-    constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
+    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
 
-    public generate(name: string, namespace: string, fluxSyncInterval: string,  fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string) {
+    public generate(name: string, namespace: string, fluxSyncInterval: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string) {
         
         const repository = this.bootstrapRepo!;
         const kustomizationManifest = {
@@ -38,5 +38,3 @@ export class FluxKustomization {
         return kustomizationManifest;
     }
 }
-
-

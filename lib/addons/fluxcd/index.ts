@@ -10,6 +10,55 @@ import { FluxKustomization } from "./kustomization";
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
 
 /**
+ * Options for a FluxCD repository
+ */
+export interface FluxCDGitRepo {
+  /**
+   * If provided, the addon will bootstrap the app or apps in the provided repository.
+   * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
+   * after the infrastructure and team provisioning is complete.
+   * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
+   * repository will be used for provisioning all `HelmAddOn` based AddOns.
+   */
+  bootstrapRepo?: spi.ApplicationRepository;
+
+  /**
+   * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
+   * to the applications. 
+   */
+  bootstrapValues?: spi.Values,
+
+  /** 
+  * Flux SecretRef */
+  fluxSecretRefName?: string;
+
+  /** 
+  * Internal for Flux sync.
+  * Default `5m0s` */
+  fluxSyncInterval?: string;
+
+  /** 
+  * Flux Kustomization Target Namespace.
+  * Default `default` */
+  fluxTargetNamespace?: string;
+
+  /** 
+  * Flux Kustomization paths within the repository;
+  * Flux Kustomizations will be created for bootstrapRepo.path and for the paths specified in this array */
+  additionalFluxKustomizationPaths?: string[];
+
+  /** 
+  * Flux Kustomization Prune.
+  * Default `true` */
+  fluxPrune?: boolean;
+
+  /** 
+  * Flux Kustomization Timeout.
+  * Default `1m` */
+  fluxTimeout?: string;
+}
+
+/**
  * User provided options for the Helm Chart
  */
 export interface FluxCDAddOnProps extends HelmAddOnUserProps {
@@ -27,62 +76,19 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
   version?: string;
 
   /**
-   * If provided, the addon will bootstrap the app or apps in the provided repository.
-   * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
-   * after the infrastructure and team provisioning is complete.
-   * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
-   * repository will be used for provisioning all `HelmAddOn` based AddOns.
-   */
-  bootstrapRepo?: spi.ApplicationRepository;
-
-  /**
-   * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
-   * to the applications. 
-   */
-  bootstrapValues?: spi.Values,
-
-  /**
    * Values to pass to the chart as per https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/values.yaml.
    */
   values?: spi.Values;
+
   /**
    * To Create Namespace using CDK
    */    
   createNamespace?: boolean;
 
-  /** 
-  * Flux SecretRef */
-  fluxSecretRefName?: string;
-
-  /** 
-  * Internal for Flux sync.
-  * Default `5m0s` */
-  fluxSyncInterval?: string;
-
-  /** 
-  * Flux Kustomization Target Namespace.
-  * Note: when set, this parameter will override all the objects that are part of the Kustomization, please see https://fluxcd.io/flux/components/kustomize/kustomization/#target-namespace */
-  fluxTargetNamespace?: string;
-
-  /** 
-  * Flux Kustomization paths within the repository;
-  * Flux Kustomizations will be created for bootstrapRepo.path and for the paths specified in this array */
-  additionalFluxKustomizationPaths?: string[];
-
-  /** 
-  * Flux Kustomization Prune.
-  * Default `true` */
-  fluxPrune?: boolean;
-
-  /** 
-  * Flux Kustomization Timeout.
-  * Default `1m` */
-  fluxTimeout?: string;
-
-    /**
-     * List of Workload Applications to deploy
-     */
-    workloadApplications?: spi.GitOpsApplicationDeployment[];
+  /**
+   * List of repositories to sync
+   */
+  repositories?: FluxCDGitRepo[];
 }
 
 /**
@@ -97,10 +103,13 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
   createNamespace: true,
+};
+
+const defaultRepoProps: FluxCDGitRepo = {
   fluxSyncInterval: "5m0s",
   fluxPrune: true,
   fluxTimeout: "1m"
-};
+}
 
 /**
  * Main class to instantiate the Helm chart
@@ -126,27 +135,19 @@ export class FluxCDAddOn extends HelmAddOn {
       chart.node.addDependency(namespace);
     }
 
-        //Lets create a GitRepository resource as a source to Flux
-        if (this.options.bootstrapRepo?.repoUrl) {
-            const bootstrapRepo: spi.GitOpsApplicationDeployment = {
-                name: this.options.bootstrapRepo.name ?? "bootstrap-apps",
-                namespace: this.options.namespace!,
-                repository: this.options.bootstrapRepo,
-                values: this.options.bootstrapValues ?? {},
-            };
-            const gitRepositoryConstruct = createGitRepository(clusterInfo, bootstrapRepo, this.options);
+    //Create GitRepository sources and Kustomizations
+    if (this.options.repositories) {
+        this.options.repositories.map((repo) => {
+            repo = {...defaultRepoProps, ...repo};
+            const gitRepositoryConstruct = createGitRepository(clusterInfo, this.options.name!, this.options.namespace!, repo);
             gitRepositoryConstruct.node.addDependency(chart);
-            const kustomizationConstructs = createKustomizations(clusterInfo, bootstrapRepo, this.options);
+
+            const kustomizationConstructs = createKustomizations(clusterInfo, this.options.name!, this.options.namespace!, repo);
             kustomizationConstructs.map(kustomizationConstruct => kustomizationConstruct.node.addDependency(gitRepositoryConstruct));
-        }
-        if (this.options.workloadApplications) {
-            this.options.workloadApplications.forEach(app => {
-                const gitRepoConstruct = createGitRepository(clusterInfo, app, this.options);
-                gitRepoConstruct.node.addDependency(chart);
-                const kustomizationConstruct = createKustomization(clusterInfo, app, this.options);
-                kustomizationConstruct.node.addDependency(gitRepoConstruct);
-            });
-        }
+        });
+
+    }
+
     return Promise.resolve(chart);
   }
 }
@@ -154,47 +155,42 @@ export class FluxCDAddOn extends HelmAddOn {
 /**
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
-function createGitRepository(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest {
-    const manifest = new FluxGitRepository(bootstrapRepo).generate(fluxcdAddonProps.namespace!, fluxcdAddonProps.fluxSyncInterval!, fluxcdAddonProps.fluxSecretRefName!);
-    let manifestName: string | undefined = fluxcdAddonProps.name + '-gitrepository-' + bootstrapRepo.name;
-    const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
-    return construct;
-}
-
-/**
- * create Kustomizations calls the FluxKustomization().generate to create Kustomization resource.
- */
-function createKustomization(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps, fluxKustomizationPath?: string, manifestNameAddOns?: string, fluxKustomization?: FluxKustomization): KubernetesManifest {
-    fluxKustomization = fluxKustomization ?? new FluxKustomization(bootstrapRepo);
-    const manifest = fluxKustomization.generate(
-        bootstrapRepo.name + (manifestNameAddOns ? "-" + manifestNameAddOns : ""),
-        fluxcdAddonProps.namespace!,
-        fluxcdAddonProps.fluxSyncInterval!,
-        fluxcdAddonProps.fluxPrune!,
-        fluxcdAddonProps.fluxTimeout!,
-        bootstrapRepo.values,
-        fluxKustomizationPath ?? bootstrapRepo.repository?.path ?? ".",
-        fluxcdAddonProps.fluxTargetNamespace
-    );
-    let manifestName: string | undefined = fluxcdAddonProps.name + '-kustomization-' + bootstrapRepo.name + (manifestNameAddOns ? "-" + manifestNameAddOns : "");
-    const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
-    return construct;
+function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: string, fluxcdGitRepo: FluxCDGitRepo): KubernetesManifest {
+  if (fluxcdGitRepo.bootstrapRepo === undefined) {
+    throw new Error("Missing Git repository");
+  }
+  
+  const manifest = new FluxGitRepository(fluxcdGitRepo.bootstrapRepo).generate(namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
+  let manifestName: string | undefined = name + 'gitrepository' + fluxcdGitRepo.bootstrapRepo.name!;
+  const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
+  return construct;
 }
 
 /**
  * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
  */
-function createKustomizations(clusterInfo: ClusterInfo, bootstrapRepo: spi.GitOpsApplicationDeployment, fluxcdAddonProps: FluxCDAddOnProps): KubernetesManifest[] {
-  let fluxKustomizationPaths = bootstrapRepo.repository?.path ? [bootstrapRepo.repository?.path] : ["."];
+function createKustomizations(clusterInfo: ClusterInfo, name: string, namespace: string, fluxcdGitRepo: FluxCDGitRepo): KubernetesManifest[] {
+  let fluxKustomizationPaths = fluxcdGitRepo.bootstrapRepo?.path ? [fluxcdGitRepo.bootstrapRepo?.path] : ["."];
 
-  if (fluxcdAddonProps.additionalFluxKustomizationPaths){
-    fluxKustomizationPaths = fluxKustomizationPaths.concat(fluxcdAddonProps.additionalFluxKustomizationPaths as string[]);
+  if (typeof fluxcdGitRepo.additionalFluxKustomizationPaths !== undefined){
+    fluxKustomizationPaths = fluxKustomizationPaths.concat(fluxcdGitRepo.additionalFluxKustomizationPaths as string[]);
   }
 
   const constructs: KubernetesManifest[] = [];
-  const fluxKustomization = new FluxKustomization(bootstrapRepo);
+  const fluxKustomization = new FluxKustomization(fluxcdGitRepo.bootstrapRepo!);
   fluxKustomizationPaths.map((fluxKustomizationPath, index) => {
-        constructs.push(createKustomization(clusterInfo, bootstrapRepo, fluxcdAddonProps, fluxKustomizationPath, "" + index, fluxKustomization));
+    const manifest =fluxKustomization.generate(
+      fluxcdGitRepo.bootstrapRepo!.name! + "-" + index,
+      namespace,
+      fluxcdGitRepo.fluxSyncInterval!,
+      fluxcdGitRepo.fluxPrune!,
+      fluxcdGitRepo.fluxTimeout!,
+      fluxcdGitRepo.bootstrapValues!,
+      fluxKustomizationPath,
+      fluxcdGitRepo.fluxTargetNamespace
+    );
+    let manifestName: string | undefined = name + 'kustomization' +fluxcdGitRepo.bootstrapRepo!.name! + index;
+    constructs.push(clusterInfo.cluster.addManifest(manifestName!, manifest));
   });
 
   return constructs;
