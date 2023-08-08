@@ -102,6 +102,7 @@ nav:
   - Builders:
     - Overview: 'builders/index.md'
     - Observability Builder: 'builders/observability-builder.md'
+    - Windows Builder: 'builders/windows-builder.ts'
   - Extensibility: 'extensibility.md'
   - API Reference: 'api'
 markdown_extensions:
