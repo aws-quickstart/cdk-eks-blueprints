@@ -12,7 +12,13 @@ import {
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
 import * as _m0 from "protobufjs/minimal";
-import { AddAckAddOnRequest, AddAddonsRequest, AddCoreDNSAddOnRequest, AddKubeProxyAddOnRequest } from "./addons";
+import {
+  AddAckAddOnRequest,
+  AddAddonsRequest,
+  AddCoreDNSAddOnRequest,
+  AddKubeProxyAddOnRequest,
+  AddMetricsServerAddOnRequest,
+} from "./addons";
 import {
   AddAsgClusterProviderRequest,
   AddClusterProviderRequest,
@@ -516,6 +522,16 @@ export const ClusterServiceService = {
     responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => APIResponse.decode(value),
   },
+  addMetricsServerAddOn: {
+    path: "/codegen.ClusterService/AddMetricsServerAddOn",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddMetricsServerAddOnRequest) =>
+      Buffer.from(AddMetricsServerAddOnRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => AddMetricsServerAddOnRequest.decode(value),
+    responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => APIResponse.decode(value),
+  },
   addAddons: {
     path: "/codegen.ClusterService/AddAddons",
     requestStream: false,
@@ -542,6 +558,7 @@ export interface ClusterServiceServer extends UntypedServiceImplementation {
   addAckAddOn: handleUnaryCall<AddAckAddOnRequest, APIResponse>;
   addKubeProxyAddOn: handleUnaryCall<AddKubeProxyAddOnRequest, APIResponse>;
   addCoreDnsAddOn: handleUnaryCall<AddCoreDNSAddOnRequest, APIResponse>;
+  addMetricsServerAddOn: handleUnaryCall<AddMetricsServerAddOnRequest, APIResponse>;
   addAddons: handleUnaryCall<AddAddonsRequest, APIResponse>;
 }
 
@@ -752,6 +769,21 @@ export interface ClusterServiceClient extends Client {
   ): ClientUnaryCall;
   addCoreDnsAddOn(
     request: AddCoreDNSAddOnRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: APIResponse) => void,

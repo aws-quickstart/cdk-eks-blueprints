@@ -24,6 +24,7 @@ service ClusterService {
     rpc AddAckAddOn (AddAckAddOnRequest) returns (APIResponse);
     rpc AddKubeProxyAddOn (AddKubeProxyAddOnRequest) returns (APIResponse);
     rpc AddCoreDNSAddOn (AddCoreDNSAddOnRequest) returns (APIResponse);
+    rpc AddMetricsServerAddOn (AddMetricsServerAddOnRequest) returns (APIResponse);
     rpc AddAddons (AddAddonsRequest) returns (APIResponse);
 }
 

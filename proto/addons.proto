@@ -39,3 +39,12 @@ message AddCoreDNSAddOnRequest {
 message CoreDNSAddOn {
     optional string version = 1;
 }
+
+message MetricsServerAddOn {
+    optional bool createNamespace = 1;
+}
+
+message AddMetricsServerAddOnRequest {
+    string cluster_name = 1;
+    MetricsServerAddOn metrics_server_add_on = 2;
+}

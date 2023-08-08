@@ -39,6 +39,15 @@ export interface CoreDNSAddOn {
   version?: string | undefined;
 }
 
+export interface MetricsServerAddOn {
+  createNamespace?: boolean | undefined;
+}
+
+export interface AddMetricsServerAddOnRequest {
+  clusterName: string;
+  metricsServerAddOn: MetricsServerAddOn | undefined;
+}
+
 function createBaseAddAddonsRequest(): AddAddonsRequest {
   return { clusterName: "", addons: [] };
 }
@@ -603,6 +612,141 @@ export const CoreDNSAddOn = {
   fromPartial<I extends Exact<DeepPartial<CoreDNSAddOn>, I>>(object: I): CoreDNSAddOn {
     const message = createBaseCoreDNSAddOn();
     message.version = object.version ?? undefined;
+    return message;
+  },
+};
+
+function createBaseMetricsServerAddOn(): MetricsServerAddOn {
+  return { createNamespace: undefined };
+}
+
+export const MetricsServerAddOn = {
+  encode(message: MetricsServerAddOn, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.createNamespace !== undefined) {
+      writer.uint32(8).bool(message.createNamespace);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MetricsServerAddOn {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMetricsServerAddOn();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.createNamespace = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MetricsServerAddOn {
+    return { createNamespace: isSet(object.createNamespace) ? Boolean(object.createNamespace) : undefined };
+  },
+
+  toJSON(message: MetricsServerAddOn): unknown {
+    const obj: any = {};
+    if (message.createNamespace !== undefined) {
+      obj.createNamespace = message.createNamespace;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MetricsServerAddOn>, I>>(base?: I): MetricsServerAddOn {
+    return MetricsServerAddOn.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<MetricsServerAddOn>, I>>(object: I): MetricsServerAddOn {
+    const message = createBaseMetricsServerAddOn();
+    message.createNamespace = object.createNamespace ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAddMetricsServerAddOnRequest(): AddMetricsServerAddOnRequest {
+  return { clusterName: "", metricsServerAddOn: undefined };
+}
+
+export const AddMetricsServerAddOnRequest = {
+  encode(message: AddMetricsServerAddOnRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.metricsServerAddOn !== undefined) {
+      MetricsServerAddOn.encode(message.metricsServerAddOn, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddMetricsServerAddOnRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddMetricsServerAddOnRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.metricsServerAddOn = MetricsServerAddOn.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddMetricsServerAddOnRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      metricsServerAddOn: isSet(object.metricsServerAddOn)
+        ? MetricsServerAddOn.fromJSON(object.metricsServerAddOn)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AddMetricsServerAddOnRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.metricsServerAddOn !== undefined) {
+      obj.metricsServerAddOn = MetricsServerAddOn.toJSON(message.metricsServerAddOn);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddMetricsServerAddOnRequest>, I>>(base?: I): AddMetricsServerAddOnRequest {
+    return AddMetricsServerAddOnRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AddMetricsServerAddOnRequest>, I>>(object: I): AddMetricsServerAddOnRequest {
+    const message = createBaseAddMetricsServerAddOnRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.metricsServerAddOn = (object.metricsServerAddOn !== undefined && object.metricsServerAddOn !== null)
+      ? MetricsServerAddOn.fromPartial(object.metricsServerAddOn)
+      : undefined;
     return message;
   },
 };
