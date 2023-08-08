@@ -2,13 +2,6 @@
 
 The `WindowsBuilder` allows you to get started with a builder class to configure with required setup as you prepare a blueprint for setting up EKS cluster with windows to run your windows workloads.
 
-## Supported Methods
- 
-`WindowsBuilder` supports following methods for setting up windows on Amazon EKS:
-
-- `addGenericNodeGroup`: This method helps you prepare a blueprint by setting up a generic linux node group on EKS which is required as part of Windows on EKS setup
-- `addWindowsNodeGroup`: This method helps you prepare a blueprint by setting up a windows node group on EKS which is required to run windows workloads
-
 ## Input Parameters
 
 `WindowsOptions` which takes inputs to `WindowsBuilder` supports following parameters:
