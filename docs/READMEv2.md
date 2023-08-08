@@ -2,7 +2,7 @@
 
 ### Start the server
 ```bash
-npx cdk -a "npx ts-node lib/server/index.ts" synth
+make run-server
 ```
 
 ### Run a client
@@ -36,5 +36,5 @@ python3 test.py
 Go back to the cdk-eks-blueprints project
 
 ```bash
-npx cdk -a cdk.out deploy
+make deploy-server
 ```
