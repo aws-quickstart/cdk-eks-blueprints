@@ -15,15 +15,18 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-  bootstrapRepo: {
-      repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
-      name: "aws-observability-accelerator",
-      targetRevision: "main",
-      path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
-  },
-  bootstrapValues: {
-      "region": "us-east-1"
-  }
+    repositories:[{
+         name: "aws-observability-accelerator",
+         namespace: undefined,
+         repository: {
+             repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+             targetRevision: "main",
+         },
+         values: {
+             "region": "us-east-1"
+         },
+         kustomizations: [{fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
+    }],
 })
 ...
 
@@ -44,16 +47,17 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
     repositories: [{
-        bootstrapRepo: {
+        name: "aws-observability-accelerator",
+        namespace: undefined,
+        repository: {
             repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
-            name: "aws-observability-accelerator",
             targetRevision: "main",
             path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
         },
-        bootstrapValues: {
+        values: {
             "region": "us-east-1"
         },
-        additionalFluxKustomizationPaths: ["./artifacts/grafana-operator-manifests/eks/java"]
+        kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
     }],
 })
 ...
@@ -79,27 +83,29 @@ const nginxDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-ob
 const addOn = new blueprints.addons.FluxCDAddOn({
     repositories: [
         {
-            bootstrapRepo: {
+            name: "aws-observability-accelerator",
+            namespace: undefined,
+            repository: {
                 repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
-                name: "aws-observability-accelerator",
                 targetRevision: "main",
                 path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
             },
-            bootstrapValues: {
+            values: {
                 "region": "us-east-1"
             },
-            additionalFluxKustomizationPaths: ["./artifacts/grafana-operator-manifests/eks/java"]
+            kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
         },
         {
-            bootstrapRepo: {
+            name: "podinfo",
+            namespace: undefined,
+            repository: {
                 repoUrl: 'https://github.com/stefanprodan/podinfo',
-                name: "podinfo",
                 targetRevision: "master",
-                path: "./kustomize"
             },
-            bootstrapValues: {
-                "region": "us-east-1"
+            values: {
+                "region": "us-east-2"
             },
+            kustomizations: [{fluxKustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
         }
     ],
 });
@@ -145,15 +151,16 @@ const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.FluxCDAddOn({
     repositories:[
       {
-        bootstrapRepo: {
+        name: "<<YOUR_FLUX_APP_NAME>>",
+        namespace: "<<YOUR_FLUX_ADDON_NAMESPACE>>",
+        repository: {
             repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
-            name: "<<YOUR_FLUX_APP_NAME>>",
             targetRevision: "<<YOUR_TARGET_REVISION>>",
-            path: "<<YOUR_FLUX_SYNC_PATH>>",
         },
-        bootstrapValues: {
+        values: {
             "region": "us-east-1"
         },
+        kustomizations: [{fluxKustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
         // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
         fluxSecretRefName: "repository-creds" 
       }

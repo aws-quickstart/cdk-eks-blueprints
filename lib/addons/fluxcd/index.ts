@@ -12,22 +12,12 @@ import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
 /**
  * Options for a FluxCD repository
  */
-export interface FluxCDGitRepo {
-  /**
-   * If provided, the addon will bootstrap the app or apps in the provided repository.
-   * In general, the repo is expected to have the app of apps, which can enable to bootstrap all workloads,
-   * after the infrastructure and team provisioning is complete.
-   * When GitOps mode is enabled via `ArgoGitOpsFactory` for deploying the AddOns, this bootstrap
-   * repository will be used for provisioning all `HelmAddOn` based AddOns.
-   */
-  bootstrapRepo?: spi.ApplicationRepository;
+export interface FluxCDGitRepo extends Omit<spi.GitOpsApplicationDeployment, "repository">{
 
-  /**
-   * Optional values for the bootstrap application. These may contain values such as domain named provisioned by other add-ons, certificate, and other parameters to pass 
-   * to the applications. 
-   */
-  bootstrapValues?: spi.Values,
-
+    /** 
+     * Repository to create source from
+     */
+    repository: Omit<spi.GitRepositoryReference, "path" | "name">
   /** 
   * Flux SecretRef */
   fluxSecretRefName?: string;
@@ -37,25 +27,31 @@ export interface FluxCDGitRepo {
   * Default `5m0s` */
   fluxSyncInterval?: string;
 
-  /** 
-  * Flux Kustomization Target Namespace.
-  * Default `default` */
-  fluxTargetNamespace?: string;
+    /**
+     * List of kustomizations to create */
+    kustomizations?: FluxKustomizationProps[];
+}
 
-  /** 
-  * Flux Kustomization paths within the repository;
-  * Flux Kustomizations will be created for bootstrapRepo.path and for the paths specified in this array */
-  additionalFluxKustomizationPaths?: string[];
+export interface FluxKustomizationProps {
+    /**
+     * Flux Kustomization path within the GitRepository 
+     * Do not use the path in the repository field*/
+    fluxKustomizationPath: string;
 
-  /** 
-  * Flux Kustomization Prune.
-  * Default `true` */
-  fluxPrune?: boolean;
+    /** 
+    * Flux Kustomization Target Namespace.
+    * Note: when set, this parameter will override all the objects that are part of the Kustomization, please see https://fluxcd.io/flux/components/kustomize/kustomization/#target-namespace */
+    kustomizationTargetNamespace?: string;
 
-  /** 
-  * Flux Kustomization Timeout.
-  * Default `1m` */
-  fluxTimeout?: string;
+    /** 
+    * Flux Kustomization Prune.
+    * Default `true` */
+    fluxPrune?: boolean;
+
+    /** 
+    * Flux Kustomization Timeout.
+    * Default `1m` */
+    fluxTimeout?: string;
 }
 
 /**
@@ -105,11 +101,15 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   createNamespace: true,
 };
 
-const defaultRepoProps: FluxCDGitRepo = {
-  fluxSyncInterval: "5m0s",
-  fluxPrune: true,
-  fluxTimeout: "1m"
-}
+const defaultRepoProps: Partial<FluxCDGitRepo> = {
+    fluxSyncInterval: "5m0s",
+};
+
+const defaultKustomiationProps: FluxKustomizationProps = {
+    fluxKustomizationPath: ".",
+    fluxPrune: true,
+    fluxTimeout: "1m",
+};
 
 /**
  * Main class to instantiate the Helm chart
@@ -156,12 +156,12 @@ export class FluxCDAddOn extends HelmAddOn {
  * create GitRepository calls the FluxGitRepository().generate to create GitRepostory resource.
  */
 function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: string, fluxcdGitRepo: FluxCDGitRepo): KubernetesManifest {
-  if (fluxcdGitRepo.bootstrapRepo === undefined) {
+  if (fluxcdGitRepo.repository === undefined) {
     throw new Error("Missing Git repository");
   }
   
-  const manifest = new FluxGitRepository(fluxcdGitRepo.bootstrapRepo).generate(namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
-  let manifestName: string | undefined = name + 'gitrepository' + fluxcdGitRepo.bootstrapRepo.name!;
+  const manifest = new FluxGitRepository(fluxcdGitRepo.repository).generate(fluxcdGitRepo.namespace ?? namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
+  let manifestName: string | undefined = name + 'gitrepository' + fluxcdGitRepo.name;
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }
@@ -170,27 +170,24 @@ function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: 
  * create Kustomizations calls the FluxKustomization().generate multiple times to create Kustomization resources.
  */
 function createKustomizations(clusterInfo: ClusterInfo, name: string, namespace: string, fluxcdGitRepo: FluxCDGitRepo): KubernetesManifest[] {
-  let fluxKustomizationPaths = fluxcdGitRepo.bootstrapRepo?.path ? [fluxcdGitRepo.bootstrapRepo?.path] : ["."];
-
-  if (typeof fluxcdGitRepo.additionalFluxKustomizationPaths !== undefined){
-    fluxKustomizationPaths = fluxKustomizationPaths.concat(fluxcdGitRepo.additionalFluxKustomizationPaths as string[]);
-  }
-
   const constructs: KubernetesManifest[] = [];
-  const fluxKustomization = new FluxKustomization(fluxcdGitRepo.bootstrapRepo!);
-  fluxKustomizationPaths.map((fluxKustomizationPath, index) => {
+  const kustomizations = fluxcdGitRepo.kustomizations ?? [{fluxKustomizationPath: "."}]
+  const fluxKustomization = new FluxKustomization(fluxcdGitRepo.repository!);
+  kustomizations?.map((kustomization, index) => {
+    kustomization = {...defaultKustomiationProps, ...kustomization}
     const manifest =fluxKustomization.generate(
-      fluxcdGitRepo.bootstrapRepo!.name! + "-" + index,
-      namespace,
+      fluxcdGitRepo.name + "-" + index,
+      fluxcdGitRepo.namespace ?? namespace,
       fluxcdGitRepo.fluxSyncInterval!,
-      fluxcdGitRepo.fluxPrune!,
-      fluxcdGitRepo.fluxTimeout!,
-      fluxcdGitRepo.bootstrapValues!,
-      fluxKustomizationPath,
-      fluxcdGitRepo.fluxTargetNamespace
+      kustomization.fluxPrune!,
+      kustomization.fluxTimeout!,
+      fluxcdGitRepo.values,
+      kustomization.fluxKustomizationPath,
+      kustomization.kustomizationTargetNamespace,
     );
-    let manifestName: string | undefined = name + 'kustomization' +fluxcdGitRepo.bootstrapRepo!.name! + index;
+    let manifestName: string | undefined = name + 'kustomization' +fluxcdGitRepo.name + index;
     constructs.push(clusterInfo.cluster.addManifest(manifestName!, manifest));
+    
   });
 
   return constructs;
