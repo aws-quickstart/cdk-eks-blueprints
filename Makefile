@@ -45,6 +45,7 @@ deploy-server:
 	$(CDK) -a lib/server/cdk.out/ deploy --output=lib/server/cdk_deploy.out
 
 codegen:
+	$(DEPS)
 	bash scripts/codegen.sh
 
 clean-server:
