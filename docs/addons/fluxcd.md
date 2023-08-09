@@ -25,7 +25,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
          values: {
              "region": "us-east-1"
          },
-         kustomizations: [{fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
+         kustomizations: [{kustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
     }],
 })
 ...
@@ -52,12 +52,11 @@ const addOn = new blueprints.addons.FluxCDAddOn({
         repository: {
             repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
             targetRevision: "main",
-            path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
         },
         values: {
             "region": "us-east-1"
         },
-        kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+        kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
     }],
 })
 ...
@@ -79,6 +78,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const nginxDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/nginx/nginx.json"
+const javaDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/java/default.json"
 
 const addOn = new blueprints.addons.FluxCDAddOn({
     repositories: [
@@ -88,12 +88,12 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             repository: {
                 repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
                 targetRevision: "main",
-                path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
             },
             values: {
-                "region": "us-east-1"
+                "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
+                "GRAFANA_JAVA_JMX_DASH_URL": javaDashUrl,
             },
-            kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+            kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
         },
         {
             name: "podinfo",
@@ -105,7 +105,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             values: {
                 "region": "us-east-2"
             },
-            kustomizations: [{fluxKustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
+            kustomizations: [{kustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
         }
     ],
 });
@@ -160,9 +160,9 @@ const addOns: Array<blueprints.ClusterAddOn> = [
         values: {
             "region": "us-east-1"
         },
-        kustomizations: [{fluxKustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
+        kustomizations: [{kustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
         // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
-        fluxSecretRefName: "repository-creds" 
+        secretRefName: "repository-creds" 
       }
     ],
 
