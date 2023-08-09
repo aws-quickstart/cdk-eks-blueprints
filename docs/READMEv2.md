@@ -35,3 +35,10 @@ Go back to the cdk-eks-blueprints project
 ```bash
 make deploy-server
 ```
+
+## Contributing
+If changes were made to protobufs you must generate new code. To generate new code, run this command. 
+
+```bash
+make codegen
+```
