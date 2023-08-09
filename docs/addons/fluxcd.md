@@ -23,7 +23,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
              targetRevision: "main",
          },
          values: {
-             "region": "us-east-1"
+             "region": "us-east-2"
          },
          kustomizations: [{kustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
     }],
@@ -54,7 +54,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             targetRevision: "main",
         },
         values: {
-            "region": "us-east-1"
+            "region": "us-east-2"
         },
         kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
     }],
