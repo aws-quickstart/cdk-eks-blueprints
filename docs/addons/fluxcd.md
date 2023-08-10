@@ -15,15 +15,18 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-  bootstrapRepo: {
-      repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
-      name: "aws-observability-accelerator",
-      targetRevision: "main",
-      path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
-  },
-  bootstrapValues: {
-      "region": "us-east-1"
-  }
+    repositories:[{
+         name: "aws-observability-accelerator",
+         namespace: undefined,
+         repository: {
+             repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+             targetRevision: "main",
+         },
+         values: {
+             "region": "us-east-2"
+         },
+         kustomizations: [{kustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
+    }],
 })
 ...
 
@@ -43,16 +46,18 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-  bootstrapRepo: {
-      repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
-      name: "aws-observability-accelerator",
-      targetRevision: "main",
-      path: "./artifacts/grafana-operator-manifests/eks/infrastructure"
-  },
-  bootstrapValues: {
-      "region": "us-east-1"
-  },
-  additionalFluxKustomizationPaths: ["./artifacts/grafana-operator-manifests/eks/java"]
+    repositories: [{
+        name: "aws-observability-accelerator",
+        namespace: undefined,
+        repository: {
+            repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+            targetRevision: "main",
+        },
+        values: {
+            "region": "us-east-2"
+        },
+        kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+    }],
 })
 ...
 
@@ -73,29 +78,34 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const nginxDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/nginx/nginx.json"
+const javaDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/java/default.json"
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-    bootstrapRepo: {
-        repoUrl: 'https://github.com/stefanprodan/podinfo',
-        name: "podinfo",
-        targetRevision: "master",
-        path: "./kustomize"
-    },
-    bootstrapValues: {
-        "region": "us-east-1"
-    },
-    workloadApplications: [
+    repositories: [
         {
-            name: "nginx-grafanadashboard",
-            namespace: "grafana-operator",
+            name: "aws-observability-accelerator",
+            namespace: undefined,
             repository: {
                 repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
                 targetRevision: "main",
-                path: "./artifacts/grafana-operator-manifests/eks/nginx"
             },
             values: {
                 "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
+                "GRAFANA_JAVA_JMX_DASH_URL": javaDashUrl,
             },
+            kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+        },
+        {
+            name: "podinfo",
+            namespace: undefined,
+            repository: {
+                repoUrl: 'https://github.com/stefanprodan/podinfo',
+                targetRevision: "master",
+            },
+            values: {
+                "region": "us-east-2"
+            },
+            kustomizations: [{kustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
         }
     ],
 });
@@ -139,18 +149,23 @@ const app = new cdk.App();
 const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.ExternalsSecretsAddOn(),
   new blueprints.addons.FluxCDAddOn({
-    bootstrapRepo: {
-        repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
+    repositories:[
+      {
         name: "<<YOUR_FLUX_APP_NAME>>",
-        targetRevision: "<<YOUR_TARGET_REVISION>>",
-        path: "<<YOUR_FLUX_SYNC_PATH>>",
-        fluxVerifyMode: "head",
+        namespace: "<<YOUR_FLUX_ADDON_NAMESPACE>>",
+        repository: {
+            repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
+            targetRevision: "<<YOUR_TARGET_REVISION>>",
+        },
+        values: {
+            "region": "us-east-1"
+        },
+        kustomizations: [{kustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
         // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
-        fluxSecretRefName: "repository-creds" 
-    },
-    bootstrapValues: {
-        "region": "us-east-1"
-    },
+        secretRefName: "repository-creds" 
+      }
+    ],
+
   }),
   new ExternalOperatorSecretAddon(),
 ];
