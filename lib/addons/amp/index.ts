@@ -68,7 +68,7 @@ export interface AmpAddOnProps {
      * Enable "apiserver" job in the Prometheus configuration of the default OpenTelemetryCollector.
      * @default false
      */
-    enableAPIserverJob?: boolean;
+    enableAPIServerJob?: boolean;
     /** 
      * AMP rules providing AMP workspace ARN and paths to files encoding recording and/or alerting rules following the same format as a rules file in standalone Prometheus.
      * This parameter is optional and if not provided, no rules will be applied.
@@ -127,7 +127,7 @@ export class AmpAddOn implements ClusterAddOn {
             doc,
             "{{ if enableAPIserverJob }}",
             "{{ end }}",
-            this.ampAddOnProps.enableAPIserverJob!
+            this.ampAddOnProps.enableAPIServerJob!
             );
 
         const manifest = doc.split("---").map(e => {
