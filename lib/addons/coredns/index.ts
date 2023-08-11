@@ -9,7 +9,8 @@ type corednsCollectorAddOnProps = CoreAddOnProps;
 const defaultProps = {
     addOnName: 'coredns',
     version: 'v1.9.3-eksbuild.5',
-    saName: 'coredns'
+    saName: 'coredns',
+    configurationValues: {}
 }
 
 /**
