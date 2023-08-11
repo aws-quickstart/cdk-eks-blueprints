@@ -1,5 +1,5 @@
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import { dependable, loadYaml, readYamlDocument } from "../../utils";
+import { dependable, loadYaml, readYamlDocument, changeTextBetweenTokens } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
@@ -64,6 +64,11 @@ export interface AmpAddOnProps {
      * @default 'adot-collector-amp'
      */
     name?: string;
+    /**
+     * Enable "apiserver" job in the Prometheus configuration of the default OpenTelemetryCollector.
+     * @default false
+     */
+    enableAPIserverJob?: boolean;
     /** 
      * AMP rules providing AMP workspace ARN and paths to files encoding recording and/or alerting rules following the same format as a rules file in standalone Prometheus.
      * This parameter is optional and if not provided, no rules will be applied.
@@ -90,7 +95,8 @@ export const enum DeploymentMode {
 const defaultProps = {
     deploymentMode: DeploymentMode.DEPLOYMENT,
     name: 'adot-collector-amp',
-    namespace: 'default'
+    namespace: 'default',
+    enableAPIserverJob: false
 };
 
 /**
@@ -116,6 +122,13 @@ export class AmpAddOn implements ClusterAddOn {
         else {
             doc = readYamlDocument(__dirname + '/collector-config-amp.ytpl');
         }
+
+        doc = changeTextBetweenTokens(
+            doc,
+            "{{ if enableAPIserverJob }}",
+            "{{ end }}",
+            this.ampAddOnProps.enableAPIserverJob!
+            );
 
         const manifest = doc.split("---").map(e => {
             let object = loadYaml(e);
