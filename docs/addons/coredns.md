@@ -54,21 +54,106 @@ aws eks describe-addon-configuration \
 --addon-name coredns \
 --addon-version v1.10.1-eksbuild.1 \
 --query configurationSchema \
---output text
+--output text | jq '.definitions.Coredns.properties'
 
-# Output (Simplified)
-"properties":{
-    "affinity":Object,
-    "computeType": String,
-    "corefile": String,
-    "nodeSelector": String,
-    "replicaCount":Integer,
-    "resources": Resource,
-    "tolerations": Array of Objects,
-    "topologySpreadConstraints":Array
+# Output 
+{
+  "affinity": {
+    "default": {
+      "affinity": {
+        "nodeAffinity": {
+          "requiredDuringSchedulingIgnoredDuringExecution": {
+            "nodeSelectorTerms": [
+              {
+                "matchExpressions": [
+                  {
+                    "key": "kubernetes.io/os",
+                    "operator": "In",
+                    "values": [
+                      "linux"
+                    ]
+                  },
+                  {
+                    "key": "kubernetes.io/arch",
+                    "operator": "In",
+                    "values": [
+                      "amd64",
+                      "arm64"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "podAntiAffinity": {
+          "preferredDuringSchedulingIgnoredDuringExecution": [
+            {
+              "podAffinityTerm": {
+                "labelSelector": {
+                  "matchExpressions": [
+                    {
+                      "key": "k8s-app",
+                      "operator": "In",
+                      "values": [
+                        "kube-dns"
+                      ]
+                    }
+                  ]
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              },
+              "weight": 100
+            }
+          ]
+        }
+      }
+    },
+    "description": "Affinity of the coredns pods",
+    "type": [
+      "object",
+      "null"
+    ]
+  },
+  "computeType": {
+    "type": "string"
+  },
+  "corefile": {
+    "description": "Entire corefile contents to use with installation",
+    "type": "string"
+  },
+  "nodeSelector": {
+    "additionalProperties": {
+      "type": "string"
+    },
+    "type": "object"
+  },
+  "replicaCount": {
+    "type": "integer"
+  },
+  "resources": {
+    "$ref": "#/definitions/Resources"
+  },
+  "tolerations": {
+    "default": [
+      {
+        "key": "CriticalAddonsOnly",
+        "operator": "Exists"
+      },
+      {
+        "key": "node-role.kubernetes.io/master",
+        "operator": "NoSchedule"
+      }
+    ],
+    "description": "Tolerations of the coredns pod",
+    "items": {
+      "type": "object"
+    },
+    "type": "array"
+  }
 }
 ```
-
+Note: To deploy fargate cluster, we need to pass configurationValue.computeType as "Fargate" as described in the [EKS Fargate documentation](https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html#fargate-gs-coredns)
 
 # Validation
 To validate that coredns add-on is running, ensure that both the coredns pods are in Running state.
