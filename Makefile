@@ -42,10 +42,15 @@ run-server:
 	$(CDK) -a "npx ts-node lib/server/index.ts" synth --output=lib/server/cdk.out
 
 deploy-server:
-	$(CDK) -a lib/server/cdk.out/ deploy --output=lib/server/cdk.out
+	$(CDK) -a lib/server/cdk.out/ deploy --output=lib/server/cdk_deploy.out
 
 codegen:
+	$(DEPS)
 	bash scripts/codegen.sh
+
+clean-server:
+	rm -rf lib/server/cdk.out
+
 
 synth:
 	$(DEPS)

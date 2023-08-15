@@ -99,9 +99,8 @@ export const AddResourceProviderRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddResourceProviderRequest>, I>>(base?: I): AddResourceProviderRequest {
-    return AddResourceProviderRequest.fromPartial(base ?? {});
+    return AddResourceProviderRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddResourceProviderRequest>, I>>(object: I): AddResourceProviderRequest {
     const message = createBaseAddResourceProviderRequest();
     message.clusterName = object.clusterName ?? "";
@@ -161,9 +160,8 @@ export const ResourceProvider = {
   },
 
   create<I extends Exact<DeepPartial<ResourceProvider>, I>>(base?: I): ResourceProvider {
-    return ResourceProvider.fromPartial(base ?? {});
+    return ResourceProvider.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ResourceProvider>, I>>(object: I): ResourceProvider {
     const message = createBaseResourceProvider();
     message.vpcProvider = (object.vpcProvider !== undefined && object.vpcProvider !== null)
@@ -251,9 +249,8 @@ export const AddVpcProviderRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddVpcProviderRequest>, I>>(base?: I): AddVpcProviderRequest {
-    return AddVpcProviderRequest.fromPartial(base ?? {});
+    return AddVpcProviderRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddVpcProviderRequest>, I>>(object: I): AddVpcProviderRequest {
     const message = createBaseAddVpcProviderRequest();
     message.clusterName = object.clusterName ?? "";
@@ -313,9 +310,8 @@ export const VpcProvider = {
   },
 
   create<I extends Exact<DeepPartial<VpcProvider>, I>>(base?: I): VpcProvider {
-    return VpcProvider.fromPartial(base ?? {});
+    return VpcProvider.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VpcProvider>, I>>(object: I): VpcProvider {
     const message = createBaseVpcProvider();
     message.vpcId = object.vpcId ?? undefined;

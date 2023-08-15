@@ -12,7 +12,13 @@ import {
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
 import * as _m0 from "protobufjs/minimal";
-import { AddAckAddOnRequest, AddAddonsRequest, AddKubeProxyAddOnRequest } from "./addons";
+import {
+  AddAckAddOnRequest,
+  AddAddonsRequest,
+  AddCoreDNSAddOnRequest,
+  AddKubeProxyAddOnRequest,
+  AddMetricsServerAddOnRequest,
+} from "./addons";
 import {
   AddAsgClusterProviderRequest,
   AddClusterProviderRequest,
@@ -92,9 +98,8 @@ export const APIResponse = {
   },
 
   create<I extends Exact<DeepPartial<APIResponse>, I>>(base?: I): APIResponse {
-    return APIResponse.fromPartial(base ?? {});
+    return APIResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<APIResponse>, I>>(object: I): APIResponse {
     const message = createBaseAPIResponse();
     message.message = object.message ?? "";
@@ -166,9 +171,8 @@ export const CreateClusterRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreateClusterRequest>, I>>(base?: I): CreateClusterRequest {
-    return CreateClusterRequest.fromPartial(base ?? {});
+    return CreateClusterRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CreateClusterRequest>, I>>(object: I): CreateClusterRequest {
     const message = createBaseCreateClusterRequest();
     message.id = object.id ?? "";
@@ -255,9 +259,8 @@ export const BuildClusterRequest = {
   },
 
   create<I extends Exact<DeepPartial<BuildClusterRequest>, I>>(base?: I): BuildClusterRequest {
-    return BuildClusterRequest.fromPartial(base ?? {});
+    return BuildClusterRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<BuildClusterRequest>, I>>(object: I): BuildClusterRequest {
     const message = createBaseBuildClusterRequest();
     message.clusterName = object.clusterName ?? "";
@@ -373,9 +376,8 @@ export const CloneClusterRequest = {
   },
 
   create<I extends Exact<DeepPartial<CloneClusterRequest>, I>>(base?: I): CloneClusterRequest {
-    return CloneClusterRequest.fromPartial(base ?? {});
+    return CloneClusterRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CloneClusterRequest>, I>>(object: I): CloneClusterRequest {
     const message = createBaseCloneClusterRequest();
     message.clusterName = object.clusterName ?? "";
@@ -511,6 +513,25 @@ export const ClusterServiceService = {
     responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => APIResponse.decode(value),
   },
+  addCoreDnsAddOn: {
+    path: "/codegen.ClusterService/AddCoreDNSAddOn",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddCoreDNSAddOnRequest) => Buffer.from(AddCoreDNSAddOnRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => AddCoreDNSAddOnRequest.decode(value),
+    responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => APIResponse.decode(value),
+  },
+  addMetricsServerAddOn: {
+    path: "/codegen.ClusterService/AddMetricsServerAddOn",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddMetricsServerAddOnRequest) =>
+      Buffer.from(AddMetricsServerAddOnRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => AddMetricsServerAddOnRequest.decode(value),
+    responseSerialize: (value: APIResponse) => Buffer.from(APIResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => APIResponse.decode(value),
+  },
   addAddons: {
     path: "/codegen.ClusterService/AddAddons",
     requestStream: false,
@@ -536,6 +557,8 @@ export interface ClusterServiceServer extends UntypedServiceImplementation {
   addResourceProvider: handleUnaryCall<AddResourceProviderRequest, APIResponse>;
   addAckAddOn: handleUnaryCall<AddAckAddOnRequest, APIResponse>;
   addKubeProxyAddOn: handleUnaryCall<AddKubeProxyAddOnRequest, APIResponse>;
+  addCoreDnsAddOn: handleUnaryCall<AddCoreDNSAddOnRequest, APIResponse>;
+  addMetricsServerAddOn: handleUnaryCall<AddMetricsServerAddOnRequest, APIResponse>;
   addAddons: handleUnaryCall<AddAddonsRequest, APIResponse>;
 }
 
@@ -731,6 +754,36 @@ export interface ClusterServiceClient extends Client {
   ): ClientUnaryCall;
   addKubeProxyAddOn(
     request: AddKubeProxyAddOnRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addCoreDnsAddOn(
+    request: AddCoreDNSAddOnRequest,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addCoreDnsAddOn(
+    request: AddCoreDNSAddOnRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addCoreDnsAddOn(
+    request: AddCoreDNSAddOnRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: APIResponse) => void,
+  ): ClientUnaryCall;
+  addMetricsServerAddOn(
+    request: AddMetricsServerAddOnRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: APIResponse) => void,

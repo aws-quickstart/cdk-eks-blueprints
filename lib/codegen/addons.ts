@@ -30,6 +30,24 @@ export interface KubeProxyAddOn {
   version?: string | undefined;
 }
 
+export interface AddCoreDNSAddOnRequest {
+  clusterName: string;
+  coreDnsAddOn: CoreDNSAddOn | undefined;
+}
+
+export interface CoreDNSAddOn {
+  version?: string | undefined;
+}
+
+export interface MetricsServerAddOn {
+  createNamespace?: boolean | undefined;
+}
+
+export interface AddMetricsServerAddOnRequest {
+  clusterName: string;
+  metricsServerAddOn: MetricsServerAddOn | undefined;
+}
+
 function createBaseAddAddonsRequest(): AddAddonsRequest {
   return { clusterName: "", addons: [] };
 }
@@ -94,9 +112,8 @@ export const AddAddonsRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddAddonsRequest>, I>>(base?: I): AddAddonsRequest {
-    return AddAddonsRequest.fromPartial(base ?? {});
+    return AddAddonsRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddAddonsRequest>, I>>(object: I): AddAddonsRequest {
     const message = createBaseAddAddonsRequest();
     message.clusterName = object.clusterName ?? "";
@@ -169,9 +186,8 @@ export const Addon = {
   },
 
   create<I extends Exact<DeepPartial<Addon>, I>>(base?: I): Addon {
-    return Addon.fromPartial(base ?? {});
+    return Addon.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Addon>, I>>(object: I): Addon {
     const message = createBaseAddon();
     message.ackAddOn = (object.ackAddOn !== undefined && object.ackAddOn !== null)
@@ -248,9 +264,8 @@ export const AddAckAddOnRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddAckAddOnRequest>, I>>(base?: I): AddAckAddOnRequest {
-    return AddAckAddOnRequest.fromPartial(base ?? {});
+    return AddAckAddOnRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddAckAddOnRequest>, I>>(object: I): AddAckAddOnRequest {
     const message = createBaseAddAckAddOnRequest();
     message.clusterName = object.clusterName ?? "";
@@ -325,9 +340,8 @@ export const AckAddOn = {
   },
 
   create<I extends Exact<DeepPartial<AckAddOn>, I>>(base?: I): AckAddOn {
-    return AckAddOn.fromPartial(base ?? {});
+    return AckAddOn.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AckAddOn>, I>>(object: I): AckAddOn {
     const message = createBaseAckAddOn();
     message.id = object.id ?? undefined;
@@ -400,9 +414,8 @@ export const AddKubeProxyAddOnRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddKubeProxyAddOnRequest>, I>>(base?: I): AddKubeProxyAddOnRequest {
-    return AddKubeProxyAddOnRequest.fromPartial(base ?? {});
+    return AddKubeProxyAddOnRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddKubeProxyAddOnRequest>, I>>(object: I): AddKubeProxyAddOnRequest {
     const message = createBaseAddKubeProxyAddOnRequest();
     message.clusterName = object.clusterName ?? "";
@@ -461,12 +474,279 @@ export const KubeProxyAddOn = {
   },
 
   create<I extends Exact<DeepPartial<KubeProxyAddOn>, I>>(base?: I): KubeProxyAddOn {
-    return KubeProxyAddOn.fromPartial(base ?? {});
+    return KubeProxyAddOn.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KubeProxyAddOn>, I>>(object: I): KubeProxyAddOn {
     const message = createBaseKubeProxyAddOn();
     message.version = object.version ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAddCoreDNSAddOnRequest(): AddCoreDNSAddOnRequest {
+  return { clusterName: "", coreDnsAddOn: undefined };
+}
+
+export const AddCoreDNSAddOnRequest = {
+  encode(message: AddCoreDNSAddOnRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.coreDnsAddOn !== undefined) {
+      CoreDNSAddOn.encode(message.coreDnsAddOn, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddCoreDNSAddOnRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddCoreDNSAddOnRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.coreDnsAddOn = CoreDNSAddOn.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddCoreDNSAddOnRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      coreDnsAddOn: isSet(object.coreDnsAddOn) ? CoreDNSAddOn.fromJSON(object.coreDnsAddOn) : undefined,
+    };
+  },
+
+  toJSON(message: AddCoreDNSAddOnRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.coreDnsAddOn !== undefined) {
+      obj.coreDnsAddOn = CoreDNSAddOn.toJSON(message.coreDnsAddOn);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddCoreDNSAddOnRequest>, I>>(base?: I): AddCoreDNSAddOnRequest {
+    return AddCoreDNSAddOnRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AddCoreDNSAddOnRequest>, I>>(object: I): AddCoreDNSAddOnRequest {
+    const message = createBaseAddCoreDNSAddOnRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.coreDnsAddOn = (object.coreDnsAddOn !== undefined && object.coreDnsAddOn !== null)
+      ? CoreDNSAddOn.fromPartial(object.coreDnsAddOn)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCoreDNSAddOn(): CoreDNSAddOn {
+  return { version: undefined };
+}
+
+export const CoreDNSAddOn = {
+  encode(message: CoreDNSAddOn, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.version !== undefined) {
+      writer.uint32(10).string(message.version);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CoreDNSAddOn {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCoreDNSAddOn();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.version = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CoreDNSAddOn {
+    return { version: isSet(object.version) ? String(object.version) : undefined };
+  },
+
+  toJSON(message: CoreDNSAddOn): unknown {
+    const obj: any = {};
+    if (message.version !== undefined) {
+      obj.version = message.version;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CoreDNSAddOn>, I>>(base?: I): CoreDNSAddOn {
+    return CoreDNSAddOn.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CoreDNSAddOn>, I>>(object: I): CoreDNSAddOn {
+    const message = createBaseCoreDNSAddOn();
+    message.version = object.version ?? undefined;
+    return message;
+  },
+};
+
+function createBaseMetricsServerAddOn(): MetricsServerAddOn {
+  return { createNamespace: undefined };
+}
+
+export const MetricsServerAddOn = {
+  encode(message: MetricsServerAddOn, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.createNamespace !== undefined) {
+      writer.uint32(8).bool(message.createNamespace);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MetricsServerAddOn {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMetricsServerAddOn();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.createNamespace = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MetricsServerAddOn {
+    return { createNamespace: isSet(object.createNamespace) ? Boolean(object.createNamespace) : undefined };
+  },
+
+  toJSON(message: MetricsServerAddOn): unknown {
+    const obj: any = {};
+    if (message.createNamespace !== undefined) {
+      obj.createNamespace = message.createNamespace;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MetricsServerAddOn>, I>>(base?: I): MetricsServerAddOn {
+    return MetricsServerAddOn.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<MetricsServerAddOn>, I>>(object: I): MetricsServerAddOn {
+    const message = createBaseMetricsServerAddOn();
+    message.createNamespace = object.createNamespace ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAddMetricsServerAddOnRequest(): AddMetricsServerAddOnRequest {
+  return { clusterName: "", metricsServerAddOn: undefined };
+}
+
+export const AddMetricsServerAddOnRequest = {
+  encode(message: AddMetricsServerAddOnRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.clusterName !== "") {
+      writer.uint32(10).string(message.clusterName);
+    }
+    if (message.metricsServerAddOn !== undefined) {
+      MetricsServerAddOn.encode(message.metricsServerAddOn, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AddMetricsServerAddOnRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddMetricsServerAddOnRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.clusterName = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.metricsServerAddOn = MetricsServerAddOn.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddMetricsServerAddOnRequest {
+    return {
+      clusterName: isSet(object.clusterName) ? String(object.clusterName) : "",
+      metricsServerAddOn: isSet(object.metricsServerAddOn)
+        ? MetricsServerAddOn.fromJSON(object.metricsServerAddOn)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AddMetricsServerAddOnRequest): unknown {
+    const obj: any = {};
+    if (message.clusterName !== "") {
+      obj.clusterName = message.clusterName;
+    }
+    if (message.metricsServerAddOn !== undefined) {
+      obj.metricsServerAddOn = MetricsServerAddOn.toJSON(message.metricsServerAddOn);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddMetricsServerAddOnRequest>, I>>(base?: I): AddMetricsServerAddOnRequest {
+    return AddMetricsServerAddOnRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AddMetricsServerAddOnRequest>, I>>(object: I): AddMetricsServerAddOnRequest {
+    const message = createBaseAddMetricsServerAddOnRequest();
+    message.clusterName = object.clusterName ?? "";
+    message.metricsServerAddOn = (object.metricsServerAddOn !== undefined && object.metricsServerAddOn !== null)
+      ? MetricsServerAddOn.fromPartial(object.metricsServerAddOn)
+      : undefined;
     return message;
   },
 };
