@@ -155,6 +155,34 @@ describe('Unit tests for Karpenter addon', () => {
                 },
             });
         }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
+<<<<<<< HEAD
+=======
+    })
+});
+=======
+            .addOns(
+                new blueprints.AwsLoadBalancerControllerAddOn,
+                new blueprints.JupyterHubAddOn({
+                ebsConfig: {
+                    storageClass: "gp2",
+                    capacity: "4Gi",
+                },
+<<<<<<< HEAD
+                serviceType: JupyterHubServiceType.CLUSTERIP,
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+=======
+            });
+        }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
+    });
+>>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
+});
+>>>>>>> 1a24a266 (lint fix)
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-no-ebs-csi-addon');
+        }).toThrow("Missing a dependency: EbsCsiDriverAddOn. Please add it to your list of addons.");
+>>>>>>> c47eb420 (PR Fixes)
     });
   test("Stack creation succeeds with custom values overrides", async () => {
     const app = new cdk.App();
