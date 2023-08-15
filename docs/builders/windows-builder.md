@@ -14,6 +14,7 @@ The `WindowsBuilder` creates the following:
 - `kubernetesVersion` : Required field, Kubernetes version to use for the cluster
 - `instanceClass`: Required field, Instance class to use for the cluster
 - `instanceSize`:  Required field, Instance size to use for the cluster
+- `nodeRole`: optional, Node IAM Role to be attached to Windows and Non-windows nodes.
 - `windowsAmiType`: Required field, AMI Type for Windows Nodes. For example `WINDOWS_FULL_2022_X86_64`.
 - `desiredNodeSize`: Optional field, Desired number of nodes to use for the cluster
 - `minNodeSize`: Optional field, Minimum number of nodes to use for the cluster

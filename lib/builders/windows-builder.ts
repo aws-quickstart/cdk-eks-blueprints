@@ -6,6 +6,7 @@ import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import merge from 'ts-deepmerge';
 
 /**
  * Configuration options for Windows Builder.
@@ -25,6 +26,12 @@ export interface WindowsOptions {
      * Required, Instance size to use for the cluster. 
      */
     instanceSize: ec2.InstanceSize,
+
+    /** 
+     * optional, Node IAM Role to be attached to Windows 
+     * and Non-windows nodes.
+     */
+    nodeRole?: iam.Role,
 
     /** 
      * Optional, AMI Type for Windows Nodes
@@ -85,7 +92,11 @@ export interface WindowsOptions {
  * Default props to be used when creating the non-windows and windows nodes 
  * for Windows EKS cluster
  */
-const defaultNodeProps = {
+const defaultOptions: WindowsOptions = {
+    kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+    instanceClass: ec2.InstanceClass.M5,
+    instanceSize: ec2.InstanceSize.XLARGE4,
+    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
     windowsAmiType: NodegroupAmiType.WINDOWS_FULL_2022_X86_64,
     desiredNodeSize: 2,
     minNodeSize: 2,
@@ -124,12 +135,13 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
      */
     public static builder(options: WindowsOptions): WindowsBuilder {
         const builder = new WindowsBuilder();
+        const mergedOptions = merge(options, defaultOptions);
 
         builder
             .clusterProvider(
                 new blueprints.GenericClusterProvider({
-                    version: options.kubernetesVersion,
-                    tags: options.clusterProviderTags ?? defaultNodeProps.clusterProviderTags,
+                    version: mergedOptions.kubernetesVersion,
+                    tags: mergedOptions.clusterProviderTags,
                     role: blueprints.getResource(context => {
                         return new iam.Role(context.scope, 'ClusterRole', { 
                             assumedBy: new iam.ServicePrincipal("eks.amazonaws.com"),
@@ -140,8 +152,8 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
                         });
                     }),
                     managedNodeGroups: [
-                        addGenericNodeGroup(options),
-                        addWindowsNodeGroup(options)
+                        addGenericNodeGroup(mergedOptions),
+                        addWindowsNodeGroup(mergedOptions)
                     ]
                 })
             )
@@ -186,13 +198,13 @@ function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
         id: "mng-linux",
         amiType: NodegroupAmiType.AL2_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-        desiredSize: options.desiredNodeSize ?? defaultNodeProps.desiredNodeSize, 
-        minSize: options.minNodeSize ?? defaultNodeProps.minNodeSize, 
-        maxSize: options.maxNodeSize ?? defaultNodeProps.maxNodeSize,
-        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        desiredSize: options.desiredNodeSize, 
+        minSize: options.minNodeSize, 
+        maxSize: options.maxNodeSize,
+        nodeRole: options.nodeRole,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
-            tags: options.genericNodeGroupTags ?? defaultNodeProps.genericNodeGroupTags,
+            tags: options.genericNodeGroupTags,
             requireImdsv2: false
         }
     };
@@ -206,15 +218,15 @@ function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
 function addWindowsNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGroup {
     const result : blueprints.ManagedNodeGroup = {
         id: "mng-windows",
-        amiType: options.windowsAmiType ?? defaultNodeProps.windowsAmiType,
+        amiType: options.windowsAmiType,
         instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
-        desiredSize: options.desiredNodeSize ?? defaultNodeProps.desiredNodeSize, 
-        minSize: options.minNodeSize ?? defaultNodeProps.minNodeSize, 
-        maxSize: options.maxNodeSize ?? defaultNodeProps.maxNodeSize,
-        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        desiredSize: options.desiredNodeSize, 
+        minSize: options.minNodeSize, 
+        maxSize: options.maxNodeSize,
+        nodeRole: options.nodeRole,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-        diskSize: options.blockDeviceSize ?? defaultNodeProps.blockDeviceSize,
-        tags: options.windowsNodeGroupTags ?? defaultNodeProps.windowsNodeGroupTags
+        diskSize: options.blockDeviceSize,
+        tags: options.windowsNodeGroupTags
     };
 
     if(options.noScheduleForWindowsNodes) {
