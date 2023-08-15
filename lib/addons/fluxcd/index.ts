@@ -177,10 +177,10 @@ function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: 
  */
 function createKustomizations(clusterInfo: ClusterInfo, name: string, namespace: string, fluxGitRepo: FluxGitRepo): KubernetesManifest[] {
   const constructs: KubernetesManifest[] = [];
-  const kustomizations = fluxGitRepo.kustomizations ?? [{kustomizationPath: "."}]
+  const kustomizations = fluxGitRepo.kustomizations ?? [{kustomizationPath: "."}];
   const fluxKustomization = new FluxKustomization();
   kustomizations?.map((kustomization, index) => {
-    kustomization = {...defaultKustomiationProps, ...kustomization}
+    kustomization = {...defaultKustomiationProps, ...kustomization};
     const manifest =fluxKustomization.generate(
       fluxGitRepo.name + "-" + index,
       fluxGitRepo.name,
