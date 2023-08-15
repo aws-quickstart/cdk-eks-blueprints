@@ -1,6 +1,11 @@
 # Windows Builder
 
-The `WindowsBuilder` allows you to get started with a builder class to configure with required setup as you prepare a blueprint for setting up EKS cluster with windows to run your windows workloads.
+The `WindowsBuilder` allows you to get started with a builder class to configure with required setup as you prepare a blueprint for setting up EKS cluster with windows to run your windows workloads. 
+
+The `WindowsBuilder` creates the following:
+- An EKS Cluster` with passed k8s version and cluster tags.
+- A non-windows nodegroup for standard software with parameters passed.
+- A windows nodegroup to schedule windows workloads with parameters passed.
 
 ## Input Parameters
 
@@ -9,14 +14,15 @@ The `WindowsBuilder` allows you to get started with a builder class to configure
 - `kubernetesVersion` : Required field, Kubernetes version to use for the cluster
 - `instanceClass`: Required field, Instance class to use for the cluster
 - `instanceSize`:  Required field, Instance size to use for the cluster
-- `desiredNodeSize`: Required field, Desired number of nodes to use for the cluster
-- `minNodeSize`: Required field, Minimum number of nodes to use for the cluster
-- `maxNodeSize`: Required field, Maximum number of nodes to use for the cluster
-- `blockDeviceSize`: Required field, Block device size
-- `noScheduleForWindowsNodes`: Optional field, No Schedule for Windows Nodes
-- `clusterProviderTags`: Required field, Cluster Provider Tags
-- `genericNodeGroupTags`: Required field, Generic Node Group Tags
-- `windowsNodeGroupTags`: Required field, Windows Node Group Tags.
+- `windowsAmiType`: Required field, AMI Type for Windows Nodes. For example `WINDOWS_FULL_2022_X86_64`.
+- `desiredNodeSize`: Optional field, Desired number of nodes to use for the cluster
+- `minNodeSize`: Optional field, Minimum number of nodes to use for the cluster
+- `maxNodeSize`: Optional field, Maximum number of nodes to use for the cluster
+- `blockDeviceSize`: Optional field, Block device size
+- `noScheduleForWindowsNodes`: Optional field, No Schedule for Windows Nodes, this allows Windows nodes to be marked as no-schedule by default to prevent any linux workloads from scheduling.
+- `clusterProviderTags`: Optional field, Cluster Provider Tags
+- `genericNodeGroupTags`: Optional field, Generic Node Group Tags for non-windows nodes which run standard cluster software.
+- `windowsNodeGroupTags`: Optional field, Windows Node Group Tags.
 
 ### Demonstration - Building Windows on EKS Cluster
 
@@ -48,27 +54,7 @@ export default class WindowsConstruct {
         const options: WindowsOptions = {
             kubernetesVersion: eks.KubernetesVersion.of("1.27"),
             instanceClass: ec2.InstanceClass.M5,
-            instanceSize: ec2.InstanceSize.XLARGE4,
-            desiredNodeSize: 2,
-            minNodeSize: 2,
-            maxNodeSize: 3,
-            blockDeviceSize: 50,
-            noScheduleForWindowsNodes: true,
-            clusterProviderTags: {
-                "Name": "blueprints-windows-eks-cluster",
-                "Type": "generic-windows-cluster"
-            },
-            genericNodeGroupTags: {
-                "Name": "Mng-linux",
-                "Type": "Managed-linux-Node-Group",
-                "LaunchTemplate": "Linux-Launch-Template",
-            },
-            windowsNodeGroupTags: {
-                "Name": "Managed-Node-Group",
-                "Type": "Windows-Node-Group",
-                "LaunchTemplate": "WindowsLT",
-                "kubernetes.io/cluster/windows-eks-blueprint": "owned"  
-            }
+            instanceSize: ec2.InstanceSize.XLARGE4
         };
 
         const addOns: Array<blueprints.ClusterAddOn> = [

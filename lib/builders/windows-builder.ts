@@ -19,7 +19,7 @@ export interface WindowsOptions {
     /** 
      * Required, Instance class to use for the cluster. 
      */
-    instanceClass: ec2.InstanceType,
+    instanceClass: ec2.InstanceClass,
 
     /** 
      * Required, Instance size to use for the cluster. 
@@ -27,56 +27,94 @@ export interface WindowsOptions {
     instanceSize: ec2.InstanceSize,
 
     /** 
-     * Required, Desired number of nodes to use for the cluster. 
+     * Optional, AMI Type for Windows Nodes
      */
-    desiredNodeSize: number,
+    windowsAmiType?: NodegroupAmiType,
 
     /** 
-     * Required, Minimum number of nodes to use for the cluster. 
+     * Optional, Desired number of nodes to use for the cluster. 
      */
-    minNodeSize: number,
+    desiredNodeSize?: number,
 
     /** 
-     * Required, Maximum number of nodes to use for the cluster. 
+     * Optional, Minimum number of nodes to use for the cluster. 
      */
-    maxNodeSize: number,
+    minNodeSize?: number,
 
     /** 
-     * Required, Block device size.
+     * Optional, Maximum number of nodes to use for the cluster. 
      */
-    blockDeviceSize: number,
+    maxNodeSize?: number,
+
+    /** 
+     * Optional, Block device size.
+     */
+    blockDeviceSize?: number,
 
     /**
-     * Optional, No Schedule for Windows Nodes.
+     * Optional, No Schedule for Windows Nodes, this allows Windows 
+     * nodes to be marked as no-schedule by default to prevent any 
+     * linux workloads from scheduling.
      */
     noScheduleForWindowsNodes?: boolean,
 
     /**
-     * Required, Cluster Provider Tags.
+     * Optional, Cluster Provider Tags.
      */
-    clusterProviderTags: {
+    clusterProviderTags?: {
         [key: string]: string;
     },
 
     /**
-     * Required, Generic Node Group Tags.
+     * Optional, Generic Node Group Tags for non-windows nodes 
+     * which run standard cluster software.
      */
-    genericNodeGroupTags: {
+    genericNodeGroupTags?: {
         [key: string]: string;
     }
 
     /**
-     * Required, Windows Node Group Tags.
+     * Optional, Windows Node Group Tags.
      */
-    windowsNodeGroupTags: {
+    windowsNodeGroupTags?: {
         [key: string]: string;
     }
 }
 
+/**
+ * Default props to be used when creating the non-windows and windows nodes 
+ * for Windows EKS cluster
+ */
+const defaultNodeProps = {
+    windowsAmiType: NodegroupAmiType.WINDOWS_FULL_2022_X86_64,
+    desiredNodeSize: 2,
+    minNodeSize: 2,
+    maxNodeSize: 3,
+    blockDeviceSize: 50,
+    noScheduleForWindowsNodes: true,
+    clusterProviderTags: {
+        "Name": "blueprints-windows-eks-cluster",
+        "Type": "generic-windows-cluster"
+    },
+    genericNodeGroupTags: {
+        "Name": "Mng-linux",
+        "Type": "Managed-linux-Node-Group",
+        "LaunchTemplate": "Linux-Launch-Template",
+    },
+    windowsNodeGroupTags: {
+        "Name": "Managed-Node-Group",
+        "Type": "Windows-Node-Group",
+        "LaunchTemplate": "WindowsLT",
+        "kubernetes.io/cluster/windows-eks-blueprint": "owned"  
+    }
+  };
 
 /** 
- * This class helps you prepare a blueprint for setting up windows nodes with 
- * Amazon EKS cluster.
+ * This builder class helps you prepare a blueprint for setting up 
+ * windows nodes with EKS cluster. The `WindowsBuilder` creates the following:
+ * 1. An EKS Cluster` with passed k8s version and cluster tags.
+ * 2. A non-windows nodegroup for standard software.
+ * 3. A windows nodegroup to schedule windows workloads
  */
 export class WindowsBuilder extends blueprints.BlueprintBuilder {
 
@@ -91,7 +129,7 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
             .clusterProvider(
                 new blueprints.GenericClusterProvider({
                     version: options.kubernetesVersion,
-                    tags: options.clusterProviderTags,
+                    tags: options.clusterProviderTags ?? defaultNodeProps.clusterProviderTags,
                     role: blueprints.getResource(context => {
                         return new iam.Role(context.scope, 'ClusterRole', { 
                             assumedBy: new iam.ServicePrincipal("eks.amazonaws.com"),
@@ -148,13 +186,13 @@ function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
         id: "mng-linux",
         amiType: NodegroupAmiType.AL2_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-        desiredSize: options.desiredNodeSize,
-        minSize: options.minNodeSize, 
-        maxSize: options.maxNodeSize,
+        desiredSize: options.desiredNodeSize ?? defaultNodeProps.desiredNodeSize, 
+        minSize: options.minNodeSize ?? defaultNodeProps.minNodeSize, 
+        maxSize: options.maxNodeSize ?? defaultNodeProps.maxNodeSize,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
-            tags: options.genericNodeGroupTags,
+            tags: options.genericNodeGroupTags ?? defaultNodeProps.genericNodeGroupTags,
             requireImdsv2: false
         }
     };
@@ -168,15 +206,15 @@ function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
 function addWindowsNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGroup {
     const result : blueprints.ManagedNodeGroup = {
         id: "mng-windows",
-        amiType: NodegroupAmiType.WINDOWS_CORE_2022_X86_64,
+        amiType: options.windowsAmiType ?? defaultNodeProps.windowsAmiType,
         instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
-        desiredSize: options.desiredNodeSize,
-        minSize: options.minNodeSize, 
-        maxSize: options.maxNodeSize,
+        desiredSize: options.desiredNodeSize ?? defaultNodeProps.desiredNodeSize, 
+        minSize: options.minNodeSize ?? defaultNodeProps.minNodeSize, 
+        maxSize: options.maxNodeSize ?? defaultNodeProps.maxNodeSize,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-        diskSize: options.blockDeviceSize,
-        tags: options.windowsNodeGroupTags
+        diskSize: options.blockDeviceSize ?? defaultNodeProps.blockDeviceSize,
+        tags: options.windowsNodeGroupTags ?? defaultNodeProps.windowsNodeGroupTags
     };
 
     if(options.noScheduleForWindowsNodes) {
