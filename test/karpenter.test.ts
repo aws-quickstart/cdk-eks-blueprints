@@ -73,7 +73,6 @@ describe('Unit tests for Karpenter addon', () => {
         }).toThrow("Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.");
     });
 
-<<<<<<< HEAD
   test("Stack creation succeeds with custom values overrides", async () => {
     const app = new cdk.App();
 
@@ -111,7 +110,7 @@ describe('Unit tests for Karpenter addon', () => {
     expect(valuesStr).toContain("override-queue-name");
     expect(valuesStr).toContain("enableENILimitedPodDensity");
   });
-=======
+
     test("Stack creates with interruption enabled", () => {
         const app = new cdk.App();
 
@@ -150,7 +149,6 @@ describe('Unit tests for Karpenter addon', () => {
                 },
             });
         }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
-    });
->>>>>>> 31463a07 (fixing Karpenter interruption queue issue, with tests added)
+    })
 });
 
