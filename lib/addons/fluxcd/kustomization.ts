@@ -6,11 +6,10 @@ import * as spi from "../../spi";
  */
 export class FluxKustomization {
 
-    constructor(private readonly bootstrapRepo: spi.GitOpsApplicationDeployment) {}
+    constructor() {}
 
-    public generate(name: string, namespace: string, fluxSyncInterval: string, fluxTargetNamespace: string, fluxPrune: boolean, fluxTimeout: string, bootstrapValues: spi.Values, fluxKustomizationPath: string) {
+    public generate(name: string, repoName: string, namespace: string, fluxSyncInterval: string, fluxPrune: boolean, fluxTimeout: string, values: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string) {
         
-        const repository = this.bootstrapRepo!;
         const kustomizationManifest = {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
             kind: "Kustomization",
@@ -20,21 +19,21 @@ export class FluxKustomization {
             },
             spec: {
                 interval: fluxSyncInterval,
-                targetNamespace: fluxTargetNamespace,
                 sourceRef: {
                     kind: "GitRepository",
-                    name: repository.name
+                    name: repoName
                 },
                 path: fluxKustomizationPath,
                 prune: fluxPrune,
                 timeout: fluxTimeout
             }
         };
-        if (bootstrapValues) {
-            setPath(kustomizationManifest, "spec.postBuild.substitute", bootstrapValues);
+        if (values) {
+            setPath(kustomizationManifest, "spec.postBuild.substitute", values);
+        }
+        if (fluxTargetNamespace) {
+            setPath(kustomizationManifest, "spec.targetNamespace", fluxTargetNamespace);
         }
         return kustomizationManifest;
     }
 }
-
-
