@@ -337,4 +337,3 @@ Run the below command to check on the `Kustomization` setup with Flux :
 NAMESPACE     NAME      AGE   READY   STATUS
 flux-system   podinfo   12m   True    Applied revision: master@sha1:073f1ec5aff930bd3411d33534e91cbe23302324
 ```
-
