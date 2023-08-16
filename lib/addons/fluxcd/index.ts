@@ -162,12 +162,17 @@ function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: 
     throw new Error("Missing Git repository");
   }
   
+<<<<<<< HEAD
   const manifest = new FluxGitRepository(fluxGitRepo.repository).generate(
         fluxGitRepo.name,
         fluxGitRepo.namespace ?? namespace,
         fluxGitRepo.syncInterval!,
         fluxGitRepo.secretRefName!);
   let manifestName: string | undefined = name + 'gitrepository' + fluxGitRepo.name;
+=======
+  const manifest = new FluxGitRepository(fluxcdGitRepo.repository).generate(fluxcdGitRepo.name, fluxcdGitRepo.namespace ?? namespace, fluxcdGitRepo.fluxSyncInterval!, fluxcdGitRepo.fluxSecretRefName!);
+  let manifestName: string | undefined = name + 'gitrepository' + fluxcdGitRepo.name;
+>>>>>>> 114b8859 (fix gitrepo name)
   const construct = clusterInfo.cluster.addManifest(manifestName!, manifest);
   return construct;
 }
