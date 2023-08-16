@@ -30,8 +30,12 @@ const addOn = new blueprints.addons.FluxCDAddOn({
 =======
              "region": "us-east-1"
          },
+<<<<<<< HEAD
          kustomizations: [{fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
 >>>>>>> 7244e614 (make new interfaces and fix docs)
+=======
+         kustomizations: [{kustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
+>>>>>>> dbb14306 (fix naming issues)
     }],
 })
 ...
@@ -67,8 +71,12 @@ const addOn = new blueprints.addons.FluxCDAddOn({
 =======
             "region": "us-east-1"
         },
+<<<<<<< HEAD
         kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
 >>>>>>> 7244e614 (make new interfaces and fix docs)
+=======
+        kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+>>>>>>> dbb14306 (fix naming issues)
     }],
 })
 ...
@@ -103,6 +111,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             },
             values: {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
                 "GRAFANA_JAVA_JMX_DASH_URL": javaDashUrl,
             },
@@ -112,6 +121,12 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             },
             kustomizations: [{fluxKustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {fluxKustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
 >>>>>>> 7244e614 (make new interfaces and fix docs)
+=======
+                "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
+                "GRAFANA_JAVA_JMX_DASH_URL": javaDashUrl,
+            },
+            kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+>>>>>>> dbb14306 (fix naming issues)
         },
         {
             name: "podinfo",
@@ -124,10 +139,14 @@ const addOn = new blueprints.addons.FluxCDAddOn({
                 "region": "us-east-2"
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
             kustomizations: [{kustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
 =======
             kustomizations: [{fluxKustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
 >>>>>>> 7244e614 (make new interfaces and fix docs)
+=======
+            kustomizations: [{kustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
+>>>>>>> dbb14306 (fix naming issues)
         }
     ],
 });
@@ -183,10 +202,14 @@ const addOns: Array<blueprints.ClusterAddOn> = [
             "region": "us-east-1"
         },
 <<<<<<< HEAD
+<<<<<<< HEAD
         kustomizations: [{kustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
 =======
         kustomizations: [{fluxKustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
 >>>>>>> 7244e614 (make new interfaces and fix docs)
+=======
+        kustomizations: [{kustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
+>>>>>>> dbb14306 (fix naming issues)
         // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
         secretRefName: "repository-creds" 
       }
