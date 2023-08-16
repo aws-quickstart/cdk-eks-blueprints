@@ -78,6 +78,7 @@ describe('Unit tests for Karpenter addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
+	.version("auto")
         .addOns(new blueprints.KarpenterAddOn({
             interruptionHandling: true
         }))
@@ -97,6 +98,7 @@ describe('Unit tests for Karpenter addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
+	.version("auto")
         .addOns(new blueprints.KarpenterAddOn({
             interruptionHandling: false
         }))
