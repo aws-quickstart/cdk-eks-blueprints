@@ -23,6 +23,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
              targetRevision: "main",
          },
          values: {
+             "region": "us-east-2"
 <<<<<<< HEAD
              "region": "us-east-2"
          },
@@ -64,6 +65,7 @@ const addOn = new blueprints.addons.FluxCDAddOn({
             targetRevision: "main",
         },
         values: {
+            "region": "us-east-2"
 <<<<<<< HEAD
             "region": "us-east-2"
         },
