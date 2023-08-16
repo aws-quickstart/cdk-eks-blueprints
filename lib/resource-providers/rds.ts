@@ -1,8 +1,8 @@
-import { CfnOutput } from "aws-cdk-lib";
+import {CfnOutput, RemovalPolicy} from "aws-cdk-lib";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { GlobalResources, ResourceContext, ResourceProvider } from "../spi";
+import {GlobalResources, ResourceContext, ResourceProvider} from "../spi";
 
 
 export interface RdsInstanceProps {
@@ -29,6 +29,8 @@ export class RdsInstanceProvider
     const instanceProps: rds.DatabaseInstanceProps = {
       ...this.options.rdsProps,
       vpc: rdsVpc,
+      removalPolicy: RemovalPolicy.RETAIN,
+      deletionProtection: true,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       }
@@ -78,7 +80,9 @@ export class AuroraClusterProvider
     };
 
     const clusterProps: rds.DatabaseClusterProps = {
-      ...this.options.clusterProps, instanceProps
+      ...this.options.clusterProps, instanceProps,
+      deletionProtection: true,
+      removalPolicy: RemovalPolicy.RETAIN
     } as rds.DatabaseClusterProps;
 
     let auroraInstance = new rds.DatabaseCluster(
