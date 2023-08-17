@@ -21,6 +21,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.UpboundUniversalCrossplaneAddOn(),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

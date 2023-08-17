@@ -9,10 +9,11 @@ const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto"
     instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
 }
 const clusterProvider = new blueprints.MngClusterProvider(props);
@@ -27,6 +28,7 @@ The `MngClusterProvider` supports the following configuration options.
 |-----------------------|-------------|
 | name                  | The name for the cluster. @Deprecated
 | clusterName           | Cluster name
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | minSize               | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize               | Max cluster size, must be greater than minSize (default 3).
 | desiredSize           | Desired cluster size, must be greater or equal to minSize (default `min-size`).
@@ -52,7 +54,7 @@ Configuration can also be supplied via context variables (specify in cdk.json, c
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `MngClusterProviderProps` to each cluster blueprint.
 
-You can find more details on the supported configuration options in the API documentation for the [MngClusterProviderProps](../api/interfaces/MngClusterProviderProps.html).
+You can find more details on the supported configuration options in the API documentation for the [MngClusterProviderProps](../api/interfaces/clusters.MngClusterProviderProps.html).
 
 ## Upgrading Worker Nodes
 
@@ -60,8 +62,8 @@ Upgrading Kubernetes versions via cluster configuration at present won't impact 
 
 ```typescript
 const props: MngClusterProviderProps = {
-    version: KubernetesVersion.V1_24,
-    amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
+    version: KubernetesVersion.V1_25,
+    amiReleaseVersion: "1.25.7-20230509" // this will upgrade kubelet to 1.25
 }
 ```
 
@@ -74,9 +76,9 @@ To create clusters which leverage Spot capacity, set the `nodeGroupCapacityType`
 ```typescript
 const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.SPOT,
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     instanceTypes: [new InstanceType('t3.large'), new InstanceType('m5.large')],
-    amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
+    amiReleaseVersion: "1.25.7-20230509" // this will upgrade kubelet to 1.25
 }
 ```
 
@@ -92,7 +94,7 @@ userData.addCommands(`/etc/eks/bootstrap.sh ${cluster.clusterName}`);
 
 const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     instanceTypes: [new InstanceType('t3.large')],
     customAmi: {
         machineImage: MachineImage.genericLinux({'us-east-1': 'ami-0be34337b485b2609'}),

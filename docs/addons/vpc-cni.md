@@ -29,6 +29,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.VpcCniAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -58,6 +59,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(undefined,"100.64.0.0/24",["100.64.0.0/25","100.64.0.128/26","100.64.0.192/26"],))
   .build(app, 'my-stack-name');
@@ -89,6 +91,7 @@ const addOn = new blueprints.addons.VpcCniAddOn({
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .resourceProvider(blueprints.GlobalResources.Vpc, new VpcProvider(yourVpcId))
   .resourceProvider("secondary-cidr-subnet-0", new LookupSubnetProvider(subnet1Id)
@@ -124,7 +127,7 @@ const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new ia
   ]);
 
 const clusterProvider = new blueprints.GenericClusterProvider({
-  version: KubernetesVersion.V1_24,
+  version: KubernetesVersion.V1_25,
   managedNodeGroups: [
     {
       id: "mng1",
@@ -148,37 +151,33 @@ blueprints.EksBlueprint.builder()
 # Assuming cluster version is 1.19, below command shows versions of the vpc-cni add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
     --addon-name vpc-cni \
-    --kubernetes-version 1.23 \
+    --kubernetes-version 1.25 \
     --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
     --output text
 # Output
-v1.12.1-eksbuild.2
+v1.13.2-eksbuild.1
 False
-v1.12.1-eksbuild.1
+v1.13.0-eksbuild.1
 False
+v1.12.6-eksbuild.2
+False
+v1.12.6-eksbuild.1
+False
+v1.12.5-eksbuild.2
+False
+v1.12.5-eksbuild.1
+False
+v1.12.2-eksbuild.1
+True
 v1.12.0-eksbuild.2
 False
-v1.12.0-eksbuild.1
+v1.11.5-eksbuild.1
 False
 v1.11.4-eksbuild.3
 False
-v1.11.4-eksbuild.2
+v1.10.4-eksbuild.3
 False
-v1.11.4-eksbuild.1
-False
-v1.11.3-eksbuild.3
-False
-v1.11.3-eksbuild.2
-False
-v1.11.3-eksbuild.1
-False
-v1.11.2-eksbuild.3
-False
-...
-...
-v1.7.5-eksbuild.1
-False
-v1.6.3-eksbuild.2
+v1.0.0-eksbuild.preview
 False
 ```  
 # Validation
@@ -197,7 +196,7 @@ aws eks describe-addon \
     --query "addon.addonVersion" \
     --output text
 # Output
-v1.12.1-eksbuild.2
+v1.13.0-eksbuild.1
 ```
 
 ## Functionality

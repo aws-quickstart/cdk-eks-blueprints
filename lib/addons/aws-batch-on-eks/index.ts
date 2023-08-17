@@ -1,5 +1,7 @@
+import assert = require("assert");
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Stack } from "aws-cdk-lib";
+import { Cluster } from "aws-cdk-lib/aws-eks";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 
@@ -7,7 +9,8 @@ const BATCH = 'aws-batch';
 
 export class AwsBatchAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-    const cluster = clusterInfo.cluster;
+    assert(clusterInfo.cluster instanceof Cluster, "AwsBatchAddOn cannot be used with imported clusters");
+    const cluster: Cluster = clusterInfo.cluster;
     const roleNameforBatch = 'AWSServiceRoleForBatch';
     const slrCheck = Role.fromRoleName(cluster.stack, 'BatchServiceLinkedRole', roleNameforBatch);
 

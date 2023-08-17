@@ -43,6 +43,7 @@ const dataTeam: EmrEksTeamProps = {
     };
 
 const parentStack = blueprints.EksBlueprint.builder()
+        .version("auto")
         .addOns(
             new blueprints.VpcCniAddOn(),
             new blueprints.CoreDnsAddOn(),

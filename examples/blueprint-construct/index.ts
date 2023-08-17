@@ -7,10 +7,12 @@ import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
+import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
 const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
+const blueprintID = 'blueprint-construct-dev';
 
 export interface BlueprintConstructProps {
     /**
@@ -41,6 +43,17 @@ export default class BlueprintConstruct {
             iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
         ]);
 
+        const ampWorkspaceName = "blueprints-amp-workspace";
+        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+
+        const apacheAirflowS3Bucket = new blueprints.CreateS3BucketProvider({
+            id: 'apache-airflow-s3-bucket-id',
+            s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
+        });
+        const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
+            name: 'blueprints-apache-airflow-efs',    
+        });
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -48,9 +61,13 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn(),
+            new blueprints.addons.AmpAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+            }),
             new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
+            // new blueprints.addons.ContainerInsightsAddOn(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -103,6 +120,9 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
+                amiSelector: {
+                    "karpenter.sh/discovery/MyClusterName": '*',
+                },
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
@@ -112,6 +132,9 @@ export default class BlueprintConstruct {
                         cpu: 20,
                         memory: "64Gi",
                     }
+                },
+                tags: {
+                    schedule: 'always-on'
                 }
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
@@ -135,36 +158,42 @@ export default class BlueprintConstruct {
                 irsaRoles: ["CloudWatchFullAccess", "AmazonSQSFullAccess"]
             }),
             new blueprints.addons.AWSPrivateCAIssuerAddon(),
-            new blueprints.addons.JupyterHubAddOn({
-                efsConfig: {
-                    pvcName: "efs-persist",
-                    removalPolicy: cdk.RemovalPolicy.DESTROY,
-                    capacity: '10Gi',
-                },
-                serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
-                notebookStack: 'jupyter/datascience-notebook',
-                values: { prePuller: { hook: { enabled: false }}}
-            }),
+            // new blueprints.addons.JupyterHubAddOn({
+            //     efsConfig: {
+            //         pvcName: "efs-persist",
+            //         removalPolicy: cdk.RemovalPolicy.DESTROY,
+            //         capacity: '10Gi',
+            //     },
+            //     serviceType: blueprints.JupyterHubServiceType.CLUSTERIP,
+            //     notebookStack: 'jupyter/datascience-notebook',
+            //     values: { prePuller: { hook: { enabled: false }}}
+            // }),
             new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
-            new blueprints.AwsForFluentBitAddOn(),
+            // Commenting due to conflicts with `CloudWatchLogsAddon`
+            // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
             new blueprints.GrafanaOperatorAddon(),
+            new blueprints.CloudWatchLogsAddon({
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logRetentionDays: 30
+            }),
+            new blueprints.ApacheAirflowAddOn({
+                enableLogging: true,
+                s3Bucket: 'apache-airflow-s3-bucket-provider',
+                enableEfs: true,
+                efsFileSystem: 'apache-airflow-efs-provider'
+            }),
+            new blueprints.ExternalsSecretsAddOn(),
         ];
 
         // Instantiated to for helm version check.
         new blueprints.ExternalDnsAddOn({
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
-        new blueprints.ExternalsSecretsAddOn();
-       
-        const blueprintID = 'blueprint-construct-dev';
-
-        const userData = ec2.UserData.forLinux();
-        userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_26,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -173,51 +202,9 @@ export default class BlueprintConstruct {
                 return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
             }),
             managedNodeGroups: [
-                {
-                    id: "mng1",
-                    amiType: NodegroupAmiType.AL2_X86_64,
-                    instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
-                    desiredSize: 2,
-                    maxSize: 3, 
-                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-                    launchTemplate: {
-                        // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
-                        tags: {
-                            "Name": "Mng1",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "ONDEMAND"
-                        },
-                        requireImdsv2: true
-                    }
-                },
-                {
-                    id: "mng2-customami",
-                    instanceTypes: [new ec2.InstanceType('t3.large')],
-                    nodeGroupCapacityType: CapacityType.SPOT,
-                    desiredSize: 0,
-                    minSize: 0,
-                    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-                    launchTemplate: {
-                        tags: {
-                            "Name": "Mng2",
-                            "Type": "Managed-Node-Group",
-                            "LaunchTemplate": "Custom",
-                            "Instance": "SPOT"
-                        },
-                        machineImage: ec2.MachineImage.genericLinux({
-                            'eu-west-1': 'ami-00805477850d62b8c',
-                            'us-east-1': 'ami-08e520f5673ee0894',
-                            'us-west-2': 'ami-0403ff342ceb30967',
-                            'us-east-2': 'ami-07109d69738d6e1ee',
-                            'us-west-1': 'ami-07bda4b61dc470985',
-                            'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
-                            'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
-                        }),
-                        userData: userData,
-                    }
-                }
+                addGenericNodeGroup(),
+                addCustomNodeGroup(),
+                addWindowsNodeGroup() //  commented out to check the impact on e2e
             ]
         });
 
@@ -274,10 +261,93 @@ export default class BlueprintConstruct {
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
             .resourceProvider("node-role", nodeRole)
+            .resourceProvider('apache-airflow-s3-bucket-provider', apacheAirflowS3Bucket)
+            .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
             .clusterProvider(clusterProvider)
+            .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
             .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
 
     }
 }
+
+function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
+
+    return {
+        id: "mng1",
+        amiType: NodegroupAmiType.AL2_X86_64,
+        instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+        desiredSize: 2,
+        maxSize: 3, 
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        launchTemplate: {
+            // You can pass Custom Tags to Launch Templates which gets Propogated to worker nodes.
+            tags: {
+                "Name": "Mng1",
+                "Type": "Managed-Node-Group",
+                "LaunchTemplate": "Custom",
+                "Instance": "ONDEMAND"
+            },
+            requireImdsv2: false
+        }
+    };
+}
+
+function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
+    
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+
+    return {
+        id: "mng2-customami",
+        amiType: NodegroupAmiType.AL2_X86_64,
+        instanceTypes: [new ec2.InstanceType('t3.large')],
+        nodeGroupCapacityType: CapacityType.SPOT,
+        desiredSize: 0,
+        minSize: 0,
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        launchTemplate: {
+            tags: {
+                "Name": "Mng2",
+                "Type": "Managed-Node-Group",
+                "LaunchTemplate": "Custom",
+                "Instance": "SPOT"
+            },
+            machineImage: ec2.MachineImage.genericLinux({
+                'eu-west-1': 'ami-00805477850d62b8c',
+                'us-east-1': 'ami-08e520f5673ee0894',
+                'us-west-2': 'ami-0403ff342ceb30967',
+                'us-east-2': 'ami-07109d69738d6e1ee',
+                'us-west-1': 'ami-07bda4b61dc470985',
+                'us-gov-west-1': 'ami-0e9ebbf0d3f263e9b',
+                'us-gov-east-1':'ami-033eb9bc6daf8bfb1'
+            }),
+            userData: userData,
+        }
+    };
+}
+
+function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
+
+    return {
+        id: "mng3-windowsami",
+        amiType: NodegroupAmiType.WINDOWS_CORE_2019_X86_64,
+        instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+        desiredSize: 0,
+        minSize: 0, 
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        diskSize: 50,
+        tags: {
+            "Name": "Mng3",
+            "Type": "Managed-WindowsNode-Group",
+            "LaunchTemplate": "WindowsLT",
+            "kubernetes.io/cluster/blueprint-construct-dev": "owned"
+        }
+    };
+}
+
+
+
+

@@ -9,9 +9,11 @@ export * from './aws-for-fluent-bit';
 export * from './aws-loadbalancer-controller';
 export * from './aws-node-termination-handler';
 export * from './aws-privateca-issuer';
+export * from './backstage';
 export * from './calico';
 export * from './calico-operator';
 export * from './cloudwatch-adot-addon';
+export * from './cloudwatch-logs';
 export * from './cert-manager';
 export * from './cluster-autoscaler';
 export * from './container-insights';
@@ -49,6 +51,7 @@ export * from './jupyterhub';
 export * from './emr-on-eks';
 export * from './aws-batch-on-eks';
 export * from './upbound-universal-crossplane';
+export * from './apache-airflow';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

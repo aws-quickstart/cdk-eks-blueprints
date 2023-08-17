@@ -1,11 +1,12 @@
 import { CfnOutput } from 'aws-cdk-lib';
-import { KubernetesManifest, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesManifest, ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { CsiSecretProps, SecretProviderClass } from '../addons/secrets-store/csi-driver-provider-aws-secrets';
 import { ClusterInfo, Team, Values } from '../spi';
 import { applyYamlFromDir } from '../utils/yaml-utils';
 import { DefaultTeamRoles } from './default-team-roles';
+import { logger } from '../utils';
 
 /**
  * Team properties.
@@ -115,8 +116,14 @@ export class ApplicationTeam implements Team {
     }
 
     protected defaultSetupAccess(clusterInfo: ClusterInfo) {
-        const props = this.teamProps;
-        const awsAuth = clusterInfo.cluster.awsAuth;
+        const props = this.teamProps;        
+        
+        if(!(clusterInfo.cluster instanceof Cluster)) {
+            logger.warn(`Team ${props.name} has cluster access updates that are not supported with imported clusters` );
+            return;
+        }
+        const eksCluster : Cluster = clusterInfo.cluster;
+        const awsAuth = eksCluster.awsAuth;
 
         const users = this.teamProps.users ?? [];
         const teamRole = this.getOrCreateRole(clusterInfo, users, props.userRoleArn);
@@ -132,15 +139,20 @@ export class ApplicationTeam implements Team {
      * @param clusterInfo 
      */
     protected defaultSetupAdminAccess(clusterInfo: ClusterInfo) {
-        const props = this.teamProps;
-        const awsAuth = clusterInfo.cluster.awsAuth;
+        const props = this.teamProps;        
+        
+        if(!(clusterInfo.cluster instanceof Cluster)) {
+            logger.warn(`Team ${props.name} has cluster access updates that are not supported with imported clusters` );
+            return;
+        }
         const admins = this.teamProps.users ?? [];
         const adminRole = this.getOrCreateRole(clusterInfo, admins, props.userRoleArn);
 
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" });
 
         if (adminRole) {
-            awsAuth.addMastersRole(adminRole, this.teamProps.name);
+            const eksCluster: Cluster = clusterInfo.cluster;
+            eksCluster.awsAuth.addMastersRole(adminRole, this.teamProps.name);
         }
     }
 

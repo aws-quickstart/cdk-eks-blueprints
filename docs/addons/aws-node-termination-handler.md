@@ -22,11 +22,12 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.AwsNodeTerminationHandlerAddOn();
 
 const clusterProvider = new blueprints.AsgClusterProvider({
-  version: eks.KubernetesVersion.V1_24,
+  version: eks.KubernetesVersion.V1_25,
   machineImageType:  eks.MachineImageType.BOTTLEROCKET
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .clusterProvider(clusterProvider)
   .addOns(addOn)
   .build(app, 'my-stack-name');

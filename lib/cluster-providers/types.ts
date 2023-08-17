@@ -7,6 +7,10 @@ import { AutoScalingGroupCapacityOptions } from "aws-cdk-lib/aws-eks";
  */
 export interface LaunchTemplateProps {
     /**
+     * Specifies how block devices are exposed to the instance
+     */
+    blockDevices?: ec2.BlockDevice[];
+    /**
      * The custom AMI for the node group.
      */
     machineImage?: ec2.IMachineImage;
@@ -27,6 +31,11 @@ export interface LaunchTemplateProps {
      * Whether IMDSv2 should be required on launched instances. (optional, default: false)
      */
     requireImdsv2?: boolean;
+
+    /**
+     * Security group to assign to instances created with the launch template.
+     */
+    securityGroup?: ec2.ISecurityGroup;
 }
 
 

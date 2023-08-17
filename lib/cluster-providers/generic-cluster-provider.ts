@@ -2,11 +2,12 @@
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
+// import {KubectlV27Layer} from "@aws-cdk/lambda-layer-kubectl-v27";
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
-import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import { AccountRootPrincipal, ManagedPolicy, Role } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
@@ -15,16 +16,44 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
 }
 
 /**
+ * Function that contains logic to map the correct kunbectl layer based on the passed in version. 
+ * @param scope in whch the kubectl layer must be created
+ * @param version EKS version
+ * @returns ILayerVersion or undefined
+ */
+export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVersion): ILayerVersion | undefined {
+    switch(version.version) {
+        case "1.23":
+            return new KubectlV23Layer(scope, "kubectllayer23");
+        case "1.24":
+            return new KubectlV24Layer(scope, "kubectllayer24");
+        case "1.25":
+            return new KubectlV25Layer(scope, "kubectllayer25");
+        case "1.26":
+            return new KubectlV26Layer(scope, "kubectllayer26");
+        //case "1.27":
+            //return new KubectlV27Layer(scope, "kubectllayer27");
+    }
+    
+    const minor = version.version.split('.')[1];
+
+    if(minor && parseInt(minor, 10) > 26) {
+        return new KubectlV26Layer(scope, "kubectllayer26"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
+    }
+    return undefined;
+}
+/**
  * Properties for the generic cluster provider, containing definitions of managed node groups,
  * auto-scaling groups, fargate profiles.
  */
-export interface GenericClusterProviderProps extends eks.ClusterOptions {
+export interface GenericClusterProviderProps extends Partial<eks.ClusterOptions> {
 
     /**
      * Whether API server is private.
@@ -141,7 +170,7 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_24
+    version: eks.KubernetesVersion.V1_25
 };
 
 export class ClusterBuilder {
@@ -155,7 +184,7 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_24 } };
+        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_25 } };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
@@ -181,7 +210,7 @@ export class ClusterBuilder {
     build() {
         return new GenericClusterProvider({
             ...this.props,
-            version: this.props.version!,
+            version: this.props.version,
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups,
             autoscalingNodeGroups: this.autoscalingNodeGroups,
@@ -207,16 +236,23 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined, kubernetesVersion: eks.KubernetesVersion | undefined): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
-        const version = this.props.version;
+        if(!kubernetesVersion && !this.props.version) {
+            throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
+        }
+        const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_27;
+
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
+        const mastersRole = this.props.mastersRole ?? new Role(scope, `${clusterName}-AccessRole`, {
+            assumedBy: new AccountRootPrincipal() 
+        });
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
         const tags = this.props.tags;
@@ -231,6 +267,7 @@ export class GenericClusterProvider implements ClusterProvider {
             endpointAccess,
             kubectlLayer,
             tags,
+            mastersRole,
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
@@ -277,21 +314,7 @@ export class GenericClusterProvider implements ClusterProvider {
      * @returns 
      */
     protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
-        switch(version) {
-            case eks.KubernetesVersion.V1_23:
-                return new KubectlV23Layer(scope, "kubectllayer23");
-            case eks.KubernetesVersion.V1_24:
-                return new KubectlV24Layer(scope, "kubectllayer24");
-            case eks.KubernetesVersion.V1_25:
-                return new KubectlV25Layer(scope, "kubectllayer25");
-        }
-        
-        const minor = version.version.split('.')[1];
-
-        if(minor && parseInt(minor, 10) > 25) {
-            return new KubectlV25Layer(scope, "kubectllayer25"); // for all versions above 1.25 use 1.25 kubectl (unless explicitly supported in CDK)
-        }
-        return undefined;
+       return selectKubectlLayer(scope, version);
     }
 
     /**
@@ -365,7 +388,9 @@ export class GenericClusterProvider implements ClusterProvider {
         if (nodeGroup.launchTemplate) {
             // Create launch template with provided launch template properties
             const lt = new ec2.LaunchTemplate(cluster, `${nodeGroup.id}-lt`, {
+                blockDevices: nodeGroup.launchTemplate.blockDevices,
                 machineImage: nodeGroup.launchTemplate?.machineImage,
+                securityGroup: nodeGroup.launchTemplate.securityGroup,
                 userData: nodeGroup.launchTemplate?.userData,
                 requireImdsv2: nodeGroup.launchTemplate?.requireImdsv2,
             });
@@ -375,8 +400,11 @@ export class GenericClusterProvider implements ClusterProvider {
             });
             const tags = Object.entries(nodeGroup.launchTemplate.tags ?? {});
             tags.forEach(([key, options]) => Tags.of(lt).add(key,options));
-            delete nodegroupOptions.amiType;
-            delete nodegroupOptions.releaseVersion;
+            if (nodeGroup.launchTemplate?.machineImage) {
+                delete nodegroupOptions.amiType;
+                delete nodegroupOptions.releaseVersion;
+                delete nodeGroup.amiReleaseVersion;
+            }
         }
 
         const result = cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);

@@ -54,6 +54,7 @@ const executionRolePolicyStatement: PolicyStatement [] = [
 
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .teams(new blueprints.EmrEksTeam(dataTeam))
   .build(app, 'my-stack-name');

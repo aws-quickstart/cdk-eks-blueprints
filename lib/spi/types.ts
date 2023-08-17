@@ -1,12 +1,12 @@
 import * as assert from "assert";
 import * as cdk from 'aws-cdk-lib';
 import { AutoScalingGroup } from 'aws-cdk-lib/aws-autoscaling';
-import { Cluster, FargateProfile, KubernetesVersion, Nodegroup } from 'aws-cdk-lib/aws-eks';
-import { Construct } from 'constructs';
+import * as eks from 'aws-cdk-lib/aws-eks';
+import { Construct, IConstruct } from 'constructs';
 import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { logger } from "../utils/log-utils";
-
+import * as constraints from '../utils/constraints-utils';
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
  */
@@ -22,6 +22,15 @@ export interface HelmRepository {
  */
 export type Values = {
     [key: string]: any;
+};
+
+/**
+ * Utility type for Kubernetes taints passed to Helm or GitOps applications.
+ */
+export type Taint = {
+    key: string,
+    value: string,
+    effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
 };
 
 /**
@@ -73,13 +82,19 @@ export interface ApplicationRepository extends GitRepositoryReference {
     credentialsType?: "USERNAME" | "TOKEN" | "SSH"
 
 }
+/**
+ * Adds Constraints to application repository
+ */
+export class ApplicationRepositoryConstraints implements constraints.ConstraintsType<ApplicationRepository> {
+    credentialsSecretName = new constraints.InternetHostStringConstraint();
+}
 
 /**
  * Provides API to register resource providers and get access to the provided resources.
  */
 export class ResourceContext {
 
-    private readonly resources: Map<string, cdk.IResource> = new Map();
+    private readonly resources: Map<string, IConstruct> = new Map();
 
     constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
 
@@ -89,7 +104,7 @@ export class ResourceContext {
      * @param provider Implementation of the resource provider interface
      * @returns the provided resource
      */
-    public add<T extends cdk.IResource = cdk.IResource>(name: string, provider: ResourceProvider<T>): T {
+    public add<T extends IConstruct>(name: string, provider: ResourceProvider<T>): T {
         const resource = provider.provide(this);
         assert(!this.resources.has(name), `Overwriting ${name} resource during execution is not allowed.`);
         this.resources.set(name, resource);
@@ -101,7 +116,7 @@ export class ResourceContext {
      * @param name under which the resource provider was registered
      * @returns the resource or undefined if the specified resource was not found
      */
-    public get<T extends cdk.IResource = cdk.IResource>(name: string): T | undefined {
+    public get<T extends IConstruct = IConstruct>(name: string): T | undefined {
         return <T>this.resources.get(name);
     }
 }
@@ -112,6 +127,7 @@ export enum GlobalResources {
     Certificate = 'certificate',
     KmsKey = 'kms-key',
     Rds = 'rds'
+    Amp = 'amp',
 }
 
 /**
@@ -130,8 +146,8 @@ export class ClusterInfo {
      * Constructor for ClusterInfo
      * @param props
      */
-    constructor(readonly cluster: Cluster, readonly version: KubernetesVersion,
-        readonly nodeGroups?: Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: FargateProfile[]) {
+    constructor(readonly cluster: eks.ICluster, readonly version: eks.KubernetesVersion,
+        readonly nodeGroups?: eks.Nodegroup[], readonly autoscalingGroups?: AutoScalingGroup[], readonly fargateProfiles?: eks.FargateProfile[]) {
         this.cluster = cluster;
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();

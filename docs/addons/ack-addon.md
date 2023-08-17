@@ -21,11 +21,12 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 2 : This installs AWS Controller for Kubernetes for EC2 ACK controller using service name internally referencing service mapping values for helm options. After Installing this EC2 ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
+> Pattern # 2 : This installs AWS Controller for Kubernetes for EC2 ACK controller using service name internally referencing service mapping values for helm options. After Installing this EC2 ACK Controller, the instructions in [Provision ACK Resource](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -40,11 +41,12 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
+> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -66,6 +68,7 @@ const addOn = new blueprints.addons.AckAddOn({
 }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -111,7 +114,7 @@ replicaset.apps/rds-chart-5f6f5b8fc7   1         1         1       5m36s
 ## aws-controller-8s references
 
 Please refer to following aws-controller-8s references for more information :
-- [ACK Workshop](https://preview--eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
+- [ACK Workshop](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
 - [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/) 
 - [ACK GitHub](https://github.com/aws-controllers-k8s/community)
 

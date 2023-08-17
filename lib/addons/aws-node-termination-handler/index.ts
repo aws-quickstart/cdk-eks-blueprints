@@ -1,6 +1,6 @@
 import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
 import { QueueHook } from 'aws-cdk-lib/aws-autoscaling-hooktargets';
-import { Cluster, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ICluster, ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import { EventPattern, Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -122,7 +122,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * @param asgCapacity
    * @returns Helm values
    */
-    private configureQueueMode(cluster: Cluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup[], karpenter: Promise<Construct> | undefined): any {
+    private configureQueueMode(cluster: ICluster, serviceAccount: ServiceAccount, asgCapacity: AutoScalingGroup[], karpenter: Promise<Construct> | undefined): any {
         const queue = new Queue(cluster.stack, "aws-nth-queue", {
             retentionPeriod: Duration.minutes(5)
         });

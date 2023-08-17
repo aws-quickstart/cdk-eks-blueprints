@@ -27,3 +27,23 @@ export function kebabToCamel(str: string) { return str.replace(/-./g, x => x[1].
  * @returns
  */
 export function escapeDots(str: string) { return str.replace(/\./g, '\\.'); }
+
+/**
+ * Removes either text between given tokens or just the tokens themselves.
+ * Example use case: YAML manipulation similar to Helm: openToken = "{{ if ... }}", closeToken = "{{ end }}""
+ * @param string
+ * @returns
+ */
+export function changeTextBetweenTokens(str: string, openToken: string, closeToken: string, keep: boolean) {
+    let regex: RegExp;
+    let regexString: string;
+    if (keep){
+        regexString = ".*(" + openToken + "|" + closeToken + ").*\r?\n";
+        regex = new RegExp(regexString, "g");
+    } else {
+        regexString = openToken + ".*" + closeToken;
+        regex = new RegExp(regexString, "sg");
+    }
+
+    return str.replace(regex, '');
+}

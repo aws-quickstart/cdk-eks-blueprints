@@ -20,6 +20,7 @@ const addOn = new blueprints.addons.AwsLoadBalancerControllerAddOn();
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
+  .version("auto")
   .build(app, 'my-stack-name');
 ```
 

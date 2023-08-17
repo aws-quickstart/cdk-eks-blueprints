@@ -10,6 +10,7 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(
                 new blueprints.AwsLoadBalancerControllerAddOn,
                 new blueprints.JupyterHubAddOn({
@@ -32,6 +33,7 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(
                 new blueprints.AwsLoadBalancerControllerAddOn,
                 new blueprints.JupyterHubAddOn({
@@ -55,6 +57,7 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(
                 new blueprints.EfsCsiDriverAddOn,
                 new blueprints.JupyterHubAddOn({
@@ -78,6 +81,7 @@ describe('Unit tests for JupyterHub addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
+            .version("auto")
             .addOns(
                 new blueprints.EfsCsiDriverAddOn,
                 new blueprints.JupyterHubAddOn({

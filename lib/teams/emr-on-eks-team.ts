@@ -1,4 +1,4 @@
-import { Cluster } from "aws-cdk-lib/aws-eks";
+import { ICluster } from "aws-cdk-lib/aws-eks";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
 import { Aws, CfnJson, CfnOutput, CfnTag } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';
@@ -187,7 +187,7 @@ export class EmrEksTeam extends ApplicationTeam {
    * @param name Name of the IAM role
    * @returns Role
    */
-  private createExecutionRole(cluster: Cluster, policy: IManagedPolicy, namespace: string, name: string): Role {
+  private createExecutionRole(cluster: ICluster, policy: IManagedPolicy, namespace: string, name: string): Role {
 
     const stack = cluster.stack;
 

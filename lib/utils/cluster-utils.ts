@@ -9,7 +9,7 @@ import { ClusterInfo } from "../spi";
 const CONTROL_PLANE_LOG_TYPES = ['api','audit','authenticator','controllerManager','scheduler'];
 
 // Enables logs for the cluster.
-export function setupClusterLogging(stack: Stack, cluster: eks.Cluster, enableLogTypes: string[]): void {
+export function setupClusterLogging(stack: Stack, cluster: eks.ICluster, enableLogTypes: string[]): void {
 	if(!enableLogTypes.every(val => CONTROL_PLANE_LOG_TYPES.includes(val))){
 		throw new Error('You have included an invalid Control Plane Log Type.');
 	}

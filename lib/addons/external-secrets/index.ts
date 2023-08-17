@@ -23,7 +23,7 @@ const defaultProps: ExternalsSecretsAddOnProps = {
   name: "external-secrets",
   chart: "external-secrets",
   release: "blueprints-addon-external-secrets",
-  version: "0.8.1",
+  version: "0.9.1",
   repository: "https://charts.external-secrets.io",
   namespace: "external-secrets",
   values: {},
@@ -40,6 +40,12 @@ const defaultIamPolicy: iam.PolicyStatement = new iam.PolicyStatement({
     "secretsmanager:DescribeSecret",
     "secretsmanager:ListSecretVersionIds",
     "secretsmanager:ListSecrets",
+    "ssm:DescribeParameters",
+    "ssm:GetParameter",
+    "ssm:GetParameters",
+    "ssm:GetParametersByPath",
+    "ssm:GetParameterHistory",
+    "kms:Decrypt"
   ],
   resources: ["*"],
 });

@@ -11,7 +11,7 @@ import * as yaml from 'js-yaml';
  * @param cluster 
  * @param namespaceManifest 
  */
-export function applyYamlFromDir(dir: string, cluster: eks.Cluster, namespaceManifest: KubernetesManifest): void {
+export function applyYamlFromDir(dir: string, cluster: eks.ICluster, namespaceManifest: KubernetesManifest): void {
     fs.readdirSync(dir, { encoding: 'utf8' }).forEach((file, index) => {
         if (file.split('.').pop() == 'yaml') {
             const data = fs.readFileSync(dir + file, 'utf8');

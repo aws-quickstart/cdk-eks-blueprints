@@ -3,7 +3,9 @@
 **Kasten K10 by Veeam Overview**
 
 The K10 data management platform, purpose-built for Kubernetes, provides enterprise operations teams an easy-to-use, scalable, and secure system for backup/restore, disaster recovery, and mobility of Kubernetes applications.
-![Kasten-K10 Overview](/docs/assets/images/kastenk10_image1.png)
+
+## Kasten-K10 Overview
+
 K10’s application-centric approach and deep integrations with relational and NoSQL databases, Amazon EKS and AWS Services provides teams the freedom of infrastructure choice without sacrificing operational simplicity. Policy-driven and extensible, K10 provides a native Kubernetes API and includes features such full-spectrum consistency, database integrations, automatic application discovery, application mobility, and a powerful web-based user interface.
 
 Given K10’s extensive ecosystem support you have the flexibility to choose environments (public/ private/ hybrid cloud/ on-prem) and Kubernetes distributions (cloud vendor managed or self managed) in support of three principal use cases:
@@ -13,7 +15,8 @@ Given K10’s extensive ecosystem support you have the flexibility to choose env
 -   [Disaster Recovery](https://www.kasten.io/kubernetes/use-cases/disaster-recovery/)
     
 -   [Application Mobility](https://www.kasten.io/kubernetes/use-cases/application-mobility/)
-![Kasten-K10 Use Cases ](/docs/assets/images/kastenk10_image2.png)
+
+## Kasten-K10 Use Cases
 
 The Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster. 
 
@@ -37,6 +40,7 @@ import { KastenK10AddOn } from '@kastenhq/kasten-eks-blueprints-addon';
 const app = new App();
 
 blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(new blueprints.ClusterAutoScalerAddOn)
     .addOns(new KastenK10AddOn)
     .build(app, 'eks-with-kastenk10');

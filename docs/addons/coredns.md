@@ -24,6 +24,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.CoreDnsAddOn("v1.8.0-eksbuild.1"); // optionally specify image version to pull or empty constructor
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -31,19 +32,129 @@ const blueprint = blueprints.EksBlueprint.builder()
 
    - `version`: Pass in the core-dns plugin version compatible with kubernetes-cluster version as shown below
 ```bash
-# Assuming cluster version is 1.19, below command shows versions of the CoreDNS add-on available for the specified cluster's version.
+# Assuming cluster version is 1.27, below command shows versions of the CoreDNS add-on available for the specified cluster's version.
 aws eks describe-addon-versions \
 --addon-name coredns \
---kubernetes-version 1.19 \
+--kubernetes-version 1.27 \
 --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" --output text
 # Output
-v1.8.3-eksbuild.1
+v1.10.1-eksbuild.2
 False
-v1.8.0-eksbuild.1
+v1.10.1-eksbuild.1
 True
-v1.7.0-eksbuild.1
+v1.9.3-eksbuild.5
+False
+v1.9.3-eksbuild.3
 False
 ```
+  - 'configurationValues' : pass custom configurations to CoreDNS addon
+```bash
+#Assuming coredns version is v1.10.1-eksbuild.1, below command shows the available configuration values that can be specified for coreDNS addon.
+aws eks describe-addon-configuration \
+--addon-name coredns \
+--addon-version v1.10.1-eksbuild.1 \
+--query configurationSchema \
+--output text | jq '.definitions.Coredns.properties'
+
+# Output 
+{
+  "affinity": {
+    "default": {
+      "affinity": {
+        "nodeAffinity": {
+          "requiredDuringSchedulingIgnoredDuringExecution": {
+            "nodeSelectorTerms": [
+              {
+                "matchExpressions": [
+                  {
+                    "key": "kubernetes.io/os",
+                    "operator": "In",
+                    "values": [
+                      "linux"
+                    ]
+                  },
+                  {
+                    "key": "kubernetes.io/arch",
+                    "operator": "In",
+                    "values": [
+                      "amd64",
+                      "arm64"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "podAntiAffinity": {
+          "preferredDuringSchedulingIgnoredDuringExecution": [
+            {
+              "podAffinityTerm": {
+                "labelSelector": {
+                  "matchExpressions": [
+                    {
+                      "key": "k8s-app",
+                      "operator": "In",
+                      "values": [
+                        "kube-dns"
+                      ]
+                    }
+                  ]
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              },
+              "weight": 100
+            }
+          ]
+        }
+      }
+    },
+    "description": "Affinity of the coredns pods",
+    "type": [
+      "object",
+      "null"
+    ]
+  },
+  "computeType": {
+    "type": "string"
+  },
+  "corefile": {
+    "description": "Entire corefile contents to use with installation",
+    "type": "string"
+  },
+  "nodeSelector": {
+    "additionalProperties": {
+      "type": "string"
+    },
+    "type": "object"
+  },
+  "replicaCount": {
+    "type": "integer"
+  },
+  "resources": {
+    "$ref": "#/definitions/Resources"
+  },
+  "tolerations": {
+    "default": [
+      {
+        "key": "CriticalAddonsOnly",
+        "operator": "Exists"
+      },
+      {
+        "key": "node-role.kubernetes.io/master",
+        "operator": "NoSchedule"
+      }
+    ],
+    "description": "Tolerations of the coredns pod",
+    "items": {
+      "type": "object"
+    },
+    "type": "array"
+  }
+}
+```
+Note: To deploy fargate cluster, we need to pass configurationValue.computeType as "Fargate" as described in the [EKS Fargate documentation](https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html#fargate-gs-coredns)
+
 # Validation
 To validate that coredns add-on is running, ensure that both the coredns pods are in Running state.
 ```bash

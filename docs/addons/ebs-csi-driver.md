@@ -32,6 +32,7 @@ const addOn = new blueprints.addons.EbsCsiDriverAddOn({
       }),
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

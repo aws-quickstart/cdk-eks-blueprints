@@ -1,9 +1,8 @@
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
-
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument, createNamespace } from "../../utils";
+import { loadYaml, readYamlDocument } from "../../utils";
 
 /**
  * Implementation of AWS X-Ray add-on for EKS Blueprints. Installs xray daemonset and exposes 
@@ -13,29 +12,19 @@ export class XrayAddOn implements ClusterAddOn {
 
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
-        assertEC2NodeGroup(clusterInfo, "X-Ray Addon");
+        const nodeGroups = assertEC2NodeGroup(clusterInfo, XrayAddOn.name);
 
-        // Setup managed policy.
-        const opts = { name: 'xray-account', namespace: "xray-system" };
-        const sa = cluster.addServiceAccount('xray-account', opts);
-
-        // Cloud Map Full Access policy.
-        const cloudMapPolicy = ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess");
-        sa.role.addManagedPolicy(cloudMapPolicy);
-
-        // X-Ray Namespace
-        const namespace = createNamespace('xray-system', cluster);
-        sa.node.addDependency(namespace);
+        nodeGroups.forEach(nodeGroup => {
+            nodeGroup.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess'));
+        });
 
         // Apply manifest
         const doc = readYamlDocument(__dirname + '/xray-ds.yaml');
-        const docArray = doc.replace(/{{cluster_name}}/g, cluster.clusterName).replace(/{{region_name}}/g, cluster.stack.region);
-        const manifest = docArray.split("---").map(e => loadYaml(e));
-        const statement = new KubernetesManifest(cluster.stack, "xray-daemon", {
+        const manifest = doc.split("---").map(e => loadYaml(e));
+        new KubernetesManifest(cluster.stack, "xray-daemon", {
             cluster,
             manifest,
             overwrite: true
         });
-        statement.node.addDependency(sa);
     }
 }

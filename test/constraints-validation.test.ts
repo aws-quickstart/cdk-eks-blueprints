@@ -55,7 +55,17 @@ const notUrlError = new z.ZodError([{
     path: []
 }]);
 
+const badRegexError = new z.ZodError([{
+    validation: "regex",
+    code: "invalid_string",
+    message: "",
+    path: []
+}]);
+
 const longName = 'eks-blueprint-with-an-extra-kind-of-very-long-name-that-is-definitely-not-going-to-work';
+const argoLongName = 'way-too-long-argocd-secret-name-that-is-not-going-to-work-please-dont-work-please-dont';
+const argoBadName = 'name_with-underscore';
+const argoLongAndBadName = 'way_too-long-and-bad-argocd-secret-name-that-is-not-going-to-work-please-dont';
 
 const blueprintBase = blueprints.EksBlueprint.builder().addOns(...addOns);
 
@@ -65,7 +75,7 @@ type DataError = [Executable, ZodError];
 
 function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         autoscalingNodeGroups: [
             {
                 id: id,
@@ -78,7 +88,7 @@ function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, 
 
 function createManyAutoScalingGroup(length: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         autoscalingNodeGroups: loop(new Array<blueprints.AutoscalingNodeGroup>(length).fill({ id: "" }))
     });
 }
@@ -92,7 +102,7 @@ function loop(array: Array<blueprints.AutoscalingNodeGroup>): blueprints.Autosca
 
 function singleErrorInArray(id: string, errorNumberVariable?: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         autoscalingNodeGroups: [
             {
                 id: id + 1
@@ -113,13 +123,22 @@ function singleErrorInArray(id: string, errorNumberVariable?: number) {
 
 function createFargateProfile(fargateProfileName: string) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_24,
+        version: KubernetesVersion.V1_25,
         fargateProfiles: {
             "fp1": {
                 fargateProfileName: fargateProfileName,
                 selectors: [{ namespace: "serverless1" }]
             }
         }
+    });
+}
+
+function createArgoAddon(credentialsSecretName: string) {
+    return new blueprints.ArgoCDAddOn({
+        bootstrapRepo: {
+            repoUrl: "fakerepo.com",
+            credentialsSecretName: credentialsSecretName,
+        },
     });
 }
 
@@ -147,6 +166,11 @@ function getConstraintsDataSet(): DataError[] {
 
     result.push([() => createManyAutoScalingGroup(6000), tooBigNumber5000]);
     result.push([() => singleErrorInArray("Name", 6000), tooBigNumber5000]);
+
+    result.push([() => createArgoAddon(argoBadName), badRegexError]);
+    result.push([() => createArgoAddon(argoLongName), tooBigString63]);
+    result.push([() => createArgoAddon(""), tooSmallString1]);
+    result.push([() => createArgoAddon(argoLongAndBadName), badRegexError]);
 
     return result;
 }

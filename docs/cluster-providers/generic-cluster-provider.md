@@ -10,16 +10,30 @@ Note: If `launchTemplate` is passed with `managedNodeGroups`, `diskSize` is not 
 
 Full list of configuration options:
 
-- [Generic Cluster Provider](../api/interfaces/GenericClusterProviderProps.html)
-- [Managed Node Group](../api/interfaces/ManagedNodeGroup.html)
-- [Autoscaling Group](../api/interface/../interfaces/AutoscalingNodeGroup.html)
-- [Fargate Cluster](../api/interfaces/FargateClusterProviderProps.html)
+- [Generic Cluster Provider](../api/interfaces/clusters.GenericClusterProviderProps.html)
+- [Managed Node Group](../api/interfaces/clusters.ManagedNodeGroup.html)
+- [Autoscaling Group](../api/interfaces/clusters.AutoscalingNodeGroup.html)
+- [Fargate Cluster](../api/interfaces/clusters.FargateClusterProviderProps.html)
 
 ## Usage 
 
 ```typescript
+const windowsUserData = ec2.UserData.forWindows();
+windowsUserData.addCommands(`
+    $ErrorActionPreference = 'Stop'
+    $EKSBootstrapScriptPath = "C:\\\\Program Files\\\\Amazon\\\\EKS\\\\Start-EKSBootstrap.ps1"
+    Try {
+    & $EKSBootstrapScriptPath -EKSClusterName '<YOUR_CLUSTER_NAME>'
+    } Catch {
+    Throw $_
+    }
+`);
+const ebsDeviceProps: ec2.EbsDeviceProps = {
+    deleteOnTermination: false,
+    volumeType: ec2.EbsDeviceVolumeType.GP2
+};
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     tags: {
         "Name": "blueprints-example-cluster",
         "Type": "generic-cluster"
@@ -71,6 +85,39 @@ const clusterProvider = new blueprints.GenericClusterProvider({
                     "Instance": "SPOT"
                 }
             }
+        },
+        // Below is a Managed Windows Node Group Sample.
+        {
+            id: "mng3-windowsami",
+            amiType: NodegroupAmiType.AL2_X86_64,
+            instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
+            desiredSize: 0,
+            minSize: 0, 
+            nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+            launchTemplate: {
+                blockDevices: [
+                    {
+                        deviceName: "/dev/sda1",
+                        volume: ec2.BlockDeviceVolume.ebs(50, ebsDeviceProps),
+                    }
+                ],
+            machineImage: ec2.MachineImage.genericWindows({
+                'us-east-1': 'ami-0e80b8d281637c6c1',
+                'us-east-2': 'ami-039ecff89038848a6',
+                'us-west-1': 'ami-0c0815035bf1efb6e',
+                'us-west-2': 'ami-029e1340b254a7667',
+                'eu-west-1': 'ami-09af50f599f7f882c',
+                'eu-west-2': 'ami-0bf1fec1eaef78230',
+            }),
+                securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup,
+                tags: {
+                    "Name": "Mng3",
+                    "Type": "Managed-WindowsNode-Group",
+                    "LaunchTemplate": "WindowsLT",
+                    "kubernetes.io/cluster/<YOUR_CLUSTER_NAME>": "owned"
+                },
+                userData: windowsUserData,
+            }
         }
     ],
     fargateProfiles: {
@@ -95,7 +142,7 @@ All of such cases can be solved with [Resource Providers](../resource-providers/
 Example:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     tags: {
         "Name": "blueprints-example-cluster",
         "Type": "generic-cluster"
@@ -104,7 +151,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
     mastersRole: blueprints.getResource(context => {
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
     }),
-    securityGroup: blueprints.getNamedResource("my-cluster-security-group"), // assumed to be register as a resource provider under name my-cluster-security-group
+    securityGroup: blueprints.getNamedResource("my-cluster-security-group") as ec2.ISecurityGroup, // assumed to be register as a resource provider under name my-cluster-security-group
     managedNodeGroups: [
         {
             id: "mng1",
@@ -119,7 +166,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 EksBlueprint.builder()
     .resourceProvider("my-cluster-security-group", {
         provide(context: blueprints.ResourceContext) : ec2.ISecurityGroup {
-            return ec2.SecurityGroup.fromSecurityGroupId(this, 'SG', 'sg-12345', { mutable: false }); // example for look up
+            return ec2.SecurityGroup.fromSecurityGroupId(context.scope, 'SG', 'sg-12345', { mutable: false }); // example for look up
         }
     })
     .clusterProvider(clusterProvider)
@@ -138,7 +185,7 @@ The `GenericClusterProvider` supports the following configuration options.
 | managedNodeGroups     | Zero or more managed node groups.
 | autoscalingNodeGroups | Zero or more autoscaling node groups (mutually exclusive with managed node groups).
 | fargateProfiles       | Zero or more Fargate profiles.
-| version               | Kubernetes version for the control plane.
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | vpc                   | VPC for the cluster.
 | vpcSubnets            | The subnets for control plane ENIs (subnet selection).
 | privateCluster        | If `true` Kubernetes API server is private.
@@ -157,7 +204,7 @@ Default configuration for managed and autoscaling node groups can also be suppli
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass individual `GenericProviderClusterProps` to each cluster blueprint.
 
-You can find more details on the supported configuration options in the API documentation for the [GenericClusterProviderProps](../api/interfaces/GenericClusterProviderProps.html).
+You can find more details on the supported configuration options in the API documentation for the [GenericClusterProviderProps](../api/interfaces/clusters.GenericClusterProviderProps.html).
 
 ## Upgrading Control Plane
 
@@ -165,7 +212,7 @@ Upgrading Kubernetes versions via cluster configuration at present won't impact 
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_24,
+    version: KubernetesVersion.V1_25,
     managedNodeGroups: [
         {
             id: "managed-1",
@@ -176,4 +223,4 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 });
 ```
 
-Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-linux-ami-versions.html) for information ion the AMI release version that matches Kubernetes versions.
+Note: consult the [official EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-amis.html) for information ion the AMI release version that matches Kubernetes versions.

@@ -23,6 +23,7 @@ const awsPcaParams = {
 const addOn = new blueprints.addons.AWSPrivateCAIssuerAddon(awsPcaParams)
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

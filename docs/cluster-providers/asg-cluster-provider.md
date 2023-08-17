@@ -9,6 +9,7 @@ const props: AsgClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto",
     instanceType: new InstanceType('m5.large'),
     machineImageType: eks.MachineImageType.AMAZON_LINUX_2,
     updatePolicy: UpdatePolicy.Rolling
@@ -27,6 +28,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | minSize           | Min cluster size, must be positive integer greater than 0 (default 1).
 | maxSize           | Max cluster size, must be greater than minSize (default 3).
 | desiredSize       | Desired cluster size, must be greater or equal to minSize (default `min-size`).
+| version           | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | instanceType      | Type of instance for the EKS cluster, must be a valid instance type, i.e. t3.medium (default "m5.large")
 | machineImageType  | Machine Image Type for the Autoscaling Group.
 | updatePolicy      | Update policy for the Autoscaling Group.
@@ -46,7 +48,7 @@ Configuration can also be supplied via context variables (specify in cdk.json, c
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `AsgClusterProviderProps` to each cluster blueprint.
 
-You can find more details on the supported configuration options in the API documentation for the [AsgClusterProviderProps](../api/interfaces/AsgClusterProviderProps.html).
+You can find more details on the supported configuration options in the API documentation for the [AsgClusterProviderProps](../api/interfaces/clusters.AsgClusterProviderProps.html).
 
 ## Bottlerocket ASG
 
@@ -57,6 +59,7 @@ const props: AsgClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    version: "auto",
     instanceType: new InstanceType('m5.large'),
     machineImageType: eks.MachineImageType.BOTTLEROCKET,
     updatePolicy: UpdatePolicy.Rolling

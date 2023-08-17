@@ -51,6 +51,7 @@ export class TeamBurnham extends ApplicationTeam {
 }
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .teams(new TeamBurnham(app))
   .build(app, 'my-stack-name');

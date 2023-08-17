@@ -7,7 +7,7 @@ import { getEbsDriverPolicyDocument } from "./iam-policy";
 /**
  * Interface for EBS CSI Driver EKS add-on options
  */
-interface EbsCsiDriverAddOnProps {
+export interface EbsCsiDriverAddOnProps {
     /**
      * Version of the driver to deploy
      */
@@ -23,7 +23,7 @@ interface EbsCsiDriverAddOnProps {
  */
 const defaultProps = {
     addOnName: "aws-ebs-csi-driver",
-    version: "v1.18.0-eksbuild.1",
+    version: "v1.20.0-eksbuild.1",
     saName: "ebs-csi-controller-sa",
 };
 

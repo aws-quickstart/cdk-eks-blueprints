@@ -17,6 +17,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.MetricsServerAddOn('v0.5.0');
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
@@ -34,6 +35,7 @@ blueprints-addon-metrics-server                               1/1     1         
 
 1. Deploys the metrics-server helm chart in `kube-system` namespace by default.
 2. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
+3. Supports `createNamespace` configuration to deploy the addon to a customized namespace.
 
 ## Testing with Kubernetes Dashboard
 

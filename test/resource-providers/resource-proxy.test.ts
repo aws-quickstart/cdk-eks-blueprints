@@ -34,7 +34,7 @@ describe("ResourceProxy",() => {
         const app = new App();
         
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -42,6 +42,7 @@ describe("ResourceProxy",() => {
 
         const builder = EksBlueprint.builder()
             .clusterProvider(clusterProvider)
+            .version("auto")
             .account("123456789012")
             .region("us-east-1");
 
@@ -64,7 +65,7 @@ describe("ResourceProxy",() => {
         
         const sgDescription = "My new security group";
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -78,6 +79,7 @@ describe("ResourceProxy",() => {
 
         const builder = EksBlueprint.builder()
             .clusterProvider(clusterProvider)
+            .version("auto")
             .account("123456789012")
             .region("us-east-1");
 
@@ -99,6 +101,7 @@ describe("ResourceProxy",() => {
         
         const builder = EksBlueprint.builder()
             .resourceProvider(GlobalResources.KmsKey, new CreateKmsKeyProvider())
+            .version("auto")
             .account("123456789012")
             .region("us-east-1")
             .addOns(new AppMeshAddOn( {
@@ -120,7 +123,7 @@ describe("ResourceProxy",() => {
         const app = new App();
 
         const genericClusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_24,
+            version: KubernetesVersion.V1_25,
             managedNodeGroups: [{
                 id: "mng1",
                 launchTemplate: {
@@ -133,6 +136,7 @@ describe("ResourceProxy",() => {
                                   .clusterProvider(genericClusterProvider)
                                   .account("123456789012")
                                   .region("us-east-1")
+                                  .version("auto")
                                   .build(app, "cluster");
 
         // Then

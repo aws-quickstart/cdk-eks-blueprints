@@ -30,7 +30,7 @@ export class TeamTroi implements Team {
         new cdk.CfnOutput(stack, this.name + '-sa-iam-role', { value: sa.role.roleArn });
     }
 
-    setupNamespacePolicies(cluster: eks.Cluster) : eks.KubernetesManifest {
+    setupNamespacePolicies(cluster: eks.ICluster) : eks.KubernetesManifest {
         const quotaName = this.name + "-quota";
         return cluster.addManifest(quotaName, {
             apiVersion: 'v1',

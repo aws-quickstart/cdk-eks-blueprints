@@ -33,10 +33,12 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 const account = <AWS_ACCOUNT_ID>;
 const region = <AWS_REGION>;
+const version = "auto";
 
 const blueprint = blueprints.EksBlueprint.builder()
   .account(account) 
   .region(region)
+  .version(version)
   .addOns( new blueprints.addons.OpaGatekeeperAddOn() )
   .teams().build(app, 'my-stack-name');
 ```
