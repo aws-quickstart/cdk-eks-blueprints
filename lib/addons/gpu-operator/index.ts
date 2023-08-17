@@ -20,7 +20,7 @@ const defaultProps: HelmAddOnProps & GpuOperatorAddonProps = {
     name: "gpu-operator-addon",
     namespace: "gpu-operator",
     chart: "gpu-operator",
-    version: "v23.3.1",
+    version: "v23.6.0",
     release: "nvidia-gpu-operator",
     repository:  "https://helm.ngc.nvidia.com/nvidia",
     createNamespace: true,
