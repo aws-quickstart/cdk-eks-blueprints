@@ -173,6 +173,33 @@ export default class BlueprintConstruct {
             // Commenting due to conflicts with `CloudWatchLogsAddon`
             // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
+            new blueprints.GpuOperatorAddon({
+                values:{
+                    driver: {
+                      enabled: true
+                    },
+                    mig: {
+                      strategy: 'mixed'
+                    },
+                    devicePlugin: {
+                      enabled: true,
+                      version: 'v0.13.0'
+                    },
+                    migManager: {
+                      enabled: true,
+                      WITH_REBOOT: true
+                    },
+                    toolkit: {
+                      version: 'v1.13.1-centos7'
+                    },
+                    operator: {
+                      defaultRuntime: 'containerd'
+                    },
+                    gfd: {
+                      version: 'v0.8.0'
+                    }
+                  }
+            }),
             new blueprints.GrafanaOperatorAddon(),
             new blueprints.CloudWatchLogsAddon({
                 logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
