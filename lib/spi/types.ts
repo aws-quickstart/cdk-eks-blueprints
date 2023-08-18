@@ -126,7 +126,7 @@ export enum GlobalResources {
     HostedZone = 'hosted-zone',
     Certificate = 'certificate',
     KmsKey = 'kms-key',
-    Rds = 'rds'
+    Rds = 'rds',
     Amp = 'amp',
 }
 

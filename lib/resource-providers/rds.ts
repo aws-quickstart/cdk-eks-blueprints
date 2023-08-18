@@ -4,21 +4,25 @@ import {IVpc} from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
 import {GlobalResources, ResourceContext, ResourceProvider} from "../spi";
 
-
-export interface RdsInstanceProps {
+export interface CreateRDSInstanceProviderProps {
   readonly name?: string;
-  readonly rdsProps?: Omit<rds.DatabaseInstanceProps, "vpc" | "vpcSubnets">;
+  readonly rdsProps?: Omit<rds.DatabaseInstanceProps, "vpc"| "vpcSubnets" | "databaseName" | "removalPolicy">;
 }
 
-export class RdsInstanceProvider
-  implements ResourceProvider<rds.DatabaseInstance> {
-  readonly options: RdsInstanceProps;
+export class CreateRDSProvider implements ResourceProvider<rds.IDatabaseInstance> {
+  readonly options: CreateRDSInstanceProviderProps;
 
-  constructor(options: RdsInstanceProps) {
+  /**
+   * Constructs a new RDS Provider.
+   *
+   * @param {CreateRDSInstanceProviderProps} options - The options for creating the RDS Provider.
+   */
+
+  constructor(options: CreateRDSInstanceProviderProps) {
     this.options = options;
   }
 
-  provide(context: ResourceContext): rds.DatabaseInstance {
+  provide(context: ResourceContext): rds.IDatabaseInstance {
     const id = context.scope.node.id;
 
     const rdsVpc = context.get(GlobalResources.Vpc) as IVpc ?? new ec2.Vpc(
@@ -29,7 +33,7 @@ export class RdsInstanceProvider
     const instanceProps: rds.DatabaseInstanceProps = {
       ...this.options.rdsProps,
       vpc: rdsVpc,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.SNAPSHOT,
       deletionProtection: true,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
@@ -37,16 +41,16 @@ export class RdsInstanceProvider
     } as rds.DatabaseInstanceProps;
 
     let rdsInstance: rds.DatabaseInstance = new rds.DatabaseInstance(
-      context.scope,
-      this.options.name || `${id}-RDSInstance`,
-      instanceProps
+        context.scope,
+        this.options.name || `${id}-RDSInstance`,
+        instanceProps
     );
 
     new CfnOutput(context.scope, "RDSInstanceId", {
       value: rdsInstance.instanceIdentifier
     });
 
-    new CfnOutput(context.scope, "AuroraSecretIdentifier", {
+    new CfnOutput(context.scope, "RDSSecretIdentifier", {
       value: rdsInstance.secret!.secretArn
     });
 
@@ -54,44 +58,46 @@ export class RdsInstanceProvider
   }
 }
 
-export interface AuroraClusterProps {
+export interface CreateAuroraClusterProviderProps {
   readonly name?: string;
-  readonly clusterProps?: Omit<rds.DatabaseClusterProps, "instanceProps">
-  readonly instanceProps?: Omit<rds.InstanceProps, "vpc" | "vpcSubnets" | "securityGroups">;
+  readonly clusterEngine: rds.IClusterEngine;
+  readonly clusterProps?: Omit<rds.DatabaseClusterProps, "engine" | "vpc" | "vpcSubnets">
 }
 
-export class AuroraClusterProvider
-  implements ResourceProvider<rds.DatabaseCluster> {
-  readonly options: AuroraClusterProps;
+export class CreateAuroraClusterProvider implements ResourceProvider<rds.IDatabaseCluster> {
+  readonly options: CreateAuroraClusterProviderProps;
 
-  constructor(options: AuroraClusterProps) {
+  /**
+   * Constructor for the CreateAuroraClusterProvider class.
+   *
+   * @param {CreateAuroraClusterProviderProps} options - The options for creating an Aurora cluster provider.
+   */
+  constructor(options: CreateAuroraClusterProviderProps) {
     this.options = options;
   }
 
-  provide(context: ResourceContext): rds.DatabaseCluster {
+  provide(context: ResourceContext): rds.IDatabaseCluster {
     const id = context.scope.node.id;
 
-    const instanceProps: rds.InstanceProps = {
-      ...this.options.instanceProps,
-      vpc: context.get(GlobalResources.Vpc) as IVpc ?? new ec2.Vpc(
+    const auroraVpc = context.get(GlobalResources.Vpc) as IVpc ?? new ec2.Vpc(
         context.scope,
         `${this.options.name}-${id}-Vpc`
-      ),
-    };
+    );
 
     const clusterProps: rds.DatabaseClusterProps = {
-      ...this.options.clusterProps, instanceProps,
+      ...this.options.clusterProps,
+      removalPolicy: RemovalPolicy.SNAPSHOT,
       deletionProtection: true,
-      removalPolicy: RemovalPolicy.RETAIN
+      vpc: auroraVpc,
     } as rds.DatabaseClusterProps;
 
     let auroraInstance = new rds.DatabaseCluster(
-      context.scope,
-      this.options.name || `${id}-AuroraInstance`,
-      clusterProps
+        context.scope,
+        this.options.name || `${id}-AuroraCluster`,
+        clusterProps
     );
 
-    new CfnOutput(context.scope, "AuroraInstanceId", {
+    new CfnOutput(context.scope, "AuroraClusterId", {
       value: auroraInstance.clusterIdentifier
     });
 
@@ -101,4 +107,5 @@ export class AuroraClusterProvider
 
     return auroraInstance;
   }
+
 }

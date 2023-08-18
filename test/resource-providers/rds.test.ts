@@ -1,7 +1,7 @@
 import { App } from "aws-cdk-lib";
 import * as blueprints from "../../lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
-import {AuroraClusterProvider, RdsInstanceProvider} from "../../lib";
+import {CreateAuroraClusterProvider, CreateRDSProvider} from "../../lib";
 import {GlobalResources, VpcProvider} from "../../lib";
 import {
   AuroraPostgresEngineVersion, Credentials,
@@ -18,12 +18,10 @@ describe("AuroraClusterProvider", () => {
     const stack = blueprints.EksBlueprint.builder()
       .resourceProvider(
         GlobalResources.Rds,
-        new AuroraClusterProvider({
-          clusterProps: {
-            engine: DatabaseClusterEngine.auroraPostgres(
-              { version: AuroraPostgresEngineVersion.VER_14_6 }
+        new CreateAuroraClusterProvider({
+            clusterEngine: DatabaseClusterEngine.auroraPostgres(
+                { version: AuroraPostgresEngineVersion.VER_14_6 }
             ),
-          },
           name: "aurora-rp-test-no-vpc"
         })
       )
@@ -57,12 +55,10 @@ describe("AuroraClusterProvider", () => {
       )
       .resourceProvider(
         GlobalResources.Rds,
-        new AuroraClusterProvider({
-          clusterProps: {
-            engine: DatabaseClusterEngine.auroraPostgres(
-              { version: AuroraPostgresEngineVersion.VER_14_6 }
+        new CreateAuroraClusterProvider({
+            clusterEngine: DatabaseClusterEngine.auroraPostgres(
+                { version: AuroraPostgresEngineVersion.VER_14_6 }
             ),
-          },
           name: "aurora-rp-test-w-vpc"
         })
       )
@@ -95,12 +91,10 @@ describe("AuroraClusterProvider", () => {
       )
       .resourceProvider(
         GlobalResources.Rds,
-        new AuroraClusterProvider({
-          clusterProps: {
-            engine: DatabaseClusterEngine.auroraPostgres(
-              { version: AuroraPostgresEngineVersion.VER_14_6 }
+        new CreateAuroraClusterProvider({
+            clusterEngine: DatabaseClusterEngine.auroraPostgres(
+                { version: AuroraPostgresEngineVersion.VER_14_6 }
             ),
-          },
           name: "aurora-rp-test-w-vpc"
         })
       )
@@ -127,7 +121,7 @@ describe("RDSInstanceProvider", () => {
     const stack = blueprints.EksBlueprint.builder()
       .resourceProvider(
         GlobalResources.Rds,
-        new RdsInstanceProvider(
+        new CreateRDSProvider(
           {
             rdsProps: {
               credentials: Credentials.fromGeneratedSecret('admin'),
@@ -170,7 +164,7 @@ describe("RDSInstanceProvider", () => {
       )
       .resourceProvider(
         GlobalResources.Rds,
-        new RdsInstanceProvider({
+        new CreateRDSProvider({
           rdsProps: {
             credentials: Credentials.fromGeneratedSecret('admin'),
             engine: DatabaseInstanceEngine.postgres({
@@ -210,7 +204,7 @@ describe("RDSInstanceProvider", () => {
       )
       .resourceProvider(
         GlobalResources.Rds,
-        new RdsInstanceProvider({
+        new CreateRDSProvider({
           rdsProps: {
             engine: DatabaseInstanceEngine.mysql({
               version: MysqlEngineVersion.VER_8_0
