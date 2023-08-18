@@ -26,7 +26,7 @@ const defaultProps: AwsForFluentBitAddOnProps = {
     name: 'fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-for-fluent-bit",
-    version: '0.1.27',
+    version: '0.1.28',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'kube-system',
     createNamespace: false,

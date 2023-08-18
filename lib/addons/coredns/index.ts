@@ -7,7 +7,7 @@ type coreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName">;
 
 const defaultProps = {
     addOnName: 'coredns',
-    version: 'v1.9.3-eksbuild.5',
+    version: 'v1.10.1-eksbuild.2',
     saName: 'coredns',
     configurationValues: {}
 };

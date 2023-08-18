@@ -2,7 +2,8 @@
 import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
 import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
-// import {KubectlV27Layer} from "@aws-cdk/lambda-layer-kubectl-v27";
+import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
+import { KubectlV27Layer } from "@aws-cdk/lambda-layer-kubectl-v27";
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
@@ -16,7 +17,6 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
-import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -38,8 +38,8 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
             return new KubectlV25Layer(scope, "kubectllayer25");
         case "1.26":
             return new KubectlV26Layer(scope, "kubectllayer26");
-        //case "1.27":
-            //return new KubectlV27Layer(scope, "kubectllayer27");
+        case "1.27":
+            return new KubectlV27Layer(scope, "kubectllayer27");
     }
     
     const minor = version.version.split('.')[1];
