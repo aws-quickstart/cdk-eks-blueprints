@@ -101,7 +101,7 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
         new blueprints.addons.KubeProxyAddOn(),
         new blueprints.addons.VpcCniAddOn(),
         new blueprints.addons.GpuOperatorAddon({values})
-        )
+        );
     }
      /**
      * This method helps you prepare a blueprint for setting up windows nodes with 
