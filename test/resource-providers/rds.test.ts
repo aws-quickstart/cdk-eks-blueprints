@@ -189,7 +189,7 @@ describe("RDSInstanceProvider", () => {
     });
   });
 
-  test("Stack created with arbitrary user props passed to aurora should be honoured", () => {
+  test("Stack created with arbitrary user props passed to RDS Instance should be honoured", () => {
     const app = new App();
 
     const stack = blueprints.EksBlueprint.builder()

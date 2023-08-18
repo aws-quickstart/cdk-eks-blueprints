@@ -1,7 +1,7 @@
-import {CfnOutput, RemovalPolicy} from "aws-cdk-lib";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
+import {CfnOutput, RemovalPolicy} from "aws-cdk-lib";
 import {GlobalResources, ResourceContext, ResourceProvider} from "../spi";
 
 export interface CreateRDSInstanceProviderProps {
