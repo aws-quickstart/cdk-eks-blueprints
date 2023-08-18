@@ -107,35 +107,13 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
      * This method helps you prepare a blueprint for setting up windows nodes with 
      * usage tracking addon
      */
-     public static builder(options: GpuOptions): GpuBuilder {
+     public static builder(): GpuBuilder {
         const builder = new GpuBuilder();
-        const mergedOptions = merge(defaultOptions, options);
-
-        builder
-            .clusterProvider(
-                new blueprints.GenericClusterProvider({
-                    version: mergedOptions.kubernetesVersion,
-                    tags: mergedOptions.clusterProviderTags,
-                    role: blueprints.getResource(context => {
-                        return new iam.Role(context.scope, 'ClusterRole', { 
-                            assumedBy: new iam.ServicePrincipal("eks.amazonaws.com"),
-                            managedPolicies: [
-                                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSClusterPolicy"),
-                                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSVPCResourceController")
-                            ]
-                        });
-                    }),
-                    managedNodeGroups: [
-                        addNodeGroup(mergedOptions)
-                    ]
-                })
-            )
-            .addOns(
-                new blueprints.NestedStackAddOn({
-                    id: "usage-tracking-addon",
-                    builder: UsageTrackingAddOn.builder(),
-                })
-            );
+        builder.addOns(
+            new blueprints.NestedStackAddOn({
+                id: "usage-tracking-addon",
+                builder: UsageTrackingAddOn.builder(),
+            })); 
         return builder;
     }
 }

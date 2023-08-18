@@ -40,14 +40,6 @@ export default class GpuConstruct {
         const region = process.env.CDK_DEFAULT_REGION!;
         const stackID = `${id}-eks-blueprint`;
 
-        const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new iam.ServicePrincipal("ec2.amazonaws.com"),
-            [
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")
-            ]);
-
         const options: GpuOptions = {
             kubernetesVersion: eks.KubernetesVersion.of("1.27"),
             instanceClass: ec2.InstanceClass.G5,
@@ -82,14 +74,9 @@ export default class GpuConstruct {
 
 
         GpuBuilder.builder(options)
-            .enableGpu({values})
             .account(account)
             .region(region)
-            .resourceProvider("node-role", nodeRole)
-            .resourceProvider(
-                blueprints.GlobalResources.Vpc,
-                new blueprints.VpcProvider()
-            )
+            .enableGpu({values})
             .build(scope, stackID);
     }
 }
