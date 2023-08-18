@@ -31,7 +31,7 @@ export interface GpuOptions {
     /** 
      * Optional, AMI Type for Windows Nodes
      */
-    windowsAmiType?: NodegroupAmiType,
+    gpuAmiType?: NodegroupAmiType,
     /** 
      * Optional, Desired number of nodes to use for the cluster. 
      */
@@ -73,7 +73,7 @@ const defaultOptions: GpuOptions = {
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-    windowsAmiType: NodegroupAmiType.AL2_X86_64_GPU,
+    gpuAmiType: NodegroupAmiType.AL2_X86_64_GPU,
     desiredNodeSize: 2,
     minNodeSize: 2,
     maxNodeSize: 3,
@@ -89,7 +89,20 @@ const defaultOptions: GpuOptions = {
     }
   };
 export class GpuBuilder extends blueprints.BlueprintBuilder {
-
+    /**
+     * This method helps you prepare a blueprint for setting up observability 
+     * returning an array of blueprint addons for AWS managed open source services
+     */
+    public enableGpu(values?: blueprints.Values): GpuBuilder {
+    return this.addOns(
+        new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+        new blueprints.addons.CertManagerAddOn(),
+        new blueprints.addons.CoreDnsAddOn(),
+        new blueprints.addons.KubeProxyAddOn(),
+        new blueprints.addons.VpcCniAddOn(),
+        new blueprints.addons.GpuOperatorAddon({values})
+        )
+    }
      /**
      * This method helps you prepare a blueprint for setting up windows nodes with 
      * usage tracking addon
