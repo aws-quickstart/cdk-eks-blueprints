@@ -193,7 +193,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_26,
+            version: KubernetesVersion.V1_27,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
