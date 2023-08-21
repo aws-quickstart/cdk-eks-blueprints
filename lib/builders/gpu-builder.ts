@@ -4,9 +4,8 @@ import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as iam from 'aws-cdk-lib/aws-iam';
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import merge from 'ts-deepmerge';
+
 /**
  * Configuration options for GPU Builder.
  */
@@ -24,12 +23,7 @@ export interface GpuOptions {
      */
     instanceSize: ec2.InstanceSize,
     /** 
-     * optional, Node IAM Role to be attached to Windows 
-     * and Non-windows nodes.
-     */
-    nodeRole?: iam.Role,
-    /** 
-     * Optional, AMI Type for Windows Nodes
+     * Optional, AMI Type for GPU Nodes @ default AL2_X86_64_GPU 
      */
     gpuAmiType?: NodegroupAmiType,
     /** 
@@ -72,7 +66,6 @@ const defaultOptions: GpuOptions = {
     kubernetesVersion: eks.KubernetesVersion.of("1.27"),
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
-    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
     gpuAmiType: NodegroupAmiType.AL2_X86_64_GPU,
     desiredNodeSize: 2,
     minNodeSize: 2,
@@ -138,25 +131,3 @@ export class UsageTrackingAddOn extends NestedStack {
     }
 }
 
-/**  
- * This function adds a generic node group to the windows cluster.
- * @param: options: WindowsOptions
- * @returns: blueprints.ManagedNodeGroup
- */
-function addNodeGroup(options: GpuOptions): blueprints.ManagedNodeGroup {
-
-    return {
-        id: "mng-linux",
-        amiType: NodegroupAmiType.AL2_X86_64_GPU,
-        instanceTypes: [new ec2.InstanceType('g5.xlarge')],
-        desiredSize: options.desiredNodeSize, 
-        minSize: options.minNodeSize, 
-        maxSize: options.maxNodeSize,
-        nodeRole: options.nodeRole,
-        nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-        launchTemplate: {
-            tags: options.nodeGroupTags,
-            requireImdsv2: false
-        }
-    };
-}
