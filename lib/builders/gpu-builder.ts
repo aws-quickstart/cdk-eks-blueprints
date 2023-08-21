@@ -5,6 +5,9 @@ import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import merge from 'ts-deepmerge';
+import { ValuesSchema } from '../addons/gpu-operator/values';
+
 
 /**
  * Configuration options for GPU Builder.
@@ -76,8 +79,8 @@ const defaultOptions: GpuOptions = {
         "Type": "generic-gpu-cluster"
     },
     nodeGroupTags: {
-        "Name": "Mng-linux",
-        "Type": "Managed-linux-Node-Group",
+        "Name": "Mng-linux-Gpu",
+        "Type": "Managed-linux-Gpu-Node-Group",
         "LaunchTemplate": "Linux-Launch-Template",
     }
   };
@@ -86,7 +89,7 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
      */
-    public enableGpu(values?: blueprints.Values): GpuBuilder {
+    public enableGpu(values?: ValuesSchema): GpuBuilder {
     return this.addOns(
         new blueprints.addons.AwsLoadBalancerControllerAddOn(),
         new blueprints.addons.CertManagerAddOn(),
@@ -100,9 +103,20 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
      * This method helps you prepare a blueprint for setting up windows nodes with 
      * usage tracking addon
      */
-     public static builder(): GpuBuilder {
+     public static builder(options: GpuOptions): GpuBuilder {
         const builder = new GpuBuilder();
-        builder.addOns(
+        const mergedOptions = merge(defaultOptions, options);
+        builder
+        .clusterProvider(
+            new blueprints.GenericClusterProvider({
+                version: mergedOptions.kubernetesVersion,
+                tags: mergedOptions.clusterProviderTags,
+                managedNodeGroups: [
+                    addGpuNodeGroup(mergedOptions),
+                ]
+            })
+        )
+        .addOns(
             new blueprints.NestedStackAddOn({
                 id: "usage-tracking-addon",
                 builder: UsageTrackingAddOn.builder(),
@@ -129,5 +143,27 @@ export class UsageTrackingAddOn extends NestedStack {
     constructor(scope: Construct, id: string, props: NestedStackProps) {
         super(scope, id, utils.withUsageTracking(UsageTrackingAddOn.USAGE_ID, props));
     }
+}
+
+/**  
+ * This function adds a GPU node group to the cluster.
+ * @param: options: GpuOptions
+ * @returns: blueprints.ManagedNodeGroup
+ */
+function addGpuNodeGroup(options: GpuOptions): blueprints.ManagedNodeGroup {
+
+    return {
+        id: "mng-linux-gpu",
+        amiType: NodegroupAmiType.AL2_X86_64_GPU,
+        instanceTypes: [new ec2.InstanceType('g5.xlarge')],
+        desiredSize: options.desiredNodeSize, 
+        minSize: options.minNodeSize, 
+        maxSize: options.maxNodeSize,
+        nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        launchTemplate: {
+            tags: options.nodeGroupTags,
+            requireImdsv2: false
+        }
+    };
 }
 

@@ -3,6 +3,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { ValuesSchema } from './values';
 /**
  * User provided options for the Helm Chart
  */
@@ -11,6 +12,8 @@ export interface GpuOperatorAddonProps extends HelmAddOnUserProps {
    * To Create Namespace using CDK
    */    
   createNamespace?: boolean;
+
+  values?: ValuesSchema;
 }
 
 /**
