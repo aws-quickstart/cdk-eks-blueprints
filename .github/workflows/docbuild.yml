@@ -4,7 +4,7 @@ on:
     types: [published]
   push:
     branches:
-      - ghActions
+      - fix/ghActions
 permissions:
   contents: write
 jobs:
