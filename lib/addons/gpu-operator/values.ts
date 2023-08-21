@@ -62,4 +62,5 @@ export interface ValuesSchema {
         [k: string]: unknown
 
     }
+    [k: string]: unknown
 }
