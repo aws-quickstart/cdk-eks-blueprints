@@ -130,7 +130,7 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
  */
 export class UsageTrackingAddOn extends NestedStack {
 
-    static readonly USAGE_ID = "qs-pending";
+    static readonly USAGE_ID = "qs-1ug68anj6";
 
     public static builder(): blueprints.NestedStackBuilder {
         return {
