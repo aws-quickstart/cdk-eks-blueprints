@@ -2,6 +2,9 @@ name: 'Release Website Publish'
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - ghActions
 permissions:
   contents: write
 jobs:
@@ -19,4 +22,4 @@ jobs:
       - run: pip install mkdocs-material
       - run: npm install
       - run: npx typedoc --out docs/api lib/index.ts
-      - run: mkdocs gh-deploy
+      - run: mkdocs gh-deploy --force
