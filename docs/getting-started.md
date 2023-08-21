@@ -26,8 +26,8 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 ```bash
 npm install -g n # may require sudo
 n stable # may require sudo 
-npm install -g aws-cdk@2.88.0 # may require sudo (Ubuntu) depending on configuration
-cdk --version # must produce 2.88.0
+npm install -g aws-cdk@2.91.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.91.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
@@ -43,7 +43,6 @@ npm i @aws-quickstart/eks-blueprints
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
