@@ -170,7 +170,7 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
 /**
  * Nested stack that is used as tracker for Windows Accelerator
  */
-export class UsageTrackingAddOn extends NestedStack {
+class UsageTrackingAddOn extends NestedStack {
 
     static readonly USAGE_ID = "qs-1ubotj5kl";
 

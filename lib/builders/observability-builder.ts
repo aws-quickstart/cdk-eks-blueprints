@@ -77,7 +77,7 @@ export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
 /**
  * Nested stack that is used as tracker for Observability Accelerator
  */
-export class UsageTrackingAddOn extends NestedStack {
+class UsageTrackingAddOn extends NestedStack {
 
     static readonly USAGE_ID = "qs-1u9l12gj7";
 

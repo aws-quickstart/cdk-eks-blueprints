@@ -1,5 +1,8 @@
-import * as blueprints from '../../lib';
+import { BlueprintBuilder } from '../../lib/stacks';
+import * as addons from '../../lib/addons';
 import * as utils from "../utils";
+import * as spi from '../../lib/spi';
+import * as clusterproviders from '../../lib/cluster-providers';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
@@ -84,19 +87,19 @@ const defaultOptions: GpuOptions = {
         "LaunchTemplate": "Linux-Launch-Template",
     }
   };
-export class GpuBuilder extends blueprints.BlueprintBuilder {
+export class GpuBuilder extends BlueprintBuilder {
     /**
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
      */
     public enableGpu(values?: ValuesSchema): GpuBuilder {
     return this.addOns(
-        new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-        new blueprints.addons.CertManagerAddOn(),
-        new blueprints.addons.CoreDnsAddOn(),
-        new blueprints.addons.KubeProxyAddOn(),
-        new blueprints.addons.VpcCniAddOn(),
-        new blueprints.addons.GpuOperatorAddon({values})
+        new addons.AwsLoadBalancerControllerAddOn(),
+        new addons.CertManagerAddOn(),
+        new addons.CoreDnsAddOn(),
+        new addons.KubeProxyAddOn(),
+        new addons.VpcCniAddOn(),
+        new addons.GpuOperatorAddon({values})
         );
     }
      /**
@@ -108,7 +111,7 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
         const mergedOptions = merge(defaultOptions, options);
         builder
         .clusterProvider(
-            new blueprints.GenericClusterProvider({
+            new clusterproviders.GenericClusterProvider({
                 version: mergedOptions.kubernetesVersion,
                 tags: mergedOptions.clusterProviderTags,
                 managedNodeGroups: [
@@ -117,7 +120,7 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
             })
         )
         .addOns(
-            new blueprints.NestedStackAddOn({
+            new addons.NestedStackAddOn({
                 id: "usage-tracking-addon",
                 builder: UsageTrackingAddOn.builder(),
             })); 
@@ -128,11 +131,11 @@ export class GpuBuilder extends blueprints.BlueprintBuilder {
 /**
  * Nested stack that is used as tracker for GPU Accelerator
  */
-export class UsageTrackingAddOn extends NestedStack {
+class UsageTrackingAddOn extends NestedStack {
 
     static readonly USAGE_ID = "qs-1ug68anj6";
 
-    public static builder(): blueprints.NestedStackBuilder {
+    public static builder(): spi.NestedStackBuilder {
         return {
             build(scope: Construct, id: string, props: NestedStackProps) {
                 return new UsageTrackingAddOn(scope, id, props);
@@ -150,7 +153,7 @@ export class UsageTrackingAddOn extends NestedStack {
  * @param: options: GpuOptions
  * @returns: blueprints.ManagedNodeGroup
  */
-function addGpuNodeGroup(options: GpuOptions): blueprints.ManagedNodeGroup {
+function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup {
 
     return {
         id: "mng-linux-gpu",
