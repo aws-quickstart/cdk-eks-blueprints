@@ -78,15 +78,18 @@ export class ExternalDnsAddOn extends HelmAddOn {
 
         sa.node.addDependency(namespaceManifest);
 
+        // Create a --zone-id-filter arg for each hosted zone
+        const zoneIdFilterArgs = hostedZones.map((hostedZone) => `--zone-id-filter=${hostedZone!.hostedZoneId}`);
+
         let values: Values = {
             provider: "aws",
-            zoneIdFilters: hostedZones.map((hostedZone) => hostedZone!.hostedZoneId),
+            extraArgs: zoneIdFilterArgs,
             aws: {
               region,
             },
             serviceAccount: {
               create: false,
-             name: sa.serviceAccountName,
+              name: sa.serviceAccountName,
             },
         };
 

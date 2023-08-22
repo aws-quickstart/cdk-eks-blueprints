@@ -143,6 +143,7 @@ export class BatchEksTeam extends ApplicationTeam {
 
     jobQueue.node.addDependency(computeEnv);
   }
+
   /**
    * method to to apply k8s RBAC to the service account used by Batch service role
    * @param ClusterInfo EKS cluster where to apply the RBAC
@@ -150,7 +151,6 @@ export class BatchEksTeam extends ApplicationTeam {
    * @param createNamespace flag to create namespace if not already created
    * @returns 
    */
-
   private setBatchEksResources(clusterInfo: ClusterInfo, namespace: string): Construct {
 
     let doc = readYamlDocument(`${__dirname}/aws-batch-rbac-config.ytpl`);
@@ -193,7 +193,7 @@ export class BatchEksTeam extends ApplicationTeam {
       instanceProfileName: ngRole,
       roles: [ngRole]
     });
-
+  
     const batchComputeEnv = new batch.CfnComputeEnvironment(cluster, "batch-eks-compute-environment", {
       type: 'MANAGED',
       computeEnvironmentName: this.batchTeamProps.envName,
@@ -215,7 +215,6 @@ export class BatchEksTeam extends ApplicationTeam {
     });
 
     batchComputeEnv.node.addDependency(instanceProfile);
-
     return batchComputeEnv;
   }
 }
