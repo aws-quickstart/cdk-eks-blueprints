@@ -20,9 +20,8 @@
       { "pattern": "https://sqs" },
       { "pattern": "www.rsa-2048.example.com" },
       { "pattern": "rsa-2048.example.com" },
-      { "pattern": "https://ingress-red-saas.instana.io/" },
-      { "pattern": "http://console-eks.yourdomain.com/" },
-      { "pattern": "https://p191.p3.n0.cdn.getcloudapp.com"},
-      { "pattern": "http://console-eks.yourdomain.com"}
+      { "pattern": "https://ingress-red-saas.instana.io" },
+      { "pattern": "http://console-eks.yourdomain.com" },
+      { "pattern": "https://p191.p3.n0.cdn.getcloudapp.com"}
     ]
 }
