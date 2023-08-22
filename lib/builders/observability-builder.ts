@@ -1,11 +1,11 @@
-import * as blueprintbuilder from '../../lib/stacks';
+import { BlueprintBuilder } from '../../lib/stacks';
 import * as addons from '../../lib/addons';
 import * as utils from "../utils";
-import * as spi from '../../lib/spi'
+import * as spi from '../../lib/spi';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export class ObservabilityBuilder extends blueprintbuilder.BlueprintBuilder {
+export class ObservabilityBuilder extends BlueprintBuilder {
 
     /**
      * This method helps you prepare a blueprint for setting up observability 

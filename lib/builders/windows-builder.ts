@@ -1,7 +1,7 @@
-import * as blueprintbuilder from '../../lib/stacks';
+import { BlueprintBuilder } from '../../lib/stacks';
 import * as addons from '../../lib/addons';
 import * as utils from "../utils";
-import * as spi from '../../lib/spi'
+import * as spi from '../../lib/spi';
 import * as clusterproviders from '../../lib/cluster-providers';
 import * as resourceproviders from '../../lib/resource-providers';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
@@ -131,7 +131,7 @@ const defaultOptions: WindowsOptions = {
  * 2. A non-windows nodegroup for standard software.
  * 3. A windows nodegroup to schedule windows workloads
  */
-export class WindowsBuilder extends blueprintbuilder.BlueprintBuilder {
+export class WindowsBuilder extends BlueprintBuilder {
 
     /**
      * This method helps you prepare a blueprint for setting up windows nodes with 
