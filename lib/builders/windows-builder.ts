@@ -1,5 +1,9 @@
-import * as blueprints from '../../lib';
+import { BlueprintBuilder } from '../../lib/stacks';
+import * as addons from '../../lib/addons';
 import * as utils from "../utils";
+import * as spi from '../../lib/spi';
+import * as clusterproviders from '../../lib/cluster-providers';
+import * as resourceproviders from '../../lib/resource-providers';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
@@ -96,7 +100,7 @@ const defaultOptions: WindowsOptions = {
     kubernetesVersion: eks.KubernetesVersion.of("1.27"),
     instanceClass: ec2.InstanceClass.M5,
     instanceSize: ec2.InstanceSize.XLARGE4,
-    nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+    nodeRole: resourceproviders.getNamedResource("node-role") as iam.Role,
     windowsAmiType: NodegroupAmiType.WINDOWS_FULL_2022_X86_64,
     desiredNodeSize: 2,
     minNodeSize: 2,
@@ -127,7 +131,7 @@ const defaultOptions: WindowsOptions = {
  * 2. A non-windows nodegroup for standard software.
  * 3. A windows nodegroup to schedule windows workloads
  */
-export class WindowsBuilder extends blueprints.BlueprintBuilder {
+export class WindowsBuilder extends BlueprintBuilder {
 
     /**
      * This method helps you prepare a blueprint for setting up windows nodes with 
@@ -139,10 +143,10 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
 
         builder
             .clusterProvider(
-                new blueprints.GenericClusterProvider({
+                new clusterproviders.GenericClusterProvider({
                     version: mergedOptions.kubernetesVersion,
                     tags: mergedOptions.clusterProviderTags,
-                    role: blueprints.getResource(context => {
+                    role: resourceproviders.getResource(context => {
                         return new iam.Role(context.scope, 'ClusterRole', { 
                             assumedBy: new iam.ServicePrincipal("eks.amazonaws.com"),
                             managedPolicies: [
@@ -158,7 +162,7 @@ export class WindowsBuilder extends blueprints.BlueprintBuilder {
                 })
             )
             .addOns(
-                new blueprints.NestedStackAddOn({
+                new addons.NestedStackAddOn({
                     id: "usage-tracking-addon",
                     builder: UsageTrackingAddOn.builder(),
                 })
@@ -174,7 +178,7 @@ class UsageTrackingAddOn extends NestedStack {
 
     static readonly USAGE_ID = "qs-1ubotj5kl";
 
-    public static builder(): blueprints.NestedStackBuilder {
+    public static builder(): spi.NestedStackBuilder {
         return {
             build(scope: Construct, id: string, props: NestedStackProps) {
                 return new UsageTrackingAddOn(scope, id, props);
@@ -192,7 +196,7 @@ class UsageTrackingAddOn extends NestedStack {
  * @param: options: WindowsOptions
  * @returns: blueprints.ManagedNodeGroup
  */
-function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGroup {
+function addGenericNodeGroup(options: WindowsOptions): clusterproviders.ManagedNodeGroup {
 
     return {
         id: "mng-linux",
@@ -215,8 +219,8 @@ function addGenericNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
  * @param options: WindowsOptions
  * @returns: blueprints.ManagedNodeGroup
  */
-function addWindowsNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGroup {
-    const result : blueprints.ManagedNodeGroup = {
+function addWindowsNodeGroup(options: WindowsOptions): clusterproviders.ManagedNodeGroup {
+    const result : clusterproviders.ManagedNodeGroup = {
         id: "mng-windows",
         amiType: options.windowsAmiType,
         instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
@@ -230,7 +234,7 @@ function addWindowsNodeGroup(options: WindowsOptions): blueprints.ManagedNodeGro
     };
 
     if(options.noScheduleForWindowsNodes) {
-        blueprints.utils.setPath(result, "taints", [
+        utils.setPath(result, "taints", [
             {
                 key: "os",
                 value: "windows",

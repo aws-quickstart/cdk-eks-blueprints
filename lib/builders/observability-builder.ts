@@ -1,9 +1,11 @@
-import * as blueprints from '../../lib';
+import { BlueprintBuilder } from '../../lib/stacks';
+import * as addons from '../../lib/addons';
 import * as utils from "../utils";
+import * as spi from '../../lib/spi';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
+export class ObservabilityBuilder extends BlueprintBuilder {
 
     /**
      * This method helps you prepare a blueprint for setting up observability 
@@ -11,14 +13,14 @@ export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
      */
     public enableNativePatternAddOns(): ObservabilityBuilder {
         return this.addOns(
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-            new blueprints.addons.CertManagerAddOn(),
-            new blueprints.addons.ContainerInsightsAddOn(),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.KubeStateMetricsAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.PrometheusNodeExporterAddOn());
+            new addons.AwsLoadBalancerControllerAddOn(),
+            new addons.CertManagerAddOn(),
+            new addons.ContainerInsightsAddOn(),
+            new addons.CoreDnsAddOn(),
+            new addons.KubeProxyAddOn(),
+            new addons.KubeStateMetricsAddOn(),
+            new addons.MetricsServerAddOn(),
+            new addons.PrometheusNodeExporterAddOn());
     }
 
     /**
@@ -28,14 +30,14 @@ export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
      */
     public enableMixedPatternAddOns(): ObservabilityBuilder {
         return this.addOns(
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-            new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.CertManagerAddOn(),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.KubeStateMetricsAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.PrometheusNodeExporterAddOn());
+            new addons.AwsLoadBalancerControllerAddOn(),
+            new addons.AdotCollectorAddOn(),
+            new addons.CertManagerAddOn(),
+            new addons.CoreDnsAddOn(),
+            new addons.KubeProxyAddOn(),
+            new addons.KubeStateMetricsAddOn(),
+            new addons.MetricsServerAddOn(),
+            new addons.PrometheusNodeExporterAddOn());
     }
 
     /**
@@ -44,19 +46,19 @@ export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
      */
     public enableOpenSourcePatternAddOns(ampPrometheusEndpoint: string): ObservabilityBuilder {
         return this.addOns(
-            new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-            new blueprints.addons.AdotCollectorAddOn(),
-            new blueprints.addons.AmpAddOn({
+            new addons.AwsLoadBalancerControllerAddOn(),
+            new addons.AdotCollectorAddOn(),
+            new addons.AmpAddOn({
                 ampPrometheusEndpoint: ampPrometheusEndpoint,
             }),
-            new blueprints.addons.CertManagerAddOn(),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.ExternalsSecretsAddOn(),
-            new blueprints.addons.GrafanaOperatorAddon(),
-            new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.KubeStateMetricsAddOn(),
-            new blueprints.addons.MetricsServerAddOn(),
-            new blueprints.addons.PrometheusNodeExporterAddOn());
+            new addons.CertManagerAddOn(),
+            new addons.CoreDnsAddOn(),
+            new addons.ExternalsSecretsAddOn(),
+            new addons.GrafanaOperatorAddon(),
+            new addons.KubeProxyAddOn(),
+            new addons.KubeStateMetricsAddOn(),
+            new addons.MetricsServerAddOn(),
+            new addons.PrometheusNodeExporterAddOn());
     }
 
     /**
@@ -66,7 +68,7 @@ export class ObservabilityBuilder extends blueprints.BlueprintBuilder {
     public static builder(): ObservabilityBuilder {
         const builder = new ObservabilityBuilder();
         builder.addOns(
-            new blueprints.NestedStackAddOn({
+            new addons.NestedStackAddOn({
                 id: "usage-tracking-addon",
                 builder: UsageTrackingAddOn.builder(),
             }));
@@ -81,7 +83,7 @@ class UsageTrackingAddOn extends NestedStack {
 
     static readonly USAGE_ID = "qs-1u9l12gj7";
 
-    public static builder(): blueprints.NestedStackBuilder {
+    public static builder(): spi.NestedStackBuilder {
         return {
             build(scope: Construct, id: string, props: NestedStackProps) {
                 return new UsageTrackingAddOn(scope, id, props);
