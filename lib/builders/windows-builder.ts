@@ -1,9 +1,9 @@
-import { BlueprintBuilder } from '../../lib/stacks';
-import * as addons from '../../lib/addons';
+import { BlueprintBuilder } from '../stacks';
+import * as addons from '../addons';
 import * as utils from "../utils";
-import * as spi from '../../lib/spi';
-import * as clusterproviders from '../../lib/cluster-providers';
-import * as resourceproviders from '../../lib/resource-providers';
+import * as spi from '../spi';
+import * as clusterproviders from '../cluster-providers';
+import * as resourceproviders from '../resource-providers';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
