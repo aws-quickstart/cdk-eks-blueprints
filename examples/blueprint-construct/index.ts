@@ -231,7 +231,8 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-                addWindowsNodeGroup() //  commented out to check the impact on e2e
+                addWindowsNodeGroup(), //  commented out to check the impact on e2e
+                addGpuNodeGroup()
             ]
         });
 
@@ -375,6 +376,25 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
+function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
 
+    return {
+        id: "mng-linux-gpu",
+        amiType: NodegroupAmiType.AL2_X86_64_GPU,
+        instanceTypes: [new ec2.InstanceType('g5.xlarge')],
+        desiredSize: 0, 
+        minSize: 0, 
+        maxSize: 1,
+        nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        launchTemplate: {
+            tags: {
+                "Name": "Mng-linux-Gpu",
+                "Type": "Managed-linux-Gpu-Node-Group",
+                "LaunchTemplate": "Linux-Launch-Template",
+            },
+            requireImdsv2: false
+        }
+    };
+}
 
 
