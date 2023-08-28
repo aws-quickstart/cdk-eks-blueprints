@@ -31,8 +31,8 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     public enableMixedPatternAddOns(): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.AdotCollectorAddOn(),
             new addons.CertManagerAddOn(),
+            new addons.AdotCollectorAddOn(),
             new addons.CoreDnsAddOn(),
             new addons.KubeProxyAddOn(),
             new addons.KubeStateMetricsAddOn(),
@@ -43,19 +43,19 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     /**
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
+     * @param ampAddOnProps AmpAddonProps. This is mandatory.
+     * @param kubeProxyVersion KubeProxy Version. This is optional.
      */
-    public enableOpenSourcePatternAddOns(ampPrometheusEndpoint: string): ObservabilityBuilder {
+    public enableOpenSourcePatternAddOns(ampAddOnProps: addons.AmpAddOnProps, kubeProxyVersion?: string): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.AdotCollectorAddOn(),
-            new addons.AmpAddOn({
-                ampPrometheusEndpoint: ampPrometheusEndpoint,
-            }),
             new addons.CertManagerAddOn(),
+            new addons.AdotCollectorAddOn(),
+            new addons.AmpAddOn(ampAddOnProps),
             new addons.CoreDnsAddOn(),
             new addons.ExternalsSecretsAddOn(),
             new addons.GrafanaOperatorAddon(),
-            new addons.KubeProxyAddOn(),
+            new addons.KubeProxyAddOn(kubeProxyVersion),
             new addons.KubeStateMetricsAddOn(),
             new addons.MetricsServerAddOn(),
             new addons.PrometheusNodeExporterAddOn());
