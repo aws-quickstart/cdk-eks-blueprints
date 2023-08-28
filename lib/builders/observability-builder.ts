@@ -31,8 +31,8 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     public enableMixedPatternAddOns(): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.AdotCollectorAddOn(),
             new addons.CertManagerAddOn(),
+            new addons.AdotCollectorAddOn(),
             new addons.CoreDnsAddOn(),
             new addons.KubeProxyAddOn(),
             new addons.KubeStateMetricsAddOn(),
@@ -49,9 +49,9 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     public enableOpenSourcePatternAddOns(ampAddOnProps: addons.AmpAddOnProps, kubeProxyVersion?: string): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(),
+            new addons.CertManagerAddOn(),
             new addons.AdotCollectorAddOn(),
             new addons.AmpAddOn(ampAddOnProps),
-            new addons.CertManagerAddOn(),
             new addons.CoreDnsAddOn(),
             new addons.ExternalsSecretsAddOn(),
             new addons.GrafanaOperatorAddon(),
