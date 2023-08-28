@@ -61,16 +61,15 @@ Deployment of arbitrary kubernetes manifests can leverage the following construc
 
 ```typescript
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
-import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
+import * as blueprints from "@aws-quickstart/eks-blueprints";
 
-export class MyNonHelmAddOn implements ClusterAddOn {
-    deploy(clusterInfo: ClusterInfo): void {
+export class MyNonHelmAddOn implements blueprints.ClusterAddOn {
+    deploy(clusterInfo: blueprints.ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         // Apply manifest
-        const doc = readYamlDocument(__dirname + '/my-product.yaml');
+        const doc = blueprints.utils.readYamlDocument(__dirname + '/my-product.yaml');
         // ... apply any substitutions for dynamic values 
-        const manifest = docArray.split("---").map(e => loadYaml(e));
+        const manifest = doc.split("---").map(e => blueprints.utils.loadYaml(e));
         new KubernetesManifest(cluster.stack, "myproduct-manifest", {
             cluster,
             manifest,
@@ -92,17 +91,15 @@ Example:
 
 ```typescript
 import { Construct } from "constructs";
-import { ClusterInfo } from "../../spi";
-import { dependable } from "../../utils";
-import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import * as blueprints from "@aws-quickstart/eks-blueprints";
 
-export class MyProductAddOn extends HelmAddOn {
+export class MyProductAddOn extends blueprints.HelmAddOn {
 
     readonly options: MyProductAddOnProps; // extends HelmAddOnUserProps
    
     ...
  
-    @dependable('AwsLoadBalancerControllerAddOn') // depends on AwsLoadBalancerController
+    @@blueprints.utils.dependable('AwsLoadBalancerControllerAddOn') // depends on AwsLoadBalancerController
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         ...
     }
