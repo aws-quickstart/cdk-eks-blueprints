@@ -51,8 +51,8 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     ): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
-            new addons.AdotCollectorAddOn(adotCollectorProps),
             new addons.CertManagerAddOn(certManagerProps),
+            new addons.AdotCollectorAddOn(adotCollectorProps),
             new addons.CoreDnsAddOn(coreDnsProps),
             new addons.KubeProxyAddOn(kubeProxyVersion,kubeProxyAddOnProps),
             new addons.KubeStateMetricsAddOn(kubeStateMetricsProps),
@@ -63,9 +63,11 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     /**
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
+     * @param ampAddOnProps AmpAddonProps. This is mandatory.
+     * @param kubeProxyVersion KubeProxy Version. This is optional.
      */
     public enableOpenSourcePatternAddOns(
-        ampPrometheusEndpoint   : string,
+        ampAddonProps           : addons.AmpAddOnProps,
         awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
         certManagerProps?       : addons.CertManagerAddOnProps,
         adotCollectorProps?     : addons.AdotCollectorAddOnProps,
@@ -76,15 +78,13 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         metricsServerProps?     : addons.MetricsServerAddOnProps,
         prometheusNodeExpProps? : addons.PrometheusNodeExporterAddOnProps,
         externalSecretProps?    : addons.ExternalsSecretsAddOnProps,
-        grafanaOperatorProps?   : addons.GrafanaOperatorAddonProps
+        grafanaOperatorProps?   : addons.GrafanaOperatorAddonProps,
         ): ObservabilityBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
-            new addons.AdotCollectorAddOn(adotCollectorProps),
-            new addons.AmpAddOn({
-                ampPrometheusEndpoint: ampPrometheusEndpoint,
-            }),
             new addons.CertManagerAddOn(certManagerProps),
+            new addons.AdotCollectorAddOn(adotCollectorProps),
+            new addons.AmpAddOn(ampAddonProps),
             new addons.CoreDnsAddOn(coreDnsProps),
             new addons.ExternalsSecretsAddOn(externalSecretProps),
             new addons.GrafanaOperatorAddon(grafanaOperatorProps),
