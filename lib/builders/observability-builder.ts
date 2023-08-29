@@ -11,16 +11,26 @@ export class ObservabilityBuilder extends BlueprintBuilder {
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS native services
      */
-    public enableNativePatternAddOns(): ObservabilityBuilder {
+    public enableNativePatternAddOns(
+        awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
+        certManagerProps?       : addons.CertManagerAddOnProps,
+        containerInsightsProps? : addons.CertManagerAddOnProps,
+        coreDnsProps?           : addons.coreDnsAddOnProps,
+        kubeProxyVersion?       : string,
+        kubeProxyAddOnProps?    : addons.kubeProxyAddOnProps,
+        kubeStateMetricsProps?  : addons.KubeStateMetricsAddOnProps,
+        metricsServerProps?     : addons.MetricsServerAddOnProps,
+        prometheusNodeExpProps? : addons.PrometheusNodeExporterAddOnProps
+        ): ObservabilityBuilder {
         return this.addOns(
-            new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.CertManagerAddOn(),
-            new addons.ContainerInsightsAddOn(),
-            new addons.CoreDnsAddOn(),
-            new addons.KubeProxyAddOn(),
-            new addons.KubeStateMetricsAddOn(),
-            new addons.MetricsServerAddOn(),
-            new addons.PrometheusNodeExporterAddOn());
+            new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
+            new addons.CertManagerAddOn(certManagerProps),
+            new addons.ContainerInsightsAddOn(containerInsightsProps),
+            new addons.CoreDnsAddOn(coreDnsProps),
+            new addons.KubeProxyAddOn(kubeProxyVersion, kubeProxyAddOnProps),
+            new addons.KubeStateMetricsAddOn(kubeStateMetricsProps),
+            new addons.MetricsServerAddOn(metricsServerProps),
+            new addons.PrometheusNodeExporterAddOn(prometheusNodeExpProps));
     }
 
     /**
@@ -28,37 +38,60 @@ export class ObservabilityBuilder extends BlueprintBuilder {
      * returning an array of blueprint addons for combination of AWS native and 
      * AWS managed open source services
      */
-    public enableMixedPatternAddOns(): ObservabilityBuilder {
+    public enableMixedPatternAddOns(
+        awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
+        certManagerProps?       : addons.CertManagerAddOnProps,
+        adotCollectorProps?     : addons.AdotCollectorAddOnProps,
+        coreDnsProps?           : addons.coreDnsAddOnProps,
+        kubeProxyVersion?       : string,
+        kubeProxyAddOnProps?    : addons.kubeProxyAddOnProps,
+        kubeStateMetricsProps?  : addons.KubeStateMetricsAddOnProps,
+        metricsServerProps?     : addons.MetricsServerAddOnProps,
+        prometheusNodeExpProps? : addons.PrometheusNodeExporterAddOnProps
+    ): ObservabilityBuilder {
         return this.addOns(
-            new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.AdotCollectorAddOn(),
-            new addons.CertManagerAddOn(),
-            new addons.CoreDnsAddOn(),
-            new addons.KubeProxyAddOn(),
-            new addons.KubeStateMetricsAddOn(),
-            new addons.MetricsServerAddOn(),
-            new addons.PrometheusNodeExporterAddOn());
+            new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
+            new addons.AdotCollectorAddOn(adotCollectorProps),
+            new addons.CertManagerAddOn(certManagerProps),
+            new addons.CoreDnsAddOn(coreDnsProps),
+            new addons.KubeProxyAddOn(kubeProxyVersion,kubeProxyAddOnProps),
+            new addons.KubeStateMetricsAddOn(kubeStateMetricsProps),
+            new addons.MetricsServerAddOn(metricsServerProps),
+            new addons.PrometheusNodeExporterAddOn(prometheusNodeExpProps));
     }
 
     /**
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
      */
-    public enableOpenSourcePatternAddOns(ampPrometheusEndpoint: string): ObservabilityBuilder {
+    public enableOpenSourcePatternAddOns(
+        ampPrometheusEndpoint   : string,
+        awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
+        certManagerProps?       : addons.CertManagerAddOnProps,
+        adotCollectorProps?     : addons.AdotCollectorAddOnProps,
+        coreDnsProps?           : addons.coreDnsAddOnProps,
+        kubeProxyVersion?       : string,
+        kubeProxyAddOnProps?    : addons.kubeProxyAddOnProps,
+        kubeStateMetricsProps?  : addons.KubeStateMetricsAddOnProps,
+        metricsServerProps?     : addons.MetricsServerAddOnProps,
+        prometheusNodeExpProps? : addons.PrometheusNodeExporterAddOnProps,
+        externalSecretProps?    : addons.ExternalsSecretsAddOnProps,
+        grafanaOperatorProps?   : addons.GrafanaOperatorAddonProps
+        ): ObservabilityBuilder {
         return this.addOns(
-            new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.AdotCollectorAddOn(),
+            new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
+            new addons.AdotCollectorAddOn(adotCollectorProps),
             new addons.AmpAddOn({
                 ampPrometheusEndpoint: ampPrometheusEndpoint,
             }),
-            new addons.CertManagerAddOn(),
-            new addons.CoreDnsAddOn(),
-            new addons.ExternalsSecretsAddOn(),
-            new addons.GrafanaOperatorAddon(),
-            new addons.KubeProxyAddOn(),
-            new addons.KubeStateMetricsAddOn(),
-            new addons.MetricsServerAddOn(),
-            new addons.PrometheusNodeExporterAddOn());
+            new addons.CertManagerAddOn(certManagerProps),
+            new addons.CoreDnsAddOn(coreDnsProps),
+            new addons.ExternalsSecretsAddOn(externalSecretProps),
+            new addons.GrafanaOperatorAddon(grafanaOperatorProps),
+            new addons.KubeProxyAddOn(kubeProxyVersion,kubeProxyAddOnProps),
+            new addons.KubeStateMetricsAddOn(kubeStateMetricsProps),
+            new addons.MetricsServerAddOn(metricsServerProps),
+            new addons.PrometheusNodeExporterAddOn(prometheusNodeExpProps));
     }
 
     /**

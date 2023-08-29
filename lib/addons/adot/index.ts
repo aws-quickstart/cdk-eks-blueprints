@@ -9,7 +9,7 @@ import { getAdotCollectorPolicyDocument } from "./iam-policy";
 /**
  * Configuration options for the Adot add-on.
  */
-type AdotCollectorAddOnProps = CoreAddOnProps;
+export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" >;
 
 const defaultProps = {
     addOnName: 'adot',
