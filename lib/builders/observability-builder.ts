@@ -64,10 +64,9 @@ export class ObservabilityBuilder extends BlueprintBuilder {
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for AWS managed open source services
      * @param ampAddOnProps AmpAddonProps. This is mandatory.
-     * @param kubeProxyVersion KubeProxy Version. This is optional.
      */
     public enableOpenSourcePatternAddOns(
-        ampAddonProps           : addons.AmpAddOnProps,
+        ampAddOnProps           : addons.AmpAddOnProps,
         awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
         certManagerProps?       : addons.CertManagerAddOnProps,
         adotCollectorProps?     : addons.AdotCollectorAddOnProps,
@@ -84,7 +83,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.AwsLoadBalancerControllerAddOn(awsLoadBalancerProps),
             new addons.CertManagerAddOn(certManagerProps),
             new addons.AdotCollectorAddOn(adotCollectorProps),
-            new addons.AmpAddOn(ampAddonProps),
+            new addons.AmpAddOn(ampAddOnProps),
             new addons.CoreDnsAddOn(coreDnsProps),
             new addons.ExternalsSecretsAddOn(externalSecretProps),
             new addons.GrafanaOperatorAddon(grafanaOperatorProps),
