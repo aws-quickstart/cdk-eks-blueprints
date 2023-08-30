@@ -29,10 +29,6 @@ export interface GpuOptions {
      */
     instanceSize: ec2.InstanceSize,
     /** 
-     * Optional, AMI Type for GPU Nodes @ default AL2_X86_64_GPU 
-     */
-    gpuAmiType?: NodegroupAmiType,
-    /** 
      * Optional, Desired number of nodes to use for the cluster. 
      */
     desiredNodeSize?: number,
@@ -44,10 +40,6 @@ export interface GpuOptions {
      * Optional, Maximum number of nodes to use for the cluster. 
      */
     maxNodeSize?: number,
-    /** 
-     * Optional, Block device size.
-     */
-    blockDeviceSize?: number,
     /**
      * Optional, Cluster Provider Tags.
      */
@@ -72,11 +64,9 @@ const defaultOptions: GpuOptions = {
     kubernetesVersion: eks.KubernetesVersion.of("1.27"),
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
-    gpuAmiType: NodegroupAmiType.AL2_X86_64_GPU,
     desiredNodeSize: 2,
     minNodeSize: 2,
     maxNodeSize: 3,
-    blockDeviceSize: 50,
     clusterProviderTags: {
         "Name": "blueprints-gpu-eks-cluster",
         "Type": "generic-gpu-cluster"
