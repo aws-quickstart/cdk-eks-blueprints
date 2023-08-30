@@ -158,7 +158,7 @@ function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup
     return {
         id: "mng-linux-gpu",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
-        instanceTypes: [new ec2.InstanceType('g5.xlarge')],
+        instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
         desiredSize: options.desiredNodeSize, 
         minSize: options.minNodeSize, 
         maxSize: options.maxNodeSize,
