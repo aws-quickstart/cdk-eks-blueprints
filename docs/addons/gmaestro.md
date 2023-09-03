@@ -9,14 +9,14 @@ For additional information, visit [gMaestro documentation](https://gmaestro.gitb
 ## Prerequisite 
 Before using gMaestro, you need to:
 1. [Sign up](https://app.granulate.io/gMaestroSignup) to the gMaestro platform
-2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" 
+2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File"
 
-![GmaestroGenerateConfigFile](assets/images/gmaestro-generate-config-file.png)
+![GmaestroGenerateConfigFile](./../assets/images/gmaestro-generate-config-file.png)
 
-![GmaestroConfigFile](assets/images/gmaestro-config-file.png)
+![GmaestroConfigFile](./../assets/images/gmaestro-config-file.png)
 
 3. Create a secret (as a plaintext) in AWS Secrets Manager copy its value from the following place:
-   1. Deployment section `MAESTRO_CLIENT_ID`
+   1. Navigate to Deployment section in the downloaded config file and use the value of `MAESTRO_CLIENT_ID` environment variable
 
 ## Installation
 
@@ -37,14 +37,23 @@ import {GmaestroAddOn} from '@granulate/gmaestro-eks-blueprints-addon';
 const app = new cdk.App();
 
 const addOn = new GmaestroAddOn({
-        clientIdSecretName: "<client id secret name>", // Create and copy from gMaestro deployment yaml
-        clusterName: "<cluster name>",
+        clientIdSecretName: "<client id secret name>", // Copy from gMaestro deployment yaml
+        clusterName: "<cluster name>", // Copy from gMaestro deployment yaml
     });
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
+
+## AddOn Options
+
+| Option               | Description                                         | Default   |
+|----------------------|-----------------------------------------------------|-----------|
+| `clientIdSecretName` | The secret name from the Prerequisite section 3.i.  |           |
+| `clusterName`        | Navigate to Deployment section in the downloaded config file and use the value of `MAESTRO_SERVICE_NAME` environment variable |           |
+| `createNamespace`    | If you want CDK to create the namespace for you     | false     |
+| `namespace`          | The namespace where gMaestro will be installed          | "default" |
 
 Use the following command to validate that gMaestro installed successfully:
 
@@ -53,47 +62,20 @@ $ kubectl get pods --all-namespaces | grep granulate-maestro
 
 NAMESPACE     NAME                                 READY   STATUS    RESTARTS   AGE
 default       granulate-maestro-6947dc87bc-k5nfc   2/2     Running   0          11m
-kube-system   aws-node-9rhgx                       1/1     Running   0          16m
-kube-system   coredns-d5b9bfc4-8v8k5               1/1     Running   0          21m
-kube-system   coredns-d5b9bfc4-r5sdb               1/1     Running   0          21m
-kube-system   kube-proxy-js5pn                     1/1     Running   0          16m
 ```
 
 After a few seconds, you will gain full visibility into your K8s cluster objects.
 The first rightsizing recommendations may take up to 5 minutes to load.
 
-## `gMaestroAddOn` Required (props)
-Take the following parameter from the sample YAML file that was downloaded.
-
-#### `clientIdSecretName: string`
-
-The secret name from the Prerequisite section 3.i.
-
-#### `clusterName: string`
-
-Copy from the Deployment section `MAESTRO_SERVICE_NAME` value
-
-#### `createNamespace: boolean`
-
-If you want CDK to create the namespace for you
-
-#### `namespace: string` (optional)
-
-The namespace where gMaestro will be installed. `default` namespace is used as default.
-
-
-## Security issue
-
-1. The implementation requires access to the AWS Secrets Manager at build time to retrieve secret values.
-2. The secret value will be stored as plain text in the resulting CloudFormation stack, meaning that any user with access to view CloudFormation stack can gain access to this secret.
-
-Note: This secret is specific to gMaestro and don't affect customer account beyond the scope of the gMaestro add-on.
-
-This issue will be mitigated and updated in the following weeks.
+## Disclaimer 
+This pattern relies on an open source NPM package [aws-eks-blueprint-addon](https://www.npmjs.com/package/@granulate/gmaestro-eks-blueprints-addon?activeTab=readme). Please refer to the package npm site for more information.
+```
+https://www.npmjs.com/package/@granulate/gmaestro-eks-blueprints-addon?activeTab=readme
+```
 
 ## Support
 
-If you have questions about Gmaestro, catch us [on Slack](https://granulatecommunity.slack.com/archives/C03RK0HN2TU)!
+If you have questions about Gmaestro, catch us [on Slack](https://join.slack.com/t/granulatecommunity/shared_invite/zt-1dde7x9ki-QHl3pX54peYP91SR5kAcRA)!
 
 ## License
 
