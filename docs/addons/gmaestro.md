@@ -16,7 +16,7 @@ Before using gMaestro, you need to:
    1. Navigate to Deployment section in the downloaded config file and use the value of `MAESTRO_CLIENT_ID` environment variable
    2. Using AWS CLI:
       ```bash
-      export MAESTRO_CLIENT_ID=<MAESTRO_CLIENT_ID value from the  Deployment section in the downloaded config file>
+      export MAESTRO_CLIENT_ID=<MAESTRO_CLIENT_ID value from the Deployment section in the downloaded config file>
       export MAESTRO_SECRET_NAME=<MAESTRO_SECRET_NAME your preferred aws secret name>
       aws secretsmanager create-secret --name ${MAESTRO_SECRET_NAME} \
           --description "Encrypted client ID for Granulate gMaestro" \
