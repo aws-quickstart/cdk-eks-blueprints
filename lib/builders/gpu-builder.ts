@@ -40,6 +40,10 @@ export interface GpuOptions {
      * Optional, Maximum number of nodes to use for the cluster. 
      */
     maxNodeSize?: number,
+    /** 
+     * Optional, Block device size.
+     */
+    blockDeviceSize?: number,
     /**
      * Optional, Cluster Provider Tags.
      */
@@ -152,6 +156,7 @@ function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup
         desiredSize: options.desiredNodeSize, 
         minSize: options.minNodeSize, 
         maxSize: options.maxNodeSize,
+        blockDeviceSize: options.blockDeviceSize,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
             tags: options.nodeGroupTags,
