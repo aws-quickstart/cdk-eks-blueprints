@@ -12,12 +12,12 @@ Before using gMaestro, you need to:
 
 ![GmaestroConfigFile](./../assets/images/gmaestro-config-file.png)
 
-3. Create a secret (as a plaintext) in AWS Secrets Manager copy its value from the following place:
+3. Create a secret (as a plaintext) in AWS Secrets Manager:
    1. Navigate to Deployment section in the downloaded config file and use the value of `MAESTRO_CLIENT_ID` environment variable
    2. Using AWS CLI:
       ```bash
-      export MAESTRO_CLIENT_ID=<MAESTRO_CLIENT_ID>
-      export MAESTRO_SECRET_NAME=<MAESTRO_SECRET_NAME>
+      export MAESTRO_CLIENT_ID=<MAESTRO_CLIENT_ID value from the  Deployment section in the downloaded config file>
+      export MAESTRO_SECRET_NAME=<MAESTRO_SECRET_NAME your preferred aws secret name>
       aws secretsmanager create-secret --name ${MAESTRO_SECRET_NAME} \
           --description "Encrypted client ID for Granulate gMaestro" \
           --secret-string "${MAESTRO_CLIENT_ID}"
@@ -43,8 +43,8 @@ import {GmaestroAddOn} from '@granulate/gmaestro-eks-blueprints-addon';
 const app = new cdk.App();
 
 const addOn = new GmaestroAddOn({
-        clientIdSecretName: "<secret name>", // MAESTRO_SECRET_NAME
-        clusterName: "<cluster name>", // Copy from gMaestro deployment yaml
+        clientIdSecretName: "<MAESTRO_SECRET_NAME>", // MAESTRO_SECRET_NAME
+        clusterName: "<MAESTRO_SERVICE_NAME>", // Copy from gMaestro deployment yaml
     });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -54,12 +54,12 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## AddOn Options
 
-| Option               | Description                                         | Default   |
-|----------------------|-----------------------------------------------------|-----------|
-| `clientIdSecretName` | The secret name from the Prerequisite section 3.i.  |           |
+| Option               | Description                                                                                                                   | Default   |
+|----------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------|
+| `clientIdSecretName` | The secret name from the Prerequisite section 3.i. `MAESTRO_CLIENT_ID`                                                        |           |
 | `clusterName`        | Navigate to Deployment section in the downloaded config file and use the value of `MAESTRO_SERVICE_NAME` environment variable |           |
-| `createNamespace`    | If you want CDK to create the namespace for you     | false     |
-| `namespace`          | The namespace where gMaestro will be installed          | "default" |
+| `createNamespace`    | If you want CDK to create the namespace for you                                                                               | false     |
+| `namespace`          | The namespace where gMaestro will be installed                                                                                | "default" |
 
 
 ## Support
