@@ -71,6 +71,7 @@ const defaultOptions: GpuOptions = {
     desiredNodeSize: 2,
     minNodeSize: 2,
     maxNodeSize: 3,
+    blockDeviceSize: 50,
     clusterProviderTags: {
         "Name": "blueprints-gpu-eks-cluster",
         "Type": "generic-gpu-cluster"
