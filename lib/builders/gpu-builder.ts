@@ -151,17 +151,22 @@ class UsageTrackingAddOn extends NestedStack {
 function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup {
 
     return {
-        id: "mng-linux-gpu",
+        id: "mng-linux-gpu-01",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
         instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
         desiredSize: options.desiredNodeSize, 
         minSize: options.minNodeSize, 
         maxSize: options.maxNodeSize,
-        diskSize: options.blockDeviceSize,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
             tags: options.nodeGroupTags,
-            requireImdsv2: false
+            requireImdsv2: false,
+            blockDevices: [
+                {
+                    deviceName: "/dev/sda1",
+                    volume: ec2.BlockDeviceVolume.ebs(options.blockDeviceSize!),
+                }
+            ]
         }
     };
 }
