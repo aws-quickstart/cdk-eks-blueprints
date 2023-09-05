@@ -1,6 +1,10 @@
 # gMaestro add-on for Amazon EKS Blueprints
 
-The gMaestro Blueprints AddOn deploys the gMaestro Agent on Amazon EKS using the [eks-blueprints](https://github.com/aws-quickstart/cdk-eks-blueprints) [CDK](https://aws.amazon.com/cdk/) construct.
+This add-on deploys the [gMaestro Agent](https://gmaestro.gitbook.io/gmaestro-docs/) on Amazon EKS using the [eks-blueprints](https://github.com/aws-quickstart/cdk-eks-blueprints) [CDK](https://aws.amazon.com/cdk/) construct.
+
+gMaestro is a Kubernetes cost optimization solution that helps companies reduce spending on un-utilized resources by up to 60%. With gMaestro, you gain full visibility into K8s clusters, seamlessly interact with HPA scaling policies, and achieve your cost-performance goals by applying custom rightsizing recommendations based on actual usage in production.
+
+This add-on will deploy gMaestro agent on a namespace of your choice and create it if it doesn't exist.
 
 
 ## Prerequisites
