@@ -46,6 +46,7 @@ nav:
     - External Secrets: 'addons/external-secrets.md'
     - EMR on EKS: 'addons/emr-eks.md'
     - FluxCD: 'addons/fluxcd.md'
+    - Gmaestro: 'addons/gmaestro.md'
     - NVIDIA GPU Operator: 'addons/gpu-operator.md'
     - Grafana Operator: 'addons/grafana-operator.md'
     - IBM Instana: 'addons/instana-addon.md'
