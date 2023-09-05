@@ -10,7 +10,7 @@ This add-on will deploy gMaestro agent on a namespace of your choice and create 
 ## Prerequisites
 Before using gMaestro, you need to:
 1. [Sign up](https://app.granulate.io/gMaestroSignup) to the gMaestro platform
-2. Download a sample YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" 
+2. Download a config YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" as shown bellow:
 
 ![GmaestroGenerateConfigFile](./../assets/images/gmaestro-generate-config-file.png)
 
