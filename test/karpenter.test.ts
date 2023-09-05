@@ -73,6 +73,30 @@ describe('Unit tests for Karpenter addon', () => {
         }).toThrow("Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.");
     });
 
+    test("Support Windows2019 as amiFamily", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version("auto")
+            .addOns(new blueprints.KarpenterAddOn({
+                amiFamily: "Windows2019"
+            }));
+    });
+
+    test("Support Windows2022 as amiFamily", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version("auto")
+            .addOns(new blueprints.KarpenterAddOn({
+                amiFamily: "Windows2022"
+            }));
+    });
+
     test("Stack creates with interruption enabled", () => {
         const app = new cdk.App();
 
