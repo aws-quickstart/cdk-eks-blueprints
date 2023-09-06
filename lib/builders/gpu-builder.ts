@@ -29,10 +29,6 @@ export interface GpuOptions {
      */
     instanceSize: ec2.InstanceSize,
     /** 
-     * Optional, AMI Type for GPU Nodes @ default AL2_X86_64_GPU 
-     */
-    gpuAmiType?: NodegroupAmiType,
-    /** 
      * Optional, Desired number of nodes to use for the cluster. 
      */
     desiredNodeSize?: number,
@@ -72,7 +68,6 @@ const defaultOptions: GpuOptions = {
     kubernetesVersion: eks.KubernetesVersion.of("1.27"),
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
-    gpuAmiType: NodegroupAmiType.AL2_X86_64_GPU,
     desiredNodeSize: 2,
     minNodeSize: 2,
     maxNodeSize: 3,
@@ -156,16 +151,22 @@ class UsageTrackingAddOn extends NestedStack {
 function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup {
 
     return {
-        id: "mng-linux-gpu",
+        id: "mng-linux-gpu-01",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
-        instanceTypes: [new ec2.InstanceType('g5.xlarge')],
+        instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
         desiredSize: options.desiredNodeSize, 
         minSize: options.minNodeSize, 
         maxSize: options.maxNodeSize,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
             tags: options.nodeGroupTags,
-            requireImdsv2: false
+            requireImdsv2: false,
+            blockDevices: [
+                {
+                    deviceName: "/dev/sda1",
+                    volume: ec2.BlockDeviceVolume.ebs(options.blockDeviceSize!),
+                }
+            ]
         }
     };
 }
