@@ -86,7 +86,7 @@ const app = new cdk.App();
 // AddOns for the cluster.
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn,
-    new blueprints.addons.CalicoAddOn,
+    new blueprints.addons.CalicoOperatorAddOn,
     new blueprints.addons.MetricsServerAddOn,
     new blueprints.addons.ClusterAutoScalerAddOn,
     new blueprints.addons.ContainerInsightsAddOn,
