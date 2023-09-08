@@ -64,7 +64,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
      */
-    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
+    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
 
     /**
      * AMI Selector
