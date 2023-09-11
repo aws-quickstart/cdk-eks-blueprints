@@ -102,7 +102,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         awsLoadBalancerProps?   : addons.AwsLoadBalancerControllerProps,
         certManagerProps?       : addons.CertManagerAddOnProps,
         adotCollectorProps?     : addons.AdotCollectorAddOnProps,
-        coreDnsProps?           : addons.coreDnsAddOnProps,
+        coreDnsProps?           : addons.CoreDnsAddOnProps,
         kubeProxyVersion?       : string,
         kubeProxyAddOnProps?    : addons.kubeProxyAddOnProps,
         kubeStateMetricsProps?  : addons.KubeStateMetricsAddOnProps,
