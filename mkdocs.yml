@@ -59,6 +59,7 @@ nav:
     - Keptn: 'https://github.com/keptn-sandbox/keptn-eks-blueprints-addon'
     - Knative: 'addons/knative-operator.md'
     - Komodor: 'https://github.com/komodorio/komodor-eks-blueprints-addon'
+    - Konveyor: 'addons/konveyor.md'
     - Kube Proxy: 'addons/kube-proxy.md'
     - Kubecost: 'addons/kubecost.md'
     - Kubeflow: 'addons/kubeflow.md'
