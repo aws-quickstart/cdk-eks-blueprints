@@ -75,51 +75,51 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     }
 
     public withAwsLoadBalancerControllerProps(props: addons.AwsLoadBalancerControllerProps){
-        this.awsLoadbalancerProps = merge(this.awsLoadbalancerProps, props)
+        this.awsLoadbalancerProps = merge(this.awsLoadbalancerProps, props);
     }
     
     public withCertManagerProps(props: addons.CertManagerAddOnProps){
-        this.certManagerProps = merge(this.certManagerProps, props)
+        this.certManagerProps = merge(this.certManagerProps, props);
     }
 
     public withContainerInsightProps(props: addons.ContainerInsightAddonProps) {
-        this.containerInsightsProps = merge(this.containerInsightsProps,props)
+        this.containerInsightsProps = merge(this.containerInsightsProps,props);
     }
 
     public withCoreDnsProps(props:addons.CoreDnsAddOnProps) {
-        this.coreDnsProps = merge(this.coreDnsProps, props)
+        this.coreDnsProps = merge(this.coreDnsProps, props);
     }
 
     public withKubeProxyProps(props:addons.kubeProxyAddOnProps, version: string) {
-        this.kubeProxyProps = merge(this.kubeProxyProps, props)
+        this.kubeProxyProps = merge(this.kubeProxyProps, props);
         this.kubeProxyVersion = version;
     }
 
     public withKubeStateMetricsProps(props:addons.KubeStateMetricsAddOnProps) {
-        this.kubeStateMetricsProps = merge(this.kubeStateMetricsProps, props)
+        this.kubeStateMetricsProps = merge(this.kubeStateMetricsProps, props);
     }
 
     public withMetricsServerProps(props:addons.MetricsServerAddOnProps) {
-        this.metricsServerProps = merge(this.metricsServerProps, props)
+        this.metricsServerProps = merge(this.metricsServerProps, props);
     }
 
     public withPrometheusNodeExporterProps(props:addons.PrometheusNodeExporterAddOnProps) {
-        this.prometheusNodeExporterProps = merge(this.prometheusNodeExporterProps, props)
+        this.prometheusNodeExporterProps = merge(this.prometheusNodeExporterProps, props);
     }
 
     public withAdotCollectorProps(props:addons.AdotCollectorAddOnProps) {
-        this.adotCollectorProps = merge(this.adotCollectorProps, props)
+        this.adotCollectorProps = merge(this.adotCollectorProps, props);
     }
 
     public withExternalSecretsProps(props:addons.ExternalDnsProps) {
-        this.externalSecretProps = merge(this.externalSecretProps, props)
+        this.externalSecretProps = merge(this.externalSecretProps, props);
     }
 
     public withGrafanaOperatorProps(props:addons.GrafanaOperatorAddonProps) {
-        this.grafanaOperatorProps = merge(this.grafanaOperatorProps, props)
+        this.grafanaOperatorProps = merge(this.grafanaOperatorProps, props);
     }
     public withAmpProps(props:addons.AmpAddOnProps) {
-        this.ampProps = merge(this.ampProps, props)
+        this.ampProps = merge(this.ampProps, props);
     }
     /**
      * This method helps you prepare a blueprint for setting up observability with 
