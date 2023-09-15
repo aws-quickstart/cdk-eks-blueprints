@@ -37,7 +37,21 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.MetricsServerAddOn(this.metricsServerProps),
             new addons.PrometheusNodeExporterAddOn(this.prometheusNodeExporterProps));
     }
-
+    /**
+     * This method helps you prepare a blueprint for setting up observability 
+     * returning an array of blueprint addons for AWS Fargate services
+     */
+    public enableFargatePatternAddOns(): ObservabilityBuilder {
+        return this.addOns(
+            new addons.AwsLoadBalancerControllerAddOn(this.awsLoadbalancerProps),
+            new addons.CertManagerAddOn(this.certManagerProps),
+            new addons.AdotCollectorAddOn(this.adotCollectorProps),
+            new addons.CoreDnsAddOn(this.coreDnsProps),
+            new addons.KubeProxyAddOn(this.kubeProxyVersion, this.kubeProxyProps),
+            new addons.KubeStateMetricsAddOn(this.kubeStateMetricsProps),
+            new addons.MetricsServerAddOn(this.metricsServerProps));
+    }
+    
     /**
      * This method helps you prepare a blueprint for setting up observability 
      * returning an array of blueprint addons for combination of AWS native and 
