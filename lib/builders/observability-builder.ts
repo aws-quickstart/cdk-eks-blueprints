@@ -4,7 +4,7 @@ import * as utils from "../utils";
 import * as spi from '../spi';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { cloneDeep } from '../utils';
 
 export class ObservabilityBuilder extends BlueprintBuilder {
 
@@ -88,52 +88,64 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.PrometheusNodeExporterAddOn(this.prometheusNodeExporterProps));
     }
 
-    public withAwsLoadBalancerControllerProps(props: addons.AwsLoadBalancerControllerProps){
-        this.awsLoadbalancerProps = merge(this.awsLoadbalancerProps, props);
+    public withAwsLoadBalancerControllerProps(props: addons.AwsLoadBalancerControllerProps) : this {
+        this.awsLoadbalancerProps = { ...this.awsLoadbalancerProps, ...cloneDeep(props) };
+        return this;
     }
     
-    public withCertManagerProps(props: addons.CertManagerAddOnProps){
-        this.certManagerProps = merge(this.certManagerProps, props);
+    public withCertManagerProps(props: addons.CertManagerAddOnProps) : this {
+        this.certManagerProps = { ...this.certManagerProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withContainerInsightProps(props: addons.ContainerInsightAddonProps) {
-        this.containerInsightsProps = merge(this.containerInsightsProps,props);
+    public withContainerInsightProps(props: addons.ContainerInsightAddonProps) : this {
+        this.containerInsightsProps = { ...this.containerInsightsProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withCoreDnsProps(props:addons.CoreDnsAddOnProps) {
-        this.coreDnsProps = merge(this.coreDnsProps, props);
+    public withCoreDnsProps(props:addons.CoreDnsAddOnProps) : this {
+        this.coreDnsProps = { ...this.coreDnsProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withKubeProxyProps(props:addons.kubeProxyAddOnProps, version: string) {
-        this.kubeProxyProps = merge(this.kubeProxyProps, props);
+    public withKubeProxyProps(props:addons.kubeProxyAddOnProps, version: string) : this {
+        this.kubeProxyProps = { ...this.kubeProxyProps, ...cloneDeep(props) };
         this.kubeProxyVersion = version;
+        return this;
     }
 
-    public withKubeStateMetricsProps(props:addons.KubeStateMetricsAddOnProps) {
-        this.kubeStateMetricsProps = merge(this.kubeStateMetricsProps, props);
+    public withKubeStateMetricsProps(props:addons.KubeStateMetricsAddOnProps) : this {
+        this.kubeStateMetricsProps = { ...this.kubeStateMetricsProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withMetricsServerProps(props:addons.MetricsServerAddOnProps) {
-        this.metricsServerProps = merge(this.metricsServerProps, props);
+    public withMetricsServerProps(props:addons.MetricsServerAddOnProps) : this {
+        this.metricsServerProps = { ...this.metricsServerProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withPrometheusNodeExporterProps(props:addons.PrometheusNodeExporterAddOnProps) {
-        this.prometheusNodeExporterProps = merge(this.prometheusNodeExporterProps, props);
+    public withPrometheusNodeExporterProps(props:addons.PrometheusNodeExporterAddOnProps) : this {
+        this.prometheusNodeExporterProps = { ...this.prometheusNodeExporterProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withAdotCollectorProps(props:addons.AdotCollectorAddOnProps) {
-        this.adotCollectorProps = merge(this.adotCollectorProps, props);
+    public withAdotCollectorProps(props:addons.AdotCollectorAddOnProps) : this {
+        this.adotCollectorProps = { ...this.adotCollectorProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withExternalSecretsProps(props:addons.ExternalDnsProps) {
-        this.externalSecretProps = merge(this.externalSecretProps, props);
+    public withExternalSecretsProps(props:addons.ExternalDnsProps) : this {
+        this.externalSecretProps = { ...this.externalSecretProps, ...cloneDeep(props) };
+        return this;
     }
 
-    public withGrafanaOperatorProps(props:addons.GrafanaOperatorAddonProps) {
-        this.grafanaOperatorProps = merge(this.grafanaOperatorProps, props);
+    public withGrafanaOperatorProps(props:addons.GrafanaOperatorAddonProps) : this {
+        this.grafanaOperatorProps = { ...this.grafanaOperatorProps, ...cloneDeep(props) };
+        return this;
     }
-    public withAmpProps(props:addons.AmpAddOnProps) {
-        this.ampProps = merge(this.ampProps, props);
+    public withAmpProps(props:addons.AmpAddOnProps) : this {
+        this.ampProps = { ...this.ampProps, ...cloneDeep(props) };
+        return this;
     }
     /**
      * This method helps you prepare a blueprint for setting up observability with 
