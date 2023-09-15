@@ -17,6 +17,7 @@ export * from './cloudwatch-logs';
 export * from './cert-manager';
 export * from './cluster-autoscaler';
 export * from './container-insights';
+export * from './core-addon'
 export * from './coredns';
 export * from './external-dns';
 export * from './external-secrets';
