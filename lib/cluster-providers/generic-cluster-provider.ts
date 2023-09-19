@@ -170,7 +170,6 @@ export class GenericClusterPropsConstraints implements utils.ConstraintsType<Gen
 }
 
 export const defaultOptions = {
-    version: eks.KubernetesVersion.V1_25
 };
 
 export class ClusterBuilder {
@@ -184,7 +183,7 @@ export class ClusterBuilder {
     } = {};
 
     constructor() {
-        this.props = { ...this.props, ...{ version: eks.KubernetesVersion.V1_25 } };
+        this.props = { ...this.props };
     }
 
     withCommonOptions(options: Partial<eks.ClusterOptions>): this {
