@@ -54,9 +54,21 @@ const blueprint = blueprints.EksBlueprint.builder()
         owner: "aws-samples",
         repoUrl: 'cdk-eks-blueprints-patterns',
         credentialsSecretName: 'github-token',
-        targetRevision: 'main' // optional, default is "main"
+        targetRevision: 'main' // optional, default is "main",
     })
 ```
+
+If you IaC code is located under a specific folder, for example `PROJECT_ROOT/infra/blueprints` you can specify that directory with the repository (applies to GitHub. CodeCommit and CodeStar repos). 
+
+```
+ blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
+    .repository({
+        owner: "aws-samples",
+        repoUrl: 'cdk-eks-blueprints-patterns',
+        credentialsSecretName: 'github-token',
+        path: "./infra/blueprints" // optional, default is './'
+    })```
 
 Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be fined in one main region, and replicated to all target regions.
 
