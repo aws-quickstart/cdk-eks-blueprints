@@ -206,10 +206,14 @@ export class ClusterBuilder {
         return this;
     }
 
+    version(version: eks.KubernetesVersion): this {
+        this.props = { ...this.props, version };
+        return this;
+    }
+
     build() {
         return new GenericClusterProvider({
             ...this.props,
-            version: this.props.version,
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups,
             autoscalingNodeGroups: this.autoscalingNodeGroups,
@@ -270,7 +274,7 @@ export class GenericClusterProvider implements ClusterProvider {
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
-        const clusterOptions = { ...defaultOptions, ...this.props };
+        const clusterOptions = { ...defaultOptions, ...this.props, version };
         // Create an EKS Cluster
         const cluster = this.internalCreateCluster(scope, id, clusterOptions);
         cluster.node.addDependency(vpc);
