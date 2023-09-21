@@ -103,9 +103,11 @@ nav:
     - VPC Resource Providers: 'resource-providers/vpc-providers.md'
   - Builders:
     - Overview: 'builders/index.md'
+    - Graviton Builder: 'builders/graviton-builder.md'
+    - Generative AI Builder: 'builders/genai-builder.md' 
+    - GPU Builder: 'builders/gpu-builder.md'
     - Observability Builder: 'builders/observability-builder.md'
     - Windows Builder: 'builders/windows-builder.md'
-    - GPU Builder: 'builders/gpu-builder.md'
   - Extensibility: 'extensibility.md'
   - API Reference: 'api'
 markdown_extensions:
