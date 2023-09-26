@@ -1,4 +1,7 @@
+import { Construct } from "constructs/lib/construct";
+import { ClusterInfo } from "../../spi";
 import { CoreAddOn } from "../core-addon";
+import { ArchType, arch } from "../../utils";
 
 /**
  * Interface for Upbound Universal Crossplane EKS add-on options
@@ -29,6 +32,11 @@ export class UpboundUniversalCrossplaneAddOn extends CoreAddOn {
             version: options?.version ?? defaultProps.version,
             saName: ""
         });
+    }
+    
+    @arch(ArchType.X86)
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        return super.deploy(clusterInfo);
     }
 
 }

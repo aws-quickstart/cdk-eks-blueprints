@@ -4,7 +4,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { ArchType, arch, createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
+import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
 
 export class CoreAddOnProps {
     /**
@@ -59,7 +59,6 @@ export class CoreAddOn implements ClusterAddOn {
         userLog.debug(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         
         let serviceAccountRoleArn: string | undefined = undefined;

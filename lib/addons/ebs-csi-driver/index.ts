@@ -3,6 +3,8 @@ import * as kms from "aws-cdk-lib/aws-kms";
 import { ClusterInfo } from "../../spi";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
+import { arch, ArchType } from "../../utils";
+import { Construct } from "constructs/lib/construct";
 
 /**
  * Interface for EBS CSI Driver EKS add-on options
@@ -42,6 +44,11 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
     providePolicyDocument(clusterInfo: ClusterInfo) : PolicyDocument {
         return getEbsDriverPolicyDocument(clusterInfo.cluster.stack.partition, this.options?.kmsKeys);
+    }
+
+    @arch(ArchType.X86,ArchType.ARM)
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        return super.deploy(clusterInfo);
     }
 }
 
