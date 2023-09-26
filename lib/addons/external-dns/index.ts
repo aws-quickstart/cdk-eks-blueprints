@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import merge from "ts-deepmerge";
+import { ArchType, arch } from '../../utils';
 
 
 /**
@@ -41,6 +42,7 @@ export class ExternalDnsAddOn extends HelmAddOn {
         this.options = this.props as ExternalDnsProps;
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const region = clusterInfo.cluster.stack.region;
         const cluster = clusterInfo.cluster;

@@ -5,6 +5,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
+import { ArchType, arch } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -85,6 +86,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         this.options = this.props as AwsLoadBalancerControllerProps;
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {

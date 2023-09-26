@@ -19,7 +19,7 @@ const defaultProps = {
 };
 
 /**
- * Implementation of EBS CSI Driver EKS add-on
+ * Implementation of Upbound Crossplane EKS add-on
  */
 export class UpboundUniversalCrossplaneAddOn extends CoreAddOn {
 
@@ -30,5 +30,6 @@ export class UpboundUniversalCrossplaneAddOn extends CoreAddOn {
             saName: ""
         });
     }
+
 }
 

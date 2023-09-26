@@ -7,7 +7,7 @@ import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-
+import { validateSupportedArchitecture, ArchType } from "../utils"
 
 /**
  * Configuration options for Graviton Builder.
@@ -25,7 +25,6 @@ export interface GravitonOptions {
  */
 
 export class GravitonBuilder extends BlueprintBuilder {
-
 
     public addIstioBaseAddOn(props?: addons.IstioBaseAddOnProps) : GravitonBuilder {
         return this.addOns(
@@ -121,6 +120,11 @@ export class GravitonBuilder extends BlueprintBuilder {
         return this.addOns(
             new addons.XrayAdotAddOn(props)
         );
+    }
+
+    public addOns(...addOns: spi.ClusterAddOn[]): this {
+        addOns.forEach(a => validateSupportedArchitecture(a.constructor.name, ArchType.ARM)); 
+        return super.addOns(...addOns);
     }
 
     public static builder(options: GravitonOptions): GravitonBuilder {

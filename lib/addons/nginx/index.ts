@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo, Values } from "../../spi";
-import { dependable } from "../../utils";
+import { ArchType, arch, dependable } from "../../utils";
 import { setPath } from "../../utils/object-utils";
 import * as dot from 'dot-object';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -80,6 +80,7 @@ export class NginxAddOn extends HelmAddOn {
     }
 
     @dependable(AwsLoadBalancerControllerAddOn.name)
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const props = this.options;

@@ -3,7 +3,7 @@ import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace, setPath } from "../../utils";
+import { ArchType, arch, createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -72,6 +72,7 @@ export class KedaAddOn extends HelmAddOn {
     this.options = this.props as KedaAddOnProps;
   }
 
+  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     
     const cluster = clusterInfo.cluster;

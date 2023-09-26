@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi";
-import { setPath } from "../../utils";
+import { ArchType, arch, setPath } from "../../utils";
 
 
 /**
@@ -50,6 +50,7 @@ export class KubeviousAddOn extends HelmAddOn {
         this.options = this.props as KubeviousAddOnProps;
     }
 
+    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         let values: Values = populateValues(this.options);
         const chart = this.addHelmChart(clusterInfo, values);

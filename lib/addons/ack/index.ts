@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import "reflect-metadata";
-import { createNamespace, setPath } from "../../utils";
+import { ArchType, arch, createNamespace, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AckServiceName, serviceMappings } from './serviceMappings';
 
@@ -63,6 +63,7 @@ export class AckAddOn extends HelmAddOn {
     this.id = this.options.id;
   }
 
+  @arch(ArchType.X86)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
 

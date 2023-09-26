@@ -1,3 +1,4 @@
+import { ArchType, arch } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 
 /**
@@ -20,5 +21,4 @@ export class CoreDnsAddOn extends CoreAddOn {
     constructor(props?: CoreDnsAddOnProps) {
         super({ ...defaultProps, ...props });
     }
-   
 }

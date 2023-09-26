@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import {dependable, loadExternalYaml} from "../../utils";
+import {ArchType, arch, dependable, loadExternalYaml} from "../../utils";
 import { HelmAddOnUserProps } from '../helm-addon';
 import { KubectlProvider } from "../helm-addon/kubectl-provider";
 
@@ -45,6 +45,7 @@ export class KNativeOperator implements ClusterAddOn {
     }
 
     @dependable('IstioControlPlaneAddOn')
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const BASE_URL = `https://github.com/knative/operator/releases/download/knative`;
 

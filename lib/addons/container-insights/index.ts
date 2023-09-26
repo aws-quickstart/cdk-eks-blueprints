@@ -4,7 +4,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
-import { conflictsWith, createNamespace } from "../../utils";
+import { ArchType, arch, conflictsWith, createNamespace } from "../../utils";
 
 export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
     values?: ValuesSchema
@@ -29,6 +29,7 @@ export class ContainerInsightsAddOn extends HelmAddOn {
      * @override
      */
     @conflictsWith("AdotCollectorAddOn")
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;        
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');

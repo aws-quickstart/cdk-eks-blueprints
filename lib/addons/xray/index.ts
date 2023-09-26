@@ -2,7 +2,7 @@ import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import { loadYaml, readYamlDocument } from "../../utils";
+import { ArchType, arch, loadYaml, readYamlDocument } from "../../utils";
 
 /**
  * Implementation of AWS X-Ray add-on for EKS Blueprints. Installs xray daemonset and exposes 
@@ -10,6 +10,7 @@ import { loadYaml, readYamlDocument } from "../../utils";
  */
 export class XrayAddOn implements ClusterAddOn {
 
+    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
         const nodeGroups = assertEC2NodeGroup(clusterInfo, XrayAddOn.name);

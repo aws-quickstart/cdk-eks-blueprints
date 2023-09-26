@@ -5,6 +5,7 @@ import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { ArchType, arch } from "../../utils";
 
 
 /**
@@ -58,6 +59,7 @@ export class AppMeshAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
+    @arch(ArchType.X86)
     override deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const cluster = clusterInfo.cluster;

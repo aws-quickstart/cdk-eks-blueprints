@@ -2,7 +2,7 @@ import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from '../../spi/types';
 import { HelmAddOn } from '../helm-addon/index';
 import { Construct } from "constructs";
-import { setPath } from "../../utils";
+import { ArchType, arch, setPath } from "../../utils";
 import { Values } from "../../spi";
 
 /**
@@ -63,6 +63,7 @@ export class FalcoAddOn extends HelmAddOn {
         this.options = this.props as FalcoAddOnProps;
     }
 
+    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         let values: Values = populateValues(this.options);
         const chart = this.addHelmChart(clusterInfo, values);

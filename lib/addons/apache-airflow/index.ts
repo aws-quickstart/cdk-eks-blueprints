@@ -13,7 +13,7 @@ import { EfsCsiDriverAddOn } from "../efs-csi-driver";
 
 import { ClusterInfo } from '../../spi/types';
 import { Values } from "../../spi";
-import { setPath, createNamespace, createServiceAccount } from "../../utils";
+import { setPath, createNamespace, createServiceAccount, ArchType, arch } from "../../utils";
 import { IFileSystem } from "aws-cdk-lib/aws-efs";
 
 import merge from "ts-deepmerge";
@@ -95,7 +95,8 @@ export class ApacheAirflowAddOn extends HelmAddOn {
         super({...defaultProps  as any, ...props});
         this.options = this.props as AirflowAddOnProps;
     }
-
+    
+    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const albAddOnCheck = clusterInfo.getScheduledAddOn(AwsLoadBalancerControllerAddOn.name);

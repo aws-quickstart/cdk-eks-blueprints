@@ -1,5 +1,5 @@
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import { dependable, loadYaml, readYamlDocument } from "../../utils";
+import { ArchType, arch, dependable, loadYaml, readYamlDocument } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
@@ -73,6 +73,7 @@ export class CloudWatchAdotAddOn implements ClusterAddOn {
     }
 
     @dependable(AdotCollectorAddOn.name)
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
 

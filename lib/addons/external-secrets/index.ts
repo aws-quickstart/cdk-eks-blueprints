@@ -1,4 +1,4 @@
-import { createNamespace } from "../../utils";
+import { ArchType, arch, createNamespace } from "../../utils";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
 import { Construct } from "constructs";
@@ -65,6 +65,7 @@ export class ExternalsSecretsAddOn extends HelmAddOn {
     this.options = this.props;
   }
 
+  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
 

@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';
-import { cloneDeep } from "../../utils";
+import { ArchType, arch, cloneDeep } from "../../utils";
 
 /**
  * Configuration options for Secrets Store AddOn
@@ -61,6 +61,7 @@ export class SecretsStoreAddOn implements ClusterAddOn {
         this.options = cloneDeep({ ...defaultProps, ...props });
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const csiDriverProviderAws = new CsiDriverProviderAws(this.options);
         return Promise.resolve(csiDriverProviderAws.deploy(clusterInfo));

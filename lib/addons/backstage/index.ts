@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { dependable, setPath } from "../../utils";
+import { ArchType, arch, dependable, setPath } from "../../utils";
 import { ClusterInfo, Values } from "../../spi";
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import * as rds from "aws-cdk-lib/aws-rds";
@@ -76,8 +76,8 @@ export class BackstageAddOn extends HelmAddOn {
     this.options = this.props as BackstageAddOnProps;
   }
   
-  @dependable('AwsLoadBalancerControllerAddOn')
-  @dependable('ExternalsSecretsAddOn')
+  @dependable('AwsLoadBalancerControllerAddOn','ExternalsSecretsAddOn')
+  @arch(ArchType.X86)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     let values: Values = this.populateValues(clusterInfo, this.options);
     const chart = this.addHelmChart(clusterInfo, values);

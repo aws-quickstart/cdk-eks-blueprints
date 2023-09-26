@@ -9,7 +9,7 @@ import { Duration } from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import * as assert from "assert";
 import { ClusterInfo } from '../../spi';
-import { tagAsg } from '../../utils';
+import { ArchType, arch, tagAsg } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 
 /**
@@ -64,6 +64,7 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * Implementation of the deploy interface
    * @param clusterInfo 
    */
+  @arch(ArchType.X86)
   deploy(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;    
     const asgCapacity = clusterInfo.autoscalingGroups || [];

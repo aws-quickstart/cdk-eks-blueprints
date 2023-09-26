@@ -3,7 +3,7 @@ import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { ClusterInfo, Values } from "../../spi";
-import { loadYaml, readYamlDocument, ReplaceServiceAccount } from "../../utils";
+import { arch, ArchType, loadYaml, readYamlDocument, ReplaceServiceAccount } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
@@ -313,6 +313,7 @@ export class VpcCniAddOn extends CoreAddOn {
     (this.coreAddOnProps.configurationValues as any) = populateVpcCniConfigurationValues(props);
   }
 
+  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let clusterSecurityGroupId = cluster.clusterSecurityGroupId;

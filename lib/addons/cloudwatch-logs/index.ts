@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
-import { conflictsWith, setPath } from "../../utils";
+import { ArchType, arch, conflictsWith, setPath } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
@@ -63,6 +63,7 @@ export class CloudWatchLogsAddon extends HelmAddOn {
     }
 
     @conflictsWith('AwsForFluentBitAddOn')
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         let values: Values = populateValues(clusterInfo, this.options);
         values = merge(values, this.props.values ?? {});

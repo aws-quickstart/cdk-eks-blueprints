@@ -2,7 +2,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo, Values, Taint } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
+import { ArchType, arch, conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
@@ -161,6 +161,7 @@ export class KarpenterAddOn extends HelmAddOn {
     }
 
     @conflictsWith('ClusterAutoScalerAddOn')
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         assert(clusterInfo.cluster instanceof Cluster, "KarpenterAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");
         const cluster : Cluster = clusterInfo.cluster;

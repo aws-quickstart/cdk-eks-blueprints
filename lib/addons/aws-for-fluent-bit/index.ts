@@ -4,6 +4,7 @@ import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
+import { ArchType, arch } from '../../utils';
 
 /**
  * Configuration options for the FluentBit add-on.
@@ -49,6 +50,7 @@ export class AwsForFluentBitAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const namespace = this.options.namespace!;

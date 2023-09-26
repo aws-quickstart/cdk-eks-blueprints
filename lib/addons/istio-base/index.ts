@@ -4,6 +4,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
 import merge from "ts-deepmerge";
 import { Duration } from "aws-cdk-lib";
+import { ArchType, arch } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -68,6 +69,7 @@ export class IstioBaseAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const cluster = clusterInfo.cluster;

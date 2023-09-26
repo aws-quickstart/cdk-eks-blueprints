@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import merge from 'ts-deepmerge';
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { createNamespace } from '../../utils';
+import { ArchType, arch, createNamespace } from '../../utils';
 
 /**
  * Configuration options for the add-on.
@@ -36,6 +36,7 @@ export class MetricsServerAddOn extends HelmAddOn {
         this.options = this.props as MetricsServerAddOnProps;
     }
 
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let values: Values = this.options ?? {};
