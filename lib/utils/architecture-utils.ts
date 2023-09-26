@@ -1,5 +1,4 @@
 import "reflect-metadata";
-import { ClusterAddOn,  } from '../spi';
 
 export enum ArchType {
   ARM = "arm",
