@@ -2,21 +2,12 @@ import { BlueprintBuilder } from '../stacks';
 import * as utils from "../utils";
 import * as addons from '../addons';
 import * as spi from '../spi';
-import { MngClusterProvider } from '../cluster-providers';
+import { MngClusterProvider, MngClusterProviderProps } from '../cluster-providers';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { validateSupportedArchitecture, ArchType } from "../utils";
 
-/**
- * Configuration options for Graviton Builder.
- */
-export interface GravitonOptions {
-    kubernetesVersion: eks.KubernetesVersion,
-    instanceClass: ec2.InstanceClass,
-    instanceSize: ec2.InstanceSize
-}
 /** 
  * This builder class helps you prepare a blueprint for setting up 
  * Graviton nodes with EKS cluster. The `GravitonBuilder` creates the following:
@@ -36,14 +27,14 @@ export class GravitonBuilder extends BlueprintBuilder {
         return super.addOns(...addOns);
     }
 
-    public static builder(options: GravitonOptions): GravitonBuilder {
+    public static builder(options: Partial<MngClusterProviderProps>): GravitonBuilder {
         const builder = new GravitonBuilder();
 
         builder
             .clusterProvider(
                 new MngClusterProvider({
-                    version: options.kubernetesVersion,
-                    instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
+                    version: options.version,
+                    instanceTypes: options.instanceTypes,
                     amiType: eks.NodegroupAmiType.AL2_ARM_64,
                     desiredSize: 3,
                     minSize: 2,
