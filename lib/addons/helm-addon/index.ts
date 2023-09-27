@@ -4,7 +4,6 @@ import { HelmChartVersion, checkHelmChartVersion } from "./helm-version-checker"
 import { HelmChartConfiguration, KubectlProvider } from "./kubectl-provider";
 import * as spi from "../..";
 import * as utils from "../../utils";
-import { ArchType } from "../../utils";
 
 export type HelmAddOnProps = HelmChartConfiguration;
 export type HelmAddOnUserProps = Partial<HelmChartConfiguration>;

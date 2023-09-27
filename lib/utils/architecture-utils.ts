@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 export enum ArchType {
   ARM = "arm",
   X86 = "x86",
@@ -28,9 +26,14 @@ export function isSupportedArchitecture(addOnName: string, arch: ArchType) : boo
   return archs.includes(arch);
 }
 
-export function validateSupportedArchitecture(addOnName: string, arch: ArchType) : void {
+export function validateSupportedArchitecture(addOnName: string, arch: ArchType, strictValidation?: boolean ) : void {
   if (!isSupportedArchitecture(addOnName, arch)) {
-    throw new Error(`Addon ${addOnName} is not supported on architecture ${arch}`);
+    if ((strictValidation) || (strictValidation === undefined)) {
+      throw new Error(`Addon ${addOnName} is not supported on architecture ${arch}`);
+    }
+    else {
+      console.warn(`Addon ${addOnName} is not supported on architecture ${arch}`);
+    }
   }
 }
 
@@ -41,8 +44,8 @@ export function validateSupportedArchitecture(addOnName: string, arch: ArchType)
  * @returns 
  */
 export function arch(...archType: ArchType[]) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+  
+  return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {
 
     const addonName = descriptor.value;
     addonArchitectureMap.set(addonName, archType);

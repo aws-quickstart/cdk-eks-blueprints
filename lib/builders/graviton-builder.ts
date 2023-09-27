@@ -7,7 +7,7 @@ import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { validateSupportedArchitecture, ArchType } from "../utils"
+import { validateSupportedArchitecture, ArchType } from "../utils";
 
 /**
  * Configuration options for Graviton Builder.
@@ -22,105 +22,14 @@ export interface GravitonOptions {
  * Graviton nodes with EKS cluster. The `GravitonBuilder` creates the following:
  * 1. An EKS Cluster` with passed k8s version.
  * 2. A managed graviton nodegroup for ARM64 software.
+ * 3. Validates each addon is supported for the given architecture.
+ * 
+ * @example
+ * ```typescript
+ * import { GravitonBuilder }
  */
 
 export class GravitonBuilder extends BlueprintBuilder {
-
-    public addIstioBaseAddOn(props?: addons.IstioBaseAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.IstioBaseAddOn(props)
-        );
-    }
-
-    public addIstioControlPlaneAddOn(props?: addons.IstioControlPlaneAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.IstioControlPlaneAddOn(props)
-        );
-    }
-
-    public addKubeStateMetricsAddOn(props?: addons.KubeStateMetricsAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.KubeStateMetricsAddOn(props)
-        );
-    }
-
-    public addMetricsServerAddOn(props?: addons.MetricsServerAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.MetricsServerAddOn(props)
-        );
-    }
-
-    public addPrometheusNodeExporterAddOn(props?: addons.PrometheusNodeExporterAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.PrometheusNodeExporterAddOn(props)
-        );
-    }
-
-    public addExternalsSecretsAddOn(props?: addons.ExternalsSecretsAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.ExternalsSecretsAddOn(props)
-        );
-    }
-
-    public addSecretsStoreAddOn(props?: addons.SecretsStoreAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.SecretsStoreAddOn(props)
-        );
-    }
-
-    public addCalicoOperatorAddOn(props?: addons.CalicoOperatorAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.CalicoOperatorAddOn(props)
-        );
-    }
-
-    public addCertManagerAddOn(props?: addons.CertManagerAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.CertManagerAddOn(props)
-        );
-    }
-
-    public addAdotCollectorAddOn(props?: addons.AdotCollectorAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.AdotCollectorAddOn(props)
-        );
-    }
-
-    public addAmpAddOn(props: addons.AmpAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.AmpAddOn(props)
-        );
-    }
-
-    public addCloudWatchLogsAddOn(props: addons.CloudWatchLogsAddonProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.CloudWatchLogsAddon(props)
-        );
-    }
-
-    public addEfsCsiDriverAddOn(props?: addons.EfsCsiDriverProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.EfsCsiDriverAddOn(props)
-        );
-    } 
-
-    public addFluxCDAddOn(props?: addons.FluxCDAddOnProps) : GravitonBuilder {  
-        return this.addOns(
-            new addons.FluxCDAddOn(props)
-        );
-    }  
-
-    public addGrafanaOperatorAddOn(props?: addons.GrafanaOperatorAddonProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.GrafanaOperatorAddon(props)
-        );
-    }  
-
-    public addXrayAdotAddOn(props?: addons.XrayAdotAddOnProps) : GravitonBuilder {
-        return this.addOns(
-            new addons.XrayAdotAddOn(props)
-        );
-    }
 
     public addOns(...addOns: spi.ClusterAddOn[]): this {
         addOns.forEach(a => validateSupportedArchitecture(a.constructor.name, ArchType.ARM)); 
