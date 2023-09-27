@@ -31,7 +31,7 @@ export class NestedStackAddOn  implements ClusterAddOn {
         this.id = props.id;
     }
 
-    @arch(ArchType.X86)
+    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): void | Promise<Construct> {
         const props = this.props;
         const stack = clusterInfo.cluster.stack;
