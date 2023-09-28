@@ -19,11 +19,11 @@ export interface KubeRayAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps: HelmAddOnProps & KubeRayAddOnProps = {
   name: "kuberay-operator",
-  chart: "kuberay/kuberay-operator",
-  namespace:"default",
+  chart: "kuberay-operator",
+  namespace: "default",
   version: "1.0.0-rc.0",
-  release: "KubeRay",
-  repository:  "https://ray-project.github.io/kuberay-helm",
+  release: "kuberay-operator",
+  repository: "https://ray-project.github.io/kuberay-helm",
   values: {},
   createNamespace: true
 };
