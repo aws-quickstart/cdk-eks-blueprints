@@ -43,19 +43,6 @@ export function validateSupportedArchitecture(addOnName: string, arch: ArchType,
  * @param arch
  * @returns 
  */
-export function arch(...archType: ArchType[]) {
-  
-  return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {
-
-    const originalValue = descriptor.value;
-
-    descriptor.value = function(...args: any[]) {  
-      const addonName = this.constructor.name;
-      addonArchitectureMap.set(addonName, archType);
-      return originalValue.apply(this, args);
-    }
-  };
-}
 
 export function supportsX86(constructor: Function) {
   const addonName = constructor.name;
