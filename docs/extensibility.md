@@ -243,19 +243,19 @@ Partner extensions (APN Partner) are expected to comply with the public extensio
 
 ## Architecture Validation
 
-Architecture validation in the blueprints feature to  specify whether a particular addon supports architecture types such as `ARM`, `X86`. New addons should add the following decorator before the `deploy`` method to make sure the dynamic map is updated with addon name and supported architectures.
+Architecture validation in the blueprints feature to specify whether a particular addon supports architecture types such as `ARM`, `X86`. New addons should add the following decorator before the `class` to make sure the dynamic map is updated with addon name and supported architectures.
 
 ```typescript
+@supportsALL
 export class AdotCollectorAddOn extends CoreAddOn {
 
     constructor(props?: AdotCollectorAddOnProps) {
         super({ ...defaultProps, ...props });
     }
     @dependable(CertManagerAddOn.name)
-    @arch(ArchType.X86,ArchType.ARM)
 ```
 
-While creating solutions with blueprints, it is recommended to use the below method override to `addOns` method to validate a particular addon is supported for a particular architecure. 
+While creating solutions with blueprints, it is recommended to use the below method override to `addOns` method to validate a particular addon is supported for a particular architecure.
 
 ```typescript
     public addOns(...addOns: spi.ClusterAddOn[]): this {

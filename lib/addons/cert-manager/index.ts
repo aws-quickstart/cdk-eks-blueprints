@@ -2,7 +2,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, createNamespace, dependable } from "../../utils";
+import { createNamespace, dependable, supportsALL } from "../../utils";
 import { setPath } from '../../utils/object-utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadBalancerControllerAddOn } from '../aws-loadbalancer-controller';
@@ -39,6 +39,7 @@ const defaultProps: HelmAddOnProps & CertManagerAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class CertManagerAddOn extends HelmAddOn {
 
   readonly options: CertManagerAddOnProps;
@@ -49,7 +50,6 @@ export class CertManagerAddOn extends HelmAddOn {
   }
 
   @dependable(AwsLoadBalancerControllerAddOn.name)
-  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let values: Values = populateValues(this.options);

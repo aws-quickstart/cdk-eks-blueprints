@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided options for the Helm Chart
@@ -29,6 +29,7 @@ const defaultProps: HelmAddOnProps & GrafanaOperatorAddonProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class GrafanaOperatorAddon extends HelmAddOn {
 
   readonly options: GrafanaOperatorAddonProps;
@@ -38,7 +39,6 @@ export class GrafanaOperatorAddon extends HelmAddOn {
     this.options = this.props as GrafanaOperatorAddonProps;
   }
 
-  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let values: Values = this.options.values ?? {};

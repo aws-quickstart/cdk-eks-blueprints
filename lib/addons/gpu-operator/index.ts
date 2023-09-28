@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from './values';
 /**
@@ -36,6 +36,7 @@ const defaultProps: HelmAddOnProps & GpuOperatorAddonProps = {
  * It validates all requisite software is installed before scheduling GPU workload
  * Using MIG (Multi Instance GPUs) allows you to virtually split your GPU into multiple units
  */
+@supportsALL
 export class GpuOperatorAddon extends HelmAddOn {
 
   readonly options: GpuOperatorAddonProps;
@@ -45,7 +46,6 @@ export class GpuOperatorAddon extends HelmAddOn {
     this.options = this.props as GpuOperatorAddonProps;
   }
 
-  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let values: Values = this.options.values ?? {};

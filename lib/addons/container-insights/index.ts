@@ -4,7 +4,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
-import { ArchType, arch, conflictsWith, createNamespace } from "../../utils";
+import { conflictsWith, createNamespace, supportsALL } from "../../utils";
 
 export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
     values?: ValuesSchema
@@ -19,6 +19,7 @@ const defaultProps = {
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };
 
+@supportsALL
 export class ContainerInsightsAddOn extends HelmAddOn {
 
     constructor(props?: ContainerInsightAddonProps) {
@@ -29,7 +30,6 @@ export class ContainerInsightsAddOn extends HelmAddOn {
      * @override
      */
     @conflictsWith("AdotCollectorAddOn")
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;        
         const policy = ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy');

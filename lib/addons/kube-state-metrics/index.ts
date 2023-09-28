@@ -2,7 +2,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided option for the Helm Chart
@@ -32,6 +32,7 @@ const defaultProps: HelmAddOnProps & KubeStateMetricsAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class KubeStateMetricsAddOn extends HelmAddOn {
 
   readonly options: KubeStateMetricsAddOnProps;
@@ -41,7 +42,6 @@ export class KubeStateMetricsAddOn extends HelmAddOn {
     this.options = this.props as KubeStateMetricsAddOnProps;
   }
 
-  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let values: Values = populateValues(this.options);

@@ -1,10 +1,10 @@
 import { Construct } from "constructs";
-import {ClusterInfo, Values} from "../../spi";
+import { ClusterInfo, Values} from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { getEfsDriverPolicyStatements } from "./iam-policy";
 import { registries }  from "../../utils/registry-utils";
 import * as iam from "aws-cdk-lib/aws-iam";
-import {arch, ArchType, setPath} from "../../utils";
+import { setPath, supportsALL} from "../../utils";
 import * as kms from "aws-cdk-lib/aws-kms";
 
 
@@ -45,6 +45,7 @@ const defaultProps: EfsCsiDriverProps = {
     replicaCount: 2
 };
 
+@supportsALL
 export class EfsCsiDriverAddOn extends HelmAddOn {
 
     readonly options: EfsCsiDriverProps;
@@ -54,7 +55,6 @@ export class EfsCsiDriverAddOn extends HelmAddOn {
         this.options = this.props as EfsCsiDriverProps;
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         // Create service account and policy
         const cluster = clusterInfo.cluster;

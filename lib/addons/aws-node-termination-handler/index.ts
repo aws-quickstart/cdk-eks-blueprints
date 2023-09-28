@@ -9,7 +9,7 @@ import { Duration } from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import * as assert from "assert";
 import { ClusterInfo } from '../../spi';
-import { ArchType, arch, tagAsg } from '../../utils';
+import { supportsX86, tagAsg } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 
 /**
@@ -51,6 +51,7 @@ const defaultProps: AwsNodeTerminationHandlerProps = {
   mode: Mode.IMDS
 };
 
+@supportsX86
 export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
 
   private options: AwsNodeTerminationHandlerProps;
@@ -64,7 +65,6 @@ export class AwsNodeTerminationHandlerAddOn extends HelmAddOn {
    * Implementation of the deploy interface
    * @param clusterInfo 
    */
-  @arch(ArchType.X86)
   deploy(clusterInfo: ClusterInfo): void {
     const cluster = clusterInfo.cluster;    
     const asgCapacity = clusterInfo.autoscalingGroups || [];

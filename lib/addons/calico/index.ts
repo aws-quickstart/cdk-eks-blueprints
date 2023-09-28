@@ -2,7 +2,7 @@ import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { ArchType, arch } from '../../utils';
+import { supportsX86 } from '../../utils';
 
 /**
  * Configuration options for the add-on.
@@ -43,6 +43,7 @@ const defaultProps = {
 /**
  * @deprecated use CalicoOperator add-on instead
  */
+@supportsX86
 export class CalicoAddOn extends HelmAddOn {
 
     private options: CalicoAddOnProps;
@@ -52,7 +53,6 @@ export class CalicoAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): void {
         const values = this.options.values ?? {};
         const defaultValues = {};

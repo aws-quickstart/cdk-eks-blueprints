@@ -13,7 +13,7 @@ import { EfsCsiDriverAddOn } from "../efs-csi-driver";
 
 import { ClusterInfo } from '../../spi/types';
 import { Values } from "../../spi";
-import { setPath, createNamespace, createServiceAccount, ArchType, arch } from "../../utils";
+import { setPath, createNamespace, createServiceAccount, supportsX86 } from "../../utils";
 import { IFileSystem } from "aws-cdk-lib/aws-efs";
 
 import merge from "ts-deepmerge";
@@ -87,6 +87,7 @@ const AIRFLOWPVC = 'efs-apache-airflow-pvc';
  * This add-on is currently not supported. It will apply the latest falco helm chart but the latest AMI does not have stock driver supported and
  * driver build in the init fails atm. 
  */
+@supportsX86
 export class ApacheAirflowAddOn extends HelmAddOn {
 
     readonly options: AirflowAddOnProps;
@@ -96,7 +97,6 @@ export class ApacheAirflowAddOn extends HelmAddOn {
         this.options = this.props as AirflowAddOnProps;
     }
     
-    @arch(ArchType.X86)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const albAddOnCheck = clusterInfo.getScheduledAddOn(AwsLoadBalancerControllerAddOn.name);

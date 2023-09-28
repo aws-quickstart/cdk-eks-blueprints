@@ -1,7 +1,7 @@
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { ArchType, arch } from "../../utils";
+import { supportsALL } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -38,6 +38,7 @@ const defaultProps = {
     repository: "https://projectcalico.docs.tigera.io/charts"
 };
 
+@supportsALL
 export class CalicoOperatorAddOn extends HelmAddOn {
 
     private options: CalicoOperatorAddOnProps;
@@ -47,7 +48,6 @@ export class CalicoOperatorAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): void {
         const values = this.options.values ?? {};
         const defaultValues = {};

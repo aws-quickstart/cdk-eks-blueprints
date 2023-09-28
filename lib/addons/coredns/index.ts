@@ -1,6 +1,4 @@
-import { Construct } from "constructs/lib/construct";
-import { ClusterInfo } from "../../spi";
-import { ArchType, arch } from "../../utils";
+import {supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 
 /**
@@ -18,14 +16,11 @@ const defaultProps = {
 /**
  * Implementation of CoreDns EKS add-on.
  */
+@supportsALL
 export class CoreDnsAddOn extends CoreAddOn {
 
     constructor(props?: CoreDnsAddOnProps) {
         super({ ...defaultProps, ...props });
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        return super.deploy(clusterInfo);
-    }
 }

@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import * as spi from "../../spi";
 import { ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
@@ -116,6 +116,7 @@ const defaultKustomiationProps: FluxKustomizationProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class FluxCDAddOn extends HelmAddOn {
 
   readonly options: FluxCDAddOnProps;
@@ -125,7 +126,6 @@ export class FluxCDAddOn extends HelmAddOn {
     this.options = this.props as FluxCDAddOnProps;
   }
 
-  @arch(ArchType.X86,ArchType.ARM)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     let values: Values = this.options.values ?? {};

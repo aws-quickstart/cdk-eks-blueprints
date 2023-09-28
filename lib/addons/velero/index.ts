@@ -4,7 +4,7 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
-import { ArchType, arch, createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -56,6 +56,7 @@ const defaultProps = {
     },
 };
 
+@supportsALL
 export class VeleroAddOn extends HelmAddOn {
 
     private options: Required<VeleroAddOnProps>;
@@ -68,7 +69,6 @@ export class VeleroAddOn extends HelmAddOn {
     /**
      * Implementation of the add-on contract deploy method.
     */
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const props = this.options;

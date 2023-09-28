@@ -1,5 +1,5 @@
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import { ArchType, arch, dependable, loadYaml, readYamlDocument } from "../../utils";
+import { dependable, loadYaml, readYamlDocument, supportsALL } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
@@ -50,6 +50,7 @@ const defaultProps = {
 /**
  * Implementation of XRAY ADOT add-on for EKS Blueprints. Installs ADOT Collector.
  */
+@supportsALL
 export class XrayAdotAddOn implements ClusterAddOn {
 
     readonly xrayAddOnProps: XrayAdotAddOnProps;
@@ -58,7 +59,6 @@ export class XrayAdotAddOn implements ClusterAddOn {
     }
 
     @dependable(AdotCollectorAddOn.name)
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         let doc: string;

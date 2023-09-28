@@ -47,8 +47,43 @@ export function arch(...archType: ArchType[]) {
   
   return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {
 
-    const addonName = descriptor.value;
-    addonArchitectureMap.set(addonName, archType);
+    const originalValue = descriptor.value;
 
+    descriptor.value = function(...args: any[]) {  
+      const addonName = this.constructor.name;
+      addonArchitectureMap.set(addonName, archType);
+      return originalValue.apply(this, args);
+    }
   };
+}
+
+export function supportsX86(constructor: Function) {
+  const addonName = constructor.name;
+  addAddonArch(addonName, ArchType.X86);
+}
+
+export function supportsARM(constructor: Function) {
+  const addonName = constructor.name;
+  addAddonArch(addonName, ArchType.ARM);
+}
+
+export function supportsALL(constructor: Function) {
+  const addonName = constructor.name;
+  addAddonArch(addonName, ArchType.X86);
+  addAddonArch(addonName, ArchType.ARM);
+}
+
+function addAddonArch(addonName: string, architecture: ArchType) {
+  if (addonArchitectureMap.has(addonName)) {
+    const value = addonArchitectureMap.get(addonName);
+    if (value !== undefined) {
+      value.push(architecture);
+    }
+    else {
+      addonArchitectureMap.set(addonName, [architecture]);
+    }
+  }
+  else {
+    addonArchitectureMap.set(addonName, [architecture]);
+  }
 }

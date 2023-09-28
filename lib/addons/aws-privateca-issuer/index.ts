@@ -4,7 +4,7 @@ import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
 import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
-import { dependable, setPath, createNamespace, ArchType, arch } from '../../utils';
+import { dependable, setPath, createNamespace, supportsX86 } from '../../utils';
 import { ClusterInfo, Values } from "../../spi";
 
 /**
@@ -42,6 +42,7 @@ const defaultProps: HelmAddOnProps & AWSPrivateCAIssuerAddonProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsX86
 export class AWSPrivateCAIssuerAddon extends HelmAddOn {
 
   readonly options: AWSPrivateCAIssuerAddonProps;
@@ -53,7 +54,6 @@ export class AWSPrivateCAIssuerAddon extends HelmAddOn {
 
   // AWSPrivateCAIssuerAddon requires CertManagerAddOn as a prerequisite . Pls refer to documentation for more details
   @dependable('CertManagerAddOn')
-  @arch(ArchType.X86)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     //Create Service Account with IRSA
     const cluster = clusterInfo.cluster;

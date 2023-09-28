@@ -5,7 +5,7 @@ import { Construct } from "constructs";
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import merge from "ts-deepmerge";
-import { ArchType, arch } from '../../utils';
+import { supportsALL } from '../../utils';
 
 
 /**
@@ -33,6 +33,7 @@ const defaultProps = {
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
  * It is required to integrate with Route53 for external DNS resolution. 
  */
+@supportsALL
 export class ExternalDnsAddOn extends HelmAddOn {
 
     private options: ExternalDnsProps;
@@ -42,7 +43,6 @@ export class ExternalDnsAddOn extends HelmAddOn {
         this.options = this.props as ExternalDnsProps;
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const region = clusterInfo.cluster.stack.region;
         const cluster = clusterInfo.cluster;

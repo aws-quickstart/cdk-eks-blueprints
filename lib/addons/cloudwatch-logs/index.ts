@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
-import { ArchType, arch, conflictsWith, setPath } from "../../utils";
+import { conflictsWith, setPath, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
@@ -53,6 +53,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
  * https://github.com/aws/eks-charts/tree/master/stable/aws-for-fluent-bit
  * 
  */
+@supportsALL
 export class CloudWatchLogsAddon extends HelmAddOn {
 
     readonly options: CloudWatchLogsAddonProps;
@@ -63,7 +64,6 @@ export class CloudWatchLogsAddon extends HelmAddOn {
     }
 
     @conflictsWith('AwsForFluentBitAddOn')
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         let values: Values = populateValues(clusterInfo, this.options);
         values = merge(values, this.props.values ?? {});

@@ -7,7 +7,7 @@ import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { arch, ArchType, createNamespace, getSecretValue, validateConstraints } from '../../utils';
+import { createNamespace, getSecretValue, supportsALL, validateConstraints } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
@@ -82,6 +82,7 @@ const defaultProps = {
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
+@supportsALL
 export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
@@ -118,7 +119,6 @@ export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
     /**
      * Implementation of the add-on contract deploy method.
     */
-    @arch(ArchType.X86,ArchType.ARM)
     async deploy(clusterInfo: spi.ClusterInfo): Promise<Construct> {
         const namespace = createNamespace(this.options.namespace!, clusterInfo.cluster, true);
 

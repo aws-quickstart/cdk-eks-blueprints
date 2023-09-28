@@ -1,8 +1,6 @@
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
-import { arch, ArchType } from "../../utils";
-import { ClusterInfo } from "../../spi";
-import { Construct } from "constructs/lib/construct";
+import { supportsALL } from "../../utils";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_27, "v1.27.1-eksbuild.1"],
@@ -26,6 +24,7 @@ const defaultProps = {
 /**
  * Implementation of KubeProxy EKS add-on.
  */
+@supportsALL
 export class KubeProxyAddOn extends CoreAddOn {
 
     constructor(version?: string, props?: kubeProxyAddOnProps) {
@@ -34,10 +33,5 @@ export class KubeProxyAddOn extends CoreAddOn {
             ... defaultProps,
             ... props
         });
-    }
-
-    @arch(ArchType.X86,ArchType.ARM)
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        return super.deploy(clusterInfo);
     }
 }

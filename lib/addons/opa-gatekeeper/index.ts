@@ -1,5 +1,5 @@
 import { ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
-import { ArchType, arch } from "../../utils";
+import { supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -23,6 +23,7 @@ const defaultProps: HelmAddOnProps = {
     version: '3.13.0'
 };
 
+@supportsALL
 export class OpaGatekeeperAddOn extends HelmAddOn implements ClusterPostDeploy {
 
     private options: OpaGatekeeperAddOnProps;
@@ -32,7 +33,6 @@ export class OpaGatekeeperAddOn extends HelmAddOn implements ClusterPostDeploy {
         this.options = this.props;
     }
 
-    @arch(ArchType.X86,ArchType.ARM)
     deploy(_clusterInfo: ClusterInfo): void {
         return;
     }
