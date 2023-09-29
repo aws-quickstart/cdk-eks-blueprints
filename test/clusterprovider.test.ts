@@ -39,9 +39,10 @@ test("Generic cluster provider correctly registers managed node groups", async (
 
     const blueprint =  await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
+        .version('auto')
         .clusterProvider(clusterProvider)
         .addOns(new blueprints.ClusterAutoScalerAddOn)
-        .buildAsync(app, 'stack-with-resource-providers');
+        .build(app, 'stack-with-resource-providers');
     
     expect(addNodegroupCapacityMock).toBeCalledWith(
         expect.any(String),
@@ -104,6 +105,7 @@ test("Generic cluster provider correctly registers autoscaling node groups", () 
     const app = new cdk.App();
 
     const clusterProvider = blueprints.clusterBuilder()
+    .version(KubernetesVersion.V1_27)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,
@@ -149,6 +151,7 @@ test("Generic cluster provider correctly registers autoscaling node groups with 
     app.node.setContext("eks.default.instance-type", "m5.large");
 
     const clusterProvider = blueprints.clusterBuilder()
+    .version(eks.KubernetesVersion.V1_27)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,

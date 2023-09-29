@@ -3,7 +3,7 @@ import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 /**
  * Configuration options for the coredns add-on.
  */
-type coreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName">;
+export type CoreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName">;
 
 const defaultProps = {
     addOnName: 'coredns',
@@ -17,7 +17,7 @@ const defaultProps = {
  */
 export class CoreDnsAddOn extends CoreAddOn {
 
-    constructor(props?: coreDnsAddOnProps) {
+    constructor(props?: CoreDnsAddOnProps) {
         super({ ...defaultProps, ...props });
     }
    
