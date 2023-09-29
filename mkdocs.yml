@@ -62,6 +62,7 @@ nav:
     - Kube Proxy: 'addons/kube-proxy.md'
     - Kubecost: 'addons/kubecost.md'
     - Kubeflow: 'addons/kubeflow.md'
+    - KubeRay Operator: 'addons/kuberay-operator.md'
     - Kubevious: 'addons/kubevious.md'
     - Kube State Metrics: 'addons/kube-state-metrics.md'
     - Metrics Server: 'addons/metrics-server.md'

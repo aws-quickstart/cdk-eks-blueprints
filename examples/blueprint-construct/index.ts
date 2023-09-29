@@ -212,6 +212,7 @@ export default class BlueprintConstruct {
                 efsFileSystem: 'apache-airflow-efs-provider'
             }),
             new blueprints.ExternalsSecretsAddOn(),
+            new blueprints.KubeRayAddOn()
         ];
 
         // Instantiated to for helm version check.
