@@ -243,7 +243,7 @@ Partner extensions (APN Partner) are expected to comply with the public extensio
 
 ## Architecture Validation
 
-Architecture validation in the blueprints feature to specify whether a particular addon supports architecture types such as `ARM`, `X86`. New addons should add the following decorator before the `class` to make sure the dynamic map is updated with addon name and supported architectures.
+Architecture validation in the blueprints feature is to specify whether a particular addon supports architecture types such as `ARM`, `X86`. New addons should add the decorator `@supportALL` or `@supportX86` or `@supportARM` as shown below before the `class` to make sure the dynamic map is updated with addon name and supported architectures.
 
 ```typescript
 @supportsALL
