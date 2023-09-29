@@ -299,7 +299,7 @@ export interface CustomNetworkingConfig {
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.13.4-eksbuild.1',
+  version: 'v1.14.1-eksbuild.1',
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
@@ -364,14 +364,14 @@ export class VpcCniAddOn extends CoreAddOn {
    * @returns 
    */
   createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, policies: iam.IManagedPolicy[]): eks.ServiceAccount {
-      const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
-        cluster: clusterInfo.cluster,
-        name: this.coreAddOnProps.saName,
-        namespace: saNamespace
-      });
+    const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
+      cluster: clusterInfo.cluster,
+      name: this.coreAddOnProps.saName,
+      namespace: saNamespace
+    });
 
-      policies.forEach(p => sa.role.addManagedPolicy(p));
-      return sa as any as eks.ServiceAccount;
+    policies.forEach(p => sa.role.addManagedPolicy(p));
+    return sa as any as eks.ServiceAccount;
   }
 }
 
