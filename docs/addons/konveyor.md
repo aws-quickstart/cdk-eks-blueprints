@@ -1,6 +1,6 @@
 # Konveyor Add-On for Amazon EKS Blueprints
 
-Streamline the modernization of your application portfolio to Kubernetes. The Konveyor tool gives you insight throughout the migration process - whether you're making decisions at the portfolio or application level.
+[Konveyor](https://konveyor.github.io/konveyor/) is an open-source application modernization platform that helps organizations safely and predictably modernize applications to new technologies, with an initial focus on accelerating the adoption of legacy applications to Kubernetes. Konveyor’s goal is to deliver a Unified Experience to the organizations embarking on their modernization journey. It follows a simple yet effective approach of surfacing the information about the application to aid a ‘Decision Maker’ to make decisions about their modernization and migration needs, plan the work in the form of ‘Migration waves’ and provide guidance to the developers to complete the needed migration/modernization by providing assets as well as a catalog of integrated tools to aid specific workflows.
 
 Feature set
 
@@ -19,6 +19,10 @@ Feature set
 [Konveyor](https://www.konveyor.io/) is an Open Source software developed by the Konveyor Community, and is a [CNCF](https://www.cncf.io/) Sandbox project.
 
 This Open Source solution is packaged by [Claranet Switzerland](https://www.claranet.ch/) GmbH.
+
+## Arhcitecture
+
+<img src="../assets/images/konveyor-architecture.png" width=700 />
 
 ## Prerequisites
 
@@ -203,6 +207,16 @@ And enter the default admin credentials:
 
 - Username: `admin`
 - Password: `Passw0rd!`
+
+## Koveyor UI
+
+Login page
+
+<img src="../assets/images/konveyor-login.png" width=500/>
+
+Home Page
+
+<img src="../assets/images/konveyor-home.png" widht=500/>
 
 ## Cleanup
 
