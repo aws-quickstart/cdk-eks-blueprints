@@ -225,14 +225,14 @@ export interface VpcCniAddOnProps {
   * `MAX_ENI` Environment Variable. Format integer.
   * Specifies the maximum number of ENIs that will be attached to the node. 
   */
-  maxEni?: number;  
+  maxEni?: number;
 
   /**
   * `MINIMUM_IP_TARGET` Environment Variable. Format integer.
   * Specifies the number of total IP addresses that the ipamd 
   * daemon should attempt to allocate for pod assignment on the node.
   */
-  minimumIpTarget?: number; 
+  minimumIpTarget?: number;
 
   /**
    * `POD_SECURITY_GROUP_ENFORCING_MODE` Environment Variable. Type: String. 
@@ -274,6 +274,13 @@ export interface VpcCniAddOnProps {
    * 
    */
   serviceAccountPolicies?: iam.IManagedPolicy[];
+
+  /**
+   * Enable kubernetes network policy in the VPC CNI introduced in vpc-cni 1.14
+   * More informaton on official AWS documentation: https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html
+   * 
+   */
+  enableNetworkPolicy?: string;
 
   /**
    * Version of the add-on to use. Must match the version of the cluster where it
@@ -410,14 +417,15 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode,
       WARM_ENI_TARGET: props?.warmEniTarget,
       WARM_IP_TARGET: props?.warmIpTarget,
-      WARM_PREFIX_TARGET: props?.warmPrefixTarget
-    }
+      WARM_PREFIX_TARGET: props?.warmPrefixTarget,
+    },
+    enableNetworkPolicy: props?.enableNetworkPolicy
   };
 
   // clean up all undefined
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ?  JSON.stringify(values[key]):values[key]);
- 
+  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ? JSON.stringify(values[key]) : values[key]);
+
   return result;
 }
