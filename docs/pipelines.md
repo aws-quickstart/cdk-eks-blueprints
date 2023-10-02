@@ -70,7 +70,7 @@ If you IaC code is located under a specific folder, for example `PROJECT_ROOT/in
         path: "./infra/blueprints" // optional, default is './'
     })```
 
-Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be fined in one main region, and replicated to all target regions.
+Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be defined in one main region, and replicated to all target regions.
 
 ### Using AWS CodeCommit as CodePipeline repository source.
 
