@@ -36,9 +36,9 @@ export class GravitonBuilder extends BlueprintBuilder {
                     version: options.version,
                     instanceTypes: options.instanceTypes,
                     amiType: eks.NodegroupAmiType.AL2_ARM_64,
-                    desiredSize: 3,
-                    minSize: 2,
-                    maxSize: 6,
+                    desiredSize: options.desiredSize,
+                    minSize: options.minSize,
+                    maxSize: options.maxSize,
                 })
             )
             .addOns(
