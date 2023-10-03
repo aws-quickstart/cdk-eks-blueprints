@@ -433,6 +433,8 @@ class CodePipeline {
 
         const app = props.application ? `--app '${props.application}'` : "";
 
+        const path = props.repository.path ?? "./";
+
         return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
@@ -440,9 +442,9 @@ class CodePipeline {
               installCommands: [
                 'n stable',
                 'npm install -g aws-cdk@2.91.0',
-                'npm install',
+                `cd ${path} && npm install`,
               ],
-              commands: ['npm run build', 'npx cdk synth ' + app]
+              commands: [`cd ${path}`, 'npm run build', 'npx cdk synth ' + app]
             }),
             crossAccountKeys: props.crossAccountKeys,
             codeBuildDefaults: {
