@@ -39,5 +39,5 @@
     ],
     "include": [
         "lib"
-    ]
+, "../eks-genai-usecases/builder/genai-builder.ts"    ]
 }

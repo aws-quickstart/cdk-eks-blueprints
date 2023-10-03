@@ -104,7 +104,6 @@ nav:
   - Builders:
     - Overview: 'builders/index.md'
     - Graviton Builder: 'builders/graviton-builder.md'
-    - Generative AI Builder: 'builders/genai-builder.md' 
     - GPU Builder: 'builders/gpu-builder.md'
     - Observability Builder: 'builders/observability-builder.md'
     - Windows Builder: 'builders/windows-builder.md'
