@@ -6,7 +6,21 @@ import { MngClusterProvider, MngClusterProviderProps } from '../cluster-provider
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { validateSupportedArchitecture, ArchType } from "../utils";
+import merge from 'ts-deepmerge';
+
+/**
+ * Default props to be used when creating the Graviton nodes 
+ * for EKS cluster
+ */
+const defaultOptions: Partial<MngClusterProviderProps> = {
+    version: eks.KubernetesVersion.of("1.27"),
+    instanceTypes:  [ec2.InstanceType.of(ec2.InstanceClass.M7G, ec2.InstanceSize.XLARGE)],
+    desiredSize: 3,
+    minSize: 2,
+    maxSize: 5
+};
 
 /** 
  * This builder class helps you prepare a blueprint for setting up 
@@ -29,18 +43,10 @@ export class GravitonBuilder extends BlueprintBuilder {
 
     public static builder(options: Partial<MngClusterProviderProps>): GravitonBuilder {
         const builder = new GravitonBuilder();
+        const mergedOptions = merge(defaultOptions, options);
 
         builder
-            .clusterProvider(
-                new MngClusterProvider({
-                    version: options.version,
-                    instanceTypes: options.instanceTypes,
-                    amiType: eks.NodegroupAmiType.AL2_ARM_64,
-                    desiredSize: options.desiredSize,
-                    minSize: options.minSize,
-                    maxSize: options.maxSize,
-                })
-            )
+            .clusterProvider(new MngClusterProvider(mergedOptions))
             .addOns(
                 new addons.NestedStackAddOn({
                     id: "usage-tracking-addon",
