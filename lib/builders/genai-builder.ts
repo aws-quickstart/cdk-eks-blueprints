@@ -1,7 +1,7 @@
-import { BlueprintBuilder } from '../../cdk-eks-blueprints/lib/stacks';
-import * as utils from "../../cdk-eks-blueprints/lib/utils";
-import * as addons from '../../cdk-eks-blueprints/lib/addons';
-import * as spi from '../../cdk-eks-blueprints/lib/spi';
+import { BlueprintBuilder } from '../../lib/stacks';
+import * as utils from "../../lib/utils";
+import * as addons from '../../lib/addons';
+import * as spi from '../../lib/spi';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
