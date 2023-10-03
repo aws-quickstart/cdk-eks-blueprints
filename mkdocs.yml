@@ -16,6 +16,7 @@ nav:
     - Teams: 'teams/teams.md'
     - EMR on EKS Team: 'teams/emr-eks-team.md'
     - AWS Batch on EKS Team: 'teams/aws-batch-on-eks-team.md'
+    - Gen AI Team: 'teams/geneai-team/genai-team.md'
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
@@ -104,6 +105,7 @@ nav:
   - Builders:
     - Overview: 'builders/index.md'
     - Graviton Builder: 'builders/graviton-builder.md'
+    - Generative AI Builder: 'builders/genai-builder.md' 
     - GPU Builder: 'builders/gpu-builder.md'
     - Observability Builder: 'builders/observability-builder.md'
     - Windows Builder: 'builders/windows-builder.md'
