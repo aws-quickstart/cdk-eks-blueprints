@@ -17,7 +17,7 @@ This add-on installs the KubeRay Operator [Helm chart](https://github.com/ray-pr
 import { Construct } from 'constructs';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-export class DatadogConstruct extends Construct {
+export class KubeRayConstruct extends Construct {
     constructor(scope: Construct, id: string) {
         super(scope, id);
         
