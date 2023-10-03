@@ -180,10 +180,11 @@ False
 v1.0.0-eksbuild.preview
 False
 ```  
-   - enableNetworkPolicy - set to string `true` enables Kubernetes Network policy. This setting is introduced on `1.14.0` or latter.
+   - enableNetworkPolicy - set to `true` enables Kubernetes Network policy. This setting is introduced on `1.14.0` or latter.
 
+For example:
 ```typescript
-new blueprints.addons.VpcCniAddOn({ enableNetworkPolicy: 'true', version: 'v1.15.0-eksbuild.2' }) 
+new blueprints.addons.VpcCniAddOn({ enableNetworkPolicy: true, version: 'v1.15.0-eksbuild.2' }) 
 ```  
 
 # Validation

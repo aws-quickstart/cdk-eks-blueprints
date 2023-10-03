@@ -280,7 +280,7 @@ export interface VpcCniAddOnProps {
    * More informaton on official AWS documentation: https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html
    * 
    */
-  enableNetworkPolicy?: string;
+  enableNetworkPolicy?: boolean;
 
   /**
    * Version of the add-on to use. Must match the version of the cluster where it
@@ -419,7 +419,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       WARM_IP_TARGET: props?.warmIpTarget,
       WARM_PREFIX_TARGET: props?.warmPrefixTarget,
     },
-    enableNetworkPolicy: props?.enableNetworkPolicy
+    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy)
   };
 
   // clean up all undefined
