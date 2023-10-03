@@ -12,7 +12,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
       
-const bedrockTeam: blueprints.BedrockTeam = {
+const bedrockTeamProps: blueprints.BedrockTeamProps = {
   namespace: 'bedrock',
   createNamespace: true,
   serviceAccountName: 'bedrock-service-account',
@@ -21,6 +21,6 @@ const bedrockTeam: blueprints.BedrockTeam = {
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")
-  .teams(new blueprints.GenAITeam(bedrockTeam))
+  .teams(new blueprints.BedrockTeam(bedrockTeamProps))
   .build(app, 'my-stack-name');
 ```
