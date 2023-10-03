@@ -78,7 +78,12 @@ export class TeamProps {
     /**
      * Optional, directory where a team's manifests are stored
      */
-     readonly teamManifestDir?: string;
+    readonly teamManifestDir?: string;
+
+    /**
+     * Optional, to pass a function for workloads.
+    */
+    readonly workloadsFunction?: Function;
 }
 
 export class ApplicationTeam implements Team {
@@ -113,6 +118,9 @@ export class ApplicationTeam implements Team {
         this.setupNamespace(clusterInfo);
         this.setupServiceAccount(clusterInfo);
         this.setupSecrets(clusterInfo);
+        if (this.teamProps.workloadsFunction) {
+            this.teamProps.workloadsFunction.apply(this, clusterInfo);
+         }
     }
 
     protected defaultSetupAccess(clusterInfo: ClusterInfo) {
