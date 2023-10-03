@@ -17,6 +17,7 @@ import merge from 'ts-deepmerge';
 const defaultOptions: Partial<MngClusterProviderProps> = {
     version: eks.KubernetesVersion.of("1.27"),
     instanceTypes:  [ec2.InstanceType.of(ec2.InstanceClass.M7G, ec2.InstanceSize.XLARGE)],
+    amiType: eks.NodegroupAmiType.AL2_ARM_64,
     desiredSize: 3,
     minSize: 2,
     maxSize: 5
