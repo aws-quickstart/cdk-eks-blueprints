@@ -23,7 +23,7 @@ export default class GenAIShowcase {
 
         const account = process.env.COA_ACCOUNT_ID! || process.env.CDK_DEFAULT_ACCOUNT!;
         const region = process.env.COA_AWS_REGION! || process.env.CDK_DEFAULT_REGION!;
-        const bedrockTeam: blueprints.BedrockTeam = {
+        const bedrockTeamProps: blueprints.BedrockTeamProps = {
             namespace: 'bedrock',
             createNamespace: true,
             serviceAccountName: 'bedrock-service-account',
@@ -32,7 +32,7 @@ export default class GenAIShowcase {
         BedrockBuilder.builder()
             .account(account)
             .region(region)
-            .teams(new blueprints.GenAITeam(bedrockTeam))
+            .teams(new blueprints.BedrockTeam(bedrockTeamProps))
             .build(scope, stackId);
     }
 }
