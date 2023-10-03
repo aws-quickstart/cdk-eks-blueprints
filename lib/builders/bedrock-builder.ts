@@ -1,18 +1,18 @@
-import { BlueprintBuilder } from '../../lib/stacks';
-import * as utils from "../../lib/utils";
-import * as addons from '../../lib/addons';
-import * as spi from '../../lib/spi';
+import { BlueprintBuilder } from '../stacks';
+import * as utils from "../utils";
+import * as addons from '../addons';
+import * as spi from '../spi';
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export class GenAIBuilder extends BlueprintBuilder {
+export class BedrockBuilder extends BlueprintBuilder {
 
     /**
      * This method helps you prepare a blueprint for setting up EKS cluster with 
      * usage tracking addon
      */
-    public static builder(): GenAIBuilder {
-        const builder = new GenAIBuilder();
+    public static builder(): BedrockBuilder {
+        const builder = new BedrockBuilder();
 
         builder.addOns(
             new addons.NestedStackAddOn({
