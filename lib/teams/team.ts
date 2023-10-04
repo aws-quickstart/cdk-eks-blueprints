@@ -83,6 +83,7 @@ export class TeamProps {
     /**
      * Optional, to pass a function for workloads.
     */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     readonly workloadsFunction?: Function;
 }
 
