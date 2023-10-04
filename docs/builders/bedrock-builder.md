@@ -13,7 +13,7 @@ The `BedrockBuilder` creates the following:
 The below usage helps you with a demonstration to use `BedrockBuilder` to setup required addons as you prepare a blueprint for setting up Bedrock access to a new EKS cluster.
 
 ```typescript
-import { BedrockBuilder, ClusterInfo } from "@aws-quickstart/eks-blueprints";
+import { ApplicationTeam, BedrockBuilder, ClusterInfo } from "@aws-quickstart/eks-blueprints";
 import * as blueprints from "@aws-quickstart/eks-blueprints";
 import * as spi from '@aws-quickstart/eks-blueprints/dist/spi';
 import { Construct } from "constructs";
@@ -25,34 +25,13 @@ export default class GenAIShowcase {
         const account = process.env.CDK_DEFAULT_ACCOUNT!;
         const region = process.env.CDK_DEFAULT_REGION!;
         const stackID = `${id}-blueprint`;
-        const name = blueprints.utils.valueFromContext(scope, "bedrock.pattern.name", "showcase");
-        const namespace = blueprints.utils.valueFromContext(scope, "bedrock.pattern.namespace", "bedrock");
-        const imageName = blueprints.utils.valueFromContext(scope,"bedrock.pattern.image.name", undefined);
-        const imageTag = blueprints.utils.valueFromContext(scope, "bedrock.pattern.image.tag", undefined);
-        const values: spi.Values = {
-            namespace: namespace,
-            imageName: imageName,
-            imageTag: imageTag
-        };
-    
-        // Apply manifest
-        const doc = readYamlDocument(__dirname + '/deployment/showcase-deployment.ytpl');
-        const manifest = doc.split("---").map((e: any) => loadYaml(e));
-    
-        const manifestDeployment: ManifestDeployment = {
-            name: name,
-            namespace: namespace,
-            manifest,
-            values
-        };
 
-        const workloadsFunction = (clusterInfo: ClusterInfo) => ( new KubectlProvider(clusterInfo).addManifest(manifestDeployment));
         const bedrockTeamProps: blueprints.teams.BedrockTeamProps = {
-            name: 'bedrock-team',
-            namespace: 'bedrock',
+            name: blueprints.utils.valueFromContext(scope, "bedrock.pattern.name", "showcase"),
+            namespace: blueprints.utils.valueFromContext(scope, "bedrock.pattern.namespace", "bedrock"),
             createNamespace: true,
             serviceAccountName: 'bedrock-service-account',
-            workloadsFunction: workloadsFunction
+            workloadDeployments: workloadDeployments
         }; 
 
         BedrockBuilder.builder()
@@ -64,4 +43,24 @@ export default class GenAIShowcase {
     }
 }
 
+function workloadDeployments(team: ApplicationTeam, clusterInfo: ClusterInfo) {
+    const values: spi.Values = {
+        namespace: team.teamProps.namespace,
+        imageName: blueprints.utils.valueFromContext(clusterInfo.cluster, "bedrock.pattern.image.tag", undefined),
+        imageTag: blueprints.utils.valueFromContext(clusterInfo.cluster, "bedrock.pattern.image.tag", undefined)
+    };
+
+    // Apply manifest
+    const doc = readYamlDocument(__dirname + '/deployment/showcase-deployment.ytpl');
+    const manifest = doc.split("---").map((e: any) => loadYaml(e));
+
+    const manifestDeployment: ManifestDeployment = {
+        name: team.teamProps.name,
+        namespace: team.teamProps.namespace!,
+        manifest,
+        values
+    };
+    const manifestConstruct = new KubectlProvider(clusterInfo).addManifest(manifestDeployment);
+    manifestConstruct.node.addDependency(team.serviceAccount);
+}
 ```

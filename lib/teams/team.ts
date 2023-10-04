@@ -81,10 +81,9 @@ export class TeamProps {
     readonly teamManifestDir?: string;
 
     /**
-     * Optional, to pass a function for workloads.
+     * Optional, Use this function to add workloads to the team
     */
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    readonly workloadsFunction?: Function;
+    workloadDeployments? (team: ApplicationTeam, clusterInfo: ClusterInfo): void;
 }
 
 export class ApplicationTeam implements Team {
@@ -119,8 +118,8 @@ export class ApplicationTeam implements Team {
         this.setupNamespace(clusterInfo);
         this.setupServiceAccount(clusterInfo);
         this.setupSecrets(clusterInfo);
-        if (this.teamProps.workloadsFunction) {
-            this.teamProps.workloadsFunction.apply(this, clusterInfo);
+        if (this.teamProps.workloadDeployments) {
+            this.teamProps.workloadDeployments(this, clusterInfo);
          }
     }
 
