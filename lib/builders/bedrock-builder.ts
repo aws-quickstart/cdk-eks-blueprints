@@ -20,7 +20,6 @@ export class BedrockBuilder extends BlueprintBuilder {
                 builder: UsageTrackingAddOn.builder(),
             }),
             new addons.AwsLoadBalancerControllerAddOn(),
-            new addons.ClusterAutoScalerAddOn(),
             new addons.CoreDnsAddOn(),
             new addons.CertManagerAddOn(),
             new addons.KubeStateMetricsAddOn(),

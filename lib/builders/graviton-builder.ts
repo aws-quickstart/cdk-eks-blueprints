@@ -54,7 +54,6 @@ export class GravitonBuilder extends BlueprintBuilder {
                     builder: UsageTrackingAddOn.builder(),
                 }),
                 new addons.AwsLoadBalancerControllerAddOn(),
-                new addons.ClusterAutoScalerAddOn(),
                 new addons.KubeProxyAddOn("v1.27.1-eksbuild.1"),
                 new addons.VpcCniAddOn(),
             );
