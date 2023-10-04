@@ -81,9 +81,10 @@ export class TeamProps {
     readonly teamManifestDir?: string;
 
     /**
-     * Optional, Use this function to add workloads to the team
+     * Optional, Use this function to add infrastructure or workloads 
+     * deploymentto the team
     */
-    workloadDeployments? (team: ApplicationTeam, clusterInfo: ClusterInfo): void;
+    extensionFunction? (team: ApplicationTeam, clusterInfo: ClusterInfo): void;
 }
 
 export class ApplicationTeam implements Team {
@@ -109,7 +110,8 @@ export class ApplicationTeam implements Team {
             serviceAccountPolicies: teamProps.serviceAccountPolicies,
             userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
-            teamManifestDir: teamProps.teamManifestDir
+            teamManifestDir: teamProps.teamManifestDir,
+            extensionFunction: teamProps.extensionFunction
         };
     }
 
@@ -118,8 +120,8 @@ export class ApplicationTeam implements Team {
         this.setupNamespace(clusterInfo);
         this.setupServiceAccount(clusterInfo);
         this.setupSecrets(clusterInfo);
-        if (this.teamProps.workloadDeployments) {
-            this.teamProps.workloadDeployments(this, clusterInfo);
+        if (this.teamProps.extensionFunction) {
+            this.teamProps.extensionFunction(this, clusterInfo);
          }
     }
 

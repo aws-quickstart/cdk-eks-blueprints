@@ -31,7 +31,7 @@ export default class GenAIShowcase {
             namespace: blueprints.utils.valueFromContext(scope, "bedrock.pattern.namespace", "bedrock"),
             createNamespace: true,
             serviceAccountName: 'bedrock-service-account',
-            workloadDeployments: workloadDeployments
+            extensionFunction: extensionFunction
         }; 
 
         BedrockBuilder.builder()
@@ -43,10 +43,10 @@ export default class GenAIShowcase {
     }
 }
 
-function workloadDeployments(team: ApplicationTeam, clusterInfo: ClusterInfo) {
+function extensionFunction(team: ApplicationTeam, clusterInfo: ClusterInfo) {
     const values: spi.Values = {
         namespace: team.teamProps.namespace,
-        imageName: blueprints.utils.valueFromContext(clusterInfo.cluster, "bedrock.pattern.image.tag", undefined),
+        imageName: blueprints.utils.valueFromContext(clusterInfo.cluster, "bedrock.pattern.image.name", undefined),
         imageTag: blueprints.utils.valueFromContext(clusterInfo.cluster, "bedrock.pattern.image.tag", undefined)
     };
 
