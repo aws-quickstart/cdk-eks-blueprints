@@ -38,7 +38,7 @@ export default class GenAIShowcase {
             .account(account)
             .region(region)
             .version('auto')
-            .teams(new blueprints.BedrockTeam(bedrockTeamProps))
+            .addBedrockTeam(bedrockTeamProps)
             .build(scope, stackID);
     }
 }
