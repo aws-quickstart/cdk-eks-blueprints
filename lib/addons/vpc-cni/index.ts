@@ -225,14 +225,14 @@ export interface VpcCniAddOnProps {
   * `MAX_ENI` Environment Variable. Format integer.
   * Specifies the maximum number of ENIs that will be attached to the node. 
   */
-  maxEni?: number;  
+  maxEni?: number;
 
   /**
   * `MINIMUM_IP_TARGET` Environment Variable. Format integer.
   * Specifies the number of total IP addresses that the ipamd 
   * daemon should attempt to allocate for pod assignment on the node.
   */
-  minimumIpTarget?: number; 
+  minimumIpTarget?: number;
 
   /**
    * `POD_SECURITY_GROUP_ENFORCING_MODE` Environment Variable. Type: String. 
@@ -276,6 +276,13 @@ export interface VpcCniAddOnProps {
   serviceAccountPolicies?: iam.IManagedPolicy[];
 
   /**
+   * Enable kubernetes network policy in the VPC CNI introduced in vpc-cni 1.14
+   * More informaton on official AWS documentation: https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html
+   * 
+   */
+  enableNetworkPolicy?: boolean;
+
+  /**
    * Version of the add-on to use. Must match the version of the cluster where it
    * will be deployed.
    */
@@ -292,7 +299,7 @@ export interface CustomNetworkingConfig {
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.13.4-eksbuild.1',
+  version: 'v1.14.1-eksbuild.1',
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
@@ -357,14 +364,14 @@ export class VpcCniAddOn extends CoreAddOn {
    * @returns 
    */
   createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, policies: iam.IManagedPolicy[]): eks.ServiceAccount {
-      const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
-        cluster: clusterInfo.cluster,
-        name: this.coreAddOnProps.saName,
-        namespace: saNamespace
-      });
+    const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
+      cluster: clusterInfo.cluster,
+      name: this.coreAddOnProps.saName,
+      namespace: saNamespace
+    });
 
-      policies.forEach(p => sa.role.addManagedPolicy(p));
-      return sa as any as eks.ServiceAccount;
+    policies.forEach(p => sa.role.addManagedPolicy(p));
+    return sa as any as eks.ServiceAccount;
   }
 }
 
@@ -410,14 +417,15 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode,
       WARM_ENI_TARGET: props?.warmEniTarget,
       WARM_IP_TARGET: props?.warmIpTarget,
-      WARM_PREFIX_TARGET: props?.warmPrefixTarget
-    }
+      WARM_PREFIX_TARGET: props?.warmPrefixTarget,
+    },
+    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy)
   };
 
   // clean up all undefined
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ?  JSON.stringify(values[key]):values[key]);
- 
+  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ? JSON.stringify(values[key]) : values[key]);
+
   return result;
 }
