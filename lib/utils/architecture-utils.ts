@@ -65,7 +65,7 @@ export function supportsALL(constructor: Function) {
 function addAddonArch(addonName: string, architecture: ArchType) {
   if (addonArchitectureMap.has(addonName)) {
     const value = addonArchitectureMap.get(addonName);
-    if (value !== undefined) {
+    if ((value !== undefined) && !value.includes(architecture)) {
       value.push(architecture);
     }
     else {
