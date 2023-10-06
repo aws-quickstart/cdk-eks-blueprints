@@ -3,7 +3,7 @@ import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { ClusterInfo, Values } from "../../spi";
-import { loadYaml, readYamlDocument, ReplaceServiceAccount } from "../../utils";
+import { loadYaml, readYamlDocument, ReplaceServiceAccount, supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 
@@ -309,6 +309,7 @@ const defaultProps: CoreAddOnProps = {
 /**
  * Implementation of VpcCni EKS add-on with Advanced Configurations.
  */
+@supportsALL
 export class VpcCniAddOn extends CoreAddOn {
 
   readonly vpcCniAddOnProps: VpcCniAddOnProps;

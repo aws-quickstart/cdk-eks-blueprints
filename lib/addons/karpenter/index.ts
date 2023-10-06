@@ -2,7 +2,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo, Values, Taint } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
+import { conflictsWith, createNamespace, createServiceAccount, setPath, supportsALL, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
@@ -151,6 +151,7 @@ const defaultProps: HelmAddOnProps = {
 /**
  * Implementation of the Karpenter add-on
  */
+@supportsALL
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;

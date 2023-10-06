@@ -3,6 +3,7 @@ import * as kms from "aws-cdk-lib/aws-kms";
 import { ClusterInfo } from "../../spi";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
+import { supportsALL } from "../../utils";
 
 /**
  * Interface for EBS CSI Driver EKS add-on options
@@ -30,6 +31,7 @@ const defaultProps = {
 /**
  * Implementation of EBS CSI Driver EKS add-on
  */
+@supportsALL
 export class EbsCsiDriverAddOn extends CoreAddOn {
 
     constructor(readonly options?: EbsCsiDriverAddOnProps) {

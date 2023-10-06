@@ -78,7 +78,13 @@ export class TeamProps {
     /**
      * Optional, directory where a team's manifests are stored
      */
-     readonly teamManifestDir?: string;
+    readonly teamManifestDir?: string;
+
+    /**
+     * Optional, Use this function to add infrastructure or workloads 
+     * deploymentto the team
+    */
+    extensionFunction? (team: ApplicationTeam, clusterInfo: ClusterInfo): void;
 }
 
 export class ApplicationTeam implements Team {
@@ -104,7 +110,8 @@ export class ApplicationTeam implements Team {
             serviceAccountPolicies: teamProps.serviceAccountPolicies,
             userRoleArn: teamProps.userRoleArn,
             teamSecrets: teamProps.teamSecrets,
-            teamManifestDir: teamProps.teamManifestDir
+            teamManifestDir: teamProps.teamManifestDir,
+            extensionFunction: teamProps.extensionFunction
         };
     }
 
@@ -113,6 +120,9 @@ export class ApplicationTeam implements Team {
         this.setupNamespace(clusterInfo);
         this.setupServiceAccount(clusterInfo);
         this.setupSecrets(clusterInfo);
+        if (this.teamProps.extensionFunction) {
+            this.teamProps.extensionFunction(this, clusterInfo);
+         }
     }
 
     protected defaultSetupAccess(clusterInfo: ClusterInfo) {

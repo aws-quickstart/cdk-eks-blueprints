@@ -5,6 +5,7 @@ import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { supportsX86 } from "../../utils";
 
 
 /**
@@ -49,6 +50,7 @@ const defaultProps = {
     repository: "https://aws.github.io/eks-charts"
 };
 
+@supportsX86
 export class AppMeshAddOn extends HelmAddOn {
 
     readonly options: AppMeshAddOnProps;

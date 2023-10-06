@@ -5,6 +5,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
+import { supportsALL } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -76,6 +77,7 @@ function lookupImage(registry?: string, region?: string): Values {
 }
 
 @Reflect.metadata("ordered", true)
+@supportsALL
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
 
     readonly options: AwsLoadBalancerControllerProps;

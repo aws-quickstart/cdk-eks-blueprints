@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { dependable } from '../../utils';
+import { dependable, supportsALL } from '../../utils';
 import { ValuesSchema } from "./values";
 
 export interface IstioControlPlaneAddOnProps extends HelmAddOnUserProps {
@@ -18,6 +18,7 @@ const defaultProps = {
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
+@supportsALL
 export class IstioControlPlaneAddOn extends HelmAddOn {
 
     constructor(props?: IstioControlPlaneAddOnProps) {

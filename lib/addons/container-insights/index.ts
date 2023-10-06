@@ -4,7 +4,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
-import { conflictsWith, createNamespace } from "../../utils";
+import { conflictsWith, createNamespace, supportsALL } from "../../utils";
 
 export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
     values?: ValuesSchema
@@ -19,6 +19,7 @@ const defaultProps = {
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };
 
+@supportsALL
 export class ContainerInsightsAddOn extends HelmAddOn {
 
     constructor(props?: ContainerInsightAddonProps) {

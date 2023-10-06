@@ -3,7 +3,7 @@ import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace, setPath } from "../../utils";
+import { createNamespace, setPath, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -64,6 +64,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class KedaAddOn extends HelmAddOn {
 
   readonly options: KedaAddOnProps;

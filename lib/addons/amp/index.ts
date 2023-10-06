@@ -1,5 +1,5 @@
 import { ClusterAddOn, ClusterInfo, Values } from "../../spi";
-import { dependable, loadYaml, readYamlDocument, changeTextBetweenTokens } from "../../utils";
+import { dependable, loadYaml, readYamlDocument, changeTextBetweenTokens, supportsALL } from "../../utils";
 import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
@@ -102,6 +102,7 @@ const defaultProps = {
 /**
  * Implementation of AMP add-on for EKS Blueprints. Installs ADOT Collector.
  */
+@supportsALL
 export class AmpAddOn implements ClusterAddOn {
 
     readonly ampAddOnProps: AmpAddOnProps;

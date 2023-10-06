@@ -2,7 +2,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided option for the Helm Chart
@@ -32,6 +32,7 @@ const defaultProps: HelmAddOnProps & PrometheusNodeExporterAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class PrometheusNodeExporterAddOn extends HelmAddOn {
 
   readonly options: PrometheusNodeExporterAddOnProps;

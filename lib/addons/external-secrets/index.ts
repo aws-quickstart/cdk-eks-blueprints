@@ -1,4 +1,4 @@
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
 import { Construct } from "constructs";
@@ -57,6 +57,7 @@ const defaultIamPolicy: iam.PolicyStatement = new iam.PolicyStatement({
  * For information on how to configure the `external-secrets` Helm chart, please view the values.yaml spec provided by the chart.
  * https://github.com/external-secrets/external-secrets/blob/main/deploy/charts/external-secrets/values.yaml
  */
+@supportsALL
 export class ExternalsSecretsAddOn extends HelmAddOn {
   readonly options: ExternalsSecretsAddOnProps;
 

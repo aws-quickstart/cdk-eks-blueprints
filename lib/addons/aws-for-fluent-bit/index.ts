@@ -4,6 +4,7 @@ import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
+import { supportsALL } from '../../utils';
 
 /**
  * Configuration options for the FluentBit add-on.
@@ -40,6 +41,7 @@ const defaultProps: AwsForFluentBitAddOnProps = {
  * For information on how to configure the `aws-for-fluent-bit` Helm chart to forward logs and metrics to AWS services like CloudWatch or Kinesis, please view the values.yaml spec provided by the chart.
  * https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml
  */
+@supportsALL
 export class AwsForFluentBitAddOn extends HelmAddOn {
 
     readonly options: AwsForFluentBitAddOnProps;
