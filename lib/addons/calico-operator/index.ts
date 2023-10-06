@@ -32,7 +32,7 @@ export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 const defaultProps = {
     name: 'calico-operator',
     namespace: 'calico-operator',
-    version: 'v3.26.1',
+    version: 'v3.26.2',
     chart: "tigera-operator",
     release: "bp-addon-calico-operator",
     repository: "https://projectcalico.docs.tigera.io/charts"

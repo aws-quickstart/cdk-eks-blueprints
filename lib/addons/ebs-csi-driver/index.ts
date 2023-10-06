@@ -24,7 +24,7 @@ export interface EbsCsiDriverAddOnProps {
  */
 const defaultProps = {
     addOnName: "aws-ebs-csi-driver",
-    version: "v1.21.0-eksbuild.1",
+    version: "v1.23.0-eksbuild.1",
     saName: "ebs-csi-controller-sa",
 };
 

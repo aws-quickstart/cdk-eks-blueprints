@@ -441,7 +441,7 @@ class CodePipeline {
               input: codePipelineSource,
               installCommands: [
                 'n stable',
-                'npm install -g aws-cdk@2.91.0',
+                'npm install -g aws-cdk@2.99.1',
                 `cd ${path} && npm install`,
               ],
               commands: [`cd ${path}`, 'npm run build', 'npx cdk synth ' + app]

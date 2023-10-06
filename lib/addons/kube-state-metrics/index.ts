@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & KubeStateMetricsAddOnProps = {
   name: "kube-state-metrics",
   namespace: "kube-system",
   chart: "kube-state-metrics",
-  version: "5.10.1",
+  version: "5.14.0",
   release: "kube-state-metrics",
   repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},
