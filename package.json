@@ -1,6 +1,6 @@
 {
     "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.11.3",
+    "version": "1.12.0",
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -26,7 +26,7 @@
         "@types/uuid": "^9.0.1",
         "@typescript-eslint/eslint-plugin": "^6.4.0",
         "@typescript-eslint/parser": "^6.4.0",
-        "aws-cdk": "2.91.0",
+        "aws-cdk": "2.99.1",
         "copyfiles": "^2.4.1",
         "eslint": "^8.38.0",
         "jest": "^29.6.2",
@@ -34,8 +34,8 @@
         "lint": "^1.1.2",
         "ts-jest": "^29.1.0",
         "ts-node": "^10.9.1",
-        "typedoc": "^0.24.4",
-        "typescript": "^5.0.4"
+        "typedoc": "^0.25.1",
+        "typescript": "^5.2.2"
     },
     "dependencies": {
         "@aws-cdk/lambda-layer-kubectl-v25": "^2.0.3",
@@ -47,7 +47,7 @@
         "@types/bcrypt": "^5.0.0",
         "@types/lodash.clonedeep": "^4.5.7",
         "@types/uuid": "^9.0.1",
-        "aws-cdk-lib": "2.91.0",
+        "aws-cdk-lib": "2.99.1",
         "bcrypt": "^5.1.1",
         "constructs": "^10.2.33",
         "dot-object": "^2.1.4",

@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & GrafanaOperatorAddonProps = {
   chart: 'oci://ghcr.io/grafana-operator/helm-charts/grafana-operator',
   namespace: 'grafana-operator',
   release: 'grafana-operator',
-  version: 'v5.0.0-rc3',
+  version: 'v5.4.0',
   values: {},
   createNamespace: true
 };
