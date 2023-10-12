@@ -42,7 +42,7 @@ export function loadMultiResourceYaml(path: string): any {
 
 export function loadMultiResourceExternalYaml(url: string): any {
     const doc = loadExternalYaml(url);
-    return doc.split("---").map((e: any) => loadYaml(e));
+    return doc;
 }
 
 export function loadYaml(document: string): any {
