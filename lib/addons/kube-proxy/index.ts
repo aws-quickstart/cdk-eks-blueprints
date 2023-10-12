@@ -1,5 +1,6 @@
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { CoreAddOn } from "../core-addon";
+import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { supportsALL } from "../../utils";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_27, "v1.27.1-eksbuild.1"],
@@ -10,16 +11,27 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 ]);
 
 /**
+ * Configuration options for the coredns add-on.
+ */
+export type kubeProxyAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" | "version" >;
+
+const defaultProps = {
+    addOnName: "kube-proxy",
+    saName: "kube-proxy",
+    versionMap: versionMap,
+};
+
+/**
  * Implementation of KubeProxy EKS add-on.
  */
+@supportsALL
 export class KubeProxyAddOn extends CoreAddOn {
 
-    constructor(version?: string) {
+    constructor(version?: string, props?: kubeProxyAddOnProps) {
         super({
-            addOnName: "kube-proxy",
             version: version ?? "auto",
-            saName: "kube-proxy",
-            versionMap: versionMap,
+            ... defaultProps,
+            ... props
         });
     }
 }

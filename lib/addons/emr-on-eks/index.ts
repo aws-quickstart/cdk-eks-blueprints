@@ -4,7 +4,9 @@ import { Stack } from "aws-cdk-lib";
 import { Cluster } from "aws-cdk-lib/aws-eks";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import { supportsALL } from "../../utils";
 
+@supportsALL
 export class EmrEksAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     assert(clusterInfo.cluster instanceof Cluster, "EmrEksAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");

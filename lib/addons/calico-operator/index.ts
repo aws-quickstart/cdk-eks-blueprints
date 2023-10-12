@@ -1,6 +1,7 @@
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
+import { supportsALL } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -31,12 +32,13 @@ export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 const defaultProps = {
     name: 'calico-operator',
     namespace: 'calico-operator',
-    version: 'v3.26.1',
+    version: 'v3.26.2',
     chart: "tigera-operator",
     release: "bp-addon-calico-operator",
     repository: "https://projectcalico.docs.tigera.io/charts"
 };
 
+@supportsALL
 export class CalicoOperatorAddOn extends HelmAddOn {
 
     private options: CalicoOperatorAddOnProps;

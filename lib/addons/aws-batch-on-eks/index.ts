@@ -4,9 +4,11 @@ import { Stack } from "aws-cdk-lib";
 import { Cluster } from "aws-cdk-lib/aws-eks";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import { supportsALL } from "../../utils";
 
 const BATCH = 'aws-batch';
 
+@supportsALL
 export class AwsBatchAddOn implements ClusterAddOn {
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     assert(clusterInfo.cluster instanceof Cluster, "AwsBatchAddOn cannot be used with imported clusters");

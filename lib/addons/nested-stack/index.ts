@@ -1,6 +1,7 @@
 import { NestedStackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo, NestedStackBuilder } from "../../spi";
+import { supportsALL } from "../../utils";
 
 /**
  * Properties for the nested stack add-on.
@@ -22,6 +23,7 @@ export class NestedStackAddOnProps {
     nestedStackProps?: NestedStackProps;
 }
 
+@supportsALL
 export class NestedStackAddOn  implements ClusterAddOn {
 
     readonly id? : string;

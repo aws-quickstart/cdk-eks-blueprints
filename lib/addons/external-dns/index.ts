@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import merge from "ts-deepmerge";
+import { supportsALL } from '../../utils';
 
 
 /**
@@ -24,7 +25,7 @@ const defaultProps = {
     namespace: 'external-dns',
     repository: 'https://kubernetes-sigs.github.io/external-dns/',
     release: 'blueprints-addon-external-dns',
-    version: '1.13.0',
+    version: '1.13.1',
     values: {},
 };
 
@@ -32,6 +33,7 @@ const defaultProps = {
  * Implementation of the External DNS service: https://github.com/kubernetes-sigs/external-dns/.
  * It is required to integrate with Route53 for external DNS resolution. 
  */
+@supportsALL
 export class ExternalDnsAddOn extends HelmAddOn {
 
     private options: ExternalDnsProps;

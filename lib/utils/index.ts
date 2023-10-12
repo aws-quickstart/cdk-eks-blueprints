@@ -1,4 +1,5 @@
 export * from './addon-utils';
+export * from './architecture-utils';
 export * from './cluster-utils';
 export * from './constraints-utils';
 export * from './context-utils';

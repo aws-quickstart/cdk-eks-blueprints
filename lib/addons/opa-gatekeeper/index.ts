@@ -1,4 +1,5 @@
 import { ClusterInfo, ClusterPostDeploy, Team } from "../../spi";
+import { supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -22,6 +23,7 @@ const defaultProps: HelmAddOnProps = {
     version: '3.13.0'
 };
 
+@supportsALL
 export class OpaGatekeeperAddOn extends HelmAddOn implements ClusterPostDeploy {
 
     private options: OpaGatekeeperAddOnProps;

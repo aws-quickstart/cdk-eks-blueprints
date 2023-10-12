@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import merge from "ts-deepmerge";
-import { conflictsWith, setPath } from "../../utils";
+import { conflictsWith, setPath, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi/types";
 import { createNamespace } from "../../utils/namespace-utils";
@@ -38,7 +38,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     name: 'aws-for-fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-fluent-bit-for-cw",
-    version: '0.1.28',
+    version: '0.1.30',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'aws-for-fluent-bit',
     createNamespace: true,
@@ -53,6 +53,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
  * https://github.com/aws/eks-charts/tree/master/stable/aws-for-fluent-bit
  * 
  */
+@supportsALL
 export class CloudWatchLogsAddon extends HelmAddOn {
 
     readonly options: CloudWatchLogsAddonProps;

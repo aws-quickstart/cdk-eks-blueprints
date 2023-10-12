@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ClusterAddOn, ClusterInfo } from "../../spi";
-import {dependable, loadExternalYaml} from "../../utils";
+import { dependable, loadExternalYaml, supportsALL} from "../../utils";
 import { HelmAddOnUserProps } from '../helm-addon';
 import { KubectlProvider } from "../helm-addon/kubectl-provider";
 
@@ -36,6 +36,7 @@ const defaultProps = {
 /**
  * Implementation of KNative add-on for EKS Blueprints. Installs KNative to the Cluster.
  */
+@supportsALL
 export class KNativeOperator implements ClusterAddOn {
 
     readonly knativeAddOnProps: KnativeOperatorProps;

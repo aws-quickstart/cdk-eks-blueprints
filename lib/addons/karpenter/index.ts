@@ -2,7 +2,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo, Values, Taint } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
+import { conflictsWith, createNamespace, createServiceAccount, setPath, supportsALL, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
@@ -64,7 +64,7 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
      */
-    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu"
+    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
 
     /**
      * AMI Selector
@@ -142,7 +142,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.29.2',
+    version: 'v0.31.0',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -151,6 +151,7 @@ const defaultProps: HelmAddOnProps = {
 /**
  * Implementation of the Karpenter add-on
  */
+@supportsALL
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;

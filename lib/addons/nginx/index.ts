@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo, Values } from "../../spi";
-import { dependable } from "../../utils";
+import { dependable, supportsALL } from "../../utils";
 import { setPath } from "../../utils/object-utils";
 import * as dot from 'dot-object';
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -61,7 +61,7 @@ const defaultProps: NginxAddOnProps = {
     name: "nginx-ingress",
     chart: "nginx-ingress",
     release: "blueprints-addon-nginx",
-    version: "0.18.1",
+    version: "1.0.0",
     repository: "https://helm.nginx.com/stable",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,
@@ -70,6 +70,7 @@ const defaultProps: NginxAddOnProps = {
     namespace: 'kube-system'
 };
 
+@supportsALL
 export class NginxAddOn extends HelmAddOn {
 
     readonly options: NginxAddOnProps;

@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from '../../spi';
 import { HelmAddOnUserProps } from '../helm-addon';
 import { CsiDriverProviderAws } from './csi-driver-provider-aws';
-import { cloneDeep } from "../../utils";
+import { cloneDeep, supportsALL } from "../../utils";
 
 /**
  * Configuration options for Secrets Store AddOn
@@ -53,6 +53,7 @@ const defaultProps: SecretsStoreAddOnProps = {
     syncSecrets: true,
 };
 
+@supportsALL
 export class SecretsStoreAddOn implements ClusterAddOn {
 
     private options: SecretsStoreAddOnProps;

@@ -7,7 +7,7 @@ import * as dot from 'dot-object';
 import merge from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
-import { createNamespace, getSecretValue, validateConstraints } from '../../utils';
+import { createNamespace, getSecretValue, supportsALL, validateConstraints } from '../../utils';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
 import { ArgoApplication } from './application';
 import { createSecretRef } from './manifest-utils';
@@ -72,7 +72,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
  */
 const defaultProps = {
     namespace: "argocd",
-    version: '5.43.4',
+    version: '5.46.7',
     chart: "argo-cd",
     release: "blueprints-addon-argocd",
     repository: "https://argoproj.github.io/argo-helm"
@@ -82,6 +82,7 @@ const defaultProps = {
 /**
  * Implementation of ArgoCD add-on and post deployment hook.
  */
+@supportsALL
 export class ArgoCDAddOn implements spi.ClusterAddOn, spi.ClusterPostDeploy {
 
     readonly options: ArgoCDAddOnProps;
