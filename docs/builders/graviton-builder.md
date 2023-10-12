@@ -1,4 +1,4 @@
-# GPU Builder
+# Graviton Builder
 
 The `GravitonBuilder` allows you to get started with a builder class to configure with required setup as you prepare a blueprint for setting up EKS cluster with Graviton worker nodes to run your ARM64 workloads.
 
