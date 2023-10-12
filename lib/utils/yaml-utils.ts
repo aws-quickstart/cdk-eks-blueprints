@@ -35,6 +35,18 @@ export function readYamlDocument(path: string): string {
     }
 }
 
+<<<<<<< HEAD
+=======
+export function loadMultiResourceYaml(path: string): any {
+    const doc = readYamlDocument(path);
+    return doc.split("---").map((e: any) => loadYaml(e));
+}
+
+export function loadMultiResourceExternalYaml(url: string): any {
+    const doc = loadExternalYaml(url);
+    return doc;
+}
+>>>>>>> 38b70f6d (test fix, lint fix, and removed local testing example blueprint)
 
 export function loadYaml(document: string): any {
     return yaml.load(document);

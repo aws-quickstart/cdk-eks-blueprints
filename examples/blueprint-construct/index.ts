@@ -229,11 +229,8 @@ export default class BlueprintConstruct {
                 efsFileSystem: 'apache-airflow-efs-provider'
             }),
             new blueprints.ExternalsSecretsAddOn(),
-<<<<<<< HEAD
             new blueprints.EksPodIdentityAgentAddOn(),
-=======
             new blueprints.NeuronPluginAddOn(),
->>>>>>> 3423025f (first commit - adding the addons, manifests, and example with GPU nodes)
         ];
 
         // Instantiated to for helm version check.
@@ -253,13 +250,9 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-<<<<<<< HEAD
                 addWindowsNodeGroup(), //  commented out to check the impact on e2e
-                addGpuNodeGroup()
-=======
-                addWindowsNodeGroup(),
-                addInferentiaGroup(),
->>>>>>> 3423025f (first commit - adding the addons, manifests, and example with GPU nodes)
+                addGpuNodeGroup(),
+                addInferentiaNodeGroup(),
             ]
         });
 
@@ -403,7 +396,6 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-<<<<<<< HEAD
 function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
@@ -421,21 +413,24 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
                 "LaunchTemplate": "Linux-Launch-Template",
             },
             requireImdsv2: false
-=======
-function addInferentiaGroup(): blueprints.ManagedNodeGroup {
-    return {   
+        }
+    };
+}
+
+function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+
+    return {
         id: "mng4-inferentia",
-        amiType: NodegroupAmiType.AL2_X86_64_GPU,
         instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
         desiredSize: 1,
-        minSize: 1,
+        minSize: 1, 
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         diskSize: 50,
-        tags:{
+        tags: {
             "Name": "Mng4",
-            "Type": "Inferentia-Node-Group",
+            "Type": "Managed-InferentiaNode-Group",
+            "LaunchTemplate": "Inferentia",
             "kubernetes.io/cluster/blueprint-construct-dev": "owned"
->>>>>>> 3423025f (first commit - adding the addons, manifests, and example with GPU nodes)
         }
     };
 }
