@@ -26,8 +26,8 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 ```bash
 npm install -g n # may require sudo
 n stable # may require sudo 
-npm install -g aws-cdk@2.86.0 # may require sudo (Ubuntu) depending on configuration
-cdk --version # must produce 2.86.0
+npm install -g aws-cdk@2.91.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.91.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
@@ -43,13 +43,13 @@ npm i @aws-quickstart/eks-blueprints
 Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
 
 ```typescript
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
+const version = 'auto';
 
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn(),
@@ -65,6 +65,7 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
+    .version(version)
     .addOns(...addOns)
     .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
     .build(app, 'eks-blueprint');
@@ -136,7 +137,7 @@ You should see output that lists all namespaces in your cluster.
 
 ## Deploy workloads with ArgoCD
 
-Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/eks-blueprints-workloads).
+Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the [App of Apps](https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern) pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found [here](https://github.com/aws-samples/eks-blueprints-workloads).
 
 You can leverage [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping) for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.
 
@@ -144,7 +145,7 @@ You can leverage [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping) for 
 
 These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the [Automatic Bootstrapping](addons/argo-cd.md#bootstrapping).
 
-Follow the instructions found [here](https://argoproj.github.io/argo-cd/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
+Follow the instructions found [here](https://argo-cd.readthedocs.io/en/stable/cli_installation/) as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:
 
 ```
 argocd version --short --client
@@ -172,7 +173,7 @@ kubectl port-forward $ARGO_SERVER -n argocd 8080:443
 
 Open your browser to http://localhost:8080 and you should see the ArgoCD login screen.
 
-![ArgoCD](../assets/images/argo-cd.png)
+![ArgoCD](./assets/images/argo-cd.png)
 
 ### Logging Into ArgoCD
 
@@ -232,10 +233,10 @@ Open up `localhost:4040` in your browser and you should see the application.
 
 ## Next Steps
 
-For information on onboarding teams to your clusters, see [`Team` documentation](../teams). 
+For information on onboarding teams to your clusters, see [`Team` documentation](./teams/teams.md). 
 
-For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](../pipelines).
+For information on deploying Continuous Delivery pipelines for your infrastructure, see [`Pipelines` documentation](./pipelines.md).
 
-For information on supported add-ons, see [`Add-on` documentation](../addons)
+For information on supported add-ons, see [`Add-on` documentation](./addons/index.md)
 
 For information on Onboarding and managing workloads in your clusters, see [`Workload` documentation](https://github.com/aws-samples/eks-blueprints-workloads). 

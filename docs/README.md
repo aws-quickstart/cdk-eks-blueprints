@@ -44,14 +44,14 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.86.0
+npm install -g aws-cdk@2.91.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.86.0
+# must output 2.91.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.
@@ -99,10 +99,12 @@ const addOns: Array<blueprints.ClusterAddOn> = [
 
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
+const version = 'auto';
 
 blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
+    .version(version)
     .addOns(...addOns)
     .build(app, 'eks-blueprint');
 ```

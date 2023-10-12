@@ -57,6 +57,7 @@ const externalDnsAddOn = new blueprints.addons.ExternalDnsAddOn({
 const addOns: Array<blueprints.ClusterAddOn> = [ awsAlbAddOn, externalDnsAddOn, efsCsiAddOn, jupyterHubAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .resourceProvider(GlobalResources.HostedZone, new DelegatingHostedZoneProvider({
     parentDomain,
     subdomain,

@@ -122,7 +122,15 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
            */
           [k: string]: unknown;
         };
-    };
+    },
+
+    /**
+     * Tags adds tags to all resources created, including EC2 Instances, EBS volumes and Launch Templates.
+     * Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domains 
+     * (such as "karpenter.sh", "karpenter.k8s.aws", and "kubernetes.io/cluster").
+     * This ensures that Karpenter is able to correctly auto-discover machines that it owns.
+     */
+    tags?: Values;
 }
 
 const KARPENTER = 'karpenter';
@@ -134,7 +142,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.28.0',
+    version: 'v0.29.2',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -180,6 +188,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const repo = this.options.repository!;
         const interruption = this.options.interruptionHandling || false;
         const limits = this.options.limits || null;
+        const tags = this.options.tags || null;
         
         // Various checks for version errors
         const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
@@ -267,12 +276,13 @@ export class KarpenterAddOn extends HelmAddOn {
 
         // Add helm chart
         if (semver.gte(this.options.version!, '0.19.0')){
-            setPath(values, "settings.aws", {
+            const awsSettings = {
                 clusterEndpoint: endpoint,
                 clusterName: name,
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
-                interruptionQueueName: stackName
-            });
+                interruptionQueueName: interruption ? stackName : "",
+            };
+            setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
         } else {
             setPath(values, "clusterEndpoint", endpoint);
             setPath(values, "clusterName", name);
@@ -329,6 +339,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     amiSelector: amiSelector,
                     subnetSelector: subnetTags,
                     securityGroupSelector: sgTags,
+                    tags: tags,
                 },
             });
             nodeTemplate.node.addDependency(provisioner);

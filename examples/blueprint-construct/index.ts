@@ -132,6 +132,9 @@ export default class BlueprintConstruct {
                         cpu: 20,
                         memory: "64Gi",
                     }
+                },
+                tags: {
+                    schedule: 'always-on'
                 }
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
@@ -170,6 +173,33 @@ export default class BlueprintConstruct {
             // Commenting due to conflicts with `CloudWatchLogsAddon`
             // new blueprints.AwsForFluentBitAddOn(),
             new blueprints.FluxCDAddOn(),
+            new blueprints.GpuOperatorAddon({
+                values:{
+                    driver: {
+                      enabled: true
+                    },
+                    mig: {
+                      strategy: 'mixed'
+                    },
+                    devicePlugin: {
+                      enabled: true,
+                      version: 'v0.13.0'
+                    },
+                    migManager: {
+                      enabled: true,
+                      WITH_REBOOT: true
+                    },
+                    toolkit: {
+                      version: 'v1.13.1-centos7'
+                    },
+                    operator: {
+                      defaultRuntime: 'containerd'
+                    },
+                    gfd: {
+                      version: 'v0.8.0'
+                    }
+                  }
+            }),
             new blueprints.GrafanaOperatorAddon(),
             new blueprints.CloudWatchLogsAddon({
                 logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
@@ -191,7 +221,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_27,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -203,7 +233,6 @@ export default class BlueprintConstruct {
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
                 addWindowsNodeGroup(),
-                addInferentiaGroup(),
             ]
         });
 
@@ -347,21 +376,6 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addInferentiaGroup(): blueprints.ManagedNodeGroup {
-    return {   
-        id: "mng4-inferentia",
-        amiType: NodegroupAmiType.AL2_X86_64_GPU,
-        instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
-        desiredSize: 1,
-        minSize: 1,
-        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
-        diskSize: 50,
-        tags:{
-            "Name": "Mng4",
-            "Type": "Inferentia-Node-Group",
-            "kubernetes.io/cluster/blueprint-construct-dev": "owned"
-        }
-    };
-}
+
 
 

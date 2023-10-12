@@ -6,7 +6,7 @@ import { defaultOptions, GenericClusterProvider } from './generic-cluster-provid
 /**
  * Configuration options for the cluster provider.
  */
-export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
+export interface FargateClusterProviderProps extends Partial<eks.CommonClusterOptions> {
 
     /**
     * The name for the cluster.
@@ -14,9 +14,11 @@ export interface FargateClusterProviderProps extends eks.CommonClusterOptions {
     name?: string
 
     /**
-     * The Fargate for the cluster.
+     * The Fargate profiles associated with the cluster.
+     *
+     * <b>Note</b> The `Map<>` form is deprecated and will be removed from a future release.
      */
-    fargateProfiles?: Map<string, eks.FargateProfileOptions>,
+    fargateProfiles?: { [key: string]: eks.FargateProfileOptions } | Map<string, eks.FargateProfileOptions>,
 
     /**
      * Subnets are passed to the cluster configuration.
@@ -45,7 +47,7 @@ export class FargateClusterProvider extends GenericClusterProvider {
 
     constructor(props?: FargateClusterProviderProps) {
         super({...defaultOptions, ...props, ...{
-                fargateProfiles: Object.fromEntries(props?.fargateProfiles ?? new Map())
+                fargateProfiles: props?.fargateProfiles instanceof Map ? Object.fromEntries(props?.fargateProfiles) : props?.fargateProfiles
             }
         });
     }

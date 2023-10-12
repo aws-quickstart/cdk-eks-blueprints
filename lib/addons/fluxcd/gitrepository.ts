@@ -6,16 +6,16 @@ import { setPath } from "../../utils";
  */
 export class FluxGitRepository {
 
-    constructor(private readonly bootstrapRepo: spi.ApplicationRepository) {}
+    constructor(private readonly repository: spi.ApplicationRepository) {}
 
-    public generate(namespace: string, fluxSyncInterval: string, fluxSecretRefName: string) {
+    public generate(name: string, namespace: string, fluxSyncInterval: string, fluxSecretRefName: string) {
 
-        const repository = this.bootstrapRepo!;
+        const repository = this.repository;
         const gitManifest =  {
             apiVersion: "source.toolkit.fluxcd.io/v1beta2",
             kind: "GitRepository",
             metadata: {
-                name: repository.name,
+                name: name,
                 namespace: namespace
             },
             spec: {

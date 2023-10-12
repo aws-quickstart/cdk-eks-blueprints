@@ -35,6 +35,15 @@ export function readYamlDocument(path: string): string {
     }
 }
 
+export function loadMultiResourceYaml(path: string): any {
+    const doc = readYamlDocument(path);
+    return doc.split("---").map((e: any) => loadYaml(e));
+}
+
+export function loadMultiResourceExternalYaml(url: string): any {
+    const doc = loadExternalYaml(url);
+    return doc.split("---").map((e: any) => loadYaml(e));
+}
 
 export function loadYaml(document: string): any {
     return yaml.load(document);

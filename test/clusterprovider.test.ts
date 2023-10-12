@@ -61,7 +61,8 @@ test("Generic cluster provider correctly registers managed node groups with inst
 
     const clusterProvider = blueprints.clusterBuilder()
     .withCommonOptions({
-        serviceIpv4Cidr: "10.43.0.0/16"
+        serviceIpv4Cidr: "10.43.0.0/16",
+        version: KubernetesVersion.V1_27
     })
     .managedNodeGroup({
         id: "mng1",
@@ -301,8 +302,39 @@ test("Kubectl layer is correctly injected for EKS version 1.21 and below", () =>
 
     const stackV122 = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_21).build(app, "stack-122");
+        .version(KubernetesVersion.V1_22).build(app, "stack-122");
     
     const template = Template.fromStack(stackV122);
     template.resourceCountIs("AWS::Lambda::LayerVersion", 0);
+});
+
+test("Build fails if no version is set in builder or node group", () => {
+    const app = new cdk.App();
+    const clusterProvider = new blueprints.GenericClusterProvider({
+        clusterName: "my-cluster",
+    });
+    expect(() => {
+        blueprints.EksBlueprint.builder()
+        .clusterProvider(clusterProvider).build(app, "stack-fail-2");
+    }).toThrow("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
+});
+
+test("Kubernetes Version gets set correctly for \"auto\"", () => {
+    const app = new cdk.App();
+    const stack = blueprints.EksBlueprint.builder()
+    .account('123456789').region('us-west-2')
+    .version("auto").build(app, "stack-auto");
+
+    expect(stack.getClusterInfo().version.version).toBe("1.27");
+});
+
+
+test("Kubernetes Version gets set correctly in NodeGroup", () => {
+    const app = new cdk.App();
+    const stack = blueprints.EksBlueprint.builder()
+    .account('123456789').region('us-west-2')
+    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_27}))
+    .build(app, "stack-auto");
+
+    expect(stack.getClusterInfo().version.version).toBe("1.27");
 });

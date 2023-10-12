@@ -31,6 +31,7 @@ const batchTeam: BatchEksTeamProps = {
 };
 
 const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(addOn)
     .teams(new blueprints.BatchEksTeam(batchTeam))
     .build(app, 'my-stack-name');

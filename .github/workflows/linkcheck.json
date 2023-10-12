@@ -1,0 +1,27 @@
+{
+    "timeout": "5s",
+    "retryOn429": true,
+    "retryCount": 5,
+    "fallbackRetryDelay": "30s",
+    "aliveStatusCodes": [200, 206],
+    "httpHeaders": [
+      {
+        "urls": ["https://help.github.com/"],
+        "headers": {
+          "Accept-Encoding": "zstd, br, gzip, deflate"
+        }
+      }
+    ],
+    "ignorePatterns": [
+      { "pattern": "localhost" },
+      { "pattern": "127.0.0.1" },
+      { "pattern": "../api" },
+      { "pattern": "https://helm.datadoghq.com" },
+      { "pattern": "https://sqs" },
+      { "pattern": "www.rsa-2048.example.com" },
+      { "pattern": "rsa-2048.example.com" },
+      { "pattern": "https://ingress-red-saas.instana.io" },
+      { "pattern": "http://console-eks.yourdomain.com" },
+      { "pattern": "https://p191.p3.n0.cdn.getcloudapp.com"}
+    ]
+}

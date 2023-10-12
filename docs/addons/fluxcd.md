@@ -6,6 +6,8 @@ Flux is a declarative, GitOps-based continuous delivery tool that can be integra
 
 ## Usage
 
+### Single bootstrap repo path
+
 ```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
@@ -13,21 +15,110 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.FluxCDAddOn({
-  bootstrapRepo: {
-      repoUrl: 'https://github.com/stefanprodan/podinfo',
-      name: "podinfo",
-      targetRevision: "master",
-      path: "./kustomize"
-  },
-  bootstrapValues: {
-      "region": "us-east-1"
-  },
-}),
+    repositories:[{
+         name: "aws-observability-accelerator",
+         namespace: undefined,
+         repository: {
+             repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+             targetRevision: "main",
+         },
+         values: {
+             "region": "us-east-2"
+         },
+         kustomizations: [{kustomizationPath: "./artifacts/grafana-operator-manifests/eks/infrastructure"}],
+    }],
+})
+...
 
 const blueprint = blueprints.EksBlueprint.builder()
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```
+
+### Multiple bootstrap repo paths
+
+Multiple bootstrap repo paths are useful when you want to create multiple Kustomizations, pointing to different paths, e.g. to deploy manifests from specific subfolders in your repository:
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.FluxCDAddOn({
+    repositories: [{
+        name: "aws-observability-accelerator",
+        namespace: undefined,
+        repository: {
+            repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+            targetRevision: "main",
+        },
+        values: {
+            "region": "us-east-2"
+        },
+        kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+    }],
+})
+...
+
+const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
+    .addOns(addOn)
+    .build(app, 'my-stack-name');
+```
+
+## Workload Repositories
+
+1. To add workload repositories as well as the bootstrap repository, please follow this example below 
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const nginxDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/nginx/nginx.json"
+const javaDashUrl = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/java/default.json"
+
+const addOn = new blueprints.addons.FluxCDAddOn({
+    repositories: [
+        {
+            name: "aws-observability-accelerator",
+            namespace: undefined,
+            repository: {
+                repoUrl: 'https://github.com/aws-observability/aws-observability-accelerator',
+                targetRevision: "main",
+            },
+            values: {
+                "GRAFANA_NGINX_DASH_URL" : nginxDashUrl,
+                "GRAFANA_JAVA_JMX_DASH_URL": javaDashUrl,
+            },
+            kustomizations: [{kustomizationPath:"./artifacts/grafana-operator-manifests/eks/infrastructure"}, {kustomizationPath: "./artifacts/grafana-operator-manifests/eks/java"}]
+        },
+        {
+            name: "podinfo",
+            namespace: undefined,
+            repository: {
+                repoUrl: 'https://github.com/stefanprodan/podinfo',
+                targetRevision: "master",
+            },
+            values: {
+                "region": "us-east-2"
+            },
+            kustomizations: [{kustomizationPath: "./kustomize", kustomizationTargetNamespace: "default"}],
+        }
+    ],
+});
+
+const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
+    .addOns(
+        new blueprints.addons.GrafanaOperatorAddon,
+        addOn,
+    )
+    .build(app, 'my-stack-name');
+```
+
 
 ## Secret Management for private Git repositories with FluxCD
 
@@ -58,24 +149,30 @@ const app = new cdk.App();
 const addOns: Array<blueprints.ClusterAddOn> = [
   new blueprints.addons.ExternalsSecretsAddOn(),
   new blueprints.addons.FluxCDAddOn({
-    bootstrapRepo: {
-        repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
+    repositories:[
+      {
         name: "<<YOUR_FLUX_APP_NAME>>",
-        targetRevision: "<<YOUR_TARGET_REVISION>>",
-        path: "<<YOUR_FLUX_SYNC_PATH>>",
-        fluxVerifyMode: "head",
+        namespace: "<<YOUR_FLUX_ADDON_NAMESPACE>>",
+        repository: {
+            repoUrl: '<<YOUR_PRIVATE_GIT_REPOSITORY>>',
+            targetRevision: "<<YOUR_TARGET_REVISION>>",
+        },
+        values: {
+            "region": "us-east-1"
+        },
+        kustomizations: [{kustomizationPath: "<<YOUR_FLUX_SYNC_PATH>>"}],
         // This is the name of the kubernetes secret to be created by `ExternalSecret` shown in step 3.
-        fluxSecretRefName: "repository-creds" 
-    },
-    bootstrapValues: {
-        "region": "us-east-1"
-    },
+        secretRefName: "repository-creds" 
+      }
+    ],
+
   }),
   new ExternalOperatorSecretAddon(),
 ];
 
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOns)
   .build(app, 'my-stack-name');
 ```

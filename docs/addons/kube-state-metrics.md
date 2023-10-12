@@ -17,6 +17,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.KubeStateMetricsAddOn()
 
 const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
   .addOns(addOn)
   .build(app, 'my-stack-name');
 ```

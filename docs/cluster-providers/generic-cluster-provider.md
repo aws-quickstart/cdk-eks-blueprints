@@ -10,10 +10,10 @@ Note: If `launchTemplate` is passed with `managedNodeGroups`, `diskSize` is not 
 
 Full list of configuration options:
 
-- [Generic Cluster Provider](../api/interfaces/GenericClusterProviderProps.html)
-- [Managed Node Group](../api/interfaces/ManagedNodeGroup.html)
-- [Autoscaling Group](../api/interface/../interfaces/AutoscalingNodeGroup.html)
-- [Fargate Cluster](../api/interfaces/FargateClusterProviderProps.html)
+- [Generic Cluster Provider](../api/interfaces/clusters.GenericClusterProviderProps.html)
+- [Managed Node Group](../api/interfaces/clusters.ManagedNodeGroup.html)
+- [Autoscaling Group](../api/interfaces/clusters.AutoscalingNodeGroup.html)
+- [Fargate Cluster](../api/interfaces/clusters.FargateClusterProviderProps.html)
 
 ## Usage 
 
@@ -185,7 +185,7 @@ The `GenericClusterProvider` supports the following configuration options.
 | managedNodeGroups     | Zero or more managed node groups.
 | autoscalingNodeGroups | Zero or more autoscaling node groups (mutually exclusive with managed node groups).
 | fargateProfiles       | Zero or more Fargate profiles.
-| version               | Kubernetes version for the control plane.
+| version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | vpc                   | VPC for the cluster.
 | vpcSubnets            | The subnets for control plane ENIs (subnet selection).
 | privateCluster        | If `true` Kubernetes API server is private.
@@ -204,7 +204,7 @@ Default configuration for managed and autoscaling node groups can also be suppli
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass individual `GenericProviderClusterProps` to each cluster blueprint.
 
-You can find more details on the supported configuration options in the API documentation for the [GenericClusterProviderProps](../api/interfaces/GenericClusterProviderProps.html).
+You can find more details on the supported configuration options in the API documentation for the [GenericClusterProviderProps](../api/interfaces/clusters.GenericClusterProviderProps.html).
 
 ## Upgrading Control Plane
 

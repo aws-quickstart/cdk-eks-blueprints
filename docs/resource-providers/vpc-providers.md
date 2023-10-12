@@ -23,9 +23,23 @@ Provides the given VPC to the blueprint constructs under the provided name.
 
 Example Implementation:
 ```typescript
-const myVpc = ec2.Vpc(scope, id + 'vpc');
+
+const app = new cdk.App();
+
+export class VPCStack extends cdk.Stack {
+  public readonly vpc: ec2.Vpc;
+
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    this.vpc = new ec2.Vpc(this, 'eks-blueprint-vpc');
+  }
+}
+
+const vpcStack = new VPCStack(app, 'eks-blueprint-vpc', { env: { account, region } });
+
 blueprints.EksBlueprint.builder()
-  .resourceProvider(GlobalResources.Vpc, new blueprints.DirectVpcProvider(myVpc))
+  .resourceProvider(GlobalResources.Vpc, new blueprints.DirectVpcProvider(vpcStack.vpc))
   ...
   .build();
 ```

@@ -19,6 +19,7 @@ const addOns = [
 ];
 
 const blueprint = blueprints.EksBlueprint.builder()
+    .version("auto")
     .addOns(...addOns)
     .build(app, 'my-stack-name');
 ```
@@ -63,4 +64,4 @@ documentation.
 
 ### Applying KNative Functions
 Currently, the Knative Operator does not support the deployment of Knative directly as they're directly run as services.
-For better instructions check (their documentation.)[https://knative.dev/docs/functions/deploying-functions/]
+For better instructions check [their documentation](https://knative.dev/docs/functions/deploying-functions).

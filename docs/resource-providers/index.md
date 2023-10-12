@@ -182,6 +182,7 @@ blueprints.EksBlueprint.builder()
         externalDnsHostname: 'my.domain.com'
     }))
     .teams(...)
+    .version("auto")
     .build(app, 'stack-with-resource-providers');
 ```
 
@@ -204,6 +205,7 @@ blueprints.EksBlueprint.builder()
         externalDnsHostname: 'my.domain.com'
     }))
     .teams(...)
+    .version("auto")
     .build(app, 'stack-with-resource-providers');
 ```
 
@@ -231,6 +233,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 blueprints.EksBlueprint.builder()
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
+    .version("auto")
     .build(scope, blueprintID, props);
 ```
 
@@ -249,6 +252,7 @@ blueprints.EksBlueprint.builder()
     .resourceProvider("my-role", new blueprints.LookupRoleProvider("SomeExistingRole")) // enables to look up this role from ClusterInfo under "my-role" in add-ons, etc.
     .addOns(...addOns)
     .clusterProvider(clusterProvider)
+    .version("auto")
     .build(scope, blueprintID, props);
 ```
 
@@ -272,6 +276,7 @@ blueprints.EksBlueprint.builder()
     .resourceProvider("FsxLustreFileSystem" ,new MyResourceProvider())
     .addOns(...)
     .teams(...)
+    .version("auto")
     .build();
 ```
 
