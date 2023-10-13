@@ -1,6 +1,6 @@
 # Neuron Device Plugin Addon
 
-[AWS Neuron](https://awsdocs-neuron.readthedocs-hosted.com/en/latest/) is the SDK used to run deep learning workloads on AWS Inferentia and AWS Trainium based instances. This addon will install the Neuron Device Plugin necessary to run the instances on Amazon EKS (and Blueprints). Note that you **must** use a GPU nodegroup with *inf1, inf2, trn1,* or *trn1n* instances.
+[AWS Neuron](https://awsdocs-neuron.readthedocs-hosted.com/en/latest/) is the SDK used to run deep learning workloads on AWS Inferentia and AWS Trainium based instances. This addon will install the Neuron Device Plugin necessary to run the instances on Amazon EKS (and Blueprints). Note that you **must** use *inf1, inf2, trn1,* or *trn1n* instances.
 
 ## Usage
 
@@ -15,7 +15,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.NeuronPluginAddon();
 
 const clusterProvider = new blueprints.GenericClusterProvider({
-  version: KubernetesVersion.V1_25,
+  version: KubernetesVersion.V1_27,
   managedNodeGroups: [
     inferentiaNodeGroup()
   ]
@@ -24,7 +24,6 @@ const clusterProvider = new blueprints.GenericClusterProvider({
 function inferentiaNodeGroup(): blueprints.ManagedNodeGroup {
   return {
     id: "mng1",
-      amiType: NodegroupAmiType.AL2_X86_64_GPU,
       instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
       desiredSize: 1,
       maxSize: 2, 
