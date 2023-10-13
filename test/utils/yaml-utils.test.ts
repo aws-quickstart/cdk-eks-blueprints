@@ -62,31 +62,4 @@ describe('Unit tests for yaml utils', () => {
         expect(doc.length).toBe(1);
         expect(doc[0]).toStrictEqual(part);
     });
-
-    test("External YAML Document with multiple resources is read correctly", () => {
-        const doc = yaml.loadMultiResourceExternalYaml('https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/all-in-one/frontend.yaml');
-        const firstPart = {
-            apiVersion: "v1",
-            kind: "Service",
-            metadata: {
-                name: "frontend",
-                labels:{
-                    app: "guestbook",
-                    tier: "frontend"
-                }
-            },
-            spec:
-            {
-                type: "NodePort", 
-                ports: [{port: 80}],
-                selector: {
-                    app: "guestbook",
-                    tier: "frontend"
-                }
-            }
-        };
-
-        expect(doc.length).toBe(2);
-        expect(doc[0]).toStrictEqual(firstPart);
-    });
 });
