@@ -1,6 +1,6 @@
 # JupyterHub Add-on
 
-> ⚠**WARNING:** This add-on is currently experience deployment issues due to the x509 certificate update. At the moment the deployment fails as is, however customer can still continue to use the add-on if they are willing to temporarily migrate the helm chart for version 2.0.0 their private helm (or OCI) registry and override the repository attribute of the add-on when deploying. 
+<!-- > ⚠**WARNING:** This add-on is currently experience deployment issues due to the x509 certificate update. At the moment the deployment fails as is, however customer can still continue to use the add-on if they are willing to temporarily migrate the helm chart for version 2.0.0 their private helm (or OCI) registry and override the repository attribute of the add-on when deploying.  -->
 
 JupyterHub add-on is based on the [JupyterHub](https://github.com/jupyterhub/jupyterhub) project that supports a multi-user Hub to spawn, manage, and proxy multiple instances of single user Jupyter notebook server.
 
@@ -117,7 +117,7 @@ You can log into the JupyterHub portal by accessing the Load Balancer endpoint i
 
 ![JupyterHub Login](./../assets/images/jupyterhub-login-page.png)
 
-A default arbirary username with password can be entered to log in. Once logged in, you should be able to access the main portal page.
+A default arbitrary username with password can be entered to log in. Once logged in, you should be able to access the main portal page.
 
 ![JupyterHub Portal](./../assets/images/jupyterhub-loggedin.png)
 
