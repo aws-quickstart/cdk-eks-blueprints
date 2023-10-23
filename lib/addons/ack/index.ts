@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import "reflect-metadata";
-import { createNamespace, setPath } from "../../utils";
+import { createNamespace, setPath, supportsX86 } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AckServiceName, serviceMappings } from './serviceMappings';
 
@@ -52,6 +52,7 @@ const defaultProps: AckAddOnProps = {
  * Main class to instantiate the Helm chart
  */
 @Reflect.metadata("ordered", true)
+@supportsX86
 export class AckAddOn extends HelmAddOn {
 
   readonly options: AckAddOnProps;
@@ -63,6 +64,7 @@ export class AckAddOn extends HelmAddOn {
     this.id = this.options.id;
   }
 
+  
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
 

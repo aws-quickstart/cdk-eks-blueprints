@@ -54,7 +54,7 @@ export interface EmrEksTeamProps extends TeamProps {
   /**
    * Tags to apply to EMR on EKS Virtual Cluster
    */
-   virtualClusterTags?: CfnTag[];
+  virtualClusterTags?: CfnTag[];
 }
 
 /*

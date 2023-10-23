@@ -4,7 +4,7 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -56,6 +56,7 @@ const defaultProps = {
     },
 };
 
+@supportsALL
 export class VeleroAddOn extends HelmAddOn {
 
     private options: Required<VeleroAddOnProps>;

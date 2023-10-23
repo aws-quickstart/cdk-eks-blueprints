@@ -2,7 +2,7 @@ import { HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { ClusterInfo } from '../../spi/types';
 import { HelmAddOn } from '../helm-addon/index';
 import { Construct } from "constructs";
-import { setPath } from "../../utils";
+import { setPath, supportsX86 } from "../../utils";
 import { Values } from "../../spi";
 
 /**
@@ -54,6 +54,7 @@ export interface FalcoAddOnProps extends HelmAddOnUserProps {
  * This add-on is currently not supported. It will apply the latest falco helm chart but the latest AMI does not have stock driver supported and
  * driver build in the init fails atm. 
  */
+@supportsX86
 export class FalcoAddOn extends HelmAddOn {
 
     readonly options: FalcoAddOnProps;

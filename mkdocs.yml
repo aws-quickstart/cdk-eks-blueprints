@@ -16,6 +16,7 @@ nav:
     - Teams: 'teams/teams.md'
     - EMR on EKS Team: 'teams/emr-eks-team.md'
     - AWS Batch on EKS Team: 'teams/aws-batch-on-eks-team.md'
+    - Bedrock Team: 'teams/geneai-team/bedrock-team.md'
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
@@ -104,9 +105,11 @@ nav:
     - VPC Resource Providers: 'resource-providers/vpc-providers.md'
   - Builders:
     - Overview: 'builders/index.md'
+    - Bedrock Builder: 'builders/bedrock-builder.md' 
+    - Graviton Builder: 'builders/graviton-builder.md'
+    - GPU Builder: 'builders/gpu-builder.md'
     - Observability Builder: 'builders/observability-builder.md'
     - Windows Builder: 'builders/windows-builder.md'
-    - GPU Builder: 'builders/gpu-builder.md'
   - Extensibility: 'extensibility.md'
   - API Reference: 'api'
 markdown_extensions:

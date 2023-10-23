@@ -24,8 +24,8 @@ export function isOrderedAddOn(addOn: ClusterAddOn) : boolean {
  * @returns 
  */
 export function dependable(...addOns: string[]) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+  
+  return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = function( ...args: any[]) {
