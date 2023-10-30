@@ -88,6 +88,21 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.PrometheusNodeExporterAddOn(this.prometheusNodeExporterProps));
     }
 
+    /**
+     * Enables control plane logging.
+     *
+     * @returns {ObservabilityBuilder} - The ObservabilityBuilder instance with control plane logging enabled.
+     */
+    public enableControlPlaneLogging(): ObservabilityBuilder {
+        return this.enableControlPlaneLogTypes(
+          ControlPlaneLogType.API,
+          ControlPlaneLogType.AUDIT,
+          ControlPlaneLogType.AUTHENTICATOR,
+          ControlPlaneLogType.CONTROLLER_MANAGER,
+          ControlPlaneLogType.SCHEDULER
+        );
+    }
+
     public withAwsLoadBalancerControllerProps(props: addons.AwsLoadBalancerControllerProps) : this {
         this.awsLoadbalancerProps = { ...this.awsLoadbalancerProps, ...cloneDeep(props) };
         return this;
@@ -147,20 +162,13 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         this.ampProps = { ...this.ampProps, ...cloneDeep(props) };
         return this;
     }
+
     /**
      * This method helps you prepare a blueprint for setting up observability with 
      * usage tracking addon
      */
     public static builder(): ObservabilityBuilder {
         const builder = new ObservabilityBuilder();
-
-        builder.enableControlPlaneLogTypes(
-          ControlPlaneLogType.API,
-          ControlPlaneLogType.AUDIT,
-          ControlPlaneLogType.AUTHENTICATOR,
-          ControlPlaneLogType.CONTROLLER_MANAGER,
-          ControlPlaneLogType.SCHEDULER
-        );
         builder.addOns(
             new addons.NestedStackAddOn({
                 id: "usage-tracking-addon",
