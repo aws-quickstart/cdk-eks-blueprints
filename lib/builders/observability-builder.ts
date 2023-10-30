@@ -1,10 +1,10 @@
-import { BlueprintBuilder } from '../stacks';
+import {BlueprintBuilder, ControlPlaneLogType} from '../stacks';
 import * as addons from '../addons';
 import * as utils from "../utils";
+import {cloneDeep} from "../utils";
 import * as spi from '../spi';
-import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { cloneDeep } from '../utils';
+import {NestedStack, NestedStackProps} from 'aws-cdk-lib';
+import {Construct} from 'constructs';
 
 export class ObservabilityBuilder extends BlueprintBuilder {
 
@@ -153,11 +153,20 @@ export class ObservabilityBuilder extends BlueprintBuilder {
      */
     public static builder(): ObservabilityBuilder {
         const builder = new ObservabilityBuilder();
+
+        builder.enableControlPlaneLogTypes(
+          ControlPlaneLogType.API,
+          ControlPlaneLogType.AUDIT,
+          ControlPlaneLogType.AUTHENTICATOR,
+          ControlPlaneLogType.CONTROLLER_MANAGER,
+          ControlPlaneLogType.SCHEDULER
+        );
         builder.addOns(
             new addons.NestedStackAddOn({
                 id: "usage-tracking-addon",
                 builder: UsageTrackingAddOn.builder(),
-            }));
+            })
+        );
         return builder;
     }
 }
