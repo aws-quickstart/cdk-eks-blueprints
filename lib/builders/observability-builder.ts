@@ -90,6 +90,8 @@ export class ObservabilityBuilder extends BlueprintBuilder {
 
     /**
      * Enables control plane logging.
+     * Enabling control plane logging is an in-place change for EKS as inferred from
+     * https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
      *
      * @returns {ObservabilityBuilder} - The ObservabilityBuilder instance with control plane logging enabled.
      */
