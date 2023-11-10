@@ -27,8 +27,6 @@ const defaultProps = {
 @supportsALL
 export class AdotCollectorAddOn extends CoreAddOn {
 
-    private namespace: string;
-
     constructor(props?: AdotCollectorAddOnProps) {
         super({ 
             ...defaultProps,
@@ -36,7 +34,6 @@ export class AdotCollectorAddOn extends CoreAddOn {
             ...props
         });
 
-        this.namespace = props?.namespace ?? defaultProps.namespace;
     }
     @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
@@ -44,7 +41,7 @@ export class AdotCollectorAddOn extends CoreAddOn {
         const cluster = clusterInfo.cluster;
 
         // Create namespace if not default
-        const ns = createNamespace(this.namespace!, cluster, true, true);
+        const ns = createNamespace(this.coreAddOnProps.namespace!, cluster, true, true);
 
         // Applying ADOT Permission manifest
         const otelPermissionsDoc = readYamlDocument(__dirname + '/otel-permissions.yaml');
