@@ -2,7 +2,7 @@
 
 Amazon EKS supports using Amazon EKS API to install and manage the AWS Distro for OpenTelemetry (ADOT) Operator. This enables a simplified experience for instrumenting your applications running on Amazon EKS to send metric and trace data to multiple monitoring service options like Amazon CloudWatch, Prometheus, and X-Ray. 
 
-This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to manage ADOT Collectors.
+This add-on is not automatically installed when you first create a cluster, it must be added to the cluster in order to manage ADOT Collectors. For creating add-on in specific namespace, `namespace` property needs to be passed.
 
 For more information on the add-on, please review the [user guide](https://docs.aws.amazon.com/eks/latest/userguide/opentelemetry.html).
 
@@ -11,6 +11,7 @@ For more information on the add-on, please review the [user guide](https://docs.
 
 ## Usage
 
+### Example with default namespace
 ```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
@@ -18,6 +19,24 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.AdotCollectorAddOn();
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .version("auto")
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+### Example with non-default namespace
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AdotCollectorAddOn({
+                namespace:'adot', //User supplied, non-default namespace
+                version: 'v0.80.0-eksbuild.2'
+              }),
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")

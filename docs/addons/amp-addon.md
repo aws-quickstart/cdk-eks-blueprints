@@ -30,6 +30,24 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
+With the same pattern, to deploy ADOT collector in non-default namespace:
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.AmpAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+                namespace: 'adot'
+              }),
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
 Pattern #2: Overriding property values for Name and Tags for a custom AMP Workspace name and tags. This pattern creates a new AMP workspace with property values passed on such as `workspaceName`, `tags` and deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `deployment` as the mode to remote write metrics to AMP workspace.
 
 ```typescript

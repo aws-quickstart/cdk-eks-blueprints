@@ -60,11 +60,17 @@ export default class BlueprintConstruct {
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
-            new blueprints.addons.AdotCollectorAddOn(),
+            new blueprints.addons.AdotCollectorAddOn({
+                namespace:'adot',
+                version: 'v0.80.0-eksbuild.2'
+            }),
             new blueprints.addons.AmpAddOn({
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+                namespace: 'adot'
             }),
-            new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAdotAddOn({
+                namespace: 'adot'
+            }),
             new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
