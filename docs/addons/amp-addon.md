@@ -69,7 +69,7 @@ const addOn = new blueprints.addons.AmpAddOn({
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")
   .addOns(addOn)
-  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName,{
+  .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName, [
     {
         key: 'Name',
         value: 'Sample-AMP-Workspace',
@@ -82,7 +82,7 @@ const blueprint = blueprints.EksBlueprint.builder()
         key: 'Department',
         value: 'Operations',
     }
-  }))
+  ]))
   .build(app, 'my-stack-name');
 ```
 Pattern #3: Passing on AMP Remote Endpoint of an existing AMP workspace to be used to remote write metrics. This pattern does not create an AMP workspace. Deploys an ADOT collector on the namespace specified in `namespace` with name in `name` and `deployment` as the mode to remote write metrics to AMP workspace of the URL passed as input. This pattern ignores any other property values passed if `ampPrometheusEndpoint` is present.
