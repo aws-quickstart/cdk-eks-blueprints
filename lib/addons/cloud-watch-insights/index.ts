@@ -40,7 +40,7 @@ export class CloudWatchInsights extends CoreAddOn {
     constructor(props?: CloudWatchInsightsAddOnProps) {
       super({ ...defaultProps, ...props });
 
-      this.options = props!;
+      this.options = props ?? {};
     }
 
     @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon")
@@ -49,7 +49,7 @@ export class CloudWatchInsights extends CoreAddOn {
       const context = clusterInfo.getResourceContext();
 
       const insightsSA = cluster.addServiceAccount("CloudWatchInsightsSA", {
-        name: `CloudWatchContainerInsightsSA-${cluster.clusterName}`,
+        name: `containers-insights-sa`,
         namespace: defaultProps.namespace
       });
 
@@ -58,12 +58,11 @@ export class CloudWatchInsights extends CoreAddOn {
         clusterName: cluster.clusterName,
         addonVersion: defaultProps.version,
         serviceAccountRoleArn: insightsSA.role.roleArn,
-        configurationValues: this.options.customCloudWatchAgentConfig
       });
       insightsAddon.node.addDependency(insightsSA);
       insightsAddon.node.addDependency(cluster);
 
-      if (this.options.ebsPerformanceLogs) {
+      if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
         insightsSA.role.attachInlinePolicy(
           new iam.Policy(context.scope, "EbsPerformanceLogsPolicy", {
             document: ebsCollectorPolicy()
