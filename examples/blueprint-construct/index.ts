@@ -51,7 +51,7 @@ export default class BlueprintConstruct {
             s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
         });
         const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
-            name: 'blueprints-apache-airflow-efs',    
+            name: 'blueprints-apache-airflow-efs',
         });
 
         const addOns: Array<blueprints.ClusterAddOn> = [
@@ -93,7 +93,7 @@ export default class BlueprintConstruct {
                         blueprints.getNamedResource("secondary-cidr-subnet-0"),
                         blueprints.getNamedResource("secondary-cidr-subnet-1"),
                         blueprints.getNamedResource("secondary-cidr-subnet-2"),
-                    ]   
+                    ]
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,
                 eniConfigLabelDef: 'topology.kubernetes.io/zone',
@@ -208,7 +208,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.GrafanaOperatorAddon(),
             new blueprints.CloudWatchLogsAddon({
-                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev',
                 logRetentionDays: 30
             }),
             new blueprints.ApacheAirflowAddOn({
@@ -218,6 +218,7 @@ export default class BlueprintConstruct {
                 efsFileSystem: 'apache-airflow-efs-provider'
             }),
             new blueprints.ExternalsSecretsAddOn(),
+            new blueprints.EksPodIdentityAgentAddOn(),
         ];
 
         // Instantiated to for helm version check.
@@ -248,7 +249,7 @@ export default class BlueprintConstruct {
               actions: ['s3:*'],
             }),
             new iam.PolicyStatement({
-              resources: ['*'],   
+              resources: ['*'],
               actions: ['glue:*'],
             }),
             new iam.PolicyStatement({
@@ -258,7 +259,7 @@ export default class BlueprintConstruct {
               ],
             }),
           ];
-      
+
         const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
@@ -290,7 +291,7 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, {
-                primaryCidr: "10.2.0.0/16", 
+                primaryCidr: "10.2.0.0/16",
                 secondaryCidr: "100.64.0.0/16",
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
@@ -313,7 +314,7 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
         amiType: NodegroupAmiType.AL2_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
         desiredSize: 2,
-        maxSize: 3, 
+        maxSize: 3,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
@@ -330,9 +331,9 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
 }
 
 function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
-    
+
     const userData = ec2.UserData.forLinux();
-    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
     return {
         id: "mng2-customami",
@@ -370,7 +371,7 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
         amiType: NodegroupAmiType.WINDOWS_CORE_2019_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
         desiredSize: 0,
-        minSize: 0, 
+        minSize: 0,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         diskSize: 50,
         tags: {
@@ -388,8 +389,8 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
         id: "mng-linux-gpu",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
         instanceTypes: [new ec2.InstanceType('g5.xlarge')],
-        desiredSize: 0, 
-        minSize: 0, 
+        desiredSize: 0,
+        minSize: 0,
         maxSize: 1,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
