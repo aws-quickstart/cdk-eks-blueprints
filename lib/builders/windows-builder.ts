@@ -21,50 +21,50 @@ export interface WindowsOptions {
      */
     kubernetesVersion: eks.KubernetesVersion,
 
-    /** 
-     * Required, Instance class to use for the cluster. 
+    /**
+     * Required, Instance class to use for the cluster.
      */
     instanceClass: ec2.InstanceClass,
 
-    /** 
-     * Required, Instance size to use for the cluster. 
+    /**
+     * Required, Instance size to use for the cluster.
      */
     instanceSize: ec2.InstanceSize,
 
-    /** 
-     * optional, Node IAM Role to be attached to Windows 
+    /**
+     * optional, Node IAM Role to be attached to Windows
      * and Non-windows nodes.
      */
     nodeRole?: iam.Role,
 
-    /** 
+    /**
      * Optional, AMI Type for Windows Nodes
      */
     windowsAmiType?: NodegroupAmiType,
 
-    /** 
-     * Optional, Desired number of nodes to use for the cluster. 
+    /**
+     * Optional, Desired number of nodes to use for the cluster.
      */
-    desiredNodeSize?: number,
+    desiredNodeCount?: number,
 
-    /** 
-     * Optional, Minimum number of nodes to use for the cluster. 
+    /**
+     * Optional, Minimum number of nodes to use for the cluster.
      */
     minNodeSize?: number,
 
-    /** 
-     * Optional, Maximum number of nodes to use for the cluster. 
+    /**
+     * Optional, Maximum number of nodes to use for the cluster.
      */
     maxNodeSize?: number,
 
-    /** 
+    /**
      * Optional, Block device size.
      */
     blockDeviceSize?: number,
 
     /**
-     * Optional, No Schedule for Windows Nodes, this allows Windows 
-     * nodes to be marked as no-schedule by default to prevent any 
+     * Optional, No Schedule for Windows Nodes, this allows Windows
+     * nodes to be marked as no-schedule by default to prevent any
      * linux workloads from scheduling.
      */
     noScheduleForWindowsNodes?: boolean,
@@ -134,7 +134,7 @@ const defaultOptions: WindowsOptions = {
 export class WindowsBuilder extends BlueprintBuilder {
 
     /**
-     * This method helps you prepare a blueprint for setting up windows nodes with 
+     * This method helps you prepare a blueprint for setting up windows nodes with
      * usage tracking addon
      */
     public static builder(options: WindowsOptions): WindowsBuilder {
@@ -147,7 +147,7 @@ export class WindowsBuilder extends BlueprintBuilder {
                     version: mergedOptions.kubernetesVersion,
                     tags: mergedOptions.clusterProviderTags,
                     role: resourceproviders.getResource(context => {
-                        return new iam.Role(context.scope, 'ClusterRole', { 
+                        return new iam.Role(context.scope, 'ClusterRole', {
                             assumedBy: new iam.ServicePrincipal("eks.amazonaws.com"),
                             managedPolicies: [
                                 iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSClusterPolicy"),
