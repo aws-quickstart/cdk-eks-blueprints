@@ -15,10 +15,11 @@ export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName
 
 const defaultProps = {
     addOnName: 'adot',
-    version: 'v0.80.0-eksbuild.2',
+    version: 'v0.88.0-eksbuild.2',
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
-    namespace: 'default'
+    namespace: 'default',
+    configurationValues: {}
 };
 
  /**
@@ -40,6 +41,13 @@ export class AdotCollectorAddOn extends CoreAddOn {
 
         const cluster = clusterInfo.cluster;
 
+        if (validateAdotVersion(this.coreAddOnProps.version)) {
+            console.log("Adot Addon Version is Valid");
+        } 
+        else {
+            throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
+        }
+
         // Create namespace if not default
         const ns = createNamespace(this.coreAddOnProps.namespace!, cluster, true, true);
 
@@ -60,3 +68,21 @@ export class AdotCollectorAddOn extends CoreAddOn {
         return addOnPromise;
     }
 }
+
+function validateAdotVersion(adotversion: string): boolean {
+    // Define a regular expression for a floating-point number with 2 to 6 characters
+    const adotVersionRegex = /^\d+(\.\d{2,6})?$/;
+  
+    // Check if the input matches the regex
+    if (!adotVersionRegex.test(adotversion)) {
+      return false;
+    }
+  
+    // Parse the input as a float and perform greater-than validation
+    const adotVersionValue = parseFloat(adotversion);
+    const adotVersionMinValue = 0.88; // Set your minimum value here
+  
+    return adotVersionValue >= adotVersionMinValue;
+}
+  
+
