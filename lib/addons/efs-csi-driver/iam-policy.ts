@@ -19,7 +19,9 @@ export function getEfsDriverPolicyStatements(
       "Effect": "Allow",
       "Action": [
         "elasticfilesystem:DescribeAccessPoints",
-        "elasticfilesystem:DescribeFileSystems"
+        "elasticfilesystem:DescribeFileSystems",
+        "elasticfilesystem:DescribeMountTargets",
+        "ec2:DescribeAvailabilityZones"
       ],
       "Resource": "*"
     },
