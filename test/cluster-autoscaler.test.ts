@@ -8,7 +8,7 @@ test("Cluster autoscaler correctly is using correct defaults if EKS version is n
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_27)
+        .version(KubernetesVersion.V1_28)
         .addOns(new blueprints.ClusterAutoScalerAddOn())
         .build(app, "ca-stack-127");
 
@@ -16,7 +16,7 @@ test("Cluster autoscaler correctly is using correct defaults if EKS version is n
 
     template.hasResource("Custom::AWSCDK-EKS-HelmChart", {
         Properties: {
-            Version: "9.29.0",
+            Version: "9.34.0",
         },
     });
 });
@@ -27,7 +27,7 @@ test("Cluster autoscaler correctly is using correct version for 1.26", () => {
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_26)
+        .version(KubernetesVersion.V1_27)
         .addOns(new blueprints.ClusterAutoScalerAddOn())
         .build(app, "ca-stack-126");
 
@@ -35,7 +35,7 @@ test("Cluster autoscaler correctly is using correct version for 1.26", () => {
 
     template.hasResource("Custom::AWSCDK-EKS-HelmChart", {
         Properties: {
-            Version: "9.29.0",
+            Version: "9.33.0",
         },
     });
 });

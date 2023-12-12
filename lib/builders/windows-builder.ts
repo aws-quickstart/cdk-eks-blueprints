@@ -97,7 +97,7 @@ export interface WindowsOptions {
  * for Windows EKS cluster
  */
 const defaultOptions: WindowsOptions = {
-    kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+    kubernetesVersion: eks.KubernetesVersion.of("1.28"),
     instanceClass: ec2.InstanceClass.M5,
     instanceSize: ec2.InstanceSize.XLARGE4,
     nodeRole: resourceproviders.getNamedResource("node-role") as iam.Role,

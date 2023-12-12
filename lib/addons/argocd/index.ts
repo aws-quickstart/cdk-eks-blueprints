@@ -26,7 +26,7 @@ export interface ArgoCDAddOnProps extends HelmAddOnUserProps {
 
     /**
     * Helm chart version to use to install.
-    * @default 5.37.0
+    * @default 5.51.6
     */
     version?: string;
 
