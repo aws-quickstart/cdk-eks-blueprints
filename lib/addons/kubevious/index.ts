@@ -67,7 +67,7 @@ function populateValues(helmOptions: KubeviousAddOnProps): Values {
     const values = helmOptions.values ?? {};
 
     setPath(values, "ingress.enabled",  helmOptions.ingressEnabled);
-    setPath(values, "kubevious.service.type",  helmOptions.kubeviousServiceType);
+    setPath(values, "ui.service.type",  helmOptions.kubeviousServiceType);
     // Generate a random password for MySQL DB root user
     setPath(values, "mysql.generate_passwords",  true);
 
