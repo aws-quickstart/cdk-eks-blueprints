@@ -5,6 +5,7 @@ import {ClusterInfo} from "../../spi";
 import {conflictsWith, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
+import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
 
 /**
  * Configuration options for AWS Container Insights add-on.
@@ -43,7 +44,7 @@ export class CloudWatchInsights extends CoreAddOn {
       this.options = props ?? {};
     }
 
-    @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon")
+    @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon", "CloudWatchLogsAddon")
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
       const cluster = clusterInfo.cluster;
       const context = clusterInfo.getResourceContext();
@@ -52,6 +53,8 @@ export class CloudWatchInsights extends CoreAddOn {
         name: `containers-insights-sa`,
         namespace: defaultProps.namespace
       });
+
+      insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
 
       const insightsAddon = new eks.CfnAddon(context.scope,  "CloudWatchInsightsAddon", {
         addonName: defaultProps.addOnName,
