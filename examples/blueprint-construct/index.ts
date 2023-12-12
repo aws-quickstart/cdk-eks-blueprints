@@ -62,7 +62,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn({
                 namespace:'adot',
-                version: 'v0.80.0-eksbuild.2'
+                version: 'v0.88.0-eksbuild.2'
             }),
             new blueprints.addons.AmpAddOn({
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,

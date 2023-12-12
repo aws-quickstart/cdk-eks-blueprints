@@ -5,6 +5,7 @@ import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } 
 import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
+import { semverComparator } from "../helm-addon/helm-version-checker";
 
 /**
  * Configuration options for the Adot add-on.
@@ -41,7 +42,7 @@ export class AdotCollectorAddOn extends CoreAddOn {
 
         const cluster = clusterInfo.cluster;
 
-        if (validateAdotVersion(this.coreAddOnProps.version)) {
+        if (semverComparator("0.88",this.coreAddOnProps.version)) {
             console.log("Used Adot Addon Version is Valid");
         } 
         else {
@@ -67,23 +68,6 @@ export class AdotCollectorAddOn extends CoreAddOn {
         addOnPromise.then(addOn => addOn.node.addDependency(otelPermissionsStatement));
         return addOnPromise;
     }
-}
-
-function validateAdotVersion(adotversion: string): boolean {
-    // Extract the substring from position 2 to 5
-    const extractedSubstring = adotversion.substring(1, 4);
-    const adotVersionRegex = new RegExp(`^0\.00`); // Use a regex to match the version format
-  
-    // Check if the input matches the regex
-    if (!adotVersionRegex.test(adotversion)) {
-      return false;
-    }
-  
-    // Parse the input as a float and perform greater-than validation
-    const adotVersionValue = parseFloat(adotversion);
-    const adotVersionMinValue = 0.88; // Set your minimum value here
-  
-    return adotVersionValue >= adotVersionMinValue;
 }
   
 

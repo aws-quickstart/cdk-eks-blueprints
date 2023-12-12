@@ -95,7 +95,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   name: "fluxcd-addon",
   namespace: "flux-system",
   chart: "flux2",
-  version: "2.10.1",
+  version: "2.11.1",
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},

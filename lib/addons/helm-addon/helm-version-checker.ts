@@ -11,7 +11,7 @@ export type HelmChartVersion = Omit<HelmChartConfiguration, "name" | "namespace"
  * @param b 
  * @returns 
  */
-const semverComparator = (a: string, b: string) => { 
+export const semverComparator = (a: string, b: string) => { 
     a = trimVersion(a);
     b = trimVersion(b);
 
