@@ -42,7 +42,7 @@ export class AdotCollectorAddOn extends CoreAddOn {
         const cluster = clusterInfo.cluster;
 
         if (validateAdotVersion(this.coreAddOnProps.version)) {
-            console.log("Adot Addon Version is Valid");
+            console.log("Used Adot Addon Version is Valid");
         } 
         else {
             throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
@@ -70,8 +70,9 @@ export class AdotCollectorAddOn extends CoreAddOn {
 }
 
 function validateAdotVersion(adotversion: string): boolean {
-    // Define a regular expression for a floating-point number with 2 to 6 characters
-    const adotVersionRegex = /^\d+(\.\d{2,6})?$/;
+    // Extract the substring from position 2 to 5
+    const extractedSubstring = adotversion.substring(1, 4);
+    const adotVersionRegex = new RegExp(`^0\.00`); // Use a regex to match the version format
   
     // Check if the input matches the regex
     if (!adotVersionRegex.test(adotversion)) {
