@@ -18,11 +18,11 @@ export interface GrafanaOperatorAddonProps extends HelmAddOnUserProps {
  */
 const defaultProps: HelmAddOnProps & GrafanaOperatorAddonProps = {
   name: 'grafana-operator',
-  chart: 'oci://ghcr.io/grafana-operator/helm-charts/grafana-operator',
+  chart: 'oci://ghcr.io/grafana/helm-charts/grafana-operator',
   namespace: 'grafana-operator',
   release: 'grafana-operator',
-  version: 'v5.4.0',
-  values: {},
+  version: 'v5.6.0',
+  values: {}, 
   createNamespace: true
 };
 
