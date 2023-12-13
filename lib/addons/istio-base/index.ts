@@ -4,6 +4,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
 import merge from "ts-deepmerge";
 import { Duration } from "aws-cdk-lib";
+import { supportsALL } from "../../utils";
 
 /**
  * Configuration options for the add-on.
@@ -55,10 +56,11 @@ const defaultProps = {
     release: "istio-base",
     namespace: "istio-system",
     chart: "base",
-    version: "1.18.2",
+    version: "1.19.1",
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
+@supportsALL
 export class IstioBaseAddOn extends HelmAddOn {
 
     readonly options: IstioBaseAddOnProps;

@@ -9,7 +9,14 @@ metadata:
   namespace: "{{namespace}}"
 spec:
   mode: "{{deploymentMode}}"
-  image: public.ecr.aws/aws-observability/aws-otel-collector:v0.21.0
+  image: public.ecr.aws/aws-observability/aws-otel-collector:v0.33.1
+  resources:
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+    requests:
+      cpu: "1"
+      memory: "2Gi"  
   serviceAccount: adot-collector
   config: |
     receivers:

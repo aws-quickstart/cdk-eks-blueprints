@@ -39,7 +39,7 @@ export class CoreAddOnProps {
     readonly controlPlaneAddOn?: boolean;
 
 
-    /** 
+    /**
      * Map between kubernetes versions and addOn versions for auto selection.
      */
     readonly versionMap?: Map<KubernetesVersion, string>;
@@ -60,7 +60,7 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        
+
         let serviceAccountRoleArn: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
         let saNamespace: string | undefined = undefined;
@@ -111,8 +111,8 @@ export class CoreAddOn implements ClusterAddOn {
     /**
      * Template method with default implementation to execute the supplied function of policyDocumentProvider.
      * Allows overriding this method in subclasses for more complex cases of policies.
-     * @param clusterInfo 
-     * @returns 
+     * @param clusterInfo
+     * @returns
      */
     providePolicyDocument(clusterInfo: ClusterInfo) : PolicyDocument | undefined {
         if(this.coreAddOnProps?.policyDocumentProvider) {
@@ -122,13 +122,13 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     /**
-     * Template method to return managed policies for the service account. 
+     * Template method to return managed policies for the service account.
      * Allows overriding in subclasses to handle more complex cases of policies.
      */
     provideManagedPolicies(clusterInfo: ClusterInfo) : IManagedPolicy[] | undefined {
         let result : IManagedPolicy[] | undefined;
         const policyDocument = this.providePolicyDocument(clusterInfo);
-        
+
         if(policyDocument) {
             const policy = new ManagedPolicy(clusterInfo.cluster, `${this.coreAddOnProps.addOnName}-managed-policy`, {
                 document: policyDocument

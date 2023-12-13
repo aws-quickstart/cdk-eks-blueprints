@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { ClusterInfo, Values } from "../../spi";
-import { setPath } from "../../utils";
+import { setPath, supportsX86 } from "../../utils";
 
 
 /**
@@ -41,6 +41,7 @@ const defaultProps: HelmAddOnProps & KubeviousAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsX86
 export class KubeviousAddOn extends HelmAddOn {
 
     readonly options: KubeviousAddOnProps;
@@ -66,7 +67,7 @@ function populateValues(helmOptions: KubeviousAddOnProps): Values {
     const values = helmOptions.values ?? {};
 
     setPath(values, "ingress.enabled",  helmOptions.ingressEnabled);
-    setPath(values, "kubevious.service.type",  helmOptions.kubeviousServiceType);
+    setPath(values, "ui.service.type",  helmOptions.kubeviousServiceType);
     // Generate a random password for MySQL DB root user
     setPath(values, "mysql.generate_passwords",  true);
 

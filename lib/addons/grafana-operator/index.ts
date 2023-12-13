@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 /**
  * User provided options for the Helm Chart
@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & GrafanaOperatorAddonProps = {
   chart: 'oci://ghcr.io/grafana-operator/helm-charts/grafana-operator',
   namespace: 'grafana-operator',
   release: 'grafana-operator',
-  version: 'v5.0.0-rc3',
+  version: 'v5.4.0',
   values: {},
   createNamespace: true
 };
@@ -29,6 +29,7 @@ const defaultProps: HelmAddOnProps & GrafanaOperatorAddonProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class GrafanaOperatorAddon extends HelmAddOn {
 
   readonly options: GrafanaOperatorAddonProps;

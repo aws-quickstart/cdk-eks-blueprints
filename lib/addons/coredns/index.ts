@@ -1,3 +1,4 @@
+import {supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 
 /**
@@ -7,7 +8,7 @@ export type CoreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName">;
 
 const defaultProps = {
     addOnName: 'coredns',
-    version: 'v1.10.1-eksbuild.2',
+    version: 'v1.10.1-eksbuild.4',
     saName: 'coredns',
     configurationValues: {}
 };
@@ -15,10 +16,11 @@ const defaultProps = {
 /**
  * Implementation of CoreDns EKS add-on.
  */
+@supportsALL
 export class CoreDnsAddOn extends CoreAddOn {
 
     constructor(props?: CoreDnsAddOnProps) {
         super({ ...defaultProps, ...props });
     }
-   
+
 }

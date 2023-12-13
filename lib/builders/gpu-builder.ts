@@ -81,7 +81,8 @@ const defaultOptions: GpuOptions = {
         "Type": "Managed-linux-Gpu-Node-Group",
         "LaunchTemplate": "Linux-Launch-Template",
     }
-  };
+};
+
 export class GpuBuilder extends BlueprintBuilder {
     /**
      * This method helps you prepare a blueprint for setting up observability 

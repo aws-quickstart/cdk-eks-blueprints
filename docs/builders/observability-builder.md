@@ -9,6 +9,7 @@ The `ObservabilityBuilder` allows you to get started with a builder class to con
 - `enableNativePatternAddOns`: This method helps you prepare a blueprint for setting up observability with AWS native services
 - `enableMixedPatternAddOns`: This method helps you prepare a blueprint for setting up observability with AWS managed open source services
 - `enableOpenSourcePatternAddOns`: This method helps you prepare a blueprint for setting up observability with a combination of AWS native and AWS managed open source services
+- `enableControlPlaneLogging`: This method activates all the control plane logging features for EKS Clusters and feeds them into CloudWatch. This is an in-place change and should work for new and existing deployments, please check the [AWS documentation for Control Plane Logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html) for more information on Control Plane logging.
 
 ## Usage 
 
@@ -43,6 +44,7 @@ export default class SingleNewEksConstruct {
             .account(account)
             .region(region)
             .enableNativePatternAddOns()
+            .enableControlPlaneLogging()
             .addOns(...addOns)
             .build(scope, stackId);
     }
@@ -112,6 +114,7 @@ export default class ExistingEksMixedobservabilityConstruct {
             .account(account)
             .region(region)
             .enableMixedPatternAddOns()
+            .enableControlPlaneLogging()
             .clusterProvider(importClusterProvider)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(vpcId)) 
             .addOns(...addOns)

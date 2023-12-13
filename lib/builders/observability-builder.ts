@@ -1,10 +1,10 @@
-import { BlueprintBuilder } from '../stacks';
+import {BlueprintBuilder, ControlPlaneLogType} from '../stacks';
 import * as addons from '../addons';
 import * as utils from "../utils";
+import {cloneDeep} from "../utils";
 import * as spi from '../spi';
-import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { cloneDeep } from '../utils';
+import {NestedStack, NestedStackProps} from 'aws-cdk-lib';
+import {Construct} from 'constructs';
 
 export class ObservabilityBuilder extends BlueprintBuilder {
 
@@ -88,6 +88,23 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.PrometheusNodeExporterAddOn(this.prometheusNodeExporterProps));
     }
 
+    /**
+     * Enables control plane logging.
+     * Enabling control plane logging is an in-place change for EKS as inferred from
+     * https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+     *
+     * @returns {ObservabilityBuilder} - The ObservabilityBuilder instance with control plane logging enabled.
+     */
+    public enableControlPlaneLogging(): ObservabilityBuilder {
+        return this.enableControlPlaneLogTypes(
+          ControlPlaneLogType.API,
+          ControlPlaneLogType.AUDIT,
+          ControlPlaneLogType.AUTHENTICATOR,
+          ControlPlaneLogType.CONTROLLER_MANAGER,
+          ControlPlaneLogType.SCHEDULER
+        );
+    }
+
     public withAwsLoadBalancerControllerProps(props: addons.AwsLoadBalancerControllerProps) : this {
         this.awsLoadbalancerProps = { ...this.awsLoadbalancerProps, ...cloneDeep(props) };
         return this;
@@ -147,6 +164,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         this.ampProps = { ...this.ampProps, ...cloneDeep(props) };
         return this;
     }
+
     /**
      * This method helps you prepare a blueprint for setting up observability with 
      * usage tracking addon
@@ -157,7 +175,8 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.NestedStackAddOn({
                 id: "usage-tracking-addon",
                 builder: UsageTrackingAddOn.builder(),
-            }));
+            })
+        );
         return builder;
     }
 }
