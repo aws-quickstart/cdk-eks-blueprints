@@ -108,7 +108,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: CloudWatchLogsAdd
     setPath(values, "cloudWatchLogs.logGroupName", `${helmOptions.logGroupPrefix}/workloads`);
     setPath(values, "cloudWatchLogs.logGroupTemplate", `${helmOptions.logGroupPrefix}/$kubernetes['namespace_name']`);
     setPath(values, "cloudWatchLogs.logStreamTemplate", "$kubernetes['container_name'].$kubernetes['pod_name']");
-    setPath(values, "cloudWatchLogs.log_key", "log");
-    setPath(values, "cloudWatchLogs.log_retention_days", helmOptions.logRetentionDays);
+    setPath(values, "cloudWatchLogs.logKey", "log");
+    setPath(values, "cloudWatchLogs.logRetentionDays", helmOptions.logRetentionDays);
     return values;
 }
