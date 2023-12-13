@@ -27,7 +27,7 @@ const defaultProps = {
   addOnName: "amazon-cloudwatch-observability",
   version: "v1.1.1-eksbuild.1",
   saName: "container-insights-collector",
-  namespace: 'default'
+  namespace: 'amazon-cloudwatch'
 };
 
 /**
@@ -63,7 +63,6 @@ export class CloudWatchInsights extends CoreAddOn {
         serviceAccountRoleArn: insightsSA.role.roleArn,
       });
       insightsAddon.node.addDependency(insightsSA);
-      insightsAddon.node.addDependency(cluster);
 
       if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
         insightsSA.role.attachInlinePolicy(

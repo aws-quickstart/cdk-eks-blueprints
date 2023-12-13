@@ -1,16 +1,27 @@
-# Container Insights Add-on
+# CloudWatch Insights Add-on
 
-The Container Insights add-on adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
+The Cloudwatch Insights add-on adds support for [CloudWatch Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
+This replaces the current [Container Insights](./container-insights.md) add-on and all customers on it, should migrate to
+CloudWatch Insights.
 
-Customers can use Container Insights to collect, aggregate, and summarize metrics and logs from your containerized applications and microservices. Container Insights collects data as performance log events using an embedded metric format. These performance log events are entries that use a structured JSON schema that enables high-cardinality data to be ingested and stored at scale. From this data, CloudWatch creates aggregated metrics at the cluster, node, pod, task, and service level as CloudWatch metrics. The metrics that Container Insights collects are available in CloudWatch automatic dashboards, and also viewable in the Metrics section of the CloudWatch console.
+Customers can use CloudWatch Insights to collect, aggregate, and summarize metrics and logs from your containerized 
+applications and microservices. Container Insights collects data as performance log events using an embedded metric
+format. These performance log events are entries that use a structured JSON schema that enables high-cardinality data
+to be ingested and stored at scale. From this data, CloudWatch creates aggregated metrics at the cluster, node, pod,
+task, and service level as CloudWatch metrics. The metrics that Container Insights collects are available in
+CloudWatch automatic dashboards, and also viewable in the Metrics section of the CloudWatch console.
 
 **IMPORTANT**
 
-CloudWatch does not automatically create all possible metrics from the log data, to help you manage your Container Insights costs. However, you can view additional metrics and additional levels of granularity by using CloudWatch Logs Insights to analyze the raw performance log events.
+CloudWatch does not automatically create all possible metrics from the log data, to help you manage your Container
+Insights costs. However, you can view additional metrics and additional levels of granularity by using CloudWatch Logs
+Insights to analyze the raw performance log events.
 
-Metrics collected by Container Insights are charged as custom metrics. For more information about [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), see Amazon CloudWatch Pricing.
+Metrics collected by Container Insights are charged as custom metrics. For more information about
+[CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), see Amazon CloudWatch Pricing.
 
-Note: that this add-on can not co-exist with `adot-addon`, `cloudwatch-adot-addons` or `cloudwatch-logs` on same EKS cluster as they have conflicting and redundant interactions.
+Note: that this add-on cannot co-exist with `adot-addon`, `cloudwatch-adot-addons` or `cloudwatch-logs` on same EKS
+cluster as they have conflicting and redundant interactions.
 
 ## Usage
 
@@ -33,7 +44,8 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Prerequisites
 
-Once the Container Insights add-on has been installed in your cluster, validate that the [AWS Cloudwatch Observability Controller]() is installed and FluentBit is installed: 
+Once the CloudWatch Insights add-on has been installed in your cluster, validate that the
+`AWS Cloudwatch Observability Controller` is installed and FluentBit is installed: 
 
 ```bash
 kubectl get pods -n amazon-cloudwatch
@@ -50,7 +62,7 @@ amazon-cloudwatch   fluent-bit                                           1/1    
 
 ## View metrics for cluster and workloads
 
-Under Performance Monitoring, the Container Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance.
+Under Performance Monitoring, the CloudWatch Insights dashboard allows you to hone in on both cluster and workload metrics. After selecting EKS Pods and Clusters, you will see that the dashboard provides CPU and memory utilization along with other important metrics such as network performance.
 
 ![CloudWatch](./../assets/images/eks-blueprint-cwinsights-performance-monitoring.png)
 
@@ -80,11 +92,16 @@ In order to view workload level logs follow these steps after browsing to the Cl
 
 In the navigation pane, choose Insights.
 
-Near the top of the screen is the query editor. When you first open CloudWatch Logs Insights, this box contains a default query that returns the 20 most recent log events.
+Near the top of the screen is the query editor. When you first open CloudWatch Logs Insights, this box contains
+a default query that returns the 20 most recent log events.
 
-In the box above the query editor, select one of the Container Insights log groups to query. For the following example queries to work, the log group name must end with performance. We will look at `/aws/containerinsights/east-dev/performance`
+In the box above the query editor, select one of the Container Insights log groups to query. For the following example
+queries to work, the log group name must end with performance. We will look at `/aws/containerinsights/east-dev/performance`
 
-When you select a log group, CloudWatch Logs Insights automatically detects fields in the data in the log group and displays them in Discovered fields in the right pane. It also displays a bar graph of log events in this log group over time. This bar graph shows the distribution of events in the log group that matches your query and time range, not only the events displayed in the table.
+When you select a log group, CloudWatch Logs Insights automatically detects fields in the data in the log group and
+displays them in Discovered fields in the right pane. It also displays a bar graph of log events in this log group over
+time. This bar graph shows the distribution of events in the log group that matches your query and time range, not only
+the events displayed in the table.
 
 In the query editor, replace the default query with the following query and choose Run query.
 
@@ -102,10 +119,12 @@ This query displays a list of your pods, sorted by average number of container r
 
 ![CloudWatch](./../assets/images/eks-blueprint-cloudwatch-loginsights-2.png)
 
-If you want to try another query, you can use include fields in the list at the right of the screen. For more information about query syntax, see CloudWatch Logs Insights Query Syntax.
+If you want to try another query, you can use include fields in the list at the right of the screen. For more information
+about query syntax, see CloudWatch Logs Insights Query Syntax.
 
 ## View containers via that container map in container insights.
 
-In order to view a map of all of your containers running inside your cluster, click on `View your container map` in the Container Insights tab. You will then see a map of all of your namespaces and their associated pods and services.
+In order to view a map of all of your containers running inside your cluster, click on `View your container map` in the
+Container Insights tab. You will then see a map of all of your namespaces and their associated pods and services.
 
 ![CloudWatch](./../assets/images/eks-blueprint-container-insights.png)
