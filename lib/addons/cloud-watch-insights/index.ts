@@ -2,7 +2,7 @@ import {Construct} from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import {ClusterInfo} from "../../spi";
-import {conflictsWith, supportsALL} from "../../utils";
+import {conflictsWith, createNamespace, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
 import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
@@ -21,13 +21,18 @@ export type CloudWatchInsightsAddOnProps = Omit<CoreAddOnProps, "saName" | "addO
    * https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Observability-EKS-addon.html#install-CloudWatch-Observability-EKS-addon-configuration
    */
   customCloudWatchAgentConfig?: string,
+
+  /**
+   * Define the CloudWatch Agent configuration
+   */
+  version?: string,
 };
 
 const defaultProps = {
   addOnName: "amazon-cloudwatch-observability",
   version: "v1.1.1-eksbuild.1",
-  saName: "container-insights-collector",
-  namespace: 'amazon-cloudwatch'
+  saName: "cloudwatch-agent",
+  namespace: "amazon-cloudwatch"
 };
 
 /**
@@ -50,11 +55,16 @@ export class CloudWatchInsights extends CoreAddOn {
       const context = clusterInfo.getResourceContext();
 
       const insightsSA = cluster.addServiceAccount("CloudWatchInsightsSA", {
-        name: `containers-insights-sa`,
+        name: defaultProps.saName,
         namespace: defaultProps.namespace
       });
 
+      const insightsNamespace = createNamespace(defaultProps.namespace,  cluster);
+
+      insightsSA.node.addDependency(insightsNamespace);
+
       insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
+      insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'));
 
       const insightsAddon = new eks.CfnAddon(context.scope,  "CloudWatchInsightsAddon", {
         addonName: defaultProps.addOnName,
@@ -63,6 +73,7 @@ export class CloudWatchInsights extends CoreAddOn {
         serviceAccountRoleArn: insightsSA.role.roleArn,
       });
       insightsAddon.node.addDependency(insightsSA);
+      insightsAddon.node.addDependency(insightsNamespace);
 
       if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
         insightsSA.role.attachInlinePolicy(
