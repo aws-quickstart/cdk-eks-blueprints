@@ -14,6 +14,7 @@ export * from './calico';
 export * from './calico-operator';
 export * from './cloudwatch-adot-addon';
 export * from './cloudwatch-logs';
+export * from './cloud-watch-insights';
 export * from './cert-manager';
 export * from './cluster-autoscaler';
 export * from './container-insights';

@@ -74,6 +74,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
+            // new blueprints.addons.CloudWatchInsights(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
