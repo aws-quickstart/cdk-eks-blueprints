@@ -53,7 +53,15 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
   interruptionHandling: true,
   tags: {
     schedule: 'always-on'
-  }
+  },
+  blockDeviceMappings: [{
+    deviceName: "/dev/xvda",
+    ebs: {
+      volumeSize: 100,
+      volumeType: "gp3",
+      deleteOnTermination: true
+    },
+  }],
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -86,7 +94,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements), [AMI type](https://karpenter.sh/docs/concepts/nodeclasses/#specamifamily),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsubnetselectorterms), [Security Group Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsecuritygroupselectorterms) and [Tags](https://karpenter.sh/docs/concepts/nodeclasses/#spectags). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
+5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements), [AMI type](https://karpenter.sh/docs/concepts/nodeclasses/#specamifamily),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsubnetselectorterms), [Security Group Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsecuritygroupselectorterms), [Tags](https://karpenter.sh/docs/concepts/nodeclasses/#spectags) and [BlockDeviceMappings](https://karpenter.sh/v0.30/concepts/node-templates/#specblockdevicemappings). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
 
 **NOTE:**
 1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
