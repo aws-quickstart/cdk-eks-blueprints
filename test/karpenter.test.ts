@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -158,6 +159,15 @@ describe('Unit tests for Karpenter addon', () => {
     
         const blueprint = blueprints.EksBlueprint.builder();
     
+        const blockDeviceMapping = {
+            deviceName: "/dev/xvda",
+            ebs: {
+              volumeSize: 100,
+              volumeType: EbsDeviceVolumeType.GP3,
+              deleteOnTermination: true
+            }
+          }
+
         const stack = await blueprint
           .version("auto")
           .account("123567891")
@@ -165,30 +175,32 @@ describe('Unit tests for Karpenter addon', () => {
           .addOns(
             new blueprints.KarpenterAddOn({
               version: 'v0.29.2',
-              values: {
-                blockDeviceMappings: [{
-                    deviceName: "/dev/xvda",
-                    ebs: {
-                      volumeSize: 100,
-                      volumeType: "gp3",
-                      deleteOnTermination: true
-                    },
-                  }]
+              subnetTags: {
+                "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
               },
+              securityGroupTags: {
+                "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+              },
+              blockDeviceMappings: [blockDeviceMapping]  
             })
           )
           .buildAsync(app, "stack-with-values-overrides-blockdevicemapping");
     
         const template = Template.fromStack(stack);
-        template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
-          Chart: "karpenter",
+        const karpenterResources = template.findResources("Custom::AWSCDK-EKS-KubernetesResource");
+        const nodeTemplate = Object.values(karpenterResources).find((karpenterResource) => {
+            if (karpenterResource?.Properties?.Manifest) {
+                const manifest = karpenterResource.Properties.Manifest;
+                if (typeof manifest === "string" && manifest.includes('"kind":"AWSNodeTemplate"')) { 
+                    return true;
+                }
+            }
+            return false;
         });
-        const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
-        const properties = Object.values(karpenter).pop();
-        const values = properties?.Properties?.Values;
-        expect(values).toBeDefined();
-        const valuesStr = JSON.stringify(values);
-        expect(valuesStr).toContain("blockDeviceMappings");
+        const manifest = JSON.parse(nodeTemplate?.Properties?.Manifest)[0];
+        expect(manifest.kind).toEqual('AWSNodeTemplate');
+        expect(manifest.spec.blockDeviceMappings).toBeDefined();
+        expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
+        expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);
       });
 });
-

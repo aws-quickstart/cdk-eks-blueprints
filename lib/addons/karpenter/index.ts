@@ -13,16 +13,7 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster } from 'aws-cdk-lib/aws-eks';
-
-enum VolumeType {
-    STANDARD = 'standard',
-    IO1 = 'io1',
-    IO2 = 'io2',
-    GP2 = 'gp2',
-    SC1 = 'sc1',
-    ST1 = 'st1',
-    GP3 = 'gp3',
-}
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 
 interface BlockDeviceMapping {
     deviceName?: string;
@@ -36,7 +27,7 @@ interface Ebs {
     iops?: number;
     snapshotId?: string;
     volumeSize?: number;
-    volumeType?: VolumeType;
+    volumeType?: EbsDeviceVolumeType;
     kmsKeyId?: string;
     throughput?: number;
     outpostArn?: string;

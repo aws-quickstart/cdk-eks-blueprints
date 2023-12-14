@@ -22,6 +22,7 @@ Karpenter works by:
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 
 const app = new cdk.App();
 
@@ -58,7 +59,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
     deviceName: "/dev/xvda",
     ebs: {
       volumeSize: 100,
-      volumeType: "gp3",
+      volumeType: EbsDeviceVolumeType.GP3,
       deleteOnTermination: true
     },
   }],
