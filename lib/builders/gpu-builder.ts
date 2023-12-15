@@ -65,7 +65,7 @@ export interface GpuOptions {
  * for EKS cluster
  */
 const defaultOptions: GpuOptions = {
-    kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+    kubernetesVersion: eks.KubernetesVersion.of("1.28"),
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
     desiredNodeSize: 2,

@@ -15,7 +15,7 @@ import merge from 'ts-deepmerge';
  * for EKS cluster
  */
 const defaultOptions: Partial<MngClusterProviderProps> = {
-    version: eks.KubernetesVersion.of("1.27"),
+    version: eks.KubernetesVersion.of("1.28"),
     instanceTypes:  [ec2.InstanceType.of(ec2.InstanceClass.M7G, ec2.InstanceSize.XLARGE)],
     amiType: eks.NodegroupAmiType.AL2_ARM_64,
     desiredSize: 3,
@@ -54,7 +54,7 @@ export class GravitonBuilder extends BlueprintBuilder {
                     builder: UsageTrackingAddOn.builder(),
                 }),
                 new addons.AwsLoadBalancerControllerAddOn(),
-                new addons.KubeProxyAddOn("v1.27.1-eksbuild.1"),
+                new addons.KubeProxyAddOn("auto"),
                 new addons.VpcCniAddOn(),
             );
         return builder;
