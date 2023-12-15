@@ -10,7 +10,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
 
     private awsLoadbalancerProps: addons.AwsLoadBalancerControllerProps;
     private certManagerProps: addons.CertManagerAddOnProps;
-    private containerInsightsProps: addons.ContainerInsightAddonProps;
+    private cloudWatchInsightsAddOnProps: addons.CloudWatchInsightsAddOnProps;
     private coreDnsProps: addons.CoreDnsAddOnProps;
     private kubeProxyProps: addons.kubeProxyAddOnProps;
     private kubeProxyVersion: string = "auto";
@@ -30,7 +30,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         return this.addOns(
             new addons.AwsLoadBalancerControllerAddOn(this.awsLoadbalancerProps),
             new addons.CertManagerAddOn(this.certManagerProps),
-            new addons.ContainerInsightsAddOn(this.containerInsightsProps),
+            new addons.CloudWatchInsights(this.cloudWatchInsightsAddOnProps),
             new addons.CoreDnsAddOn(this.coreDnsProps),
             new addons.KubeProxyAddOn(this.kubeProxyVersion,this.kubeProxyProps),
             new addons.KubeStateMetricsAddOn(this.kubeStateMetricsProps),
@@ -116,7 +116,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     }
 
     public withContainerInsightProps(props: addons.ContainerInsightAddonProps) : this {
-        this.containerInsightsProps = { ...this.containerInsightsProps, ...cloneDeep(props) };
+        this.cloudWatchInsightsAddOnProps = { ...this.cloudWatchInsightsAddOnProps, ...cloneDeep(props) };
         return this;
     }
 
