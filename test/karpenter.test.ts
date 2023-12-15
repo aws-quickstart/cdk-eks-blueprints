@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+import { BlockDeviceMapping, EbsVolumeMapping } from "../lib";
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -158,15 +159,17 @@ describe('Unit tests for Karpenter addon', () => {
         const app = new cdk.App();
     
         const blueprint = blueprints.EksBlueprint.builder();
-    
-        const blockDeviceMapping = {
+
+        const ebsVolumeMapping: EbsVolumeMapping = {
+            volumeSize: 20,
+            volumeType: EbsDeviceVolumeType.GP3,
+            deleteOnTermination: true,
+        };
+
+        const blockDeviceMapping: BlockDeviceMapping = {
             deviceName: "/dev/xvda",
-            ebs: {
-              volumeSize: 100,
-              volumeType: EbsDeviceVolumeType.GP3,
-              deleteOnTermination: true
-            }
-          }
+            ebs: ebsVolumeMapping,
+        };
 
         const stack = await blueprint
           .version("auto")

@@ -15,14 +15,14 @@ import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster } from 'aws-cdk-lib/aws-eks';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 
-interface BlockDeviceMapping {
+export interface BlockDeviceMapping {
     deviceName?: string;
     virtualName?: string;
-    ebs?: Ebs;
+    ebs?: EbsVolumeMapping;
     noDevice?: string;
 }
   
-interface Ebs {
+export interface EbsVolumeMapping {
     deleteOnTermination?: boolean;
     iops?: number;
     snapshotId?: string;
@@ -37,7 +37,7 @@ interface Ebs {
 /**
  * Configuration options for the add-on
  */
-interface KarpenterAddOnProps extends HelmAddOnUserProps {
+export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
      */
