@@ -115,7 +115,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
         return this;
     }
 
-    public withCloudWatchInsights(props: addons.CloudWatchInsightsAddOnProps) : this {
+    public withCloudWatchInsightsProps(props: addons.CloudWatchInsightsAddOnProps) : this {
         this.cloudWatchInsightsAddOnProps = { ...this.cloudWatchInsightsAddOnProps, ...cloneDeep(props) };
         return this;
     }
