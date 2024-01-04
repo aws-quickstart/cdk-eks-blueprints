@@ -11,9 +11,13 @@ export interface AckChartMapping {
  * List of all supported supported AWS services by ACK Addon.
  */
 export enum AckServiceName {
+  ACM = "acm",
+  ACMPCA = "acmpca",
   APIGATEWAYV2 = "apigatewayv2",
   APPLICATIONAUTOSCALING = "applicationautoscaling",
   CLOUDTRAIL = "cloudtrail",
+  CLOUDWATCH = "cloudwatch",
+  CLOUDWATCHLOGS = "cloudwatchlogs",
   DYNAMODB = "dynamodb",
   EC2 = "ec2",
   ECR = "ecr",
@@ -21,29 +25,26 @@ export enum AckServiceName {
   ELASTICACHE = "elasticache",
   ELASTICSEARCHSERVICE = "elasticsearchservice",
   EMRCONTAINERS = "emrcontainers",
+  EVENTBRIDGE = "eventbridge",
   IAM = "iam",
+  KAFKA = "kafka",
   KINESIS = "kinesis",
   KMS = "kms",
   LAMBDA = "lambda",
   MEMORYDB = "memorydb",
   MQ = "mq",
   OPENSEARCHSERVICE = "opensearchservice",
+  PIPES = "pipes",
   PROMETHEUSSERVICE = "prometheusservice",
   RDS = "rds",  
+  ROUTE53 = "route53",
+  ROUTE53RESOLVER = "route53resolver",
   S3 = "s3",
+  SAGEMAKER = "sagemaker",
+  SECRETSMANAGER = "secretsmanager",
   SFN = "sfn",
   SNS = "sns",
-  ACM = "acm",
-  ROUTE53 = "route53",
   SQS = "sqs",
-  SAGEMAKER = "sagemaker",
-  EVENTBRIDGE = "eventbridge",
-  PIPES = "pipes",
-  SECRETSMANAGER = "secretsmanager",
-  ROUTE53RESOLVER = "route53resolver",
-  CLOUDWATCH = "cloudwatch",
-  ACMPCA = "acmpca",
-  CLOUDWATCHLOGS = "cloudwatchlogs"
 }
 
 /**
@@ -215,5 +216,10 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       chart: "cloudwatchlogs-chart",
       version:  "0.0.1",
       managedPolicyName: "CloudWatchLogsFullAccess"
+    },
+    [AckServiceName.KAFKA]: {
+      chart: "kafka-chart",
+      version:  "0.0.1",
+      managedPolicyName: "AmazonMSKFullAccess"
     }
 };
