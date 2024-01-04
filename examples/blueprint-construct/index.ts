@@ -104,10 +104,10 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
-                id: "s3-ack",
+                id: "kafk-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
-                serviceName: blueprints.AckServiceName.S3
+                serviceName: blueprints.AckServiceName.KAFKA
             }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [

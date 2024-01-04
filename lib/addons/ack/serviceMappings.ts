@@ -220,6 +220,6 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.KAFKA]: {
       chart: "kafka-chart",
       version:  "0.0.1",
-      managedPolicyName: "AWSApplicationAutoscalingKafkaClusterPolicy"
+      managedPolicyName: "AmazonMSKFullAccess"
     }
 };
