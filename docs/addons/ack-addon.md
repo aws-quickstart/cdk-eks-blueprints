@@ -149,5 +149,12 @@ Please refer to following aws-controller-8s references for more information :
 25. SQS
 26. SAGEMAKER
 27. EVENTBRIDGE
+28. PIPES
+29. SECRETSMANAGER
+30. ROUTE53RESOLVER
+31. CLOUDWATCH
+32. ACMPCA
+33. CLOUDWATCHLOGS
+34. KAFKA
 
 *We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/).*
