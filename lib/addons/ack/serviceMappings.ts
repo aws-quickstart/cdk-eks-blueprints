@@ -43,7 +43,8 @@ export enum AckServiceName {
   ROUTE53RESOLVER = "route53resolver",
   CLOUDWATCH = "cloudwatch",
   ACMPCA = "acmpca",
-  CLOUDWATCHLOGS = "cloudwatchlogs"
+  CLOUDWATCHLOGS = "cloudwatchlogs",
+  KAFKA = "kafka"
 }
 
 /**
@@ -215,5 +216,10 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
       chart: "cloudwatchlogs-chart",
       version:  "0.0.1",
       managedPolicyName: "CloudWatchLogsFullAccess"
+    },
+    [AckServiceName.KAFKA]: {
+      chart: "kafka-chart",
+      version:  "0.0.1",
+      managedPolicyName: "AWSApplicationAutoscalingKafkaClusterPolicy"
     }
 };
