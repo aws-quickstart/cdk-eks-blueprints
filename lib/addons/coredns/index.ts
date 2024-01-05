@@ -1,14 +1,24 @@
 import {supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_28, "v1.10.1-eksbuild.6"],
+    [KubernetesVersion.V1_27, "v1.10.1-eksbuild.6"],
+    [KubernetesVersion.V1_26, "v1.9.3-eksbuild.10"],
+    [KubernetesVersion.V1_25, "v1.9.3-eksbuild.10"],
+    [KubernetesVersion.V1_24, "v1.9.3-eksbuild.10"],
+    [KubernetesVersion.V1_23, "v1.8.7-eksbuild.9"],
+]);
 
 /**
  * Configuration options for the coredns add-on.
  */
-export type CoreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName">;
+export type CoreDnsAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" | "version" >;
 
 const defaultProps = {
     addOnName: 'coredns',
-    version: 'v1.10.1-eksbuild.4',
+    versionMap: versionMap,
     saName: 'coredns',
     configurationValues: {}
 };
@@ -19,8 +29,12 @@ const defaultProps = {
 @supportsALL
 export class CoreDnsAddOn extends CoreAddOn {
 
-    constructor(props?: CoreDnsAddOnProps) {
-        super({ ...defaultProps, ...props });
+    constructor(version?: string, props?: CoreDnsAddOnProps) {
+        super({
+            version: version ?? "auto",
+            ... defaultProps,
+            ... props
+        });
     }
 
 }
