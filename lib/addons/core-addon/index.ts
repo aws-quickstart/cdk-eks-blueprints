@@ -106,7 +106,7 @@ export class CoreAddOn implements ClusterAddOn {
          * */ 
         
         if(clusterInfo.cluster instanceof FargateCluster && this.coreAddOnProps.addOnName === "coredns"){
-            cfnAddon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE)
+            cfnAddon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE);
         }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
