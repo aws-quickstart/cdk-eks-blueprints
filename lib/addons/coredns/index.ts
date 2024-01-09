@@ -55,13 +55,12 @@ export class CoreDnsAddOn extends CoreAddOn {
      *  Retain the addon otherwise cluster destroy will fail due to CoreDnsComputeTypePatch 
      *  https://github.com/aws/aws-cdk/issues/28621
      */ 
-    handleFargatePatch( addonPromise: Promise<Construct> ): Promise<Construct> {
+    handleFargatePatch( addonPromise: Promise<Construct> ){
         addonPromise.then(addon => {
             if(addon instanceof CfnAddon){
-                addon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE)
+                addon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE);
             }
-        })
-        return addonPromise;
+        });
     }
     
 }
