@@ -4,7 +4,8 @@ import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
+import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
+import * as sdk from "@aws-sdk/client-eks";
 
 export class CoreAddOnProps {
     /**
@@ -59,7 +60,7 @@ export class CoreAddOn implements ClusterAddOn {
         userLog.debug(`Core add-on ${coreAddOnProps.addOnName} is at version ${coreAddOnProps.version}`);
     }
 
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+    async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         let serviceAccountRoleArn: string | undefined = undefined;
         let serviceAccount: ServiceAccount | undefined = undefined;
@@ -78,8 +79,8 @@ export class CoreAddOn implements ClusterAddOn {
         }
         let version: string = this.coreAddOnProps.version;
 
-        if (this.coreAddOnProps.versionMap) {
-            version = this.coreAddOnProps.version != "auto" ? this.coreAddOnProps.version : this.provideVersion(clusterInfo, this.coreAddOnProps.versionMap);
+        if (this.coreAddOnProps.version === "auto") {
+            version = await this.provideVersion(clusterInfo, this.coreAddOnProps.versionMap);
         }
 
         let addOnProps = {
@@ -138,10 +139,43 @@ export class CoreAddOn implements ClusterAddOn {
         return result;
     }
 
-    provideVersion(clusterInfo: ClusterInfo, versionMap: Map<KubernetesVersion, string>) : string {
-        let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
-        userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
-        return version;
-    }
+    async provideVersion(clusterInfo: ClusterInfo, versionMap?: Map<KubernetesVersion, string>) : Promise<string> {
+        const client = new sdk.EKSClient(clusterInfo.cluster.stack.region);
+        const command = new sdk.DescribeAddonVersionsCommand({
+            addonName: this.coreAddOnProps.addOnName,
+            kubernetesVersion: clusterInfo.version.version
+        });
 
+        try {
+            const response = await client.send(command);
+            if (response.addons && response.addons.length > 0)
+            {
+                const defaultVersions = response.addons?.flatMap(addon =>
+                    addon.addonVersions?.filter(version =>
+                      version.compatibilities?.some(compatibility => compatibility.defaultVersion === true)
+                    )
+                );
+
+                const version: string | undefined = defaultVersions[0]?.addonVersion;
+                if (!version) { 
+                    throw new Error("No default version found");
+                }
+                userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
+                return version;
+            }
+            else {
+                throw new Error("No add-on versions found");
+            }
+        }
+        catch (error) {
+            logger.warn(error);
+            logger.warn("Failed to retrieve add-on versions from EKS. Falling back to default version.");
+            if (!versionMap) {
+                throw new Error("No version map provided and no default version found");
+            }
+            let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
+            userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
+            return version;
+        }
+    }
 }

@@ -6,6 +6,13 @@ import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
 import { semverComparator } from "../helm-addon/helm-version-checker";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_28, "v0.90.0-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v0.90.0-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v0.90.0-eksbuild.1"]
+]);
 
 /**
  * Configuration options for the Adot add-on.
@@ -16,7 +23,8 @@ export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName
 
 const defaultProps = {
     addOnName: 'adot',
-    version: 'v0.88.0-eksbuild.2',
+    version: 'auto',
+    versionMap: versionMap,
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
     namespace: 'default',
