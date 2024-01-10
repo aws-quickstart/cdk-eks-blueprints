@@ -27,6 +27,7 @@ export class EksPodIdentityAgentAddOn extends CoreAddOn {
             addOnName: defaultProps.addOnName,
             version: version ?? defaultProps.version,
             saName: defaultProps.saName,
+            versionMap: defaultProps.versionMap
         });
     }
 }
