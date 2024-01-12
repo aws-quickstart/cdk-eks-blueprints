@@ -158,20 +158,20 @@ export class CoreAddOn implements ClusterAddOn {
 
                 const version: string | undefined = defaultVersions[0]?.addonVersion;
                 if (!version) { 
-                    throw new Error("No default version found");
+                    throw new Error(`No default version found for addo-on ${this.coreAddOnProps.addOnName}`);
                 }
                 userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
                 return version;
             }
             else {
-                throw new Error("No add-on versions found");
+                throw new Error(`No add-on versions found for addon-on ${this.coreAddOnProps.addOnName}`);
             }
         }
         catch (error) {
             logger.warn(error);
-            logger.warn("Failed to retrieve add-on versions from EKS. Falling back to default version.");
+            logger.warn(`Failed to retrieve add-on versions from EKS for add-on ${this.coreAddOnProps.addOnName}. Falling back to default version.`);
             if (!versionMap) {
-                throw new Error("No version map provided and no default version found");
+                throw new Error(`No version map provided and no default version found for add-on ${this.coreAddOnProps.addOnName}`);
             }
             let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
             userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
