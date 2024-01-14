@@ -1,4 +1,4 @@
-import { CfnAddon, FargateCluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
@@ -9,8 +9,11 @@ import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog, 
 import * as sdk from "@aws-sdk/client-eks";
 =======
 import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
+<<<<<<< HEAD
 import { RemovalPolicy } from "aws-cdk-lib";
 >>>>>>> 6467b1c9 (CoreDns Retain on delete)
+=======
+>>>>>>> 963c7d30 (Migrate logic to coredns addon from core addon)
 
 export class CoreAddOnProps {
     /**
@@ -104,14 +107,6 @@ export class CoreAddOn implements ClusterAddOn {
 
         if(this.coreAddOnProps.controlPlaneAddOn) {
             deployBeforeCapacity(cfnAddon, clusterInfo);
-        }
-        /**
-         *  Retain the addon otherwise cluster destroy will fail due to CoreDnsComputeTypePatch 
-         *  https://github.com/aws/aws-cdk/issues/28621
-         * */ 
-        
-        if(clusterInfo.cluster instanceof FargateCluster && this.coreAddOnProps.addOnName === "coredns"){
-            cfnAddon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE);
         }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
