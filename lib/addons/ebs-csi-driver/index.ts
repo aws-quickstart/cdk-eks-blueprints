@@ -28,7 +28,7 @@ const defaultProps: CoreAddOnProps & EbsCsiDriverAddOnProps = {
   addOnName: "aws-ebs-csi-driver",
   version: "v1.23.0-eksbuild.1",
   saName: "ebs-csi-controller-sa",
-  storageClass: "gp2", // Set the default StorageClass to gp3
+  storageClass: "gp3", // Set the default StorageClass to gp3
 };
 
 /**
@@ -40,18 +40,16 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
   constructor(readonly options?: EbsCsiDriverAddOnProps) {
     super({
-        addOnName: defaultProps.addOnName,
-        version: options?.version ?? defaultProps.version,
-        saName: defaultProps.saName
-
+      addOnName: defaultProps.addOnName,
+      version: options?.version ?? defaultProps.version,
+      saName: defaultProps.saName,
     });
 
     this.ebsProps = {
-        ...defaultProps,
-        ...options,
+      ...defaultProps,
+      ...options,
     };
-}
-
+  }
 
   providePolicyDocument(clusterInfo: ClusterInfo): PolicyDocument {
     return getEbsDriverPolicyDocument(
@@ -66,65 +64,69 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
     if (this.ebsProps.storageClass) {
       // patch resource on cluster
-      const patchSC = new KubernetesPatch(
+      new KubernetesPatch(cluster.stack, `${cluster}-RemoveGP2SC`, {
+        cluster: cluster,
+        resourceName: "storageclass/gp2",
+        applyPatch: {
+          metadata: {
+            annotations: {
+              "storageclass.kubernetes.io/is-default-class": "false",
+            },
+          },
+        },
+        restorePatch: {
+          metadata: {
+            annotations: {
+              "storageclass.kubernetes.io/is-default-class": "true",
+            },
+          },
+        },
+      });
+
+      // Create and set gp3 StorageClass as cluster-wide default
+      updateSc = new KubernetesManifest(
         cluster.stack,
-        `${cluster}-RemoveGP2SC`,
+        `${cluster}-SetDefaultSC`,
         {
           cluster: cluster,
-          resourceName: "storageclass/gp2",
-          applyPatch: {
-            metadata: {
-              annotations: {
-                "storageclass.kubernetes.io/is-default-class": "false",
+          manifest: [
+            {
+              apiVersion: "storage.k8s.io/v1",
+              kind: "StorageClass",
+              metadata: {
+                name: "gp3",
+                annotations: {
+                  "storageclass.kubernetes.io/is-default-class": "true",
+                },
+              },
+              provisioner: "ebs.csi.aws.com",
+              reclaimPolicy: "Delete",
+              volumeBindingMode: "WaitForFirstConsumer",
+              parameters: {
+                type: "gp3",
+                fsType: "ext4",
+                encrypted: "true",
               },
             },
-          },
-          restorePatch: {
-            metadata: {
-              annotations: {
-                "storageclass.kubernetes.io/is-default-class": "true",
-              },
-            },
-          },
+          ],
         }
       );
 
-      // Create and set gp3 StorageClass as cluster-wide default
-      updateSc = new KubernetesManifest(cluster.stack, `${cluster}-SetDefaultSC`, {
-        cluster: cluster,
-        manifest: [
-          {
-            apiVersion: "storage.k8s.io/v1",
-            kind: "StorageClass",
-            metadata: {
-              name: "gp3",
-              annotations: {
-                "storageclass.kubernetes.io/is-default-class": "true",
-              },
-            },
-            provisioner: "ebs.csi.aws.com",
-            reclaimPolicy: "Delete",
-            volumeBindingMode: "WaitForFirstConsumer",
-            parameters: {
-              type: "gp3",
-              fsType: "ext4",
-              encrypted: "true",
-            },
-          },
-        ],
-      });
-
-      const updateScConstruct = new scConstruct(cluster.stack, `${cluster}-PatchSC`, updateSc);
+      new scConstruct(cluster.stack, `${cluster}-PatchSC`, updateSc);
       return Promise.resolve(updateSc);
     } else {
-        const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
-        return Promise.resolve(noOpConstruct);
+      const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
+      return Promise.resolve(noOpConstruct);
     }
   }
 }
 
 class scConstruct extends Construct {
-    constructor(scope: Construct, id: string, private manifest: KubernetesManifest) {
-        super(scope, id);
-    }
+  constructor(
+    scope: Construct,
+    id: string,
+    private manifest: KubernetesManifest
+  ) {
+    super(scope, id);
+  }
 }
