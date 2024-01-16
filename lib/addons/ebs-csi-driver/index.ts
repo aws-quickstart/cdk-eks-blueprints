@@ -58,13 +58,15 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
     );
   }
 
-  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+  async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+    const baseDeployment = await super.deploy(clusterInfo);
+
     const cluster = clusterInfo.cluster;
     let updateSc: KubernetesManifest;
 
     if (this.ebsProps.storageClass) {
       // patch resource on cluster
-      new KubernetesPatch(cluster.stack, `${cluster}-RemoveGP2SC`, {
+    const patchSc =  new KubernetesPatch(cluster.stack, `${cluster}-RemoveGP2SC`, {
         cluster: cluster,
         resourceName: "storageclass/gp2",
         applyPatch: {
@@ -112,16 +114,23 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         }
       );
 
-      new scConstruct(cluster.stack, `${cluster}-PatchSC`, updateSc);
+      /* new scConstruct(cluster.stack, `${cluster}-PatchSC`, updateSc);
       return Promise.resolve(updateSc);
     } else {
       const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
-      return Promise.resolve(noOpConstruct);
-    }
-  }
-}
+      return Promise.resolve(noOpConstruct); */
+      patchSc.node.addDependency(baseDeployment);
+      updateSc.node.addDependency(baseDeployment);
 
-class scConstruct extends Construct {
+      return baseDeployment;
+    } else {
+        return baseDeployment;
+    }
+    }
+
+  }
+
+/* class scConstruct extends Construct {
   constructor(
     scope: Construct,
     id: string,
@@ -130,3 +139,4 @@ class scConstruct extends Construct {
     super(scope, id);
   }
 }
+ */
