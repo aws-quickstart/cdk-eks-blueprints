@@ -6,7 +6,17 @@ import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-i
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
+<<<<<<< HEAD
 import { RemovalPolicy } from "aws-cdk-lib";
+=======
+=======
+import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
+<<<<<<< HEAD
+import { RemovalPolicy } from "aws-cdk-lib";
+>>>>>>> 6467b1c9 (CoreDns Retain on delete)
+=======
+>>>>>>> 963c7d30 (Migrate logic to coredns addon from core addon)
+>>>>>>> bb411535 (Upgrade Core Addons to support MAP of Versions for Kubernetes versions - Fixing Tests)
 
 export class CoreAddOnProps {
     /**
@@ -101,6 +111,7 @@ export class CoreAddOn implements ClusterAddOn {
         if(this.coreAddOnProps.controlPlaneAddOn) {
             deployBeforeCapacity(cfnAddon, clusterInfo);
         }
+<<<<<<< HEAD
         /**
          *  Retain the addon otherwise cluster destroy will fail due to CoreDnsComputeTypePatch 
          *  https://github.com/aws/aws-cdk/issues/28621
@@ -109,6 +120,8 @@ export class CoreAddOn implements ClusterAddOn {
         if(clusterInfo.cluster instanceof FargateCluster && this.coreAddOnProps.addOnName === "coredns"){
             cfnAddon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE)
         }
+=======
+>>>>>>> 763c1e10 (Upgrade Core Addons to support MAP of Versions for Kubernetes versions - PR Fix)
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
     }
