@@ -12,7 +12,6 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 import { CfnAddon, FargateCluster } from "aws-cdk-lib/aws-eks";
 import { RemovalPolicy } from "aws-cdk-lib";
 
-
 /**
  * Configuration options for the coredns add-on.
  */
