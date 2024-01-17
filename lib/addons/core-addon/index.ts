@@ -6,6 +6,7 @@ import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-i
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
+import { RemovalPolicy } from "aws-cdk-lib";
 
 export class CoreAddOnProps {
     /**
@@ -99,6 +100,14 @@ export class CoreAddOn implements ClusterAddOn {
 
         if(this.coreAddOnProps.controlPlaneAddOn) {
             deployBeforeCapacity(cfnAddon, clusterInfo);
+        }
+        /**
+         *  Retain the addon otherwise cluster destroy will fail due to CoreDnsComputeTypePatch 
+         *  https://github.com/aws/aws-cdk/issues/28621
+         * */ 
+        
+        if(clusterInfo.cluster instanceof FargateCluster && this.coreAddOnProps.addOnName === "coredns"){
+            cfnAddon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE)
         }
         // Instantiate the Add-on
         return Promise.resolve(cfnAddon);
