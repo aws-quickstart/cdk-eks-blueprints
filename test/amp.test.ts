@@ -45,8 +45,7 @@ test("Stack creation fails due to ruleFilePaths.length == 0", async () => {
                     ruleFilePaths: []
                 }
             })
-        );
-
+    );
     try {
         const stack = await blueprint.buildAsync(app, "amp-missing-rules");
         expect(stack).toBeDefined();

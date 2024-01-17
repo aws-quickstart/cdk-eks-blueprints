@@ -43,16 +43,16 @@ const dataTeam: EmrEksTeamProps = {
     };
 
 const parentStack = blueprints.EksBlueprint.builder()
-        .version("auto")
-        .addOns(
-            new blueprints.MetricsServerAddOn,
-            new blueprints.ClusterAutoScalerAddOn,
-            new blueprints.AwsLoadBalancerControllerAddOn,
-            new blueprints.CertManagerAddOn,
-            new blueprints.EmrEksAddOn)
-        .teams(
-            new blueprints.EmrEksTeam(dataTeam))
-        .build(app, "test-emr-eks-blueprint");
+  .version("auto")
+  .addOns(
+      new blueprints.MetricsServerAddOn,
+      new blueprints.ClusterAutoScalerAddOn,
+      new blueprints.AwsLoadBalancerControllerAddOn,
+      new blueprints.CertManagerAddOn,
+      new blueprints.EmrEksAddOn)
+  .teams(
+      new blueprints.EmrEksTeam(dataTeam))
+  .build(app, "test-emr-eks-blueprint");
 
 const template = Template.fromStack(parentStack);
 
