@@ -53,5 +53,5 @@ test("Stack creation fails due to ruleFilePaths.length == 0", async () => {
     catch (error){
         return;
     }
-    fail("Expected exception wasnt thrown for AMP Addon-on Rule Path test.")      
+    fail("Expected exception wasnt thrown for AMP Addon-on Rule Path test.");
 });

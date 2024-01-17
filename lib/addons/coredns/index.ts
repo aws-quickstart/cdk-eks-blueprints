@@ -54,8 +54,8 @@ export class CoreDnsAddOn extends CoreAddOn {
     handleFargatePatch( addonPromise: Promise<Construct> ){
         addonPromise.then(addon => {
             if(addon instanceof CfnAddon){
-                addon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE)
+                addon.applyRemovalPolicy(RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE);
             }
-        })
+        });
     }   
 }
