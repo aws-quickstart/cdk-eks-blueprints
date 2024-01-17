@@ -45,14 +45,10 @@ const dataTeam: EmrEksTeamProps = {
 const parentStack = blueprints.EksBlueprint.builder()
         .version("auto")
         .addOns(
-            new blueprints.VpcCniAddOn(),
-            new blueprints.CoreDnsAddOn(),
             new blueprints.MetricsServerAddOn,
             new blueprints.ClusterAutoScalerAddOn,
             new blueprints.AwsLoadBalancerControllerAddOn,
             new blueprints.CertManagerAddOn,
-            new blueprints.EbsCsiDriverAddOn,
-            new blueprints.KubeProxyAddOn,
             new blueprints.EmrEksAddOn)
         .teams(
             new blueprints.EmrEksTeam(dataTeam))
