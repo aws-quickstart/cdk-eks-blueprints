@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
+import * as sdk from "@aws-sdk/client-eks";
 
 export class CoreAddOnProps {
     /**
