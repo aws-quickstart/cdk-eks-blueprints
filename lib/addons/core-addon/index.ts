@@ -4,12 +4,8 @@ import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-<<<<<<< HEAD
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
-=======
-import { createServiceAccountWithPolicy, deployBeforeCapacity, userLog,  } from "../../utils";
->>>>>>> 6467b1c9 (CoreDns Retain on delete)
 import { RemovalPolicy } from "aws-cdk-lib";
 
 export class CoreAddOnProps {

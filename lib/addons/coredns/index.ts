@@ -59,10 +59,5 @@ export class CoreDnsAddOn extends CoreAddOn {
             }
         })
         return addonPromise;
-<<<<<<< HEAD
     }   
-=======
-    }
-    
->>>>>>> bb411535 (Upgrade Core Addons to support MAP of Versions for Kubernetes versions - Fixing Tests)
 }
