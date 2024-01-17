@@ -1,4 +1,4 @@
-import { CfnAddon, FargateCluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { CfnAddon, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
 import { Construct } from "constructs";

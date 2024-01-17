@@ -2,15 +2,14 @@ import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import {supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
+import { CfnAddon, FargateCluster } from "aws-cdk-lib/aws-eks";
+import { RemovalPolicy } from "aws-cdk-lib";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_28, "v1.10.1-eksbuild.2"],
     [KubernetesVersion.V1_27, "v1.10.1-eksbuild.1"],
     [KubernetesVersion.V1_26, "v1.9.3-eksbuild.2"],
 ]);
-
-import { CfnAddon, FargateCluster } from "aws-cdk-lib/aws-eks";
-import { RemovalPolicy } from "aws-cdk-lib";
 
 /**
  * Configuration options for the coredns add-on.
