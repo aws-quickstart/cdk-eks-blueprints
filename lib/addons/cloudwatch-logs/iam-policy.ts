@@ -15,7 +15,9 @@ export function getCloudWatchLogsPolicyDocument() : Statement[] {
                 "logs:DescribeLogStreams",
                 "logs:DescribeLogGroups",
                 "logs:CreateLogStream",
-                "logs:CreateLogGroup"
+                "logs:CreateLogGroup",
+                "logs:PutRetentionPolicy",
+                "logs:DeleteRetentionPolicy"
             ],
             "Resource": "*"
         }

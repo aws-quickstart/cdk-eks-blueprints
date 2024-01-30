@@ -63,7 +63,7 @@ test("Generic cluster provider correctly registers managed node groups with inst
     const clusterProvider = blueprints.clusterBuilder()
     .withCommonOptions({
         serviceIpv4Cidr: "10.43.0.0/16",
-        version: KubernetesVersion.V1_27
+        version: KubernetesVersion.V1_28
     })
     .managedNodeGroup({
         id: "mng1",
@@ -105,7 +105,7 @@ test("Generic cluster provider correctly registers autoscaling node groups", () 
     const app = new cdk.App();
 
     const clusterProvider = blueprints.clusterBuilder()
-    .version(KubernetesVersion.V1_27)
+    .version(KubernetesVersion.V1_28)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,
@@ -151,7 +151,7 @@ test("Generic cluster provider correctly registers autoscaling node groups with 
     app.node.setContext("eks.default.instance-type", "m5.large");
 
     const clusterProvider = blueprints.clusterBuilder()
-    .version(eks.KubernetesVersion.V1_27)
+    .version(eks.KubernetesVersion.V1_28)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,
@@ -328,7 +328,7 @@ test("Kubernetes Version gets set correctly for \"auto\"", () => {
     .account('123456789').region('us-west-2')
     .version("auto").build(app, "stack-auto");
 
-    expect(stack.getClusterInfo().version.version).toBe("1.27");
+    expect(stack.getClusterInfo().version.version).toBe("1.28");
 });
 
 
@@ -336,8 +336,8 @@ test("Kubernetes Version gets set correctly in NodeGroup", () => {
     const app = new cdk.App();
     const stack = blueprints.EksBlueprint.builder()
     .account('123456789').region('us-west-2')
-    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_27}))
+    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_28}))
     .build(app, "stack-auto");
 
-    expect(stack.getClusterInfo().version.version).toBe("1.27");
+    expect(stack.getClusterInfo().version.version).toBe("1.28");
 });

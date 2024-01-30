@@ -13,7 +13,7 @@ import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = 1.27;
+export const DEFAULT_VERSION = 1.28;
 
 export class EksBlueprintProps {
     /**
@@ -240,7 +240,7 @@ export class EksBlueprint extends cdk.Stack {
 
         let version = blueprintProps.version;
         if (version == "auto") {
-            version = KubernetesVersion.V1_27;
+            version = KubernetesVersion.V1_28;
         }
 
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);

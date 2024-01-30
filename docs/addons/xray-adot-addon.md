@@ -30,6 +30,24 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
+With the same pattern, to deploy ADOT collector in non-default namespace:
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const addOn = new blueprints.addons.XrayAdotAddOn({
+                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+                namespace: 'adot'
+              }),
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
 Pattern # 2 : Overriding Property value for different deployment Modes. This pattern deploys an ADOT collector on the namespace specified in `namespace`, name specified in `name` with `daemonset` as the mode to X-Ray console. Deployment mode can be overridden to any of these values - `deployment`, `daemonset`, `statefulset`, `sidecar`.
 
 ```typescript
