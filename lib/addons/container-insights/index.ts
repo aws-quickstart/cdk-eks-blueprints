@@ -6,6 +6,9 @@ import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from "./values";
 import { conflictsWith, createNamespace, supportsALL } from "../../utils";
 
+/**
+ * @deprecated use CloudWatch Insights add-on instead
+ */
 export interface ContainerInsightAddonProps extends Omit<HelmAddOnUserProps, "namespace"> {
     values?: ValuesSchema
 }
@@ -19,6 +22,9 @@ const defaultProps = {
     repository: "https://aws-observability.github.io/aws-otel-helm-charts"
 };
 
+/**
+ * @deprecated use CloudWatch Insights add-on instead
+ */
 @supportsALL
 export class ContainerInsightsAddOn extends HelmAddOn {
 

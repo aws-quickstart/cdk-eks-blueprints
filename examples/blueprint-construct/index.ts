@@ -62,7 +62,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn({
                 namespace:'adot',
-                version: 'v0.80.0-eksbuild.2'
+                version: 'v0.88.0-eksbuild.2'
             }),
             new blueprints.addons.AmpAddOn({
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
@@ -74,6 +74,7 @@ export default class BlueprintConstruct {
             new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
+            // new blueprints.addons.CloudWatchInsights(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -103,10 +104,10 @@ export default class BlueprintConstruct {
             new blueprints.addons.KubeProxyAddOn(),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
-                id: "s3-ack",
+                id: "kafk-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
-                serviceName: blueprints.AckServiceName.S3
+                serviceName: blueprints.AckServiceName.KAFKA
             }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
@@ -228,7 +229,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_27,
+            version: KubernetesVersion.V1_28,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"

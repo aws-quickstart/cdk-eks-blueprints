@@ -17,6 +17,7 @@ The framework currently supports the following add-ons.
 | [`ApacheAirflowAddOn`](./apache-airflow.md)                                           | This add-on is an implementation of Apache Airflow on EKS using the official helm chart.                                                  | ✅ |
 | [`ArgoCDAddOn`](./argo-cd.md)                                             | Provisions Argo CD into your cluster.                                                                                                 | ✅ | ✅ |
 | [`AWS Batch for EKS`](./aws-batch-on-eks.md)                              | Enables EKS cluster to be used with AWS Batch on EKS                                                                    | ✅ | ✅ |
+| [`AWS CloudWatch Insgihts`](./aws-cloudwatch-insights.md) | Provisions CloudWatch Insights to be used with the EKS cluster. | ✅ | ✅ |  
 | [`AWS for Fluent Bit`](./aws-for-fluent-bit.md)                           | Provisions Fluent Bit into your cluster for log aggregation and consumption.                                                                        | ✅ | ✅
 | [`AWS Load Balancer Controller`](./aws-load-balancer-controller.md)       | Provisions the AWS Load Balancer Controller into your cluster.                                                                        | ✅ | ✅ |
 | [`AWS Node Termination Handler`](./aws-node-termination-handler.md)       | Provisions Node Termination Handler into your cluster.                                                                        | ✅ |

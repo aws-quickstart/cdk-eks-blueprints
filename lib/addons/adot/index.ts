@@ -5,6 +5,7 @@ import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } 
 import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
+import { semverComparator } from "../helm-addon/helm-version-checker";
 
 /**
  * Configuration options for the Adot add-on.
@@ -15,10 +16,11 @@ export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName
 
 const defaultProps = {
     addOnName: 'adot',
-    version: 'v0.80.0-eksbuild.2',
+    version: 'v0.88.0-eksbuild.2',
     saName: 'adot-collector',
     policyDocumentProvider: getAdotCollectorPolicyDocument,
-    namespace: 'default'
+    namespace: 'default',
+    configurationValues: {}
 };
 
  /**
@@ -40,6 +42,13 @@ export class AdotCollectorAddOn extends CoreAddOn {
 
         const cluster = clusterInfo.cluster;
 
+        if (semverComparator("0.88",this.coreAddOnProps.version)) {
+            console.log("Used Adot Addon Version is Valid");
+        } 
+        else {
+            throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
+        }
+
         // Create namespace if not default
         const ns = createNamespace(this.coreAddOnProps.namespace!, cluster, true, true);
 
@@ -60,3 +69,5 @@ export class AdotCollectorAddOn extends CoreAddOn {
         return addOnPromise;
     }
 }
+  
+

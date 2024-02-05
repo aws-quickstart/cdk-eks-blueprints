@@ -38,7 +38,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     name: 'aws-for-fluent-bit',
     chart: 'aws-for-fluent-bit',
     release: "blueprints-addon-aws-fluent-bit-for-cw",
-    version: '0.1.30',
+    version: '0.1.32',
     repository: 'https://aws.github.io/eks-charts',
     namespace: 'aws-for-fluent-bit',
     createNamespace: true,
@@ -108,7 +108,7 @@ function populateValues(clusterInfo: ClusterInfo, helmOptions: CloudWatchLogsAdd
     setPath(values, "cloudWatchLogs.logGroupName", `${helmOptions.logGroupPrefix}/workloads`);
     setPath(values, "cloudWatchLogs.logGroupTemplate", `${helmOptions.logGroupPrefix}/$kubernetes['namespace_name']`);
     setPath(values, "cloudWatchLogs.logStreamTemplate", "$kubernetes['container_name'].$kubernetes['pod_name']");
-    setPath(values, "cloudWatchLogs.log_key", "log");
-    setPath(values, "cloudWatchLogs.log_retention_days", helmOptions.logRetentionDays);
+    setPath(values, "cloudWatchLogs.logKey", "log");
+    setPath(values, "cloudWatchLogs.logRetentionDays", helmOptions.logRetentionDays);
     return values;
 }

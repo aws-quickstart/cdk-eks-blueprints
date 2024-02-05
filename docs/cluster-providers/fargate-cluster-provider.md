@@ -27,7 +27,7 @@ const tags = {
     "Type": "fargate-cluster"
 }
 const clusterProvider = new blueprints.FargateClusterProvider({
-    version: KubernetesVersion.V1_27,
+    version: KubernetesVersion.V1_28,
     fargateProfiles,
     tags
 });

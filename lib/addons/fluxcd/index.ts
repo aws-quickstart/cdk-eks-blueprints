@@ -68,7 +68,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 
   /**
   * Helm chart version to use to install.
-  * @default 2.8.0
+  * @default 2.12.0
   */
   version?: string;
 
@@ -95,7 +95,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   name: "fluxcd-addon",
   namespace: "flux-system",
   chart: "flux2",
-  version: "2.10.1",
+  version: "2.12.1",
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},

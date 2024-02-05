@@ -1,6 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+import { BlockDeviceMapping, EbsVolumeMapping } from "../lib";
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -114,42 +116,94 @@ describe('Unit tests for Karpenter addon', () => {
             });
         }).toThrow("Template has 0 resources with type AWS::SQS::Queue.");
     });
-  test("Stack creation succeeds with custom values overrides", async () => {
-    const app = new cdk.App();
 
-    const blueprint = blueprints.EksBlueprint.builder();
+    test("Stack creation succeeds with custom values overrides", async () => {
+        const app = new cdk.App();
 
-    const stack = await blueprint
-      .version("auto")
-      .account("123567891")
-      .region("us-west-1")
-      .addOns(
-        new blueprints.KarpenterAddOn({
-          version: 'v0.29.2',
-          values: {
-            settings: {
-              aws: {
-                enableENILimitedPodDensity: true,
-                interruptionQueueName: "override-queue-name",
-              },
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        const stack = await blueprint
+        .version("auto")
+        .account("123567891")
+        .region("us-west-1")
+        .addOns(
+            new blueprints.KarpenterAddOn({
+            version: 'v0.29.2',
+            values: {
+                settings: {
+                aws: {
+                    enableENILimitedPodDensity: true,
+                    interruptionQueueName: "override-queue-name",
+                },
+                },
             },
-          },
-        })
-      )
-      .buildAsync(app, "stack-with-values-overrides");
+            })
+        )
+        .buildAsync(app, "stack-with-values-overrides");
 
-    const template = Template.fromStack(stack);
-    template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
-      Chart: "karpenter",
+        const template = Template.fromStack(stack);
+        template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
+        Chart: "karpenter",
+        });
+        const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
+        const properties = Object.values(karpenter).pop();
+        const values = properties?.Properties?.Values;
+        expect(values).toBeDefined();
+        const valuesStr = JSON.stringify(values);
+        expect(valuesStr).toContain("defaultInstanceProfile");
+        expect(valuesStr).toContain("override-queue-name");
+        expect(valuesStr).toContain("enableENILimitedPodDensity");
     });
-    const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
-    const properties = Object.values(karpenter).pop();
-    const values = properties?.Properties?.Values;
-    expect(values).toBeDefined();
-    const valuesStr = JSON.stringify(values);
-    expect(valuesStr).toContain("defaultInstanceProfile");
-    expect(valuesStr).toContain("override-queue-name");
-    expect(valuesStr).toContain("enableENILimitedPodDensity");
-  });
-});
 
+    test("Stack creation succeeds with custom values overrides for blockDeviceMapping", async () => {
+        const app = new cdk.App();
+    
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        const ebsVolumeMapping: EbsVolumeMapping = {
+            volumeSize: 20,
+            volumeType: EbsDeviceVolumeType.GP3,
+            deleteOnTermination: true,
+        };
+
+        const blockDeviceMapping: BlockDeviceMapping = {
+            deviceName: "/dev/xvda",
+            ebs: ebsVolumeMapping,
+        };
+
+        const stack = await blueprint
+          .version("auto")
+          .account("123567891")
+          .region("us-west-1")
+          .addOns(
+            new blueprints.KarpenterAddOn({
+              version: 'v0.29.2',
+              subnetTags: {
+                "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+              },
+              securityGroupTags: {
+                "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+              },
+              blockDeviceMappings: [blockDeviceMapping]  
+            })
+          )
+          .buildAsync(app, "stack-with-values-overrides-blockdevicemapping");
+    
+        const template = Template.fromStack(stack);
+        const karpenterResources = template.findResources("Custom::AWSCDK-EKS-KubernetesResource");
+        const nodeTemplate = Object.values(karpenterResources).find((karpenterResource) => {
+            if (karpenterResource?.Properties?.Manifest) {
+                const manifest = karpenterResource.Properties.Manifest;
+                if (typeof manifest === "string" && manifest.includes('"kind":"AWSNodeTemplate"')) { 
+                    return true;
+                }
+            }
+            return false;
+        });
+        const manifest = JSON.parse(nodeTemplate?.Properties?.Manifest)[0];
+        expect(manifest.kind).toEqual('AWSNodeTemplate');
+        expect(manifest.spec.blockDeviceMappings).toBeDefined();
+        expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
+        expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);
+      });
+});

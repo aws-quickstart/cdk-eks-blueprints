@@ -1,4 +1,4 @@
-import { ISubnet } from "aws-cdk-lib/aws-ec2";
+import { ISecurityGroup, ISubnet } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
@@ -295,6 +295,10 @@ export interface CustomNetworkingConfig {
    * Secondary subnets of your VPC
    */
   readonly subnets?: ISubnet[];
+  /**
+   * Security group of secondary ENI
+   */
+  readonly securityGroup?: ISecurityGroup;
 }
 
 const defaultProps: CoreAddOnProps = {
@@ -323,7 +327,11 @@ export class VpcCniAddOn extends CoreAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+    let securityGroupId = cluster.clusterSecurityGroupId;
+
+    if (this.vpcCniAddOnProps.customNetworkingConfig?.securityGroup) {
+      securityGroupId = this.vpcCniAddOnProps.customNetworkingConfig.securityGroup.securityGroupId;
+    }
 
     if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
       for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
@@ -331,7 +339,7 @@ export class VpcCniAddOn extends CoreAddOn {
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
           availabilityZone: subnet.availabilityZone,
-          clusterSecurityGroupId: clusterSecurityGroupId,
+          securityGroupId: securityGroupId,
           subnetId: subnet.subnetId
         };
         const manifestDeployment: ManifestDeployment = {
