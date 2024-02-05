@@ -100,8 +100,8 @@ export default class BlueprintConstruct {
                 eniConfigLabelDef: 'topology.kubernetes.io/zone',
                 serviceAccountPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
             }),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.CoreDnsAddOn("auto"),
+            new blueprints.addons.KubeProxyAddOn("auto"),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
                 id: "kafk-ack",

@@ -4,6 +4,13 @@ import { ClusterInfo } from "../../spi";
 import { CoreAddOn } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 import { supportsALL } from "../../utils";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_28, "v1.26.1-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v1.26.1-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v1.26.1-eksbuild.1"]
+]);
 
 /**
  * Interface for EBS CSI Driver EKS add-on options
@@ -24,7 +31,8 @@ export interface EbsCsiDriverAddOnProps {
  */
 const defaultProps = {
     addOnName: "aws-ebs-csi-driver",
-    version: "v1.23.0-eksbuild.1",
+    version: "auto",
+    versionMap: versionMap,
     saName: "ebs-csi-controller-sa",
 };
 
@@ -38,7 +46,8 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         super({
             addOnName: defaultProps.addOnName,
             version: options?.version ?? defaultProps.version,
-            saName: defaultProps.saName
+            saName: defaultProps.saName,
+            versionMap: defaultProps.versionMap,
         });
     }
 

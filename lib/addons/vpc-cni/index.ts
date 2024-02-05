@@ -6,6 +6,13 @@ import { ClusterInfo, Values } from "../../spi";
 import { loadYaml, readYamlDocument, ReplaceServiceAccount, supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+  [KubernetesVersion.V1_28, "v1.14.1-eksbuild.1"],
+  [KubernetesVersion.V1_27, "v1.12.6-eksbuild.2"],
+  [KubernetesVersion.V1_26, "v1.12.5-eksbuild.2"],
+]);
 
 /**
  * User provided option for the Helm Chart
@@ -303,7 +310,8 @@ export interface CustomNetworkingConfig {
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.14.1-eksbuild.1',
+  version: 'auto',
+  versionMap: versionMap,
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
