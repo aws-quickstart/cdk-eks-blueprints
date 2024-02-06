@@ -26,7 +26,7 @@ export interface EbsVolumeMapping {
     deleteOnTermination?: boolean;
     iops?: number;
     snapshotId?: string;
-    volumeSize?: number;
+    volumeSize?: string;
     volumeType?: EbsDeviceVolumeType;
     kmsKeyId?: string;
     throughput?: number;
