@@ -227,6 +227,7 @@ export default class BlueprintConstruct {
                 efsFileSystem: 'apache-airflow-efs-provider'
             }),
             new blueprints.ExternalsSecretsAddOn(),
+            new blueprints.NeuronPluginAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
         ];
 
@@ -248,7 +249,8 @@ export default class BlueprintConstruct {
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
                 addWindowsNodeGroup(), //  commented out to check the impact on e2e
-                addGpuNodeGroup()
+                addGpuNodeGroup(),
+                addInferentiaNodeGroup(),
             ]
         });
 
@@ -412,5 +414,24 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
         }
     };
 }
+
+function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+
+    return {
+        id: "mng4-inferentia",
+        instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
+        desiredSize: 1,
+        minSize: 1, 
+        nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
+        diskSize: 50,
+        tags: {
+            "Name": "Mng4",
+            "Type": "Managed-InferentiaNode-Group",
+            "LaunchTemplate": "Inferentia",
+            "kubernetes.io/cluster/blueprint-construct-dev": "owned"
+        }
+    };
+}
+
 
 
