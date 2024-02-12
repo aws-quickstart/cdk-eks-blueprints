@@ -100,8 +100,8 @@ export default class BlueprintConstruct {
                 eniConfigLabelDef: 'topology.kubernetes.io/zone',
                 serviceAccountPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
             }),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.CoreDnsAddOn("auto"),
+            new blueprints.addons.KubeProxyAddOn("auto"),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
                 id: "kafk-ack",
@@ -127,9 +127,6 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
-                amiSelector: {
-                    "karpenter.sh/discovery/MyClusterName": '*',
-                },
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
@@ -142,7 +139,18 @@ export default class BlueprintConstruct {
                 },
                 tags: {
                     schedule: 'always-on'
-                }
+                },
+                blockDeviceMappings: [{
+                    deviceName: "/dev/xvda",
+                    ebs: {
+                        deleteOnTermination: true,
+                        iops: 3000,
+                        volumeSize: "100Gi",
+                        volumeType: ec2.EbsDeviceVolumeType.GP3,
+                        throughput: 250,
+                        encrypted: true,
+                    },
+                }]
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
