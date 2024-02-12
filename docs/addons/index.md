@@ -61,6 +61,7 @@ The framework currently supports the following add-ons.
 | [`MetricsServerAddOn`](./metrics-server.md)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      | ✅ | ✅ |
 | [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               | ✅ | 
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller  | ✅ | ✅ |                                                                                                        |
+| [`NeuronAddOn`](./neuron-plugin-addon.md)                                             | Adds Neuron Addon  | ✅ |  | 
 | [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                                    | ✅ | ✅ |
 | [`ParalusAddOn`](./paralus.md)                            | Adds [Paralus](https://paralus.io/)                                                                                                                   | ✅ | ✅ |
 | [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more.  | ✅ | 
