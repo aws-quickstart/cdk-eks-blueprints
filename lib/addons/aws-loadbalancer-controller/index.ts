@@ -69,7 +69,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
 
 function lookupImage(registry?: string, region?: string): Values {
     if (registry == null) {
-        console.log("Unable to get ECR repository for AWS Loadbalancer Controller for region " + region) + ". Using default helm image";
+        console.log("Unable to get ECR repository for AWS Loadbalancer Controller for region " + region + ". Using default helm image");
         return {};
     }
 
