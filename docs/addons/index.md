@@ -43,6 +43,8 @@ The framework currently supports the following add-ons.
 | [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster. | ✅ | ✅ |
 | [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster. | ✅ | ✅ |
 | [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster. | ✅ | ✅ |
+| [`IstioCniAddOn`](./istio-cni.md)                | Installs Istio Cni Plugin addon to the EKS cluster. | ✅ | ✅ |
+| [`IstioIngressGatewayAddOn`](./istio-ingress-gateway.md)                | Installs Istio Ingress Gateway Plugin to the EKS cluster. | ✅ | ✅ |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               | ✅ | ✅ |
 | [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster. | ✅ | 
 | [`KedaAddOn`](./keda.md)                                      | Installs [Keda](https://github.com/kedacore/keda) into EKS cluster. | ✅ | ✅ |
