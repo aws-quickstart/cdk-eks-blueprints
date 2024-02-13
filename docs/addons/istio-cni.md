@@ -58,4 +58,4 @@ horizontalpodautoscaler.autoscaling/istiod           Deployment/istiod          
 
 ## Functionality
 
-1. Installs Istio CNI plugin performs the Istio mesh pod traffic redirection in the Kubernetes pod lifecycle’s network setup phase.
+1. Installs Istio CNI plugin performs the Istio mesh pod traffic redirection in the Kubernetes pod lifecycle’s network setup.
