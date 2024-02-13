@@ -1,4 +1,4 @@
-import { ISubnet } from "aws-cdk-lib/aws-ec2";
+import { ISecurityGroup, ISubnet } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
@@ -6,6 +6,13 @@ import { ClusterInfo, Values } from "../../spi";
 import { loadYaml, readYamlDocument, ReplaceServiceAccount, supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+  [KubernetesVersion.V1_28, "v1.14.1-eksbuild.1"],
+  [KubernetesVersion.V1_27, "v1.12.6-eksbuild.2"],
+  [KubernetesVersion.V1_26, "v1.12.5-eksbuild.2"],
+]);
 
 /**
  * User provided option for the Helm Chart
@@ -295,11 +302,16 @@ export interface CustomNetworkingConfig {
    * Secondary subnets of your VPC
    */
   readonly subnets?: ISubnet[];
+  /**
+   * Security group of secondary ENI
+   */
+  readonly securityGroup?: ISecurityGroup;
 }
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.14.1-eksbuild.1',
+  version: 'auto',
+  versionMap: versionMap,
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
@@ -323,7 +335,11 @@ export class VpcCniAddOn extends CoreAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+    let securityGroupId = cluster.clusterSecurityGroupId;
+
+    if (this.vpcCniAddOnProps.customNetworkingConfig?.securityGroup) {
+      securityGroupId = this.vpcCniAddOnProps.customNetworkingConfig.securityGroup.securityGroupId;
+    }
 
     if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
       for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
@@ -331,7 +347,7 @@ export class VpcCniAddOn extends CoreAddOn {
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
           availabilityZone: subnet.availabilityZone,
-          clusterSecurityGroupId: clusterSecurityGroupId,
+          securityGroupId: securityGroupId,
           subnetId: subnet.subnetId
         };
         const manifestDeployment: ManifestDeployment = {

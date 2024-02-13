@@ -1,5 +1,8 @@
 # Container Insights Add-on
 
+**!!  This add-on is deprecated in favour of CloudWatch insights to provide deeper integration with EKS through CloudWatch.
+Please use CloudWatch Insights instead linked here: [AWS CloudWatch Insights](./aws-cloudwatch-insights.md) !!**
+
 The Container Insights add-on adds support for [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) to an EKS cluster.
 
 Customers can use Container Insights to collect, aggregate, and summarize metrics and logs from your containerized applications and microservices. Container Insights collects data as performance log events using an embedded metric format. These performance log events are entries that use a structured JSON schema that enables high-cardinality data to be ingested and stored at scale. From this data, CloudWatch creates aggregated metrics at the cluster, node, pod, task, and service level as CloudWatch metrics. The metrics that Container Insights collects are available in CloudWatch automatic dashboards, and also viewable in the Metrics section of the CloudWatch console.

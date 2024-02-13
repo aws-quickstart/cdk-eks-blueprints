@@ -13,12 +13,31 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster } from 'aws-cdk-lib/aws-eks';
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 
+export interface BlockDeviceMapping {
+    deviceName?: string;
+    virtualName?: string;
+    ebs?: EbsVolumeMapping;
+    noDevice?: string;
+}
+  
+export interface EbsVolumeMapping {
+    deleteOnTermination?: boolean;
+    iops?: number;
+    snapshotId?: string;
+    volumeSize?: string;
+    volumeType?: EbsDeviceVolumeType;
+    kmsKeyId?: string;
+    throughput?: number;
+    outpostArn?: string;
+    encrypted?: boolean;
+}
 
 /**
  * Configuration options for the add-on
  */
-interface KarpenterAddOnProps extends HelmAddOnUserProps {
+export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
      */
@@ -131,6 +150,13 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * This ensures that Karpenter is able to correctly auto-discover machines that it owns.
      */
     tags?: Values;
+
+    /**
+     * BlockDeviceMappings allows you to specify the block device mappings for the instances.
+     * This is a list of mappings, where each mapping consists of a device name and an EBS configuration.
+     * If you leave this blank, it will use the Karpenter default.
+     */
+    blockDeviceMappings?: BlockDeviceMapping[];
 }
 
 const KARPENTER = 'karpenter';
@@ -190,6 +216,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const interruption = this.options.interruptionHandling || false;
         const limits = this.options.limits || null;
         const tags = this.options.tags || null;
+        const blockDeviceMappings = this.options.blockDeviceMappings || [];
         
         // Various checks for version errors
         const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
@@ -341,6 +368,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     subnetSelector: subnetTags,
                     securityGroupSelector: sgTags,
                     tags: tags,
+                    blockDeviceMappings: blockDeviceMappings
                 },
             });
             nodeTemplate.node.addDependency(provisioner);

@@ -52,7 +52,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   name: "blueprints-keda-addon",
   chart: "keda",
   namespace:"keda",
-  version: "2.12.0",
+  version: "2.12.1",
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},

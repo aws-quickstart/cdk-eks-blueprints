@@ -26,7 +26,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 2 : This installs AWS Controller for Kubernetes for EC2 ACK controller using service name internally referencing service mapping values for helm options. After Installing this EC2 ACK Controller, the instructions in [Provision ACK Resource](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
+> Pattern # 2 : This installs AWS Controller for Kubernetes for EC2 ACK controller using service name internally referencing service mapping values for helm options. After Installing this EC2 ACK Controller, the instructions in [Provision ACK Resource](https://www.eksworkshop.com/docs/automation/controlplanes/ack/provision-resources) can be used to provision EC2 namespaces `SecurityGroup` resources required for creating Amazon RDS database as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -46,7 +46,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/configureResources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
+> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://www.eksworkshop.com/docs/automation/controlplanes/ack/provision-resources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -114,7 +114,7 @@ replicaset.apps/rds-chart-5f6f5b8fc7   1         1         1       5m36s
 ## aws-controller-8s references
 
 Please refer to following aws-controller-8s references for more information :
-- [ACK Workshop](https://eksworkshop-v2-next.netlify.app/docs/gitops/controlplanes/ack/)
+- [ACK Workshop](https://www.eksworkshop.com/docs/automation/controlplanes/ack/)
 - [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/) 
 - [ACK GitHub](https://github.com/aws-controllers-k8s/community)
 
@@ -122,32 +122,39 @@ Please refer to following aws-controller-8s references for more information :
 
 *You can use this ACK Addon today to provision resources for below mentioned 22 AWS services:*
 
-1. IAM
-2. RDS
-3. EC2
-4. S3
-5. DYNAMODB
-6. ECR
-7. SNS
-8. APIGATEWAYV2
-9. ELASTICACHE
-10. OPENSEARCHSERVICE
-11. MQ
-12. LAMBDA
-13. KMS
-14. MEMORYDB
-15. EKS
-16. APPLICATIONAUTOSCALING
-17. ELASTICSEARCHSERVICE
-18. PROMETHEUSSERVICE
-19. EMRCONTAINERS
-20. SFN
-21. KINESIS
-22. CLOUDTRAIL
-23. ACM
-24. ROUTE53
-25. SQS
-26. SAGEMAKER
-27. EVENTBRIDGE
+1. ACM
+2. ACMPCA
+3. APIGATEWAYV2
+4. APPLICATIONAUTOSCALING
+5. CLOUDTRAIL
+6. CLOUDWATCH
+7. CLOUDWATCHLOGS
+8. DYNAMODB
+9. EC2
+10. ECR
+11. EMRCONTAINERS
+12. EKS
+13. ELASTICACHE
+14. ELASTICSEARCHSERVICE
+15. EVENTBRIDGE
+16. IAM
+17. KAFKA
+18. KINESIS
+19. KMS
+20. LAMBDA
+21. MEMORYDB
+22. MQ
+23. OPENSEARCHSERVICE
+24. PIPES
+25. PROMETHEUSSERVICE
+26. RDS
+27. ROUTE53
+28. ROUTE53RESOLVER
+29. S3
+30. SAGEMAKER
+31. SECRETSMANAGER
+32. SFN
+33. SNS
+34. SQS
 
 *We highly recommend you to contribute to this ACK Addon whenever there is a newer service or new version of supported service by this Addon is published to [ECR Gallery for ACK](https://gallery.ecr.aws/aws-controllers-k8s/).*

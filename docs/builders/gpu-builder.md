@@ -41,7 +41,7 @@ export default class GpuConstruct {
         const stackID = `${id}-eks-blueprint`;
 
         const options: GpuOptions = {
-            kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+            kubernetesVersion: eks.KubernetesVersion.of("1.28"),
             instanceClass: ec2.InstanceClass.G5,
             instanceSize: ec2.InstanceSize.XLARGE
         };

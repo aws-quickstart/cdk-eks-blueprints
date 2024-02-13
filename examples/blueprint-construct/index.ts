@@ -51,7 +51,7 @@ export default class BlueprintConstruct {
             s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
         });
         const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
-            name: 'blueprints-apache-airflow-efs',    
+            name: 'blueprints-apache-airflow-efs',
         });
 
         const addOns: Array<blueprints.ClusterAddOn> = [
@@ -60,14 +60,21 @@ export default class BlueprintConstruct {
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
-            new blueprints.addons.AdotCollectorAddOn(),
+            new blueprints.addons.AdotCollectorAddOn({
+                namespace:'adot',
+                version: 'v0.88.0-eksbuild.2'
+            }),
             new blueprints.addons.AmpAddOn({
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+                namespace: 'adot'
             }),
-            new blueprints.addons.XrayAdotAddOn(),
+            new blueprints.addons.XrayAdotAddOn({
+                namespace: 'adot'
+            }),
             new blueprints.addons.XrayAddOn(),
             // new blueprints.addons.CloudWatchAdotAddOn(),
             // new blueprints.addons.ContainerInsightsAddOn(),
+            // new blueprints.addons.CloudWatchInsights(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.CalicoOperatorAddOn(),
@@ -87,20 +94,20 @@ export default class BlueprintConstruct {
                         blueprints.getNamedResource("secondary-cidr-subnet-0"),
                         blueprints.getNamedResource("secondary-cidr-subnet-1"),
                         blueprints.getNamedResource("secondary-cidr-subnet-2"),
-                    ]   
+                    ]
                 },
                 awsVpcK8sCniCustomNetworkCfg: true,
                 eniConfigLabelDef: 'topology.kubernetes.io/zone',
                 serviceAccountPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")]
             }),
-            new blueprints.addons.CoreDnsAddOn(),
-            new blueprints.addons.KubeProxyAddOn(),
+            new blueprints.addons.CoreDnsAddOn("auto"),
+            new blueprints.addons.KubeProxyAddOn("auto"),
             new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
-                id: "s3-ack",
+                id: "kafk-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
-                serviceName: blueprints.AckServiceName.S3
+                serviceName: blueprints.AckServiceName.KAFKA
             }),
             new blueprints.addons.KarpenterAddOn({
                 requirements: [
@@ -120,9 +127,6 @@ export default class BlueprintConstruct {
                     value: "test",
                     effect: "NoSchedule",
                 }],
-                amiSelector: {
-                    "karpenter.sh/discovery/MyClusterName": '*',
-                },
                 consolidation: { enabled: true },
                 ttlSecondsUntilExpired: 2592000,
                 weight: 20,
@@ -135,7 +139,18 @@ export default class BlueprintConstruct {
                 },
                 tags: {
                     schedule: 'always-on'
-                }
+                },
+                blockDeviceMappings: [{
+                    deviceName: "/dev/xvda",
+                    ebs: {
+                        deleteOnTermination: true,
+                        iops: 3000,
+                        volumeSize: "100Gi",
+                        volumeType: ec2.EbsDeviceVolumeType.GP3,
+                        throughput: 250,
+                        encrypted: true,
+                    },
+                }]
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
@@ -202,7 +217,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.GrafanaOperatorAddon(),
             new blueprints.CloudWatchLogsAddon({
-                logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
+                logGroupPrefix: '/aws/eks/blueprints-construct-dev',
                 logRetentionDays: 30
             }),
             new blueprints.ApacheAirflowAddOn({
@@ -212,6 +227,7 @@ export default class BlueprintConstruct {
                 efsFileSystem: 'apache-airflow-efs-provider'
             }),
             new blueprints.ExternalsSecretsAddOn(),
+            new blueprints.EksPodIdentityAgentAddOn(),
             new blueprints.NeuronPluginAddOn(),
         ];
 
@@ -221,7 +237,7 @@ export default class BlueprintConstruct {
         });
 
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_27,
+            version: KubernetesVersion.V1_28,
             tags: {
                 "Name": "blueprints-example-cluster",
                 "Type": "generic-cluster"
@@ -244,7 +260,7 @@ export default class BlueprintConstruct {
               actions: ['s3:*'],
             }),
             new iam.PolicyStatement({
-              resources: ['*'],   
+              resources: ['*'],
               actions: ['glue:*'],
             }),
             new iam.PolicyStatement({
@@ -254,7 +270,7 @@ export default class BlueprintConstruct {
               ],
             }),
           ];
-      
+
         const dataTeam: blueprints.EmrEksTeamProps = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
@@ -286,7 +302,7 @@ export default class BlueprintConstruct {
         blueprints.EksBlueprint.builder()
             .addOns(...addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, {
-                primaryCidr: "10.2.0.0/16", 
+                primaryCidr: "10.2.0.0/16",
                 secondaryCidr: "100.64.0.0/16",
                 secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
             }))
@@ -309,7 +325,7 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
         amiType: NodegroupAmiType.AL2_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
         desiredSize: 2,
-        maxSize: 3, 
+        maxSize: 3,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
@@ -326,9 +342,9 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
 }
 
 function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
-    
+
     const userData = ec2.UserData.forLinux();
-    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`); 
+    userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
 
     return {
         id: "mng2-customami",
@@ -366,7 +382,7 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
         amiType: NodegroupAmiType.WINDOWS_CORE_2019_X86_64,
         instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
         desiredSize: 0,
-        minSize: 0, 
+        minSize: 0,
         nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
         diskSize: 50,
         tags: {
@@ -384,8 +400,8 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
         id: "mng-linux-gpu",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
         instanceTypes: [new ec2.InstanceType('g5.xlarge')],
-        desiredSize: 0, 
-        minSize: 0, 
+        desiredSize: 0,
+        minSize: 0,
         maxSize: 1,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {

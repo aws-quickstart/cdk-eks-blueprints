@@ -1,4 +1,4 @@
-# GPU Builder
+# Graviton Builder
 
 The `GravitonBuilder` allows you to get started with a builder class to configure with required setup as you prepare a blueprint for setting up EKS cluster with Graviton worker nodes to run your ARM64 workloads.
 
@@ -37,7 +37,7 @@ export default class GravitonConstruct {
             blueprints.getNamedResource(ampWorkspaceName);
 
         const options: Partial<blueprints.MngClusterProviderProps> = {
-            version: eks.KubernetesVersion.of("1.27"),
+            version: eks.KubernetesVersion.of("1.28"),
             instanceTypes: [ec2.InstanceType.of(ec2.InstanceClass.M7G, ec2.InstanceSize.XLARGE)],
             desiredSize: 3,
             minSize: 2,
