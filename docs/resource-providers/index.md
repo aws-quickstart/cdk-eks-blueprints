@@ -242,7 +242,7 @@ Example with a named resource:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
     version: KubernetesVersion.V1_25,
-    mastersRole: blueprints.getNamedResource("my-role")  as iam.Role,
+    mastersRole: blueprints.getNamedResource("my-role") as iam.Role,
     managedNodeGroups: [
         ...
     ]
