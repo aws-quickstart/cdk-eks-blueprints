@@ -34,9 +34,26 @@ const blueprint = blueprints.EksBlueprint.builder()
 To validate that installation is successful run the following command:
 
 ```bash
-$ kubectl get po -n istio-system
-NAME                      READY   STATUS    RESTARTS   AGE
-istiod-5797797b4b-fjrq2   1/1     Running   0          28m
+$ kubectl get all -n istio-system
+NAME                                  READY   STATUS    RESTARTS   AGE
+pod/ingressgateway-686c75b54c-qgmd4   1/1     Running   0          4m25s
+pod/istiod-6c7b79d8cc-mwk4c           1/1     Running   0          4m43s
+
+NAME                     TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)                                      AGE
+service/ingressgateway   LoadBalancer   172.20.141.148   a2b87c2b0a6d64bfe9e99b29308ae0ad-449071982.us-east-1.elb.amazonaws.com   15021:30586/TCP,80:32662/TCP,443:30891/TCP   4m25s
+service/istiod           ClusterIP      172.20.237.63    <none>                                                                   15010/TCP,15012/TCP,443/TCP,15014/TCP        4m43s
+
+NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/ingressgateway   1/1     1            1           4m25s
+deployment.apps/istiod           1/1     1            1           4m43s
+
+NAME                                        DESIRED   CURRENT   READY   AGE
+replicaset.apps/ingressgateway-686c75b54c   1         1         1       4m25s
+replicaset.apps/istiod-6c7b79d8cc           1         1         1       4m43s
+
+NAME                                                 REFERENCE                   TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/ingressgateway   Deployment/ingressgateway   2%/80%    1         5         1          4m25s
+horizontalpodautoscaler.autoscaling/istiod           Deployment/istiod           0%/80%    1         5         1          4m43s
 ```
 
 ## Functionality
