@@ -9,12 +9,19 @@ import { Construct } from "constructs";
 import { getResource } from "../resource-providers/utils";
 import { LookupOpenIdConnectProvider } from "../resource-providers";
 import { logger } from "../utils";
+import { isToken, uniqueId } from "../utils/id-utils";
 
 
 /**
  * Properties object for the ImportClusterProvider.
  */
 export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, "vpc"> {
+    
+    /**
+     * Used for the CDK construct id for the imported cluster. Useful when passing tokens for cluster name. 
+     */
+    id?: string;
+
     /**
      * This property is needed as it drives selection of certain add-on versions as well as kubectl layer. 
      */
@@ -27,7 +34,11 @@ export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, 
  */
 export class ImportClusterProvider implements ClusterProvider {
 
-    constructor(private readonly props: ImportClusterProviderProps) { }
+    readonly id: string;
+
+    constructor(readonly props: ImportClusterProviderProps) { 
+        this.id = props.id ?? (isToken(this.props.clusterName) ? uniqueId() : this.props.clusterName);
+    }
 
     /**
      * Implements contract method to create a cluster, by importing an existing cluster.
@@ -42,8 +53,7 @@ export class ImportClusterProvider implements ClusterProvider {
         if(! props.kubectlLayer) {
             props.kubectlLayer = selectKubectlLayer(scope, props.version);
         }
-        
-        const existingCluster = eks.Cluster.fromClusterAttributes(scope, 'imported-cluster-' + this.props.clusterName, props);
+        const existingCluster = eks.Cluster.fromClusterAttributes(scope, `imported-cluster-${this.id}`, props);
         return new ClusterInfo(existingCluster, this.props.version);
     }
 
