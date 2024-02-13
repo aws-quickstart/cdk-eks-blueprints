@@ -3,7 +3,7 @@ import merge from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { dependable, supportsALL } from '../../utils';
-import { ValuesSchema } from "./values";
+import { ValuesSchema } from "./istio-control-plane-values";
 
 export interface IstioControlPlaneAddOnProps extends HelmAddOnUserProps {
     values?: ValuesSchema
