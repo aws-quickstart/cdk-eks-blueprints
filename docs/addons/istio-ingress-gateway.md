@@ -1,6 +1,6 @@
 # Istio Ingress Gateway Add-on
 
-Istio is an open platform for providing a uniform way to integrate microservices, manage traffic flow across microservices, enforce policies and aggregate telemetry data. An Ingress gateway is a load balancer that handles incoming HTTP and HTTPS traffic to the mesh. It can be used to expose services to the internet, or to enable communication between services within the mesh. The Ingress gateway is implemented using a Kubernetes gateway resource and a set of Envoy proxy instances.
+Istio is an open platform for providing a uniform way to integrate microservices, manage traffic flow across microservices, enforce policies and aggregate telemetry data. An Ingress gateway is a load balancer that handles incoming HTTP and HTTPS traffic to the mesh. It can be used to expose services to the internet, or to enable communication between services within the mesh. Istio Ingress Gateway Add-on installs Istio Ingress Gateway implementing a Kubernetes gateway resource and a set of Envoy proxy instances.
 
 ***IMPORTANT***:
 
@@ -58,4 +58,4 @@ horizontalpodautoscaler.autoscaling/istiod           Deployment/istiod          
 
 ## Functionality
 
-1. Installs Istio Ingress Gateway implements a Kubernetes gateway resource and a set of Envoy proxy instances.
+1. Istio Ingress Gateway Add-on installs Istio Ingress Gateway implementing a Kubernetes gateway resource and a set of Envoy proxy instances.
