@@ -1,5 +1,5 @@
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
-import { Construct } from 'constructs';
+import { Construct, IConstruct } from 'constructs';
 import { ClusterInfo } from "../../spi";
 import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } from "../../utils";
 import { CertManagerAddOn } from "../cert-manager";
@@ -47,18 +47,27 @@ export class AdotCollectorAddOn extends CoreAddOn {
     }
     @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
-
-        const cluster = clusterInfo.cluster;
-
         if (semverComparator("0.88",this.coreAddOnProps.version)) {
             console.log("Used Adot Addon Version is Valid");
         } 
         else {
             throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
         }
+        
+        const addOnPromise = super.deploy(clusterInfo);
+        return addOnPromise;
+    }
 
+    /**
+     * Overriding base class method to create namespace and register permissions.
+     * @param clusterInfo 
+     * @param name 
+     * @returns 
+     */
+    createNamespace(clusterInfo: ClusterInfo, namespaceName: string): IConstruct | undefined {
         // Create namespace if not default
-        const ns = createNamespace(this.coreAddOnProps.namespace!, cluster, true, true);
+        const cluster = clusterInfo.cluster;
+        const ns = createNamespace(namespaceName, cluster, true, true);
 
         // Applying ADOT Permission manifest
         const otelPermissionsDoc = readYamlDocument(__dirname + '/otel-permissions.yaml');
@@ -71,10 +80,7 @@ export class AdotCollectorAddOn extends CoreAddOn {
         });
         
         otelPermissionsStatement.node.addDependency(ns); 
-        
-        const addOnPromise = super.deploy(clusterInfo);
-        addOnPromise.then(addOn => addOn.node.addDependency(otelPermissionsStatement));
-        return addOnPromise;
+        return otelPermissionsStatement;
     }
 }
   
