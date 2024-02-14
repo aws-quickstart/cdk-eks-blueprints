@@ -1,4 +1,4 @@
-import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
+import { ManagedPolicy, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import merge from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
@@ -27,6 +27,11 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
      * @default IAMFullAccess
      */
     managedPolicyName?: string;
+    /**
+    * Inline IAM Policy for the ack controller
+    * @default undefined
+    */
+    inlinePolicyStatements?: PolicyStatement[];
     /**
      * To Create Namespace using CDK. This should be done only for the first time.
      */    
@@ -64,7 +69,7 @@ export class AckAddOn extends HelmAddOn {
     this.id = this.options.id;
   }
 
-  
+
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
 
@@ -81,8 +86,15 @@ export class AckAddOn extends HelmAddOn {
       const namespace = createNamespace(this.options.namespace! , cluster);
       sa.node.addDependency(namespace);
     }
-    
-    sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
+
+    if (this.options.managedPolicyName) {
+      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
+    }
+    if (this.options.inlinePolicyStatements && this.options.inlinePolicyStatements.length > 0) {
+      sa.role.attachInlinePolicy(new Policy(cluster.stack, "inline-policy", {
+        statements: this.options.inlinePolicyStatements
+      }));
+    }
     const chart = this.addHelmChart(clusterInfo, values);
     chart.node.addDependency(sa);
     return Promise.resolve(chart);
@@ -116,6 +128,7 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   tempProps.release = tempProps.release ?? tempProps.chart;
   tempProps.repository = tempProps.repository ?? `${repositoryUrl}/${tempProps.name}`;
   tempProps.managedPolicyName = tempProps.managedPolicyName ?? serviceMappings[tempProps.serviceName!]?.managedPolicyName;
+  tempProps.inlinePolicyStatements = tempProps.inlinePolicyStatements ?? serviceMappings[tempProps.serviceName!]?.inlinePolicyStatements;
   tempProps.createNamespace = tempProps.createNamespace ?? defaultProps.createNamespace;
   tempProps.saName = tempProps.saName ?? `${tempProps.chart}-sa`;
   return tempProps as AckAddOnProps;

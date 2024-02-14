@@ -1,10 +1,13 @@
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+
 /**
  * Chart Mapping for fields such as chart, version, managed IAM policy.
  */
 export interface AckChartMapping {
     chart: string,
     version: string,
-    managedPolicyName: string
+    managedPolicyName?: string
+    inlinePolicyStatements?: PolicyStatement[]
 }
 
 /**
@@ -125,7 +128,16 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.EKS]: {
       chart: "eks-chart",
       version:  "1.0.5",
-      managedPolicyName: "AmazonEKSClusterPolicy"
+      managedPolicyName: "AmazonEKSClusterPolicy",
+      inlinePolicyStatements: [PolicyStatement.fromJson({
+        "Effect": "Allow",
+        "Action": [
+          "eks:*",
+          "iam:GetRole",
+          "iam:PassRole"
+        ],
+        "Resource": "*"
+      })]
     },
     [AckServiceName.APPLICATIONAUTOSCALING]: {
       chart: "applicationautoscaling-chart",
