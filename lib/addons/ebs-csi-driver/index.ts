@@ -66,24 +66,28 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
     if (this.ebsProps.storageClass) {
       // patch resource on cluster
-    const patchSc =  new KubernetesPatch(cluster.stack, `${cluster}-RemoveGP2SC`, {
-        cluster: cluster,
-        resourceName: "storageclass/gp2",
-        applyPatch: {
-          metadata: {
-            annotations: {
-              "storageclass.kubernetes.io/is-default-class": "false",
+      const patchSc = new KubernetesPatch(
+        cluster.stack,
+        `${cluster}-RemoveGP2SC`,
+        {
+          cluster: cluster,
+          resourceName: "storageclass/gp2",
+          applyPatch: {
+            metadata: {
+              annotations: {
+                "storageclass.kubernetes.io/is-default-class": "false",
+              },
             },
           },
-        },
-        restorePatch: {
-          metadata: {
-            annotations: {
-              "storageclass.kubernetes.io/is-default-class": "true",
+          restorePatch: {
+            metadata: {
+              annotations: {
+                "storageclass.kubernetes.io/is-default-class": "true",
+              },
             },
           },
-        },
-      });
+        }
+      );
 
       // Create and set gp3 StorageClass as cluster-wide default
       updateSc = new KubernetesManifest(
@@ -114,29 +118,13 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
         }
       );
 
-      /* new scConstruct(cluster.stack, `${cluster}-PatchSC`, updateSc);
-      return Promise.resolve(updateSc);
-    } else {
-      const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
-      return Promise.resolve(noOpConstruct); */
       patchSc.node.addDependency(baseDeployment);
       updateSc.node.addDependency(baseDeployment);
 
       return baseDeployment;
-    } else {
-        return baseDeployment;
+    } else 
+    {
+      return baseDeployment;
     }
-    }
-
-  }
-
-/* class scConstruct extends Construct {
-  constructor(
-    scope: Construct,
-    id: string,
-    private manifest: KubernetesManifest
-  ) {
-    super(scope, id);
   }
 }
- */
