@@ -228,7 +228,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.ExternalsSecretsAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
-            new blueprints.KubeRayAddOn()
+            new blueprints.KubeRayAddOn(),
             new blueprints.NeuronPluginAddOn()
         ];
 
