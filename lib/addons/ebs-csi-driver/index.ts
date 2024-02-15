@@ -6,6 +6,13 @@ import { getEbsDriverPolicyDocument } from "./iam-policy";
 import { supportsALL } from "../../utils";
 import { Construct } from "constructs";
 import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_28, "v1.26.1-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v1.26.1-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v1.26.1-eksbuild.1"]
+]);
 
 /**
  * Interface for EBS CSI Driver EKS add-on options
@@ -119,9 +126,9 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
       );
 
       patchSc.node.addDependency(baseDeployment);
-      updateSc.node.addDependency(baseDeployment);
+      updateSc.node.addDependency(patchSc);
 
-      return baseDeployment;
+      return updateSc;
     } else 
     {
       return baseDeployment;

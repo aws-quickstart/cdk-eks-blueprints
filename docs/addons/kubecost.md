@@ -1,6 +1,6 @@
 # Kubecost AddOn
 
-[Kubecost](https://kubecost.com) provides real-time cost visibility and insights by uncovering patterns that create overspending on infrastructure to help teams prioritize where to focus optimization efforts. By identifying root causes for negative patterns, customers using Kubecost save 30-50% or more of their Kubernetes cloud infrastructure costs. To read more about Kubecost and how to use it, see the [product and technical docs](https://docs.kubecost.com/getting-started).
+[Kubecost](https://kubecost.com) provides real-time cost visibility and insights by uncovering patterns that create overspending on infrastructure to help teams prioritize where to focus optimization efforts. By identifying root causes for negative patterns, customers using Kubecost save 30-50% or more of their Kubernetes cloud infrastructure costs. To read more about Kubecost and how to use it, see the [product and technical docs](https://docs.kubecost.com/#getting-started).
 
 ## Installation
 
