@@ -6,6 +6,13 @@ import {conflictsWith, createNamespace, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
 import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_28, "v1.2.1-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v1.2.1-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v1.2.1-eksbuild.1"]
+]);
 
 /**
  * Configuration options for AWS Container Insights add-on.
@@ -30,7 +37,8 @@ export type CloudWatchInsightsAddOnProps = Omit<CoreAddOnProps, "saName" | "addO
 
 const defaultProps = {
   addOnName: "amazon-cloudwatch-observability",
-  version: "v1.1.1-eksbuild.1",
+  version: "auto",
+  versionMap: versionMap,
   saName: "cloudwatch-agent",
   namespace: "amazon-cloudwatch"
 };

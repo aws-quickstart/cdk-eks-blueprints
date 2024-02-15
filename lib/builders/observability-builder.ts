@@ -12,6 +12,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
     private certManagerProps: addons.CertManagerAddOnProps;
     private cloudWatchInsightsAddOnProps: addons.CloudWatchInsightsAddOnProps;
     private coreDnsProps: addons.CoreDnsAddOnProps;
+    private coreDnsVersion: string = "auto";
     private kubeProxyProps: addons.kubeProxyAddOnProps;
     private kubeProxyVersion: string = "auto";
     private kubeStateMetricsProps: addons.KubeStateMetricsAddOnProps;
@@ -31,7 +32,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.AwsLoadBalancerControllerAddOn(this.awsLoadbalancerProps),
             new addons.CertManagerAddOn(this.certManagerProps),
             new addons.CloudWatchInsights(this.cloudWatchInsightsAddOnProps),
-            new addons.CoreDnsAddOn(this.coreDnsProps),
+            new addons.CoreDnsAddOn(this.coreDnsVersion,this.coreDnsProps),
             new addons.KubeProxyAddOn(this.kubeProxyVersion,this.kubeProxyProps),
             new addons.KubeStateMetricsAddOn(this.kubeStateMetricsProps),
             new addons.MetricsServerAddOn(this.metricsServerProps),
@@ -46,7 +47,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.AwsLoadBalancerControllerAddOn(this.awsLoadbalancerProps),
             new addons.CertManagerAddOn(this.certManagerProps),
             new addons.AdotCollectorAddOn(this.adotCollectorProps),
-            new addons.CoreDnsAddOn(this.coreDnsProps),
+            new addons.CoreDnsAddOn(this.coreDnsVersion,this.coreDnsProps),
             new addons.KubeProxyAddOn(this.kubeProxyVersion, this.kubeProxyProps),
             new addons.KubeStateMetricsAddOn(this.kubeStateMetricsProps),
             new addons.MetricsServerAddOn(this.metricsServerProps));
@@ -62,7 +63,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.AwsLoadBalancerControllerAddOn(this.awsLoadbalancerProps),
             new addons.CertManagerAddOn(this.certManagerProps),
             new addons.AdotCollectorAddOn(this.adotCollectorProps),
-            new addons.CoreDnsAddOn(this.coreDnsProps),
+            new addons.CoreDnsAddOn(this.coreDnsVersion,this.coreDnsProps),
             new addons.KubeProxyAddOn(this.kubeProxyVersion, this.kubeProxyProps),
             new addons.KubeStateMetricsAddOn(this.kubeStateMetricsProps),
             new addons.MetricsServerAddOn(this.metricsServerProps),
@@ -79,7 +80,7 @@ export class ObservabilityBuilder extends BlueprintBuilder {
             new addons.CertManagerAddOn(this.certManagerProps),
             new addons.AdotCollectorAddOn(this.adotCollectorProps),
             new addons.AmpAddOn(this.ampProps),
-            new addons.CoreDnsAddOn(this.coreDnsProps),
+            new addons.CoreDnsAddOn(this.coreDnsVersion,this.coreDnsProps),
             new addons.ExternalsSecretsAddOn(this.externalSecretProps),
             new addons.GrafanaOperatorAddon(this.grafanaOperatorProps),
             new addons.KubeProxyAddOn(this.kubeProxyVersion,this.kubeProxyProps),

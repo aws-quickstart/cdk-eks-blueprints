@@ -161,7 +161,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         const ebsVolumeMapping: EbsVolumeMapping = {
-            volumeSize: 20,
+            volumeSize: "20Gi",
             volumeType: EbsDeviceVolumeType.GP3,
             deleteOnTermination: true,
         };
