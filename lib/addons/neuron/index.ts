@@ -1,13 +1,13 @@
 import { Construct } from "constructs";
-
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
-import { loadExternalYaml } from "../../utils/yaml-utils";
+import { readYamlDocument, loadYaml, loadExternalYaml } from "../../utils/yaml-utils";
 
 const PLUGIN_URL = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml";
 const RBAC_URL = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin-rbac.yml";
 
-export class NeuronPluginAddOn implements ClusterAddOn {
+export class NeuronDevicePluginAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const kubectlProvider = new KubectlProvider(clusterInfo);
 
@@ -35,5 +35,20 @@ export class NeuronPluginAddOn implements ClusterAddOn {
         pluginStatement.node.addDependency(rbacStatement);
 
         return Promise.resolve(pluginStatement);
+    }
+}
+
+export class NeuronMonitorAddOn implements ClusterAddOn {
+    deploy(clusterInfo: ClusterInfo): void {
+        const cluster = clusterInfo.cluster;
+
+        const neuronMonitorDoc = readYamlDocument(__dirname + '/neuron-monitor.yaml');
+        const neuronMonitorManifest = neuronMonitorDoc.split("---").map(e => loadYaml(e));
+
+        new KubernetesManifest(cluster.stack, "neuron-monitor-manifest", {
+            cluster,
+            manifest: neuronMonitorManifest,
+            overwrite: true
+        });
     }
 }
