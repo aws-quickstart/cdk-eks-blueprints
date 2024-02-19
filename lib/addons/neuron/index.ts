@@ -3,6 +3,7 @@ import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { readYamlDocument, loadYaml, loadExternalYaml } from "../../utils/yaml-utils";
+import { dependable } from "../../utils";
 
 const PLUGIN_URL = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml";
 const RBAC_URL = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin-rbac.yml";
@@ -39,6 +40,8 @@ export class NeuronDevicePluginAddOn implements ClusterAddOn {
 }
 
 export class NeuronMonitorAddOn implements ClusterAddOn {
+
+    @dependable(NeuronDevicePluginAddOn.name)
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
 
