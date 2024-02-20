@@ -33,8 +33,9 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Configuration Options
 
-- `version`: Version fo the Helm Chart to be used to install Keda
-- `values`: Arbitrary values to pass to the chart. Refer to the Keda [Helm Chart documentation](https://github.com/kedacore/charts) for additional details
+- `createNamespace`: (boolean) If you want CDK to create the namespace for you
+- `version`: Version fo the Helm Chart to be used to install
+- `values`: Arbitrary values to pass to the chart. Refer to [Helm Chart documentation](https://istio.io/v1.1/docs/setup/kubernetes/additional-setup/cni/) for additional details
 - `values.cni.chained` is enabled by default which allows Istio CNI plugin to operate as a chained CNI plugin, and it is designed to be used with another CNI pluginenables. In-case `values.cni.chained` is disabled, `VpcCniAddOn` addon-on should be removed manually before disabling this option.
 
 ## Validation

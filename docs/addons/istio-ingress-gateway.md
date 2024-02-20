@@ -31,6 +31,14 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
+## Configuration Options
+
+- `createNamespace`: (boolean) If you want CDK to create the namespace for you
+- `version`: Version fo the Helm Chart to be used to install
+- `values`: Arbitrary values to pass to the chart. Refer to [Helm Chart documentation](https://istio.io/latest/docs/setup/additional-setup/gateway/) for additional details
+
+## Validation
+
 To validate that installation is successful run the following command:
 
 ```bash
