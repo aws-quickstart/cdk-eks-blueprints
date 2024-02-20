@@ -1,6 +1,6 @@
 # Istio Cni Add-on
 
-Istio is an open platform for providing a uniform way to integrate microservices, manage traffic flow across microservices, enforce policies and aggregate telemetry data. The Istio CNI plugin performs the Istio mesh pod traffic redirection in the Kubernetes pod lifecycle’s network setup phase, thereby removing the requirement for the NET_ADMIN and NET_RAW capabilities for users deploying pods into the Istio mesh. 
+Istio is an open platform for providing a uniform way to integrate microservices, manage traffic flow across microservices, enforce policies and aggregate telemetry data. The Istio CNI plugin performs the Istio mesh pod traffic redirection in the Kubernetes pod lifecycle’s network setup phase, thereby removing the requirement for the NET_ADMIN and NET_RAW capabilities for users deploying pods into the Istio mesh. This addo-on does not replace the `VpcCniAddOn` which helps with native VPC networking with the Amazon VPC Container Network Interface (CNI).
 
 ***IMPORTANT***:
 
@@ -30,6 +30,14 @@ const blueprint = blueprints.EksBlueprint.builder()
   .addOns(...addOns)
   .build(app, 'my-stack-name');
 ```
+
+## Configuration Options
+
+- `version`: Version fo the Helm Chart to be used to install Keda
+- `values`: Arbitrary values to pass to the chart. Refer to the Keda [Helm Chart documentation](https://github.com/kedacore/charts) for additional details
+- `values.cni.chained` is enabled by default which allows Istio CNI plugin to operate as a chained CNI plugin, and it is designed to be used with another CNI pluginenables. In-case `values.cni.chained` is disabled, `VpcCniAddOn` addon-on should be removed manually before disabling this option.
+
+## Validation
 
 To validate that installation is successful run the following command:
 
