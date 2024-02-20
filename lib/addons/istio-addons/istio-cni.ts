@@ -1,10 +1,20 @@
 import { Construct } from 'constructs';
 import { ClusterInfo } from "../../spi";
-import { HelmAddOn, HelmAddOnProps } from "../helm-addon";
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { dependable, supportsALL } from '../../utils';
 import { ISTIO_VERSION } from './istio-base';
 
-const defaultProps: HelmAddOnProps = {
+/**
+ * User provided option for the Helm Chart
+ */
+export interface IstioCniAddonProps extends HelmAddOnUserProps {
+    /**
+     * To Create Namespace using CDK
+     */    
+    createNamespace?: boolean;
+}
+
+const defaultProps: HelmAddOnProps & IstioCniAddonProps = {
     name: 'istio-cni',
     release: 'cni',
     namespace: 'istio-system',
@@ -12,13 +22,14 @@ const defaultProps: HelmAddOnProps = {
     version: ISTIO_VERSION,
     repository: 'https://istio-release.storage.googleapis.com/charts',
     values: {}, 
+    createNamespace: false
 };
 
 @supportsALL
 export class IstioCniAddon extends HelmAddOn {
 
-    constructor() {
-        super({...defaultProps});
+    constructor(props?: IstioCniAddonProps) {
+        super({ ...defaultProps, ...props });
     }
 
     @dependable('IstioBaseAddOn','IstioControlPlaneAddOn')
