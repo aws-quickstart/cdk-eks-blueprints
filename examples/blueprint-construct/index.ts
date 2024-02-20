@@ -434,5 +434,3 @@ function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
         }
     };
 }
-
-
