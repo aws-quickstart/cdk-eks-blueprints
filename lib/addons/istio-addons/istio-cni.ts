@@ -20,8 +20,10 @@ export class IstioCniAddon extends HelmAddOn {
     constructor() {
         super({...defaultProps});
     }
+
     @dependable('IstioBaseAddOn','IstioControlPlaneAddOn')
     deploy(clusterInfo: ClusterInfo): void | Promise<Construct> {
+        
         const chart = this.addHelmChart(clusterInfo, this.props.values);
         return Promise.resolve(chart);
     }
