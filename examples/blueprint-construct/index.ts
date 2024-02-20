@@ -402,8 +402,8 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
         id: "mng-linux-gpu",
         amiType: NodegroupAmiType.AL2_X86_64_GPU,
         instanceTypes: [new ec2.InstanceType('g5.xlarge')],
-        desiredSize: 0, 
-        minSize: 0, 
+        desiredSize: 0,
+        minSize: 0,
         maxSize: 1,
         nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         launchTemplate: {
@@ -418,6 +418,7 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
 }
 
 function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+
     return {
         id: "mng4-inferentia",
         instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],
@@ -433,5 +434,6 @@ function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
         }
     };
 }
+
 
 
