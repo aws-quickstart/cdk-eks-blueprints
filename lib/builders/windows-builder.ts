@@ -119,6 +119,31 @@ const defaultOptions: WindowsOptions = {
     }
   };
 
+const defaultKarpenterProps: addons.KarpenterAddOnProps = {
+    version: "v0.31.3",
+    requirements: [
+        { key: 'kubernetes.io/os', op: 'In', vals: ['windows']},
+    ],
+    //subnetTags: {
+        //"Name": `${stackID}/${stackID}-vpc/Private*`,
+    //},
+    //securityGroupTags: {
+        //[`kubernetes.io/cluster/${stackID}`]: "owned",
+    //},
+    consolidation: { enabled: true },
+    ttlSecondsUntilExpired: 2592000,
+    weight: 20,
+    interruptionHandling: true,
+    taints: [
+        {
+            key: "os",
+            value: "windows",
+            effect: "NoSchedule"
+        }
+    ],
+    amiFamily: "Windows2022"
+};
+
 /**
  * This builder class helps you prepare a blueprint for setting up
  * windows nodes with EKS cluster. The `WindowsBuilder` creates the following:
@@ -127,6 +152,8 @@ const defaultOptions: WindowsOptions = {
  * 3. A windows nodegroup to schedule windows workloads
  */
 export class WindowsBuilder extends BlueprintBuilder {
+
+    private karpenterProps:addons.KarpenterAddOnProps;
 
     /**
      * This method helps you prepare a blueprint for setting up windows nodes with
@@ -160,10 +187,22 @@ export class WindowsBuilder extends BlueprintBuilder {
                 new addons.NestedStackAddOn({
                     id: "usage-tracking-addon",
                     builder: UsageTrackingAddOn.builder(),
-                })
+                }),
             );
         return builder;
     }
+
+    public enableKarpenter(): WindowsBuilder {
+        return this.addOns(
+            new addons.KarpenterAddOn(this.karpenterProps)
+        )
+    }
+
+    public withKarpenterProps(props:addons.KarpenterAddOnProps) : this {
+        this.karpenterProps = { ...this.karpenterProps, ...utils.cloneDeep(props) };
+        return this;
+    }
+
 }
 
 /**
