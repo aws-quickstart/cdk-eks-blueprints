@@ -418,7 +418,6 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
 }
 
 function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
-
     return {
         id: "mng4-inferentia",
         instanceTypes: [new ec2.InstanceType('inf1.2xlarge')],

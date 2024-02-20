@@ -56,6 +56,7 @@ export * from './emr-on-eks';
 export * from './aws-batch-on-eks';
 export * from './upbound-universal-crossplane';
 export * from './apache-airflow';
+export * from './neuron';
 export * from './eks-pod-identity-agent';
 export * from './neuron';
 
