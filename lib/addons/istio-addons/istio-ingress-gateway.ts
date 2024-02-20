@@ -2,13 +2,14 @@ import { Construct } from 'constructs';
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnProps } from "../helm-addon";
 import { dependable, supportsALL } from '../../utils';
+import { ISTIO_VERSION } from './istio-base';
 
 const defaultProps: HelmAddOnProps = {
     name: 'istio-ingressgateway',
     release: 'ingressgateway',
     namespace: 'istio-system',
     chart: 'gateway',
-    version: "1.20.1",
+    version: ISTIO_VERSION,
     repository: 'https://istio-release.storage.googleapis.com/charts',
     values: {},
 };
