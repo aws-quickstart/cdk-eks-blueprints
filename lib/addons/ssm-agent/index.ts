@@ -49,7 +49,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
                         ],
                         initContainers: [
                             {
-                                image: "public.ecr.aws/amazon-ssm-agent/amazon-ssm-agent:3.1.90.0",
+                                image: "public.ecr.aws/amazon-ssm-agent/amazon-ssm-agent:3.2.2143.0",
                                 imagePullPolicy: "Always",
                                 name: "ssm-install",
                                 securityContext: {
