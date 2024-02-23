@@ -22,7 +22,8 @@ const app = new cdk.App();
 
 const addOn = new blueprints.addons.EbsCsiDriverAddOn({
                 addOnName: "aws-ebs-csi-driver",
-                version: "v1.23.0-eksbuild.1",
+                version: "auto",
+                versionMap: versionMap,
                 saName: "ebs-csi-controller-sa", 
                 kmsKeys: [
                   blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
