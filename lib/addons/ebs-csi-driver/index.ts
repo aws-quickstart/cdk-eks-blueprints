@@ -7,6 +7,8 @@ import { supportsALL } from "../../utils";
 import { Construct } from "constructs";
 import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { Construct } from "constructs";
+import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_28, "v1.26.1-eksbuild.1"],
@@ -31,11 +33,13 @@ export interface EbsCsiDriverAddOnProps extends CoreAddOnProps {
 /**
  * Default values for the add-on
  */
-const defaultProps: CoreAddOnProps & EbsCsiDriverAddOnProps = {
-  addOnName: "aws-ebs-csi-driver",
-  version: "v1.23.0-eksbuild.1",
-  saName: "ebs-csi-controller-sa",
-  storageClass: "gp3", // Set the default StorageClass to gp3
+const defaultProps : CoreAddOnProps & EbsCsiDriverAddOnProps = {
+    addOnName: "aws-ebs-csi-driver",
+    version: "auto",
+    versionMap: versionMap,
+    saName: "ebs-csi-controller-sa",
+    storageClass: "gp3", // Set the default StorageClass to gp3
+
 };
 
 /**
@@ -45,18 +49,20 @@ const defaultProps: CoreAddOnProps & EbsCsiDriverAddOnProps = {
 export class EbsCsiDriverAddOn extends CoreAddOn {
   readonly ebsProps: EbsCsiDriverAddOnProps;
 
-  constructor(readonly options?: EbsCsiDriverAddOnProps) {
-    super({
-      addOnName: defaultProps.addOnName,
-      version: options?.version ?? defaultProps.version,
-      saName: defaultProps.saName,
-    });
+    constructor(readonly options?: EbsCsiDriverAddOnProps) {
+        super({
+            addOnName: defaultProps.addOnName,
+            version: options?.version ?? defaultProps.version,
+            saName: defaultProps.saName,
+            versionMap: defaultProps.versionMap,
+        });
 
     this.ebsProps = {
-      ...defaultProps,
-      ...options,
+        ...defaultProps,
+        ...options,
     };
-  }
+}
+
 
   providePolicyDocument(clusterInfo: ClusterInfo): PolicyDocument {
     return getEbsDriverPolicyDocument(
@@ -67,13 +73,12 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
   async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const baseDeployment = await super.deploy(clusterInfo);
-
     const cluster = clusterInfo.cluster;
-    let updateSc: KubernetesManifest;
+    let updateSC: KubernetesManifest;
 
     if (this.ebsProps.storageClass) {
       // patch resource on cluster
-      const patchSc = new KubernetesPatch(
+      const patchSC = new KubernetesPatch(
         cluster.stack,
         `${cluster}-RemoveGP2SC`,
         {
@@ -97,41 +102,37 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
       );
 
       // Create and set gp3 StorageClass as cluster-wide default
-      updateSc = new KubernetesManifest(
-        cluster.stack,
-        `${cluster}-SetDefaultSC`,
-        {
-          cluster: cluster,
-          manifest: [
-            {
-              apiVersion: "storage.k8s.io/v1",
-              kind: "StorageClass",
-              metadata: {
-                name: "gp3",
-                annotations: {
-                  "storageclass.kubernetes.io/is-default-class": "true",
-                },
-              },
-              provisioner: "ebs.csi.aws.com",
-              reclaimPolicy: "Delete",
-              volumeBindingMode: "WaitForFirstConsumer",
-              parameters: {
-                type: "gp3",
-                fsType: "ext4",
-                encrypted: "true",
+      updateSC = new KubernetesManifest(cluster.stack, `${cluster}-SetDefaultSC`, {
+        cluster: cluster,
+        manifest: [
+          {
+            apiVersion: "storage.k8s.io/v1",
+            kind: "StorageClass",
+            metadata: {
+              name: "gp3",
+              annotations: {
+                "storageclass.kubernetes.io/is-default-class": "true",
               },
             },
-          ],
-        }
-      );
+            provisioner: "ebs.csi.aws.com",
+            reclaimPolicy: "Delete",
+            volumeBindingMode: "WaitForFirstConsumer",
+            parameters: {
+              type: "gp3",
+              fsType: "ext4",
+              encrypted: "true",
+            },
+          },
+        ],
+      });
 
-      patchSc.node.addDependency(baseDeployment);
-      updateSc.node.addDependency(patchSc);
+      patchSC.node.addDependency(baseDeployment);
+      updateSC.node.addDependency(patchSC);
 
-      return updateSc;
-    } else 
-    {
-      return baseDeployment;
+      return updateSC;
+    } else {
+        const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
+        return Promise.resolve(noOpConstruct);
     }
   }
 }

@@ -87,7 +87,7 @@ export default class BlueprintConstruct {
                     controller: { service: { create: false } }
                 }
             }),
-            new blueprints.addons.VeleroAddOn(),
+            //new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
                     subnets: [
