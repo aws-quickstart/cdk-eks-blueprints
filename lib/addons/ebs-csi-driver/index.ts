@@ -33,13 +33,12 @@ export interface EbsCsiDriverAddOnProps extends CoreAddOnProps {
 /**
  * Default values for the add-on
  */
-const defaultProps : CoreAddOnProps & EbsCsiDriverAddOnProps = {
-    addOnName: "aws-ebs-csi-driver",
-    version: "auto",
-    versionMap: versionMap,
-    saName: "ebs-csi-controller-sa",
-    storageClass: "gp3", // Set the default StorageClass to gp3
-
+const defaultProps: CoreAddOnProps & EbsCsiDriverAddOnProps = {
+  addOnName: "aws-ebs-csi-driver",
+  version: "auto",
+  versionMap: versionMap,
+  saName: "ebs-csi-controller-sa",
+  storageClass: "gp3", // Set the default StorageClass to gp3
 };
 
 /**
@@ -49,20 +48,19 @@ const defaultProps : CoreAddOnProps & EbsCsiDriverAddOnProps = {
 export class EbsCsiDriverAddOn extends CoreAddOn {
   readonly ebsProps: EbsCsiDriverAddOnProps;
 
-    constructor(readonly options?: EbsCsiDriverAddOnProps) {
-        super({
-            addOnName: defaultProps.addOnName,
-            version: options?.version ?? defaultProps.version,
-            saName: defaultProps.saName,
-            versionMap: defaultProps.versionMap,
-        });
+  constructor(readonly options?: EbsCsiDriverAddOnProps) {
+    super({
+      addOnName: defaultProps.addOnName,
+      version: options?.version ?? defaultProps.version,
+      versionMap: defaultProps.versionMap,
+      saName: defaultProps.saName,
+    });
 
     this.ebsProps = {
-        ...defaultProps,
-        ...options,
+      ...defaultProps,
+      ...options,
     };
-}
-
+  }
 
   providePolicyDocument(clusterInfo: ClusterInfo): PolicyDocument {
     return getEbsDriverPolicyDocument(
@@ -73,12 +71,13 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
 
   async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const baseDeployment = await super.deploy(clusterInfo);
+
     const cluster = clusterInfo.cluster;
-    let updateSC: KubernetesManifest;
+    let updateSc: KubernetesManifest;
 
     if (this.ebsProps.storageClass) {
       // patch resource on cluster
-      const patchSC = new KubernetesPatch(
+      const patchSc = new KubernetesPatch(
         cluster.stack,
         `${cluster}-RemoveGP2SC`,
         {
@@ -102,37 +101,41 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
       );
 
       // Create and set gp3 StorageClass as cluster-wide default
-      updateSC = new KubernetesManifest(cluster.stack, `${cluster}-SetDefaultSC`, {
-        cluster: cluster,
-        manifest: [
-          {
-            apiVersion: "storage.k8s.io/v1",
-            kind: "StorageClass",
-            metadata: {
-              name: "gp3",
-              annotations: {
-                "storageclass.kubernetes.io/is-default-class": "true",
+      updateSc = new KubernetesManifest(
+        cluster.stack,
+        `${cluster}-SetDefaultSC`,
+        {
+          cluster: cluster,
+          manifest: [
+            {
+              apiVersion: "storage.k8s.io/v1",
+              kind: "StorageClass",
+              metadata: {
+                name: "gp3",
+                annotations: {
+                  "storageclass.kubernetes.io/is-default-class": "true",
+                },
+              },
+              provisioner: "ebs.csi.aws.com",
+              reclaimPolicy: "Delete",
+              volumeBindingMode: "WaitForFirstConsumer",
+              parameters: {
+                type: "gp3",
+                fsType: "ext4",
+                encrypted: "true",
               },
             },
-            provisioner: "ebs.csi.aws.com",
-            reclaimPolicy: "Delete",
-            volumeBindingMode: "WaitForFirstConsumer",
-            parameters: {
-              type: "gp3",
-              fsType: "ext4",
-              encrypted: "true",
-            },
-          },
-        ],
-      });
+          ],
+        }
+      );
 
-      patchSC.node.addDependency(baseDeployment);
-      updateSC.node.addDependency(patchSC);
+      patchSc.node.addDependency(baseDeployment);
+      updateSc.node.addDependency(patchSc);
 
-      return updateSC;
-    } else {
-        const noOpConstruct = new Construct(cluster.stack, `${cluster}-NoOp`);
-        return Promise.resolve(noOpConstruct);
+      return updateSc;
+    } else 
+    {
+      return baseDeployment;
     }
   }
 }
