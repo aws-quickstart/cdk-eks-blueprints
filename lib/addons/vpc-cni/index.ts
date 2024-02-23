@@ -444,7 +444,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       WARM_PREFIX_TARGET: props?.warmPrefixTarget,
     },
     enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
-    enableWindowsIpam:JSON.stringify(props?.enableWindowsIpam)
+    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam)
   };
 
   // clean up all undefined
