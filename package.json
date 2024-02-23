@@ -47,7 +47,7 @@
         "@types/bcrypt": "^5.0.2",
         "@types/lodash.clonedeep": "^4.5.9",
         "@types/uuid": "^9.0.7",
-        "aws-cdk-lib": "2.115.0",
+        "aws-cdk-lib": "2.130.0",
         "bcrypt": "^5.1.1",
         "constructs": "^10.3.0",
         "dot-object": "^2.1.4",
