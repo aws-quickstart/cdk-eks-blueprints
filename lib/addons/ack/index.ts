@@ -91,7 +91,7 @@ export class AckAddOn extends HelmAddOn {
       sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
     }
     if (this.options.inlinePolicyStatements && this.options.inlinePolicyStatements.length > 0) {
-      sa.role.attachInlinePolicy(new Policy(cluster.stack, "inline-policy", {
+      sa.role.attachInlinePolicy(new Policy(cluster.stack, `${this.options.chart}-inline-policy`, {
         statements: this.options.inlinePolicyStatements
       }));
     }

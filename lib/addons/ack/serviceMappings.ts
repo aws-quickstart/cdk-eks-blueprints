@@ -128,7 +128,6 @@ export const serviceMappings : {[key in AckServiceName]?: AckChartMapping } = {
     [AckServiceName.EKS]: {
       chart: "eks-chart",
       version:  "1.0.5",
-      managedPolicyName: "AmazonEKSClusterPolicy",
       inlinePolicyStatements: [PolicyStatement.fromJson({
         "Effect": "Allow",
         "Action": [
