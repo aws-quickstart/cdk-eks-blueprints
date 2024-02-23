@@ -4,18 +4,9 @@ import { ClusterInfo } from "../../spi";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 import { supportsALL } from "../../utils";
-import { Construct } from "constructs";
-import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Construct } from "constructs";
 import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-
-const versionMap: Map<KubernetesVersion, string> = new Map([
-  [KubernetesVersion.V1_28, "v1.26.1-eksbuild.1"],
-  [KubernetesVersion.V1_27, "v1.26.1-eksbuild.1"],
-  [KubernetesVersion.V1_26, "v1.26.1-eksbuild.1"]
-]);
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_28, "v1.26.1-eksbuild.1"],
@@ -61,7 +52,6 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
       version: options?.version ?? defaultProps.version,
       versionMap: defaultProps.versionMap,
       saName: defaultProps.saName,
-      versionMap: defaultProps.versionMap,
     });
 
     this.ebsProps = {
