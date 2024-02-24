@@ -4,7 +4,44 @@ import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Template } from 'aws-cdk-lib/assertions';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 import { BlockDeviceMapping, EbsVolumeMapping } from "../lib";
-import { userLog } from "../lib/utils";
+import { reqValues } from "../lib/spi";
+
+const defaultReq: reqValues = [
+    { 
+        key: "karpenter.k8s.aws/instance-category",
+        operator: "In",
+        values: ["c", "m", "r"]
+    },
+    { 
+        key: "karpenter.k8s.aws/instance-cpu",
+        operator: "In",
+        values: ["4", "8", "16", "32"]
+    },
+    { 
+        key: "karpenter.k8s.aws/instance-hypervisor", 
+        operator: "In", 
+        values: ["nitro"]
+    },
+    {
+        key: "karpenter.k8s.aws/instance-generation",
+        operator: "Gt",
+        values: ["2"]},
+    {
+        key: "topology.kubernetes.io/zone",
+        operator: "In",
+        values: ["us-west-2a", "us-west-2b"]
+    },
+    {
+        key: "kubernetes.io/arch",
+        operator: "In",
+        values: ["arm64", "amd64"]
+    },
+    {
+        key: "karpenter.sh/capacity-type",
+        operator: "In",
+        values: ["spot", "on-demand"]
+    }
+]
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -84,14 +121,40 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "0.34.1",
-                ttlSecondsAfterEmpty: 30,
-                consolidation: { enabled: true },
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                    ttlSecondsAfterEmpty: 30,
+                    consolidation: { enabled: true },
+                },
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {
             blueprint.build(app, 'stack-with-old-consolidation-features');
         }).toThrow("Consolidation features are only available for previous versions of Karpenter.");
+    });
+
+    test("Stack creation fails due to setting consolidateAfter prop when the policy is set to WhenUnderutilized", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version("auto")
+            .addOns(new blueprints.KarpenterAddOn({
+                NodePoolSpec:{
+                    requirements: defaultReq,
+                    disruption: {
+                        consolidationPolicy: "WhenUnderutilized",
+                        consolidateAfter: "30h"
+                    },
+                }
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-incorrect-consolidateAfter-values');
+        }).toThrow("You cannot set consolidateAfter value if the consolidation policy is set to Underutilized.");
     });
 
     test("Stack creation fails due to non-existing disruption props", () => {
@@ -103,8 +166,10 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_25)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "0.28.0",
-                ttlSecondsAfterEmpty: 30,
-                disruption: {},
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                    disruption: {},
+                }
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -117,16 +182,24 @@ describe('Unit tests for Karpenter addon', () => {
 
     });
 
+    test("", () => {
+
+    });
+
     test("Stack creation fails due to conflicting Karpenter Addon Props", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version("auto")
+            .version(KubernetesVersion.V1_23)
             .addOns(new blueprints.KarpenterAddOn({
-                ttlSecondsAfterEmpty: 30,
-                consolidation: { enabled: true },
+                version: "v0.21.0",
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                    ttlSecondsAfterEmpty: 30,
+                    consolidation: { enabled: true },
+                }
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -160,7 +233,7 @@ describe('Unit tests for Karpenter addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
-	    .version("auto")
+        .version("auto")
         .addOns(new blueprints.KarpenterAddOn({
             interruptionHandling: false
         }))
@@ -186,17 +259,16 @@ describe('Unit tests for Karpenter addon', () => {
         .version(KubernetesVersion.V1_27)
         .account("123567891")
         .region("us-west-1")
-        .addOns(
-            new blueprints.KarpenterAddOn({
-            version: 'v0.29.2',
-            values: {
-                settings: {
-                aws: {
-                    enableENILimitedPodDensity: true,
-                    interruptionQueueName: "override-queue-name",
+        .addOns(new blueprints.KarpenterAddOn({
+                version: 'v0.29.2',
+                values: {
+                    settings: {
+                    aws: {
+                        enableENILimitedPodDensity: true,
+                        interruptionQueueName: "override-queue-name",
+                    },
+                    },
                 },
-                },
-            },
             })
         )
         .buildAsync(app, "stack-with-values-overrides");
@@ -232,35 +304,40 @@ describe('Unit tests for Karpenter addon', () => {
         };
 
         const stack = await blueprint
-          .version("auto")
-          .account("123567891")
-          .region("us-west-1")
-          .addOns(
-            new blueprints.KarpenterAddOn({
-              subnetTags: {
-                "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-              },
-              securityGroupTags: {
-                "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-              },
-              blockDeviceMappings: [blockDeviceMapping]  
+            .version("auto")
+            .account("123567891")
+            .region("us-west-1")
+            .addOns(
+                new blueprints.KarpenterAddOn({
+                NodePoolSpec: {
+                    requirements: defaultReq
+                },
+                EC2NodeClassSpec: {
+                    subnetTags: {
+                        "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                    },
+                    securityGroupTags: {
+                        "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+                    },
+                    blockDeviceMappings: [blockDeviceMapping] 
+                }
             })
           )
           .buildAsync(app, "stack-with-values-overrides-blockdevicemapping");
     
         const template = Template.fromStack(stack);
         const karpenterResources = template.findResources("Custom::AWSCDK-EKS-KubernetesResource");
-        const nodeTemplate = Object.values(karpenterResources).find((karpenterResource) => {
+        const nodeClass = Object.values(karpenterResources).find((karpenterResource) => {
             if (karpenterResource?.Properties?.Manifest) {
                 const manifest = karpenterResource.Properties.Manifest;
-                if (typeof manifest === "string" && manifest.includes('"kind":"AWSNodeTemplate"')) { 
+                if (typeof manifest === "string" && manifest.includes('"kind":"EC2NodeClass"')) { 
                     return true;
                 }
             }
             return false;
         });
-        const manifest = JSON.parse(nodeTemplate?.Properties?.Manifest)[0];
-        expect(manifest.kind).toEqual('AWSNodeTemplate');
+        const manifest = JSON.parse(nodeClass?.Properties?.Manifest)[0];
+        expect(manifest.kind).toEqual('EC2NodeClass');
         expect(manifest.spec.blockDeviceMappings).toBeDefined();
         expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
         expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);

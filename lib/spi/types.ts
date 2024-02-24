@@ -25,6 +25,16 @@ export type Values = {
 };
 
 /**
+ * Utility type for Karpenter requirement values
+ */
+export type reqValues = {
+    key: string,
+    operator: "In" | "NotIn" | "Exists" | "DoesNotExist" | "Gt" | "Lt",
+    values: string[],
+}[]
+
+
+/**
  * Utility type for Kubernetes taints passed to Helm or GitOps applications.
  */
 export type Taint = {
