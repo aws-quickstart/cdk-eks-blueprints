@@ -2,7 +2,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
 import { ClusterInfo, Values, Taint } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, setPath, supportsALL, } from '../../utils';
+import * as utils from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy } from './iam';
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
@@ -12,8 +12,22 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+
+type sec = `${number}s`;
+type min = `${number}m`;
+type hour = `${number}h`;
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.of('1.29'), '0.34.0'],
+    [KubernetesVersion.V1_28, '0.31.0'],
+    [KubernetesVersion.V1_27, '0.28.0'],
+    [KubernetesVersion.V1_26, '0.28.0'],
+    [KubernetesVersion.V1_25, '0.25.0'],
+    [KubernetesVersion.V1_24, '0.21.0'],
+    [KubernetesVersion.V1_23, '0.21.0'],
+]);
 
 export interface BlockDeviceMapping {
     deviceName?: string;
@@ -93,7 +107,8 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     /**
      * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
      * Mutually exclusive with the ttlSecondsAfterEmpty parameter.
-     * Only applicable for v0.15.0 or later.
+     * 
+     * Replaced with disruption.consolidationPolicy for versions v0.32.x and later
      */
     consolidation?: {
         enabled: boolean,
@@ -103,14 +118,34 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * If omitted, the feature is disabled and nodes will never expire.  
      * If set to less time than it requires for a node to become ready, 
      * the node may expire before any pods successfully start.
+     * 
+     * Replaced with disruption.expireAfter for versions v0.32.x and later
      */
     ttlSecondsUntilExpired?: number,
 
     /**
      * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
      * Mutually exclusive with the consolidation parameter.
+     * 
+     * Replaced with disruption.consolidationPolicy and disruption.consolidateAfter for versions v0.32.x and later
      */
     ttlSecondsAfterEmpty?: number,
+
+    /** 
+     * Disruption section which describes the ways in which Karpenter can disrupt and replace Nodes
+     * Configuration in this section constrains how aggressive Karpenter can be with performing operations
+     * like rolling Nodes due to them hitting their maximum lifetime (expiry) or scaling down nodes to reduce cluster cost
+     * Only applicable for versions v0.32 or later
+     * 
+     * @param consolidationPolicy consolidation policy - will default to WhenUnderutilized if not provided
+     * @param consolidateAfter How long Karpenter waits to consolidate nodes - cannot be set when the policy is WhenUnderutilized
+     * @param expireAfter How long Karpenter waits to expire nodes
+     */
+    disruption?: {
+        consolidationPolicy?: "WhenUnderutilized" | "WhenEmpty",
+        consolidateAfter?: string,
+        expireAfter?:  "Never" | sec | min | hour
+    },
 
     /**
      * Priority given to the provisioner when the scheduler considers which provisioner
@@ -168,7 +203,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.31.0',
+    version: 'v0.34.1',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -177,7 +212,7 @@ const defaultProps: HelmAddOnProps = {
 /**
  * Implementation of the Karpenter add-on
  */
-@supportsALL
+@utils.supportsALL
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;
@@ -187,7 +222,7 @@ export class KarpenterAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @conflictsWith('ClusterAutoScalerAddOn')
+    @utils.conflictsWith('ClusterAutoScalerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         assert(clusterInfo.cluster instanceof Cluster, "KarpenterAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");
         const cluster : Cluster = clusterInfo.cluster;
@@ -212,14 +247,17 @@ export class KarpenterAddOn extends HelmAddOn {
         const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
         const weight = this.options.weight || null;
         const consol = this.options.consolidation || null;
-        const repo = this.options.repository!;
+        const disruption = this.options.disruption || null;
         const interruption = this.options.interruptionHandling || false;
         const limits = this.options.limits || null;
         const tags = this.options.tags || null;
         const blockDeviceMappings = this.options.blockDeviceMappings || [];
         
-        // Various checks for version errors
-        const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
+        // Check Kubernetes and Karpenter version compatibility for warning
+        this.isCompatible(version, clusterInfo.version);
+
+        // Version feature checks for errors
+        this.versionFeatureChecksForError(clusterInfo, version, disruption, consol, ttlSecondsAfterEmpty, ttlSecondsUntilExpired);
 
         // Set up the node role and instance profile
         const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(cluster, stackName, region);
@@ -234,8 +272,8 @@ export class KarpenterAddOn extends HelmAddOn {
             resources: [`${karpenterNodeRole.roleArn}`]
         }));
 
-        // Support for Native spot interruption only available on v0.19.0 or later
-        if (semver.gte(version, 'v0.19.0') && interruption){
+        // Support for Native spot interruption
+        if (interruption){
             // Create Interruption Queue
             const queue = new sqs.Queue(cluster.stack, 'karpenter-queue', {
                 queueName: stackName,
@@ -298,25 +336,34 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         // Create Namespace
-        const ns = createNamespace(KARPENTER, cluster, true, true);
-        const sa = createServiceAccount(cluster, RELEASE, KARPENTER, karpenterPolicyDocument);
+        const ns = utils.createNamespace(KARPENTER, cluster, true, true);
+        const sa = utils.createServiceAccount(cluster, RELEASE, KARPENTER, karpenterPolicyDocument);
         sa.node.addDependency(ns);
 
-        // Add helm chart
-        if (semver.gte(this.options.version!, '0.19.0')){
-            const awsSettings = {
-                clusterEndpoint: endpoint,
-                clusterName: name,
+        // Create global helm values based on v1beta1 migration as shown below:
+        // https://karpenter.sh/v0.32/upgrading/v1beta1-migration/#helm-values
+        let globalSettings = {
+            clusterName: name,
+            clusterEndpoint: endpoint
+        };
+
+        if (semver.lt(version, '0.32.0')){
+            globalSettings = merge(globalSettings, { 
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
-                interruptionQueueName: interruption ? stackName : "",
-            };
-            setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
+                interruptionQueueName: interruption ? stackName : "" 
+            });
         } else {
-            setPath(values, "clusterEndpoint", endpoint);
-            setPath(values, "clusterName", name);
-            setPath(values, "aws.defaultInstanceProfile", karpenterInstanceProfile.instanceProfileName);
+            globalSettings = merge(globalSettings, { 
+                interruptionQueue: interruption ? stackName : "" 
+            });
         }
         
+        if (semver.lt(version, '0.32.0')){
+            utils.setPath(values, "settings.aws", merge(globalSettings, values?.settings?.aws ?? {}));
+        } else {
+            utils.setPath(values, "settings", merge(globalSettings, values?.settings ?? {}));
+        }
+
         const saValues = {
             serviceAccount: {
                 create: false,
@@ -332,9 +379,37 @@ export class KarpenterAddOn extends HelmAddOn {
 
         karpenterChart.node.addDependency(ns);
 
-        // (Optional) default provisioner
-        if ((Object.keys(subnetTags).length > 0) && (Object.keys(sgTags).length > 0)){
-            const provisioner = cluster.addManifest('default-provisioner', {
+        // Provisioner or NodePool
+        let pool;
+        if (semver.gte(version, '0.32.0')){
+            pool = {
+                apiVersion: 'karpenter.sh/v1beta1',
+                kind: 'NodePool',
+                metadata: { name: 'default' },
+                spec: {
+                    template: {
+                        labels: labels,
+                        annotations: annotations,
+                        spec: {
+                            nodeClassRef: {
+                                name: "default"
+                            },
+                            taints: taints,
+                            startupTaints: startupTaints,
+                            requirements: this.convert(requirements),
+                        }
+                    },
+                    disruption: {
+                        consolidation: consol,
+                        ttlSecondsUntilExpired: ttlSecondsUntilExpired,
+                        ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
+                    },
+                    limits: limits,
+                    weight: weight,
+                },
+            };
+        } else {
+            pool = {
                 apiVersion: 'karpenter.sh/v1alpha5',
                 kind: 'Provisioner',
                 metadata: { name: 'default' },
@@ -348,14 +423,21 @@ export class KarpenterAddOn extends HelmAddOn {
                     annotations: annotations,
                     requirements: this.convert(requirements),
                     limits: limits,
-                    consolidation: consolidation,
+                    consolidation: consol,
                     ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                     ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
                     weight: weight,
                 },
-            });
+            };
+        }
+
+
+        // Provisioner or EC2NodePool
+        if ((Object.keys(subnetTags).length > 0) && (Object.keys(sgTags).length > 0)){
+            const provisioner = cluster.addManifest('default-provisioner', pool);
             provisioner.node.addDependency(karpenterChart);
 
+            // NodeTemplate or NodeClass
             const nodeTemplate = cluster.addManifest('default-node-template', {
                 apiVersion: "karpenter.k8s.aws/v1alpha1",
                 kind: "AWSNodeTemplate",
@@ -402,46 +484,30 @@ export class KarpenterAddOn extends HelmAddOn {
     /**
      * Helper function to ensure right features are added as part of the configuration
      * for the right version of the add-on
+     * @param clusterInfo 
      * @param version version of the add-on
-     * @param weight weight setting
-     * @param consol consolidation setting
-     * @param repo repository url of the helm chart
+     * @param disruption disruption feature available with the Beta CRDs
+     * @param consolidation consolidation setting available with the Alpha CRDs
      * @param ttlSecondsAfterEmpty ttlSecondsAfterEmpty setting
-     * @returns consolidation
+     * @param ttlSecondsUntilExpired ttlSecondsUntilExpired setting
+     * @returns
      */
-    private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, weight: any, consol: any, repo: string, ttlSecondsAfterEmpty: any, interruption: boolean): any {
+    private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, disruption: any, consolidation: any, ttlSecondsAfterEmpty: any, ttlSecondsUntilExpired: any): void {
         
-        // Consolidation only available with v0.15.0 and later
-        let consolidation;
-        if (semver.lt(version, '0.15.0')){
-            assert(!consol, 'The prop consolidation is only supported on versions v0.15.0 and later.');
-        } else {
-            consolidation = consol || { enabled: false }; 
-            // You cannot enable consolidation and ttlSecondsAfterEmpty values
+        // consolidation only available before v0.32.0 (in alpha CRDs)
+        if (semver.gte(version, '0.32.0')){
+            assert(!consolidation && !ttlSecondsAfterEmpty && !ttlSecondsUntilExpired, 'Consolidation features are only available for previous versions of Karpenter.');
+        }
+
+        // disruption only available after v0.32.0 in beta CRDs
+        if (semver.lt(version, '0.32.0')){
             assert( !(consolidation.enabled && ttlSecondsAfterEmpty) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
-        }
-
-        // Weight only available with v0.16.0 and later
-        if (semver.lt(version, '0.16.0')){
-            assert(!weight, 'The prop weight is only supported on versions v0.16.0 and later.');
+            assert(!disruption, 'Disruption configuration is only supported on versions v0.32.0 and later.');
         }
         
-        // Registry changes with v0.17.0 and later
-        if (semver.gte(version, '0.17.0')){
-            assert(repo === 'oci://public.ecr.aws/karpenter/karpenter', 'Please provide the OCI repository.');
-        } else {
-            assert(repo === 'https://charts.karpenter.sh', 'Please provide the older Karpenter repository url.');
-        }
+        // We should block Node Termination Handler usage once Karpenter is leveraged
+         assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.');
 
-        // Interruption handling only available with v0.19.0 and later
-        // Conversely, we should block Node Termination Handler usage once Karpenter is leveraged
-        if (semver.lt(version, '0.19.0')){
-            assert(!interruption, 'Interruption handling is only supported on versions v0.19.0 and later.');
-        } else {
-            assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.');
-        }
-
-        return consolidation;
     }
 
     /**
@@ -495,5 +561,14 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         return [karpenterNodeRole, karpenterInstanceProfile];
+    }
+
+    private isCompatible(karpenterVersion: string, kubeVersion: KubernetesVersion): void {
+        assert(versionMap.has(kubeVersion), 'Please upgrade your EKS Kubernetes version to start using Karpenter.');
+        assert(semver.gte(karpenterVersion, '0.21.0'), 'Please use Karpenter version 0.21.0 or above.');
+        const compatibleVersion = versionMap.get(kubeVersion) as string;
+        if (semver.gt(compatibleVersion, karpenterVersion)) {
+            console.warn(`Please use minimum Karpenter version for this Kubernetes Version: ${compatibleVersion}, otherwise you will run into compatibility issues.`);
+        }   
     }
 }

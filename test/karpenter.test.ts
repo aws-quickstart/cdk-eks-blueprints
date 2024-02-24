@@ -1,8 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Template } from 'aws-cdk-lib/assertions';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 import { BlockDeviceMapping, EbsVolumeMapping } from "../lib";
+import { userLog } from "../lib/utils";
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -21,40 +23,98 @@ describe('Unit tests for Karpenter addon', () => {
         }).toThrow("Deploying stack-with-conflicting-addons failed due to conflicting add-on: KarpenterAddOn.");
     });
 
-    test("Stack creation fails due to conflicting Karpenter prop for version under 0.16", () => {
+    test("Stack creation fails due to non-supporting Kubernetes version for Karpenter", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version("auto")
+            .version(KubernetesVersion.V1_22)
+            .addOns(new blueprints.KarpenterAddOn())
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-non-supporting-kubernetes-version');
+        }).toThrow("Please upgrade your EKS Kubernetes version to start using Karpenter.");
+    });
+
+    test("Stack creation fails due to Karpenter below minimum version", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
-                version: "0.15.0",
-                weight: 30
+                "version": "0.20.1"
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-karpenter-props');
-        }).toThrow("The prop weight is only supported on versions v0.16.0 and later.");
+            blueprint.build(app, 'stack-with-below-minimum-karpenter-version');
+        }).toThrow("Please use Karpenter version 0.21.0 or above.");
     });
 
-    test("Stack creation fails due to conflicting Karpenter prop for version under 0.15", () => {
+    test("Stack creation with warning message due to compatibility issue", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        const warningLog = jest.spyOn(global.console, 'warn');
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_28)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: '0.30.2'
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        blueprint.build(app, 'stack-with-non-supporting-kubernetes-version');
+        expect(warningLog).toHaveBeenCalled();
+        expect(warningLog).toHaveBeenCalledTimes(1);
+        expect(warningLog).toHaveBeenCalledWith('Please use minimum Karpenter version for this Kubernetes Version: 0.31.0, otherwise you will run into compatibility issues.');
+    });
+
+    test("Stack creation fails due to non-existing consolidation props", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version("auto")
+            .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
-                version: "0.14.0",
+                version: "0.34.1",
+                ttlSecondsAfterEmpty: 30,
                 consolidation: { enabled: true },
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
         expect(()=> {
-            blueprint.build(app, 'stack-with-conflicting-karpenter-props');
-        }).toThrow("The prop consolidation is only supported on versions v0.15.0 and later.");
+            blueprint.build(app, 'stack-with-old-consolidation-features');
+        }).toThrow("Consolidation features are only available for previous versions of Karpenter.");
+    });
+
+    test("Stack creation fails due to non-existing disruption props", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_25)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: "0.28.0",
+                ttlSecondsAfterEmpty: 30,
+                disruption: {},
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-new-consolidation-features');
+        }).toThrow("Disruption configuration is only supported on versions v0.32.0 and later.");
+    });
+
+    test("", () => {
+
     });
 
     test("Stack creation fails due to conflicting Karpenter Addon Props", () => {
@@ -100,7 +160,7 @@ describe('Unit tests for Karpenter addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-1')
-	.version("auto")
+	    .version("auto")
         .addOns(new blueprints.KarpenterAddOn({
             interruptionHandling: false
         }))
@@ -123,7 +183,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         const stack = await blueprint
-        .version("auto")
+        .version(KubernetesVersion.V1_27)
         .account("123567891")
         .region("us-west-1")
         .addOns(
@@ -177,7 +237,6 @@ describe('Unit tests for Karpenter addon', () => {
           .region("us-west-1")
           .addOns(
             new blueprints.KarpenterAddOn({
-              version: 'v0.29.2',
               subnetTags: {
                 "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
               },
