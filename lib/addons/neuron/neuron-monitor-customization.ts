@@ -112,7 +112,7 @@ export class NeuronMonitorManifest {
             }
         };
         
-        const manifest = [deamonSetManifest, serviceManifest]
-        return manifest
+        const manifest = [deamonSetManifest, serviceManifest];
+        return manifest;
     }
 }

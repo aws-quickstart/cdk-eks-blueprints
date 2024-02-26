@@ -59,7 +59,7 @@ The framework currently supports the following add-ons.
 | [`MetricsServerAddOn`](./metrics-server.md)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      | ✅ | ✅ |
 | [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               | ✅ | 
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller  | ✅ | ✅ |                                                                                                        |
-| [`NeuronDevicePluginAddOn`](./neuron-plugin-addon.md)                                             | Adds Neuron Device Plugin Addon  | ✅ |  |
+| [`NeuronDevicePluginAddOn`](./neuron-device-plugin-addon.md)                                             | Adds Neuron Device Plugin Addon  | ✅ |  |
 | [`NeuronMonitorAddOn`](./neuron-monitor-addon.md)                                             | Adds Neuron Monitor Addon  | ✅ |  | 
 | [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                                    | ✅ | ✅ |
 | [`ParalusAddOn`](./paralus.md)                            | Adds [Paralus](https://paralus.io/)                                                                                                                   | ✅ | ✅ |

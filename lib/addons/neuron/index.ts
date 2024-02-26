@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { loadExternalYaml } from "../../utils/yaml-utils";
-import { createNamespace } from "../../utils";
+import { createNamespace, dependable } from "../../utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { NeuronMonitorManifest } from "./neuron-monitor-customization";
 
@@ -66,22 +66,23 @@ const defaultProps: NeuronMonitorAddOnProps = {
     namespace: "kube-system",
     imageTag: "1.0.0",
     port: 9010
-}
+};
 
 
 export class NeuronMonitorAddOn implements ClusterAddOn {
 
-    readonly options: NeuronMonitorAddOnProps
+    readonly options: NeuronMonitorAddOnProps;
 
     constructor(props?: NeuronMonitorAddOnProps){
-        this.options = {...defaultProps, ...props}
+        this.options = {...defaultProps, ...props};
     }
 
+    @dependable(NeuronDevicePluginAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>{
         
         const cluster = clusterInfo.cluster;
 
-        const manifest = new NeuronMonitorManifest().generate(this.options.namespace!, this.options.imageTag!, this.options.port!)
+        const manifest = new NeuronMonitorManifest().generate(this.options.namespace!, this.options.imageTag!, this.options.port!);
 
         const neuronMonitorManifest = new KubernetesManifest(cluster.stack, "neuron-monitor-manifest", {
             cluster,
