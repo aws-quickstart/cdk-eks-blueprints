@@ -29,7 +29,8 @@ export function build(app: App) {
             repoUrl: 'cdk-eks-blueprints',
             credentialsSecretName: 'github-token',
             targetRevision: 'bug/broken-monorepo-pipelines',
-            path: "examples/monorepo"
+            path: "examples/monorepo",
+            trigger: blueprints.GitHubTrigger.POLL
         })
         .stage({
             id: 'us-west-2-sandbox',
