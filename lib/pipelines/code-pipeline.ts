@@ -422,8 +422,7 @@ class CodePipeline {
 
           default:{
             let gitHubRepo = props.repository as GitHubSourceRepository;
-            let githubProps: cdkpipelines.GitHubSourceOptions | undefined =
-              undefined;
+            let githubProps: cdkpipelines.GitHubSourceOptions = {};
             const gitHubOwner = gitHubRepo.owner ?? props.owner;
 
             if (gitHubRepo.credentialsSecretName) {
@@ -439,6 +438,7 @@ class CodePipeline {
               { 
                 ...githubProps,
                 trigger: gitHubRepo.trigger ?? GitHubTrigger.WEBHOOK,
+
               }
             );
             break;
@@ -453,17 +453,19 @@ class CodePipeline {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
               input: codePipelineSource,
+              primaryOutputDirectory: "cdk.out",
               installCommands: [
                 'n stable',
                 'npm install -g aws-cdk@2.115.0',
-                `cd ${path} && npm install`,
+                `cd $CODEBUILD_SRC_DIR/${path} && npm install`,
               ],
-              commands: [`cd ${path}`, 'npm run build', 'npx cdk synth ' + app]
+              commands: [`cd $CODEBUILD_SRC_DIR/${path}`, 'npm run build', 'npx cdk synth ' + app]
             }),
             crossAccountKeys: props.crossAccountKeys,
             codeBuildDefaults: {
-                rolePolicy: props.codeBuildPolicies
-            }
+                rolePolicy: props.codeBuildPolicies    
+            },
+            
           });
     }
 }
