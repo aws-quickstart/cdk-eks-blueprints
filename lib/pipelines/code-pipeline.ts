@@ -203,7 +203,8 @@ export const DEFAULT_BUILD_POLICIES = [ new PolicyStatement({
         "sts:AssumeRole",
         "secretsmanager:GetSecretValue",
         "secretsmanager:DescribeSecret",
-        "cloudformation:*"
+        "cloudformation:*",
+        "eks:DescribeAddonVersions"
     ]
 })];
 
