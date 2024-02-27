@@ -453,7 +453,7 @@ class CodePipeline {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
               input: codePipelineSource,
-              primaryOutputDirectory: "cdk.out",
+              primaryOutputDirectory: `${path}/cdk.out`,
               installCommands: [
                 'n stable',
                 'npm install -g aws-cdk@2.115.0',

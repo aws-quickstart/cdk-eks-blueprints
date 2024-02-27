@@ -21,7 +21,7 @@ export function build(app: App) {
         );
 
     blueprints.CodePipelineStack.builder()
-        .application("npx ts-node bin/pipeline.ts")
+        .application("npx ts-node bin/main.ts")
         .name("blueprints-eks-pipeline")
         .owner("aws-quickstart")
         .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
