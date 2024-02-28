@@ -6,6 +6,8 @@ import merge from "ts-deepmerge";
 import { Duration } from "aws-cdk-lib";
 import { supportsALL } from "../../utils";
 
+export const ISTIO_VERSION = "1.20.1";
+
 /**
  * Configuration options for the add-on.
  */
@@ -56,7 +58,7 @@ const defaultProps = {
     release: "istio-base",
     namespace: "istio-system",
     chart: "base",
-    version: "1.20.1",
+    version: ISTIO_VERSION,
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
