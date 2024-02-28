@@ -77,6 +77,8 @@ export default class BlueprintConstruct {
             // new blueprints.addons.CloudWatchInsights(),
             new blueprints.addons.IstioBaseAddOn(),
             new blueprints.addons.IstioControlPlaneAddOn(),
+            new blueprints.addons.IstioCniAddon(),
+            new blueprints.addons.IstioIngressGatewayAddon(),
             new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
@@ -87,7 +89,7 @@ export default class BlueprintConstruct {
                     controller: { service: { create: false } }
                 }
             }),
-            new blueprints.addons.VeleroAddOn(),
+            // new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
                     subnets: [

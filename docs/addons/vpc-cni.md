@@ -185,7 +185,14 @@ False
 For example:
 ```typescript
 new blueprints.addons.VpcCniAddOn({ enableNetworkPolicy: true, version: 'v1.15.0-eksbuild.2' }) 
+
 ```  
+   - enableWindowsIpam - set to `true` enables Windows support for EKS cluster. 
+
+For example:
+```typescript
+new blueprints.addons.VpcCniAddOn({ enableWindowsIpam: true, version: 'v1.15.0-eksbuild.2' }) 
+``` 
 
 # Validation
 To validate that vpc-cni add-on is running, ensure that the pod is in Running state.
