@@ -4,7 +4,7 @@ import { logger } from '../../../lib/utils';
 
 export function build(app: App) {
     const account = process.env.CDK_DEFAULT_ACCOUNT!;
-    const region = 'us-west-2';
+    const region = process.env.CDK_DEFAULT_REGION!;
     
     logger.settings.minLevel = 3;
     blueprints.HelmAddOn.validateHelmVersions = true;
@@ -33,8 +33,8 @@ export function build(app: App) {
             trigger: blueprints.GitHubTrigger.POLL
         })
         .stage({
-            id: 'us-west-2-sandbox',
-            stackBuilder: blueprint.clone('us-west-2')
+            id: `${region}-sandbox`,
+            stackBuilder: blueprint.clone(region)
         })
         .build(app, "pipeline", { env: { region, account }});
 }

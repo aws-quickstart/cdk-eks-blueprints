@@ -211,7 +211,7 @@ const pipeline = blueprints.CodePipelineStack.builder()
 
 ## Monorepo support
 
-In some cases, customers choose to have their bllueprints defined in subdirectories on a monorepo project. In this scenario, the root of the project is not the root of the CDK pipeline. A single monorepo can also support multiple subprojects each containing its own pipeline. 
+In some cases, customers choose to have their blueprints defined in subdirectories on a monorepo project. In this scenario, the root of the project is not the root of the CDK pipeline. A single monorepo can also support multiple subprojects each containing its own pipeline. 
 
 To support this case, customers can specify the relative path of the subdirectory containing the blueprints. 
 
