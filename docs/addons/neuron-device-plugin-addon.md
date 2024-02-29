@@ -12,7 +12,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addons.NeuronPluginAddon();
+const addOn = new blueprints.addons.NeuronDevicePluginAddon();
 
 const clusterProvider = new blueprints.GenericClusterProvider({
   version: KubernetesVersion.V1_27,

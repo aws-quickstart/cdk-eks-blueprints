@@ -457,8 +457,8 @@ class CodePipeline {
               primaryOutputDirectory: `${path}/cdk.out`,
               installCommands: [
                 'n stable',
-                'npm install -g aws-cdk@2.115.0',
-                `cd $CODEBUILD_SRC_DIR/${path} && npm install`,
+                'npm install -g aws-cdk@2.130.0',
+                `cd $CODEBUILD_SRC_DIR/${path} && npm install`
               ],
               commands: [`cd $CODEBUILD_SRC_DIR/${path}`, 'npm run build', 'npx cdk synth ' + app]
             }),
