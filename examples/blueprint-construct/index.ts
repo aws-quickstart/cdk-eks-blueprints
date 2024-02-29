@@ -55,6 +55,7 @@ export default class BlueprintConstruct {
         });
 
         const addOns: Array<blueprints.ClusterAddOn> = [
+            new blueprints.KubeRayAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
             new blueprints.addons.CertManagerAddOn(),
