@@ -43,6 +43,8 @@ The framework currently supports the following add-ons.
 | [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster. | ✅ | ✅ |
 | [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster. | ✅ | ✅ |
 | [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster. | ✅ | ✅ |
+| [`IstioCniAddOn`](./istio-cni.md)                | Installs Istio Cni Plugin addon to the EKS cluster. | ✅ | ✅ |
+| [`IstioIngressGatewayAddOn`](./istio-ingress-gateway.md)                | Installs Istio Ingress Gateway Plugin to the EKS cluster. | ✅ | ✅ |
 | [`JupyterHubAddOn`](./jupyterhub.md)                                   | Adds [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/#) support for AWS to the cluster.                               | ✅ | ✅ |
 | [`Kasten-K10AddOn`](./kasten-k10.md)                          | Kasten K10 add-on installs Kasten K10 into your Amazon EKS cluster. | ✅ | 
 | [`KedaAddOn`](./keda.md)                                      | Installs [Keda](https://github.com/kedacore/keda) into EKS cluster. | ✅ | ✅ |
@@ -52,6 +54,7 @@ The framework currently supports the following add-ons.
 | [`KonveyorAddOn`](https://github.com/claranet-ch/konveyor-eks-blueprint-addon)    | Adds [Konveyor](https://www.konveyor.io/) to the EKS Cluster.                                                         | ✅ | ✅ |
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.                                                  | ✅ |               
 | [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                | ✅ | 
+| [`KubeRayAddOn`](./kuberay-operator.md)                      | Installs the [KubeRay Operator](https://docs.ray.io/en/latest/cluster/kubernetes/index.html).                                                                        | ✅ | ✅ | 
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |  ✅ | 
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                         | ✅ | ✅ |
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         | ✅ | ✅ |
@@ -59,7 +62,8 @@ The framework currently supports the following add-ons.
 | [`MetricsServerAddOn`](./metrics-server.md)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      | ✅ | ✅ |
 | [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               | ✅ | 
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller  | ✅ | ✅ |                                                                                                        |
-| [`NeuronAddOn`](./neuron-plugin-addon.md)                                             | Adds Neuron Addon  | ✅ |  | 
+| [`NeuronDevicePluginAddOn`](./neuron-device-plugin-addon.md)                                             | Adds Neuron Device Plugin Addon  | ✅ |  |
+| [`NeuronMonitorAddOn`](./neuron-monitor-addon.md)                                             | Adds Neuron Monitor Addon  | ✅ |  | 
 | [`OpaGatekeeperAddOn`](./opa-gatekeeper.md)                            | Adds OPA Gatekeeper                                                                                                                    | ✅ | ✅ |
 | [`ParalusAddOn`](./paralus.md)                            | Adds [Paralus](https://paralus.io/)                                                                                                                   | ✅ | ✅ |
 | [`PixieAddOn`](./pixie.md)                                             | Adds [Pixie](https://px.dev) to the EKS Cluster. Pixie provides auto-telemetry for requests, metrics, application profiles, and more.  | ✅ | 

@@ -46,26 +46,49 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-> Pattern # 3 : This installs AWS Controller for Kubernetes for RDS ACK controller with user specified values. After Installing this RDS ACK Controller, the instructions in [Provision ACK Resource](https://www.eksworkshop.com/docs/automation/controlplanes/ack/provision-resources) can be used to provision Amazon RDS database using the RDS ACK controller as an example.
+> Pattern # 3 : This installs AWS Controller for Kubernetes for S3 ACK controller with user specified values. After Installing this S3 ACK Controller, the instructions in [Provision ACK Resource](https://www.eksworkshop.com/docs/automation/controlplanes/ack/provision-resources) can be used to provision Amazon S3 resources using the S3 ACK controller as an example.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.AckAddOn({
-  id: "rds-ack",
-  serviceName: AckServiceName.RDS,
-  name: "rds-chart",
-  chart: "rds-chart",
+  id: "s3-ack",
+  serviceName: AckServiceName.S3,
+  name: "s3-chart",
+  chart: "s3-chart",
   version: "v0.1.1",
-  release: "rds-chart",
-  repository: "oci://public.ecr.aws/aws-controllers-k8s/rds-chart",
-  managedPolicyName: "AmazonRDSFullAccess",
+  release: "s3-chart",
+  repository: "oci://public.ecr.aws/aws-controllers-k8s/s3-chart",
+  managedPolicyName: "AmazonS3FullAccess",
+  inlinePolicyStatements: [
+    iam.PolicyStatement.fromJson({
+      "Sid": "S3AllPermission",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*",
+        "s3-object-lambda:*"
+      ],
+      "Resource": "*"
+    }),
+    iam.PolicyStatement.fromJson({
+      "Sid": "S3ReplicationPassRole",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "s3.amazonaws.com"
+        }
+      },
+      "Action": "iam:PassRole",
+      "Resource": "*",
+      "Effect": "Allow"
+    })
+  ],
   createNamespace: false,
-  saName: "rds-chart"
-}),
+  saName: "s3-chart"
+})
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")
@@ -83,6 +106,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 - `release`: Release Name of the ACK Chart
 - `repository`: Repository URI of the specific ACK Chart
 - `managedPolicyName`: Policy Name required to be added to the IAM role for that ACK
+- `inlinePolicyStatements`: Inline Policy Statements required to be added to the IAM role for that ACK
 - `createNamespace`: (boolean) This should be false if you are using for the second time
 - `saName` : Name to create the service account.
 - `values`: Arbitrary values to pass to the chart

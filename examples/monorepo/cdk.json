@@ -1,0 +1,10 @@
+{
+    "app": "npx ts-node bin/main.ts",
+    "context": {
+        "eks.default.vpc": null,
+        "eks.default.min-size": 1,
+        "eks.default.max-size": 2,
+        "eks.default.desired-size": 1,
+        "eks.default.private-cluster": "false"
+    }
+}
