@@ -290,9 +290,16 @@ export interface VpcCniAddOnProps {
   enableNetworkPolicy?: boolean;
 
   /**
+   * Enable windows support for your cluster
+   * 
+   */
+  enableWindowsIpam?: boolean;
+
+  /**
    * Version of the add-on to use. Must match the version of the cluster where it
    * will be deployed.
    */
+
   version?: string;
 }
 
@@ -436,7 +443,8 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       WARM_IP_TARGET: props?.warmIpTarget,
       WARM_PREFIX_TARGET: props?.warmPrefixTarget,
     },
-    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy)
+    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
+    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam)
   };
 
   // clean up all undefined
