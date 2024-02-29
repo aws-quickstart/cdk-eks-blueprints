@@ -49,7 +49,7 @@ Custom values to pass to the chart. Config options: https://github.com/kubecost/
 #### `customPrometheus: string` (optional)
 
 Kubecost comes bundled with a Prometheus installation. However, if you wish to integrate with an external Prometheus deployment, provide your local Prometheus service address with this format `http://..svc`.
-Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/install-and-configure/install
+Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/install-and-configure/advanced-configuration/custom-prom
 
 #### `installPrometheusNodeExporter: boolean` (optional)
 

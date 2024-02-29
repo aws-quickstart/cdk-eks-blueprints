@@ -47,8 +47,10 @@ export * from './keda';
 export * from './kubevious';
 export * from './ebs-csi-driver';
 export * from './efs-csi-driver';
-export * from './istio-base';
-export * from './istio-control-plane';
+export * from './istio-addons/istio-base';
+export * from './istio-addons/istio-control-plane';
+export * from './istio-addons/istio-cni';
+export * from './istio-addons/istio-ingress-gateway';
 export * from './knative-operator';
 export * from './jupyterhub';
 export * from './emr-on-eks';
@@ -57,6 +59,7 @@ export * from './upbound-universal-crossplane';
 export * from './apache-airflow';
 export * from './neuron';
 export * from './eks-pod-identity-agent';
+export * from './neuron';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
