@@ -18,8 +18,8 @@ export interface CsiSecretProps {
     secretProvider: SecretProvider;
 
     /**
-     * For secrets containing JSON structure, an optional JMES Path (https://jmespath.org/) object to decompose individual keys as separate 
-     * secret object data. 
+     * For secrets containing JSON structure, an optional JMES Path (https://jmespath.org/) object to decompose individual keys as separate
+     * secret object data.
      */
     jmesPath?: JmesPathObject[];
 
@@ -45,6 +45,11 @@ export interface KubernetesSecret {
     secretName: string;
 
     /**
+     * An alias for the AWS secret once it is synced as a Kubernetes secret.
+     */
+    secretAlias?: string;
+
+    /**
      * Type of Kubernetes Secret
      */
     type?: KubernetesSecretType
@@ -66,7 +71,7 @@ export interface KubernetesSecret {
 interface KubernetesSecretObjectData {
 
     /**
-     * Name of the AWS Secret that is syncd
+     * Name of the AWS Secret that is synced
      */
     objectName?: string;
 
@@ -95,13 +100,15 @@ export enum KubernetesSecretType {
 interface ParameterObject {
     objectName: string;
     objectType: string;
+    objectAlias?: string;
     jmesPath?: JmesPathObject[];
 }
 
-function createParameterObject(csiSecret: CsiSecretProps, secretName: string, secretType: AwsSecretType) {
+function createParameterObject(csiSecret: CsiSecretProps, secretName: string, secretType: AwsSecretType, secretAlias?: string) {
     const result: ParameterObject = {
         objectName: secretName,
         objectType: secretType,
+        objectAlias: secretAlias,
     };
     if (csiSecret.jmesPath) {
         result.jmesPath = csiSecret.jmesPath;
@@ -158,7 +165,7 @@ export class SecretProviderClass {
 
     /**
      * Setup CSI secrets
-     * @param clusterInfo 
+     * @param clusterInfo
      */
     protected setupSecrets(): Promise<Construct> {
         const secretsDriverPromise = this.clusterInfo.getScheduledAddOn(SecretsStoreAddOn.name);
@@ -184,18 +191,19 @@ export class SecretProviderClass {
             let kubernetesSecret: KubernetesSecret;
             let secretName: string;
             const secret: ISecret | IStringParameter = csiSecret.secretProvider.provide(this.clusterInfo);
+            const secretAlias: string | undefined = csiSecret.kubernetesSecret?.secretAlias;
 
             if (Object.hasOwnProperty.call(secret, 'secretArn')) {
                 const secretManagerSecret = secret as ISecret;
                 secretName = secretManagerSecret.secretName;
-                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SECRETSMANAGER);
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SECRETSMANAGER, secretAlias);
                 this.parameterObjects.push(parameterObject);
                 secretManagerSecret.grantRead(this.serviceAccount);
             }
             else {
                 const ssmSecret = secret as IStringParameter;
                 secretName = ssmSecret.parameterName;
-                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SSMPARAMETER);
+                const parameterObject = createParameterObject(csiSecret, secretName, AwsSecretType.SSMPARAMETER, secretAlias);
                 this.parameterObjects.push(parameterObject);
                 ssmSecret.grantRead(this.serviceAccount);
             }
