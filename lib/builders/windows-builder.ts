@@ -121,27 +121,34 @@ const defaultOptions: WindowsOptions = {
 
 const defaultKarpenterProps: addons.KarpenterAddOnProps = {
     version: "v0.31.3",
-    requirements: [
-        { key: 'kubernetes.io/os', op: 'In', vals: ['windows']},
-    ],
-    //subnetTags: {
-        //"Name": `${stackID}/${stackID}-vpc/Private*`,
-    //},
-    //securityGroupTags: {
-        //[`kubernetes.io/cluster/${stackID}`]: "owned",
-    //},
-    consolidation: { enabled: true },
-    ttlSecondsUntilExpired: 2592000,
-    weight: 20,
-    interruptionHandling: true,
-    taints: [
-        {
+    NodePoolSpec: {
+        labels: {
+            type: "karpenter-test"
+        },
+        annotations: {
+            "eks-blueprints/owner": "young"
+        },
+        taints: [{
             key: "os",
             value: "windows",
             effect: "NoSchedule"
+        }],
+        requirements: [
+            { key: 'kubernetes.io/os', operator: 'In', values: ['windows'] },
+        ],
+        disruption: {
+            consolidationPolicy: "WhenEmpty",
+            consolidateAfter: "30s",
+            expireAfter: "20m",
+            budgets: [{nodes: "10%"}]
         }
-    ],
-    amiFamily: "Windows2022"
+    },
+    // EC2NodeClassSpec: {
+    //     amiFamily: "Windows2022",
+    //     subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
+    //     securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
+    // },
+    interruptionHandling: true,
 };
 
 /**
@@ -195,7 +202,7 @@ export class WindowsBuilder extends BlueprintBuilder {
     public enableKarpenter(): WindowsBuilder {
         return this.addOns(
             new addons.KarpenterAddOn(this.karpenterProps)
-        )
+        );
     }
 
     public withKarpenterProps(props:addons.KarpenterAddOnProps) : this {
@@ -249,7 +256,7 @@ function getInstanceType(nodegroupOptions: eks.NodegroupOptions, windowsOptions:
 function buildGenericNodeGroup(options: WindowsOptions, overrideOptions?: eks.NodegroupOptions): clusterproviders.ManagedNodeGroup {
 
     let currentOptions = options.genericNodeGroupOptions;
-    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions) }
+    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions) };
 
     return {
         id: currentOptions.nodegroupName || "",

@@ -41,7 +41,7 @@ const defaultReq: reqValues = [
         operator: "In",
         values: ["spot", "on-demand"]
     }
-]
+];
 
 describe('Unit tests for Karpenter addon', () => {
 
@@ -83,7 +83,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
-                "version": "0.20.1"
+                "version": "v0.20.1"
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -102,7 +102,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
-                version: '0.30.2'
+                version: 'v0.30.2'
             }))
             .teams(new blueprints.PlatformTeam({ name: 'platform' }));
 
@@ -110,6 +110,66 @@ describe('Unit tests for Karpenter addon', () => {
         expect(warningLog).toHaveBeenCalled();
         expect(warningLog).toHaveBeenCalledTimes(1);
         expect(warningLog).toHaveBeenCalledWith('Please use minimum Karpenter version for this Kubernetes Version: 0.31.0, otherwise you will run into compatibility issues.');
+    });
+
+    test("Stack creation fails due to providing Detailed Monitoring in non-supported Karpenter version", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_24)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: "v0.21.0",
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                },
+                EC2NodeClassSpec: {
+                    amiFamily: "AL2",
+                    subnetSelector: {
+                        "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                    },
+                    securityGroupSelector: {
+                        "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+                    },
+                    detailedMonitoring: true
+                }
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-old-consolidation-features');
+        }).toThrow("Detailed Monitoring is not available in this version of Karpenter. Please upgrade to at least 0.23.0.");
+        
+    });
+
+    test("Stack creation fails due to disruption budget prop provided in non-supported Karpenter version", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_28)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: "v0.33.0",
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                    ttlSecondsAfterEmpty: 30,
+                    disruption: {
+                        consolidationPolicy: "WhenEmpty",
+                        consolidateAfter: "20m",
+                        expireAfter: "20m",
+                        budgets: [
+                            {nodes: "20%"}
+                        ]
+                    }
+                },
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-old-consolidation-features');
+        }).toThrow("You cannot set disruption budgets for this version of Karpenter. Please upgrade to 0.34.0 or higher.");
     });
 
     test("Stack creation fails due to non-existing consolidation props", () => {
@@ -120,7 +180,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
-                version: "0.34.1",
+                version: "v0.34.1",
                 NodePoolSpec: {
                     requirements: defaultReq,
                     ttlSecondsAfterEmpty: 30,
@@ -165,7 +225,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version(KubernetesVersion.V1_25)
             .addOns(new blueprints.KarpenterAddOn({
-                version: "0.28.0",
+                version: "v0.28.0",
                 NodePoolSpec: {
                     requirements: defaultReq,
                     disruption: {},
@@ -178,8 +238,33 @@ describe('Unit tests for Karpenter addon', () => {
         }).toThrow("Disruption configuration is only supported on versions v0.32.0 and later.");
     });
 
-    test("", () => {
+    test("Stack creation fails due to unprovided AMI Family for Beta CRD EC2NodeClass", () => {
+        const app = new cdk.App();
 
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_25)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: "v0.34.1",
+                NodePoolSpec: {
+                    requirements: defaultReq,
+                    disruption: {},
+                },
+                EC2NodeClassSpec: {
+                    subnetSelectorTerms: [{
+                        tags: { "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1" }
+                    }],
+                    securityGroupSelectorTerms: [{
+                        tags: { "kubernetes.io/cluster/blueprint-construct-dev": "owned" }
+                    }],
+                }
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        expect(()=> {
+            blueprint.build(app, 'stack-with-missing-ami-family-in-node-class');
+        }).toThrow("Please provide the AMI Family for your EC2NodeClass.");
     });
 
     test("", () => {
@@ -304,23 +389,25 @@ describe('Unit tests for Karpenter addon', () => {
         };
 
         const stack = await blueprint
-            .version("auto")
+            .version(KubernetesVersion.V1_28)
             .account("123567891")
             .region("us-west-1")
             .addOns(
                 new blueprints.KarpenterAddOn({
-                NodePoolSpec: {
-                    requirements: defaultReq
-                },
-                EC2NodeClassSpec: {
-                    subnetTags: {
-                        "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                    version: "v0.31.0",
+                    NodePoolSpec: {
+                        requirements: defaultReq
                     },
-                    securityGroupTags: {
-                        "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-                    },
-                    blockDeviceMappings: [blockDeviceMapping] 
-                }
+                    EC2NodeClassSpec: {
+                        amiFamily: "AL2",
+                        subnetSelector: {
+                            "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
+                        },
+                        securityGroupSelector: {
+                            "kubernetes.io/cluster/blueprint-construct-dev": "owned",
+                        },
+                        blockDeviceMappings: [blockDeviceMapping] 
+                    }
             })
           )
           .buildAsync(app, "stack-with-values-overrides-blockdevicemapping");
@@ -330,14 +417,14 @@ describe('Unit tests for Karpenter addon', () => {
         const nodeClass = Object.values(karpenterResources).find((karpenterResource) => {
             if (karpenterResource?.Properties?.Manifest) {
                 const manifest = karpenterResource.Properties.Manifest;
-                if (typeof manifest === "string" && manifest.includes('"kind":"EC2NodeClass"')) { 
+                if (typeof manifest === "string" && manifest.includes('"kind":"AWSNodeTemplate"')) { 
                     return true;
                 }
             }
             return false;
         });
         const manifest = JSON.parse(nodeClass?.Properties?.Manifest)[0];
-        expect(manifest.kind).toEqual('EC2NodeClass');
+        expect(manifest.kind).toEqual('AWSNodeTemplate');
         expect(manifest.spec.blockDeviceMappings).toBeDefined();
         expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
         expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);

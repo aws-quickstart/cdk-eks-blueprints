@@ -39,7 +39,7 @@ export type reqValues = {
  */
 export type Taint = {
     key: string,
-    value: string,
+    value?: string,
     effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
 };
 
