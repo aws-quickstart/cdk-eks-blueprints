@@ -29,6 +29,7 @@ export * from './helm-addon';
 export * from './karpenter';
 export * from './kube-proxy';
 export * from './kube-state-metrics';
+export * from './kuberay';
 export * from './metrics-server';
 export * from './nested-stack';
 export * from './nginx';

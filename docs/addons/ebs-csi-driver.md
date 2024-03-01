@@ -21,15 +21,16 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.EbsCsiDriverAddOn({
-        kmsKeys: [
-          blueprints.getResource(
-            (context) =>
-              new kms.Key(context.scope, "ebs-csi-driver-key", {
-                alias: "ebs-csi-driver-key",
-              })
-          ),
-        ],
-      }),
+                addOnName: "aws-ebs-csi-driver",
+                version: "auto",
+                versionMap: versionMap,
+                saName: "ebs-csi-controller-sa", 
+                kmsKeys: [
+                  blueprints.getResource( context => new kms.Key(context.scope, "ebs-csi-driver-key", { alias: "ebs-csi-driver-key"})),
+                ],
+                storageClass: "gp3"
+              }
+            )
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")
@@ -40,6 +41,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
 - `version`: Version of the EBS CSI Driver add-on to be installed. The version must be compatible with kubernetes cluster version.
+- `storageClass`: Storage Class type for AWS EBS Volumes, example: gp2, gp3
 
 ```bash
 # Command to show versions of the EBS CSI Driver add-on available for cluster version is 1.20
@@ -66,6 +68,17 @@ ebs-csi-controller-95848f4d9-m4f54   4/4     Running   0          4m38s
 ebs-csi-node-c9xdf                   3/3     Running   0          5m8s
 
 
+```
+
+To validate, storageClass type and default across cluster:
+```bash
+kubectl get storageclass
+
+# Output
+NAME                PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+apache-airflow-sc   efs.csi.aws.com         Delete          Immediate              false                  5d8h
+gp2                 kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   false                  5d8h
+gp3 (default)       ebs.csi.aws.com         Delete          WaitForFirstConsumer   false                  163m
 ```
 
 Additionally, the `aws cli` can be used to determine which version of the add-on is installed in the cluster
