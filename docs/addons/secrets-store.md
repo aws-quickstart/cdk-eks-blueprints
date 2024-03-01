@@ -69,6 +69,24 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 The AWS Secrets Manger and Config Provider provides compatibility for legacy applications that access secrets as mounted files in the pod. Security conscious applications should use the native AWS APIs to fetch secrets and optionally cache them in memory rather than storing them in the file system.
 
+## Renaming Mounted Kubernetes Secrets
+
+By default, mounted Kubernetes Secrets inherit the name of their corresponding AWS Secret or SSM Parameter. If the AWS Secret or Parameter name contains slashes ("/" or "\"), they will be replaced by underscores by the CSI Driver.  
+
+This can result in undesirable secret names being mounted to your pods, so as a workaround the driver also offers an aliasing feature.
+
+```typescript
+{
+    secretProvider: new blueprints.LookupSsmSecretByAttrs('/path/to/my/parameter', 1),
+    kubernetesSecret: {
+        secretName: 'my_parameter', // not respected when mounting the secret directly to the pod, and will result in sync errors during pod init
+        secretAlias: 'my_parameter', // respected during mounting. File will be called "my_parameter" instead of "_path_to_my_parameter"
+    }
+}
+```
+
+NOTE: `secretAlias` is only applicable to secrets that are **mounted** to a pod. In these scenarios, `secretName` should match the name of the Secret or Parameter in AWS.
+
 ## Example
 
 After the Blueprint stack is deployed you can test consuming the secret from within a `deployment`.
