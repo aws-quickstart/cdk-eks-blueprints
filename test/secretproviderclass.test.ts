@@ -23,6 +23,7 @@ class TestSecretAddon implements ClusterAddOn {
         );
     }
 }
+
 describe('Unit tests for SecretProviderClass', () => {
 
     test("SecretProviderClass contains objectAlas when configured.", async () => {
