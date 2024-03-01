@@ -108,10 +108,12 @@ function createParameterObject(csiSecret: CsiSecretProps, secretName: string, se
     const result: ParameterObject = {
         objectName: secretName,
         objectType: secretType,
-        objectAlias: secretAlias,
     };
     if (csiSecret.jmesPath) {
         result.jmesPath = csiSecret.jmesPath;
+    }
+    if (secretAlias) {
+        result.objectAlias = secretAlias;
     }
     return result;
 }
