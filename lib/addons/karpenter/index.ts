@@ -96,7 +96,7 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
          * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
          * deploy a Provisioner with default values.
          */
-        requirements: reqValues,
+        requirements?: reqValues,
 
         /**
          * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
@@ -212,6 +212,12 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
          * Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
          */
         amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
+        
+        /**
+         * Optional field to control how instance store volumes are handled. Set it to RAID0
+         * for faster ephemeral storage
+         */
+        instanceStorePolicy?: "RAID0"
 
         /**
          * Optional user provided UserData applied to the worker nodes,
@@ -323,6 +329,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const amiFamily = this.options.EC2NodeClassSpec?.amiFamily;
         const amiSelector = this.options.EC2NodeClassSpec?.amiSelector || {};
         const amiSelectorTerms = this.options.EC2NodeClassSpec?.amiSelectorTerms;
+        const instanceStorePolicy = this.options.EC2NodeClassSpec?.instanceStorePolicy || "";
         const userData = this.options.EC2NodeClassSpec?.userData || "";
         const instanceProf = this.options.EC2NodeClassSpec?.instanceProfile; 
         const tags = this.options.EC2NodeClassSpec?.tags || {};
@@ -548,6 +555,11 @@ export class KarpenterAddOn extends HelmAddOn {
                         ec2Node = merge(ec2Node, { spec: { instanceProfile: instanceProf }});
                     } else {
                         ec2Node = merge(ec2Node, { spec: { role: karpenterNodeRole.roleName }});
+                    }
+
+                    // Instance Store Policy added for v0.34.0 and up
+                    if (semver.gte(version, '0.34.0')){
+                        ec2Node = merge(ec2Node, { spec: { instanceStorePolicy: instanceStorePolicy }});
                     }
                 } else {
                     ec2Node = {

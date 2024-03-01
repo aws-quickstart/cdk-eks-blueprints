@@ -256,7 +256,7 @@ function getInstanceType(nodegroupOptions: eks.NodegroupOptions, windowsOptions:
 function buildGenericNodeGroup(options: WindowsOptions, overrideOptions?: eks.NodegroupOptions): clusterproviders.ManagedNodeGroup {
 
     let currentOptions = options.genericNodeGroupOptions;
-    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions) };
+    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions); }
 
     return {
         id: currentOptions.nodegroupName || "",
