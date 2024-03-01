@@ -113,39 +113,37 @@ export default class BlueprintConstruct {
                 serviceName: blueprints.AckServiceName.S3
             }),
             new blueprints.addons.KarpenterAddOn({
-                requirements: [
-                    { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-                    { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
-                    { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-                    { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot']},
-                ],
-                subnetTags: {
-                    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-                },
-                securityGroupTags: {
-                    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-                },
-                taints: [{
-                    key: "workload",
-                    value: "test",
-                    effect: "NoSchedule",
-                }],
-                amiSelector: {
-                    "karpenter.sh/discovery/MyClusterName": '*',
-                },
-                consolidation: { enabled: true },
-                ttlSecondsUntilExpired: 2592000,
-                weight: 20,
-                interruptionHandling: true,
-                limits: {
-                    resources: {
-                        cpu: 20,
-                        memory: "64Gi",
+                version: "v0.33.2",
+                NodePoolSpec: {
+                    labels: {
+                        type: "karpenter-test"
+                    },
+                    annotations: {
+                        "eks-blueprints/owner": "young"
+                    },
+                    taints: [{
+                        key: "workload",
+                        value: "test",
+                        effect: "NoSchedule",
+                    }],
+                    requirements: [
+                        { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.2xlarge'] },
+                        { key: 'topology.kubernetes.io/zone', operator: 'In', values: [`${props?.env?.region}a`,`${props?.env?.region}b`]},
+                        { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
+                        { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['spot']},
+                    ],
+                    disruption: {
+                        consolidationPolicy: "WhenEmpty",
+                        consolidateAfter: "30s",
+                        expireAfter: "20m",
                     }
                 },
-                tags: {
-                    schedule: 'always-on'
-                }
+                EC2NodeClassSpec: {
+                    amiFamily: "AL2",
+                    subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
+                    securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
+                },
+                interruptionHandling: true,
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
