@@ -1,6 +1,6 @@
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";

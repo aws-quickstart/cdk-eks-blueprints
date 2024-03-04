@@ -1,6 +1,6 @@
 // lib/certmanager_addon.ts
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & PrometheusNodeExporterAddOnProps = {
   name: "prometheus-node-exporter",
   namespace: "prometheus-node-exporter",
   chart: "prometheus-node-exporter",
-  version: "4.24.0",
+  version: "4.30.3",
   release: "prometheus-node-exporter",
   repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},

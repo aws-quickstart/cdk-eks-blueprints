@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";

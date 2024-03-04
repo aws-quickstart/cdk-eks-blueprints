@@ -418,7 +418,7 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+export function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng4-inferentia",

@@ -1,6 +1,6 @@
 import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { AwsLoadBalancerControllerAddOn } from "..";
 import { ClusterInfo, Values } from "../../spi";
 import { dependable, supportsALL } from "../../utils";
@@ -61,7 +61,7 @@ const defaultProps: NginxAddOnProps = {
     name: "nginx-ingress",
     chart: "nginx-ingress",
     release: "blueprints-addon-nginx",
-    version: "1.0.2",
+    version: "1.1.3",
     repository: "https://helm.nginx.com/stable",
     backendProtocol: 'tcp',
     crossZoneEnabled: true,

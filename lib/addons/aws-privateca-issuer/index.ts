@@ -1,7 +1,7 @@
 // lib/kubevious_addon.ts
 import { Construct } from 'constructs';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { dependable, setPath, createNamespace, supportsX86 } from '../../utils';
@@ -30,7 +30,7 @@ const defaultProps: HelmAddOnProps & AWSPrivateCAIssuerAddonProps = {
   name: "blueprints-aws-pca-issuer-addon",
   chart: "aws-privateca-issuer",
   namespace:"aws-pca-issuer",
-  version: "1.2.6",
+  version: "1.2.7",
   release: "aws-pca-issuer",
   repository:  "https://cert-manager.github.io/aws-privateca-issuer",
   values: {},

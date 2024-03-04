@@ -2,11 +2,11 @@ import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace } from "../../utils/namespace-utils";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { Duration } from "aws-cdk-lib";
 import { supportsALL } from "../../utils";
 
-export const ISTIO_VERSION = "1.20.1";
+export const ISTIO_VERSION = "1.20.3";
 
 /**
  * Configuration options for the add-on.

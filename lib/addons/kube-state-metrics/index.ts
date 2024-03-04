@@ -1,6 +1,6 @@
 // lib/certmanager_addon.ts
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & KubeStateMetricsAddOnProps = {
   name: "kube-state-metrics",
   namespace: "kube-system",
   chart: "kube-state-metrics",
-  version: "5.15.2",
+  version: "5.16.2",
   release: "kube-state-metrics",
   repository:  "https://prometheus-community.github.io/helm-charts",
   values: {},

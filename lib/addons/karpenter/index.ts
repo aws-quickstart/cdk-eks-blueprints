@@ -1,6 +1,6 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import merge from 'ts-deepmerge';
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values, Taint } from '../../spi';
 import { conflictsWith, createNamespace, createServiceAccount, setPath, supportsALL, } from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
