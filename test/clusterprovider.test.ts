@@ -7,9 +7,12 @@ import { SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import * as blueprints from '../lib';
 import { AsgClusterProvider, MngClusterProvider } from '../lib';
+import { logger } from '../lib/utils';
+import { isToken } from '../lib/utils/id-utils';
 
 const addAutoScalingGroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addAutoScalingGroupCapacity');
 const addNodegroupCapacityMock = jest.spyOn(eks.Cluster.prototype, 'addNodegroupCapacity');
+logger.settings.minLevel = 3;
 
 test("Generic cluster provider correctly registers managed node groups", async () => {
     const app = new cdk.App();
@@ -340,4 +343,20 @@ test("Kubernetes Version gets set correctly in NodeGroup", () => {
     .build(app, "stack-auto");
 
     expect(stack.getClusterInfo().version.version).toBe("1.28");
+});
+
+test("Import cluster provider can use output values from other stacks as params", () => {
+    const importClusterProvider = new blueprints.ImportClusterProvider({
+        clusterName: cdk.Fn.importValue('ClusterName'),
+        version: KubernetesVersion.V1_27,
+        clusterEndpoint: cdk.Fn.importValue('ClusterEndpoint'),
+        openIdConnectProvider: blueprints.getResource((context) =>
+          new blueprints.LookupOpenIdConnectProvider(
+            'classified',
+          ).provide(context),
+        ),
+        kubectlRoleArn: cdk.Fn.importValue('KubectlRoleArn'),
+        clusterSecurityGroupId: cdk.Fn.importValue('ClusterSecurityGroupId'),
+      });
+      expect(isToken(importClusterProvider.id)).toBeFalsy();
 });

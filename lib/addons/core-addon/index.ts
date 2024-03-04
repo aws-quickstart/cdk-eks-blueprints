@@ -1,7 +1,7 @@
 import { CfnAddon, FargateCluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { ClusterAddOn } from "../..";
 import { ClusterInfo, Values } from "../../spi";
-import { Construct } from "constructs";
+import { Construct, IConstruct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
@@ -72,12 +72,18 @@ export class CoreAddOn implements ClusterAddOn {
             saNamespace = this.coreAddOnProps.namespace;
         }
 
+        const ns = this.createNamespace(clusterInfo, saNamespace);
+
         // Create a service account if user provides namespace, PolicyDocument
         const policies = this.provideManagedPolicies(clusterInfo);
         if (policies) {
             serviceAccount = this.createServiceAccount(clusterInfo, saNamespace, policies);
             serviceAccountRoleArn = serviceAccount.role.roleArn;
+            if(ns) {
+                serviceAccount.node.addDependency(ns);
+            }
         }
+
         let version: string = this.coreAddOnProps.version;
 
         if (this.coreAddOnProps.version === "auto") {
@@ -97,6 +103,9 @@ export class CoreAddOn implements ClusterAddOn {
         if (serviceAccount) {
             cfnAddon.node.addDependency(serviceAccount);
         }
+        else if(ns) {
+            cfnAddon.node.addDependency(ns);
+        }
 
         if(this.coreAddOnProps.controlPlaneAddOn) {
             deployBeforeCapacity(cfnAddon, clusterInfo);
@@ -113,6 +122,25 @@ export class CoreAddOn implements ClusterAddOn {
         return Promise.resolve(cfnAddon);
     }
 
+    /**
+     * Override this method to create namespace for the core addon. In many cases the addon is created in the kube-system namespace
+     * which does not require creation as it is always there. 
+     * For addons that support other namespace as destinations this method should be implemented.
+     * @param clusterInfo 
+     * @param name 
+     * @returns 
+     */
+    createNamespace(_clusterInfo: ClusterInfo, _namespaceName: string): IConstruct | undefined {
+        return undefined;
+    }
+
+    /**
+     * Override this method to control how service account is created.
+     * @param clusterInfo 
+     * @param saNamespace 
+     * @param policies 
+     * @returns 
+     */
     createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, policies: IManagedPolicy[]): ServiceAccount {
         return createServiceAccountWithPolicy(clusterInfo.cluster, this.coreAddOnProps.saName,
             saNamespace, ...policies);
