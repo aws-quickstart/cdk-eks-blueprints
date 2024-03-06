@@ -47,12 +47,6 @@ export class AdotCollectorAddOn extends CoreAddOn {
     }
     @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
-        if (semverComparator("0.88",this.coreAddOnProps.version)) {
-            console.log("Used Adot Addon Version is Valid");
-        } 
-        else {
-            throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
-        }
         
         const addOnPromise = super.deploy(clusterInfo);
         return addOnPromise;
