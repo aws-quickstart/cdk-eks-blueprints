@@ -5,7 +5,6 @@ import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } 
 import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
-import { semverComparator } from "../helm-addon/helm-version-checker";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
