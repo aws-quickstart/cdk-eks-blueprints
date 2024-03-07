@@ -195,7 +195,7 @@ export class WindowsBuilder extends BlueprintBuilder {
     public enableKarpenter(): WindowsBuilder {
         return this.addOns(
             new addons.KarpenterAddOn(this.karpenterProps)
-        )
+        );
     }
 
     public withKarpenterProps(props:addons.KarpenterAddOnProps) : this {
@@ -249,7 +249,7 @@ function getInstanceType(nodegroupOptions: eks.NodegroupOptions, windowsOptions:
 function buildGenericNodeGroup(options: WindowsOptions, overrideOptions?: eks.NodegroupOptions): clusterproviders.ManagedNodeGroup {
 
     let currentOptions = options.genericNodeGroupOptions;
-    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions) }
+    if ( overrideOptions ) { currentOptions = merge(options.genericNodeGroupOptions, overrideOptions); }
 
     return {
         id: currentOptions.nodegroupName || "",

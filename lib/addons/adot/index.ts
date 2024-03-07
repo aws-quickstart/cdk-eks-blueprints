@@ -5,7 +5,6 @@ import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } 
 import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
-import { semverComparator } from "../helm-addon/helm-version-checker";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
@@ -47,12 +46,6 @@ export class AdotCollectorAddOn extends CoreAddOn {
     }
     @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
-        if (semverComparator("0.88",this.coreAddOnProps.version)) {
-            console.log("Used Adot Addon Version is Valid");
-        } 
-        else {
-            throw new Error(`Adot Addon Version is not Valid and greater than 0.88.0`);
-        }
         
         const addOnPromise = super.deploy(clusterInfo);
         return addOnPromise;
