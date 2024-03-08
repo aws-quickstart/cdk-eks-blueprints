@@ -69,7 +69,7 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * A single nodepool is capable of managing a diverse set of nodes. 
      * Node properties are determined from a combination of nodepool and pod scheduling constraints.
      */
-    NodePoolSpec?: {
+    nodePoolSpec?: {
         /**
          * Labels applied to all nodes
          */
@@ -172,7 +172,7 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * This is the top level spec for the AWS Karpenter Provider
      * It contains configuration necessary to launch instances in AWS. 
      */
-    EC2NodeClassSpec?: {
+    ec2NodeClassSpec?: {
         /**
          * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
          * Required for Alpha CRDS
@@ -309,45 +309,45 @@ export class KarpenterAddOn extends HelmAddOn {
         const interruption = this.options.interruptionHandling || false;
 
         // NodePool variables
-        const labels = this.options.NodePoolSpec?.labels || {};
-        const annotations = this.options.NodePoolSpec?.annotations || {};
-        const taints = this.options.NodePoolSpec?.taints || [];
-        const startupTaints = this.options.NodePoolSpec?.startupTaints || [];
-        const requirements = this.options.NodePoolSpec?.requirements || [];
-        const consol = this.options.NodePoolSpec?.consolidation || null;
-        const ttlSecondsAfterEmpty = this.options.NodePoolSpec?.ttlSecondsAfterEmpty || null;
-        const ttlSecondsUntilExpired = this.options.NodePoolSpec?.ttlSecondsUntilExpired || null;
-        const disruption = this.options.NodePoolSpec?.disruption || null;
-        const limits = this.options.NodePoolSpec?.limits || null;
-        const weight = this.options.NodePoolSpec?.weight || null;
+        const labels = this.options.nodePoolSpec?.labels || {};
+        const annotations = this.options.nodePoolSpec?.annotations || {};
+        const taints = this.options.nodePoolSpec?.taints || [];
+        const startupTaints = this.options.nodePoolSpec?.startupTaints || [];
+        const requirements = this.options.nodePoolSpec?.requirements || [];
+        const consol = this.options.nodePoolSpec?.consolidation || null;
+        const ttlSecondsAfterEmpty = this.options.nodePoolSpec?.ttlSecondsAfterEmpty || null;
+        const ttlSecondsUntilExpired = this.options.nodePoolSpec?.ttlSecondsUntilExpired || null;
+        const disruption = this.options.nodePoolSpec?.disruption || null;
+        const limits = this.options.nodePoolSpec?.limits || null;
+        const weight = this.options.nodePoolSpec?.weight || null;
 
         // NodeClass variables
-        const subnetSelector = this.options.EC2NodeClassSpec?.subnetSelector;
-        const sgSelector = this.options.EC2NodeClassSpec?.securityGroupSelector;
-        const subnetSelectorTerms = this.options.EC2NodeClassSpec?.subnetSelectorTerms;
-        const sgSelectorTerms = this.options.EC2NodeClassSpec?.securityGroupSelectorTerms;
-        const amiFamily = this.options.EC2NodeClassSpec?.amiFamily;
-        const amiSelector = this.options.EC2NodeClassSpec?.amiSelector || {};
-        const amiSelectorTerms = this.options.EC2NodeClassSpec?.amiSelectorTerms;
-        const instanceStorePolicy = this.options.EC2NodeClassSpec?.instanceStorePolicy || "";
-        const userData = this.options.EC2NodeClassSpec?.userData || "";
-        const instanceProf = this.options.EC2NodeClassSpec?.instanceProfile; 
-        const tags = this.options.EC2NodeClassSpec?.tags || {};
-        const metadataOptions = this.options.EC2NodeClassSpec?.metadataOptions || {
+        const subnetSelector = this.options.ec2NodeClassSpec?.subnetSelector;
+        const sgSelector = this.options.ec2NodeClassSpec?.securityGroupSelector;
+        const subnetSelectorTerms = this.options.ec2NodeClassSpec?.subnetSelectorTerms;
+        const sgSelectorTerms = this.options.ec2NodeClassSpec?.securityGroupSelectorTerms;
+        const amiFamily = this.options.ec2NodeClassSpec?.amiFamily;
+        const amiSelector = this.options.ec2NodeClassSpec?.amiSelector || {};
+        const amiSelectorTerms = this.options.ec2NodeClassSpec?.amiSelectorTerms;
+        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || "";
+        const userData = this.options.ec2NodeClassSpec?.userData || "";
+        const instanceProf = this.options.ec2NodeClassSpec?.instanceProfile; 
+        const tags = this.options.ec2NodeClassSpec?.tags || {};
+        const metadataOptions = this.options.ec2NodeClassSpec?.metadataOptions || {
             httpEndpoint: "enabled",
             httpProtocolIPv6: "disabled",
             httpPutResponseHopLimit: 2,
             httpTokens: "required"
         };
-        const blockDeviceMappings = this.options.EC2NodeClassSpec?.blockDeviceMappings || [];
-        const detailedMonitoring = this.options.EC2NodeClassSpec?.detailedMonitoring || false;
+        const blockDeviceMappings = this.options.ec2NodeClassSpec?.blockDeviceMappings || [];
+        const detailedMonitoring = this.options.ec2NodeClassSpec?.detailedMonitoring || false;
         
         // Check Kubernetes and Karpenter version compatibility for warning
         this.isCompatible(version, clusterInfo.version);
 
         // Version feature checks for errors
         this.versionFeatureChecksForError(clusterInfo, version, disruption, consol, ttlSecondsAfterEmpty, ttlSecondsUntilExpired, 
-            this.options.EC2NodeClassSpec, amiFamily);
+            this.options.ec2NodeClassSpec, amiFamily);
 
         // Set up the node role and instance profile
         const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(cluster, stackName, region);
@@ -475,7 +475,7 @@ export class KarpenterAddOn extends HelmAddOn {
         karpenterChart.node.addDependency(ns);
 
         // Deploy Provisioner (Alpha) or NodePool (Beta) CRD based on the Karpenter Version
-        if (this.options.NodePoolSpec){
+        if (this.options.nodePoolSpec){
             let pool;
             if (semver.gte(version, '0.32.0')){
                 pool = {
@@ -528,7 +528,7 @@ export class KarpenterAddOn extends HelmAddOn {
             poolManifest.node.addDependency(karpenterChart);
 
             // Deploy AWSNodeTemplate (Alpha) or EC2NodeClass (Beta) CRD based on the Karpenter Version
-            if (this.options.EC2NodeClassSpec){
+            if (this.options.ec2NodeClassSpec){
                 let ec2Node;
                 if (semver.gte(version, '0.32.0')){
                     ec2Node = {
@@ -625,16 +625,16 @@ export class KarpenterAddOn extends HelmAddOn {
      * @param consolidation consolidation setting available with the Alpha CRDs
      * @param ttlSecondsAfterEmpty ttlSecondsAfterEmpty setting
      * @param ttlSecondsUntilExpired ttlSecondsUntilExpired setting
-     * @param EC2NodeClassSpec Node Class Spec
+     * @param ec2NodeClassSpec Node Class Spec
      * @param amiFamily AMI Family
      * @returns
      */
     private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, disruption: any, consolidation: any, ttlSecondsAfterEmpty: any, ttlSecondsUntilExpired: any, 
-        EC2NodeClassSpec: any, amiFamily: any): void {
+        ec2NodeClassSpec: any, amiFamily: any): void {
         
         // EC2 Detailed Monitoring is only available in versions 0.23.0 and above
-        if (semver.lt(version, '0.23.0') && EC2NodeClassSpec){
-            assert(EC2NodeClassSpec["detailedMonitoring"] === undefined, "Detailed Monitoring is not available in this version of Karpenter. Please upgrade to at least 0.23.0.");
+        if (semver.lt(version, '0.23.0') && ec2NodeClassSpec){
+            assert(ec2NodeClassSpec["detailedMonitoring"] === undefined, "Detailed Monitoring is not available in this version of Karpenter. Please upgrade to at least 0.23.0.");
         }
 
         // Disruption budget should not exist for versions below 0.34.x
@@ -655,10 +655,10 @@ export class KarpenterAddOn extends HelmAddOn {
             }
 
             // AMI Family, Security Group and Subnet terms must be provided, given EC2 NodeSpec
-            if (EC2NodeClassSpec){
+            if (ec2NodeClassSpec){
                 assert(amiFamily !== undefined, "Please provide the AMI Family for your EC2NodeClass.");
-                assert(EC2NodeClassSpec["securityGroupSelectorTerms"] !== undefined, "Please provide SecurityGroupTerm for your EC2NodeClass.");
-                assert(EC2NodeClassSpec["subnetSelectorTerms"] !== undefined, "Please provide subnetGroupTerm for your EC2NodeClass.");
+                assert(ec2NodeClassSpec["securityGroupSelectorTerms"] !== undefined, "Please provide SecurityGroupTerm for your EC2NodeClass.");
+                assert(ec2NodeClassSpec["subnetSelectorTerms"] !== undefined, "Please provide subnetGroupTerm for your EC2NodeClass.");
             }
         }
 
@@ -671,9 +671,9 @@ export class KarpenterAddOn extends HelmAddOn {
             assert(!disruption, 'Disruption configuration is only supported on versions v0.32.0 and later.');
 
             //Security Group and Subnet terms must be provided, given EC2 NodeSpec
-            if (EC2NodeClassSpec){
-                assert(EC2NodeClassSpec["securityGroupSelector"] !== undefined, "Please provide SecurityGroupTerm for your AWSNodeTemplate.");
-                assert(EC2NodeClassSpec["subnetSelector"] !== undefined, "Please provide subnetGroupTerm for your AWSNodeTemplate.");
+            if (ec2NodeClassSpec){
+                assert(ec2NodeClassSpec["securityGroupSelector"] !== undefined, "Please provide SecurityGroupTerm for your AWSNodeTemplate.");
+                assert(ec2NodeClassSpec["subnetSelector"] !== undefined, "Please provide subnetGroupTerm for your AWSNodeTemplate.");
             }
         }
 
