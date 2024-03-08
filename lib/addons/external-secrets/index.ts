@@ -1,6 +1,6 @@
 import { createNamespace, supportsALL } from "../../utils";
 import * as iam from "aws-cdk-lib/aws-iam";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -23,7 +23,7 @@ const defaultProps: ExternalsSecretsAddOnProps = {
   name: "external-secrets",
   chart: "external-secrets",
   release: "blueprints-addon-external-secrets",
-  version: "0.9.9",
+  version: "0.9.13",
   repository: "https://charts.external-secrets.io",
   namespace: "external-secrets",
   values: {},

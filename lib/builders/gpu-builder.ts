@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import merge from 'ts-deepmerge';
+import { merge } from "ts-deepmerge";
 import { ValuesSchema } from '../addons/gpu-operator/values';
 
 

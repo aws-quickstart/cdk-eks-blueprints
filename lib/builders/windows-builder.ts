@@ -10,7 +10,7 @@ import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import merge from 'ts-deepmerge';
+import { merge } from "ts-deepmerge";
 
 /**
  * Configuration options for Windows Builder.
@@ -19,64 +19,65 @@ export interface WindowsOptions {
     /**
      * Required, Kubernetes version to use for the cluster.
      */
-    kubernetesVersion: eks.KubernetesVersion,
+    kubernetesVersion: eks.KubernetesVersion;
 
     /**
      * Required, Instance class to use for the cluster.
      */
-    instanceClass: ec2.InstanceClass,
+    instanceClass: ec2.InstanceClass;
 
     /**
      * Required, Instance size to use for the cluster.
      */
-    instanceSize: ec2.InstanceSize,
+    instanceSize: ec2.InstanceSize;
 
     /**
      * optional, Node IAM Role to be attached to Windows
      * and Non-windows nodes.
      */
-    nodeRole?: iam.Role,
+    nodeRole?: iam.Role;
 
     /**
      * Optional, AMI Type for Windows Nodes
      */
-    windowsAmiType?: NodegroupAmiType,
+    windowsAmiType?: NodegroupAmiType;
 
     /**
      * Optional, Desired number of nodes to use for the cluster.
      */
-    desiredNodeCount?: number,
+    desiredNodeCount?: number;
 
     /**
      * Optional, Minimum number of nodes to use for the cluster.
      */
-    minNodeSize?: number,
+    minNodeSize?: number;
 
     /**
      * Optional, Maximum number of nodes to use for the cluster.
      */
-    maxNodeSize?: number,
+    maxNodeSize?: number;
 
     /**
      * Optional, Block device size.
      */
-    blockDeviceSize?: number,
+    blockDeviceSize?: number;
 
     /**
      * Optional, No Schedule for Windows Nodes, this allows Windows
      * nodes to be marked as no-schedule by default to prevent any
      * linux workloads from scheduling.
      */
-    noScheduleForWindowsNodes?: boolean,
+    noScheduleForWindowsNodes?: boolean;
 
     /**
      * Optional, Cluster Provider Tags.
      */
     clusterProviderTags?: {
         [key: string]: string;
-    },
+    };
 
-    genericNodeGroupOptions: eks.NodegroupOptions
+    genericNodeGroupOptions: eks.NodegroupOptions;
+
     windowsNodeGroupOptions: eks.NodegroupOptions
 }
 
@@ -119,7 +120,7 @@ const defaultOptions: WindowsOptions = {
     }
   };
 
-const defaultKarpenterProps: addons.KarpenterAddOnProps = {
+export const defaultKarpenterProps: addons.KarpenterAddOnProps = {
     version: "v0.31.3",
     requirements: [
         { key: 'kubernetes.io/os', op: 'In', vals: ['windows']},

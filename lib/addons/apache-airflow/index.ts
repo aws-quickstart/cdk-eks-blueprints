@@ -16,7 +16,7 @@ import { Values } from "../../spi";
 import { setPath, createNamespace, createServiceAccount, supportsX86 } from "../../utils";
 import { IFileSystem } from "aws-cdk-lib/aws-efs";
 
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 
 /**
  * User provided options for the Helm Chart
@@ -74,7 +74,7 @@ const AIRFLOWPVC = 'efs-apache-airflow-pvc';
     name: AIRFLOW,
     namespace: AIRFLOW,
     chart: AIRFLOW,
-    version: "1.11.0",
+    version: "1.13.0",
     release: RELEASE,
     repository:  "https://airflow.apache.org",
     enableAlb: false,

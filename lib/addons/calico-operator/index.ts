@@ -1,4 +1,4 @@
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { supportsALL } from "../../utils";
@@ -16,7 +16,7 @@ export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Helm chart version to use to install.
-     * @default 3.23.1
+     * @default 3.27.2
      */
     version?: string;
 
@@ -32,7 +32,7 @@ export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 const defaultProps = {
     name: 'calico-operator',
     namespace: 'calico-operator',
-    version: 'v3.26.4',
+    version: 'v3.26.4', // v3.27.2' latest is causing issues on cdk destroy
     chart: "tigera-operator",
     release: "bp-addon-calico-operator",
     repository: "https://projectcalico.docs.tigera.io/charts"

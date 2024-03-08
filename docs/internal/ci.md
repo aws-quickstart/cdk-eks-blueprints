@@ -19,7 +19,7 @@ cd cdk-eks-blueprints
 Install CDK (please review and install any missing [pre-requisites](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) for your environment)
 
 ```sh
-npm install -g aws-cdk@2.130.0
+npm install -g aws-cdk@2.131.0
 ```
 
 Install the dependencies for this project.
