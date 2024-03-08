@@ -5,6 +5,7 @@ import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
 import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 import { KubectlV27Layer } from "@aws-cdk/lambda-layer-kubectl-v27";
 import { KubectlV28Layer } from "@aws-cdk/lambda-layer-kubectl-v28";
+import { KubectlV29Layer } from "@aws-cdk/lambda-layer-kubectl-v29";
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
@@ -43,12 +44,15 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
             return new KubectlV27Layer(scope, "kubectllayer27");
         case "1.28":
             return new KubectlV28Layer(scope, "kubectllayer28");
+        case "1.29":
+            return new KubectlV29Layer(scope, "kubectllayer29");
+    
     }
     
     const minor = version.version.split('.')[1];
 
-    if(minor && parseInt(minor, 10) > 27) {
-        return new KubectlV27Layer(scope, "kubectllayer27"); // for all versions above 1.27 use 1.27 kubectl (unless explicitly supported in CDK)
+    if(minor && parseInt(minor, 10) > 29) {
+        return new KubectlV29Layer(scope, "kubectllayer29"); // for all versions above 1.29 use 1.29 kubectl (unless explicitly supported in CDK)
     }
     return undefined;
 }
