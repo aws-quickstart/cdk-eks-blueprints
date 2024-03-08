@@ -4,7 +4,7 @@ import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnUserProps } from '../helm-addon';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { supportsALL } from '../../utils';
 
 
@@ -25,7 +25,7 @@ const defaultProps = {
     namespace: 'external-dns',
     repository: 'https://kubernetes-sigs.github.io/external-dns/',
     release: 'blueprints-addon-external-dns',
-    version: '1.13.1',
+    version: '1.14.3',
     values: {},
 };
 

@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import merge from 'ts-deepmerge';
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from '../../spi';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { createNamespace, supportsALL } from '../../utils';
@@ -21,7 +21,7 @@ export interface MetricsServerAddOnProps extends HelmAddOnUserProps {
 const defaultProps: HelmAddOnProps & MetricsServerAddOnProps = {
     chart: 'metrics-server',
     repository: 'https://kubernetes-sigs.github.io/metrics-server',
-    version: '3.11.0',
+    version: '3.12.0',
     release: 'blueprints-addon-metrics-server',
     name: 'metrics-server',
     namespace: 'kube-system',

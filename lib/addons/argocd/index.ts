@@ -4,7 +4,7 @@ import { Stack } from 'aws-cdk-lib';
 import * as bcrypt from "bcrypt";
 import { Construct } from "constructs";
 import * as dot from 'dot-object';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { SecretProviderClass } from '..';
 import * as spi from "../../spi";
 import { createNamespace, getSecretValue, supportsALL, validateConstraints } from '../../utils';

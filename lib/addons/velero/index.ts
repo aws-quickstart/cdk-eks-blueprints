@@ -2,7 +2,7 @@ import { KubernetesManifest, ServiceAccount } from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";

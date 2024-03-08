@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
@@ -23,7 +23,7 @@ const defaultProps: HelmAddOnProps & GpuOperatorAddonProps = {
     name: "gpu-operator-addon",
     namespace: "gpu-operator",
     chart: "gpu-operator",
-    version: "v23.9.1",
+    version: "v23.9.2",
     release: "nvidia-gpu-operator",
     repository:  "https://helm.ngc.nvidia.com/nvidia",
     createNamespace: true,

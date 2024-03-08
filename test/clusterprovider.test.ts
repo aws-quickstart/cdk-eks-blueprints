@@ -331,7 +331,7 @@ test("Kubernetes Version gets set correctly for \"auto\"", () => {
     .account('123456789').region('us-west-2')
     .version("auto").build(app, "stack-auto");
 
-    expect(stack.getClusterInfo().version.version).toBe("1.28");
+    expect(stack.getClusterInfo().version.version).toBe(blueprints.DEFAULT_VERSION.version);
 });
 
 

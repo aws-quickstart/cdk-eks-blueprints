@@ -1,6 +1,6 @@
 import { ManagedPolicy, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import "reflect-metadata";
 import { createNamespace, setPath, supportsX86 } from "../../utils";

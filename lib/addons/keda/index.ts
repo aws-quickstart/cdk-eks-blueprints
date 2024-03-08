@@ -1,7 +1,7 @@
 import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import { createNamespace, setPath, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
@@ -52,7 +52,7 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   name: "blueprints-keda-addon",
   chart: "keda",
   namespace:"keda",
-  version: "2.12.1",
+  version: "2.13.2",
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},

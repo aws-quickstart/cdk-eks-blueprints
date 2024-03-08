@@ -58,12 +58,13 @@ export default class BlueprintConstruct {
             new blueprints.KubeRayAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
+            new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
             new blueprints.addons.AdotCollectorAddOn({
                 namespace:'adot',
-                version: 'v0.88.0-eksbuild.2'
+                version: 'auto'
             }),
             new blueprints.addons.AmpAddOn({
                 ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
@@ -80,7 +81,6 @@ export default class BlueprintConstruct {
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.IstioCniAddon(),
             new blueprints.addons.IstioIngressGatewayAddon(),
-            new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.MetricsServerAddOn(),
             new blueprints.addons.SecretsStoreAddOn(),
             new blueprints.addons.ArgoCDAddOn(),
@@ -416,7 +416,7 @@ function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
+export function addInferentiaNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng4-inferentia",
