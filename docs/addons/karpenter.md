@@ -31,7 +31,7 @@ const app = new cdk.App();
 
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
     version: 'v0.33.1',
-    NodePoolSpec: {
+    nodePoolSpec: {
       labels: {
           type: "karpenter-test"
       },
@@ -56,7 +56,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
           budgets: [{nodes: "10%"}]
       }
     },
-    EC2NodeClassSpec: {
+    ec2NodeClassSpec: {
       amiFamily: "AL2",
       subnetSelectorTerms: [{ tags: { "Name": "my-stack-name/my-stack-name-vpc/PrivateSubnet*" }}],
       securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": "my-stack-name" }}],
@@ -95,12 +95,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 5. If the user provides `nodePoolSpec` (and `ec2NodeClassSpec`), the addon will provisions a default Karpenter NodePool and EC2NodeClass CRDs. `nodePoolSpec` requires [requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements) while `ec2NodeClassSpec` requires subnets and security groups. Based on what version of Karpenter you provide, you will need either `subnetSelector` and `securityGroupSelector` (for versions v0.31.x or down), or `subnetSelectorTerms` and `securityGroupSelectorTerms` (for versions v0.32.x and up).
 6. As mentioned above, the CRDs installed will be different from v0.32.0, since Karpenter as a project graduated to beta in October 2023. This meant significant API changes, going from alpha to beta. The addon has reflected those changes and will deploy NodePool and EC2NodeClass for v1beta1 CRDs, versus Provisioner and AWSNodeTemplate for v1alpha5. You can read more about the changes in this [blog](https://aws.amazon.com/blogs/containers/karpenter-graduates-to-beta/).
 
-**NOTE:**
-1. EKS Blueprints will only support minimum Karpenter version that matches the supporter EKS Kubernetes version. Please see the compatibility matrix [here](https://karpenter.sh/docs/upgrading/compatibility/). If you provide incompatible version (i.e. providing version 0.27.x for EKS version 1.27), you will see warnings in the logs but will proceed deployment. You will run into compatibility issues.
-2. EKS Blueprints npm v1.14 and above introduces the following breaking changes:
-- The add-on will no longer support any versions below v0.21.0
-- User provided properties have been refactored to better reflect the parameters of the various Karpenter resources (i.e. NodePool, EC2NodeClass)
-- For NodePool and EC2NodeClass, the parameters will apply to either the v1alpha5 CRDs ( provisioner, AWSNodeTemplate, for Karpenter versions v0.31.x or earlier) or v1beta1 CRDs (NodePool, EC2NodeClass, for Karpenter versions v0.32.x and later). **If you provide non-matching parameters, i.e. providing `consolidation` instead of `disruption` for Karpenter version v0.33.1, you will see an error with stack failing to provision.** Please consult the [upgrade guide](https://karpenter.sh/docs/upgrading/upgrade-guide/) to see the changes for various versions.
+***NOTE: EKS Blueprints npm v1.14 and above introduces breaking changes to the addon. Please see [Upgrade Path](#upgrade-path) for more details.***
 
 ## Using Karpenter
 
@@ -241,6 +236,15 @@ Karpenter, starting from the OCI registry versions, will untar the files under `
 
 ## Upgrade Path
 
-1. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](https://karpenter.sh/docs/upgrading/upgrade-guide/) for details.
+The addon introduces breaking changes for Blueprints npm version v0.14 and later. Here are the details:
 
-2. Starting v0.32.0, Karpenter introduces the new beta APIs (v1beta1). While you can use both v1beta1 and v1alpha5 CRDs for v0.32, starting in v0.33, v1alpha5 CRDs are obsolete. If you want to upgrade to the latest, ensure that you have upgraded to v0.32.x first before proceeding.
+- EKS Blueprints will only support minimum Karpenter version that matches the supporter EKS Kubernetes version. Please see the compatibility matrix [here](https://karpenter.sh/docs/upgrading/compatibility/). If you provide incompatible version (i.e. providing version 0.27.x for EKS version 1.27), you will see warnings in the logs but will proceed deployment. You will run into compatibility issues.
+- The add-on will no longer support any versions below v0.21.0
+- User provided properties have been refactored to better reflect the parameters of the various Karpenter resources (i.e. NodePool, EC2NodeClass)
+- For NodePool and EC2NodeClass, the parameters will apply to either the v1alpha5 CRDs ( provisioner, AWSNodeTemplate, for Karpenter versions v0.31.x or earlier) or v1beta1 CRDs (NodePool, EC2NodeClass, for Karpenter versions v0.32.x and later). **If you provide non-matching parameters, i.e. providing `consolidation` instead of `disruption` for Karpenter version v0.33.1, you will see an error with stack failing to provision.** Please consult the [upgrade guide](https://karpenter.sh/docs/upgrading/upgrade-guide/) to see the changes for various versions.
+
+If you are upgrading from earlier version of Blueprints and need to add the Karpenter addon, please ensure the following:
+
+1. You are using the minimum Karpenter version supported by the Kubernetes version of your blueprint cluster. Not doing so will cause incompatibility issues.
+
+2. Starting v0.32.0, Karpenter introduces the new beta APIs (v1beta1), and therefore the addon will make v1alpha5 CRDs obsolete. Ensure that you are providing the corresponding, matching parameters.
