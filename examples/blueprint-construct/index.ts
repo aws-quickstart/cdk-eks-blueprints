@@ -54,6 +54,37 @@ export default class BlueprintConstruct {
             name: 'blueprints-apache-airflow-efs',
         });
 
+        const nodeClassSpec: blueprints.Ec2NodeClassSpec = {
+            amiFamily: "AL2",
+            subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
+            securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
+        };
+        
+        const nodePoolSpec: blueprints.NodePoolSpec = {
+            labels: {
+                type: "karpenter-test"
+            },
+            annotations: {
+                "eks-blueprints/owner": "young"
+            },
+            taints: [{
+                key: "workload",
+                value: "test",
+                effect: "NoSchedule",
+            }],
+            requirements: [
+                { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.2xlarge'] },
+                { key: 'topology.kubernetes.io/zone', operator: 'In', values: [`${props?.env?.region}a`,`${props?.env?.region}b`]},
+                { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
+                { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['spot']},
+            ],
+            disruption: {
+                consolidationPolicy: "WhenEmpty",
+                consolidateAfter: "30s",
+                expireAfter: "20m",
+            }
+        };
+
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.KubeRayAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
@@ -114,35 +145,8 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.KarpenterAddOn({
                 version: "v0.33.2",
-                nodePoolSpec: {
-                    labels: {
-                        type: "karpenter-test"
-                    },
-                    annotations: {
-                        "eks-blueprints/owner": "young"
-                    },
-                    taints: [{
-                        key: "workload",
-                        value: "test",
-                        effect: "NoSchedule",
-                    }],
-                    requirements: [
-                        { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.2xlarge'] },
-                        { key: 'topology.kubernetes.io/zone', operator: 'In', values: [`${props?.env?.region}a`,`${props?.env?.region}b`]},
-                        { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
-                        { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['spot']},
-                    ],
-                    disruption: {
-                        consolidationPolicy: "WhenEmpty",
-                        consolidateAfter: "30s",
-                        expireAfter: "20m",
-                    }
-                },
-                ec2NodeClassSpec: {
-                    amiFamily: "AL2",
-                    subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
-                    securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
-                },
+                nodePoolSpec: nodePoolSpec,
+                ec2NodeClassSpec: nodeClassSpec,
                 interruptionHandling: true,
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
