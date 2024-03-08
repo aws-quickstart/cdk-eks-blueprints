@@ -70,7 +70,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
+The add-on automatically sets Helm Chart [values](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter#values), and it is **recommended** not to pass custom values for the following:
 - settings.clusterName
 - settings.interruptionQueue (if interruption handling is enabled)
 - serviceAccount.create

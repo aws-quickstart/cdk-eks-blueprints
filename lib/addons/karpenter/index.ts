@@ -1,7 +1,7 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
 import merge from 'ts-deepmerge';
-import { ClusterInfo, Values, Taint, reqValues } from '../../spi';
+import { ClusterInfo, NodePoolSpec, Ec2NodeClassSpec } from '../../spi';
 import * as utils from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam';
@@ -13,23 +13,6 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
-import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
-import { min } from 'lodash';
-
-// simple types for various props
-type sec = `${number}s`;
-type min = `${number}m`;
-type hour = `${number}h`;
-type budget = {
-    nodes: string
-    schedule?: string
-    duration?: string
-};
-
-// Specific types for the Beta CRD Subnet and Security Group selector terms
-type betaSubnetTerm = { id?: string, tags?: Values };
-type betaSecurityGroupTerm = { tags?: Values, id?: string, name?: string };
-type amiSelectorTerm = { tags?: Values, name?: string, owner?: string } | { id?: string };
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_29, '0.34.0'],
@@ -41,25 +24,6 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_23, '0.21.0'],
 ]);
 
-export interface BlockDeviceMapping {
-    deviceName?: string;
-    virtualName?: string;
-    ebs?: EbsVolumeMapping;
-    noDevice?: string;
-}
-  
-export interface EbsVolumeMapping {
-    deleteOnTermination?: boolean;
-    iops?: number;
-    snapshotId?: string;
-    volumeSize?: string;
-    volumeType?: EbsDeviceVolumeType;
-    kmsKeyId?: string;
-    throughput?: number;
-    outpostArn?: string;
-    encrypted?: boolean;
-}
-
 /**
  * Configuration options for the add-on
  */
@@ -69,194 +33,13 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * A single nodepool is capable of managing a diverse set of nodes. 
      * Node properties are determined from a combination of nodepool and pod scheduling constraints.
      */
-    nodePoolSpec?: {
-        /**
-         * Labels applied to all nodes
-         */
-        labels?: Values,
-
-        /**
-         * Annotations applied to all nodes
-         */
-        annotations?: Values,
-
-        /**
-         * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
-         */
-        taints?: Taint[],
-
-        /**
-         * Provisioned nodes will have these taints, but pods do not need to tolerate these taints to be provisioned by this
-         * provisioner. These taints are expected to be temporary and some other entity (e.g. a DaemonSet) is responsible for
-         * removing the taint after it has finished initializing the node.
-         */
-        startupTaints?: Taint[],
-
-        /**
-         * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
-         * deploy a Provisioner with default values.
-         */
-        requirements?: reqValues,
-
-        /**
-         * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
-         * Mutually exclusive with the ttlSecondsAfterEmpty parameter.
-         * 
-         * Replaced with disruption.consolidationPolicy for versions v0.32.x and later
-         */
-        consolidation?: {
-            enabled: boolean,
-        }
-
-        /**
-         * If omitted, the feature is disabled and nodes will never expire.  
-         * If set to less time than it requires for a node to become ready, 
-         * the node may expire before any pods successfully start.
-         * 
-         * Replaced with disruption.expireAfter for versions v0.32.x and later
-         */
-        ttlSecondsUntilExpired?: number,
-
-        /**
-         * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
-         * Mutually exclusive with the consolidation parameter.
-         * 
-         * Replaced with disruption.consolidationPolicy and disruption.consolidateAfter for versions v0.32.x and later
-         */
-        ttlSecondsAfterEmpty?: number,
-
-        /** 
-         * Disruption section which describes the ways in which Karpenter can disrupt and replace Nodes
-         * Configuration in this section constrains how aggressive Karpenter can be with performing operations
-         * like rolling Nodes due to them hitting their maximum lifetime (expiry) or scaling down nodes to reduce cluster cost
-         * Only applicable for versions v0.32 or later
-         * 
-         * @param consolidationPolicy consolidation policy - will default to WhenUnderutilized if not provided
-         * @param consolidateAfter How long Karpenter waits to consolidate nodes - cannot be set when the policy is WhenUnderutilized
-         * @param expireAfter How long Karpenter waits to expire nodes
-         */
-        disruption?: {
-            consolidationPolicy?: "WhenUnderutilized" | "WhenEmpty",
-            consolidateAfter?: sec | min | hour,
-            expireAfter?:  "Never" | sec | min | hour
-            budgets?: budget[]
-        },
-
-        /**
-         * Limits define a set of bounds for provisioning capacity.
-         * Resource limits constrain the total size of the cluster.
-         * Limits prevent Karpenter from creating new instances once the limit is exceeded.
-         */
-        limits?: {
-            resources?: {
-            cpu?: number;
-            memory?: string;
-            /**
-             * Extended resources are fully-qualified resource names outside the kubernetes.io domain.
-             * They allow cluster operators to advertise and users to consume the non-Kubernetes-built-in
-             * resources such as hardware devices GPUs, RDMAs, SR-IOVs...
-             * e.g nvidia.com/gpu, amd.com/gpu, etc...
-             */
-            [k: string]: unknown;
-            };
-        },
-
-        /**
-         * Priority given to the provisioner when the scheduler considers which provisioner
-         * to select. Higher weights indicate higher priority when comparing provisioners.
-         */
-        weight?: number,
-    }
+    nodePoolSpec?: NodePoolSpec,
     
     /**
      * This is the top level spec for the AWS Karpenter Provider
      * It contains configuration necessary to launch instances in AWS. 
      */
-    ec2NodeClassSpec?: {
-        /**
-         * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
-         * Required for Alpha CRDS
-         */
-        subnetSelector?: Values,
-
-        /**
-         * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
-         * Required for Alpha CRDS
-         */
-        securityGroupSelector?: Values,
-        
-        /**
-         * Subnet selector terms (subnet id or tags) used for Beta CRDs
-         * Required for Beta CRDS
-         */
-        subnetSelectorTerms?: betaSubnetTerm[],
-
-        /**
-         * Security Group selector terms (security group id, tags or names) used for Beta CRDs
-         * Required for Beta CRDS
-         */
-        securityGroupSelectorTerms?: betaSecurityGroupTerm[],
-
-        /**
-         * AMI Selector
-         */
-        amiSelector?: Values,
-
-        /**
-         * AMI Selector terms used for Beta CRDs
-         */
-        amiSelectorTerms?: amiSelectorTerm[];
-
-        /**
-         * AMI Family: required for v0.32.0 and above, optional otherwise
-         * Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
-         */
-        amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
-        
-        /**
-         * Optional field to control how instance store volumes are handled. Set it to RAID0
-         * for faster ephemeral storage
-         */
-        instanceStorePolicy?: "RAID0"
-
-        /**
-         * Optional user provided UserData applied to the worker nodes,
-         * i.e. custom scripts or pass-through custom configurations at start-up
-         */
-        userData?: string,
-        
-        /**
-         * Optional field to use the name of the IAM Instance profile,
-         * instead of the role generated by Karpenter.
-         * User must pre-provision an IAM instance profile and assign a role to it.
-         */
-        instanceProfile?: string,
-
-        /**
-         * Tags adds tags to all resources created, including EC2 Instances, EBS volumes and Launch Templates.
-         * Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domains 
-         * (such as "karpenter.sh", "karpenter.k8s.aws", and "kubernetes.io/cluster").
-         * This ensures that Karpenter is able to correctly auto-discover machines that it owns.
-         */
-        tags?: Values;
-
-        /**
-         * Control the exposure of Instance Metadata service using this configuration
-         */
-        metadataOptions?: Values;
-
-        /**
-         * BlockDeviceMappings allows you to specify the block device mappings for the instances.
-         * This is a list of mappings, where each mapping consists of a device name and an EBS configuration.
-         * If you leave this blank, it will use the Karpenter default.
-         */
-        blockDeviceMappings?: BlockDeviceMapping[];
-
-        /**
-         * Detailed monitoring on EC2
-         */
-        detailedMonitoring?: boolean
-    }
+    ec2NodeClassSpec?: Ec2NodeClassSpec,
 
     /**
      * Flag for enabling Karpenter's native interruption handling 
