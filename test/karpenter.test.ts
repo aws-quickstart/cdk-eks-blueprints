@@ -121,10 +121,10 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_24)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.21.0",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                 },
-                EC2NodeClassSpec: {
+                ec2NodeClassSpec: {
                     amiFamily: "AL2",
                     subnetSelector: {
                         "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
@@ -152,7 +152,7 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.33.0",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                     ttlSecondsAfterEmpty: 30,
                     disruption: {
@@ -181,7 +181,7 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.34.1",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                     ttlSecondsAfterEmpty: 30,
                     consolidation: { enabled: true },
@@ -202,7 +202,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version("auto")
             .addOns(new blueprints.KarpenterAddOn({
-                NodePoolSpec:{
+                nodePoolSpec:{
                     requirements: defaultReq,
                     disruption: {
                         consolidationPolicy: "WhenUnderutilized",
@@ -226,7 +226,7 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_25)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.28.0",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                     disruption: {},
                 }
@@ -247,11 +247,11 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_25)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.34.1",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                     disruption: {},
                 },
-                EC2NodeClassSpec: {
+                ec2NodeClassSpec: {
                     subnetSelectorTerms: [{
                         tags: { "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1" }
                     }],
@@ -280,7 +280,7 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_23)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.21.0",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     requirements: defaultReq,
                     ttlSecondsAfterEmpty: 30,
                     consolidation: { enabled: true },
@@ -395,10 +395,10 @@ describe('Unit tests for Karpenter addon', () => {
             .addOns(
                 new blueprints.KarpenterAddOn({
                     version: "v0.31.0",
-                    NodePoolSpec: {
+                    nodePoolSpec: {
                         requirements: defaultReq
                     },
-                    EC2NodeClassSpec: {
+                    ec2NodeClassSpec: {
                         amiFamily: "AL2",
                         subnetSelector: {
                             "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
