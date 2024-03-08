@@ -114,7 +114,7 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.KarpenterAddOn({
                 version: "v0.33.2",
-                NodePoolSpec: {
+                nodePoolSpec: {
                     labels: {
                         type: "karpenter-test"
                     },
@@ -138,7 +138,7 @@ export default class BlueprintConstruct {
                         expireAfter: "20m",
                     }
                 },
-                EC2NodeClassSpec: {
+                ec2NodeClassSpec: {
                     amiFamily: "AL2",
                     subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
                     securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
