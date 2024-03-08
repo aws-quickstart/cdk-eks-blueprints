@@ -97,7 +97,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 **NOTE:**
 1. EKS Blueprints will only support minimum Karpenter version that matches the supporter EKS Kubernetes version. Please see the compatibility matrix [here](https://karpenter.sh/docs/upgrading/compatibility/). If you provide incompatible version (i.e. providing version 0.27.x for EKS version 1.27), you will see warnings in the logs but will proceed deployment. You will run into compatibility issues.
-2. EKS Blueprints npm v1.13.x introduces the following breaking changes:
+2. EKS Blueprints npm v1.14 and above introduces the following breaking changes:
 - The add-on will no longer support any versions below v0.21.0
 - User provided properties have been refactored to better reflect the parameters of the various Karpenter resources (i.e. NodePool, EC2NodeClass)
 - For NodePool and EC2NodeClass, the parameters will apply to either the v1alpha5 CRDs ( provisioner, AWSNodeTemplate, for Karpenter versions v0.31.x or earlier) or v1beta1 CRDs (NodePool, EC2NodeClass, for Karpenter versions v0.32.x and later). **If you provide non-matching parameters, i.e. providing `consolidation` instead of `disruption` for Karpenter version v0.33.1, you will see an error with stack failing to provision.** Please consult the [upgrade guide](https://karpenter.sh/docs/upgrading/upgrade-guide/) to see the changes for various versions.
