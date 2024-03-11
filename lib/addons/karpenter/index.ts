@@ -254,6 +254,13 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     ec2NodeClassSpec?: Ec2NodeClassSpec,
 
     /**
+     * Optional for Karpenter Node Role additional policies
+     * As users may require other policies in order for pods on Karpenter nodes
+     * to execute its tasks
+     */
+    additionalPolicies?: string,
+
+    /**
      * Flag for enabling Karpenter's native interruption handling 
      */
     interruptionHandling?: boolean,
@@ -268,7 +275,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.34.1',
+    version: 'v0.35.0',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -345,7 +352,7 @@ export class KarpenterAddOn extends HelmAddOn {
             this.options.ec2NodeClassSpec, amiFamily);
 
         // Set up the node role and instance profile
-        const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(cluster, stackName, region);
+        const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(clusterInfo, stackName, region);
 
         // Create the controller policy
         let karpenterPolicyDocument;
@@ -685,44 +692,55 @@ export class KarpenterAddOn extends HelmAddOn {
      * @param region Region of the stack
      * @returns [karpenterNodeRole, karpenterInstanceProfile]
      */
-    private setUpNodeRole(cluster: Cluster, stackName: string, region: string): [iam.Role, iam.CfnInstanceProfile] {
+    private setUpNodeRole(clusterInfo: ClusterInfo, stackName: string, region: string): [iam.Role, iam.CfnInstanceProfile] {
+        
+        // Required Managed Policies for the Node Role
+        let nodeRoleManagedPolicies = [
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
+        ];
+
+        // Add EKS CNI Policy only if VPC CNI is not part of the provisioned addons
+        if (clusterInfo.getProvisionedAddOn('VpcCniAddOn')){
+            nodeRoleManagedPolicies.push(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"));
+        }
+
+        // Add any additional custom policies provided by the user
+        
+        
         // Set up Node Role
-        const karpenterNodeRole = new iam.Role(cluster, 'karpenter-node-role', {
-            assumedBy: new iam.ServicePrincipal(`ec2.${cluster.stack.urlSuffix}`),
-            managedPolicies: [
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
-                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
-            ],
+        const karpenterNodeRole = new iam.Role(clusterInfo.cluster, 'karpenter-node-role', {
+            assumedBy: new iam.ServicePrincipal(`ec2.${clusterInfo.cluster.stack.urlSuffix}`),
+            managedPolicies: nodeRoleManagedPolicies,
             //roleName: `KarpenterNodeRole-${name}` // let role name to be generated as unique
         });
 
         // Set up Instance Profile
         const instanceProfileName = md5.Md5.hashStr(stackName+region);
-        const karpenterInstanceProfile = new iam.CfnInstanceProfile(cluster, 'karpenter-instance-profile', {
+        const karpenterInstanceProfile = new iam.CfnInstanceProfile(clusterInfo.cluster, 'karpenter-instance-profile', {
             roles: [karpenterNodeRole.roleName],
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
         
-        const clusterId = Names.uniqueId(cluster);
+        const clusterId = Names.uniqueId(clusterInfo.cluster);
 
         //Cfn output for Node Role in case of needing to add additional policies
-        new CfnOutput(cluster.stack, 'Karpenter Instance Node Role', {
+        new CfnOutput(clusterInfo.cluster.stack, 'Karpenter Instance Node Role', {
             value: karpenterNodeRole.roleName,
             description: "Karpenter add-on Node Role name",
             exportName: clusterId+"KarpenterNodeRoleName",
         });
         //Cfn output for Instance Profile for creating additional provisioners
-        new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', { 
+        new CfnOutput(clusterInfo.cluster.stack, 'Karpenter Instance Profile name', { 
             value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
             description: "Karpenter add-on Instance Profile name",
             exportName: clusterId+"KarpenterInstanceProfileName", 
         });
 
         // Map Node Role to aws-auth
-        cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
+        clusterInfo.cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
             groups: ['system:bootstrapper', 'system:nodes'],
             username: 'system:node:{{EC2PrivateDNSName}}'
         });
