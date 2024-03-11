@@ -3,10 +3,9 @@ import * as blueprints from '../lib';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Template } from 'aws-cdk-lib/assertions';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
-import { BlockDeviceMapping, EbsVolumeMapping } from "../lib";
-import { reqValues } from "../lib/spi";
+import { BlockDeviceMapping, EbsVolumeMapping, NodePoolRequirementValues } from "../lib";
 
-const defaultReq: reqValues = [
+const defaultReq: NodePoolRequirementValues = [
     { 
         key: "karpenter.k8s.aws/instance-category",
         operator: "In",
