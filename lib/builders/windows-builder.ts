@@ -120,31 +120,6 @@ const defaultOptions: WindowsOptions = {
     }
   };
 
-export const defaultKarpenterProps: addons.KarpenterAddOnProps = {
-    version: "v0.31.3",
-    requirements: [
-        { key: 'kubernetes.io/os', op: 'In', vals: ['windows']},
-    ],
-    //subnetTags: {
-        //"Name": `${stackID}/${stackID}-vpc/Private*`,
-    //},
-    //securityGroupTags: {
-        //[`kubernetes.io/cluster/${stackID}`]: "owned",
-    //},
-    consolidation: { enabled: true },
-    ttlSecondsUntilExpired: 2592000,
-    weight: 20,
-    interruptionHandling: true,
-    taints: [
-        {
-            key: "os",
-            value: "windows",
-            effect: "NoSchedule"
-        }
-    ],
-    amiFamily: "Windows2022"
-};
-
 /**
  * This builder class helps you prepare a blueprint for setting up
  * windows nodes with EKS cluster. The `WindowsBuilder` creates the following:
