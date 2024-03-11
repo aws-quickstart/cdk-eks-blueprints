@@ -33,14 +33,45 @@ cd my-blueprints
 cdk init app --language typescript
 ```
 
-## Configure and Deploy EKS Clusters
-Install the `eks-blueprints` NPM package via the following.
+## Configure Your Project
+
+Install the `eks-blueprints` NPM package (keep reading if you get an error or warning message):
 
 ```bash
 npm i @aws-quickstart/eks-blueprints
 ```
 
-Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install the `ArgoCD` addon.
+CDK version of the EKS Blueprints is pinned as [`peerDependencies`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#peerdependencies) to the version that we tested against to minimize the risk of incompatibilities and/or broken functionality. When running the install command, NPM will detect any mismatch in the version and issue an error. For example:
+
+```
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR! 
+npm ERR! While resolving: my-blueprint@0.1.0
+npm ERR! Found: aws-cdk-lib@2.130.0
+npm ERR! node_modules/aws-cdk-lib
+npm ERR!   aws-cdk-lib@"2.130.0" from the root project
+npm ERR! 
+npm ERR! Could not resolve dependency:
+npm ERR! peer bundled aws-cdk-lib@"2.132.0" from @aws-quickstart/eks-blueprints@1.14.0
+npm ERR! node_modules/@aws-quickstart/eks-blueprint
+```
+
+This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line `peer bundled` and check the expected version of the CDK. Make sure that in your `package.json` the version is set to the expected. In this example, `package.json` contained `"aws-cdk-lib": "2.130.0"`, while the expected version was `2.132.0`.
+
+**Note**: after the initial installation, upgrading the version of CDK to an incompatible higher/lower version will produce a warning, but will succeed. For community support (submitting GitHub issues) please make sure you have a matching version configured.
+
+Example warning:
+
+```
+npm WARN 
+npm WARN Could not resolve dependency:
+npm WARN peer bundled aws-cdk-lib@"2.132.0" from @aws-quickstart/eks-blueprints@1.14.0
+```
+
+## Deploy EKS Clusters
+
+Replace the contents of `bin/<your-main-file>.ts` (where `your-main-file` by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install a number of addons.
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -50,6 +81,8 @@ const app = new cdk.App();
 const account = 'XXXXXXXXXXXXX';
 const region = 'us-east-2';
 const version = 'auto';
+
+blueprints.HelmAddOn.validateHelmVersions = true; // optional if you would like to check for newer versions
 
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn(),
