@@ -7,6 +7,8 @@ import { ResourceProvider } from '.';
 import { EksBlueprintProps } from '../stacks';
 import { logger } from "../utils/log-utils";
 import * as constraints from '../utils/constraints-utils';
+import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
  */
@@ -29,9 +31,34 @@ export type Values = {
  */
 export type Taint = {
     key: string,
-    value: string,
+    value?: string,
     effect: "NoSchedule" | "PreferNoSchedule" | "NoExecute",
 };
+
+// simple types for various time-bound property values
+export type Sec = `${number}s`;
+export type Min = `${number}m`;
+export type Hour = `${number}h`;
+
+// Specific interface for Block Device Mapping and EBS Volume Mapping
+export interface BlockDeviceMapping {
+    deviceName?: string;
+    virtualName?: string;
+    ebs?: EbsVolumeMapping;
+    noDevice?: string;
+}
+  
+export interface EbsVolumeMapping {
+    deleteOnTermination?: boolean;
+    iops?: number;
+    snapshotId?: string;
+    volumeSize?: string;
+    volumeType?: EbsDeviceVolumeType;
+    kmsKeyId?: string;
+    throughput?: number;
+    outpostArn?: string;
+    encrypted?: boolean;
+}
 
 /**
  * Interface that includes a reference to a Git repository for reuse, without credentials

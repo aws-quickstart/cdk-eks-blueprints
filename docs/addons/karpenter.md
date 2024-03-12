@@ -1,6 +1,6 @@
 # Karpenter Add-on
 
-Karpenter add-on is based on the [Karpenter](https://github.com/aws/karpenter) open source node provisioning project. It provides a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application.
+Karpenter add-on is based on the [Karpenter](https://github.com/kubernetes-sigs/karpenter) open source node provisioning project. For this add-on, it will utilize the [AWS provider](https://github.com/aws/karpenter-provider-aws), to ensure a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application on your EKS cluster.
 
 Karpenter works by:
 
@@ -16,6 +16,8 @@ Karpenter works by:
 
 2. (If using Spot), EC2 Spot Service Linked Role should be created. See [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html) for more details.
 
+3. [Amazon EKS cluster with supported Kubernetes version](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html). Karpenter provides minimum supported Karpenter versions for each Kubernetes version in form of a matrix [here](https://karpenter.sh/docs/upgrading/compatibility/#compatibility-matrix).
+
 ## Usage
 
 ```typescript
@@ -23,59 +25,54 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
 const app = new cdk.App();
 
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
-  requirements: [
-      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
-      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
-  ],
-  subnetTags: {
-    "Name": "blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1",
-  },
-  securityGroupTags: {
-    "kubernetes.io/cluster/blueprint-construct-dev": "owned",
-  },
-  taints: [{
-    key: "workload",
-    value: "test",
-    effect: "NoSchedule",
-  }],
-  amiFamily: "AL2",
-  amiSelector: {
-    "karpenter.sh/discovery/MyClusterName": '*',
-  },
-  consolidation: { enabled: true },
-  ttlSecondsUntilExpired: 2592000,
-  weight: 20,
-  interruptionHandling: true,
-  tags: {
-    schedule: 'always-on'
-  },
-  blockDeviceMappings: [{
-    deviceName: "/dev/xvda",
-    ebs: {
-      volumeSize: 100,
-      volumeType: EbsDeviceVolumeType.GP3,
-      deleteOnTermination: true
+    version: 'v0.33.1',
+    nodePoolSpec: {
+      labels: {
+          type: "karpenter-test"
+      },
+      annotations: {
+          "eks-blueprints/owner": "young"
+      },
+      taints: [{
+          key: "workload",
+          value: "test",
+          effect: "NoSchedule",
+      }],
+      requirements: [
+          { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.2xlarge'] },
+          { key: 'topology.kubernetes.io/zone', operator: 'In', values: ['us-west-2a','us-west-2b', 'us-west-2c']},
+          { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
+          { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['spot']},
+      ],
+      disruption: {
+          consolidationPolicy: "WhenEmpty",
+          consolidateAfter: "30s",
+          expireAfter: "20m",
+          budgets: [{nodes: "10%"}]
+      }
     },
-  }],
+    ec2NodeClassSpec: {
+      amiFamily: "AL2",
+      subnetSelectorTerms: [{ tags: { "Name": "my-stack-name/my-stack-name-vpc/PrivateSubnet*" }}],
+      securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": "my-stack-name" }}],
+    },
+    interruptionHandling: true,
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .version("auto")
+  .version(KubernetesVersion.V1_28)
   .addOns(karpenterAddOn)
   .build(app, 'my-stack-name');
 ```
 
-The add-on automatically sets the following Helm Chart [values](https://github.com/aws/karpenter/tree/main/charts/karpenter#values), and it is **highly recommended** not to pass these values in (as it will result in errors):
-- settings.aws.defaultInstanceProfile
-- settings.aws.clusterEndpoint
-- settings.aws.clusterName
-- settings.aws.interruptionQueueName (if interruption handling is enabled)
+The add-on automatically sets Helm Chart [values](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter#values), and it is **recommended** not to pass custom values for the following:
+- settings.clusterName
+- settings.interruptionQueue (if interruption handling is enabled)
 - serviceAccount.create
 - serviceAccount.name
 - serviceAccount.annotations.eks.amazonaws.com/role-arn
@@ -94,57 +91,83 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 1. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why).
 2. Creates `karpenter` namespace.
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
-4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring cluster name and cluster endpoint on the controller by default.
-5. (Optionally) provisions a default Karpenter Provisioner and AWSNodeTemplate CRD based on user-provided parameters such as [spec.requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements), [AMI type](https://karpenter.sh/docs/concepts/nodeclasses/#specamifamily),[weight](https://karpenter.sh/docs/concepts/provisioners/#specweight), [Subnet Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsubnetselectorterms), [Security Group Selector](https://karpenter.sh/docs/concepts/nodeclasses/#specsecuritygroupselectorterms), [Tags](https://karpenter.sh/docs/concepts/nodeclasses/#spectags) and [BlockDeviceMappings](https://karpenter.sh/docs/concepts/node-templates/#specblockdevicemappings). If created, the provisioner will discover the EKS VPC subnets and security groups to launch the nodes with.
+4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring the cluster name, endpoint, Instance Profile, and others necessary for functional addon.
+5. If the user provides `nodePoolSpec` (and `ec2NodeClassSpec`), the addon will provisions a default Karpenter NodePool and EC2NodeClass CRDs. `nodePoolSpec` requires [requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements) while `ec2NodeClassSpec` requires subnets and security groups. Based on what version of Karpenter you provide, you will need either `subnetSelector` and `securityGroupSelector` (for versions v0.31.x or down), or `subnetSelectorTerms` and `securityGroupSelectorTerms` (for versions v0.32.x and up).
+6. As mentioned above, the CRDs installed will be different from v0.32.0, since Karpenter as a project graduated to beta in October 2023. This meant significant API changes, going from alpha to beta. The addon has reflected those changes and will deploy NodePool and EC2NodeClass for v1beta1 CRDs, versus Provisioner and AWSNodeTemplate for v1alpha5. You can read more about the changes in this [blog](https://aws.amazon.com/blogs/containers/karpenter-graduates-to-beta/).
 
-**NOTE:**
-1. The default provisioner is created only if both the subnet tags and the security group tags are provided.
-2. Provisioner spec requirement fields are not necessary, as karpenter will dynamically choose (i.e. leaving instance-type blank will let karpenter choose appropriate sizing).
-3. Consolidation, which is a flag that enables , is supported on versions 0.15.0 and later. It is also mutually exclusive with `ttlSecondsAfterEmpty`, so if you provide both properties, the addon will throw an error.
-4. Weight, which is a property to prioritize provisioners based on weight, is supported on versions 0.16.0 and later. Addon will throw an error if weight is provided for earlier versions.
-5. Interruption Handling, which is a native way to handle interruption due to involuntary interruption events, is supported on versions 0.19.0 and later. For interruption handling in the earlier versions, Karpenter supports using AWS Node Interruption Handler (which you will need to add as an add-on and ***must be in add-on array after the Karpenter add-on*** for it to work.
-6. Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domain (such as "karpenter.sh", "karpenter.k8s.aws", and "kubernetes.io/cluster").
+***NOTE: EKS Blueprints npm v1.14 and above introduces breaking changes to the addon. Please see [Upgrade Path](#upgrade-path) for more details.***
 
 ## Using Karpenter
 
-To use Karpenter, you need to provision a Karpenter [provisioner CRD](https://karpenter.sh/docs/concepts/provisioners/). A single provisioner is capable of handling many different pod shapes.
+To use Karpenter, you need to provision a Karpenter [NodePool](https://karpenter.sh/docs/concepts/nodepools/) and [EC2NodeClass](https://karpenter.sh/docs/concepts/nodeclasses/). NodePool sets constraints on the nodes that can be created by Karpenter and the pods that can run on those nodes. EC2NodeClass, once associated with a NodePool, will then provision those nodes (in the form of EC2 instances) based on the AWS specific settings. Multiple NodePools may point to the same EC2NodeClass.
 
 This can be done in 2 ways:
 
-1. Provide the properties as show in [Usage](#usage). If subnet tags and security group tags are not provided at deploy time, the add-on will be installed without a Provisioner.
+1. Provide the properties as show in [Usage](#usage). If the NodePoolSpec is not provided, the addon will not deploy a NodePool or EC2NodeClass.
 
-2. Use `kubectl` to apply a sample provisioner manifest:
+2. Use `kubectl` to apply a sample NodePool and EC2NodeClass:
 ```bash
 cat <<EOF | kubectl apply -f -
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
 metadata:
   name: default
 spec:
-  requirements:
-    - key: "node.kubernetes.io/instance-type"
-      operator: In
-      values: ["m5.2xlarge"]
-    - key: "topology.kubernetes.io/zone"
-      operator: In
-      values: ["us-east-1c"]
-    - key: "kubernetes.io/arch"
-      operator: In
-      values: ["arm64", "amd64"]
-    - key: "karpenter.sh/capacity-type"
-      operator: In
-      values: ["spot", "on-demand"]
-  provider:
-    instanceProfile: <<Name of your Instance Profile>>
-    subnetSelector:
-      Name: blueprint-construct-dev/blueprint-construct-dev-vpc/PrivateSubnet1
-    securityGroupSelector:
-      "kubernetes.io/cluster/blueprint-construct-dev": "owned"
-  ttlSecondsAfterEmpty: 30
+  template:
+    spec:
+      nodeClassRef:
+        name: default
+---
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  amiFamily: AL2
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}"
+
+  securityGroupSelectorTerms:
+    # Select on any security group that has both the "karpenter.sh/discovery: ${CLUSTER_NAME}" tag
+    # AND the "environment: test" tag OR any security group with the "my-security-group" name
+    # OR any security group with ID "sg-063d7acfb4b06c82c"
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}"
+
+  role: "KarpenterNodeRole-${CLUSTER_NAME}"
+
+  userData: |
+    echo "Hello world"    
+
+  tags:
+    team: team-a
+    app: team-a-app
+
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 2
+    httpTokens: required
+
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 100Gi
+        volumeType: gp3
+        iops: 10000
+        encrypted: true
+        kmsKeyID: "1234abcd-12ab-34cd-56ef-1234567890ab"
+        deleteOnTermination: true
+        throughput: 125
+        snapshotID: snap-0123456789
+
+  detailedMonitoring: true
+
 EOF
 ```
 
-If you choose to create a provisioner manually, you **MUST** provide the tags that match the subnet and the security group that you want to use.
+If you choose to create NodePool and EC2NodeClass manually, you **MUST** provide the tags that match the subnet and the security group from the Blueprints EKS cluster that you plan to use.
 
 ## Testing with a sample deployment
 
@@ -213,35 +236,15 @@ Karpenter, starting from the OCI registry versions, will untar the files under `
 
 ## Upgrade Path
 
-1. Using an older version of the Karptner add-on, you may notice the difference in the "provisionerSpecs" property:
+The addon introduces breaking changes for Blueprints npm version v0.14 and later. Here are the details:
 
-```
-provisionerSpecs: {
-    'node.kubernetes.io/instance-type': ['m5.2xlarge'],
-    'topology.kubernetes.io/zone': ['us-east-1c'],
-    'kubernetes.io/arch': ['amd64','arm64'],
-    'karpenter.sh/capacity-type': ['spot','on-demand'],
-  },
-```
+- EKS Blueprints will only support minimum Karpenter version that matches the supporter EKS Kubernetes version. Please see the compatibility matrix [here](https://karpenter.sh/docs/upgrading/compatibility/). If you provide incompatible version (i.e. providing version 0.27.x for EKS version 1.27), you will see warnings in the logs but will proceed deployment. You will run into compatibility issues.
+- The add-on will no longer support any versions below v0.21.0
+- User provided properties have been refactored to better reflect the parameters of the various Karpenter resources (i.e. NodePool, EC2NodeClass)
+- For NodePool and EC2NodeClass, the parameters will apply to either the v1alpha5 CRDs ( provisioner, AWSNodeTemplate, for Karpenter versions v0.31.x or earlier) or v1beta1 CRDs (NodePool, EC2NodeClass, for Karpenter versions v0.32.x and later). **If you provide non-matching parameters, i.e. providing `consolidation` instead of `disruption` for Karpenter version v0.33.1, you will see an error with stack failing to provision.** Please consult the [upgrade guide](https://karpenter.sh/docs/upgrading/upgrade-guide/) to see the changes for various versions.
 
-This now changes to the "requirement" property:
+If you are upgrading from earlier version of Blueprints and need to add the Karpenter addon, please ensure the following:
 
-```
-requirements: [
-      { key: 'node.kubernetes.io/instance-type', op: 'In', vals: ['m5.2xlarge'] },
-      { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
-      { key: 'kubernetes.io/arch', op: 'In', vals: ['amd64','arm64']},
-      { key: 'karpenter.sh/capacity-type', op: 'In', vals: ['spot','on-demand']},
-  ],
-```
+1. You are using the minimum Karpenter version supported by the Kubernetes version of your blueprint cluster. Not doing so will cause incompatibility issues.
 
-The property is changed to align with the naming convention of the provisioner, and to allow multiple operators (In vs NotIn). The values correspond similarly between the two, with type change being the only difference.
-
-2. Certain upgrades require reapplying the CRDs since Helm does not maintain the lifecycle of CRDs. Please see the [official documentations](hhttps://karpenter.sh/docs/upgrading/upgrade-guide/) for details.
-
-3. Starting with v0.17.0, Karpenter's Helm chart package is stored in OCI (Open Container Initiative) registry. With this change, [charts.karpenter.sh](https://charts.karpenter.sh/) is no longer updated to preserve older versions. You have to adjust for the following:
-
-* The full URL needs to be present (including 'oci://').
-* You need to append a `v` to the version number (i.e. v0.17.0, not 0.17.0)
-
-4. Starting with v0.22.0, Karpenter will no longer work on Kubernetes version prior to 1.21. Either upgrade your Kubernetes to 1.21 or later version and apply Karpenter, or use prior Karpenter versions.
+2. Starting v0.32.0, Karpenter introduces the new beta APIs (v1beta1), and therefore the addon will make v1alpha5 CRDs obsolete. Ensure that you are providing the corresponding, matching parameters.
