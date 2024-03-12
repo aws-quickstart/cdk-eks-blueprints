@@ -469,6 +469,10 @@ export class KarpenterAddOn extends HelmAddOn {
 
         karpenterChart.node.addDependency(ns);
 
+        if(clusterInfo.nodeGroups) {
+            clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
+        }
+
         // Deploy Provisioner (Alpha) or NodePool (Beta) CRD based on the Karpenter Version
         if (this.options.nodePoolSpec){
             let pool;
