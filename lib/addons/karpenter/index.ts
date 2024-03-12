@@ -332,6 +332,10 @@ export class KarpenterAddOn extends HelmAddOn {
 
         karpenterChart.node.addDependency(ns);
 
+        if(clusterInfo.nodeGroups) {
+            clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
+        }
+
         // (Optional) default provisioner
         if ((Object.keys(subnetTags).length > 0) && (Object.keys(sgTags).length > 0)){
             const provisioner = cluster.addManifest('default-provisioner', {
