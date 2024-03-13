@@ -1,8 +1,27 @@
 import * as eks from 'aws-cdk-lib/aws-eks';
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+/**
+ * Creates a list of PolicyDocuments for every JSON file in a directory
+ * @param dir Directory path to the JSON files.
+ * @returns List of PolicyDocument objects.
+ */
+export function createPolicyDocuments(dir: string): PolicyDocument[] {
+    const policyDocuments: PolicyDocument[] = [];
+    fs.readdirSync(dir, { encoding: 'utf8' }).forEach((file, _) => {
+        if (file.split('.').pop() == 'json') {
+            const data = fs.readFileSync(dir + file, 'utf8');
+            if (data != undefined) {
+                const policyDocument = PolicyDocument.fromJson(JSON.parse(data));
+                policyDocuments.push(policyDocument);
+            }
+        }
+    });
+    return policyDocuments;
+}
 
 /**
  * Applies all manifests from a directory. Note: The manifests are not checked, 

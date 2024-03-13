@@ -14,6 +14,13 @@ import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
+export const DEFAULT_KARPENTER_NODE_ROLE_POLICIES = [
+    iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+    iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+    iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
+    iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy")
+];
+
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_29, '0.34.0'],
     [KubernetesVersion.V1_28, '0.31.0'],
@@ -254,11 +261,11 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     ec2NodeClassSpec?: Ec2NodeClassSpec,
 
     /**
-     * Optional for Karpenter Node Role additional policies
-     * As users may require other policies in order for pods on Karpenter nodes
-     * to execute its tasks
+     * Optional for Karpenter Node Role additional policies, as users may require other policies in order for pods on Karpenter nodes to execute its tasks
+     * This is a reference to the directory where the IAM Policy JSON files are located
+     * NOTE: This addon will not validate the JSON files, and invalid files may cause deployment errors
      */
-    additionalPolicies?: string,
+    nodeRoleAdditionalPoliciesDir?: string,
 
     /**
      * Flag for enabling Karpenter's native interruption handling 
@@ -275,7 +282,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.35.0',
+    version: '0.35.1',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -309,6 +316,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const version = this.options.version!;
 
         const interruption = this.options.interruptionHandling || false;
+        const nodeRoleAdditionalPoliciesDir = this.options.nodeRoleAdditionalPoliciesDir;
 
         // NodePool variables
         const labels = this.options.nodePoolSpec?.labels || {};
@@ -331,7 +339,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const amiFamily = this.options.ec2NodeClassSpec?.amiFamily;
         const amiSelector = this.options.ec2NodeClassSpec?.amiSelector || {};
         const amiSelectorTerms = this.options.ec2NodeClassSpec?.amiSelectorTerms;
-        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || "";
+        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy;
         const userData = this.options.ec2NodeClassSpec?.userData || "";
         const instanceProf = this.options.ec2NodeClassSpec?.instanceProfile; 
         const tags = this.options.ec2NodeClassSpec?.tags || {};
@@ -352,7 +360,7 @@ export class KarpenterAddOn extends HelmAddOn {
             this.options.ec2NodeClassSpec, amiFamily);
 
         // Set up the node role and instance profile
-        const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(clusterInfo, stackName, region);
+        const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(clusterInfo, stackName, nodeRoleAdditionalPoliciesDir, region);
 
         // Create the controller policy
         let karpenterPolicyDocument;
@@ -693,32 +701,38 @@ export class KarpenterAddOn extends HelmAddOn {
      * Outputs to CloudFormation and map the role to the aws-auth ConfigMap
      * @param cluster EKS Cluster
      * @param stackName Name of the stack
+     * @param nodeRoleAdditionalPoliciesDir Directory containing additional policies to be attached to the Node Role
      * @param region Region of the stack
      * @returns [karpenterNodeRole, karpenterInstanceProfile]
      */
-    private setUpNodeRole(clusterInfo: ClusterInfo, stackName: string, region: string): [iam.Role, iam.CfnInstanceProfile] {
+    private setUpNodeRole(clusterInfo: ClusterInfo, stackName: string, nodeRoleAdditionalPoliciesDir: string | undefined, region: string): [iam.Role, iam.CfnInstanceProfile] {
         
-        // Required Managed Policies for the Node Role
-        let nodeRoleManagedPolicies = [
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
-        ];
-
-        // Add EKS CNI Policy only if VPC CNI is not part of the provisioned addons
-        if (clusterInfo.getProvisionedAddOn('VpcCniAddOn')){
-            nodeRoleManagedPolicies.push(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"));
-        }
-
-        // Add any additional custom policies provided by the user
-        
+        const cluster = clusterInfo.cluster as Cluster;
         
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(clusterInfo.cluster, 'karpenter-node-role', {
             assumedBy: new iam.ServicePrincipal(`ec2.${clusterInfo.cluster.stack.urlSuffix}`),
-            managedPolicies: nodeRoleManagedPolicies,
+            managedPolicies: DEFAULT_KARPENTER_NODE_ROLE_POLICIES,
             //roleName: `KarpenterNodeRole-${name}` // let role name to be generated as unique
         });
+
+        // TODO: Add EKS CNI Policy only if VPC CNI is not part of the provisioned addons as VPC CNI adds this particular policy
+        // if (!clusterInfo.getProvisionedAddOn('VpcCniAddOn')){
+        //     karpenterNodeRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"));
+        // }
+        
+        // Generate PolicyDocuments if additional policies directory is provided
+        // Then attach the policies to the Karpenter Node Role
+        if (nodeRoleAdditionalPoliciesDir) {
+            const policyDocuments = utils.createPolicyDocuments(nodeRoleAdditionalPoliciesDir);
+            // Add any additional custom policies provided by the user
+            policyDocuments.forEach((policyDocument, index) => {
+                const policy = new iam.Policy(clusterInfo.cluster, 'karpenter-additional-policy-'+index, {
+                    document: policyDocument,
+                });
+                policy.attachToRole(karpenterNodeRole);
+            });
+        }
 
         // Set up Instance Profile
         const instanceProfileName = md5.Md5.hashStr(stackName+region);
@@ -744,7 +758,7 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Map Node Role to aws-auth
-        clusterInfo.cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
+        cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
             groups: ['system:bootstrapper', 'system:nodes'],
             username: 'system:node:{{EC2PrivateDNSName}}'
         });
