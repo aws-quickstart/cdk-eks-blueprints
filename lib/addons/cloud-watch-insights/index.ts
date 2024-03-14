@@ -6,14 +6,7 @@ import {conflictsWith, createNamespace, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
 import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
-const versionMap: Map<KubernetesVersion, string> = new Map([
-  [KubernetesVersion.V1_29, "v1.3.1-eksbuild.1"],
-  [KubernetesVersion.V1_28, "v1.3.1-eksbuild.1"],
-  [KubernetesVersion.V1_27, "v1.3.1-eksbuild.1"],
-  [KubernetesVersion.V1_26, "v1.3.1-eksbuild.1"],
-]);
 
 /**
  * Configuration options for AWS Container Insights add-on.
@@ -39,7 +32,6 @@ export type CloudWatchInsightsAddOnProps = Omit<CoreAddOnProps, "saName" | "addO
 const defaultProps = {
   addOnName: "amazon-cloudwatch-observability",
   version: "auto",
-  versionMap: versionMap,
   saName: "cloudwatch-agent",
   namespace: "amazon-cloudwatch"
 };
@@ -75,11 +67,12 @@ export class CloudWatchInsights extends CoreAddOn {
       insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
       insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'));
 
-      const insightsAddon = new eks.CfnAddon(context.scope,  "CloudWatchInsightsAddon", {
+      const insightsAddon = new eks.CfnAddon(clusterInfo.cluster.stack,  "CloudWatchInsightsAddon", {
         addonName: defaultProps.addOnName,
         clusterName: cluster.clusterName,
-        addonVersion: defaultProps.version,
+        addonVersion: this.options.version ?? defaultProps.version,
         serviceAccountRoleArn: insightsSA.role.roleArn,
+        configurationValues: this.options.customCloudWatchAgentConfig ?? undefined
       });
       insightsAddon.node.addDependency(insightsSA);
       insightsAddon.node.addDependency(insightsNamespace);
