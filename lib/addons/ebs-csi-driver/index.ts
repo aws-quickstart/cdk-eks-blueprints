@@ -10,10 +10,10 @@ import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
 
 /* VersioMap showing the default version for 4 supported Kubernetes versions */
 const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_29, "v1.28.0-eksbuild.1"],
-    [KubernetesVersion.V1_28, "v1.28.0-eksbuild.1"],
-    [KubernetesVersion.V1_27, "v1.28.0-eksbuild.1"],
-    [KubernetesVersion.V1_26, "v1.28.0-eksbuild.1"]
+  [KubernetesVersion.V1_29, "v1.28.0-eksbuild.1"],
+  [KubernetesVersion.V1_28, "v1.28.0-eksbuild.1"],
+  [KubernetesVersion.V1_27, "v1.28.0-eksbuild.1"],
+  [KubernetesVersion.V1_26, "v1.28.0-eksbuild.1"],
 ]);
 
 /**
