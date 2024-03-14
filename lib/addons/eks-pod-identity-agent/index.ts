@@ -2,9 +2,10 @@ import { CoreAddOn } from "../core-addon";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_28, "v1.0.0-eksbuild.1"],
-    [KubernetesVersion.V1_27, "v1.0.0-eksbuild.1"],
-    [KubernetesVersion.V1_26, "v1.0.0-eksbuild.1"]
+    [KubernetesVersion.V1_29, "v1.2.0-eksbuild.1"],
+    [KubernetesVersion.V1_28, "v1.2.0-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v1.2.0-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v1.2.0-eksbuild.1"],
 ]);
 
 /**
