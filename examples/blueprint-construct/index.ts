@@ -14,6 +14,8 @@ const rikerManifestDir = './examples/teams/team-riker/';
 const teamManifestDirList = [burnhamManifestDir, rikerManifestDir];
 const blueprintID = 'blueprint-construct-dev';
 
+const karpenterNodeRolePoliciesDir = './examples/policies/karpenter/';
+
 export interface BlueprintConstructProps {
     /**
      * Id
@@ -148,6 +150,7 @@ export default class BlueprintConstruct {
                 nodePoolSpec: nodePoolSpec,
                 ec2NodeClassSpec: nodeClassSpec,
                 interruptionHandling: true,
+                nodeRoleAdditionalPoliciesDir: karpenterNodeRolePoliciesDir
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),

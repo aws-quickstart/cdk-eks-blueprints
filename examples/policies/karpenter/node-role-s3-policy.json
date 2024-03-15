@@ -1,0 +1,14 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "*",
+            "Condition": {
+                "DateGreaterThan": {"aws:CurrentTime": "2024-02-01T00:00:00Z"},
+                "DateLessThan": {"aws:CurrentTime": "2024-06-30T23:59:59Z"}
+            }
+        }
+    ]
+}

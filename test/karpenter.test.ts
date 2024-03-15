@@ -427,5 +427,39 @@ describe('Unit tests for Karpenter addon', () => {
         expect(manifest.spec.blockDeviceMappings).toBeDefined();
         expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
         expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);
-      });
+    });
+
+    test("Stack creation succeeds with node role additional policy", async () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        const stack = await blueprint
+            .version(KubernetesVersion.V1_29)
+            .account("123567891")
+            .region("us-west-1")
+            .addOns(new blueprints.KarpenterAddOn({
+                version: '0.35.1',
+                nodeRoleAdditionalPoliciesDir: './test/karpenter/',
+            })).buildAsync(app, "stack-with-additional-node-role-policies");
+            
+        let numAdditionalPolicies: number = 0;
+        const template = Template.fromStack(stack);
+        const policyResources = template.findResources("AWS::IAM::Policy");
+        const additionalNodeRolePolicies = Object.values(policyResources).find((policyResource) => {
+            if (policyResource?.Properties?.PolicyName) {
+                const policyName = policyResource.Properties.PolicyName;
+                if (typeof policyName === "string" && policyName.includes('karpenteradditionalpolicy')) { 
+                    numAdditionalPolicies++;
+                    return true;
+                }
+            }
+            return false;
+        });
+        expect(numAdditionalPolicies).toEqual(1);
+        const policyStatement = additionalNodeRolePolicies?.Properties?.PolicyDocument.Statement;
+        expect(policyStatement[0].Action).toEqual('s3:ListBucket');
+        expect(policyStatement[0].Effect).toEqual('Allow');
+        expect(policyStatement[0].Resource).toEqual('*');
+    });
 });
