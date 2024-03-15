@@ -107,14 +107,15 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
             Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
         }
-        
-        // Create namespace
-        if (this.options.createNamespace) {
-            createNamespace(namespace, cluster, true);
-        }
 
         // Create IRSA
         const sa = createServiceAccount(cluster, RELEASE, namespace, autoscalerPolicyDocument);
+
+        // Create namespace
+        if (this.options.createNamespace) {
+            const ns = createNamespace(namespace, cluster, true);
+            sa.node.addDependency(ns);
+        }
 
         // Create Helm Chart
         setPath(values, "cloudProvider", "aws");
