@@ -513,7 +513,9 @@ export class KarpenterAddOn extends HelmAddOn {
                         labels: labels,
                         annotations: annotations,
                         requirements: this.convert(requirements),
-                        limits: limits,
+                        limits: {
+                            resources: limits,
+                        },
                         consolidation: consol,
                         ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                         ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
