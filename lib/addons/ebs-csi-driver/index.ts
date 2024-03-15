@@ -8,17 +8,18 @@ import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Construct } from "constructs";
 import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
 
+/* VersioMap showing the default version for 4 supported Kubernetes versions */
 const versionMap: Map<KubernetesVersion, string> = new Map([
-  [KubernetesVersion.V1_29, "v1.28.0-eksbuild.1"],
-  [KubernetesVersion.V1_28, "v1.28.0-eksbuild.1"],
-  [KubernetesVersion.V1_27, "v1.28.0-eksbuild.1"],
-  [KubernetesVersion.V1_26, "v1.28.0-eksbuild.1"],
+    [KubernetesVersion.V1_29, "v1.28.0-eksbuild.1"],
+    [KubernetesVersion.V1_28, "v1.28.0-eksbuild.1"],
+    [KubernetesVersion.V1_27, "v1.28.0-eksbuild.1"],
+    [KubernetesVersion.V1_26, "v1.28.0-eksbuild.1"]
 ]);
 
 /**
  * Interface for EBS CSI Driver EKS add-on options
  */
-export interface EbsCsiDriverAddOnProps extends CoreAddOnProps {
+export type EbsCsiDriverAddOnProps = Omit<CoreAddOnProps, "policyDocumentProvider" | "saName" | "addOnName" | "controlPlaneAddOn" | "namespace" | "versionMap" > & {
   /**
    * List of KMS keys to be used for encryption
    */
