@@ -483,12 +483,7 @@ export class KarpenterAddOn extends HelmAddOn {
             // loop over the CRD's and load the yaml and deploy the manifest
             for (const [crdName, crdUrl] of CRDs) {
                 const crdManifest = utils.loadExternalYaml(crdUrl);
-                // ... apply any substitutions for dynamic values 
-                const manifest = new KubernetesManifest(cluster.stack, crdName, {
-                    cluster,
-                    manifest: crdManifest,
-                    overwrite: true // must be true, for it to use kubectl apply, rather than create
-                });
+                const manifest = cluster.addManifest(crdName, crdManifest);
                 
                 // We want these installed before the karpenterChart, or helm will timeout waiting for it to stabilize
                 karpenterChart.node.addDependency(manifest);
