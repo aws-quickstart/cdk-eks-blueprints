@@ -12,7 +12,7 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion, KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_29, '0.34.0'],
@@ -472,6 +472,29 @@ export class KarpenterAddOn extends HelmAddOn {
         if(clusterInfo.nodeGroups) {
             clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
         }
+
+        if (semver.gte(version, "0.32.0")){
+            const CRDs =[ 
+                [ "karpentersh-nodepool-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodepools.yaml` ],
+                [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
+                [ "karpenterk8s-ec2nodeclasses-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.k8s.aws_ec2nodeclasses.yaml`],
+            ];
+            
+            // loop over the CRD's and load the yaml and deploy the manifest
+            for (const [crdName, crdUrl] of CRDs) {
+                const crdManifest = utils.loadExternalYaml(crdUrl);
+                // ... apply any substitutions for dynamic values 
+                const manifest = new KubernetesManifest(cluster.stack, crdName, {
+                    cluster,
+                    manifest: crdManifest,
+                    overwrite: true // must be true, for it to use kubectl apply, rather than create
+                });
+                
+                // We want these installed before the karpenterChart, or helm will timeout waiting for it to stabilize
+                karpenterChart.node.addDependency(manifest);
+            }
+        }
+
 
         // Deploy Provisioner (Alpha) or NodePool (Beta) CRD based on the Karpenter Version
         if (this.options.nodePoolSpec){
