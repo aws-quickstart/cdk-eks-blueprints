@@ -216,7 +216,6 @@ export type NodePoolSpec = {
       * Limits prevent Karpenter from creating new instances once the limit is exceeded.
       */
      limits?: {
-         resources?: {
          cpu?: number;
          memory?: string;
          /**
@@ -226,7 +225,6 @@ export type NodePoolSpec = {
           * e.g nvidia.com/gpu, amd.com/gpu, etc...
           */
          [k: string]: unknown;
-         };
      },
 
      /**
@@ -515,7 +513,9 @@ export class KarpenterAddOn extends HelmAddOn {
                         labels: labels,
                         annotations: annotations,
                         requirements: this.convert(requirements),
-                        limits: limits,
+                        limits: {
+                            resources: limits,
+                        },
                         consolidation: consol,
                         ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                         ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
