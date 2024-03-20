@@ -1,9 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import {CloudWatchInsightsAddOnProps} from "../lib";
+import {CloudWatchInsightsAddOnProps, Values} from "../lib";
 import {Match, Template} from "aws-cdk-lib/assertions";
 
-const customAgentConfig = `{
+const customAgentConfig: Values = {
   "agent": {
     "metrics_collection_interval": 20,
     "metrics": {
@@ -34,7 +34,7 @@ const customAgentConfig = `{
       }
     }
   }
-}`;
+};
 
 const cloudwatchInsightsAddOnProps = {
   version: "v1.2.1-eksbuild.1",
@@ -57,7 +57,7 @@ describe('Unit test for CloudWatch Addon', () => {
     template.hasResource("AWS::EKS::Addon", {
       Properties: {
         "AddonVersion": Match.stringLikeRegexp("v1.2.1-eksbuild.1"),
-        "ConfigurationValues": Match.exact(customAgentConfig)
+        "ConfigurationValues": Match.exact(JSON.stringify(customAgentConfig))
       }
     });
   });
