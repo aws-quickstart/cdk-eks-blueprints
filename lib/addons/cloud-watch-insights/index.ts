@@ -1,14 +1,13 @@
-import {Construct} from 'constructs';
-import * as iam from "aws-cdk-lib/aws-iam";
+import {Construct, IConstruct} from 'constructs';
+import {IManagedPolicy, ManagedPolicy} from "aws-cdk-lib/aws-iam";
 import {ClusterInfo, Values} from "../../spi";
-import {conflictsWith, supportsALL} from "../../utils";
+import {conflictsWith, createNamespace as makeNamespace, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
-import {IManagedPolicy, ManagedPolicy} from "aws-cdk-lib/aws-iam";
-import {KubernetesVersion, ServiceAccount} from "aws-cdk-lib/aws-eks";
+import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
-  [KubernetesVersion.V1_29, "v1.3.1-eksbuild.1"],
+  [KubernetesVersion.V1_29, "v1.4.0-eksbuild.1"],
   [KubernetesVersion.V1_28, "v1.3.1-eksbuild.1"],
   [KubernetesVersion.V1_27, "v1.3.1-eksbuild.1"],
   [KubernetesVersion.V1_26, "v1.3.1-eksbuild.1"],
@@ -52,42 +51,42 @@ export class CloudWatchInsights extends CoreAddOn {
 
   readonly options: CloudWatchInsightsAddOnProps;
 
-    constructor(props?: CloudWatchInsightsAddOnProps) {
-      super({
-        addOnName: defaultProps.addOnName,
-        version: props?.version ?? defaultProps.version,
-        versionMap: defaultProps.versionMap,
-        saName: defaultProps.saName,
-        namespace: defaultProps.namespace,
-        configurationValues: props?.customCloudWatchAgentConfig ?? {},
-        controlPlaneAddOn: false
+  constructor(props?: CloudWatchInsightsAddOnProps) {
+    super({
+      addOnName: defaultProps.addOnName,
+      version: props?.version ?? defaultProps.version,
+      versionMap: defaultProps.versionMap,
+      saName: defaultProps.saName,
+      namespace: defaultProps.namespace,
+      configurationValues: props?.customCloudWatchAgentConfig ?? {},
+      controlPlaneAddOn: false
+    });
+
+    this.options = props ?? {};
+  }
+
+  @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon", "CloudWatchLogsAddon")
+  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+    return super.deploy(clusterInfo);
+  }
+
+  createNamespace(clusterInfo: ClusterInfo, namespaceName: string): IConstruct | undefined {
+    return makeNamespace(namespaceName, clusterInfo.cluster);
+  }
+
+  provideManagedPolicies(clusterInfo: ClusterInfo): IManagedPolicy[] | undefined {
+    const requiredPolicies = [
+      ManagedPolicy.fromAwsManagedPolicyName("CloudWatchAgentServerPolicy"),
+      ManagedPolicy.fromAwsManagedPolicyName("AWSXrayWriteOnlyAccess")
+    ];
+
+    if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
+      const ebsPolicy = new ManagedPolicy(clusterInfo.cluster, 'cloudwatch-agent-mangaed-policy', {
+        document: ebsCollectorPolicy()
       });
-
-      this.options = props ?? {};
+      requiredPolicies.push(ebsPolicy);
     }
 
-    @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon", "CloudWatchLogsAddon")
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-      return super.deploy(clusterInfo);
-    }
-
-    createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, _policies: IManagedPolicy[]): ServiceAccount {
-      const sa = clusterInfo.cluster.addServiceAccount('CloudWatchInsightsSA', {
-        name: defaultProps.saName,
-        namespace: saNamespace
-      });
-
-      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
-      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'));
-
-      if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
-        sa.role.attachInlinePolicy(
-          new iam.Policy(clusterInfo.cluster.stack, "EbsPerformanceLogsPolicy", {
-            document: ebsCollectorPolicy()
-          })
-        );
-      }
-
-      return sa;
-    }
+    return requiredPolicies;
+  }
 }

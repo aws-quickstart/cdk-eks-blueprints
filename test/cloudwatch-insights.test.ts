@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import {CloudWatchInsightsAddOnProps, Values} from "../lib";
 import {Match, Template} from "aws-cdk-lib/assertions";
+import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
 
 const customAgentConfig: Values = {
   "agent": {
@@ -43,14 +44,32 @@ const cloudwatchInsightsAddOnProps = {
 
 describe('Unit test for CloudWatch Addon', () => {
 
-  test("Stack accepts the assigned version from the override", () => {
+  test("Stack is defined when using a specified version of EKS", async () => {
     const app = new cdk.App();
 
-    const blueprint = blueprints.EksBlueprint.builder()
+    const blueprint = await blueprints.EksBlueprint.builder()
+      .version(KubernetesVersion.V1_29)
+      .account("123456789012").region('us-east-2')
+      .addOns(new blueprints.CloudWatchInsights())
+      .buildAsync(app,  'cloudwatch-insights-specific-eks-version');
+
+    const template = Template.fromStack(blueprint);
+
+    template.hasResource("AWS::EKS::Addon", {
+      Properties: {
+        "AddonVersion": Match.exact("v1.4.0-eksbuild.1")
+      }
+    });
+  });
+
+  test("Stack accepts the assigned version from the override", async () => {
+    const app = new cdk.App();
+
+    const blueprint = await blueprints.EksBlueprint.builder()
       .version("auto")
       .account("123456789012").region('us-east-2')
       .addOns(new blueprints.CloudWatchInsights(cloudwatchInsightsAddOnProps))
-      .build(app,  'cloudwatch-insights-version-respected');
+      .buildAsync(app,  'cloudwatch-insights-version-respected');
 
     const template = Template.fromStack(blueprint);
 
