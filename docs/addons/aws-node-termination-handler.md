@@ -22,7 +22,7 @@ const app = new cdk.App();
 const addOn = new blueprints.addons.AwsNodeTerminationHandlerAddOn();
 
 const clusterProvider = new blueprints.AsgClusterProvider({
-  version: eks.KubernetesVersion.V1_25,
+  version: eks.KubernetesVersion.V1_29,
   machineImageType:  eks.MachineImageType.BOTTLEROCKET
 });
 
