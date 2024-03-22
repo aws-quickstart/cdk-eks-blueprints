@@ -1,12 +1,11 @@
 import {Construct} from 'constructs';
-import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
-import {ClusterInfo} from "../../spi";
-import {conflictsWith, createNamespace, supportsALL} from "../../utils";
+import {ClusterInfo, Values} from "../../spi";
+import {conflictsWith, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
-import {ManagedPolicy} from "aws-cdk-lib/aws-iam";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import {IManagedPolicy, ManagedPolicy} from "aws-cdk-lib/aws-iam";
+import {KubernetesVersion, ServiceAccount} from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
   [KubernetesVersion.V1_29, "v1.3.1-eksbuild.1"],
@@ -14,6 +13,7 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
   [KubernetesVersion.V1_27, "v1.3.1-eksbuild.1"],
   [KubernetesVersion.V1_26, "v1.3.1-eksbuild.1"],
 ]);
+
 
 /**
  * Configuration options for AWS Container Insights add-on.
@@ -28,7 +28,7 @@ export type CloudWatchInsightsAddOnProps = Omit<CoreAddOnProps, "saName" | "addO
    * Custom CloudWatch Agent configuration, specifics can be found here:
    * https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Observability-EKS-addon.html#install-CloudWatch-Observability-EKS-addon-configuration
    */
-  customCloudWatchAgentConfig?: string,
+  customCloudWatchAgentConfig?: Values,
 
   /**
    * Define the CloudWatch Agent configuration
@@ -53,45 +53,41 @@ export class CloudWatchInsights extends CoreAddOn {
   readonly options: CloudWatchInsightsAddOnProps;
 
     constructor(props?: CloudWatchInsightsAddOnProps) {
-      super({ ...defaultProps, ...props });
+      super({
+        addOnName: defaultProps.addOnName,
+        version: props?.version ?? defaultProps.version,
+        versionMap: defaultProps.versionMap,
+        saName: defaultProps.saName,
+        namespace: defaultProps.namespace,
+        configurationValues: props?.customCloudWatchAgentConfig ?? {},
+        controlPlaneAddOn: false
+      });
 
       this.options = props ?? {};
     }
 
     @conflictsWith("AdotCollectorAddon", "CloudWatchAdotAddon", "CloudWatchLogsAddon")
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-      const cluster = clusterInfo.cluster;
-      const context = clusterInfo.getResourceContext();
+      return super.deploy(clusterInfo);
+    }
 
-      const insightsSA = cluster.addServiceAccount("CloudWatchInsightsSA", {
+    createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, _policies: IManagedPolicy[]): ServiceAccount {
+      const sa = clusterInfo.cluster.addServiceAccount('CloudWatchInsightsSA', {
         name: defaultProps.saName,
-        namespace: defaultProps.namespace
+        namespace: saNamespace
       });
 
-      const insightsNamespace = createNamespace(defaultProps.namespace,  cluster);
-
-      insightsSA.node.addDependency(insightsNamespace);
-
-      insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
-      insightsSA.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'));
-
-      const insightsAddon = new eks.CfnAddon(context.scope,  "CloudWatchInsightsAddon", {
-        addonName: defaultProps.addOnName,
-        clusterName: cluster.clusterName,
-        addonVersion: defaultProps.version,
-        serviceAccountRoleArn: insightsSA.role.roleArn,
-      });
-      insightsAddon.node.addDependency(insightsSA);
-      insightsAddon.node.addDependency(insightsNamespace);
+      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'));
+      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess'));
 
       if (this.options.ebsPerformanceLogs != undefined && this.options.ebsPerformanceLogs) {
-        insightsSA.role.attachInlinePolicy(
-          new iam.Policy(context.scope, "EbsPerformanceLogsPolicy", {
+        sa.role.attachInlinePolicy(
+          new iam.Policy(clusterInfo.cluster.stack, "EbsPerformanceLogsPolicy", {
             document: ebsCollectorPolicy()
           })
         );
       }
 
-      return Promise.resolve(insightsAddon);
+      return sa;
     }
 }
