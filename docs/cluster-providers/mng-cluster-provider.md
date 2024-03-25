@@ -9,7 +9,6 @@ const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
-    version: "auto"
     instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
