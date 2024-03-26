@@ -93,7 +93,7 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring the cluster name, endpoint, Instance Profile, and others necessary for functional addon.
 5. If the user provides `nodePoolSpec` (and `ec2NodeClassSpec`), the addon will provisions a default Karpenter NodePool and EC2NodeClass CRDs. `nodePoolSpec` requires [requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements) while `ec2NodeClassSpec` requires subnets and security groups. Based on what version of Karpenter you provide, you will need either `subnetSelector` and `securityGroupSelector` (for versions v0.31.x or down), or `subnetSelectorTerms` and `securityGroupSelectorTerms` (for versions v0.32.x and up).
-6. As mentioned above, the CRDs installed will be different from v0.32.0, since Karpenter as a project graduated to beta in October 2023. This meant significant API changes, going from alpha to beta. The addon has reflected those changes and will deploy NodePool and EC2NodeClass for v1beta1 CRDs, versus Provisioner and AWSNodeTemplate for v1alpha5. You can read more about the changes in this [blog](https://aws.amazon.com/blogs/containers/karpenter-graduates-to-beta/). This addon can install the new CRDs by setting the `manageCRDs` add-on option to true.
+6. As mentioned above, the CRDs installed will be different from v0.32.0, since Karpenter as a project graduated to beta in October 2023. This meant significant API changes, going from alpha to beta. The addon has reflected those changes and will deploy NodePool and EC2NodeClass for v1beta1 CRDs, versus Provisioner and AWSNodeTemplate for v1alpha5. You can read more about the changes in this [blog](https://aws.amazon.com/blogs/containers/karpenter-graduates-to-beta/). This addon can install the new CRDs by setting the `installCRDs` add-on option to true.
 
 ***NOTE: EKS Blueprints npm v1.14 and above introduces breaking changes to the addon. Please see [Upgrade Path](#upgrade-path) for more details.***
 
@@ -242,7 +242,7 @@ The addon introduces breaking changes for Blueprints npm version v0.14 and later
 - The add-on will no longer support any versions below v0.21.0
 - User provided properties have been refactored to better reflect the parameters of the various Karpenter resources (i.e. NodePool, EC2NodeClass)
 - For NodePool and EC2NodeClass, the parameters will apply to either the v1alpha5 CRDs ( provisioner, AWSNodeTemplate, for Karpenter versions v0.31.x or earlier) or v1beta1 CRDs (NodePool, EC2NodeClass, for Karpenter versions v0.32.x and later). **If you provide non-matching parameters, i.e. providing `consolidation` instead of `disruption` for Karpenter version v0.33.1, you will see an error with stack failing to provision.** Please consult the [upgrade guide](https://karpenter.sh/docs/upgrading/upgrade-guide/) to see the changes for various versions.
-- To have the add-on install new CRDs after an initial install, set the `manageCRDs` option to true.
+- To have the add-on install new CRDs after an initial install, set the `installCRDs` option to true.
 
 If you are upgrading from earlier version of Blueprints and need to add the Karpenter addon, please ensure the following:
 

@@ -264,7 +264,7 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
     * If not provided, defaults to true
     * If set to true, the add-on will manage installation of the CRDs
     */
-    manageCRDs?: boolean,
+    installCRDs?: boolean,
 }
 
 const KARPENTER = 'karpenter';
@@ -310,7 +310,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const version = this.options.version!;
 
         const interruption = this.options.interruptionHandling || false;
-        const manageCRDs = this.options.manageCRDs || false;
+        const installCRDs = this.options.installCRDs || false;
 
         // NodePool variables
         const labels = this.options.nodePoolSpec?.labels || {};
@@ -482,7 +482,7 @@ export class KarpenterAddOn extends HelmAddOn {
             clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
         }
 
-        if (semver.gte(version, "0.32.0") && manageCRDs){
+        if (semver.gte(version, "0.32.0") && installCRDs){
             const CRDs =[ 
                 [ "karpentersh-nodepool-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodepools.yaml` ],
                 [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
