@@ -19,7 +19,7 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 /**
  * Interface for EBS CSI Driver EKS add-on options
  */
-export type EbsCsiDriverAddOnProps = Omit<CoreAddOnProps, "policyDocumentProvider" | "saName" | "addOnName" | "controlPlaneAddOn" | "namespace" | "versionMap" > & {
+export type EbsCsiDriverAddOnProps = Omit<CoreAddOnProps, "policyDocumentProvider" | "saName" | "addOnName" | "controlPlaneAddOn" | "namespace" | "versionMap" | "version"> & {
   /**
    * List of KMS keys to be used for encryption
    */
@@ -28,6 +28,10 @@ export type EbsCsiDriverAddOnProps = Omit<CoreAddOnProps, "policyDocumentProvide
    * StorageClass to be used for the addon
    */
   storageClass?: string;
+  /**
+   * Version of the EBS CSI driver to be used
+   */
+  version?: string;
 }
 
 /**
