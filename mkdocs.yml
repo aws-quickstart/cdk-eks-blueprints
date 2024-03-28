@@ -16,7 +16,7 @@ nav:
     - Teams: 'teams/teams.md'
     - EMR on EKS Team: 'teams/emr-eks-team.md'
     - AWS Batch on EKS Team: 'teams/aws-batch-on-eks-team.md'
-    - Bedrock Team: 'teams/geneai-team/bedrock-team.md'
+    - Bedrock Team: 'teams/bedrock-team.md'
   - Pipelines: 'pipelines.md'
   - AddOns:
     - Overview: 'addons/index.md'
