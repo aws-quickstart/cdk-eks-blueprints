@@ -17,7 +17,7 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 /**
  * Configuration options for the Adot add-on.
  */
-export type AdotCollectorAddOnProps = Partial<Omit<CoreAddOnProps, "addOnName" | "controlPlaneAddOn" | "saName">> & {
+export type AdotCollectorAddOnProps = Partial<Omit<CoreAddOnProps, "addOnName" | "saName">> & {
     namespace?: string;
 };
 

@@ -4,11 +4,40 @@ import * as blueprints from "../lib";
 import { AssertionError } from "assert";
 import { Match, Template } from "aws-cdk-lib/assertions";
 
+const stackName = "stack-test";
+
+const region = "us-west-1";
+const account = "123567891";
+const clusterVersion: "auto" | cdk.aws_eks.KubernetesVersion = "auto";
+
+const addonName = "adot";
+
 describe("Unit tests for ADOT addon", () => {
-    const region = "us-west-1";
-    const account = "123567891";
-    const clusterVersion: "auto" | cdk.aws_eks.KubernetesVersion = "auto";
-    const addonName = "adot";
+    describe("Composite Test", () => {
+        test("Generic Name", async () => {
+            const app = new cdk.App();
+
+            const blueprint = blueprints.EksBlueprint.builder();
+            const addonVersion = "0.61";
+
+            const stack = await blueprint
+                .account(account)
+                .region(region)
+                .version(clusterVersion)
+                .addOns(
+                    new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+                    new blueprints.addons.CertManagerAddOn(),
+                    new blueprints.addons.AdotCollectorAddOn({
+                        version: addonVersion,
+                        namespace: "adot-collector",
+                        controlPlaneAddOn: true,
+                        configurationValues: {},
+                    })
+                )
+                .buildAsync(app, stackName);
+            expect(stack).toBeDefined();
+        });
+    });
 
     describe("Stack creation", () => {
         test("fails", async () => {
@@ -22,7 +51,7 @@ describe("Unit tests for ADOT addon", () => {
                     .region(region)
                     .version(clusterVersion)
                     .addOns(new blueprints.addons.AdotCollectorAddOn())
-                    .buildAsync(app, "adot-addon-stack");
+                    .buildAsync(app, stackName);
 
                 expect(stack).toBeUndefined();
             } catch (error) {
@@ -44,7 +73,7 @@ describe("Unit tests for ADOT addon", () => {
                     new blueprints.addons.CertManagerAddOn(),
                     new blueprints.addons.AdotCollectorAddOn()
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
@@ -71,7 +100,7 @@ describe("Unit tests for ADOT addon", () => {
                         version: addonVersion,
                     })
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
@@ -97,7 +126,7 @@ describe("Unit tests for ADOT addon", () => {
                         version: addonVersion,
                     })
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
@@ -123,7 +152,7 @@ describe("Unit tests for ADOT addon", () => {
                         version: addonVersion,
                     })
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
@@ -151,7 +180,7 @@ describe("Unit tests for ADOT addon", () => {
                         namespace,
                     })
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
 
             Template.fromStack(stack).hasResourceProperties("Custom::AWSCDK-EKS-KubernetesResource", {
                 Manifest: Match.stringLikeRegexp(`.*"kind":"Namespace".*"metadata":{"name":"${namespace}",.*`),
@@ -174,7 +203,7 @@ describe("Unit tests for ADOT addon", () => {
                     new blueprints.addons.CertManagerAddOn(),
                     new blueprints.addons.AdotCollectorAddOn()
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
 
             Template.fromStack(stack).hasResourceProperties("Custom::AWSCDK-EKS-KubernetesResource", {
                 Manifest: Match.stringLikeRegexp(`.*"kind":"Namespace".*"metadata":{"name":"${namespace}",.*`),
@@ -199,7 +228,7 @@ describe("Unit tests for ADOT addon", () => {
                         namespace: undefined,
                     })
                 )
-                .buildAsync(app, "adot-addon-stack");
+                .buildAsync(app, stackName);
 
             Template.fromStack(stack).hasResourceProperties("Custom::AWSCDK-EKS-KubernetesResource", {
                 Manifest: Match.stringLikeRegexp(`.*"kind":"Namespace".*"metadata":{"name":"${namespace}",.*`),
