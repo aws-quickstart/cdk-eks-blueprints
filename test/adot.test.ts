@@ -104,6 +104,32 @@ describe("Unit tests for ADOT addon", () => {
                 AddonVersion: Match.not(addonVersion),
             });
         });
+
+        test("Use undefined version", async () => {
+            const app = new cdk.App();
+
+            const blueprint = blueprints.EksBlueprint.builder();
+            const addonVersion = undefined;
+
+            const stack = await blueprint
+                .account(account)
+                .region(region)
+                .version(clusterVersion)
+                .addOns(
+                    new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+                    new blueprints.addons.CertManagerAddOn(),
+                    new blueprints.addons.AdotCollectorAddOn({
+                        version: addonVersion,
+                    })
+                )
+                .buildAsync(app, "adot-addon-stack");
+            expect(stack).toBeDefined();
+
+            Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
+                AddonName: "adot",
+                AddonVersion: Match.not(addonVersion),
+            });
+        });
     });
 
     describe("Namespace", () => {
