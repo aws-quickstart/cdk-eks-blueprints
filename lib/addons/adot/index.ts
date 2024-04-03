@@ -17,7 +17,7 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 /**
  * Configuration options for the Adot add-on.
  */
-export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" > & {
+export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" | "version" > & {
     namespace: string; 
   };
 
@@ -76,6 +76,5 @@ export class AdotCollectorAddOn extends CoreAddOn {
         otelPermissionsStatement.node.addDependency(ns); 
         return otelPermissionsStatement;
     }
-}
-  
+} 
 
