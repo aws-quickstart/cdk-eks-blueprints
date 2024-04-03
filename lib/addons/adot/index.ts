@@ -17,9 +17,9 @@ const versionMap: Map<KubernetesVersion, string> = new Map([
 /**
  * Configuration options for the Adot add-on.
  */
-export type AdotCollectorAddOnProps = Omit<CoreAddOnProps, "saName" | "addOnName" | "version" > & {
-    namespace: string; 
-  };
+export type AdotCollectorAddOnProps = Partial<Omit<CoreAddOnProps, "addOnName" | "controlPlaneAddOn" | "saName">> & {
+    namespace?: string;
+};
 
 const defaultProps = {
     addOnName: 'adot',
@@ -31,23 +31,24 @@ const defaultProps = {
     configurationValues: {}
 };
 
- /**
-  * Implementation of Adot Collector EKS add-on.
-  */
+/**
+ * Implementation of Adot Collector EKS add-on.
+ */
 @supportsALL
 export class AdotCollectorAddOn extends CoreAddOn {
 
     constructor(props?: AdotCollectorAddOnProps) {
-        super({ 
+        super({
             ...defaultProps,
-            namespace: props?.namespace ?? defaultProps.namespace, 
-            ...props
+            ...props,
+            namespace: props?.namespace ?? defaultProps.namespace,
+            version: props?.version ?? defaultProps.version
         });
 
     }
     @dependable(CertManagerAddOn.name)
-    deploy(clusterInfo: ClusterInfo): Promise<Construct>  {
-        
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+
         const addOnPromise = super.deploy(clusterInfo);
         return addOnPromise;
     }
@@ -70,11 +71,10 @@ export class AdotCollectorAddOn extends CoreAddOn {
             cluster,
             manifest: otelPermissionsManifest,
             overwrite: true,
-            
         });
-        
-        otelPermissionsStatement.node.addDependency(ns); 
+
+        otelPermissionsStatement.node.addDependency(ns);
         return otelPermissionsStatement;
     }
-} 
+}
 
