@@ -44,11 +44,10 @@ export class AdotCollectorAddOn extends CoreAddOn {
             namespace: props?.namespace ?? defaultProps.namespace,
             version: props?.version ?? defaultProps.version
         });
-
     }
+
     @dependable(CertManagerAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-
         const addOnPromise = super.deploy(clusterInfo);
         return addOnPromise;
     }
