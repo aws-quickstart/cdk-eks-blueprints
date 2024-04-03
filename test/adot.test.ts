@@ -8,6 +8,7 @@ describe("Unit tests for ADOT addon", () => {
     const region = "us-west-1";
     const account = "123567891";
     const clusterVersion: "auto" | cdk.aws_eks.KubernetesVersion = "auto";
+    const addonName = "adot";
 
     describe("Stack creation", () => {
         test("fails", async () => {
@@ -47,7 +48,7 @@ describe("Unit tests for ADOT addon", () => {
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
-                AddonName: "adot",
+                AddonName: addonName,
             });
         });
     });
@@ -74,7 +75,7 @@ describe("Unit tests for ADOT addon", () => {
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
-                AddonName: "adot",
+                AddonName: addonName,
                 AddonVersion: addonVersion,
             });
         });
@@ -100,7 +101,7 @@ describe("Unit tests for ADOT addon", () => {
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
-                AddonName: "adot",
+                AddonName: addonName,
                 AddonVersion: Match.not(addonVersion),
             });
         });
@@ -126,7 +127,7 @@ describe("Unit tests for ADOT addon", () => {
             expect(stack).toBeDefined();
 
             Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
-                AddonName: "adot",
+                AddonName: addonName,
                 AddonVersion: Match.not(addonVersion),
             });
         });
