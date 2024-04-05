@@ -114,7 +114,15 @@ describe("Unit tests for ServiceAckAddOn", () => {
                 AckServiceName.MEMORYDB,
                 AckServiceName.S3
             ];
-            const addons = services.map((service) => { return serviceAddonSupportMapping[service] });
+            // need more control over addons to avoid them both trying to create the namespace
+            const addons = [
+                new blueprints.MemoryDBAckAddOn({
+                    createNamespace: true
+                }),
+                new blueprints.S3AckAddOn({
+                    createNamespace: false
+                }),
+            ];
             const chartNames = services.map((service) => { return blueprints.serviceMappings[service as AckServiceName]?.chart });
 
             test("ARM", async () => {
