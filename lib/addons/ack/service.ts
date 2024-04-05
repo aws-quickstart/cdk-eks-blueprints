@@ -175,6 +175,7 @@ export class KafkaAckAddOn extends AckAddOn {
         super(ackProps);
     }
 }
+@supportsALL
 export class KinesisAckAddOn extends AckAddOn {
     constructor(props?: ServiceAckAddOnProps) {
         const ackProps: AckAddOnProps = {
@@ -184,6 +185,7 @@ export class KinesisAckAddOn extends AckAddOn {
         super(ackProps);
     }
 }
+@supportsALL
 export class KMSAckAddOn extends AckAddOn {
     constructor(props?: ServiceAckAddOnProps) {
         const ackProps: AckAddOnProps = {
