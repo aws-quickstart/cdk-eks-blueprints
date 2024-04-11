@@ -432,8 +432,8 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         // Create Namespace
-        const ns = utils.createNamespace(KARPENTER, cluster, true, true);
-        const sa = utils.createServiceAccount(cluster, RELEASE, KARPENTER, karpenterPolicyDocument);
+        const ns = utils.createNamespace(this.options.namespace!, cluster, true, true);
+        const sa = utils.createServiceAccount(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
         sa.node.addDependency(ns);
 
         // Create global helm values based on v1beta1 migration as shown below:
