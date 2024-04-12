@@ -8,8 +8,7 @@ The `MngClusterProvider` allows you to provision an EKS cluster which leverages 
 const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
-    desiredSize: 4,
-    version: "auto"
+    desiredSize: 4,    
     instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
