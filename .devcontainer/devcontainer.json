@@ -1,9 +1,6 @@
 {
    "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
    "features": {
-     "ghcr.io/devcontainers/features/go:1": {
-       "version": "1.21"
-     },
      "ghcr.io/devcontainers/features/node:1": {},
      "ghcr.io/devcontainers/features/aws-cli:1": {},
      "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
@@ -11,10 +8,10 @@
      }
    },
    "postCreateCommand": ".devcontainer/postCreateCommand.sh",
-   "workspaceFolder": "/home/vscode/idpbuilder",
-   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/idpbuilder,type=bind",
+   "workspaceFolder": "/home/vscode/cdk-eks-blueprints",
+   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/cdk-eks-blueprints,type=bind",
    "hostRequirements": {
-     "cpus": 4
+     "cpus": 2
    },
    "remoteEnv": {
      "PATH": "${containerEnv:PATH}:/home/vscode/idpbuilder"
