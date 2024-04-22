@@ -7,12 +7,12 @@
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
-# For Helm
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-chmod 700 get_helm.sh
-echo "Installing 'helm' utility ..."
-./get_helm.sh
-rm -rf get_helm.sh
+# # For Helm
+# curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+# chmod 700 get_helm.sh
+# echo "Installing 'helm' utility ..."
+# ./get_helm.sh
+# rm -rf get_helm.sh
 
 # setup autocomplete for kubectl and alias k
 mkdir $HOME/.kube

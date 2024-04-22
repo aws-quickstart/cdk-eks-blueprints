@@ -1,31 +1,18 @@
-// See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-   "name": "TypeScript example",
-   "dockerComposeFile": [
-      "docker-compose.yml"
-   ],
-   // The name of the following service has to match one of the services in docker-compose.yml
-   "service": "typescript-dev",
-   "workspaceFolder": "/work",
-   "customizations": {
-      "vscode": {
-         "extensions": [
-            "dbaeumer.vscode-eslint",
-            "donjayamanne.githistory",
-            "editorconfig.editorconfig",
-            "firsttris.vscode-jest-runner",
-            "github.copilot@prerelease",
-            "github.copilot-chat@prerelease",
-            "github.copilot-labs@prerelease",
-            "mhutchie.git-graph",
-            "ms-vsliveshare.vsliveshare",
-            "mutantdino.resourcemonitor",
-            "qcz.restart-ts-server-button",
-            "rtbenfield.vscode-jest-test-adapter",
-            "usernamehw.errorlens"
-         ]
-      }
+   "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
+   "features": {
+     "ghcr.io/devcontainers/features/go:1": {
+       "version": "1.21"
+     },
+     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
    },
-   "shutdownAction": "stopCompose",
-   "remoteUser": "node"
-}
+   "postCreateCommand": ".devcontainer/postCreateCommand.sh",
+   "workspaceFolder": "/home/vscode/idpbuilder",
+   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/idpbuilder,type=bind",
+   "hostRequirements": {
+     "cpus": 4
+   },
+   "remoteEnv": {
+     "PATH": "${containerEnv:PATH}:/home/vscode/idpbuilder"
+   }
+ }
