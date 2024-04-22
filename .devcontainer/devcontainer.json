@@ -5,7 +5,6 @@
        "version": "1.21"
      },
      "ghcr.io/devcontainers/features/node:1": {},
-     "ghcr.io/devcontainers/features/aws-cli:1": {},
      "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
        "version": "2.133.0"
      }
