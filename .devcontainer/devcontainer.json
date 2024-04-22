@@ -4,7 +4,11 @@
      "ghcr.io/devcontainers/features/go:1": {
        "version": "1.21"
      },
-     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+     "ghcr.io/devcontainers/features/node:1": {},
+     "ghcr.io/devcontainers/features/aws-cli:1": {},
+     "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
+       "version": "2.133.0"
+     }
    },
    "postCreateCommand": ".devcontainer/postCreateCommand.sh",
    "workspaceFolder": "/home/vscode/idpbuilder",
