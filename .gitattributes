@@ -1,0 +1,4 @@
+# Ensure all files git considers to be text to have normalized (LF) line endings in the repository
+# https://stackoverflow.com/a/33890199/411428
+# [Manfred, 06feb2022]
+* text=auto
