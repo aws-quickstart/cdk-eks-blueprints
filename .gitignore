@@ -1,7 +1,6 @@
 !jest.config.js
 *.d.ts
 node_modules
-.vscode
 .local-pack
 .classpath.txt
 .idea
