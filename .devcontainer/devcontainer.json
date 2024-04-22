@@ -1,16 +1,32 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/devcontainers/features/aws-cli:1": {},
-    "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
-      "version": "2.133.0"
-    }
-  },
+  "name": "EKS Blueprints Dev Container Environment",
+  "dockerComposeFile": [
+     "docker-compose.yml"
+  ],
+  "service": "cdk-eks-blueprints",
   "postCreateCommand": ".devcontainer/postCreateCommand.sh",
-  "workspaceFolder": "/home/vscode/cdk-eks-blueprints",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/cdk-eks-blueprints,type=bind",
-  "hostRequirements": {
-    "cpus": 2
-  }
+  "workspaceFolder": "/work",
+  "customizations": {
+     "vscode": {
+        "extensions": [
+           "amazonwebservices.aws-toolkit-vscode",
+           "dbaeumer.vscode-eslint",
+           "donjayamanne.githistory",
+           "editorconfig.editorconfig",
+           "firsttris.vscode-jest-runner",
+           "github.copilot@prerelease",
+           "github.copilot-chat@prerelease",
+           "github.copilot-labs@prerelease",
+           "mhutchie.git-graph",
+           "ms-vsliveshare.vsliveshare",
+           "mutantdino.resourcemonitor",
+           "qcz.restart-ts-server-button",
+           "rtbenfield.vscode-jest-test-adapter",
+           "usernamehw.errorlens"
+        ]
+     }
+  },
+  "shutdownAction": "stopCompose",
+  "remoteUser": "node"
 }
