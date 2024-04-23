@@ -14,6 +14,6 @@
     "cpus": 2
   },
   "remoteEnv": {
-    "PATH": "${containerEnv:PATH}:/home/vscode/idpbuilder"
+    "PATH": "${containerEnv:PATH}:/home/vscode/cdk-eks-blueprints"
   }
 }
