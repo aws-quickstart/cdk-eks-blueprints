@@ -11,6 +11,13 @@ import { AwsLoadBalancerControllerAddOn } from ".."
 
 // Define the properties for the Kubernetes Ingress Add-On with optional and required settings
 export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
+    name?: string;
+    chart?: string;
+    release?: string;
+    version?: string;
+    repository?: string;
+    namespace?: string;
+    values?: any;
     backendProtocol?: string;
     crossZoneEnabled?: boolean;
     internetFacing?: boolean;
@@ -22,6 +29,7 @@ export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
     electionId?: string;
     isDefaultClass?: boolean;
     certificateResourceName?: string;
+
 }
 
 // Set default properties for the add-on
