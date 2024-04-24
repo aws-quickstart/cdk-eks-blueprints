@@ -32,6 +32,10 @@ Customers can use this QuickStart to easily architect and deploy a multi-team Bl
 
 You can also find a sample implementation that resides in this repository in `bin/main.ts`.
 
+## DevContainer Setup
+
+Users can choose this option, if you dont want to run this solution on a mac or ubuntu machine. Please use the dev container configuration in the `.devcontainer` folder with [devpod](devpod.sh) or any other dev container environment to create a development environment with dependencies such as Node, NPM, aws-cli, aws-cdk, kubectl, helm dependencies for your local development with `cdk-eks-blueprints` solution. 
+
 ## Getting Started
 
 First, make sure you have the [`aws-cli`](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed. To verify your installation, run the following:
