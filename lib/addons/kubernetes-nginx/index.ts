@@ -1,11 +1,13 @@
 // Import necessary AWS CDK and utility modules
-import { ICertificate, Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
 import { merge } from "ts-deepmerge";
 import * as dot from 'dot-object';
 import { dependable, supportsALL } from "../../utils";
 import { setPath } from "../../utils/object-utils";
-import { AwsLoadBalancerControllerAddOn, ClusterInfo, Values, HelmAddOn, HelmAddOnProps, HelmAddOnUserProps, GlobalResources } from "@aws-quickstart/eks-blueprints"; 
+import { ClusterInfo, Values } from "../../spi";
+import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
+import { AwsLoadBalancerControllerAddOn } from ".."
 
 // Define the properties for the Kubernetes Ingress Add-On with optional and required settings
 export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
@@ -53,7 +55,7 @@ export class KubernetesIngressAddOn extends HelmAddOn {
         const props = this.options;
 
         // Log for debugging: shows the certificate domain name used
-        console.log("Using certificate domain name: ", props.certificateDomainName);
+        // console.log("Using certificate domain name: ", props.certificateDomainName);
 
         // Setup service annotations based on the properties provided
         const presetAnnotations: any = {
