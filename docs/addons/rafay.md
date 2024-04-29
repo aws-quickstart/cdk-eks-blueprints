@@ -3,7 +3,7 @@
 
 EKS Blueprints for [CDK](https://aws.amazon.com/cdk/) is a framework that makes it easy for customers to configure and deploy Rafay Kubernetes Operator as part of an EKS Blueprints cluster on [Amazon EKS](https://aws.amazon.com/eks/).
 
-This Addon deploys [Rafay’s Kubernetes Operations Platform (KOP)](https://rafay.co/contact/) for Amazon Elastic Kubernetes Service (Amazon EKS) management and operations. With KOP, your platform and site-reliability engineering (SRE) teams can deploy, operate, and manage the lifecycle of Kubernetes clusters and containerized applications in both AWS Cloud and on-premises environments.
+This Addon deploys [Rafay’s Kubernetes Operations Platform (KOP)](https://rafay.co/) for Amazon Elastic Kubernetes Service (Amazon EKS) management and operations. With KOP, your platform and site-reliability engineering (SRE) teams can deploy, operate, and manage the lifecycle of Kubernetes clusters and containerized applications in both AWS Cloud and on-premises environments.
 
 With the Rafay Kubernetes Operations Platform, enterprises use a single operations platform to manage the lifecycle of Amazon EKS clusters and containerized applications. You can speed up the deployment of new applications to production, reduce application downtimes, and reduce security and compliance risks associated with your infrastructure.
 
