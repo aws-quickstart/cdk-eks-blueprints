@@ -88,11 +88,8 @@ For more information about the Kubeflow add module, please visit [Kubeflow on EK
 
 ## License
 
-The Kubeflow CDK Blueprints AddOn is licensed under the Apache 2.0 license. [Project repository](https://github.com/season1946/eks-blueprints-cdk-kubeflow-extension/blob/main/LICENSE)
+The Kubeflow CDK Blueprints AddOn is licensed under the Apache 2.0 license.
 
 ## Disclaimer 
 This pattern relies on an open source NPM package eks-blueprints-cdk-kubeflow-ext. Please refer to the package npm site for more information.
 https://www.npmjs.com/package/eks-blueprints-cdk-kubeflow-ext
-
-If you have any question about the npm package or find any defect, please post in the source repo at 
-https://github.com/season1946/eks-blueprints-cdk-kubeflow-extension
