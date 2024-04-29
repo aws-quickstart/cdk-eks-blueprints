@@ -206,7 +206,8 @@ export class CoreAddOn implements ClusterAddOn {
         }
         catch (error) {
             logger.warn(error);
-            logger.warn(`Failed to retrieve add-on versions from EKS for add-on ${this.coreAddOnProps.addOnName}. Falling back to default version.`);
+            logger.warn(`Failed to retrieve add-on versions from EKS for add-on ${this.coreAddOnProps.addOnName}.`);
+            logger.warn("Possible reasons for failures - Unauthorized or Authentication failure or Network failure on the terminal.")
             if (!versionMap) {
                 throw new Error(`No version map provided and no default version found for add-on ${this.coreAddOnProps.addOnName}`);
             }
