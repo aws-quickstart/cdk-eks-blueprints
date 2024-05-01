@@ -21,6 +21,17 @@ export interface BlueprintConstructProps {
     id: string
 }
 
+class ClusterSecurityGroupProvider implements blueprints.ResourceProvider<ec2.ISecurityGroup> {
+    provide(context: blueprints.ResourceContext): ec2.ISecurityGroup {
+        const sg =  new ec2.SecurityGroup(context.scope, 'my-sg', {
+            vpc: (context.get(blueprints.GlobalResources.Vpc) as ec2.IVpc)!,
+            allowAllOutbound: false
+        });
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
+        return sg;
+    }
+}
+
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
@@ -254,7 +265,8 @@ export default class BlueprintConstruct {
                 addCustomNodeGroup(),
                 addWindowsNodeGroup(), //  commented out to check the impact on e2e
                 addGpuNodeGroup()
-            ]
+            ],
+            
         });
 
         const executionRolePolicyStatement:iam. PolicyStatement [] = [

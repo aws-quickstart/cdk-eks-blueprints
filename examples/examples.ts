@@ -28,6 +28,20 @@ const base = bp.EksBlueprint.builder()
 const kmsKey: kms.Key = bp.getNamedResource(KMS_RESOURCE);
 const builder = () => base.clone();
 
+
+class RedSgProvider implements bp.ResourceProvider<ec2.SecurityGroup> {
+    provide(context: bp.ResourceContext): ec2.SecurityGroup {
+        const vpc = context.get(bp.GlobalResources.Vpc) as ec2.IVpc;
+        const sg =  new ec2.SecurityGroup(context.scope, "red-sg", { vpc, securityGroupName: "red-sg", allowAllOutbound: false });
+        sg.addIngressRule(sg, ec2.Port.allTraffic());
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(10250));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(53));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.udp(53));
+        return sg;
+    }
+}
+
 const publicCluster = {
     version: KubernetesVersion.V1_29, 
     vpcSubnets: [{ subnetType: ec2.SubnetType.PUBLIC }]
@@ -37,9 +51,27 @@ builder()
     .clusterProvider(new bp.FargateClusterProvider(publicCluster))
     .build(app, "fargate-blueprint");
 
-builder()
-    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+const blueprint = bp.EksBlueprint.builder()
+    .account(process.env.CDK_DEFAULT_ACCOUNT)
+    .region(process.env.CDK_DEFAULT_REGION)
+    .version("auto")
+    .addOns(new bp.AwsLoadBalancerControllerAddOn())
+    .addOns(new bp.NginxAddOn())
     .build(app, "mng-blueprint");
+
+    //const sg = blueprint.getClusterInfo().cluster.clusterSecurityGroup;
+
+    const sg = ec2.SecurityGroup.fromSecurityGroupId(blueprint.getClusterInfo().cluster, 'ClusterSecurityGroupMyId', blueprint.getClusterInfo().cluster.clusterSecurityGroupId, {
+        allowAllOutbound : false
+    });
+    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
+    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(10250));
+    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(53));
+    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.udp(53));
+
+
+    new cdk.CfnOutput(blueprint.getClusterInfo().cluster.stack, 'clusterSg', { value: sg.securityGroupId });
+
 
 builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
