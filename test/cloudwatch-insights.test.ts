@@ -44,6 +44,18 @@ const cloudwatchInsightsAddOnProps = {
 
 describe('Unit test for CloudWatch Addon', () => {
 
+  test("Stack defined has a Service Account", async () => {
+    const app = new cdk.App();
+
+    const blueprint = await blueprints.EksBlueprint.builder()
+      .account("123456789012").region('us-east-2')
+      .version(KubernetesVersion.V1_29)
+      .addOns(new blueprints.CloudWatchInsights())
+      .buildAsync(app, 'cloudwatch');
+
+    const template = Template.fromStack(blueprint);
+  });
+
   test("Stack is defined when using a specified version of EKS", async () => {
     const app = new cdk.App();
 
