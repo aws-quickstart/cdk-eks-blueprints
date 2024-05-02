@@ -19,7 +19,7 @@ export function setupClusterLogging(stack: Stack, cluster: eks.ICluster, enableL
 		policy: AwsCustomResourcePolicy.fromSdkCalls({
 			resources: [`${cluster.clusterArn}/update-config`],
 		}),
-
+		installLatestAwsSdk: true, 
 		onCreate: {
 			physicalResourceId: { id: `${cluster.clusterArn}/LogsEnabler` },
 			service: "EKS",
