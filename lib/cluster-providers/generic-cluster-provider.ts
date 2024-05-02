@@ -246,7 +246,7 @@ export class GenericClusterProvider implements ClusterProvider {
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey: IKey | undefined, kubernetesVersion: eks.KubernetesVersion | undefined): ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey?: IKey, kubernetesVersion?: eks.KubernetesVersion, clusterLogging?: eks.ClusterLoggingTypes[]) : ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
@@ -271,6 +271,7 @@ export class GenericClusterProvider implements ClusterProvider {
             vpc,
             secretsEncryptionKey,
             clusterName,
+            clusterLogging,
             outputClusterName,
             version,
             vpcSubnets,
