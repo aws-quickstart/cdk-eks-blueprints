@@ -122,18 +122,21 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Secret Management for private Git repositories with FluxCD
 
-Please follow the below steps if you are looking to setup FluxCD addon to read secrets and sync private Git repos:
+Please follow the below steps if you are looking to setup FluxCD addon to read secrets and sync private Git repos.
 
-1. Please use the following CLI command to create a AWS Secrets Manager secret for `bearer-token-auth`.
+*Note that different git servers may require different authentication methods. For example, GitHub requires a basic access token, while others may require a bearer token. For more information, refer to the [FluxCD documentation](https://fluxcd.io/flux/components/source/gitrepositories/#secret-reference).*
+
+1. Please use the following CLI command to create an AWS Secrets Manager secret for `basic-access-auth`.
 
 ```bash
-export SECRET_NAME=bearer-token-auth
-export GIT_BEARER_TOKEN=<YOUR_GIT_BEARER_TOKEN>
+export SECRET_NAME=basic-access-auth
+export GIT_USERNAME=<YOUR_GIT_USERNAME>
+export GIT_TOKEN=<YOUR_GIT_TOKEN>
 export AWS_REGION=<YOUR_AWS_REGION>
 aws secretsmanager create-secret \
   --name $SECRET_NAME \
-  --description "Your GIT BEARER TOKEN SECRET" \
-  --secret-string "${GIT_BEARER_TOKEN}" \
+  --description "Your GIT BASIC ACCESS SECRET" \
+  --secret-string "{ 'username': '${GIT_USERNAME}', 'password': '${GIT_TOKEN}' }" \
   --region $AWS_REGION
 ```
 
@@ -177,7 +180,7 @@ const blueprint = blueprints.EksBlueprint.builder()
   .build(app, 'my-stack-name');
 ```
 
-3. Below is the code snippet `externaloperatorsecretaddon.ts` which shows the mechanism to setup `ClusterSecretStore` and `ExternalSecret` to read AWS Secrets Manager `bearer-token-auth` secret which is a GIT BEARER Token to sync private repositories :
+3. Below is the code snippet `externaloperatorsecretaddon.ts` which shows the mechanism to setup `ClusterSecretStore` and `ExternalSecret` to read AWS Secrets Manager `basic-access-auth` secret which is a GIT basic access authentication username and password to sync private repositories :
 
 ```typescript
 import 'source-map-support/register';
@@ -239,11 +242,10 @@ export class ExternalOperatorSecretAddon implements blueprints.ClusterAddOn {
                         target: {
                             name: "repository-creds"
                         },
-                        data: [
+                        dataFrom: [
                             {
-                                secretKey: "bearerToken",
-                                remoteRef: {
-                                    key: "bearer-token-auth"
+                                extract: {
+                                    key: "basic-access-auth"
                                 },
                             },
                         ],
@@ -267,7 +269,8 @@ metadata:
   namespace: flux-system
 type: Opaque
 data:
-  bearerToken: <<BASE64 ENCODED SECRET OF YOUR_GIT_BEARER_TOKEN STORE in AWS SECRETS MANAGER>>
+  username: <<BASE64 ENCODED SECRET OF YOUR_GIT_USERNAME STORE in AWS SECRETS MANAGER>>
+  password: <<BASE64 ENCODED SECRET OF YOUR_GIT_TOKEN STORE in AWS SECRETS MANAGER>>
 ```
 
 As pointed, if you are looking to use `secretRef` to reference a secret for FluxCD addon to sync private Git repos, please make sure the referenced secret is already created in the namespace ahead of time in AWS Secrets Manager as shown above. You can use [External Secrets Addon](./external-secrets.md) to learn more about external secrets operator which allows integration with third-party secret stores like AWS Secrets Manager, AWS Systems Manager Parameter Store and inject the values into the EKS cluster as Kubernetes Secrets.
