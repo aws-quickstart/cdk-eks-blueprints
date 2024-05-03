@@ -38,7 +38,10 @@ builder()
     .build(app, "fargate-blueprint");
 
 builder()
-    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+    .clusterProvider(new bp.MngClusterProvider({
+        ...publicCluster
+    }))
+    .enableControlPlaneLogTypes(bp.ControlPlaneLogType.API, bp.ControlPlaneLogType.AUDIT)
     .build(app, "mng-blueprint");
 
 builder()
