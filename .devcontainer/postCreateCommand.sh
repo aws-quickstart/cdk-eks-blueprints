@@ -16,6 +16,18 @@ rm -rf get_helm.sh
 
 # setup autocomplete for kubectl and alias k
 mkdir $HOME/.kube
-echo "source <(kubectl completion bash)" >> $HOME/.bashrc
-echo "alias k=kubectl" >> $HOME/.bashrc
-echo "complete -F __start_kubectl k" >> $HOME/.bashrc
+chsh -s $(which zsh)
+echo "source <(kubectl completion bash)" >> $HOME/.zshrc
+echo "alias k=kubectl" >> $HOME/.zshrc
+echo "complete -F __start_kubectl k" >> $HOME/.zshrc
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+sed -i "/plugins=(git)/c 'plugins=(git docker kubectl zsh-syntax-highlighting zsh-autosuggestions zsh-interactive-cd node aws)'" ~/.zshrc
+source ~/.zshrc
+
+
+
+
+
+
