@@ -8,6 +8,10 @@ Welcome to `Amazon EKS Blueprints for CDK`.
 
 This repository contains the source code for the [`eks-blueprints`](https://www.npmjs.com/package/@aws-quickstart/eks-blueprints) NPM module. It can be used by AWS customers, partners, and internal AWS teams to configure and manage complete EKS clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. 
 
+## DevContainer Setup
+
+Users can choose this option, if you dont want to run this solution on a mac or ubuntu machine. Please use the dev container configuration in the `.devcontainer` folder with [devpod](devpod.sh) or any other dev container environment to create a development environment with dependencies such as Node, NPM, aws-cli, aws-cdk, kubectl, helm dependencies for your local development with `cdk-eks-blueprints` solution. 
+
 ## Getting Started
 
 The easiest way to get started with EKS Blueprints is to follow our [Getting Started guide](https://aws-quickstart.github.io/cdk-eks-blueprints/getting-started/).
