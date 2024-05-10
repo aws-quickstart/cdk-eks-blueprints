@@ -19,6 +19,7 @@ mkdir $HOME/.kube
 chsh -s $(which zsh)
 echo "source <(kubectl completion bash)" >> $HOME/.zshrc
 echo "alias k=kubectl" >> $HOME/.zshrc
+echo "alias cdk='npx cdk'" >> $HOME/.zshrc
 echo "complete -F __start_kubectl k" >> $HOME/.zshrc
 
 # Add Tools for Syntax Highlighting, Auto Suggestions, command shortcurts with oh-my-zsh for AWS, Kubectl, Node, Git.
