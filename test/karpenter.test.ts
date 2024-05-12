@@ -437,6 +437,7 @@ describe('Unit tests for Karpenter addon', () => {
             .version(KubernetesVersion.V1_28)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.32.0",
+                installCRDs: true,
                 nodePoolSpec: {
                     requirements: defaultReq,
                     disruption: {
