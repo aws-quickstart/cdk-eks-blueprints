@@ -14,15 +14,23 @@ import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { Cluster, KubernetesVersion, KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 
-const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_29, '0.34.0'],
-    [KubernetesVersion.V1_28, '0.31.0'],
-    [KubernetesVersion.V1_27, '0.28.0'],
-    [KubernetesVersion.V1_26, '0.28.0'],
-    [KubernetesVersion.V1_25, '0.25.0'],
-    [KubernetesVersion.V1_24, '0.21.0'],
-    [KubernetesVersion.V1_23, '0.21.0'],
-]);
+class versionMap {
+    private static readonly versionMap: Map<string, string> = new Map([
+        [KubernetesVersion.V1_29.version, '0.34.0'],
+        [KubernetesVersion.V1_28.version, '0.31.0'],
+        [KubernetesVersion.V1_27.version, '0.28.0'],
+        [KubernetesVersion.V1_26.version, '0.28.0'],
+        [KubernetesVersion.V1_25.version, '0.25.0'],
+        [KubernetesVersion.V1_24.version, '0.21.0'],
+        [KubernetesVersion.V1_23.version, '0.21.0'],
+    ]);
+    public static has(version: KubernetesVersion) {
+      return this.versionMap.has(version.version);
+    }
+    public static get(version: KubernetesVersion) {
+      return this.versionMap.get(version.version);
+    }
+  }
 
 /**
  * Utility type for Karpenter requirement values for NodePools
@@ -216,7 +224,6 @@ export type NodePoolSpec = {
       * Limits prevent Karpenter from creating new instances once the limit is exceeded.
       */
      limits?: {
-         resources?: {
          cpu?: number;
          memory?: string;
          /**
@@ -226,7 +233,6 @@ export type NodePoolSpec = {
           * e.g nvidia.com/gpu, amd.com/gpu, etc...
           */
          [k: string]: unknown;
-         };
      },
 
      /**
@@ -435,8 +441,8 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         // Create Namespace
-        const ns = utils.createNamespace(KARPENTER, cluster, true, true);
-        const sa = utils.createServiceAccount(cluster, RELEASE, KARPENTER, karpenterPolicyDocument);
+        const ns = utils.createNamespace(this.options.namespace!, cluster, true, true);
+        const sa = utils.createServiceAccount(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
         sa.node.addDependency(ns);
 
         // Create global helm values based on v1beta1 migration as shown below:
@@ -542,7 +548,9 @@ export class KarpenterAddOn extends HelmAddOn {
                         labels: labels,
                         annotations: annotations,
                         requirements: this.convert(requirements),
-                        limits: limits,
+                        limits: {
+                            resources: limits,
+                        },
                         consolidation: consol,
                         ttlSecondsUntilExpired: ttlSecondsUntilExpired,
                         ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,

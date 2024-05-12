@@ -29,7 +29,7 @@ const kmsKey: kms.Key = bp.getNamedResource(KMS_RESOURCE);
 const builder = () => base.clone();
 
 const publicCluster = {
-    version: KubernetesVersion.V1_25, 
+    version: KubernetesVersion.V1_29, 
     vpcSubnets: [{ subnetType: ec2.SubnetType.PUBLIC }]
 };
 
@@ -38,7 +38,10 @@ builder()
     .build(app, "fargate-blueprint");
 
 builder()
-    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+    .clusterProvider(new bp.MngClusterProvider({
+        ...publicCluster
+    }))
+    .enableControlPlaneLogTypes(bp.ControlPlaneLogType.API, bp.ControlPlaneLogType.AUDIT)
     .build(app, "mng-blueprint");
 
 builder()

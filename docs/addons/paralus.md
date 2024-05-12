@@ -130,4 +130,4 @@ Note: you can also refer to this [paralus eks blogpost](https://www.paralus.io/b
 
 If you have any questions about Paralus, get in touch with the team [on Slack](https://join.slack.com/t/paralus/shared_invite/zt-1a9x6y729-ySmAq~I3tjclEG7nDoXB0A).
 
-Paralus is maintained and supported by [Rafay](https://rafay.co)
+Paralus is maintained and supported by [Rafay](https://rafay.co/)

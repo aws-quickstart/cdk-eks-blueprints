@@ -26,8 +26,8 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 ```bash
 npm install -g n # may require sudo
 n stable # may require sudo 
-npm install -g aws-cdk@2.132.0 # may require sudo (Ubuntu) depending on configuration
-cdk --version # must produce 2.132.0
+npm install -g aws-cdk@2.133.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.133.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
@@ -53,11 +53,11 @@ npm ERR! node_modules/aws-cdk-lib
 npm ERR!   aws-cdk-lib@"2.130.0" from the root project
 npm ERR! 
 npm ERR! Could not resolve dependency:
-npm ERR! peer bundled aws-cdk-lib@"2.132.0" from @aws-quickstart/eks-blueprints@1.14.0
+npm ERR! peer bundled aws-cdk-lib@"2.133.0" from @aws-quickstart/eks-blueprints@1.14.0
 npm ERR! node_modules/@aws-quickstart/eks-blueprint
 ```
 
-This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line `peer bundled` and check the expected version of the CDK. Make sure that in your `package.json` the version is set to the expected. In this example, `package.json` contained `"aws-cdk-lib": "2.130.0"`, while the expected version was `2.132.0`.
+This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line `peer bundled` and check the expected version of the CDK. Make sure that in your `package.json` the version is set to the expected. In this example, `package.json` contained `"aws-cdk-lib": "2.130.0"`, while the expected version was `2.133.0`.
 
 **Note**: after the initial installation, upgrading the version of CDK to an incompatible higher/lower version will produce a warning, but will succeed. For community support (submitting GitHub issues) please make sure you have a matching version configured.
 
@@ -66,7 +66,7 @@ Example warning:
 ```
 npm WARN 
 npm WARN Could not resolve dependency:
-npm WARN peer bundled aws-cdk-lib@"2.132.0" from @aws-quickstart/eks-blueprints@1.14.0
+npm WARN peer bundled aws-cdk-lib@"2.133.0" from @aws-quickstart/eks-blueprints@1.14.0
 ```
 
 ## Deploy EKS Clusters
@@ -118,10 +118,39 @@ Note: if the account/region combination used in the code example above is differ
 
 Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
-Deploy the stack using the following command. This command will take roughly 20 minutes to complete.
+Setup the `AWS_REGION` environment variable and deploy the stack using the following command. This command will take roughly 20 minutes to complete.
 
 ```
+export AWS_REGION=us-east-2 # Replace this with region of your choice.
 cdk deploy
+```
+
+Note: Your terminal needs access to an AWS environment along with the `AWS_REGION` environment variable setup. If you fail to do so, you will observe following errors logs in your `cdk deploy` command. The stack will still run fine but will fall back picking default versions for the addon from `versionMap` in the respective `CoreAddon` instead of making an EKS API call to retrieve the latest version for the core addon.
+
+```
+ Error  Region is missing
+error stack:
+  • index.js    default
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:117
+  • index.js
+        /node_modules/@smithy/node-config-provider/dist-cjs/index.js:72
+  • index.js
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:79
+  • index.js    async coalesceProvider
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:106
+  • index.js
+        async /node_modules/@smithy/property-provider/dist-cjs/index.js:117
+  • index.js    async region
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:142
+  • httpAuthSchemeProvider.js   async Object.defaultEKSHttpAuthSchemeParametersProvider [as httpAuthSchemeParametersProvider]
+        /node_modules/@aws-sdk/client-eks/dist-cjs/auth/httpAuthSchemeProvider.js:9
+  • index.js
+        async /node_modules/@smithy/core/dist-cjs/index.js:61
+  • index.js
+        async /node_modules/@aws-sdk/middleware-logger/dist-cjs/index.js:33
+  • index.ts    async VpcCniAddOn.provideVersion
+        /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:187
+2024-04-29 19:33:48.638 WARN    /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:209 main    Failed to retrieve add-on versions from EKS for add-on vpc-cni. Falling back to default version.
 ```
 
 Congratulations! You have deployed your first EKS cluster with `eks-blueprints`. The above code will provision the following:
