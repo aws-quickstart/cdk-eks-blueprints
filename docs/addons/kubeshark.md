@@ -21,7 +21,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```
 
 #### **Another complete and comprehensive example**
-```
+```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
