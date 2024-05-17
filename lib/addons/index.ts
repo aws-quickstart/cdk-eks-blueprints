@@ -60,6 +60,7 @@ export * from './apache-airflow';
 export * from './neuron';
 export * from './eks-pod-identity-agent';
 export * from './neuron';
+export * from './kubeshark';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";
