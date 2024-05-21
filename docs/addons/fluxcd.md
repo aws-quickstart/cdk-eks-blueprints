@@ -6,6 +6,8 @@ Flux is a declarative, GitOps-based continuous delivery tool that can be integra
 
 ## Usage
 
+Only specify unique values for the repository and bucket `name` field.
+
 ### Single bootstrap repo path
 
 ```typescript
@@ -66,6 +68,42 @@ const blueprint = blueprints.EksBlueprint.builder()
     .addOns(addOn)
     .build(app, 'my-stack-name');
 ```
+
+### Single bootstrap S3 bucket repository
+
+```typescript
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+
+const app = new cdk.App();
+
+const fluxBootstrap = new s3.Bucket(this, "FluxBootstrap", {
+    removalPolicy: cdk.RemovalPolicy.RETAIN,
+});
+
+const addOn = new blueprints.addons.FluxCDAddOn({
+    buckets: [{
+        name: "bootstrap-bucket",
+        namespace: "flux-system",
+        repository: {
+            repoUrl: fluxBootstrap.bucketName,
+        },
+        bucketRegion: cdk.Aws.REGION,
+        values: {},
+    }],
+})
+...
+
+const blueprint = blueprints.EksBlueprint.builder()
+  .addOns(addOn)
+  .build(app, 'my-stack-name');
+```
+
+By default the FluxCD source-controller attempts to access the S3 bucket by using the IAM instance profile.
+To grant access assign node group instances IAM role granting read access to the S3 bucket.
+Alternatively reference to a Secret containing the `accesskey` and `secretkey` values with the `secretRef` parameter to authenticate using IAM user authentication.
+See [FluxCD Bucket Source Controller documentation](https://fluxcd.io/flux/components/source/buckets/).
 
 ## Workload Repositories
 

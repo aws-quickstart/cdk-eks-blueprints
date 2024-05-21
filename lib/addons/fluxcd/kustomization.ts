@@ -8,7 +8,7 @@ export class FluxKustomization {
 
     constructor() {}
 
-    public generate(name: string, repoName: string, namespace: string, fluxSyncInterval: string, fluxPrune: boolean, fluxTimeout: string, values: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string) {
+    public generate(name: string, repoName: string, namespace: string, fluxSyncInterval: string, fluxPrune: boolean, fluxTimeout: string, values: spi.Values, fluxKustomizationPath: string, fluxTargetNamespace?: string, fluxSourceKind?: string) {
         
         const kustomizationManifest = {
             apiVersion: "kustomize.toolkit.fluxcd.io/v1beta2",
@@ -20,7 +20,7 @@ export class FluxKustomization {
             spec: {
                 interval: fluxSyncInterval,
                 sourceRef: {
-                    kind: "GitRepository",
+                    kind: fluxSourceKind || "GitRepository",
                     name: repoName
                 },
                 path: fluxKustomizationPath,
