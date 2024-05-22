@@ -79,7 +79,7 @@ The framework currently supports the following add-ons.
 | [`XrayAdotAddOn`](./xray-adot-addon.md)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 | ✅ | ✅ |
 | [`GmaestroAddOn`](./gmaestro.md) | Adds [gMaestro](https://app.granulate.io/gMaestroSignup) cost optimization solution for EKS cluster.                                                                         |
 | [`EksPodIdentityAgentAddOn`](./eks-pod-identity-agent.md)       | [Setting up the EKS Pod Identity Agent](https://docs.aws.amazon.com/en_ca/eks/latest/userguide/pod-id-agent-setup.html)                  | ✅ | ✅ |
-
+| [`KubesharkAddOn`](./kubeshark.md)       | [Deep visibility and monitoring of all API traffic](https://github.com/kubeshark/kubeshark)                  | ✅ | ✅ |
 # Standard Helm Add-On Configuration Options
 
 Many add-ons leverage helm to provision and maintain deployments. All provided add-ons that leverage helm allow specifying the following add-on attributes:
