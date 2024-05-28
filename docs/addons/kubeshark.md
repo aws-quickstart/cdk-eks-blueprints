@@ -3,45 +3,42 @@
 [kubeshark](https://github.com/kubeshark/kubeshark)  is an API Traffic Analyzer for Kubernetes providing real-time, protocol-level visibility into Kubernetes’ internal network, capturing and monitoring all traffic and payloads going in, out and across containers, pods, nodes and clusters.
 
 ## Usage
-
-#### **`index.ts`**
-```typescript
-import 'source-map-support/register';
-import * as cdk from 'aws-cdk-lib';
-import * as blueprints from '@aws-quickstart/eks-blueprints';
-
-const app = new cdk.App();
-
-const addOn = new blueprints.addons.KubesharkAddOn('v52.3.0');
-
-const blueprint = blueprints.EksBlueprint.builder()
-  .version("auto")
-  .addOns(addOn)
-  .build(app, 'my-stack-name');
+1. import kubeshark
+```
+npm i kubeshark
+```
+2. import it in your `blueprint.ts`
+```
+import { KubesharkAddOn } from 'kubeshark';
 ```
 
-#### **Another complete and comprehensive example**
+3. include the addon
+```
+    new KubesharkAddOn({})  // Provide an empty object if no specific properties are needed
+```
+
+
+### Full example **`index.ts`**
 ```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
+import { KubesharkAddOn } from 'kubeshark';
 
 const app = new cdk.App();
-const account = 'XXXXXXXXXXXXX';
-const region = 'us-east-2';
+const account = '1234123412341';
+const region = 'us-east-1';
 const version = 'auto';
 
 blueprints.HelmAddOn.validateHelmVersions = true; // optional if you would like to check for newer versions
 
 const addOns: Array<blueprints.ClusterAddOn> = [
-    new blueprints.addons.ArgoCDAddOn(),
-    new blueprints.addons.CalicoOperatorAddOn(),
     new blueprints.addons.MetricsServerAddOn(),
     new blueprints.addons.ClusterAutoScalerAddOn(),
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
     new blueprints.addons.VpcCniAddOn(),
     new blueprints.addons.CoreDnsAddOn(),
-    new blueprints.addons.KubesharkAddOn(),
-    new blueprints.addons.KubeProxyAddOn()
+    new blueprints.addons.KubeProxyAddOn(),
+    new KubesharkAddOn({})  // Provide an empty object if no specific properties are needed
 ];
 
 const stack = blueprints.EksBlueprint.builder()
@@ -50,10 +47,9 @@ const stack = blueprints.EksBlueprint.builder()
     .version(version)
     .addOns(...addOns)
     .useDefaultSecretEncryption(true) // set to false to turn secret encryption off (non-production/demo cases)
-    .build(app, 'eks-blueprint');
-
+    .build(app, 'eks-blueprint');```
 ```
-
+## validate the deployment
 Once deployed, you can see kubeshark pod in the `kube-system` namespace.
 
 ```sh
