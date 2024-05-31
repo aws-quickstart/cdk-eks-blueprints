@@ -4,6 +4,7 @@ import * as kms  from 'aws-cdk-lib/aws-kms';
 import * as bp from '../lib';
 import * as bcrypt from 'bcrypt';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import cluster from 'cluster';
 
 /**
  * You can run these examples with the following command:
@@ -47,6 +48,20 @@ const publicCluster = {
     vpcSubnets: [{ subnetType: ec2.SubnetType.PUBLIC }]
 };
 
+
+class SecurityGroupComplianceAddon implements bp.ClusterAddOn {
+    deploy(clusterInfo: bp.ClusterInfo): void {
+        const sg = ec2.SecurityGroup.fromSecurityGroupId(clusterInfo.cluster, 'ClusterSecurityGroupCompId', clusterInfo.cluster.clusterSecurityGroupId, {
+            allowAllOutbound : false
+        });
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(10250));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(53));
+        sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.udp(53));
+        new cdk.CfnOutput(clusterInfo.cluster.stack, 'clusterSg', { value: sg.securityGroupId });
+    }
+}
+
 builder()
     .clusterProvider(new bp.FargateClusterProvider(publicCluster))
     .build(app, "fargate-blueprint");
@@ -57,20 +72,12 @@ const blueprint = bp.EksBlueprint.builder()
     .version("auto")
     .addOns(new bp.AwsLoadBalancerControllerAddOn())
     .addOns(new bp.NginxAddOn())
+    .addOns(new SecurityGroupComplianceAddon())
     .build(app, "mng-blueprint");
 
     //const sg = blueprint.getClusterInfo().cluster.clusterSecurityGroup;
 
-    const sg = ec2.SecurityGroup.fromSecurityGroupId(blueprint.getClusterInfo().cluster, 'ClusterSecurityGroupMyId', blueprint.getClusterInfo().cluster.clusterSecurityGroupId, {
-        allowAllOutbound : false
-    });
-    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
-    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(10250));
-    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(53));
-    sg.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.udp(53));
 
-
-    new cdk.CfnOutput(blueprint.getClusterInfo().cluster.stack, 'clusterSg', { value: sg.securityGroupId });
 
 
 builder()
