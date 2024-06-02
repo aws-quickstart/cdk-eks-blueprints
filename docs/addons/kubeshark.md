@@ -2,6 +2,8 @@
 
 [kubeshark](https://github.com/kubeshark/kubeshark)  is an API Traffic Analyzer for Kubernetes providing real-time, protocol-level visibility into Kubernetes’ internal network, capturing and monitoring all traffic and payloads going in, out and across containers, pods, nodes and clusters.
 
+Kubeshark provide Real-time monitoring for all traffic going in, out and across containers, pods, namespaces, nodes and clusters, which allow you to pinpoint and resolve issues efficiently, ensuring stable network performance and enhancing application success in Kubernetes environments and identifying complex networking issue.
+
 ## Usage
 1. import kubeshark
 ```
@@ -73,9 +75,17 @@ Apply the kubernetes dashboard manifest.
 $ kubectl -n kube-system port-forward svc/kubeshark-front 3000:80
 ```
 
-
 Open the [dashboard](http://localhost:3000)
 
 Then you should be able to see view like this
 ![dashboard](https://raw.githubusercontent.com/kubeshark/assets/master/png/kubeshark-ui.png)
 
+
+## Example
+
+In the below example, i'm writing a query to identify the traffic flow from the pod "nginx" in the "default" namespace to "aws.com" and "coredns". The query is writen by [Kubeshark Filter Language (KFL)](https://docs.kubeshark.co/en/filtering#kfl-syntax-reference) is the language implemented inside kubeshark/worker that enables the user to filter the traffic efficiently and precisely.
+
+![query](https://github.com/zghanem0/kubeshark/blob/main/api.png?raw=true)
+
+Also you can visualize the traffic flow and bandwidth using service map feature as shown below.
+![Service Map](https://github.com/zghanem0/kubeshark/blob/main/map.png?raw=true)
