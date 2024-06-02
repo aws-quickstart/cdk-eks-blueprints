@@ -83,7 +83,7 @@ Then you should be able to see view like this
 
 ## Example
 
-In the below example, i'm writing a query to identify the traffic flow from the pod "nginx" in the "default" namespace to "aws.com" and "coredns". The query is writen by [Kubeshark Filter Language (KFL)](https://docs.kubeshark.co/en/filtering#kfl-syntax-reference) is the language implemented inside kubeshark/worker that enables the user to filter the traffic efficiently and precisely.
+The example below shows a Kubeshark query that identifies the traffic flowing from the pod "nginx" in the "default" namespace to "aws.com" and "coredns". The query is writen by [Kubeshark Filter Language (KFL)](https://docs.kubeshark.co/en/filtering#kfl-syntax-reference) is the language implemented inside kubeshark/worker that enables the user to filter the traffic efficiently and precisely.
 
 ![query](https://github.com/zghanem0/kubeshark/blob/main/api.png?raw=true)
 
