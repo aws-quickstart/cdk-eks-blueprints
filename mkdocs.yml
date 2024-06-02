@@ -68,6 +68,7 @@ nav:
     - Kubecost: 'addons/kubecost.md'
     - Kubeflow: 'addons/kubeflow.md'
     - KubeRay Operator: 'addons/kuberay-operator.md'
+    - Kubeshark: 'addons/kubeshark.md'
     - Kubevious: 'addons/kubevious.md'
     - Kube State Metrics: 'addons/kube-state-metrics.md'
     - Metrics Server: 'addons/metrics-server.md'
@@ -88,7 +89,6 @@ nav:
     - Vpc Cni: 'addons/vpc-cni.md'
     - AWS XRay: 'addons/xray.md'
     - AWS XRay ADOT: 'addons/xray-adot-addon.md'
-    - Kubeshark: 'addons/kubeshark.md'
   - Internal:
     - CodeBuild CI: 'internal/ci.md'
     - Input Validation Framework: 'internal/input-validations-framework-readme.md'
