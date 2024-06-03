@@ -118,6 +118,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             region: clusterInfo.cluster.stack.region,
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
+            ...this.options.values,
         }, undefined, false);
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);

@@ -428,4 +428,28 @@ describe('Unit tests for Karpenter addon', () => {
         expect(manifest.spec.blockDeviceMappings.length).toEqual(1);
         expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);
       });
+
+      test("Stack creation succeeded using KubernetesVersion.Of", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.of('1.28'))
+            .addOns(new blueprints.KarpenterAddOn({
+                version: 'v0.30.2'
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const stack = blueprint.build(app, 'stack-with-non-supporting-kubernetes-version');
+
+        const template = Template.fromStack(stack);
+        template.hasResourceProperties("Custom::AWSCDK-EKS-HelmChart", {
+        Chart: "karpenter",
+        });
+        const karpenter = template.findResources("Custom::AWSCDK-EKS-HelmChart");
+        const properties = Object.values(karpenter).pop();
+        const values = properties?.Properties?.Values;
+        expect(values).toBeDefined();
+    });
 });

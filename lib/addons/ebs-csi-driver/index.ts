@@ -58,6 +58,7 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
       version: options?.version ?? defaultProps.version,
       versionMap: defaultProps.versionMap,
       saName: defaultProps.saName,
+      configurationValues: options?.configurationValues,
     });
 
     this.ebsProps = {

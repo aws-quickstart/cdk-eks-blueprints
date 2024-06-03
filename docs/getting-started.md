@@ -118,10 +118,39 @@ Note: if the account/region combination used in the code example above is differ
 
 Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
-Deploy the stack using the following command. This command will take roughly 20 minutes to complete.
+Setup the `AWS_REGION` environment variable and deploy the stack using the following command. This command will take roughly 20 minutes to complete.
 
 ```
+export AWS_REGION=us-east-2 # Replace this with region of your choice.
 cdk deploy
+```
+
+Note: Your terminal needs access to an AWS environment along with the `AWS_REGION` environment variable setup. If you fail to do so, you will observe following errors logs in your `cdk deploy` command. The stack will still run fine but will fall back picking default versions for the addon from `versionMap` in the respective `CoreAddon` instead of making an EKS API call to retrieve the latest version for the core addon.
+
+```
+ Error  Region is missing
+error stack:
+  • index.js    default
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:117
+  • index.js
+        /node_modules/@smithy/node-config-provider/dist-cjs/index.js:72
+  • index.js
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:79
+  • index.js    async coalesceProvider
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:106
+  • index.js
+        async /node_modules/@smithy/property-provider/dist-cjs/index.js:117
+  • index.js    async region
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:142
+  • httpAuthSchemeProvider.js   async Object.defaultEKSHttpAuthSchemeParametersProvider [as httpAuthSchemeParametersProvider]
+        /node_modules/@aws-sdk/client-eks/dist-cjs/auth/httpAuthSchemeProvider.js:9
+  • index.js
+        async /node_modules/@smithy/core/dist-cjs/index.js:61
+  • index.js
+        async /node_modules/@aws-sdk/middleware-logger/dist-cjs/index.js:33
+  • index.ts    async VpcCniAddOn.provideVersion
+        /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:187
+2024-04-29 19:33:48.638 WARN    /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:209 main    Failed to retrieve add-on versions from EKS for add-on vpc-cni. Falling back to default version.
 ```
 
 Congratulations! You have deployed your first EKS cluster with `eks-blueprints`. The above code will provision the following:
