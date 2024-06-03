@@ -55,6 +55,7 @@ The framework currently supports the following add-ons.
 | [`KubecostAddOn`](./kubecost.md)                                       | Adds [Kubecost](https://kubecost.com) cost analyzer to the EKS cluster.                                                  | ✅ |               
 | [`KubeflowAddOn`](./kubeflow.md)                                       | Adds [kubeflow](https://awslabs.github.io/kubeflow-manifests/) Kubeflow pipeline addon the EKS cluster.                                | ✅ | 
 | [`KubeRayAddOn`](./kuberay-operator.md)                      | Installs the [KubeRay Operator](https://docs.ray.io/en/latest/cluster/kubernetes/index.html).                                                                        | ✅ | ✅ | 
+| [`Kubernetes-NginxAddOn`](./kubernetes-nginx.md)                                  | Adds Kubernetes NGINX ingress controller  | ✅ | ✅ |                    
 | [`KubeviousAddOn`](./kubevious.md)                                     | Adds [Kubevious](https://github.com/kubevious/kubevious) open source Kubernetes dashboard to an EKS cluster.                           |  ✅ | 
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                         | ✅ | ✅ |
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         | ✅ | ✅ |
