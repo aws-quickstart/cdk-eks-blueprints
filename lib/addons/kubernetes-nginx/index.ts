@@ -105,11 +105,6 @@ export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
     isDefaultClass?: boolean;
 
     /**
-     * Domain name for which the SSL certificate is valid.
-     */
-    certificateDomainName?: string;
-
-    /**
      * Name of the certificate {@link NamedResourceProvider} to be used for certificate look up. 
      * @see {@link ImportCertificateProvider} and {@link CreateCertificateProvider} for examples of certificate providers.
      */
@@ -188,15 +183,6 @@ export class KubernetesIngressAddOn extends HelmAddOn {
                 electionID: props.electionId || "ingress-controller-leader"
             }
         };
-
-        // Create a certificate if a domain name is provided
-        if (props.certificateDomainName) {
-            const certificate = new Certificate(clusterInfo.cluster, 'MyCertificate', {
-                domainName: props.certificateDomainName,
-            });
-            console.log("Certificate ARN:", certificate.certificateArn);
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificate.certificateArn;
-        }
 
         // Configure SSL-related annotations if certificate resource name is provided
         if (props.certificateResourceName) {

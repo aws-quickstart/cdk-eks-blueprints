@@ -1,0 +1,60 @@
+import * as cdk from 'aws-cdk-lib';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as blueprints from '../lib';
+
+const app = new cdk.App();
+const account = '211125664433';
+const region = 'us-east-2';
+const version = 'auto';
+const myDomainName = "pjv.people.aws.dev";
+
+// Create the stack
+const stack = new cdk.Stack(app, 'EksBlueprintStack', {
+    env: {
+        account: account,
+        region: region,
+    }
+});
+
+// Lookup the hosted zone by domain name
+const hostedZone = cdk.aws_route53.HostedZone.fromLookup(stack, 'HostedZoneLookup', {
+    domainName: myDomainName,
+});
+
+// Create or Import the ACM certificate
+const certificate = new acm.Certificate(stack, 'MyCertificate', {
+    domainName: `*.${myDomainName}`,
+    validation: acm.CertificateValidation.fromDns(hostedZone),
+});
+
+// Ensure unique names for resource providers
+const hostedZoneProvider = new blueprints.ImportHostedZoneProvider(hostedZone.hostedZoneId);
+
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new blueprints.addons.CalicoOperatorAddOn(),
+    new blueprints.addons.AwsLoadBalancerControllerAddOn(),
+    new blueprints.addons.VpcCniAddOn(),
+    new blueprints.addons.CoreDnsAddOn(),
+    new blueprints.addons.KubeProxyAddOn(),
+    new blueprints.addons.CertManagerAddOn(),
+    new blueprints.addons.ExternalsSecretsAddOn(),
+    new blueprints.addons.KubernetesIngressAddOn({
+        crossZoneEnabled: true,
+        internetFacing: true,
+        targetType: 'ip',
+        externalDnsHostname: myDomainName,
+        certificateResourceName: certificate.certificateArn, // Use the ARN of the created certificate
+    }),
+    new blueprints.addons.ExternalDnsAddOn({
+        hostedZoneResources: ["MyHostedZoneResource"]
+    })
+];
+
+// Blueprint build with unique names
+blueprints.EksBlueprint.builder()
+    .resourceProvider('MyHostedZoneResource', hostedZoneProvider) // Unique name
+    .account(account)
+    .region(region)
+    .version(version)
+    .addOns(...addOns)
+    .build(stack, 'EksBlueprintStack'); // Ensure unique stack name
