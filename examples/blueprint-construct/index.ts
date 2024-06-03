@@ -121,6 +121,13 @@ export default class BlueprintConstruct {
                     controller: { service: { create: false } }
                 }
             }),
+            new blueprints.addons.KubernetesIngressAddOn({
+                crossZoneEnabled: true,
+                internetFacing: true,
+                targetType: 'ip',
+                externalDnsHostname: 'your-domain.com',
+                certificateResourceName: 'your-certificate-resource-name'
+            }),
             // new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
