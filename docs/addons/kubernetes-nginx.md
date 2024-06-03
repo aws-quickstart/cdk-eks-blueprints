@@ -243,7 +243,7 @@ NGINX Inc.: Provided by NGINX Inc., potentially with enterprise features and dif
 1. Annotations and Settings:
 
 Kubernetes NGINX: May have different annotations and settings specific to Kubernetes community practices.
-NGINX Inc.: May offer additional enterprise-grade features and require different annotations.
+NGINX Inc.: May offer additional enterprise-grade features and require different annotations. 
 
 1. Support and Updates:
 
