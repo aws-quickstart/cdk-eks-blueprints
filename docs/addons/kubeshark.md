@@ -111,6 +111,9 @@ kubectl -n kube-system port-forward svc/kubeshark-front 3000:80
 
 
 4.) Run Kubeshark query to identify the traffic flow.
+```
+(src.pod.metadata.name == "nginx" or dst.pod.metadata name == "nginx") and request.questions[0].name == "aws.com" or (src.name == "nginx" and src.namespace == "default" and dst.name == "kube-dns" and dst.namespace == "kube-system")
+```
 
 As shown below, the Kubeshark query used to identify the traffic flowing from the pod "nginx" in the "default" namespace to "aws.com" and "coredns". The query is writen by [Kubeshark Filter Language (KFL)](https://docs.kubeshark.co/en/filtering#kfl-syntax-reference) is the language implemented inside kubeshark/worker that enables the user to filter the traffic efficiently and precisely.
 
