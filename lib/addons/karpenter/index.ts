@@ -473,7 +473,7 @@ export class KarpenterAddOn extends HelmAddOn {
         values = merge(values, saValues);
         const karpenterChart = this.addHelmChart(clusterInfo, values, false, true);
 
-        karpenterChart.node.addDependency(ns);
+        karpenterChart.node.addDependency(sa);
 
         if(clusterInfo.nodeGroups) {
             clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
