@@ -263,6 +263,11 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Flag for enabling Karpenter's native interruption handling
      */
     interruptionHandling?: boolean,
+
+    /**
+     * Timeout duration while installing karpenter helm chart using addHelmChart API
+     */
+    helmChartTimeout?: Duration,
 }
 
 const KARPENTER = 'karpenter';
@@ -471,7 +476,9 @@ export class KarpenterAddOn extends HelmAddOn {
         };
 
         values = merge(values, saValues);
-        const karpenterChart = this.addHelmChart(clusterInfo, values, false, true);
+        // Install HelmChart using user defined value or default of 5 minutes.
+        const helmChartTimeout = this.options.helmChartTimeout || Duration.minutes(5);
+        const karpenterChart = this.addHelmChart(clusterInfo, values, false, true, helmChartTimeout);
 
         karpenterChart.node.addDependency(ns);
 
