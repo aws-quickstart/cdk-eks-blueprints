@@ -2,7 +2,6 @@ import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
 import { GlobalResources } from "../../lib";
-import {writeFileSync} from "fs";
 
 describe("EfsFileSystemProvider", () => {
   test("Stack is created with EFS file system with no encryption", () => {

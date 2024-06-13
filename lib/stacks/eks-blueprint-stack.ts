@@ -32,7 +32,7 @@ export class BlueprintBuilder extends BlueprintConstructBuilder implements spi.A
  * Entry point to the platform provisioning. Creates a CFN stack based on the provided configuration
  * and orchestrates provisioning of add-ons, teams and post deployment hooks.
  */
-export class EksBlueprint extends cdk.Stack  {
+export class EksBlueprint extends cdk.Stack {
 
     static readonly USAGE_ID = "qs-1s1r465hk";
 
