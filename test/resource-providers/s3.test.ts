@@ -3,6 +3,7 @@ import { Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
 import {EksBlueprintConstruct, GlobalResources} from "../../lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import {writeFileSync} from "fs";
 
 describe("S3BucketProvider", () => {
   test("Stack is created with a new S3 Bucket", () => {
