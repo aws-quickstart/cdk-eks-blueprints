@@ -406,6 +406,11 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   }
 
   const result: Values = {
+    init: {
+      env: {
+        DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
+      }
+    },
     env: {
       AWS_EC2_ENDPOINT: props?.awsEc2Endpoint,
       ADDITIONAL_ENI_TAGS: props?.additionalEniTags,
@@ -430,7 +435,6 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       DISABLE_INTROSPECTION: props?.disableIntrospection,
       DISABLE_METRICS: props?.disableMetrics,
       DISABLE_NETWORK_RESOURCE_PROVISIONING: props?.disablenetworkResourceProvisioning,
-      DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
       ENABLE_BANDWIDTH_PLUGIN: props?.enableBandwidthPlugin,
       ENABLE_NFTABLES: props?.enableNftables,
       ENABLE_POD_ENI: props?.enablePodEni,
@@ -452,6 +456,11 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
   Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ? JSON.stringify(values[key]) : values[key]);
+
+  // clean up all undefined on Init env
+  const initValues = result.init.env;
+  Object.keys(initValues).forEach(key => initValues[key] === undefined ? delete initValues[key] : {});
+  Object.keys(initValues).forEach(key => initValues[key] = typeof initValues[key] !== 'string' ? JSON.stringify(initValues[key]) : initValues[key]);
 
   return result;
 }
