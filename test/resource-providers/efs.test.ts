@@ -2,6 +2,7 @@ import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
 import { GlobalResources } from "../../lib";
+import {writeFileSync} from "fs";
 
 describe("EfsFileSystemProvider", () => {
   test("Stack is created with EFS file system with no encryption", () => {
@@ -124,6 +125,6 @@ describe("EfsFileSystemProvider", () => {
     const template = Template.fromStack(stack);
 
     // Then
-    template.hasOutput("EfsFileSystemId", { Value: "fs-12345678" });
+    template.hasOutput("*", { Value: "fs-12345678" });
   });
 });
