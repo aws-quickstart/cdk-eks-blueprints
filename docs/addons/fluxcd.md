@@ -85,7 +85,6 @@ const fluxBootstrap = new s3.Bucket(this, "FluxBootstrap", {
 const addOn = new blueprints.addons.FluxCDAddOn({
     buckets: [{
         name: "bootstrap-bucket",
-        namespace: "flux-system",
         bucketName: fluxBootstrap.bucketName,
         bucketRegion: cdk.Aws.REGION,
     }],

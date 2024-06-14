@@ -43,7 +43,7 @@ export interface FluxBucketRepo {
 
     /**
      * Namespace for the FluxCD bucket source (optional)
-     * Default is `default`
+     * Default is the chart namespace
      */
     namespace?: string;
     
