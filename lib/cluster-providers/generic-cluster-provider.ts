@@ -7,6 +7,7 @@ import { KubectlV27Layer } from "@aws-cdk/lambda-layer-kubectl-v27";
 import { KubectlV28Layer } from "@aws-cdk/lambda-layer-kubectl-v28";
 import { KubectlV29Layer } from "@aws-cdk/lambda-layer-kubectl-v29";
 import { KubectlV30Layer } from "@aws-cdk/lambda-layer-kubectl-v30";
+
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
