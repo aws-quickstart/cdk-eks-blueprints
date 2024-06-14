@@ -6,6 +6,7 @@ import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 import { KubectlV27Layer } from "@aws-cdk/lambda-layer-kubectl-v27";
 import { KubectlV28Layer } from "@aws-cdk/lambda-layer-kubectl-v28";
 import { KubectlV29Layer } from "@aws-cdk/lambda-layer-kubectl-v29";
+import { KubectlV30Layer } from "@aws-cdk/lambda-layer-kubectl-v30";
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
@@ -46,13 +47,15 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
             return new KubectlV28Layer(scope, "kubectllayer28");
         case "1.29":
             return new KubectlV29Layer(scope, "kubectllayer29");
+        case "1.30":
+            return new KubectlV30Layer(scope, "kubectllayer30");
     
     }
     
     const minor = version.version.split('.')[1];
 
-    if(minor && parseInt(minor, 10) > 29) {
-        return new KubectlV29Layer(scope, "kubectllayer29"); // for all versions above 1.29 use 1.29 kubectl (unless explicitly supported in CDK)
+    if(minor && parseInt(minor, 10) > 30) {
+        return new KubectlV30Layer(scope, "kubectllayer30"); // for all versions above 1.30 use 1.30 kubectl (unless explicitly supported in CDK)
     }
     return undefined;
 }
@@ -255,7 +258,7 @@ export class GenericClusterProvider implements ClusterProvider {
         if(!kubernetesVersion && !this.props.version) {
             throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
         }
-        const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_28;
+        const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_30;
 
         const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
