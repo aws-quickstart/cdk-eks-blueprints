@@ -191,7 +191,6 @@ const defaultRepoProps: Partial<FluxGitRepo> = {
 };
 
 const defaultBucketProps: Partial<FluxBucketRepo> = {
-    namespace: "flux-system",
     syncInterval: "5m0s",
     endpoint: "s3.amazonaws.com",
     provider: "aws",
