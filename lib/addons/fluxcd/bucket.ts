@@ -6,7 +6,7 @@ import { setPath } from "../../utils";
  */
 export class FluxBucket {
 
-    constructor(private readonly bucketName: string, private readonly region: string, private readonly bucketPrefix?: string) {}
+    constructor(private readonly bucketName: string, private readonly region: string, private readonly prefixPath?: string) {}
 
     public generate(name: string, namespace: string, fluxSyncInterval: string, provider: string, endpoint: string, fluxSecretRefName?: string) {
 
@@ -30,8 +30,8 @@ export class FluxBucket {
             setPath(bucketManifest, "spec.secretRef.name", fluxSecretRefName);
         }
 
-        if (this.bucketPrefix) {
-            setPath(bucketManifest, "spec.prefix", this.bucketPrefix);
+        if (this.prefixPath) {
+            setPath(bucketManifest, "spec.prefix", this.prefixPath);
         }
 
         return bucketManifest;

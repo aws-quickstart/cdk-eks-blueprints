@@ -86,11 +86,8 @@ const addOn = new blueprints.addons.FluxCDAddOn({
     buckets: [{
         name: "bootstrap-bucket",
         namespace: "flux-system",
-        repository: {
-            repoUrl: fluxBootstrap.bucketName,
-        },
+        bucketName: fluxBootstrap.bucketName,
         bucketRegion: cdk.Aws.REGION,
-        values: {},
     }],
 })
 ...

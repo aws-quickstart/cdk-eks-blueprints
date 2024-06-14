@@ -34,11 +34,35 @@ export interface FluxGitRepo extends Required<spi.GitOpsApplicationDeployment> {
 
 /**
  * Options for a FluxCD Bucket.
- * `repoUrl` is the S3 bucket name,
- * `path` is an optional prefix path and is used server-side filtering, and
- * `targetRevision` has no effect
  */
-export interface FluxBucketRepo extends Required<spi.GitOpsApplicationDeployment> {
+export interface FluxBucketRepo {
+    /**
+     * Name of the FluxCD bucket resource.
+     */
+    name: string;
+
+    /**
+     * Namespace for the FluxCD bucket source (optional)
+     * Default is `default`
+     */
+    namespace?: string;
+    
+    /**
+     * Flux Kustomization variable substitutions (optional)
+     * {@link https://fluxcd.io/flux/components/kustomize/kustomizations/#post-build-variable-substitution}
+     */
+    values?: Values;
+
+    /**
+     * Source S3 Bucket name
+     */
+    bucketName: string;
+
+    /**
+     * Prefix path used for server-side filtering (optional)
+     */
+    prefixPath?: string;
+
     /**
      * Source S3 Bucket region
      */
@@ -167,7 +191,7 @@ const defaultRepoProps: Partial<FluxGitRepo> = {
 };
 
 const defaultBucketProps: Partial<FluxBucketRepo> = {
-    namespace: "default",
+    namespace: "flux-system",
     syncInterval: "5m0s",
     endpoint: "s3.amazonaws.com",
     provider: "aws",
@@ -255,11 +279,7 @@ function createGitRepository(clusterInfo: ClusterInfo, name: string, namespace: 
  * create Bucket calls the FluxBucket().generate to create Bucket resource.
  */
 function createBucket(clusterInfo: ClusterInfo, name: string, namespace: string, props: FluxBucketRepo): KubernetesManifest {
-    if (props.repository === undefined) {
-        throw new Error("Missing S3 bucket repository");
-    }
-
-    const manifest = new FluxBucket(props.repository.repoUrl, props.bucketRegion, props.repository.path).generate(
+    const manifest = new FluxBucket(props.bucketName, props.bucketRegion, props.prefixPath).generate(
         props.name,
         props.namespace ?? namespace,
         props.syncInterval!,
