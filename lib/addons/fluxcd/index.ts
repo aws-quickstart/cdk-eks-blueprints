@@ -145,7 +145,11 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 }
 
 /**
- * Default props to be used when creating the Helm chart
+ * Default props to be used when creating the Helm chart.
+ * Find the latest version using the GitHub CLI command:
+ * `$ gh release  list --repo fluxcd-community/helm-charts`
+ * or from the packages page:
+ * @link https://github.com/fluxcd-community/helm-charts/pkgs/container/charts%2Fflux2
  */
 const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
     name: "fluxcd-addon",
