@@ -409,6 +409,7 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
     init: {
       env: {
         DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
+        ENABLE_V6_EGRESS: props?.enableV6Egress,
       }
     },
     env: {
@@ -439,7 +440,6 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       ENABLE_NFTABLES: props?.enableNftables,
       ENABLE_POD_ENI: props?.enablePodEni,
       ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
-      ENABLE_V6_EGRESS: props?.enableV6Egress,
       INTROSPECTION_BIND_ADDRESS: props?.introspectionBindAddress,
       MAX_ENI: props?.maxEni,
       MINIMUM_IP_TARGET: props?.minimumIpTarget,
