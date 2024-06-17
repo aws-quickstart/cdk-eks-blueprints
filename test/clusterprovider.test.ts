@@ -250,54 +250,54 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
     expect(blueprint.getClusterInfo().autoscalingGroups!.length).toBe(1);
 });
 
-test("Kubectl layer is correctly injected for EKS version 1.26", () => {
+test("Kubectl layer is correctly injected for EKS version 1.30", () => {
 
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_26).build(app, "stack-126");
+        .version(KubernetesVersion.V1_30).build(app, "stack-130");
     
     const template = Template.fromStack(stack);
 
     template.hasResource("AWS::Lambda::LayerVersion", {
         Properties: {
-          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.26"),
+          Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.30"),
         },
       });
 });
 
 
-test("Kubectl layer is correctly injected for EKS version 1.25", () => {
+test("Kubectl layer is correctly injected for EKS version 1.29", () => {
 
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version(KubernetesVersion.V1_25).build(app, "stack-125");
+      .version(KubernetesVersion.V1_29).build(app, "stack-129");
 
     const template = Template.fromStack(stack);
 
     template.hasResource("AWS::Lambda::LayerVersion", {
         Properties: {
-            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.25"),
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.29"),
         },
     });
 });
 
-test("Kubectl layer is correctly injected for EKS version 1.24", () => {
+test("Kubectl layer is correctly injected for EKS version 1.28", () => {
 
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
       .account('123456789').region('us-west-2')
-      .version(KubernetesVersion.V1_24).build(app, "stack-124");
+      .version(KubernetesVersion.V1_28).build(app, "stack-128");
 
     const template = Template.fromStack(stack);
 
     template.hasResource("AWS::Lambda::LayerVersion", {
         Properties: {
-            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.24"),
+            Description: Match.stringLikeRegexp("/opt/kubectl/kubectl 1.28"),
         },
     });
 });
@@ -339,10 +339,10 @@ test("Kubernetes Version gets set correctly in NodeGroup", () => {
     const app = new cdk.App();
     const stack = blueprints.EksBlueprint.builder()
     .account('123456789').region('us-west-2')
-    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_28}))
+    .clusterProvider(new MngClusterProvider({version: KubernetesVersion.V1_30}))
     .build(app, "stack-auto");
 
-    expect(stack.getClusterInfo().version.version).toBe("1.28");
+    expect(stack.getClusterInfo().version.version).toBe("1.30");
 });
 
 test("Import cluster provider can use output values from other stacks as params", () => {
