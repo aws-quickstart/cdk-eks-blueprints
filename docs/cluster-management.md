@@ -77,7 +77,6 @@ export default class MultiRegionConstruct extends cdk.Construct {
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.NginxAddOn,
             new blueprints.addons.ArgoCDAddOn,
-            new blueprints.addons.CalicoAddOn,
             new blueprints.addons.MetricsServerAddOn,
             new blueprints.addons.ClusterAutoScalerAddOn,
             new blueprints.addons.ContainerInsightsAddOn,

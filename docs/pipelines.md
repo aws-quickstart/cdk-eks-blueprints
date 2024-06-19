@@ -26,10 +26,9 @@ const blueprint = blueprints.EksBlueprint.builder()
         new blueprints.AwsLoadBalancerControllerAddOn,
         new blueprints.ExternalDnsAddOn,
         new blueprints.NginxAddOn,
-        new blueprints.CalicoAddOn,
         new blueprints.MetricsServerAddOn,
-        new blueprints.ClusterAutoScalerAddOn,
-        new blueprints.ContainerInsightsAddOn)
+        new blueprints.ClusterAutoScalerAddOn
+    )
     .teams(new team.TeamRikerSetup);
 ```
 
