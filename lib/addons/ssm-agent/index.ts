@@ -2,7 +2,9 @@ import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
+import { supportsX86 } from "../../utils";
 
+@supportsX86
 export class SSMAgentAddOn implements ClusterAddOn {
     deploy(clusterInfo: ClusterInfo): void {
         const cluster = clusterInfo.cluster;
@@ -47,7 +49,7 @@ export class SSMAgentAddOn implements ClusterAddOn {
                         ],
                         initContainers: [
                             {
-                                image: "public.ecr.aws/amazon-ssm-agent/amazon-ssm-agent:3.1.90.0",
+                                image: "public.ecr.aws/amazon-ssm-agent/amazon-ssm-agent:3.2.2222.0",
                                 imagePullPolicy: "Always",
                                 name: "ssm-install",
                                 securityContext: {

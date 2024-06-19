@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { ValuesSchema } from './values';
 /**
@@ -23,7 +23,7 @@ const defaultProps: HelmAddOnProps & GpuOperatorAddonProps = {
     name: "gpu-operator-addon",
     namespace: "gpu-operator",
     chart: "gpu-operator",
-    version: "v23.6.0",
+    version: "v23.9.2",
     release: "nvidia-gpu-operator",
     repository:  "https://helm.ngc.nvidia.com/nvidia",
     createNamespace: true,
@@ -36,6 +36,7 @@ const defaultProps: HelmAddOnProps & GpuOperatorAddonProps = {
  * It validates all requisite software is installed before scheduling GPU workload
  * Using MIG (Multi Instance GPUs) allows you to virtually split your GPU into multiple units
  */
+@supportsALL
 export class GpuOperatorAddon extends HelmAddOn {
 
   readonly options: GpuOperatorAddonProps;

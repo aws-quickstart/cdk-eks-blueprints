@@ -4,7 +4,7 @@ The `GpuBuilder` allows you to get started with a builder class to configure wit
 
 The `GpuBuilder` creates the following:
 - An EKS Cluster` with passed k8s version and cluster tags.
-- A nodegroup to schedule windows workloads with parameters passed.
+- A nodegroup to schedule GPU workloads with parameters passed.
 
 ## Input Parameters
 
@@ -13,7 +13,7 @@ The `GpuBuilder` creates the following:
 - `kubernetesVersion` : Required field, Kubernetes version to use for the cluster
 - `instanceClass`: Required field, Instance class to use for the cluster
 - `instanceSize`:  Required field, Instance size to use for the cluster
-- `nodeRole`: optional, Node IAM Role to be attached to Windows and Non-windows nodes.
+- `nodeRole`: optional, Node IAM Role to be attached to nodes.
 - `gpuAmiType`: Required field, AMI Type for GPU Nodes. For example `AL2_X86_64_GPU`.
 - `desiredNodeSize`: Optional field, Desired number of nodes to use for the cluster
 - `minNodeSize`: Optional field, Minimum number of nodes to use for the cluster
@@ -24,7 +24,7 @@ The `GpuBuilder` creates the following:
 
 ### Demonstration - Running GPUs on EKS Cluster
 
-The below usage helps you with a demonstration to use `GpuBuilder` to configure a required setup as you prepare a blueprint for setting up windows nodes on a new EKS cluster.
+The below usage helps you with a demonstration to use `GpuBuilder` to configure a required setup as you prepare a blueprint for setting up GPU nodes on a new EKS cluster.
 
 ```typescript
 import * as blueprints from "@aws-quickstart/eks-blueprints";
@@ -41,7 +41,7 @@ export default class GpuConstruct {
         const stackID = `${id}-eks-blueprint`;
 
         const options: GpuOptions = {
-            kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+            kubernetesVersion: eks.KubernetesVersion.of("1.28"),
             instanceClass: ec2.InstanceClass.G5,
             instanceSize: ec2.InstanceSize.XLARGE
         };

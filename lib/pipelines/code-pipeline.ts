@@ -4,6 +4,7 @@ import { StackProps } from 'aws-cdk-lib';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as cdkpipelines from 'aws-cdk-lib/pipelines';
+import { GitHubTrigger } from 'aws-cdk-lib/aws-codepipeline-actions';
 import { Construct } from "constructs";
 import { ApplicationRepository, AsyncStackBuilder, StackBuilder } from '../spi';
 import { withUsageTracking } from '../utils/usage-utils';
@@ -11,6 +12,8 @@ import { withUsageTracking } from '../utils/usage-utils';
 export {
     cdkpipelines
 };
+
+export { GitHubTrigger };
 
 /**
  * credentialsType is excluded and the only supported credentialsSecret is a plaintext GitHub OAuth token.
@@ -32,10 +35,16 @@ export interface GitHubSourceRepository extends Omit<ApplicationRepository, "cre
      * @see https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html
      */
     credentialsSecretName: string;
+
     /**
      * The owner of the repository for the pipeline (GitHub handle).
-    */
+     */
     owner?: string;
+
+    /**
+     * How GitHub source action will be triggered.
+     */
+    trigger?: GitHubTrigger;
 }
 
 export interface CodeCommitSourceRepository
@@ -85,15 +94,17 @@ export function isCodeStarConnection(
   
 }
 
+
+
 /**
  * Props for the Pipeline.
  */
 export type PipelineProps = {
 
-  /**
-   * Application name (optional, default to the app set in the cdk.json)
-   */
-  application?: string;
+    /**
+     * Application name (optional, default to the app set in the cdk.json)
+     */
+    application?: string;
 
     /**
      * The name for the pipeline.
@@ -118,13 +129,13 @@ export type PipelineProps = {
      */
     codeBuildPolicies?: PolicyStatement[];
 
-  /**
-   * Repository for the pipeline (GitHub or CodeCommitRepository).
-   */
-  repository:
-    | GitHubSourceRepository
-    | CodeCommitSourceRepository
-    | CodeStarConnectionRepository;
+    /**
+     * Repository for the pipeline (GitHub or CodeCommitRepository).
+     */
+    repository:
+      | GitHubSourceRepository
+      | CodeCommitSourceRepository
+      | CodeStarConnectionRepository;
 
     /**
      * Pipeline stages and options.
@@ -160,7 +171,7 @@ export interface StackStage {
 /**
  * Internal interface for wave stages
  */
-interface WaveStage extends StackStage {
+export interface WaveStage extends StackStage {
     /**
      * Wave id if this stage is part of a wave. Not required if stage is supplied
      */
@@ -192,7 +203,8 @@ export const DEFAULT_BUILD_POLICIES = [ new PolicyStatement({
         "sts:AssumeRole",
         "secretsmanager:GetSecretValue",
         "secretsmanager:DescribeSecret",
-        "cloudformation:*"
+        "cloudformation:*",
+        "eks:DescribeAddonVersions"
     ]
 })];
 
@@ -411,8 +423,7 @@ class CodePipeline {
 
           default:{
             let gitHubRepo = props.repository as GitHubSourceRepository;
-            let githubProps: cdkpipelines.GitHubSourceOptions | undefined =
-              undefined;
+            let githubProps: cdkpipelines.GitHubSourceOptions = {};
             const gitHubOwner = gitHubRepo.owner ?? props.owner;
 
             if (gitHubRepo.credentialsSecretName) {
@@ -425,7 +436,11 @@ class CodePipeline {
             codePipelineSource = cdkpipelines.CodePipelineSource.gitHub(
               `${gitHubOwner}/${gitHubRepo.repoUrl}`,
               gitHubRepo.targetRevision ?? 'main',
-              githubProps
+              { 
+                ...githubProps,
+                trigger: gitHubRepo.trigger ?? GitHubTrigger.WEBHOOK,
+
+              }
             );
             break;
           }
@@ -433,21 +448,25 @@ class CodePipeline {
 
         const app = props.application ? `--app '${props.application}'` : "";
 
+        const path = props.repository.path ?? "./";
+
         return new cdkpipelines.CodePipeline(scope, props.name, {
             pipelineName: props.name,
             synth: new cdkpipelines.ShellStep(`${props.name}-synth`, {
               input: codePipelineSource,
+              primaryOutputDirectory: `${path}/cdk.out`,
               installCommands: [
                 'n stable',
-                'npm install -g aws-cdk@2.91.0',
-                'npm install',
+                'npm install -g aws-cdk@2.145.0',
+                `cd $CODEBUILD_SRC_DIR/${path} && npm install`
               ],
-              commands: ['npm run build', 'npx cdk synth ' + app]
+              commands: [`cd $CODEBUILD_SRC_DIR/${path}`, 'npm run build', 'npx cdk synth ' + app]
             }),
             crossAccountKeys: props.crossAccountKeys,
             codeBuildDefaults: {
-                rolePolicy: props.codeBuildPolicies
-            }
+                rolePolicy: props.codeBuildPolicies    
+            },
+            
           });
     }
 }

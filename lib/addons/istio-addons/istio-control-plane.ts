@@ -1,9 +1,10 @@
 import { Construct } from "constructs";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { dependable } from '../../utils';
-import { ValuesSchema } from "./values";
+import { dependable, supportsALL } from '../../utils';
+import { ValuesSchema } from "./istio-control-plane-values";
+import { ISTIO_VERSION } from "./istio-base";
 
 export interface IstioControlPlaneAddOnProps extends HelmAddOnUserProps {
     values?: ValuesSchema
@@ -14,10 +15,11 @@ const defaultProps = {
     release: "istiod",
     namespace: "istio-system",
     chart: "istiod",
-    version: "1.18.2",
+    version: ISTIO_VERSION,
     repository: "https://istio-release.storage.googleapis.com/charts"
 };
 
+@supportsALL
 export class IstioControlPlaneAddOn extends HelmAddOn {
 
     constructor(props?: IstioControlPlaneAddOnProps) {

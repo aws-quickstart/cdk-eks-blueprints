@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { Construct } from "constructs";
 import { ClusterInfo } from '../../spi';
-import { createNamespace, setPath } from '../../utils';
+import { createNamespace, setPath, supportsALL } from '../../utils';
 import { AwsLoadBalancerControllerAddOn } from "../aws-loadbalancer-controller";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 
@@ -126,6 +126,7 @@ const defaultProps: HelmAddOnProps = {
 /**
  * Implementation of the JupyterHub add-on
  */
+@supportsALL
 export class JupyterHubAddOn extends HelmAddOn {
 
     readonly options: JupyterHubAddOnProps;

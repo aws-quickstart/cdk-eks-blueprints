@@ -33,7 +33,7 @@ const ebsDeviceProps: ec2.EbsDeviceProps = {
     volumeType: ec2.EbsDeviceVolumeType.GP2
 };
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     tags: {
         "Name": "blueprints-example-cluster",
         "Type": "generic-cluster"
@@ -142,7 +142,7 @@ All of such cases can be solved with [Resource Providers](../resource-providers/
 Example:
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     tags: {
         "Name": "blueprints-example-cluster",
         "Type": "generic-cluster"
@@ -212,7 +212,7 @@ Upgrading Kubernetes versions via cluster configuration at present won't impact 
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     managedNodeGroups: [
         {
             id: "managed-1",

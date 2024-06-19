@@ -1,9 +1,9 @@
-import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
+import { ManagedPolicy, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import "reflect-metadata";
-import { createNamespace, setPath } from "../../utils";
+import { createNamespace, setPath, supportsX86 } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AckServiceName, serviceMappings } from './serviceMappings';
 
@@ -27,6 +27,11 @@ export interface AckAddOnProps extends HelmAddOnUserProps {
      * @default IAMFullAccess
      */
     managedPolicyName?: string;
+    /**
+    * Inline IAM Policy for the ack controller
+    * @default undefined
+    */
+    inlinePolicyStatements?: PolicyStatement[];
     /**
      * To Create Namespace using CDK. This should be done only for the first time.
      */    
@@ -52,6 +57,7 @@ const defaultProps: AckAddOnProps = {
  * Main class to instantiate the Helm chart
  */
 @Reflect.metadata("ordered", true)
+@supportsX86
 export class AckAddOn extends HelmAddOn {
 
   readonly options: AckAddOnProps;
@@ -62,6 +68,7 @@ export class AckAddOn extends HelmAddOn {
     this.options = this.props as AckAddOnProps;
     this.id = this.options.id;
   }
+
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
@@ -79,8 +86,15 @@ export class AckAddOn extends HelmAddOn {
       const namespace = createNamespace(this.options.namespace! , cluster);
       sa.node.addDependency(namespace);
     }
-    
-    sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
+
+    if (this.options.managedPolicyName) {
+      sa.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(this.options.managedPolicyName!));
+    }
+    if (this.options.inlinePolicyStatements && this.options.inlinePolicyStatements.length > 0) {
+      sa.role.attachInlinePolicy(new Policy(cluster.stack, `${this.options.chart}-inline-policy`, {
+        statements: this.options.inlinePolicyStatements
+      }));
+    }
     const chart = this.addHelmChart(clusterInfo, values);
     chart.node.addDependency(sa);
     return Promise.resolve(chart);
@@ -114,6 +128,7 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   tempProps.release = tempProps.release ?? tempProps.chart;
   tempProps.repository = tempProps.repository ?? `${repositoryUrl}/${tempProps.name}`;
   tempProps.managedPolicyName = tempProps.managedPolicyName ?? serviceMappings[tempProps.serviceName!]?.managedPolicyName;
+  tempProps.inlinePolicyStatements = tempProps.inlinePolicyStatements ?? serviceMappings[tempProps.serviceName!]?.inlinePolicyStatements;
   tempProps.createNamespace = tempProps.createNamespace ?? defaultProps.createNamespace;
   tempProps.saName = tempProps.saName ?? `${tempProps.chart}-sa`;
   return tempProps as AckAddOnProps;

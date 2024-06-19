@@ -54,11 +54,23 @@ const blueprint = blueprints.EksBlueprint.builder()
         owner: "aws-samples",
         repoUrl: 'cdk-eks-blueprints-patterns',
         credentialsSecretName: 'github-token',
-        targetRevision: 'main' // optional, default is "main"
+        targetRevision: 'main' // optional, default is "main",
     })
 ```
 
-Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be fined in one main region, and replicated to all target regions.
+If you IaC code is located under a specific folder, for example `PROJECT_ROOT/infra/blueprints` you can specify that directory with the repository (applies to GitHub. CodeCommit and CodeStar repos). 
+
+```
+ blueprints.CodePipelineStack.builder()
+    .name("eks-blueprints-pipeline")
+    .repository({
+        owner: "aws-samples",
+        repoUrl: 'cdk-eks-blueprints-patterns',
+        credentialsSecretName: 'github-token',
+        path: "./infra/blueprints" // optional, default is './'
+    })```
+
+Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be defined in one main region, and replicated to all target regions.
 
 ### Using AWS CodeCommit as CodePipeline repository source.
 
@@ -197,6 +209,36 @@ const pipeline = blueprints.CodePipelineStack.builder()
             .build(...)
 ```
 
+## Monorepo support
+
+In some cases, customers choose to have their blueprints defined in subdirectories on a monorepo project. In this scenario, the root of the project is not the root of the CDK pipeline. A single monorepo can also support multiple subprojects each containing its own pipeline. 
+
+To support this case, customers can specify the relative path of the subdirectory containing the blueprints. 
+
+Example pipeline with inline explanation:
+
+```ts
+const blueprint = ...; // define your blueprint
+
+blueprints.CodePipelineStack.builder()
+    .application("npx ts-node bin/main.ts") // optionally set application to point to the launch file. In this case bin/main.ts is located in the path set in the repo configuration  - examples/monorepo/bin/main.ts. Useful when multiple apps are defined. 
+    .name("blueprints-eks-pipeline")
+    .owner("aws-quickstart")
+    .codeBuildPolicies(blueprints.DEFAULT_BUILD_POLICIES)
+    .repository({
+        repoUrl: 'cdk-eks-blueprints',
+        credentialsSecretName: 'github-token',
+        targetRevision: 'bug/broken-monorepo-pipelines',
+        path: "examples/monorepo", // set the path relative to the root of the monrepo
+        trigger: blueprints.GitHubTrigger.POLL // optionally set trigger, by default it will create a webhook.
+    })
+    .stage({
+        id: 'us-west-2-sandbox',
+        stackBuilder: blueprint.clone('us-west-2')
+    })
+    .build(app, "pipeline", { env: { region, account }});
+```
+
 ## Build the pipeline stack
 
 Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.
@@ -263,6 +305,7 @@ $ env CDK_NEW_BOOTSTRAP=1 npx cdk bootstrap \
 
 ## Troubleshooting
 
+**Problem**
 Blueprints Build can fail with AccessDenied exception during build phase. Typical error messages:
 
 ```
@@ -272,7 +315,7 @@ Error: AccessDeniedException: User: arn:aws:sts::<account>:assumed-role/blueprin
 ```
 current credentials could not be used to assume 'arn:aws:iam::<account>:role/cdk-hnb659fds-lookup-role-,account>-eu-west-3', but are for the right account. Proceeding anyway.
 ```
-
+***
 ```
 Error: you are not authorized to perform this operation.
 ```
@@ -283,5 +326,31 @@ This can happen for a few reasons, but most typical is  related to the stack req
 
 You can take advantage of supplying the require IAM policies to the pipeline to avoid this error. See [this](#handling-build-time-access) for more details.
 
-To address this issue "manually" (without the change to the pipeline), you can locate the role leveraged for Code Build and provide required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`.
+To address this issue "manually" (without the change to the pipeline), you can locate the role leveraged for Code Build and provide ***required permissions. Depending on the scope of the build role, the easiest resolution is to add `AdministratorAccess` permission to the build role which typically looks similar to this `blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1` provided your pipeline stack was named `blueprints-pipeline-stack`.
 If adding administrative access to the role solves the issue, you can then consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.
+
+**Problem**
+
+Failure to create webhook for GitHub sources. When user does not admin rights to a repository or in a more narrow case does not have required permissions to create a webhook, the pipeline fails with an error message similar to this:
+
+```
+Webhook could not be registered with GitHub. Error cause: Not found [StatusCode: 404, Body: {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/webhooks#create-a-repository-webhook"}]
+```
+
+**Resolution**
+
+1. Option one: configure proper permissions to create webhook against the target repo.
+2. Option two: modify the trigger to use POLL instead of webhook. 
+
+For option two here is the example configuration:
+
+```ts
+blueprints.CodePipelineStack.builder()
+    .name("blueprints-eks-pipeline")
+    .owner(...)
+    .repository({
+        ...
+        trigger: blueprints.GitHubTrigger.POLL // optionally set trigger to POLL, by default it will create a webhook.
+    })
+    ...
+```

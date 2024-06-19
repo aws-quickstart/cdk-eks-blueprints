@@ -1,9 +1,9 @@
 // lib/fluxcd_addon.ts
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import * as spi from "../../spi";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
@@ -68,7 +68,7 @@ export interface FluxCDAddOnProps extends HelmAddOnUserProps {
 
   /**
   * Helm chart version to use to install.
-  * @default 2.8.0
+  * @default 2.12.4
   */
   version?: string;
 
@@ -95,7 +95,7 @@ const defaultProps: HelmAddOnProps & FluxCDAddOnProps = {
   name: "fluxcd-addon",
   namespace: "flux-system",
   chart: "flux2",
-  version: "2.9.2",
+  version: "2.12.4",
   release: "blueprints-fluxcd-addon",
   repository: "https://fluxcd-community.github.io/helm-charts",
   values: {},
@@ -116,6 +116,7 @@ const defaultKustomiationProps: FluxKustomizationProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class FluxCDAddOn extends HelmAddOn {
 
   readonly options: FluxCDAddOnProps;

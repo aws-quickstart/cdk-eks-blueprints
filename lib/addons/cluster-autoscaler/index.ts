@@ -4,7 +4,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterInfo } from "../../spi";
-import { conflictsWith, createNamespace, createServiceAccount, logger, setPath } from "../../utils";
+import { conflictsWith, createNamespace, createServiceAccount, logger, setPath, supportsALL } from "../../utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 
 /**
@@ -40,18 +40,21 @@ const defaultProps: ClusterAutoScalerAddOnProps = {
 /**
  * Version of the autoscaler, controls the image tag
  */
-const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_26, "9.29.0"],
-    [KubernetesVersion.V1_25, "9.29.0"],
-    [KubernetesVersion.V1_24, "9.25.0"],
-    [KubernetesVersion.V1_23, "9.21.0"],
-    [KubernetesVersion.V1_22, "9.13.1"],
-    [KubernetesVersion.V1_21, "9.13.1"],
-    [KubernetesVersion.V1_20, "9.9.2"],
-    [KubernetesVersion.V1_19, "9.4.0"],
-    [KubernetesVersion.V1_18, "9.4.0"],
+const versionMap: Map<string, string> = new Map([
+    [KubernetesVersion.V1_28.version, "9.34.0"],
+    [KubernetesVersion.V1_27.version, "9.33.0"],
+    [KubernetesVersion.V1_26.version, "9.29.0"],
+    [KubernetesVersion.V1_25.version, "9.29.0"],
+    [KubernetesVersion.V1_24.version, "9.25.0"],
+    [KubernetesVersion.V1_23.version, "9.21.0"],
+    [KubernetesVersion.V1_22.version, "9.13.1"],
+    [KubernetesVersion.V1_21.version, "9.13.1"],
+    [KubernetesVersion.V1_20.version, "9.9.2"],
+    [KubernetesVersion.V1_19.version, "9.4.0"],
+    [KubernetesVersion.V1_18.version, "9.4.0"],
 ]);
 
+@supportsALL
 export class ClusterAutoScalerAddOn extends HelmAddOn {
 
     private options: ClusterAutoScalerAddOnProps;
@@ -65,7 +68,7 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         if(this.options.version?.trim() === 'auto') {
-            this.options.version = versionMap.get(clusterInfo.version);
+            this.options.version = versionMap.get(clusterInfo.version.version);
             if(!this.options.version) {
                 this.options.version = versionMap.values().next().value;
                 logger.warn(`Unable to auto-detect cluster autoscaler version. Applying latest: ${this.options.version}`);
@@ -104,14 +107,15 @@ export class ClusterAutoScalerAddOn extends HelmAddOn {
             Tags.of(ng).add(`k8s.io/cluster-autoscaler/${clusterName}`, "owned", { applyToLaunchedInstances: true });
             Tags.of(ng).add("k8s.io/cluster-autoscaler/enabled", "true", { applyToLaunchedInstances: true });
         }
-        
-        // Create namespace
-        if (this.options.createNamespace) {
-            createNamespace(namespace, cluster, true);
-        }
 
         // Create IRSA
         const sa = createServiceAccount(cluster, RELEASE, namespace, autoscalerPolicyDocument);
+
+        // Create namespace
+        if (this.options.createNamespace) {
+            const ns = createNamespace(namespace, cluster, true);
+            sa.node.addDependency(ns);
+        }
 
         // Create Helm Chart
         setPath(values, "cloudProvider", "aws");

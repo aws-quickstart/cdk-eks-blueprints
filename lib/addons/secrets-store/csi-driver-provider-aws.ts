@@ -3,7 +3,7 @@ import { ClusterInfo, Values } from "../../spi";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
 import { SecretsStoreAddOnProps } from ".";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { HelmAddOn } from "../helm-addon";
 
 

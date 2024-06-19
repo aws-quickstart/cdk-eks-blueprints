@@ -9,10 +9,11 @@ const props: MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,
+    desiredSize: 4,    
     instanceTypes: [new InstanceType('m5.large')],
     amiType: NodegroupAmiType.AL2_X86_64,
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
 }
 const clusterProvider = new blueprints.MngClusterProvider(props);
@@ -61,7 +62,7 @@ Upgrading Kubernetes versions via cluster configuration at present won't impact 
 
 ```typescript
 const props: MngClusterProviderProps = {
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     amiReleaseVersion: "1.25.7-20230509" // this will upgrade kubelet to 1.25
 }
 ```
@@ -75,7 +76,7 @@ To create clusters which leverage Spot capacity, set the `nodeGroupCapacityType`
 ```typescript
 const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.SPOT,
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     instanceTypes: [new InstanceType('t3.large'), new InstanceType('m5.large')],
     amiReleaseVersion: "1.25.7-20230509" // this will upgrade kubelet to 1.25
 }
@@ -93,7 +94,7 @@ userData.addCommands(`/etc/eks/bootstrap.sh ${cluster.clusterName}`);
 
 const props: MngClusterProviderProps = {
     nodeGroupCapacityType: CapacityType.ON_DEMAND,
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     instanceTypes: [new InstanceType('t3.large')],
     customAmi: {
         machineImage: MachineImage.genericLinux({'us-east-1': 'ami-0be34337b485b2609'}),

@@ -1,8 +1,8 @@
 // lib/certmanager_addon.ts
 import { Construct } from 'constructs';
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
-import { createNamespace, dependable } from "../../utils";
+import { createNamespace, dependable, supportsALL } from "../../utils";
 import { setPath } from '../../utils/object-utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadBalancerControllerAddOn } from '../aws-loadbalancer-controller';
@@ -27,7 +27,7 @@ const defaultProps: HelmAddOnProps & CertManagerAddOnProps = {
   name: "blueprints-cert-manager-addon",
   namespace: "cert-manager",
   chart: "cert-manager",
-  version: "1.12.3",
+  version: "1.14.3",
   release: "cert-manager",
   repository:  "https://charts.jetstack.io",
   values: {},
@@ -39,6 +39,7 @@ const defaultProps: HelmAddOnProps & CertManagerAddOnProps = {
 /**
  * Main class to instantiate the Helm chart
  */
+@supportsALL
 export class CertManagerAddOn extends HelmAddOn {
 
   readonly options: CertManagerAddOnProps;

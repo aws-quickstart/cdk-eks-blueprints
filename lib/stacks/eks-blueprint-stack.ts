@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { ClusterLoggingTypes as ControlPlaneLogType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 import { Construct } from 'constructs';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
@@ -13,7 +13,12 @@ import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = 1.27;
+export const DEFAULT_VERSION = KubernetesVersion.V1_29;
+
+/**
+ *  Exporting control plane log type so that customers don't have to import CDK EKS module for blueprint configuration. 
+ */  
+export { ControlPlaneLogType };
 
 export class EksBlueprintProps {
     /**
@@ -88,15 +93,6 @@ export class BlueprintPropsConstraints implements constraints.ConstraintsType<Ek
     * https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
     */
     name = new constraints.StringConstraint(1, 63);
-}
-
-export const enum ControlPlaneLogType {
-
-    API = 'api',
-    AUDIT = 'audit',
-    AUTHENTICATOR = 'authenticator',
-    CONTROLLER_MANAGER = 'controllerManager',
-    SCHEDULER = 'scheduler'
 }
 
 /**
@@ -240,7 +236,7 @@ export class EksBlueprint extends cdk.Stack {
 
         let version = blueprintProps.version;
         if (version == "auto") {
-            version = KubernetesVersion.V1_27;
+            version = DEFAULT_VERSION;
         }
 
         let kmsKeyResource: IKey | undefined = resourceContext.get(spi.GlobalResources.KmsKey);
@@ -256,13 +252,8 @@ export class EksBlueprint extends cdk.Stack {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
         this.clusterInfo.setResourceContext(resourceContext);
-
-        let enableLogTypes: string[] | undefined = blueprintProps.enableControlPlaneLogTypes;
-        if (enableLogTypes) {
-            utils.setupClusterLogging(this.clusterInfo.cluster.stack, this.clusterInfo.cluster, enableLogTypes);
-        }
 
         if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
             ArgoGitOpsFactory.enableGitOps();

@@ -221,7 +221,7 @@ Example with an anonymous resource:
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_25,
+    version: KubernetesVersion.V1_29,
     mastersRole: blueprints.getResource(context => { // will generate a unique name for resource. designed for cases when resource is defined once and needed in a single place.
         return new iam.Role(context.scope, 'AdminRole', { assumedBy: new AccountRootPrincipal() });
     }),
@@ -241,8 +241,8 @@ Example with a named resource:
 
 ```typescript
 const clusterProvider = new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_25,
-    mastersRole: blueprints.getNamedResource("my-role"),
+    version: KubernetesVersion.V1_29,
+    mastersRole: blueprints.getNamedResource("my-role") as iam.Role,
     managedNodeGroups: [
         ...
     ]

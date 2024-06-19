@@ -1,6 +1,6 @@
-import { createNamespace } from "../../utils";
+import { createNamespace, supportsALL } from "../../utils";
 import * as iam from "aws-cdk-lib/aws-iam";
-import merge from "ts-deepmerge";
+import { merge } from "ts-deepmerge";
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
@@ -23,7 +23,7 @@ const defaultProps: ExternalsSecretsAddOnProps = {
   name: "external-secrets",
   chart: "external-secrets",
   release: "blueprints-addon-external-secrets",
-  version: "0.9.3",
+  version: "0.9.13",
   repository: "https://charts.external-secrets.io",
   namespace: "external-secrets",
   values: {},
@@ -57,6 +57,7 @@ const defaultIamPolicy: iam.PolicyStatement = new iam.PolicyStatement({
  * For information on how to configure the `external-secrets` Helm chart, please view the values.yaml spec provided by the chart.
  * https://github.com/external-secrets/external-secrets/blob/main/deploy/charts/external-secrets/values.yaml
  */
+@supportsALL
 export class ExternalsSecretsAddOn extends HelmAddOn {
   readonly options: ExternalsSecretsAddOnProps;
 

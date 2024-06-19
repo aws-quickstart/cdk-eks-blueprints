@@ -1,10 +1,10 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from "constructs";
-import merge from 'ts-deepmerge';
-import { ClusterInfo, Values, Taint } from '../../spi';
-import { conflictsWith, createNamespace, createServiceAccount, setPath, } from '../../utils';
+import { merge } from 'ts-deepmerge';
+import { ClusterInfo, Values, BlockDeviceMapping, Taint, Sec, Min, Hour } from '../../spi';
+import * as utils from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
-import { KarpenterControllerPolicy } from './iam';
+import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam';
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
 import * as md5 from 'ts-md5';
 import * as semver from 'semver';
@@ -12,59 +12,74 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
+class versionMap {
+    private static readonly versionMap: Map<string, string> = new Map([
+        [KubernetesVersion.V1_29.version, '0.34.0'],
+        [KubernetesVersion.V1_28.version, '0.31.0'],
+        [KubernetesVersion.V1_27.version, '0.28.0'],
+        [KubernetesVersion.V1_26.version, '0.28.0'],
+        [KubernetesVersion.V1_25.version, '0.25.0'],
+        [KubernetesVersion.V1_24.version, '0.21.0'],
+        [KubernetesVersion.V1_23.version, '0.21.0'],
+    ]);
+    public static has(version: KubernetesVersion) {
+      return this.versionMap.has(version.version);
+    }
+    public static get(version: KubernetesVersion) {
+      return this.versionMap.get(version.version);
+    }
+  }
 
 /**
- * Configuration options for the add-on
+ * Utility type for Karpenter requirement values for NodePools
  */
-interface KarpenterAddOnProps extends HelmAddOnUserProps {
-    /**
-     * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
-     */
-    taints?: Taint[],
+export type NodePoolRequirementValues = {
+    key: string,
+    operator: "In" | "NotIn" | "Exists" | "DoesNotExist" | "Gt" | "Lt",
+    values: string[],
+}[]
 
-    /**
-     * Provisioned nodes will have these taints, but pods do not need to tolerate these taints to be provisioned by this\
-     * provisioner. These taints are expected to be temporary and some other entity (e.g. a DaemonSet) is responsible for
-     * removing the taint after it has finished initializing the node.
-     */
-    startupTaints?: Taint[],
+// Utility Type for Karpenter NodeClass Disruption Budget
+export type DisruptionBudget = {
+    nodes: string
+    schedule?: string
+    duration?: string
+};
 
-    /**
-     * Labels applied to all nodes
-     */
-    labels?: Values,
+// Specific types for the Beta CRD Subnet and Security Group selector terms
+export type BetaSubnetTerm = { id?: string, tags?: Values };
+export type BetaSecurityGroupTerm = { tags?: Values, id?: string, name?: string };
+export type AmiSelectorTerm = { tags?: Values, name?: string, owner?: string } | { id?: string };
 
-    /**
-     * Annotations applied to all nodes
-     */
-    annotations?: Values,
-
-    /**
-     * Requirement properties for a Provisioner (Optional) - If not provided, the add-on will
-     * deploy a Provisioner with default values.
-     */
-    requirements?: {
-        key: string,
-        op: 'In' | 'NotIn' ,
-        vals: string[],
-    }[]
-
+/**
+ * Utility type for Karpenter EC2NodeClass Specs
+ */
+export type Ec2NodeClassSpec = {
     /**
      * Tags needed for subnets - Subnet tags and security group tags are required for the provisioner to be created
+     * Required for Alpha CRDS
      */
-    subnetTags?: Values,
+    subnetSelector?: Values,
 
     /**
      * Tags needed for security groups - Subnet tags and security group tags are required for the provisioner to be created
+     * Required for Alpha CRDS
      */
-    securityGroupTags?: Values,
+    securityGroupSelector?: Values,
 
     /**
-     * AMI Family: If provided, Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
+     * Subnet selector terms (subnet id or tags) used for Beta CRDs
+     * Required for Beta CRDS
      */
-    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
+    subnetSelectorTerms?: BetaSubnetTerm[],
+
+    /**
+     * Security Group selector terms (security group id, tags or names) used for Beta CRDs
+     * Required for Beta CRDS
+     */
+    securityGroupSelectorTerms?: BetaSecurityGroupTerm[],
 
     /**
      * AMI Selector
@@ -72,65 +87,187 @@ interface KarpenterAddOnProps extends HelmAddOnUserProps {
     amiSelector?: Values,
 
     /**
-     * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.  
-     * Mutually exclusive with the ttlSecondsAfterEmpty parameter.
-     * Only applicable for v0.15.0 or later.
+     * AMI Selector terms used for Beta CRDs
      */
-    consolidation?: {
-        enabled: boolean,
-    }
+    amiSelectorTerms?: AmiSelectorTerm[];
 
     /**
-     * If omitted, the feature is disabled and nodes will never expire.  
-     * If set to less time than it requires for a node to become ready, 
-     * the node may expire before any pods successfully start.
+     * AMI Family: required for v0.32.0 and above, optional otherwise
+     * Karpenter will automatically query the appropriate EKS optimized AMI via AWS Systems Manager
      */
-    ttlSecondsUntilExpired?: number,
+    amiFamily?: "AL2" | "Bottlerocket" | "Ubuntu" | "Windows2019" | "Windows2022"
 
     /**
-     * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
-     * Mutually exclusive with the consolidation parameter.
+     * Optional field to control how instance store volumes are handled. Set it to RAID0
+     * for faster ephemeral storage
      */
-    ttlSecondsAfterEmpty?: number,
+    instanceStorePolicy?: "RAID0"
 
     /**
-     * Priority given to the provisioner when the scheduler considers which provisioner
-     * to select. Higher weights indicate higher priority when comparing provisioners.
+     * Optional user provided UserData applied to the worker nodes,
+     * i.e. custom scripts or pass-through custom configurations at start-up
      */
-    weight?: number,
+    userData?: string,
 
     /**
-     * Flag for enabling Karpenter's native interruption handling 
-     * Only applicable for v0.19.0 and later
+     * Optional field to use the name of the IAM Instance profile,
+     * instead of the role generated by Karpenter.
+     * User must pre-provision an IAM instance profile and assign a role to it.
      */
-    interruptionHandling?: boolean,
-
-    /**
-     * Limits define a set of bounds for provisioning capacity.
-     * Resource limits constrain the total size of the cluster.
-     * Limits prevent Karpenter from creating new instances once the limit is exceeded.
-     */
-    limits?: {
-        resources?: {
-          cpu?: number;
-          memory?: string;
-          /**
-           * Extended resources are fully-qualified resource names outside the kubernetes.io domain.
-           * They allow cluster operators to advertise and users to consume the non-Kubernetes-built-in
-           * resources such as hardware devices GPUs, RDMAs, SR-IOVs...
-           * e.g nvidia.com/gpu, amd.com/gpu, etc...
-           */
-          [k: string]: unknown;
-        };
-    },
+    instanceProfile?: string,
 
     /**
      * Tags adds tags to all resources created, including EC2 Instances, EBS volumes and Launch Templates.
-     * Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domains 
+     * Karpenter allows overrides of the default "Name" tag but does not allow overrides to restricted domains
      * (such as "karpenter.sh", "karpenter.k8s.aws", and "kubernetes.io/cluster").
      * This ensures that Karpenter is able to correctly auto-discover machines that it owns.
      */
     tags?: Values;
+
+    /**
+     * Control the exposure of Instance Metadata service using this configuration
+     */
+    metadataOptions?: Values;
+
+    /**
+     * BlockDeviceMappings allows you to specify the block device mappings for the instances.
+     * This is a list of mappings, where each mapping consists of a device name and an EBS configuration.
+     * If you leave this blank, it will use the Karpenter default.
+     */
+    blockDeviceMappings?: BlockDeviceMapping[];
+
+    /**
+     * Detailed monitoring on EC2
+     */
+    detailedMonitoring?: boolean
+}
+
+/**
+ * Utility type for Karpenter NodePool Specs
+ */
+export type NodePoolSpec = {
+     /**
+         * Labels applied to all nodes
+         */
+     labels?: Values,
+
+     /**
+      * Annotations applied to all nodes
+      */
+     annotations?: Values,
+
+     /**
+      * Taints for the provisioned nodes - Taints may prevent pods from scheduling if they are not tolerated by the pod.
+      */
+     taints?: Taint[],
+
+     /**
+      * Provisioned nodes will have these taints, but pods do not need to tolerate these taints to be provisioned by this
+      * provisioner. These taints are expected to be temporary and some other entity (e.g. a DaemonSet) is responsible for
+      * removing the taint after it has finished initializing the node.
+      */
+     startupTaints?: Taint[],
+
+     /**
+      * Requirement properties for Node Pool (Optional) - If not provided, the add-on will
+      * deploy one with no value, providing no restrictions when Karpenter optimizes.
+      */
+     requirements?: NodePoolRequirementValues,
+
+     /**
+      * Enables consolidation which attempts to reduce cluster cost by both removing un-needed nodes and down-sizing those that can't be removed.
+      * Mutually exclusive with the ttlSecondsAfterEmpty parameter.
+      *
+      * Replaced with disruption.consolidationPolicy for versions v0.32.x and later
+      */
+     consolidation?: {
+         enabled: boolean,
+     }
+
+     /**
+      * If omitted, the feature is disabled and nodes will never expire.
+      * If set to less time than it requires for a node to become ready,
+      * the node may expire before any pods successfully start.
+      *
+      * Replaced with disruption.expireAfter for versions v0.32.x and later
+      */
+     ttlSecondsUntilExpired?: number,
+
+     /**
+      * How many seconds Karpenter will wailt until it deletes empty/unnecessary instances (in seconds).
+      * Mutually exclusive with the consolidation parameter.
+      *
+      * Replaced with disruption.consolidationPolicy and disruption.consolidateAfter for versions v0.32.x and later
+      */
+     ttlSecondsAfterEmpty?: number,
+
+     /**
+      * Disruption section which describes the ways in which Karpenter can disrupt and replace Nodes
+      * Configuration in this section constrains how aggressive Karpenter can be with performing operations
+      * like rolling Nodes due to them hitting their maximum lifetime (expiry) or scaling down nodes to reduce cluster cost
+      * Only applicable for versions v0.32 or later
+      *
+      * @param consolidationPolicy consolidation policy - will default to WhenUnderutilized if not provided
+      * @param consolidateAfter How long Karpenter waits to consolidate nodes - cannot be set when the policy is WhenUnderutilized
+      * @param expireAfter How long Karpenter waits to expire nodes
+      */
+     disruption?: {
+         consolidationPolicy?: "WhenUnderutilized" | "WhenEmpty",
+         consolidateAfter?: Sec | Min | Hour,
+         expireAfter?:  "Never" | Sec | Min | Hour
+         budgets?: DisruptionBudget[]
+     },
+
+     /**
+      * Limits define a set of bounds for provisioning capacity.
+      * Resource limits constrain the total size of the cluster.
+      * Limits prevent Karpenter from creating new instances once the limit is exceeded.
+      */
+     limits?: {
+         cpu?: number;
+         memory?: string;
+         /**
+          * Extended resources are fully-qualified resource names outside the kubernetes.io domain.
+          * They allow cluster operators to advertise and users to consume the non-Kubernetes-built-in
+          * resources such as hardware devices GPUs, RDMAs, SR-IOVs...
+          * e.g nvidia.com/gpu, amd.com/gpu, etc...
+          */
+         [k: string]: unknown;
+     },
+
+     /**
+      * Priority given to the provisioner when the scheduler considers which provisioner
+      * to select. Higher weights indicate higher priority when comparing provisioners.
+      */
+     weight?: number,
+}
+
+/**
+ * Configuration options for the add-on
+ */
+export interface KarpenterAddOnProps extends HelmAddOnUserProps {
+    /**
+     * This is the top level nodepool specification. Nodepools launch nodes in response to pods that are unschedulable.
+     * A single nodepool is capable of managing a diverse set of nodes.
+     * Node properties are determined from a combination of nodepool and pod scheduling constraints.
+     */
+    nodePoolSpec?: NodePoolSpec,
+
+    /**
+     * This is the top level spec for the AWS Karpenter Provider
+     * It contains configuration necessary to launch instances in AWS.
+     */
+    ec2NodeClassSpec?: Ec2NodeClassSpec,
+
+    /**
+     * Flag for enabling Karpenter's native interruption handling
+     */
+    interruptionHandling?: boolean,
+
+    /**
+     * Timeout duration while installing karpenter helm chart using addHelmChart API
+     */
+    helmChartTimeout?: Duration,
 }
 
 const KARPENTER = 'karpenter';
@@ -142,7 +279,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.29.2',
+    version: 'v0.34.1',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -151,6 +288,7 @@ const defaultProps: HelmAddOnProps = {
 /**
  * Implementation of the Karpenter add-on
  */
+@utils.supportsALL
 export class KarpenterAddOn extends HelmAddOn {
 
     readonly options: KarpenterAddOnProps;
@@ -160,44 +298,73 @@ export class KarpenterAddOn extends HelmAddOn {
         this.options = this.props;
     }
 
-    @conflictsWith('ClusterAutoScalerAddOn')
+    @utils.conflictsWith('ClusterAutoScalerAddOn')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         assert(clusterInfo.cluster instanceof Cluster, "KarpenterAddOn cannot be used with imported clusters as it requires changes to the cluster authentication.");
         const cluster : Cluster = clusterInfo.cluster;
         const endpoint = cluster.clusterEndpoint;
         const name = cluster.clusterName;
-        
+        const partition = cluster.stack.partition;
+
         const stackName = cluster.stack.stackName;
         const region = cluster.stack.region;
 
         let values = this.options.values ?? {};
         const version = this.options.version!;
-        const requirements = this.options.requirements || [];
-        const subnetTags = this.options.subnetTags || {};
-        const sgTags = this.options.securityGroupTags || {};
-        const taints = this.options.taints || [];
-        const startupTaints = this.options.startupTaints || [];
-        const labels = this.options.labels || {};
-        const annotations = this.options.annotations || {};
-        const amiFamily = this.options.amiFamily;
-        const amiSelector = this.options.amiSelector;
-        const ttlSecondsAfterEmpty = this.options.ttlSecondsAfterEmpty || null;
-        const ttlSecondsUntilExpired = this.options.ttlSecondsUntilExpired || null;
-        const weight = this.options.weight || null;
-        const consol = this.options.consolidation || null;
-        const repo = this.options.repository!;
+
         const interruption = this.options.interruptionHandling || false;
-        const limits = this.options.limits || null;
-        const tags = this.options.tags || null;
-        
-        // Various checks for version errors
-        const consolidation = this.versionFeatureChecksForError(clusterInfo, version, weight, consol, repo, ttlSecondsAfterEmpty, interruption);
+
+        // NodePool variables
+        const labels = this.options.nodePoolSpec?.labels || {};
+        const annotations = this.options.nodePoolSpec?.annotations || {};
+        const taints = this.options.nodePoolSpec?.taints || [];
+        const startupTaints = this.options.nodePoolSpec?.startupTaints || [];
+        const requirements = this.options.nodePoolSpec?.requirements || [];
+        const consol = this.options.nodePoolSpec?.consolidation || null;
+        const ttlSecondsAfterEmpty = this.options.nodePoolSpec?.ttlSecondsAfterEmpty || null;
+        const ttlSecondsUntilExpired = this.options.nodePoolSpec?.ttlSecondsUntilExpired || null;
+        const disruption = this.options.nodePoolSpec?.disruption || null;
+        const limits = this.options.nodePoolSpec?.limits || null;
+        const weight = this.options.nodePoolSpec?.weight || null;
+
+        // NodeClass variables
+        const subnetSelector = this.options.ec2NodeClassSpec?.subnetSelector;
+        const sgSelector = this.options.ec2NodeClassSpec?.securityGroupSelector;
+        const subnetSelectorTerms = this.options.ec2NodeClassSpec?.subnetSelectorTerms;
+        const sgSelectorTerms = this.options.ec2NodeClassSpec?.securityGroupSelectorTerms;
+        const amiFamily = this.options.ec2NodeClassSpec?.amiFamily;
+        const amiSelector = this.options.ec2NodeClassSpec?.amiSelector || {};
+        const amiSelectorTerms = this.options.ec2NodeClassSpec?.amiSelectorTerms;
+        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || null;
+        const userData = this.options.ec2NodeClassSpec?.userData || "";
+        const instanceProf = this.options.ec2NodeClassSpec?.instanceProfile;
+        const tags = this.options.ec2NodeClassSpec?.tags || {};
+        const metadataOptions = this.options.ec2NodeClassSpec?.metadataOptions || {
+            httpEndpoint: "enabled",
+            httpProtocolIPv6: "disabled",
+            httpPutResponseHopLimit: 2,
+            httpTokens: "required"
+        };
+        const blockDeviceMappings = this.options.ec2NodeClassSpec?.blockDeviceMappings || [];
+        const detailedMonitoring = this.options.ec2NodeClassSpec?.detailedMonitoring || false;
+
+        // Check Kubernetes and Karpenter version compatibility for warning
+        this.isCompatible(version, clusterInfo.version);
+
+        // Version feature checks for errors
+        this.versionFeatureChecksForError(clusterInfo, version, disruption, consol, ttlSecondsAfterEmpty, ttlSecondsUntilExpired,
+            this.options.ec2NodeClassSpec, amiFamily);
 
         // Set up the node role and instance profile
         const [karpenterNodeRole, karpenterInstanceProfile] = this.setUpNodeRole(cluster, stackName, region);
 
         // Create the controller policy
-        const karpenterPolicyDocument = iam.PolicyDocument.fromJson(KarpenterControllerPolicy);
+        let karpenterPolicyDocument;
+        if (semver.gte(version, "v0.32.0")){
+            karpenterPolicyDocument = iam.PolicyDocument.fromJson(KarpenterControllerPolicyBeta(cluster, partition, region));
+        } else {
+            karpenterPolicyDocument = iam.PolicyDocument.fromJson(KarpenterControllerPolicy);
+        }
         karpenterPolicyDocument.addStatements(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             actions: [
@@ -206,8 +373,8 @@ export class KarpenterAddOn extends HelmAddOn {
             resources: [`${karpenterNodeRole.roleArn}`]
         }));
 
-        // Support for Native spot interruption only available on v0.19.0 or later
-        if (semver.gte(version, 'v0.19.0') && interruption){
+        // Support for Native spot interruption
+        if (interruption){
             // Create Interruption Queue
             const queue = new sqs.Queue(cluster.stack, 'karpenter-queue', {
                 queueName: stackName,
@@ -270,25 +437,34 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         // Create Namespace
-        const ns = createNamespace(KARPENTER, cluster, true, true);
-        const sa = createServiceAccount(cluster, RELEASE, KARPENTER, karpenterPolicyDocument);
+        const ns = utils.createNamespace(this.options.namespace!, cluster, true, true);
+        const sa = utils.createServiceAccount(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
         sa.node.addDependency(ns);
 
-        // Add helm chart
-        if (semver.gte(this.options.version!, '0.19.0')){
-            const awsSettings = {
-                clusterEndpoint: endpoint,
-                clusterName: name,
+        // Create global helm values based on v1beta1 migration as shown below:
+        // https://karpenter.sh/v0.32/upgrading/v1beta1-migration/#helm-values
+        let globalSettings = {
+            clusterName: name,
+            clusterEndpoint: endpoint
+        };
+
+        if (semver.lt(version, '0.32.0')){
+            globalSettings = merge(globalSettings, {
                 defaultInstanceProfile: karpenterInstanceProfile.instanceProfileName,
-                interruptionQueueName: interruption ? stackName : "",
-            };
-            setPath(values, "settings.aws", merge(awsSettings, values?.settings?.aws ?? {}));
+                interruptionQueueName: interruption ? stackName : ""
+            });
         } else {
-            setPath(values, "clusterEndpoint", endpoint);
-            setPath(values, "clusterName", name);
-            setPath(values, "aws.defaultInstanceProfile", karpenterInstanceProfile.instanceProfileName);
+            globalSettings = merge(globalSettings, {
+                interruptionQueue: interruption ? stackName : ""
+            });
         }
-        
+
+        if (semver.lt(version, '0.32.0')){
+            utils.setPath(values, "settings.aws", merge(globalSettings, values?.settings?.aws ?? {}));
+        } else {
+            utils.setPath(values, "settings", merge(globalSettings, values?.settings ?? {}));
+        }
+
         const saValues = {
             serviceAccount: {
                 create: false,
@@ -300,66 +476,150 @@ export class KarpenterAddOn extends HelmAddOn {
         };
 
         values = merge(values, saValues);
-        const karpenterChart = this.addHelmChart(clusterInfo, values, false, true);
+        // Install HelmChart using user defined value or default of 5 minutes.
+        const helmChartTimeout = this.options.helmChartTimeout || Duration.minutes(5);
+        const karpenterChart = this.addHelmChart(clusterInfo, values, false, true, helmChartTimeout);
 
         karpenterChart.node.addDependency(ns);
 
-        // (Optional) default provisioner
-        if ((Object.keys(subnetTags).length > 0) && (Object.keys(sgTags).length > 0)){
-            const provisioner = cluster.addManifest('default-provisioner', {
-                apiVersion: 'karpenter.sh/v1alpha5',
-                kind: 'Provisioner',
-                metadata: { name: 'default' },
-                spec: {
-                    providerRef: {
-                        name: "default"
-                    },
-                    taints: taints,
-                    startupTaints: startupTaints,
-                    labels: labels,
-                    annotations: annotations,
-                    requirements: this.convert(requirements),
-                    limits: limits,
-                    consolidation: consolidation,
-                    ttlSecondsUntilExpired: ttlSecondsUntilExpired,
-                    ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
-                    weight: weight,
-                },
-            });
-            provisioner.node.addDependency(karpenterChart);
+        if(clusterInfo.nodeGroups) {
+            clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
+        }
 
-            const nodeTemplate = cluster.addManifest('default-node-template', {
-                apiVersion: "karpenter.k8s.aws/v1alpha1",
-                kind: "AWSNodeTemplate",
-                metadata: {
-                    name: "default"
-                },
-                spec: {
-                    amiFamily: amiFamily,
-                    amiSelector: amiSelector,
-                    subnetSelector: subnetTags,
-                    securityGroupSelector: sgTags,
-                    tags: tags,
-                },
-            });
-            nodeTemplate.node.addDependency(provisioner);
+        // Deploy Provisioner (Alpha) or NodePool (Beta) CRD based on the Karpenter Version
+        if (this.options.nodePoolSpec){
+            let pool;
+            if (semver.gte(version, '0.32.0')){
+                pool = {
+                    apiVersion: 'karpenter.sh/v1beta1',
+                    kind: 'NodePool',
+                    metadata: { name: 'default-nodepool' },
+                    spec: {
+                        template: {
+                            metadata: {
+                                labels: labels,
+                                annotations: annotations,
+                            },
+                            spec: {
+                                nodeClassRef: {
+                                    name: "default-ec2nodeclass"
+                                },
+                                taints: taints,
+                                startupTaints: startupTaints,
+                                requirements: this.convert(requirements),
+                            }
+                        },
+                        disruption: disruption,
+                        limits: limits,
+                        weight: weight,
+                    },
+                };
+            } else {
+                pool = {
+                    apiVersion: 'karpenter.sh/v1alpha5',
+                    kind: 'Provisioner',
+                    metadata: { name: 'default-provisioner' },
+                    spec: {
+                        providerRef: {
+                            name: "default-nodetemplate"
+                        },
+                        taints: taints,
+                        startupTaints: startupTaints,
+                        labels: labels,
+                        annotations: annotations,
+                        requirements: this.convert(requirements),
+                        limits: {
+                            resources: limits,
+                        },
+                        consolidation: consol,
+                        ttlSecondsUntilExpired: ttlSecondsUntilExpired,
+                        ttlSecondsAfterEmpty: ttlSecondsAfterEmpty,
+                        weight: weight,
+                    },
+                };
+            }
+            const poolManifest = cluster.addManifest('default-pool', pool);
+            poolManifest.node.addDependency(karpenterChart);
+
+            // Deploy AWSNodeTemplate (Alpha) or EC2NodeClass (Beta) CRD based on the Karpenter Version
+            if (this.options.ec2NodeClassSpec){
+                let ec2Node;
+                if (semver.gte(version, '0.32.0')){
+                    ec2Node = {
+                        apiVersion: "karpenter.k8s.aws/v1beta1",
+                        kind: "EC2NodeClass",
+                        metadata: {
+                            name: "default-ec2nodeclass"
+                        },
+                        spec: {
+                            amiFamily: amiFamily,
+                            subnetSelectorTerms: subnetSelectorTerms,
+                            securityGroupSelectorTerms: sgSelectorTerms,
+                            amiSelectorTerms: amiSelectorTerms,
+                            userData: userData,
+                            tags: tags,
+                            metadataOptions: metadataOptions,
+                            blockDeviceMappings: blockDeviceMappings,
+                            detailedMonitoring: detailedMonitoring,
+                        },
+                    };
+
+                    // Provide custom Instance Profile to replace role if provided, else use the role created with the addon
+                    if (instanceProf) {
+                        ec2Node = merge(ec2Node, { spec: { instanceProfile: instanceProf }});
+                    } else {
+                        ec2Node = merge(ec2Node, { spec: { role: karpenterNodeRole.roleName }});
+                    }
+
+                    // Instance Store Policy added for v0.34.0 and up
+                    if (semver.gte(version, '0.34.0')){
+                        ec2Node = merge(ec2Node, { spec: { instanceStorePolicy: instanceStorePolicy }});
+                    }
+                } else {
+                    ec2Node = {
+                        apiVersion: "karpenter.k8s.aws/v1alpha1",
+                        kind: "AWSNodeTemplate",
+                        metadata: {
+                            name: "default-nodetemplate"
+                        },
+                        spec: {
+                            subnetSelector: subnetSelector,
+                            securityGroupSelector: sgSelector,
+                            instanceProfile: instanceProf ? instanceProf : null,
+                            amiFamily: amiFamily ? amiFamily : "AL2",
+                            amiSelector: amiSelector,
+                            tags: tags,
+                            metadataOptions: metadataOptions,
+                            blockDeviceMappings: blockDeviceMappings,
+                            userData: userData,
+                        },
+                    };
+
+                    // Add EC2 Detailed Monitoring for v0.22.0 and up
+                    if (semver.gte(version, '0.22.0')){
+                        ec2Node = merge(ec2Node, { spec: { detailedMonitoring: detailedMonitoring}});
+                    }
+                }
+                const nodeManifest = cluster.addManifest('default-node-template', ec2Node);
+                nodeManifest.node.addDependency(poolManifest);
+            }
         }
 
         return Promise.resolve(karpenterChart);
     }
 
     /**
-     * Helper function to convert a key-pair values (with an operator) 
+     * Helper function to convert a key-pair values (with an operator)
      * of spec configurations to appropriate json format for addManifest function
      * @param reqs
      * @returns newReqs
      * */
-    protected convert(reqs: {key: string, op: string, vals: string[]}[]): any[] {
+    protected convert(reqs: {key: string, operator: string, values: string[]}[]): any[] {
         const newReqs = [];
         for (let req of reqs){
             const key = req['key'];
-            const op = req['op'];
-            const val = req['vals'];
+            const op = req['operator'];
+            const val = req['values'];
             const requirement = {
                 "key": key,
                 "operator": op,
@@ -373,46 +633,67 @@ export class KarpenterAddOn extends HelmAddOn {
     /**
      * Helper function to ensure right features are added as part of the configuration
      * for the right version of the add-on
+     * @param clusterInfo
      * @param version version of the add-on
-     * @param weight weight setting
-     * @param consol consolidation setting
-     * @param repo repository url of the helm chart
+     * @param disruption disruption feature available with the Beta CRDs
+     * @param consolidation consolidation setting available with the Alpha CRDs
      * @param ttlSecondsAfterEmpty ttlSecondsAfterEmpty setting
-     * @returns consolidation
+     * @param ttlSecondsUntilExpired ttlSecondsUntilExpired setting
+     * @param ec2NodeClassSpec Node Class Spec
+     * @param amiFamily AMI Family
+     * @returns
      */
-    private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, weight: any, consol: any, repo: string, ttlSecondsAfterEmpty: any, interruption: boolean): any {
-        
-        // Consolidation only available with v0.15.0 and later
-        let consolidation;
-        if (semver.lt(version, '0.15.0')){
-            assert(!consol, 'The prop consolidation is only supported on versions v0.15.0 and later.');
-        } else {
-            consolidation = consol || { enabled: false }; 
-            // You cannot enable consolidation and ttlSecondsAfterEmpty values
-            assert( !(consolidation.enabled && ttlSecondsAfterEmpty) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
+    private versionFeatureChecksForError(clusterInfo: ClusterInfo, version: string, disruption: any, consolidation: any, ttlSecondsAfterEmpty: any, ttlSecondsUntilExpired: any,
+        ec2NodeClassSpec: any, amiFamily: any): void {
+
+        // EC2 Detailed Monitoring is only available in versions 0.23.0 and above
+        if (semver.lt(version, '0.23.0') && ec2NodeClassSpec){
+            assert(ec2NodeClassSpec["detailedMonitoring"] === undefined, "Detailed Monitoring is not available in this version of Karpenter. Please upgrade to at least 0.23.0.");
         }
 
-        // Weight only available with v0.16.0 and later
-        if (semver.lt(version, '0.16.0')){
-            assert(!weight, 'The prop weight is only supported on versions v0.16.0 and later.');
-        }
-        
-        // Registry changes with v0.17.0 and later
-        if (semver.gte(version, '0.17.0')){
-            assert(repo === 'oci://public.ecr.aws/karpenter/karpenter', 'Please provide the OCI repository.');
-        } else {
-            assert(repo === 'https://charts.karpenter.sh', 'Please provide the older Karpenter repository url.');
+        // Disruption budget should not exist for versions below 0.34.x
+        if (semver.lt(version, '0.34.0')){
+            if (disruption){
+                assert(!disruption["budgets"], "You cannot set disruption budgets for this version of Karpenter. Please upgrade to 0.34.0 or higher.");
+            }
         }
 
-        // Interruption handling only available with v0.19.0 and later
-        // Conversely, we should block Node Termination Handler usage once Karpenter is leveraged
-        if (semver.lt(version, '0.19.0')){
-            assert(!interruption, 'Interruption handling is only supported on versions v0.19.0 and later.');
-        } else {
-            assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.');
+        // version check errors for v0.32.0 and up (beta CRDs)
+        if (semver.gte(version, '0.32.0')){
+            // Consolidation features don't exist in beta CRDs
+            assert(!consolidation && !ttlSecondsAfterEmpty && !ttlSecondsUntilExpired, 'Consolidation features are only available for previous versions of Karpenter.');
+
+            // consolidateAfter cannot be set if policy is set to WhenUnderutilized
+            if (disruption && disruption["consolidationPolicy"] == "WhenUnderutilized"){
+                assert(!disruption["consolidateAfter"], 'You cannot set consolidateAfter value if the consolidation policy is set to Underutilized.');
+            }
+
+            // AMI Family, Security Group and Subnet terms must be provided, given EC2 NodeSpec
+            if (ec2NodeClassSpec){
+                assert(amiFamily !== undefined, "Please provide the AMI Family for your EC2NodeClass.");
+                assert(ec2NodeClassSpec["securityGroupSelectorTerms"] !== undefined, "Please provide SecurityGroupTerm for your EC2NodeClass.");
+                assert(ec2NodeClassSpec["subnetSelectorTerms"] !== undefined, "Please provide subnetGroupTerm for your EC2NodeClass.");
+            }
         }
 
-        return consolidation;
+        // version check errors for v0.31.x and down (alpha CRDs)
+        // Includes checks for consolidation and disruption features
+        if (semver.lt(version, '0.32.0')){
+            if (consolidation){
+                assert(!(consolidation.enabled && ttlSecondsAfterEmpty) , 'Consolidation and ttlSecondsAfterEmpty must be mutually exclusive.');
+            }
+            assert(!disruption, 'Disruption configuration is only supported on versions v0.32.0 and later.');
+
+            //Security Group and Subnet terms must be provided, given EC2 NodeSpec
+            if (ec2NodeClassSpec){
+                assert(ec2NodeClassSpec["securityGroupSelector"] !== undefined, "Please provide SecurityGroupTerm for your AWSNodeTemplate.");
+                assert(ec2NodeClassSpec["subnetSelector"] !== undefined, "Please provide subnetGroupTerm for your AWSNodeTemplate.");
+            }
+        }
+
+        // We should block Node Termination Handler usage once Karpenter is leveraged
+         assert(!clusterInfo.getProvisionedAddOn('AwsNodeTerminationHandlerAddOn'), 'Karpenter supports native interruption handling, so Node Termination Handler will not be necessary.');
+
     }
 
     /**
@@ -443,7 +724,7 @@ export class KarpenterAddOn extends HelmAddOn {
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
-        
+
         const clusterId = Names.uniqueId(cluster);
 
         //Cfn output for Node Role in case of needing to add additional policies
@@ -453,10 +734,10 @@ export class KarpenterAddOn extends HelmAddOn {
             exportName: clusterId+"KarpenterNodeRoleName",
         });
         //Cfn output for Instance Profile for creating additional provisioners
-        new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', { 
+        new CfnOutput(cluster.stack, 'Karpenter Instance Profile name', {
             value: karpenterInstanceProfile ? karpenterInstanceProfile.instanceProfileName! : "none",
             description: "Karpenter add-on Instance Profile name",
-            exportName: clusterId+"KarpenterInstanceProfileName", 
+            exportName: clusterId+"KarpenterInstanceProfileName",
         });
 
         // Map Node Role to aws-auth
@@ -466,5 +747,24 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         return [karpenterNodeRole, karpenterInstanceProfile];
+    }
+
+    /**
+     * Helper function to check whether:
+     * 1. Supported Karpenter versions are implemented, and
+     * 2. Supported Kubernetes versions are deployed on the cluster to use Karpenter
+     * It will reject the addon if the cluster uses deprecated Kubernetes version, and
+     * Warn users about issues if incompatible Karpenter version is used for a particular cluster
+     * given its Kubernetes version
+     * @param karpenterVersion Karpenter version to be deployed
+     * @param kubeVersion Cluster's Kubernetes version
+     */
+    private isCompatible(karpenterVersion: string, kubeVersion: KubernetesVersion): void {
+        assert(versionMap.has(kubeVersion), 'Please upgrade your EKS Kubernetes version to start using Karpenter.');
+        assert(semver.gte(karpenterVersion, '0.21.0'), 'Please use Karpenter version 0.21.0 or above.');
+        const compatibleVersion = versionMap.get(kubeVersion) as string;
+        if (semver.gt(compatibleVersion, karpenterVersion)) {
+            console.warn(`Please use minimum Karpenter version for this Kubernetes Version: ${compatibleVersion}, otherwise you will run into compatibility issues.`);
+        }
     }
 }

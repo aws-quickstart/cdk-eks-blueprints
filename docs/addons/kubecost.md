@@ -1,6 +1,6 @@
 # Kubecost AddOn
 
-[Kubecost](https://kubecost.com) provides real-time cost visibility and insights by uncovering patterns that create overspending on infrastructure to help teams prioritize where to focus optimization efforts. By identifying root causes for negative patterns, customers using Kubecost save 30-50% or more of their Kubernetes cloud infrastructure costs. To read more about Kubecost and how to use it, see the [product and technical docs](https://docs.kubecost.com/getting-started).
+[Kubecost](https://kubecost.com) provides real-time cost visibility and insights by uncovering patterns that create overspending on infrastructure to help teams prioritize where to focus optimization efforts. By identifying root causes for negative patterns, customers using Kubecost save 30-50% or more of their Kubernetes cloud infrastructure costs. To read more about Kubecost and how to use it, see the [product and technical docs](https://docs.kubecost.com/#getting-started).
 
 ## Installation
 
@@ -49,7 +49,7 @@ Custom values to pass to the chart. Config options: https://github.com/kubecost/
 #### `customPrometheus: string` (optional)
 
 Kubecost comes bundled with a Prometheus installation. However, if you wish to integrate with an external Prometheus deployment, provide your local Prometheus service address with this format `http://..svc`.
-Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/install-and-configure/install/custom-prom
+Note: integrating with an existing Prometheus is only officially supported under Kubecost paid plans and requires some extra configurations on your Prometheus: https://docs.kubecost.com/install-and-configure/advanced-configuration/custom-prom
 
 #### `installPrometheusNodeExporter: boolean` (optional)
 
@@ -63,7 +63,7 @@ Additional options for customers who may need to supply their own private Helm r
 
 ## Support
 
-If you have any questions about Kubecost, get in touch with the team [on Slack](https://docs.kubecost.com/kubecost-cloud/receiving-kubecost-cloud-support).
+If you have any questions about Kubecost, get in touch with the team [on Slack](https://docs.kubecost.com/troubleshooting/creating-a-support-ticket).
 
 ## License
 

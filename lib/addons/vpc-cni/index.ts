@@ -1,11 +1,19 @@
-import { ISubnet } from "aws-cdk-lib/aws-ec2";
+import { ISecurityGroup, ISubnet } from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { ClusterInfo, Values } from "../../spi";
-import { loadYaml, readYamlDocument, ReplaceServiceAccount } from "../../utils";
+import { loadYaml, readYamlDocument, ReplaceServiceAccount, supportsALL } from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+
+const versionMap: Map<KubernetesVersion, string> = new Map([
+  [KubernetesVersion.V1_29, "v1.16.0-eksbuild.1"],
+  [KubernetesVersion.V1_28, "v1.15.1-eksbuild.1"],
+  [KubernetesVersion.V1_27, "v1.15.1-eksbuild.1"],
+  [KubernetesVersion.V1_26, "v1.15.1-eksbuild.1"],
+]);
 
 /**
  * User provided option for the Helm Chart
@@ -225,14 +233,14 @@ export interface VpcCniAddOnProps {
   * `MAX_ENI` Environment Variable. Format integer.
   * Specifies the maximum number of ENIs that will be attached to the node. 
   */
-  maxEni?: number;  
+  maxEni?: number;
 
   /**
   * `MINIMUM_IP_TARGET` Environment Variable. Format integer.
   * Specifies the number of total IP addresses that the ipamd 
   * daemon should attempt to allocate for pod assignment on the node.
   */
-  minimumIpTarget?: number; 
+  minimumIpTarget?: number;
 
   /**
    * `POD_SECURITY_GROUP_ENFORCING_MODE` Environment Variable. Type: String. 
@@ -276,9 +284,23 @@ export interface VpcCniAddOnProps {
   serviceAccountPolicies?: iam.IManagedPolicy[];
 
   /**
+   * Enable kubernetes network policy in the VPC CNI introduced in vpc-cni 1.14
+   * More informaton on official AWS documentation: https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html
+   * 
+   */
+  enableNetworkPolicy?: boolean;
+
+  /**
+   * Enable windows support for your cluster
+   * 
+   */
+  enableWindowsIpam?: boolean;
+
+  /**
    * Version of the add-on to use. Must match the version of the cluster where it
    * will be deployed.
    */
+
   version?: string;
 }
 
@@ -288,11 +310,16 @@ export interface CustomNetworkingConfig {
    * Secondary subnets of your VPC
    */
   readonly subnets?: ISubnet[];
+  /**
+   * Security group of secondary ENI
+   */
+  readonly securityGroup?: ISecurityGroup;
 }
 
 const defaultProps: CoreAddOnProps = {
   addOnName: 'vpc-cni',
-  version: 'v1.13.4-eksbuild.1',
+  version: 'auto',
+  versionMap: versionMap,
   saName: 'aws-node',
   namespace: 'kube-system',
   controlPlaneAddOn: false,
@@ -302,6 +329,7 @@ const defaultProps: CoreAddOnProps = {
 /**
  * Implementation of VpcCni EKS add-on with Advanced Configurations.
  */
+@supportsALL
 export class VpcCniAddOn extends CoreAddOn {
 
   readonly vpcCniAddOnProps: VpcCniAddOnProps;
@@ -315,7 +343,11 @@ export class VpcCniAddOn extends CoreAddOn {
 
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
-    let clusterSecurityGroupId = cluster.clusterSecurityGroupId;
+    let securityGroupId = cluster.clusterSecurityGroupId;
+
+    if (this.vpcCniAddOnProps.customNetworkingConfig?.securityGroup) {
+      securityGroupId = this.vpcCniAddOnProps.customNetworkingConfig.securityGroup.securityGroupId;
+    }
 
     if ((this.vpcCniAddOnProps.customNetworkingConfig?.subnets)) {
       for (let subnet of this.vpcCniAddOnProps.customNetworkingConfig.subnets) {
@@ -323,7 +355,7 @@ export class VpcCniAddOn extends CoreAddOn {
         const manifest = doc.split("---").map(e => loadYaml(e));
         const values: Values = {
           availabilityZone: subnet.availabilityZone,
-          clusterSecurityGroupId: clusterSecurityGroupId,
+          securityGroupId: securityGroupId,
           subnetId: subnet.subnetId
         };
         const manifestDeployment: ManifestDeployment = {
@@ -357,14 +389,14 @@ export class VpcCniAddOn extends CoreAddOn {
    * @returns 
    */
   createServiceAccount(clusterInfo: ClusterInfo, saNamespace: string, policies: iam.IManagedPolicy[]): eks.ServiceAccount {
-      const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
-        cluster: clusterInfo.cluster,
-        name: this.coreAddOnProps.saName,
-        namespace: saNamespace
-      });
+    const sa = new ReplaceServiceAccount(clusterInfo.cluster, `${this.coreAddOnProps.saName}-sa`, {
+      cluster: clusterInfo.cluster,
+      name: this.coreAddOnProps.saName,
+      namespace: saNamespace
+    });
 
-      policies.forEach(p => sa.role.addManagedPolicy(p));
-      return sa as any as eks.ServiceAccount;
+    policies.forEach(p => sa.role.addManagedPolicy(p));
+    return sa as any as eks.ServiceAccount;
   }
 }
 
@@ -374,6 +406,12 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   }
 
   const result: Values = {
+    init: {
+      env: {
+        DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
+        ENABLE_V6_EGRESS: props?.enableV6Egress,
+      }
+    },
     env: {
       AWS_EC2_ENDPOINT: props?.awsEc2Endpoint,
       ADDITIONAL_ENI_TAGS: props?.additionalEniTags,
@@ -398,26 +436,31 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       DISABLE_INTROSPECTION: props?.disableIntrospection,
       DISABLE_METRICS: props?.disableMetrics,
       DISABLE_NETWORK_RESOURCE_PROVISIONING: props?.disablenetworkResourceProvisioning,
-      DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
       ENABLE_BANDWIDTH_PLUGIN: props?.enableBandwidthPlugin,
       ENABLE_NFTABLES: props?.enableNftables,
       ENABLE_POD_ENI: props?.enablePodEni,
       ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
-      ENABLE_V6_EGRESS: props?.enableV6Egress,
       INTROSPECTION_BIND_ADDRESS: props?.introspectionBindAddress,
       MAX_ENI: props?.maxEni,
       MINIMUM_IP_TARGET: props?.minimumIpTarget,
       POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode,
       WARM_ENI_TARGET: props?.warmEniTarget,
       WARM_IP_TARGET: props?.warmIpTarget,
-      WARM_PREFIX_TARGET: props?.warmPrefixTarget
-    }
+      WARM_PREFIX_TARGET: props?.warmPrefixTarget,
+    },
+    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
+    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam)
   };
 
   // clean up all undefined
   const values = result.env;
   Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ?  JSON.stringify(values[key]):values[key]);
- 
+  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ? JSON.stringify(values[key]) : values[key]);
+
+  // clean up all undefined on Init env
+  const initValues = result.init.env;
+  Object.keys(initValues).forEach(key => initValues[key] === undefined ? delete initValues[key] : {});
+  Object.keys(initValues).forEach(key => initValues[key] = typeof initValues[key] !== 'string' ? JSON.stringify(initValues[key]) : initValues[key]);
+
   return result;
 }

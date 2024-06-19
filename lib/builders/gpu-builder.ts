@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 import * as eks from "aws-cdk-lib/aws-eks";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
-import merge from 'ts-deepmerge';
+import { merge } from "ts-deepmerge";
 import { ValuesSchema } from '../addons/gpu-operator/values';
 
 
@@ -65,7 +65,7 @@ export interface GpuOptions {
  * for EKS cluster
  */
 const defaultOptions: GpuOptions = {
-    kubernetesVersion: eks.KubernetesVersion.of("1.27"),
+    kubernetesVersion: eks.KubernetesVersion.of("1.28"),
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
     desiredNodeSize: 2,
@@ -81,7 +81,8 @@ const defaultOptions: GpuOptions = {
         "Type": "Managed-linux-Gpu-Node-Group",
         "LaunchTemplate": "Linux-Launch-Template",
     }
-  };
+};
+
 export class GpuBuilder extends BlueprintBuilder {
     /**
      * This method helps you prepare a blueprint for setting up observability 
