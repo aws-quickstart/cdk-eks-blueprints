@@ -5,18 +5,25 @@ The `MngClusterProvider` allows you to provision an EKS cluster which leverages 
 ## Usage 
 
 ```typescript
-const props: MngClusterProviderProps = {
+import * as cdk from 'aws-cdk-lib';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as eks from 'aws-cdk-lib/aws-eks';
+import * as bp from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+const props: bp.MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
     desiredSize: 4,    
-    instanceTypes: [new InstanceType('m5.large')],
-    amiType: NodegroupAmiType.AL2_X86_64,
-    nodeGroupCapacityType: CapacityType.ON_DEMAND,
-    version: KubernetesVersion.V1_29,
-    amiReleaseVersion: "1.20.4-20210519" // this will upgrade kubelet to 1.20.4
-}
-const clusterProvider = new blueprints.MngClusterProvider(props);
-new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider });
+    instanceTypes: [new ec2.InstanceType('m5.large')],
+    amiType: eks.NodegroupAmiType.AL2023_X86_64_STANDARD,
+    nodeGroupCapacityType: eks.CapacityType.ON_DEMAND,
+    amiReleaseVersion: "1.30.0-20240615" // this will upgrade kubelet to 1.30.0
+};
+
+const clusterProvider = new bp.MngClusterProvider(props);
+new bp.EksBlueprint(app, { id: 'blueprint-1', addOns:[], teams: [], clusterProvider, version: eks.KubernetesVersion.V1_30 });
 ```
 
 ## Configuration

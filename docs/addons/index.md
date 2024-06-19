@@ -60,6 +60,7 @@ The framework currently supports the following add-ons.
 | [`KarpenterAddOn`](./karpenter.md)                                     | Adds [Karpenter](https://github.com/awslabs/karpenter) support for Amazon EKS.                                                         | ✅ | ✅ |
 | [`KubeProxyAddOn`](./kube-proxy.md)                                    | Adds kube-proxy Amazon EKS add-on. Kube-proxy maintains network rules on each Amazon EC2 node.                                         | ✅ | ✅ |
 | [`KubeStateMetricsAddOn`](./kube-state-metrics.md)                  | Adds [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) into the EKS cluster.                                          | ✅ | ✅ |
+| [`KubesharkAddOn`](./kubeshark.md)       | [Deep visibility and monitoring of all API traffic](https://github.com/kubeshark/kubeshark)                  | ✅ | ✅ |
 | [`MetricsServerAddOn`](./metrics-server.md)                               | Adds metrics server (pre-req for HPA and other monitoring tools).                                                                      | ✅ | ✅ |
 | [`NewRelicAddOn`](./newrelic.md)                                       | Adds [New Relic](https://newrelic.com/) and [Pixie](https://pixielabs.ai/) observability for Amazon EKS.                               | ✅ | 
 | [`NginxAddOn`](./nginx.md)                                             | Adds NGINX ingress controller  | ✅ | ✅ |                                                                                                        |
@@ -80,7 +81,6 @@ The framework currently supports the following add-ons.
 | [`XrayAdotAddOn`](./xray-adot-addon.md)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 | ✅ | ✅ |
 | [`GmaestroAddOn`](./gmaestro.md) | Adds [gMaestro](https://app.granulate.io/gMaestroSignup) cost optimization solution for EKS cluster.                                                                         |
 | [`EksPodIdentityAgentAddOn`](./eks-pod-identity-agent.md)       | [Setting up the EKS Pod Identity Agent](https://docs.aws.amazon.com/en_ca/eks/latest/userguide/pod-id-agent-setup.html)                  | ✅ | ✅ |
-
 # Standard Helm Add-On Configuration Options
 
 Many add-ons leverage helm to provision and maintain deployments. All provided add-ons that leverage helm allow specifying the following add-on attributes:

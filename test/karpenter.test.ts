@@ -429,11 +429,59 @@ describe('Unit tests for Karpenter addon', () => {
         expect(manifest.spec.blockDeviceMappings[0]).toMatchObject(blockDeviceMapping);
       });
 
+      test("Stack creates custom resource definitions for Karpenter version from 0.32", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+        const stack = blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.V1_28)
+            .addOns(new blueprints.KarpenterAddOn({
+                version: "v0.32.0",
+                installCRDs: true,
+                nodePoolSpec: {
+                    requirements: defaultReq,
+                    disruption: {
+                        consolidationPolicy: "WhenEmpty",
+                        consolidateAfter: "20m",
+                        expireAfter: "20m",
+                    }
+                },
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }))
+            .build(app, 'install-0-32-check-for-crds');
+            
+            const template = Template.fromStack(stack);
+            const karpenterResources = template.findResources("Custom::AWSCDK-EKS-KubernetesResource");
+
+            // return in array of all the elements of karpenterResources that includes "kind":"CustomResourceDefinition"
+            // and "group":"karpenter.sh" or "group":"karpenter.k8s.aws"
+            // and "spec.Versions.Name = v1beta1"
+            const crdManifests = Object.values(karpenterResources).filter(karpenterResource => {
+                if (karpenterResource?.Properties?.Manifest) {
+                    const manifest = karpenterResource.Properties.Manifest;
+                    if (typeof manifest === "string" && manifest.includes('"kind":"CustomResourceDefinition"') &&
+                                (manifest.includes('"group":"karpenter.sh"')
+                                || manifest.includes('"group":"karpenter.k8s.aws"')
+                                && manifest.includes('"name":"v1beta1"')
+                                )) {
+                                    return true;
+                    }
+                }
+                return false;
+            });
+                
+            expect(crdManifests).toBeDefined();
+            // Expect there to be 3 karpenter crd manifests for v1beta1
+            expect(crdManifests.length).toEqual(3);
+      });
+        
       test("Stack creation succeeded using KubernetesVersion.Of", () => {
         const app = new cdk.App();
 
         const blueprint = blueprints.EksBlueprint.builder();
 
+        
+        
         blueprint.account("123567891").region('us-west-1')
             .version(KubernetesVersion.of('1.28'))
             .addOns(new blueprints.KarpenterAddOn({

@@ -26,8 +26,8 @@ Create a directory that represents you project (e.g. `my-blueprints`) and then c
 ```bash
 npm install -g n # may require sudo
 n stable # may require sudo 
-npm install -g aws-cdk@2.133.0 # may require sudo (Ubuntu) depending on configuration
-cdk --version # must produce 2.133.0
+npm install -g aws-cdk@2.145.0 # may require sudo (Ubuntu) depending on configuration
+cdk --version # must produce 2.145.0
 mkdir my-blueprints
 cd my-blueprints
 cdk init app --language typescript
@@ -48,16 +48,16 @@ npm ERR! code ERESOLVE
 npm ERR! ERESOLVE unable to resolve dependency tree
 npm ERR! 
 npm ERR! While resolving: my-blueprint@0.1.0
-npm ERR! Found: aws-cdk-lib@2.130.0
+npm ERR! Found: aws-cdk-lib@2.133.0
 npm ERR! node_modules/aws-cdk-lib
-npm ERR!   aws-cdk-lib@"2.130.0" from the root project
+npm ERR!   aws-cdk-lib@"2.133.0" from the root project
 npm ERR! 
 npm ERR! Could not resolve dependency:
-npm ERR! peer bundled aws-cdk-lib@"2.133.0" from @aws-quickstart/eks-blueprints@1.14.0
+npm ERR! peer bundled aws-cdk-lib@"2.145.0" from @aws-quickstart/eks-blueprints@1.14.0
 npm ERR! node_modules/@aws-quickstart/eks-blueprint
 ```
 
-This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line `peer bundled` and check the expected version of the CDK. Make sure that in your `package.json` the version is set to the expected. In this example, `package.json` contained `"aws-cdk-lib": "2.130.0"`, while the expected version was `2.133.0`.
+This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line `peer bundled` and check the expected version of the CDK. Make sure that in your `package.json` the version is set to the expected. In this example, `package.json` contained `"aws-cdk-lib": "2.133.0"`, while the expected version was `2.145.0`.
 
 **Note**: after the initial installation, upgrading the version of CDK to an incompatible higher/lower version will produce a warning, but will succeed. For community support (submitting GitHub issues) please make sure you have a matching version configured.
 
@@ -66,7 +66,7 @@ Example warning:
 ```
 npm WARN 
 npm WARN Could not resolve dependency:
-npm WARN peer bundled aws-cdk-lib@"2.133.0" from @aws-quickstart/eks-blueprints@1.14.0
+npm WARN peer bundled aws-cdk-lib@"2.145.0" from @aws-quickstart/eks-blueprints@1.14.0
 ```
 
 ## Deploy EKS Clusters
@@ -86,11 +86,10 @@ blueprints.HelmAddOn.validateHelmVersions = true; // optional if you would like 
 
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn(),
-    new blueprints.addons.CalicoOperatorAddOn(),
     new blueprints.addons.MetricsServerAddOn(),
     new blueprints.addons.ClusterAutoScalerAddOn(),
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-    new blueprints.addons.VpcCniAddOn(),
+    new blueprints.addons.VpcCniAddOn(), // support network policies ootb
     new blueprints.addons.CoreDnsAddOn(),
     new blueprints.addons.KubeProxyAddOn()
 ];
@@ -157,9 +156,8 @@ Congratulations! You have deployed your first EKS cluster with `eks-blueprints`.
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
+- [x] [Nginx](https://docs.nginx.com/nginx-ingress-controller/technical-specifications/) into your cluster to serve as a reverse proxy for your workloads. 
 - [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
-- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
