@@ -69,6 +69,7 @@ nav:
     - Kubeflow: 'addons/kubeflow.md'
     - KubeRay Operator: 'addons/kuberay-operator.md'
     - Kubernetes Ingress: 'addons/kubernetes-ingress.md'
+    - Kubeshark: 'addons/kubeshark.md'
     - Kubevious: 'addons/kubevious.md'
     - Kube State Metrics: 'addons/kube-state-metrics.md'
     - Metrics Server: 'addons/metrics-server.md'
