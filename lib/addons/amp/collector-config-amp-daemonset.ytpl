@@ -298,3 +298,71 @@ spec:
           receivers: [prometheus]
           processors: [batch/metrics]
           exporters: [awsprometheusremotewrite]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-prometheus-role
+  namespace: "{{namespace}}"
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - namespaces
+  - pods/logs
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  - events
+  - namespaces/status
+  - nodes/spec
+  - pods/status
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - resourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-prometheus-role-binding
+  namespace: "{{namespace}}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otel-prometheus-role
+subjects:
+  - kind: ServiceAccount
+    name: adot-collector
+    namespace: "{{namespace}}"

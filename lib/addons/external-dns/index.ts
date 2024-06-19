@@ -17,6 +17,10 @@ export interface ExternalDnsProps extends HelmAddOnUserProps {
      * Hosted zone providers are registered as named resource providers with the EksBlueprintProps.
      */
     readonly hostedZoneResources: string[];
+    /**
+     * List of sources to watch when synthesizing DNS records.  If empty, the default types are "service" and "ingress".
+     */
+    readonly sources?: string[];
 }
 
 const defaultProps = {
@@ -96,6 +100,13 @@ export class ExternalDnsAddOn extends HelmAddOn {
         };
 
         values = merge(values, this.props.values ?? {});
+
+        const sources = this.options.sources;
+
+        if (sources) {
+            values.sources = sources;
+        }
+
         const chart = this.addHelmChart(clusterInfo, values);
 
         chart.node.addDependency(namespaceManifest);
