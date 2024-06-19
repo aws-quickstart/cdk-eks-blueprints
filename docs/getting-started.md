@@ -86,11 +86,10 @@ blueprints.HelmAddOn.validateHelmVersions = true; // optional if you would like 
 
 const addOns: Array<blueprints.ClusterAddOn> = [
     new blueprints.addons.ArgoCDAddOn(),
-    new blueprints.addons.CalicoOperatorAddOn(),
     new blueprints.addons.MetricsServerAddOn(),
     new blueprints.addons.ClusterAutoScalerAddOn(),
     new blueprints.addons.AwsLoadBalancerControllerAddOn(),
-    new blueprints.addons.VpcCniAddOn(),
+    new blueprints.addons.VpcCniAddOn(), // support network policies ootb
     new blueprints.addons.CoreDnsAddOn(),
     new blueprints.addons.KubeProxyAddOn()
 ];
@@ -157,9 +156,8 @@ Congratulations! You have deployed your first EKS cluster with `eks-blueprints`.
 
 - [x] A new Well-Architected VPC with both Public and Private subnets.
 - [x] A new Well-Architected EKS cluster in the region and account you specify.
-- [x] [Nginx](https://kubernetes.github.io/ingress-nginx/deploy/) into your cluster to serve as a reverse proxy for your workloads. 
+- [x] [Nginx](https://docs.nginx.com/nginx-ingress-controller/technical-specifications/) into your cluster to serve as a reverse proxy for your workloads. 
 - [x] [ArgoCD](https://argoproj.github.io/argo-cd/) into your cluster to support GitOps deployments. 
-- [x] [Calico](https://docs.projectcalico.org/getting-started/kubernetes/) into your cluster to support Network policies.
 - [x] [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) into your cluster to support metrics collection.
 - [x] AWS and Kubernetes resources needed to support [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html).
 - [x] AWS and Kubernetes resources needed to forward logs and metrics to [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html).
