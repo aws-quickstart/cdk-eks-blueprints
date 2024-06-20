@@ -1,6 +1,7 @@
 import { Role } from "aws-cdk-lib/aws-iam";
 import * as r53 from 'aws-cdk-lib/aws-route53';
 import { ResourceContext, ResourceProvider } from "../spi";
+import {Stack} from "aws-cdk-lib";
 
 /**
  * Simple lookup host zone provider
@@ -70,7 +71,7 @@ export class DelegatingHostedZoneProvider implements ResourceProvider<r53.IHoste
     constructor(private options: DelegatingHostedZoneProviderProps) { }
 
     provide(context: ResourceContext): r53.IHostedZone {
-        const stack = context.scope;
+        const stack = Stack.of(context.scope);
 
         const subZone = new r53.PublicHostedZone(stack, `${this.options.subdomain}-SubZone`, {
             zoneName: this.options.subdomain
