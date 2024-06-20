@@ -54,6 +54,26 @@ describe('Unit test for CloudWatch Addon', () => {
       .buildAsync(app, 'cloudwatch');
 
     const template = Template.fromStack(blueprint);
+
+    template.hasResource("AWS::IAM::Role", {
+      Properties: {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": Match.anyValue()
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": Match.anyValue()
+      }
+    });
   });
 
   test("Stack is defined when using a specified version of EKS", async () => {
