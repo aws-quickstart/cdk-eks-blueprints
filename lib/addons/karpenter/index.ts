@@ -488,7 +488,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const helmChartTimeout = this.options.helmChartTimeout || Duration.minutes(5);
         const karpenterChart = this.addHelmChart(clusterInfo, values, false, true, helmChartTimeout);
 
-        karpenterChart.node.addDependency(ns);
+        karpenterChart.node.addDependency(sa);
 
         if(clusterInfo.nodeGroups) {
             clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));
