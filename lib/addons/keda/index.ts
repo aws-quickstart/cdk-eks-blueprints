@@ -25,16 +25,22 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
     /**
      * securityContext: fsGroup
      * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+     *
+     * @deprecated Has no effect for version 2.14 and above. Update podSecurityContext.operator.fsGroup in Values instead. KEDA-is-secure-by-default with fsGroup: 1000
      */
     podSecurityContextFsGroup?: number;
     /**
      * securityContext:runAsGroup
      * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+     *
+     * @deprecated Has no effect for version 2.14 and above. Update podSecurityContext.operator.runAsGroup in Values instead. KEDA-is-secure-by-default with runAsGroup: 1000
      */
     securityContextRunAsGroup?: number;
     /**
      * securityContext:runAsUser
      * Check the workaround for SQS Scalar with IRSA https://github.com/kedacore/keda/issues/837#issuecomment-789037326
+     *
+     * @deprecated Has no effect for version 2.14 and above. Update podSecurityContext.operator.runAsUser in Values instead. KEDA-is-secure-by-default with runAsUser: 1000
      */
     securityContextRunAsUser?: number;
     /**
