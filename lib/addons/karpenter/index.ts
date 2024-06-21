@@ -12,7 +12,7 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster, KubernetesVersion, KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
