@@ -89,7 +89,7 @@ describe('Unit test for CloudWatch Addon', () => {
 
     template.hasResource("AWS::EKS::Addon", {
       Properties: {
-        "AddonVersion": Match.exact("v1.4.0-eksbuild.1")
+        "AddonVersion": Match.exact("v1.7.0-eksbuild.1")
       }
     });
   });
