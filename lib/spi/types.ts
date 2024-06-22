@@ -123,7 +123,7 @@ export class ResourceContext {
 
     private readonly resources: Map<string, IConstruct> = new Map();
 
-    constructor(public readonly scope: cdk.Stack, public readonly blueprintProps: EksBlueprintProps) { }
+    constructor(public readonly scope: Construct, public readonly blueprintProps: EksBlueprintProps) { }
 
     /**
      * Adds a new resource provider and specifies the name under which the provided resource will be registered,
