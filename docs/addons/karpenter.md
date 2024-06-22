@@ -62,6 +62,7 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
       securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": "my-stack-name" }}],
     },
     interruptionHandling: true,
+    podIdentity: true, // Recommended, otherwise, set false (as default) to use IRSA
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -90,7 +91,9 @@ blueprints-addon-karpenter-54fd978b89-hclmp   2/2     Running   0          99m
 
 1. Creates Karpenter Node Role, Karpenter Instance Profile, and Karpenter Controller Policy (Please see Karpenter documentation [here](https://karpenter.sh/docs/getting-started/) for more details on what is required and why).
 2. Creates `karpenter` namespace.
-3. Creates Kubernetes Service Account, and associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
+3. Creates Kubernetes Service Account, and manage credentials for karpenter with one of the following methods
+   1. Associate AWS IAM Role with Karpenter Controller Policy attached using [IRSA](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/setting-up-enable-IAM.html).
+   2. Use EKS Pod Identities by creating EKS Pod Identity association maps to the IAM role with the Karpenter Controller Policy attached to a service account in the Karpenter namespace.
 4. Deploys Karpenter helm chart in the `karpenter` namespace, configuring the cluster name, endpoint, Instance Profile, and others necessary for functional addon.
 5. If the user provides `nodePoolSpec` (and `ec2NodeClassSpec`), the addon will provisions a default Karpenter NodePool and EC2NodeClass CRDs. `nodePoolSpec` requires [requirements](https://karpenter.sh/docs/concepts/nodepools/#spectemplatespecrequirements) while `ec2NodeClassSpec` requires subnets and security groups. Based on what version of Karpenter you provide, you will need either `subnetSelector` and `securityGroupSelector` (for versions v0.31.x or down), or `subnetSelectorTerms` and `securityGroupSelectorTerms` (for versions v0.32.x and up).
 6. As mentioned above, the CRDs installed will be different from v0.32.0, since Karpenter as a project graduated to beta in October 2023. This meant significant API changes, going from alpha to beta. The addon has reflected those changes and will deploy NodePool and EC2NodeClass for v1beta1 CRDs, versus Provisioner and AWSNodeTemplate for v1alpha5. You can read more about the changes in this [blog](https://aws.amazon.com/blogs/containers/karpenter-graduates-to-beta/). This addon can install the new CRDs by setting the `installCRDs` add-on option to true.
@@ -138,7 +141,7 @@ spec:
   role: "KarpenterNodeRole-${CLUSTER_NAME}"
 
   userData: |
-    echo "Hello world"    
+    echo "Hello world"
 
   tags:
     team: team-a
@@ -226,7 +229,7 @@ The following are common troubleshooting issues observed when implementing Karpe
 2. With the upgrade to the new OCI registry starting with `v0.17.0`, if you try to upgrade you may get a following error:
 
 ```
-Received response status [FAILED] from custom resource. Message returned: Error: b'Error: path "/tmp/tmpkxgr57q5/blueprints-addon-karpenter" not found\n' 
+Received response status [FAILED] from custom resource. Message returned: Error: b'Error: path "/tmp/tmpkxgr57q5/blueprints-addon-karpenter" not found\n'
 ```
 
 Karpenter, starting from the OCI registry versions, will untar the files under `karpenter` release name only. So if you have previous version deployed under a different release name, you will run into the above error. Therefore, in order to upgrade, you will have to take the following steps:
