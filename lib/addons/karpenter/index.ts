@@ -500,7 +500,7 @@ export class KarpenterAddOn extends HelmAddOn {
         // Let Helm create the service account if using pod identity
         const saValues = {
             serviceAccount: {
-                create: podIdentity ? 'true' : 'false',
+                create: podIdentity,
                 name: RELEASE,
                 annotations: saAnnotation,
             }
