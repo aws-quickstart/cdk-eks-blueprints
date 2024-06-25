@@ -12,7 +12,7 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster, KubernetesVersion, KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
@@ -488,7 +488,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const helmChartTimeout = this.options.helmChartTimeout || Duration.minutes(5);
         const karpenterChart = this.addHelmChart(clusterInfo, values, false, true, helmChartTimeout);
 
-        karpenterChart.node.addDependency(ns);
+        karpenterChart.node.addDependency(sa);
 
         if(clusterInfo.nodeGroups) {
             clusterInfo.nodeGroups.forEach(n => karpenterChart.node.addDependency(n));

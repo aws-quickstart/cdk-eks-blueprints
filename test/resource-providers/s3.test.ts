@@ -1,7 +1,7 @@
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
-import { GlobalResources } from "../../lib";
+import {EksBlueprintConstruct, GlobalResources} from "../../lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 
 describe("S3BucketProvider", () => {
@@ -43,8 +43,8 @@ describe("S3BucketProvider", () => {
       .region("us-east-1")
       .version("auto")
       .build(app, "east-test-1");
-
-    const bucket = <s3.IBucket>stack.node.tryFindChild('imported-s3-bucket');
+    const eksBlueprintConstruct = <EksBlueprintConstruct>stack.node.tryFindChild("east-test-1");
+    const bucket = <s3.IBucket>eksBlueprintConstruct.node.tryFindChild('imported-s3-bucket');
     expect(bucket.bucketName == 'my-s3-imported-bucket-name');
   });
 });

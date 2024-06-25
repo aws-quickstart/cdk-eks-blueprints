@@ -2,6 +2,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { IManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import * as spi from '../spi';
 import assert = require('assert');
+import {Stack} from "aws-cdk-lib";
 
 /**
  * Role provider that imports an existing role, performing its lookup by the provided name.
@@ -55,9 +56,9 @@ export class LookupOpenIdConnectProvider implements spi.ResourceProvider<iam.IOp
 
     provide(context: spi.ResourceContext): iam.IOpenIdConnectProvider {
         return iam.OpenIdConnectProvider.fromOpenIdConnectProviderArn(
-            context.scope,
+            Stack.of(context.scope),
             this.id,
-            `arn:aws:iam::${context.scope.account}:oidc-provider/${this.url.substring(httpsPrefix.length)}`
+            `arn:aws:iam::${Stack.of(context.scope).account}:oidc-provider/${this.url.substring(httpsPrefix.length)}`
         );
     }
 }
