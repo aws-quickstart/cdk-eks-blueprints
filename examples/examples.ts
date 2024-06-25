@@ -29,7 +29,7 @@ const kmsKey: kms.Key = bp.getNamedResource(KMS_RESOURCE);
 const builder = () => base.clone();
 
 const publicCluster = {
-    version: KubernetesVersion.V1_29, 
+    version: KubernetesVersion.V1_30, 
     vpcSubnets: [{ subnetType: ec2.SubnetType.PUBLIC }]
 };
 

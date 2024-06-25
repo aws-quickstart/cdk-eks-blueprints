@@ -10,6 +10,7 @@ import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
 // aws eks describe-addon-versions --kubernetes-version <kubernetes-version> --addon-name amazon-cloudwatch-observability \
 //     --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output table
 const versionMap: Map<KubernetesVersion, string> = new Map([
+  [KubernetesVersion.V1_30, "v1.7.0-eksbuild.1"],
   [KubernetesVersion.V1_29, "v1.7.0-eksbuild.1"],
   [KubernetesVersion.V1_28, "v1.7.0-eksbuild.1"],
   [KubernetesVersion.V1_27, "v1.7.0-eksbuild.1"],
