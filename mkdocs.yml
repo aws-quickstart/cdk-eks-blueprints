@@ -52,6 +52,7 @@ nav:
     - NVIDIA GPU Operator: 'addons/gpu-operator.md'
     - Grafana Operator: 'addons/grafana-operator.md'
     - IBM Instana: 'addons/instana-addon.md'
+    - Ingress Nginx: 'addons/ingress-nginx.md'
     - Istio Base: 'addons/istio-base.md'
     - Istio Control Plane: 'addons/istio-control-plane.md'
     - Istio CNI: 'addons/istio-cni.md'
