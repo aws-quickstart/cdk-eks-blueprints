@@ -20,7 +20,7 @@ const app = new cdk.App();
 
 const externalDnsHostname = ...;
 const awsLbControllerAddOn = new blueprints.addons.AwsLoadBalancerControllerAddOn();
-const kubernetesNginxAddOn = new blueprints.addons.KubernetesIngressAddOn({ externalDnsHostname });
+const kubernetesNginxAddOn = new blueprints.addons.IngressNginxAddOn({ externalDnsHostname });
 const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, kubernetesNginxAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
@@ -69,7 +69,7 @@ blueprints.EksBlueprint.builder()
     .addOns(new blueprints.addons.ExternalDnsAddOn({
         hostedZoneProviders: ["MyHostedZone1"]
     }))
-    .addOns(new blueprints.KubernetesIngressAddOn({ 
+    .addOns(new blueprints.IngressNginxAddOn({ 
         internetFacing: true, 
         backendProtocol: "tcp", 
         externalDnsHostname: subdomain, 
@@ -148,7 +148,7 @@ This case is used when a certificate is already created and you just need to ref
 const myCertArn = "";
 blueprints.EksBlueprint.builder()
     .resourceProvider(GlobalResources.Certificate, new ImportCertificateProvider(myCertArn, "cert1-id"))
-    .addOns(new KubernetesIngressAddOn({
+    .addOns(new IngressNginxAddOn({
         certificateResourceName: GlobalResources.Certificate,
         externalDnsHostname: 'my.domain.com'
     }))
@@ -168,8 +168,8 @@ blueprints.EksBlueprint.builder()
     .addOns(new AwsLoadBalancerControllerAddOn())
     // Use hosted zone for External DNS
     .addOns(new ExternalDnsAddOn({ hostedZoneResources: [GlobalResources.HostedZone] }))
-    // Use certificate registered before with KubernetesIngressAddOn
-    .addOns(new KubernetesIngressAddOn({
+    // Use certificate registered before with IngressNginxAddOn
+    .addOns(new IngressNginxAddOn({
         certificateResourceName: GlobalResources.Certificate,
         externalDnsHostname: 'my.domain.com'
     }))
@@ -180,15 +180,15 @@ blueprints.EksBlueprint.builder()
 
 ## Managing Multiple Ingress Controllers with IngressClasses
 
-The KubernetesIngressAddOn leverages the Kubernetes NGINX Ingress Controller, which supports using IngressClasses to avoid conflicts. Here's how you can set up and use IngressClasses to manage multiple Ingress controllers effectively.
+The IngressNginxAddOn leverages the Kubernetes NGINX Ingress Controller, which supports using IngressClasses to avoid conflicts. Here's how you can set up and use IngressClasses to manage multiple Ingress controllers effectively.
 
-**Using IngressClasses with KubernetesIngressAddOn**
-To deploy multiple instances of the NGINX Ingress controller, grant them control over different IngressClasses and select the appropriate IngressClass using the ingressClassName field in your Ingress resources. The KubernetesIngressAddOn simplifies this setup by allowing you to define these parameters directly.
+**Using IngressClasses with IngressNginxAddOn**
+To deploy multiple instances of the NGINX Ingress controller, grant them control over different IngressClasses and select the appropriate IngressClass using the ingressClassName field in your Ingress resources. The IngressNginxAddOn simplifies this setup by allowing you to define these parameters directly.
 
 ### Add-on Configuration Example**
 
 ```typescript
-const kubernetesNginxAddOn = new blueprints.addons.KubernetesIngressAddOn({
+const kubernetesNginxAddOn = new blueprints.addons.IngressNginxAddOn({
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',

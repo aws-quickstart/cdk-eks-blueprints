@@ -1,5 +1,5 @@
 // Import necessary AWS CDK and utility modules
-import { Certificate, ICertificate  } from "aws-cdk-lib/aws-certificatemanager";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
 import { merge } from "ts-deepmerge";
 import * as dot from 'dot-object';
@@ -13,7 +13,7 @@ import { AwsLoadBalancerControllerAddOn } from ".."
  * Properties available to configure the nginx ingress controller.
  * Values to pass to the chart as per https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
  */
-export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
+export interface IngressNginxAddOnProps extends HelmAddOnUserProps {
     /**
      * The name of the Kubernetes Ingress Helm release.
      */
@@ -116,6 +116,36 @@ export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
     certificateResourceARN?: string;
 
     /**
+     * Protocol for the load balancer SSL port.
+     * @default 'https'
+     */
+    sslPort?: string;
+
+    /**
+     * Protocol for the load balancer HTTP target port.
+     * @default 'http'
+     */
+    httpTargetPort?: string;
+
+    /**
+     * Protocol for the load balancer HTTPS target port.
+     * @default 'https'
+     */
+    httpsTargetPort?: string;
+
+    /**
+     * Determines if SSL redirection should be forced.
+     * @default true
+     */
+    forceSSLRedirect?: boolean;
+
+    /**
+     * Type of the load balancer.
+     * @default 'external'
+     */
+    loadBalancerType?: string;
+
+    /**
      * ARN of the AWS Certificate Manager certificate to be used for HTTPS.
      * @default "3600"
      */
@@ -123,7 +153,7 @@ export interface KubernetesIngressAddOnProps extends HelmAddOnUserProps {
 }
 
 // Set default properties for the add-on
-const defaultProps: KubernetesIngressAddOnProps = {
+const defaultProps: IngressNginxAddOnProps = {
     name: "kubernetes-ingress",
     chart: "ingress-nginx",
     release: "k8s-ingress",
@@ -134,18 +164,23 @@ const defaultProps: KubernetesIngressAddOnProps = {
     internetFacing: true,
     targetType: 'ip',
     namespace: 'kube-system',
+    sslPort: 'https',
+    httpTargetPort: 'http',
+    httpsTargetPort: 'https',
+    forceSSLRedirect: true,
+    loadBalancerType: 'external',
     idleTimeout: '3600'
 };
 
 // Define the class for the Kubernetes Ingress Add-On, extending HelmAddOn
 @supportsALL
-export class KubernetesIngressAddOn extends HelmAddOn {
-    private readonly options: KubernetesIngressAddOnProps;
+export class IngressNginxAddOn extends HelmAddOn {
+    private readonly options: IngressNginxAddOnProps;
 
     // Constructor for the class, merging default props with user-defined props
-    constructor(props?: KubernetesIngressAddOnProps) {
+    constructor(props?: IngressNginxAddOnProps) {
         super({ ...defaultProps, ...props } as HelmAddOnProps);
-        this.options = { ...defaultProps, ...props } as KubernetesIngressAddOnProps;
+        this.options = { ...defaultProps, ...props } as IngressNginxAddOnProps;
     }
 
     // Dependency decorator to ensure this add-on is deployed after the AWS Load Balancer Controller
@@ -153,19 +188,15 @@ export class KubernetesIngressAddOn extends HelmAddOn {
     async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const props = this.options;
 
-
-
         // Setup service annotations based on the properties provided
         const presetAnnotations: any = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
             'service.beta.kubernetes.io/aws-load-balancer-attributes': `load_balancing.cross_zone.enabled=${props.crossZoneEnabled}`,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
-            'service.beta.kubernetes.io/aws-load-balancer-type': 'external',
+            'service.beta.kubernetes.io/aws-load-balancer-type': props.loadBalancerType,
             'service.beta.kubernetes.io/aws-load-balancer-nlb-target-type': props.targetType,
             'external-dns.alpha.kubernetes.io/hostname': props.externalDnsHostname,
             'service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout': '3600'
-            
-            
         };
 
         // Define values for Helm chart based on properties and annotations
@@ -184,24 +215,25 @@ export class KubernetesIngressAddOn extends HelmAddOn {
             }
         };
 
-        // Configure SSL-related annotations if certificate resource name is provided
-        if (props.certificateResourceName) {
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
+        // Combine logic for handling certificate annotations
+        let certificateResourceARN = props.certificateResourceARN;
+
+        if (!certificateResourceARN && props.certificateResourceName) {
             const certificate = clusterInfo.getResource<ICertificate>(props.certificateResourceName);
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificate?.certificateArn;
-            presetAnnotations['nginx.ingress.kubernetes.io/force-ssl-redirect'] = true;
+            certificateResourceARN = certificate?.certificateArn;
         }
 
-        // Configure SSL-related annotations if certificate resource name is provided
-        if (props.certificateResourceARN) {
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = 'https';
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = props.certificateResourceARN;
-            presetAnnotations['nginx.ingress.kubernetes.io/force-ssl-redirect'] = true;
+        if (certificateResourceARN) {
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = props.sslPort;
+            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificateResourceARN;
+            if (props.forceSSLRedirect) {
+                presetAnnotations['nginx.ingress.kubernetes.io/force-ssl-redirect'] = true;
+            }
         }
 
         // Set HTTP and HTTPS target ports
-        setPath(values, "controller.service.targetPorts.http", "http");
-        const httpsTargetPort = dot.pick("controller.service.targetPorts.https", props.values) || "http";
+        setPath(values, "controller.service.targetPorts.http", props.httpTargetPort);
+        const httpsTargetPort = dot.pick("controller.service.targetPorts.https", props.values) || props.httpsTargetPort;
         setPath(values, "controller.service.targetPorts.https", httpsTargetPort);
 
         // Merge user-defined values with defaults for the Helm chart deployment

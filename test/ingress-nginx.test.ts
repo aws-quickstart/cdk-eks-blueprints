@@ -17,7 +17,7 @@ describe('Unit tests for Kubernetes Ingress addon', () => {
 
         blueprint.account("123567891").region('us-west-1')
             .version("auto")
-            .addOns(new blueprints.KubernetesIngressAddOn(ingressProps));
+            .addOns(new blueprints.IngressNginxAddOn(ingressProps));
 
         expect(() => {
             blueprint.build(app, 'ingress-addon-missing-dependency');
@@ -40,7 +40,7 @@ describe('Unit tests for Kubernetes Ingress addon', () => {
         blueprint.account("123567891").region('us-west-1')
             .version("auto")
             .addOns(new blueprints.AwsLoadBalancerControllerAddOn())
-            .addOns(new blueprints.KubernetesIngressAddOn(ingressProps))
+            .addOns(new blueprints.IngressNginxAddOn(ingressProps))
             .build(app, 'ingress-stack-succeeds');
 
         expect(blueprint).toBeDefined();
