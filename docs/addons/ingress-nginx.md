@@ -20,8 +20,8 @@ const app = new cdk.App();
 
 const externalDnsHostname = ...;
 const awsLbControllerAddOn = new blueprints.addons.AwsLoadBalancerControllerAddOn();
-const kubernetesNginxAddOn = new blueprints.addons.IngressNginxAddOn({ externalDnsHostname });
-const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, kubernetesNginxAddOn ];
+const IngressNginxAddOn = new blueprints.addons.IngressNginxAddOn({ externalDnsHostname });
+const addOns: Array<blueprints.ClusterAddOn> = [ awsLbControllerAddOn, IngressNginxAddOn ];
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version("auto")
@@ -188,7 +188,7 @@ To deploy multiple instances of the NGINX Ingress controller, grant them control
 ### Add-on Configuration Example**
 
 ```typescript
-const kubernetesNginxAddOn = new blueprints.addons.IngressNginxAddOn({
+const IngressNginxAddOn = new blueprints.addons.IngressNginxAddOn({
     crossZoneEnabled: true,
     internetFacing: true,
     targetType: 'ip',
@@ -233,7 +233,7 @@ The Kubernetes NGINX Ingress Controller and the NGINX Inc. Ingress Controller bo
 1. Repository Source:
 
 Kubernetes NGINX: Available at [kubernetes/ingress-nginx](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/).
-NGINX Inc.: Available at [nginxinc/kubernetes-ingres](https://kubernetes.github.io/ingress-nginx/deploy/).
+NGINX Inc.: Available at [nginxinc/kubernetes-ingress](https://kubernetes.github.io/ingress-nginx/deploy/).
 
 1. Configuration and Features:
 
