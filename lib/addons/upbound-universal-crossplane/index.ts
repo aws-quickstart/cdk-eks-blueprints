@@ -15,6 +15,10 @@ export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
      * To Create Namespace using CDK
      */
     createNamespace?: boolean;
+    /*
+     * EKS MasterRole
+     */
+    eksMasterRole?: any;
 }
 
 const defaultProps = {
@@ -25,6 +29,7 @@ const defaultProps = {
     version: '1.14.5-up.1',
     repository: 'https://charts.upbound.io/stable',
     values: {},
+    eksMasterRole: "eks-connector-role"
 };
 
 @supportsALL
@@ -51,6 +56,7 @@ export class UpboundCrossplaneAddOn extends HelmAddOn {
             namespace: this.options.namespace!,
 
         });
+
         sa.node.addDependency(ns);
         sa.role.attachInlinePolicy(new Policy(cluster.stack, 'eks-connect-policy',  {
             document: PolicyDocument.fromJson({
@@ -59,7 +65,7 @@ export class UpboundCrossplaneAddOn extends HelmAddOn {
                     {
                         "Effect": "Allow",
                         "Action": ["sts:AssumeRole"],
-                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/eks-connector-role`
+                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/${this.options.eksMasterRole}`
                     },
                     {
                         "Effect": "Allow",
