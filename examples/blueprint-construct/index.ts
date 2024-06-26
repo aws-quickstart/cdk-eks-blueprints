@@ -232,7 +232,8 @@ export default class BlueprintConstruct {
             new blueprints.ExternalsSecretsAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
             new blueprints.NeuronDevicePluginAddOn(),
-            new blueprints.NeuronMonitorAddOn()
+            new blueprints.NeuronMonitorAddOn(),
+            new blueprints.UpboundCrossplaneAddOn()
         ];
 
         // Instantiated to for helm version check.
