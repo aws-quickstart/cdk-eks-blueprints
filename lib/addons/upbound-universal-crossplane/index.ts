@@ -1,36 +1,90 @@
-import { CoreAddOn } from "../core-addon";
-import { supportsX86 } from "../../utils";
+import 'source-map-support/register';
+import { Construct } from 'constructs';
+import {ClusterInfo, Values} from "../../spi";
+import { merge } from "ts-deepmerge";
+import {createNamespace, supportsALL} from '../../utils';
+import { Policy, PolicyDocument} from 'aws-cdk-lib/aws-iam';
+import * as cdk from 'aws-cdk-lib';
+import {HelmAddOn, HelmAddOnProps, HelmAddOnUserProps} from "../helm-addon";
 
 /**
- * Interface for Upbound Universal Crossplane EKS add-on options
+ * User provided options for the Helm Chart
  */
-interface UpboundUniversalCrossplaneAddOnProps {
+export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
     /**
-     * Version of the driver to deploy
+     * To Create Namespace using CDK
      */
-    version?: string;
+    createNamespace?: boolean;
 }
 
-/**
- * Default values for the add-on
- */
 const defaultProps = {
-    addOnName: "upbound_universal-crossplane",
-    version: "v1.9.1-eksbuild.0"
+    name: 'uxp',
+    release: 'blueprints-addon-uxp',
+    namespace: 'upbound-system',
+    chart: 'universal-crossplane',
+    version: '1.14.5-up.1',
+    repository: 'https://charts.upbound.io/stable',
+    values: {},
 };
 
-/**
- * Implementation of Upbound Crossplane EKS add-on
- */
-@supportsX86
-export class UpboundUniversalCrossplaneAddOn extends CoreAddOn {
+@supportsALL
+export class UpboundCrossplaneAddOn extends HelmAddOn {
 
-    constructor(readonly options?: UpboundUniversalCrossplaneAddOnProps) {
-        super({
-            addOnName: defaultProps.addOnName,
-            version: options?.version ?? defaultProps.version,
-            saName: ""
+    readonly options: UpboundCrossplaneAddOnProps;
+
+    constructor( props?: UpboundCrossplaneAddOnProps) {
+        super({...defaultProps, ...props});
+
+        this.options = this.props as UpboundCrossplaneAddOnProps;
+    }
+
+    deploy(clusterInfo: ClusterInfo): void | Promise<Construct> {
+        const cluster = clusterInfo.cluster;
+
+        // Create the `upbound-system` namespace.
+        const ns = createNamespace(this.options.namespace!, cluster, true);
+
+        // Create the CrossPlane AWS Provider IRSA.
+        const serviceAccountName = "provider-aws";
+        const sa = cluster.addServiceAccount(serviceAccountName, {
+            name: serviceAccountName,
+            namespace: this.options.namespace!,
+
         });
+        sa.node.addDependency(ns);
+        sa.role.attachInlinePolicy(new Policy(cluster.stack, 'eks-connect-policy',  {
+            document: PolicyDocument.fromJson({
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": ["sts:AssumeRole"],
+                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/eks-connector-role`
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Action": ["eks:*"],
+                        "Resource": `*`
+                    }
+                ]
+            })}));
+
+        clusterInfo.addAddOnContext(UpboundCrossplaneAddOn.name, {
+            arn: sa.role.roleArn
+        });
+
+        new cdk.CfnOutput(cluster.stack, 'providerawssaiamrole',
+            {
+                value: sa.role.roleArn,
+                description: 'provider AWS IAM role',
+                exportName : 'providerawssaiamrole'
+            });
+
+        let values: Values = this.options.values ?? {};
+        values = merge(values, values);
+
+        const chart = this.addHelmChart(clusterInfo, values, false, true);
+        chart.node.addDependency(sa);
+        return Promise.resolve(chart);
     }
 }
-
