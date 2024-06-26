@@ -16,7 +16,7 @@ export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
      */
     createNamespace?: boolean;
     /*
-     * EKS MasterRole
+     * EKS MasterRole. `mastersRole` of blueprints should be passed to this parameter.
      */
     eksMasterRole?: any;
 }
@@ -29,7 +29,7 @@ const defaultProps = {
     version: '1.14.5-up.1',
     repository: 'https://charts.upbound.io/stable',
     values: {},
-    eksMasterRole: "eks-connector-role"
+    eksMasterRole: "Admin"
 };
 
 @supportsALL
