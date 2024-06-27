@@ -13,7 +13,8 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 const app = new cdk.App();
 
 const addOn = new blueprints.addons.UpboundUniversalCrossplaneAddOn({
-        eksMasterRole: "YOUR-MASTER-ROLE"
+        // This should be modified to what is setup with `masterRole` in blueprint setup. Default is `Admin` 
+        clusterAccessRole: "Admin"
     }),
 
 const blueprint = blueprints.EksBlueprint.builder()

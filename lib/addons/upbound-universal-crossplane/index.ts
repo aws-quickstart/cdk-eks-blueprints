@@ -5,7 +5,7 @@ import { merge } from "ts-deepmerge";
 import {createNamespace, supportsALL} from '../../utils';
 import { Policy, PolicyDocument} from 'aws-cdk-lib/aws-iam';
 import * as cdk from 'aws-cdk-lib';
-import {HelmAddOn, HelmAddOnProps, HelmAddOnUserProps} from "../helm-addon";
+import {HelmAddOn, HelmAddOnUserProps} from "../helm-addon";
 
 /**
  * User provided options for the Helm Chart
@@ -16,9 +16,12 @@ export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
      */
     createNamespace?: boolean;
     /*
-     * EKS MasterRole. `mastersRole` of blueprints should be passed to this parameter.
+     * EKS Cluster Access Role. `mastersRole` of blueprints should be passed to this parameter.
+     * A single `masterRole` can be created and passed as input to this parameter.
+     * Default: `Admin`
+     *
      */
-    eksMasterRole?: any;
+    clusterAccessRole?: string;
 }
 
 const defaultProps = {
@@ -65,7 +68,7 @@ export class UpboundCrossplaneAddOn extends HelmAddOn {
                     {
                         "Effect": "Allow",
                         "Action": ["sts:AssumeRole"],
-                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/${this.options.eksMasterRole}`
+                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/${this.options.clusterAccessRole}`
                     },
                     {
                         "Effect": "Allow",
