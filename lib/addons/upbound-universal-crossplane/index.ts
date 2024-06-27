@@ -66,7 +66,7 @@ export class UpboundCrossplaneAddOn extends HelmAddOn {
                     {
                         "Effect": "Allow",
                         "Action": ["sts:AssumeRole"],
-                        "Resource": `${this.options.clusterAccessRole}`
+                        "Resource": `${this.options.clusterAccessRole.roleArn}`
                     },
                     {
                         "Effect": "Allow",

@@ -24,7 +24,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.validateHelmVersions = false;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel = 3; // info
         userLog.settings.minLevel = 2; // debug
