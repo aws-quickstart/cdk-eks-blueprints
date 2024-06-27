@@ -50,6 +50,14 @@ builder()
     .build(app, 'argo-blueprint1');
     
 
+bp.ObservabilityBuilder.builder()
+    .withBlueprintProps(base.props)
+    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+    .version('auto')
+    .enableNativePatternAddOns()
+    .enableControlPlaneLogging()
+    .build(app, "cloudwatch-insights-test");
+
 
 function buildArgoBootstrap() {
     return new bp.addons.ArgoCDAddOn({
