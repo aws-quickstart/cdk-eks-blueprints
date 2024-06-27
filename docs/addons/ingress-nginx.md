@@ -1,6 +1,6 @@
-# Kubernetes NGINX Ingress Add-on
+# Ingress NGINX Add-on
 
-This add-on installs [Kubernetes NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx) on Amazon EKS. Kubernetes NGINX ingress controller uses NGINX as a reverse proxy and load balancer.
+This add-on installs [Ingress Nginx Controller](https://kubernetes.github.io/ingress-nginx) on Amazon EKS. Kubernetes NGINX ingress controller uses NGINX as a reverse proxy and load balancer.
 
 Other than handling Kubernetes ingress objects, this ingress controller can facilitate multi-tenancy and segregation of workload ingresses based on host name (host-based routing) and/or URL Path (path-based routing).
 
