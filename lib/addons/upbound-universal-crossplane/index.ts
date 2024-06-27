@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import {ClusterInfo, Values} from "../../spi";
 import { merge } from "ts-deepmerge";
 import {createNamespace, supportsALL} from '../../utils';
-import { Policy, PolicyDocument} from 'aws-cdk-lib/aws-iam';
+import {IRole, Policy, PolicyDocument} from 'aws-cdk-lib/aws-iam';
 import * as cdk from 'aws-cdk-lib';
 import {HelmAddOn, HelmAddOnUserProps} from "../helm-addon";
 
@@ -21,7 +21,7 @@ export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
      * Default: `Admin`
      *
      */
-    clusterAccessRole?: string;
+    clusterAccessRole: IRole;
 }
 
 const defaultProps = {
@@ -32,7 +32,7 @@ const defaultProps = {
     version: '1.14.5-up.1',
     repository: 'https://charts.upbound.io/stable',
     values: {},
-    eksMasterRole: "Admin"
+    eksMasterRole: `arn:aws:iam::${cluster.stack.account}:role/Admin`
 };
 
 @supportsALL
@@ -68,7 +68,7 @@ export class UpboundCrossplaneAddOn extends HelmAddOn {
                     {
                         "Effect": "Allow",
                         "Action": ["sts:AssumeRole"],
-                        "Resource": `arn:aws:iam::${cluster.stack.account}:role/${this.options.clusterAccessRole}`
+                        "Resource": `${this.options.clusterAccessRole}`
                     },
                     {
                         "Effect": "Allow",
