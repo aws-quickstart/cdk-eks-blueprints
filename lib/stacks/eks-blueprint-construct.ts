@@ -13,7 +13,7 @@ import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = KubernetesVersion.V1_30;
+export const DEFAULT_VERSION = KubernetesVersion.V1_29;
 
 /**
  *  Exporting control plane log type so that customers don't have to import CDK EKS module for blueprint configuration.

@@ -27,7 +27,7 @@ const defaultProps: HelmAddOnProps & CertManagerAddOnProps = {
   name: "blueprints-cert-manager-addon",
   namespace: "cert-manager",
   chart: "cert-manager",
-  version: "1.15.0",
+  version: "1.15.1",
   release: "cert-manager",
   repository:  "https://charts.jetstack.io",
   values: {},
