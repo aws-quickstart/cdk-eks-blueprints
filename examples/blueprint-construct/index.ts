@@ -235,7 +235,7 @@ export default class BlueprintConstruct {
             new blueprints.NeuronMonitorAddOn(),
             new blueprints.UpboundCrossplaneAddOn({
                 skipVersionValidation: true,
-                clusterAccessRole: blueprints.getNamedResource("AdminRole")
+                clusterAccessRole: blueprints.getNamedResource("blueprint-node-role")
             })
         ];
 
