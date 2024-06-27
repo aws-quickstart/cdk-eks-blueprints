@@ -16,10 +16,9 @@ export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
      */
     createNamespace?: boolean;
     /*
-     * EKS Cluster Access Role. `mastersRole` of blueprints should be passed to this parameter.
-     * A single `masterRole` can be created and passed as input to this parameter.
-     * Default: `Admin`
-     *
+     * EKS Cluster Access Role.
+     * This is a role with right permissions that will be used by CrossPlane AWS provider
+     * to provision AWS resources.
      */
     clusterAccessRole: IRole;
 }
