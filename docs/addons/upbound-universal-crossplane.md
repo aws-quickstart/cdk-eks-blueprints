@@ -12,10 +12,8 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();
 
-const addOn = new blueprints.addonsUpboundCrossplaneAddOn({
-    clusterAccessRole: blueprints.getResource(context => {
-        return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
-    }),
+new blueprints.UpboundCrossplaneAddOn({
+    clusterAccessRole: blueprints.getNamedResource("AdminRole")
 });
 
 const blueprint = blueprints.EksBlueprint.builder()

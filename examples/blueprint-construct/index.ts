@@ -24,7 +24,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        blueprints.HelmAddOn.validateHelmVersions = false;
+        blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel = 3; // info
         userLog.settings.minLevel = 2; // debug
@@ -232,12 +232,7 @@ export default class BlueprintConstruct {
             new blueprints.ExternalsSecretsAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
             new blueprints.NeuronDevicePluginAddOn(),
-            new blueprints.NeuronMonitorAddOn(),
-            new blueprints.UpboundCrossplaneAddOn({
-                clusterAccessRole: blueprints.getResource(context => {
-                    return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
-                }),
-            })
+            new blueprints.NeuronMonitorAddOn()
         ];
 
         // Instantiated to for helm version check.
