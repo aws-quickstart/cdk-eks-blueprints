@@ -31,8 +31,7 @@ const defaultProps = {
     chart: 'universal-crossplane',
     version: '1.14.5-up.1',
     repository: 'https://charts.upbound.io/stable',
-    values: {},
-    eksMasterRole: `arn:aws:iam::${cluster.stack.account}:role/Admin`
+    values: {}
 };
 
 @supportsALL
