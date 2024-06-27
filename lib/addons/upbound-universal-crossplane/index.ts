@@ -8,7 +8,7 @@ import * as cdk from 'aws-cdk-lib';
 import {HelmAddOn, HelmAddOnUserProps} from "../helm-addon";
 
 /**
- * User provided options for the Helm Chart
+ * User provided options for the Helm Chart.
  */
 export interface UpboundCrossplaneAddOnProps extends HelmAddOnUserProps {
     /**
