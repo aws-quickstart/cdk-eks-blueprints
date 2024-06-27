@@ -8,7 +8,8 @@ import { getAdotCollectorPolicyDocument } from "./iam-policy";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_29, "v0.92.1-eksbuild.1"],
+    [KubernetesVersion.V1_30, "v0.94.1-eksbuild.1"],
+    [KubernetesVersion.V1_29, "v0.94.1-eksbuild.1"],
     [KubernetesVersion.V1_28, "v0.92.1-eksbuild.1"],
     [KubernetesVersion.V1_27, "v0.92.1-eksbuild.1"],
     [KubernetesVersion.V1_26, "v0.92.1-eksbuild.1"],

@@ -32,7 +32,7 @@ export interface CalicoOperatorAddOnProps extends HelmAddOnUserProps {
 const defaultProps = {
     name: 'calico-operator',
     namespace: 'calico-operator',
-    version: 'v3.26.4', // v3.27.2' latest is causing issues on cdk destroy
+    version: 'v3.28.0', // v3.27.2' latest is causing issues on cdk destroy
     chart: "tigera-operator",
     release: "bp-addon-calico-operator",
     repository: "https://projectcalico.docs.tigera.io/charts"
