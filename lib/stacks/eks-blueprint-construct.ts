@@ -191,6 +191,14 @@ export class BlueprintConstructBuilder {
         return this;
     }
 
+    buildConstruct(scope: Construct, id: string) : EksBlueprintConstruct {
+        return new EksBlueprintConstruct(scope,  { ...this.props, ...{ id } });
+    }
+
+    buildConstructAsync(scope: Construct, id: string) : Promise<EksBlueprintConstruct> {
+        return this.buildConstruct(scope, id).waitForAsyncTasks();
+    }
+ 
 }
 
 /**

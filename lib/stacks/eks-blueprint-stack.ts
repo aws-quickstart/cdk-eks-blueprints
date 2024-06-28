@@ -18,6 +18,7 @@ export class BlueprintBuilder extends BlueprintConstructBuilder implements spi.A
         return new BlueprintBuilder().withBlueprintProps(this.props)
             .account(account ?? this.env.account).region(region ?? this.env.region);
     }
+
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
@@ -45,7 +46,7 @@ export class EksBlueprint extends cdk.Stack {
     }
 
     constructor(scope: Construct, blueprintProps: EksBlueprintProps, props?: cdk.StackProps) {
-        super(scope, blueprintProps.id, utils.withUsageTracking(EksBlueprint.USAGE_ID, props));
+        super(scope, blueprintProps.id, utils.withUsageTracking([EksBlueprint.USAGE_ID], props));
         const eksBlueprintConstruct = new EksBlueprintConstruct(this, blueprintProps);
         this.clusterInfo = eksBlueprintConstruct.getClusterInfo();
         this.asyncTasks = eksBlueprintConstruct.getAsyncTasks();
