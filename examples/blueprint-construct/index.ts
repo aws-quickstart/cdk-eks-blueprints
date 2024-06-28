@@ -121,6 +121,11 @@ export default class BlueprintConstruct {
                     controller: { service: { create: false } }
                 }
             }),
+            new blueprints.addons.IngressNginxAddOn({
+                values: {
+                controller: {service: {type: "ClusterIP"} }
+                }
+            }),
             // new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
