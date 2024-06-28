@@ -18,7 +18,7 @@ const app = new cdk.App();
 const KMS_RESOURCE = "kms-key-22";
 const base = bp.EksBlueprint.builder()
     .account(process.env.CDK_DEFAULT_ACCOUNT)
-    .region(process.env.CDK_DEFAULT_REGION || 'us-east-2')
+    .region(process.env.CDK_DEFAULT_REGION)
     .resourceProvider(bp.GlobalResources.Vpc, new bp.VpcProvider("default")) // saving time on VPC creation
     .resourceProvider(KMS_RESOURCE, {
         provide(context): cdk.aws_kms.Key {
