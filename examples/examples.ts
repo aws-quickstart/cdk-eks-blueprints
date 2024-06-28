@@ -1,9 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as kms  from 'aws-cdk-lib/aws-kms';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import * as bp from '../lib';
 import * as bcrypt from 'bcrypt';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { IngressNginxAddOn, AwsLoadBalancerControllerAddOn } from '../lib/addons';
 
 /**
  * You can run these examples with the following command:
@@ -17,7 +18,7 @@ const app = new cdk.App();
 const KMS_RESOURCE = "kms-key-22";
 const base = bp.EksBlueprint.builder()
     .account(process.env.CDK_DEFAULT_ACCOUNT)
-    .region(process.env.CDK_DEFAULT_REGION)
+    .region(process.env.CDK_DEFAULT_REGION || 'us-east-2')
     .resourceProvider(bp.GlobalResources.Vpc, new bp.VpcProvider("default")) // saving time on VPC creation
     .resourceProvider(KMS_RESOURCE, {
         provide(context): cdk.aws_kms.Key {
@@ -29,7 +30,7 @@ const kmsKey: kms.Key = bp.getNamedResource(KMS_RESOURCE);
 const builder = () => base.clone();
 
 const publicCluster = {
-    version: KubernetesVersion.V1_30, 
+    version: KubernetesVersion.V1_30,
     vpcSubnets: [{ subnetType: ec2.SubnetType.PUBLIC }]
 };
 
@@ -48,8 +49,19 @@ builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
     .addOns(buildArgoBootstrap())
     .build(app, 'argo-blueprint1');
-    
 
+// New blueprint with IngressNginxAddOn
+builder()
+    .clusterProvider(new bp.MngClusterProvider(publicCluster))
+    .addOns(
+        new AwsLoadBalancerControllerAddOn(),
+        new IngressNginxAddOn({
+            crossZoneEnabled: true,
+            internetFacing: true,
+            targetType: 'ip'
+        })
+    )
+    .build(app, 'ingress-nginx-blueprint');
 
 function buildArgoBootstrap() {
     return new bp.addons.ArgoCDAddOn({

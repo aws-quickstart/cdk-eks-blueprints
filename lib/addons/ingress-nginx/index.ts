@@ -206,7 +206,7 @@ export class IngressNginxAddOn extends HelmAddOn {
                     annotations: presetAnnotations
                 },
                 ingressClassResource: {
-                    name: props.ingressClassName || "nginx",
+                    name: props.ingressClassName || "ingress-nginx",
                     enabled: true,
                     default: props.isDefaultClass ?? false,
                     controllerValue: props.controllerClass || "k8s.io/ingress-nginx"
