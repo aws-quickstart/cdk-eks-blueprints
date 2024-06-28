@@ -7,7 +7,7 @@ import { dependable, supportsALL } from "../../utils";
 import { setPath } from "../../utils/object-utils";
 import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { AwsLoadBalancerControllerAddOn } from ".."
+import { AwsLoadBalancerControllerAddOn } from "..";
 
 /**
  * Properties available to configure the nginx ingress controller.
