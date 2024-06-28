@@ -12,7 +12,7 @@ import * as assert from "assert";
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion, IpFamily } from 'aws-cdk-lib/aws-eks';
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
@@ -353,6 +353,9 @@ export class KarpenterAddOn extends HelmAddOn {
             httpPutResponseHopLimit: 2,
             httpTokens: "required"
         };
+        if (cluster.ipFamily == IpFamily.IP_V6) {
+            metadataOptions.httpProtocolIPv6 = "enabled";
+        }
         const blockDeviceMappings = this.options.ec2NodeClassSpec?.blockDeviceMappings || [];
         const detailedMonitoring = this.options.ec2NodeClassSpec?.detailedMonitoring || false;
 
@@ -742,6 +745,13 @@ export class KarpenterAddOn extends HelmAddOn {
             ],
             //roleName: `KarpenterNodeRole-${name}` // let role name to be generated as unique
         });
+
+        // Attach ipv6 related policies based on cluster IPFamily
+        if (cluster.ipFamily === IpFamily.IP_V6){
+            const nodeIpv6Policy = new iam.Policy(cluster, 'karpenter-node-Ipv6-Policy', {
+                document: utils.getEKSNodeIpv6PolicyDocument() });
+            karpenterNodeRole.attachInlinePolicy(nodeIpv6Policy);
+        }
 
         // Set up Instance Profile
         const instanceProfileName = md5.Md5.hashStr(stackName+region);

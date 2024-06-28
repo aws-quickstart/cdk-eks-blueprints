@@ -12,6 +12,7 @@ import { IKey } from "aws-cdk-lib/aws-kms";
 import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
+import * as eks from "aws-cdk-lib/aws-eks";
 /* Default K8s version of EKS Blueprints */
 export const DEFAULT_VERSION = KubernetesVersion.V1_29;
 
@@ -79,6 +80,11 @@ export class EksBlueprintProps {
      * GitOps modes to be enabled. If not specified, GitOps mode is not enabled.
      */
     readonly enableGitOpsMode?: spi.GitOpsMode;
+
+    /**
+     *
+     */
+    readonly ipFamily?: eks.IpFamily;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -233,7 +239,7 @@ export class EksBlueprintConstruct extends Construct {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
+        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes, blueprintProps.ipFamily);
         this.clusterInfo.setResourceContext(resourceContext);
 
         if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
