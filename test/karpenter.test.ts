@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion, IpFamily } from 'aws-cdk-lib/aws-eks';
 import { Template } from 'aws-cdk-lib/assertions';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 import { BlockDeviceMapping, EbsVolumeMapping, NodePoolRequirementValues } from "../lib";
@@ -499,5 +499,38 @@ describe('Unit tests for Karpenter addon', () => {
         const properties = Object.values(karpenter).pop();
         const values = properties?.Properties?.Values;
         expect(values).toBeDefined();
+    });
+
+    test("Stack creation with proper karpenter node-role permissions for ipv6 cluster", () => {
+        const app = new cdk.App();
+
+        const blueprint = blueprints.EksBlueprint.builder();
+
+        blueprint.account("123567891").region('us-west-1')
+            .version(KubernetesVersion.of('1.28'))
+            .withBlueprintProps({ipFamily: IpFamily.IP_V6})
+            .addOns(new blueprints.KarpenterAddOn({
+                version: 'v0.31.0'
+            }))
+            .teams(new blueprints.PlatformTeam({ name: 'platform' }));
+
+        const stack = blueprint.build(app, 'stack-with-ipv6');
+
+        const template = Template.fromStack(stack);
+        const karpenterPolicies = template.findResources("AWS::IAM::Policy", {
+        });
+        const karpenterNodeRolePolicy = Object.values(karpenterPolicies).filter(policy => {
+            if (policy?.Properties?.PolicyName) {
+                const policyName = policy?.Properties?.PolicyName;
+                if (typeof policyName === "string" && policyName.includes('stackwithipv6karpenternodeIpv6Policy')) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        const nodeRole = template.findOutputs('KarpenterInstanceNodeRole', {});
+        expect(karpenterNodeRolePolicy).toBeDefined();
+        expect(karpenterNodeRolePolicy.length).toEqual(1);
+        expect(karpenterNodeRolePolicy[0].Properties.Roles[0]).toEqual(nodeRole.KarpenterInstanceNodeRole.Value);
     });
 });
