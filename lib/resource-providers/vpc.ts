@@ -2,12 +2,14 @@ import { Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { ISubnet, PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
 import { ResourceContext, ResourceProvider } from "../spi";
+import * as eks from "aws-cdk-lib/aws-eks";
+import {Ipv6VpcProvider} from "./ipv6-vpc";
 
 /**
  * Interface for Mapping for fields such as Primary CIDR, Secondary CIDR, Secondary Subnet CIDR.
  */
 interface VpcProps {
-   primaryCidr: string, 
+   primaryCidr?: string,
    secondaryCidr?: string,
    secondarySubnetCidrs?: string[]
 }
@@ -15,13 +17,14 @@ interface VpcProps {
 /**
  * VPC resource provider 
  */
-export class VpcProvider implements ResourceProvider<ec2.IVpc> {
+export class VpcProvider extends Ipv6VpcProvider {
     readonly vpcId?: string;
     readonly primaryCidr?: string;
     readonly secondaryCidr?: string;
     readonly secondarySubnetCidrs?: string[];
 
     constructor(vpcId?: string, private vpcProps?: VpcProps) {
+        super(vpcId);
         this.vpcId = vpcId;
         this.primaryCidr = vpcProps?.primaryCidr;
         this.secondaryCidr = vpcProps?.secondaryCidr;
@@ -30,18 +33,13 @@ export class VpcProvider implements ResourceProvider<ec2.IVpc> {
 
     provide(context: ResourceContext): ec2.IVpc {
         const id = context.scope.node.id;
-        let vpc = undefined;
+        const ipFamily = context.blueprintProps.ipFamily;
 
-        if (this.vpcId) {
-            if (this.vpcId === "default") {
-                console.log(`looking up completely default VPC`);
-                vpc = ec2.Vpc.fromLookup(context.scope, id + "-vpc", { isDefault: true });
-            } else {
-                console.log(`looking up non-default ${this.vpcId} VPC`);
-                vpc = ec2.Vpc.fromLookup(context.scope, id + "-vpc", { vpcId: this.vpcId });
-            }
+        if (ipFamily == eks.IpFamily.IP_V6) {
+            return super.provide(context);
         }
 
+        let vpc = this.getVPCFromId(context, id);
         if (vpc == null) {
             // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
             // If VPC CIDR range is not provided, uses `10.0.0.0/16` as the range and creates public and private subnets per Availability Zone.

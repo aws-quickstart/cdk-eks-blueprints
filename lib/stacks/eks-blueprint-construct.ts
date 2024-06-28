@@ -12,6 +12,7 @@ import { IKey } from "aws-cdk-lib/aws-kms";
 import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
+import * as eks from "aws-cdk-lib/aws-eks";
 /* Default K8s version of EKS Blueprints */
 export const DEFAULT_VERSION = KubernetesVersion.V1_29;
 
@@ -81,9 +82,18 @@ export class EksBlueprintProps {
     readonly enableGitOpsMode?: spi.GitOpsMode;
 
     /**
+<<<<<<< HEAD
      * When set to true, will not use extra nesting for blueprint resources and attach them directly to the stack.
      */
     readonly compatibilityMode?: boolean;
+
+    /**
+     * Adding ipFamily to support IPv6 clusters. By default it uses IPv4 as the value.
+=======
+     *
+>>>>>>> cfbe78ce (IPV6 EKS cluster code.)
+     */
+    readonly ipFamily?: eks.IpFamily;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -240,7 +250,7 @@ export class EksBlueprintConstruct extends Construct {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(scope, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
+        this.clusterInfo = clusterProvider.createCluster(scope, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes, blueprintProps.ipFamily);
         this.clusterInfo.setResourceContext(resourceContext);
 
         if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
