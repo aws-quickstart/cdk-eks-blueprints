@@ -1,6 +1,6 @@
 # Ingress NGINX Add-on
 
-This add-on installs [Ingress Nginx Controller](https://kubernetes.github.io/ingress-nginx) on Amazon EKS. Kubernetes NGINX ingress controller uses NGINX as a reverse proxy and load balancer.
+This add-on installs [Ingress Nginx Controller](https://kubernetes.github.io/ingress-nginx) on Amazon EKS. Ingress Nginx controller uses NGINX as a reverse proxy and load balancer.
 
 Other than handling Kubernetes ingress objects, this ingress controller can facilitate multi-tenancy and segregation of workload ingresses based on host name (host-based routing) and/or URL Path (path-based routing).
 
@@ -44,17 +44,46 @@ Once deployed, it allows applications to create ingress objects and use host-bas
 ## Configuration
 
 - `backendProtocol`: Indication for AWS Load Balancer controller with respect to the protocol supported on the load balancer. TCP by default.
+  
 - `crossZoneEnabled`: Whether to create a cross-zone load balancer with the service that backs NGINX.
+  
 - `internetFacing`: Whether the created load balancer is internet-facing. Defaults to `true` if not specified. An internal load balancer is provisioned if set to `false`.
-targetType: `ip` or `instance mode`. Defaults to `ip`, which requires VPC-CNI and has better performance by eliminating a hop through kube-proxy. Instance mode leverages traditional NodePort mode on the instances.
+  
+- `targetType: `ip` or `instance mode`. Defaults to `ip`, which requires VPC-CNI and has better performance by eliminating a hop through kube-proxy. Instance mode leverages traditional NodePort mode on the instances.
+  
 - `externaDnsHostname`: Used in conjunction with the external DNS add-on to handle automatic registration of the service with Route 53.
+  
+- `ingressClassName`: Class of the ingress controller (default: nginx).
+  
+- `controllerClass`: Class used for handling ingress in a cluster.
+  
+- `electionId`: Identifier for leader election.
+  
+- `isDefaultClass`: Sets the ingress controller as the default for handling ingress resources (default: false).
+  
+- `certificateResourceName`: Name of the certificate resource provider.
+  
+- `certificateResourceARN`: ARN of the AWS Certificate Manager certificate for HTTPS.
+  
+- `sslPort`: Protocol for the load balancer SSL port (default: https).
+  
+- `httpTargetPort`: Protocol for the load balancer HTTP target port (default: http).
+  
+- `httpsTargetPort`: Protocol for the load balancer HTTPS target port (default: https).
+  
+- `forceSSLRedirect`: Forces SSL redirection (default: true).
+  
+- `loadBalancerType`: Type of the load balancer (default: external).
+  
+- `idleTimeout`: Idle timeout for the load balancer (default: 3600).
+  
 - `values`: Arbitrary values to pass to the chart as per <https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/>
 
 ## DNS Integration and Routing
 
-If the [External DNS Add-on](../addons/external-dns.md) is installed, it is possible to configure the Kubernetes NGINX ingress with an external NLB load balancer and leverage wild-card DNS domains (and public certificate) to route external traffic to individual workloads.
+If the [External DNS Add-on](../addons/external-dns.md) is installed, it is possible to configure the Ingress Nginx with an external NLB load balancer and leverage wild-card DNS domains (and public certificate) to route external traffic to individual workloads.
 
-The following example provides support for AWS Load Balancer Controller, External DNS, and Kubernetes NGINX add-ons to enable such routing:
+The following example provides support for AWS Load Balancer Controller, External DNS, and Ingress Nginx add-ons to enable such routing:
 
 ```typescript
 blueprints.EksBlueprint.builder()
@@ -134,7 +163,7 @@ After the above ingresses are applied (ideally through a GitOps engine), you can
 
 ## TLS Termination and Certificates
 
-You can configure the Kubernetes NGINX add-on to terminate TLS at the load balancer and supply an ACM certificate through the platform blueprint.
+You can configure the Ingress Nginx add-on to terminate TLS at the load balancer and supply an ACM certificate through the platform blueprint.
 
 A certificate can be registered using a named [resource provider](../resource-providers/index.md).
 
@@ -180,10 +209,10 @@ blueprints.EksBlueprint.builder()
 
 ## Managing Multiple Ingress Controllers with IngressClasses
 
-The IngressNginxAddOn leverages the Kubernetes NGINX Ingress Controller, which supports using IngressClasses to avoid conflicts. Here's how you can set up and use IngressClasses to manage multiple Ingress controllers effectively.
+The IngressNginxAddOn leverages the Ingress Nginx Controller, which supports using IngressClasses to avoid conflicts. Here's how you can set up and use IngressClasses to manage multiple Ingress controllers effectively.
 
 **Using IngressClasses with IngressNginxAddOn**
-To deploy multiple instances of the NGINX Ingress controller, grant them control over different IngressClasses and select the appropriate IngressClass using the ingressClassName field in your Ingress resources. The IngressNginxAddOn simplifies this setup by allowing you to define these parameters directly.
+To deploy multiple instances of the Ingress Nginx controller, grant them control over different IngressClasses and select the appropriate IngressClass using the ingressClassName field in your Ingress resources. The IngressNginxAddOn simplifies this setup by allowing you to define these parameters directly.
 
 ### Add-on Configuration Example**
 
@@ -222,37 +251,42 @@ const values: Values = {
 
 ## Benefits
 
-- Service Annotations: Customize the Kubernetes Service resource exposing the NGINX ingress controller for better control over AWS integrations.
+- Service Annotations: Customize the Kubernetes Service resource exposing the Ingress Nginx controller for better control over AWS integrations.
 - Ingress Class Resource: Manage multiple Ingress configurations by specifying different ingress classes, ensuring proper routing and avoiding conflicts.
 - Election ID: Ensure high availability and reliability by using a unique election ID for each controller instance, avoiding conflicts between multiple instances.
 
-## Differences between Kubernetes NGINX Ingress Controller and NGINX Inc. Ingress Controller
+## Differences between Ingress Nginx Controller and NGINX Inc. Ingress Controller
 
-The Kubernetes NGINX Ingress Controller and the NGINX Inc. Ingress Controller both use NGINX, but they have different implementations and configurations:
+The Ingress-Nginx Controller and the NGINX Inc(F5). Ingress Controller both use NGINX, but they have different implementations and configurations:
+
 
 1. Repository Source:
 
-Kubernetes NGINX: Available at [kubernetes/ingress-nginx](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/).
-NGINX Inc.: Available at [nginxinc/kubernetes-ingress](https://kubernetes.github.io/ingress-nginx/deploy/).
+Ingress Nginx: Available at [kubernetes/ingress-nginx](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/).
+
+NGINX Inc.(F5): Available at [nginxinc/kubernetes-ingress](https://github.com/nginxinc/kubernetes-ingress).
 
 1. Configuration and Features:
 
-Kubernetes NGINX: More commonly used within the Kubernetes community, with extensive community support and documentation.
-NGINX Inc.: Provided by NGINX Inc., potentially with enterprise features and different configurations.
+Ingress Nginx: Maintained by: Kubernetes community with extensive community support and documentation.
+
+NGINX Inc.(F5): Maintained by: NGINX Inc. (part of F5 Networks), potentially with enterprise features and different configurations.
 
 1. Annotations and Settings:
 
-Kubernetes NGINX: May have different annotations and settings specific to Kubernetes community practices.
-NGINX Inc.: May offer additional enterprise-grade features and require different annotations. 
+Ingress Nginx: May have different annotations and settings specific to Kubernetes community practices.
+
+NGINX Inc.(F5): May offer additional enterprise-grade features and require different annotations.
 
 1. Support and Updates:
 
-Kubernetes NGINX: Community-supported with frequent updates based on community contributions.
-NGINX Inc.: Officially supported by NGINX Inc., with potential access to enterprise support and updates.
+Ingress Nginx: Community-supported with regular updates and improvements based on community contributions.
+
+NGINX Inc.(F5): Commercial support available from NGINX Inc, with a focus on security and enterprise features.
 
 ## Functionality
 
-1. Installs Kubernetes NGINX ingress controller
+1. Installs Ingress Nginx controller
 2. Provides convenience options to integrate with AWS Load Balancer Controller to leverage NLB for the load balancer
 3. Provides convenience options to integrate with External DNS add-on for integration with Amazon Route 53
 4. Allows configuring TLS termination at the load balancer provisioned with the add-on
