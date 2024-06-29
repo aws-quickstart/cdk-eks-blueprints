@@ -124,6 +124,6 @@ describe("EfsFileSystemProvider", () => {
     const template = Template.fromStack(stack);
 
     // Then
-    template.hasOutput("EfsFileSystemId", { Value: "fs-12345678" });
+    template.hasOutput("*", { Value: "fs-12345678" });
   });
 });

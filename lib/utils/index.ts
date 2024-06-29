@@ -6,6 +6,7 @@ export * from './context-utils';
 export * from './log-utils';
 export * from './namespace-utils';
 export * from './object-utils';
+export * from './pod-identity-utils';
 export * from './proxy-utils';
 export * from './registry-utils';
 export * from './sa-utils';

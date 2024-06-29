@@ -40,6 +40,7 @@ The framework currently supports the following add-ons.
 | [`FluxcdAddOn`](./fluxcd.md)                                   | Setting up [Fluxcd](https://fluxcd.io/) to manage one or more Kubernetes clusters.                                 | ✅ | ✅
 | [`GpuOperatorAddon`](./gpu-operator.md)                      |  Deploys [NVIDIA GPU Operator](https://github.com/NVIDIA/gpu-operator) on your EKS Cluster to manage configuration of drivers and software dependencies for GPU instances  | ✅ | ✅ |
 | [`GrafanaOperatorAddon`](./grafana-operator.md)                                   | Deploys [GrafanaOperatorAddon](https://github.com/grafana-operator/grafana-operator#:~:text=The%20grafana%2Doperator%20is%20a,an%20easy%20and%20scalable%20way)  on your EKS Cluster to manage Amazon Managed Grafana and other external Grafana instances.                                 | ✅ | ✅ |
+| [`IngressNginxAddOn`](./ingress-nginx.md)                                  | Adds Kubernetes NGINX ingress controller  | ✅ | ✅ |                    
 | [`IstioBaseAddOn`](./istio-base.md)                                  | Adds support for Istio base chart to the EKS cluster. | ✅ | ✅ |
 | [`InstanaAddOn`](./instana-addon.md)                                  | Adds the IBM® [Instana®](https://www.ibm.com/products/instana) [Agent Operator](https://github.com/instana/instana-agent-operator) to the EKS cluster. | ✅ | ✅ |
 | [`IstioControlPlaneAddOn`](./istio-control-plane.md)                | Installs Istio Control Plane addon to the EKS cluster. | ✅ | ✅ |

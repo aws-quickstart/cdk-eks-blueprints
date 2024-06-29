@@ -70,7 +70,7 @@ log into Kubeflow pipeline UI by creating a port-forward to the ml-pipeline-ui s
 kubectl port-forward svc/ml-pipeline-ui 9000:80 -n =kubeflow-pipelines
 ```
 and open this browser: http://localhost:9000/#/pipelines
-more pipeline examples can be found at https://www.kubeflow.org/docs/components/pipelines/tutorials/
+more pipeline examples can be found at https://www.kubeflow.org/docs/components/pipelines/legacy-v1/tutorials/
 
 
 ## Cleanup

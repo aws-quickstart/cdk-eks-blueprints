@@ -121,6 +121,11 @@ export default class BlueprintConstruct {
                     controller: { service: { create: false } }
                 }
             }),
+            new blueprints.addons.IngressNginxAddOn({
+                values: {
+                controller: {service: {type: "ClusterIP"} }
+                }
+            }),
             // new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
@@ -232,7 +237,11 @@ export default class BlueprintConstruct {
             new blueprints.ExternalsSecretsAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
             new blueprints.NeuronDevicePluginAddOn(),
-            new blueprints.NeuronMonitorAddOn()
+            new blueprints.NeuronMonitorAddOn(),
+            new blueprints.UpboundCrossplaneAddOn({
+                skipVersionValidation: true,
+                clusterAccessRole: blueprints.getNamedResource("node-role")
+            })
         ];
 
         // Instantiated to for helm version check.

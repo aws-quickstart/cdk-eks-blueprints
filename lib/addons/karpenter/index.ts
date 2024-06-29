@@ -1,21 +1,22 @@
+import * as assert from "assert";
+import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
+import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Rule } from 'aws-cdk-lib/aws-events';
+import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { Construct } from "constructs";
+import * as semver from 'semver';
 import { merge } from 'ts-deepmerge';
-import { ClusterInfo, Values, BlockDeviceMapping, Taint, Sec, Min, Hour } from '../../spi';
+import * as md5 from 'ts-md5';
+import { BlockDeviceMapping, ClusterInfo, Hour, Min, Sec, Taint, Values } from '../../spi';
 import * as utils from '../../utils';
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '../helm-addon';
 import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam';
-import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
-import * as md5 from 'ts-md5';
-import * as semver from 'semver';
-import * as assert from "assert";
-import * as sqs from 'aws-cdk-lib/aws-sqs';
-import { Rule } from 'aws-cdk-lib/aws-events';
-import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
-import { Cluster, KubernetesVersion, KubernetesManifest } from 'aws-cdk-lib/aws-eks';
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
+        [KubernetesVersion.V1_30.version, '0.37.0'],
         [KubernetesVersion.V1_29.version, '0.34.0'],
         [KubernetesVersion.V1_28.version, '0.31.0'],
         [KubernetesVersion.V1_27.version, '0.28.0'],
@@ -275,6 +276,19 @@ export interface KarpenterAddOnProps extends HelmAddOnUserProps {
      * Timeout duration while installing karpenter helm chart using addHelmChart API
      */
     helmChartTimeout?: Duration,
+
+    /**
+     * Use Pod Identity.
+     * To use EKS Pod Identities
+     *  - The cluster must have Kubernetes version 1.24 or later
+     *  - Karpenter Pods must be assigned to Linux Amazon EC2 instances
+     *  - Karpenter version supports Pod Identity (v0.35.0 or later) see https://docs.aws.amazon.com/eks/latest/userguide/pod-identity.html
+     *
+     * @see https://docs.aws.amazon.com/eks/latest/userguide/pod-identity.html
+     *
+     * @default false
+     */
+    podIdentity?: boolean,
 }
 
 const KARPENTER = 'karpenter';
@@ -321,6 +335,8 @@ export class KarpenterAddOn extends HelmAddOn {
 
         const interruption = this.options.interruptionHandling || false;
         const installCRDs = this.options.installCRDs || false;
+
+        const podIdentity = this.options.podIdentity || false;
 
         // NodePool variables
         const labels = this.options.nodePoolSpec?.labels || {};
@@ -446,7 +462,16 @@ export class KarpenterAddOn extends HelmAddOn {
 
         // Create Namespace
         const ns = utils.createNamespace(this.options.namespace!, cluster, true, true);
-        const sa = utils.createServiceAccount(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
+
+        let sa: any;
+        let saAnnotation: any;
+        if (podIdentity && semver.gte(`${clusterInfo.version.version}.0`, '1.24.0') && semver.gte(version, "v0.35.0")){
+          sa = utils.podIdentityAssociation(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
+          saAnnotation = {};
+        } else {
+          sa = utils.createServiceAccount(cluster, RELEASE, this.options.namespace!, karpenterPolicyDocument);
+          saAnnotation = {"eks.amazonaws.com/role-arn": sa.role.roleArn};
+        }
         sa.node.addDependency(ns);
 
         // Create global helm values based on v1beta1 migration as shown below:
@@ -473,13 +498,12 @@ export class KarpenterAddOn extends HelmAddOn {
             utils.setPath(values, "settings", merge(globalSettings, values?.settings ?? {}));
         }
 
+        // Let Helm create the service account if using pod identity
         const saValues = {
             serviceAccount: {
-                create: false,
+                create: podIdentity,
                 name: RELEASE,
-                annotations: {
-                    "eks.amazonaws.com/role-arn": sa.role.roleArn,
-                }
+                annotations: saAnnotation,
             }
         };
 
@@ -500,12 +524,12 @@ export class KarpenterAddOn extends HelmAddOn {
                 [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/v${version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
                 [ "karpenterk8s-ec2nodeclasses-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/v${version}/pkg/apis/crds/karpenter.k8s.aws_ec2nodeclasses.yaml`],
             ];
-            
+
             // loop over the CRD's and load the yaml and deploy the manifest
             for (const [crdName, crdUrl] of CRDs) {
                 const crdManifest = utils.loadExternalYaml(crdUrl);
                 const manifest = cluster.addManifest(crdName, crdManifest);
-                
+
                 // We want these installed before the karpenterChart, or helm will timeout waiting for it to stabilize
                 karpenterChart.node.addDependency(manifest);
             }
