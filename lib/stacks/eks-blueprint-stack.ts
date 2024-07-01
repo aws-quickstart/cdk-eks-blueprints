@@ -12,6 +12,7 @@ import {BlueprintConstructBuilder, EksBlueprintConstruct, EksBlueprintProps} fro
 export class BlueprintBuilder extends BlueprintConstructBuilder implements spi.AsyncStackBuilder {
     constructor() {
         super();
+        this.props = { ...this.props, ...{ compatibilityMode: true } };
     }
 
     public clone(region?: string, account?: string): BlueprintBuilder {
@@ -21,6 +22,16 @@ export class BlueprintBuilder extends BlueprintConstructBuilder implements spi.A
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
+    }
+
+    /**
+     * Sets compatibility mode
+     * @param compatibilityMode if true will attach blueprints resources directly to the stack.
+     * @returns 
+     */
+    public compatibilityMode(compatibilityMode: boolean): BlueprintBuilder {
+        this.props = { ...this.props, ...{ compatibilityMode } };
+        return this;
     }
 
     public async buildAsync(scope: Construct, id: string, stackProps?: cdk.StackProps): Promise<EksBlueprint> {
