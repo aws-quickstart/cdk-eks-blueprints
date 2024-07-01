@@ -10,7 +10,7 @@ K10’s application-centric approach and deep integrations with relational and N
 
 Given K10’s extensive ecosystem support you have the flexibility to choose environments (public/ private/ hybrid cloud/ on-prem) and Kubernetes distributions (cloud vendor managed or self managed) in support of three principal use cases:
 
--   [Backup and Restore](https://www.kasten.io/kubernetes/use-cases/backup-restore)
+-   [Backup and Restore](https://www.kasten.io/kubernetes/)
     
 -   [Disaster Recovery](https://www.kasten.io/kubernetes/use-cases/disaster-recovery/)
     
