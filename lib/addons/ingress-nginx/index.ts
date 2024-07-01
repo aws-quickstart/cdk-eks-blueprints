@@ -8,7 +8,6 @@ import { setPath } from "../../utils/object-utils";
 import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadBalancerControllerAddOn } from "..";
-import { load } from "js-yaml";
 
 /**
  * Properties available to configure the nginx ingress controller.

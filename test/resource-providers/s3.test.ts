@@ -1,7 +1,7 @@
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import * as blueprints from "../../lib";
-import {EksBlueprintConstruct, GlobalResources} from "../../lib";
+import { GlobalResources } from "../../lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 
 describe("S3BucketProvider", () => {
