@@ -133,3 +133,6 @@ function populateDefaults(defaultProps: AckAddOnProps, props?: AckAddOnProps): A
   tempProps.saName = tempProps.saName ?? `${tempProps.chart}-sa`;
   return tempProps as AckAddOnProps;
 }
+
+// export at end since classes inside extend AckAddOn
+export * from "./service";
