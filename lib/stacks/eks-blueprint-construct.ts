@@ -79,6 +79,11 @@ export class EksBlueprintProps {
      * GitOps modes to be enabled. If not specified, GitOps mode is not enabled.
      */
     readonly enableGitOpsMode?: spi.GitOpsMode;
+
+    /**
+     * When set to true, will not use extra nesting for blueprint resources and attach them directly to the stack.
+     */
+    readonly compatibilityMode?: boolean;
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -203,11 +208,13 @@ export class EksBlueprintConstruct extends Construct {
 
     private clusterInfo: spi.ClusterInfo;
 
-    constructor(scope: Construct, blueprintProps: EksBlueprintProps) {
-        super(scope, blueprintProps.id);
+    constructor(parent: Construct, blueprintProps: EksBlueprintProps) {
+        super(parent, blueprintProps.id + "-ct" );
         this.validateInput(blueprintProps);
 
-        const resourceContext = this.provideNamedResources(blueprintProps);
+        const scope = blueprintProps.compatibilityMode ? parent : this;
+
+        const resourceContext = this.provideNamedResources(blueprintProps, scope);
 
         let vpcResource: IVpc | undefined = resourceContext.get(spi.GlobalResources.Vpc);
 
@@ -233,7 +240,7 @@ export class EksBlueprintConstruct extends Construct {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(this, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
+        this.clusterInfo = clusterProvider.createCluster(scope, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
         this.clusterInfo.setResourceContext(resourceContext);
 
         if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {
@@ -314,8 +321,8 @@ export class EksBlueprintConstruct extends Construct {
         return this.clusterInfo;
     }
 
-    private provideNamedResources(blueprintProps: EksBlueprintProps): spi.ResourceContext {
-        const result = new spi.ResourceContext(this, blueprintProps);
+    private provideNamedResources(blueprintProps: EksBlueprintProps, scope: Construct): spi.ResourceContext {
+        const result = new spi.ResourceContext(scope, blueprintProps);
 
         for (let [key, value] of blueprintProps.resourceProviders ?? []) {
             result.add(key, value);

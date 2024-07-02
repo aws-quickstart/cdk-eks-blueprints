@@ -150,6 +150,12 @@ export interface IngressNginxAddOnProps extends HelmAddOnUserProps {
      * @default "3600"
      */
     idleTimeout?: string;
+
+    /**
+     * Kubernetes service type for the ingress controller. Supported values are 'ClusterIP', 'LoadBalancer' and 'NodePort'.
+     * @default 'LoadBalancer'
+     */
+    serviceType?: string;
 }
 
 // Set default properties for the add-on
@@ -169,6 +175,7 @@ const defaultProps: IngressNginxAddOnProps = {
     httpsTargetPort: 'https',
     forceSSLRedirect: true,
     loadBalancerType: 'external',
+    serviceType: "LoadBalancer",
     idleTimeout: '3600'
 };
 
@@ -189,7 +196,7 @@ export class IngressNginxAddOn extends HelmAddOn {
         const props = this.options;
 
         // Setup service annotations based on the properties provided
-        const presetAnnotations: any = {
+        const loadBalancerAnnotations: any = {
             'service.beta.kubernetes.io/aws-load-balancer-backend-protocol': props.backendProtocol,
             'service.beta.kubernetes.io/aws-load-balancer-attributes': `load_balancing.cross_zone.enabled=${props.crossZoneEnabled}`,
             'service.beta.kubernetes.io/aws-load-balancer-scheme': props.internetFacing ? 'internet-facing' : 'internal',
@@ -203,7 +210,7 @@ export class IngressNginxAddOn extends HelmAddOn {
         const values: Values = {
             controller: {
                 service: {
-                    annotations: presetAnnotations
+                    annotations: props.serviceType == 'LoadBalancer' ? loadBalancerAnnotations : {}
                 },
                 ingressClassResource: {
                     name: props.ingressClassName || "ingress-nginx",
@@ -224,10 +231,10 @@ export class IngressNginxAddOn extends HelmAddOn {
         }
 
         if (certificateResourceARN) {
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = props.sslPort;
-            presetAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificateResourceARN;
+            loadBalancerAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-ports'] = props.sslPort;
+            loadBalancerAnnotations['service.beta.kubernetes.io/aws-load-balancer-ssl-cert'] = certificateResourceARN;
             if (props.forceSSLRedirect) {
-                presetAnnotations['nginx.ingress.kubernetes.io/force-ssl-redirect'] = true;
+                loadBalancerAnnotations['nginx.ingress.kubernetes.io/force-ssl-redirect'] = true;
             }
         }
 

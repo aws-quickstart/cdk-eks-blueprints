@@ -63,6 +63,13 @@ builder()
     )
     .build(app, 'ingress-nginx-blueprint');
 
+    bp.EksBlueprint.builder()
+        .account(process.env.CDK_DEFAULT_ACCOUNT)
+        .region(process.env.CDK_DEFAULT_REGION)
+        .version(KubernetesVersion.V1_29)
+        .compatibilityMode(false)
+        .build(app, 'eks-blueprint');
+
 function buildArgoBootstrap() {
     return new bp.addons.ArgoCDAddOn({
         bootstrapRepo: {
