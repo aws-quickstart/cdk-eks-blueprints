@@ -519,10 +519,11 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         if (semver.gte(version, "0.32.0") && installCRDs){
-            // Since v0.35.0, Karpenter OCI tags and Helm chart version are now valid semantic versions,
-            // meaning that the v prefix from the git tag has been removed and they now follow the x.y.z pattern
-            // But the CRDs URL still uses the git tag format, so we need to check for the version and adjust the URL accordingly
-            let _version = (semver.gte(version, "0.35.0")) ? `v${version}` : version;
+            let _version = version;
+            if(!version.startsWith('v')) {
+                _version = `v${version}`;
+            }
+
             const CRDs =[
                 [ "karpentersh-nodepool-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${_version}/pkg/apis/crds/karpenter.sh_nodepools.yaml` ],
                 [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${_version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
