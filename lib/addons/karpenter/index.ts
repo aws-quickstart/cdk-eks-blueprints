@@ -519,10 +519,15 @@ export class KarpenterAddOn extends HelmAddOn {
         }
 
         if (semver.gte(version, "0.32.0") && installCRDs){
+            let _version = version;
+            if(!version.startsWith('v')) {
+                _version = `v${version}`;
+            }
+
             const CRDs =[
-                [ "karpentersh-nodepool-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodepools.yaml` ],
-                [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
-                [ "karpenterk8s-ec2nodeclasses-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${version}/pkg/apis/crds/karpenter.k8s.aws_ec2nodeclasses.yaml`],
+                [ "karpentersh-nodepool-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${_version}/pkg/apis/crds/karpenter.sh_nodepools.yaml` ],
+                [ "karpentersh-nodeclaims-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${_version}/pkg/apis/crds/karpenter.sh_nodeclaims.yaml`],
+                [ "karpenterk8s-ec2nodeclasses-beta1-crd", `https://raw.githubusercontent.com/aws/karpenter/${_version}/pkg/apis/crds/karpenter.k8s.aws_ec2nodeclasses.yaml`],
             ];
 
             // loop over the CRD's and load the yaml and deploy the manifest
