@@ -38,13 +38,13 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
           type: "karpenter-test"
       },
       annotations: {
-          "eks-blueprints/owner": "young"
+          "eks-blueprints/owner": "platform-team"
       },
       requirements: [
           { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.large'] },
           { key: 'topology.kubernetes.io/zone', operator: 'In', values: [`${region}a`, `${region}b`, `${region}c`] },
           { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
-          { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['on-demand']},
+          { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['on-demand']}, // spot is also supported for cost savings, please see #2 above
       ],
       disruption: {
           consolidationPolicy: "WhenEmpty",
