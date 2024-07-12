@@ -63,12 +63,39 @@ builder()
     )
     .build(app, 'ingress-nginx-blueprint');
 
-    bp.EksBlueprint.builder()
-        .account(process.env.CDK_DEFAULT_ACCOUNT)
-        .region(process.env.CDK_DEFAULT_REGION)
-        .version(KubernetesVersion.V1_29)
-        .compatibilityMode(false)
-        .build(app, 'eks-blueprint');
+bp.EksBlueprint.builder()
+    .account(process.env.CDK_DEFAULT_ACCOUNT)
+    .region(process.env.CDK_DEFAULT_REGION)
+    .version(KubernetesVersion.V1_29)
+    .compatibilityMode(false)
+    .build(app, 'eks-blueprint');
+
+const karpenterClusterName = "karpenter-test";
+const karpenterAddOn = createKarpenterAddOn(karpenterClusterName);
+
+bp.EksBlueprint.builder()
+    .account(process.env.CDK_DEFAULT_ACCOUNT)
+    .region(process.env.CDK_DEFAAULT_REGION!)
+    .version(KubernetesVersion.V1_28)
+    .addOns(
+        new bp.addons.ArgoCDAddOn(),
+        new bp.addons.CalicoOperatorAddOn(),
+        new bp.addons.MetricsServerAddOn(),
+        new bp.addons.CoreDnsAddOn(),
+        new bp.addons.AwsLoadBalancerControllerAddOn(),
+        new bp.addons.EksPodIdentityAgentAddOn(),
+        new bp.addons.VpcCniAddOn(),
+        new bp.addons.KubeProxyAddOn(),
+        new bp.addons.CloudWatchLogsAddon({
+            namespace: 'aws-for-fluent-bit',
+            createNamespace: true,
+            serviceAccountName: 'aws-fluent-bit-for-cw-sa',
+            logGroupPrefix: `/aws/eks/${karpenterClusterName}`,
+            logRetentionDays: 7
+        }),
+        karpenterAddOn
+    )
+    .build(app, karpenterClusterName);
 
 function buildArgoBootstrap() {
     return new bp.addons.ArgoCDAddOn({
@@ -103,5 +130,43 @@ function buildArgoBootstrap() {
                 }
             }
         }
+    });
+}
+
+function createKarpenterAddOn(clusterName: string) {
+    return new bp.addons.KarpenterAddOn({
+        version: 'v0.33.1',
+        nodePoolSpec: {
+            labels: {
+                type: "karpenter-test"
+            },
+            annotations: {
+                "eks-blueprints/owner": "young",
+            },
+            taints: [{
+                key: "workload",
+                value: "test",
+                effect: "NoSchedule",
+            }],
+            requirements: [
+                { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.large'] },
+                { key: 'topology.kubernetes.io/zone', operator: 'In', values: ['us-west-2a', 'us-west-2b', 'us-west-2c'] },
+                { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64', 'arm64'] },
+                { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['on-demand'] },
+            ],
+            disruption: {
+                consolidationPolicy: "WhenEmpty",
+                consolidateAfter: "30s",
+                expireAfter: "20m",
+                //budgets: [{ nodes: "10%" }]
+            }
+        },
+        ec2NodeClassSpec: {
+            amiFamily: "AL2",
+            subnetSelectorTerms: [{ tags: { "Name": `${clusterName}/${clusterName}-vpc/PrivateSubnet*` }}],
+            securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${clusterName}` }}],
+        },
+        interruptionHandling: true,
+        podIdentity: false, // Recommended, otherwise, set false (as default) to use IRSA
     });
 }
