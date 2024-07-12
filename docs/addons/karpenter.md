@@ -28,6 +28,8 @@ import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
 
 const app = new cdk.App();
+const blueprintID = "my-stack-name"
+const region = "us-west-2"
 
 const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
     version: 'v0.33.1',
@@ -36,39 +38,34 @@ const karpenterAddOn = new blueprints.addons.KarpenterAddOn({
           type: "karpenter-test"
       },
       annotations: {
-          "eks-blueprints/owner": "young"
+          "eks-blueprints/owner": "platform-team"
       },
-      taints: [{
-          key: "workload",
-          value: "test",
-          effect: "NoSchedule",
-      }],
       requirements: [
-          { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.2xlarge'] },
-          { key: 'topology.kubernetes.io/zone', operator: 'In', values: ['us-west-2a','us-west-2b', 'us-west-2c']},
+          { key: 'node.kubernetes.io/instance-type', operator: 'In', values: ['m5.large'] },
+          { key: 'topology.kubernetes.io/zone', operator: 'In', values: [`${region}a`, `${region}b`, `${region}c`] },
           { key: 'kubernetes.io/arch', operator: 'In', values: ['amd64','arm64']},
-          { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['spot']},
+          { key: 'karpenter.sh/capacity-type', operator: 'In', values: ['on-demand']}, // spot is also supported for cost savings, please see #2 above
       ],
       disruption: {
           consolidationPolicy: "WhenEmpty",
           consolidateAfter: "30s",
           expireAfter: "20m",
-          budgets: [{nodes: "10%"}]
+          // budgets: [{nodes: "10%"}] // budgets are supported in versions 0.34+
       }
     },
     ec2NodeClassSpec: {
       amiFamily: "AL2",
-      subnetSelectorTerms: [{ tags: { "Name": "my-stack-name/my-stack-name-vpc/PrivateSubnet*" }}],
-      securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": "my-stack-name" }}],
+      subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` } }],
+      securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` } }],
     },
     interruptionHandling: true,
-    podIdentity: true, // Recommended, otherwise, set false (as default) to use IRSA
+    podIdentity: false, // Recommended true if using version 0.35+; otherwise, set false (as default) to use IRSA.
 });
 
 const blueprint = blueprints.EksBlueprint.builder()
   .version(KubernetesVersion.V1_28)
   .addOns(karpenterAddOn)
-  .build(app, 'my-stack-name');
+  .build(app, blueprintID);
 ```
 
 The add-on automatically sets Helm Chart [values](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter#values), and it is **recommended** not to pass custom values for the following:
