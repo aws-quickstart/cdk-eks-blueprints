@@ -298,6 +298,37 @@ export interface VpcCniAddOnProps {
   enableWindowsIpam?: boolean;
 
   /**
+   * Enable prefix delegation for windows
+   */
+  enableWindowsPrefixDelegation?: boolean;
+
+  /**
+   * `warm-prefix-target` value in amazon-vpc-cni config map. Format integer.
+   * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon
+   * should attempt to keep available for pod assignment on the node.
+   */
+  warmWindowsPrefixTarget?: boolean;
+
+  /**
+   * `warm-ip-target` value in amazon-vpc-cni config map. Format integer.
+   * Specifies the number of free IP addresses that the ipamd daemon
+   * should attempt to keep available for pod assignment on Windows nodes.
+   */
+  warmWindowsIPTarget?: boolean;
+
+  /**
+   * `minimum-ip-target` value in amazon-vpc-cni config map. Format integer.
+   * Specifies the number of total IP addresses that the ipamd
+   * daemon should attempt to allocate for pod assignment on a Window nodes.
+   */
+  minimumWindowsIPTarget?: boolean;
+
+  /**
+   * `branch-eni-cooldown` value in amazon-vpc-cni config map. Format integer.
+   */
+  branchENICooldown?: boolean;
+
+  /**
    * Version of the add-on to use. Must match the version of the cluster where it
    * will be deployed.
    */
@@ -450,7 +481,12 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       WARM_PREFIX_TARGET: props?.warmPrefixTarget,
     },
     enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
-    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam)
+    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam),
+    enableWindowsPrefixDelegation: JSON.stringify(props?.enableWindowsPrefixDelegation),
+    warmWindowsPrefixTarget: JSON.stringify(props?.warmWindowsPrefixTarget),
+    warmWindowsIPTarget: JSON.stringify(props?.warmWindowsIPTarget),
+    minimumWindowsIPTarget: JSON.stringify(props?.minimumWindowsIPTarget),
+    branchENICooldown: JSON.stringify(props?.branchENICooldown)
   };
 
   // clean up all undefined
