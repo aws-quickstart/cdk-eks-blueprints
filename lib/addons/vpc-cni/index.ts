@@ -298,14 +298,14 @@ export interface VpcCniAddOnProps {
   enableWindowsIpam?: boolean;
 
   /**
-   * Enable prefix delegation for windows
+   * Enable prefix delegation for Windows nodes
    */
   enableWindowsPrefixDelegation?: boolean;
 
   /**
    * `warm-prefix-target` value in amazon-vpc-cni config map. Format integer.
    * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon
-   * should attempt to keep available for pod assignment on the node.
+   * should attempt to keep available for pod assignment on Windows nodes.
    */
   warmWindowsPrefixTarget?: number;
 
@@ -319,7 +319,7 @@ export interface VpcCniAddOnProps {
   /**
    * `minimum-ip-target` value in amazon-vpc-cni config map. Format integer.
    * Specifies the number of total IP addresses that the ipamd
-   * daemon should attempt to allocate for pod assignment on a Window nodes.
+   * daemon should attempt to allocate for pod assignment on a Windows nodes.
    */
   minimumWindowsIPTarget?: number;
 
