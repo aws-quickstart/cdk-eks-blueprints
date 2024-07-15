@@ -210,12 +210,17 @@ export class CoreAddOn implements ClusterAddOn {
             logger.warn(`Failed to retrieve add-on versions from EKS for add-on ${this.coreAddOnProps.addOnName}.`);
             logger.warn("Possible reasons for failures - Unauthorized or Authentication failure or Network failure on the terminal.");
             logger.warn(" Falling back to default version.");
-            if (!versionMap) {
-                throw new Error(`No version map provided and no default version found for add-on ${this.coreAddOnProps.addOnName}`);
-            }
-            let version: string = versionMap.get(clusterInfo.version) ?? versionMap.values().next().value;
+            let version: string = this.provideDefaultAutoVersion(clusterInfo.version);
             userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
             return version;
         }
+    }
+
+    provideDefaultAutoVersion(version: KubernetesVersion) : string {
+        const versionMap = this.coreAddOnProps.versionMap;
+        if (versionMap) {
+            return versionMap.get(version) ?? versionMap.values().next().value;
+        }
+        throw new Error(`No default version found for add-on ${this.coreAddOnProps.addOnName}`);
     }
 }

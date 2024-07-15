@@ -3,6 +3,7 @@ import * as blueprints from '../lib';
 import {CloudWatchInsightsAddOnProps, Values} from "../lib";
 import {Match, Template} from "aws-cdk-lib/assertions";
 import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
+import { add } from 'lodash';
 
 const customAgentConfig: Values = {
   "agent": {
@@ -76,20 +77,22 @@ describe('Unit test for CloudWatch Addon', () => {
     });
   });
 
-  test("Stack is defined when using a specified version of EKS", async () => {
+  test("Stack is defined when using a specified version of EKS and \"auto\" version", async () => {
     const app = new cdk.App();
-
+    
+    const addOn = new blueprints.CloudWatchInsights();
+    const version = KubernetesVersion.V1_29;
     const blueprint = await blueprints.EksBlueprint.builder()
-      .version(KubernetesVersion.V1_29)
+      .version(version)
       .account("123456789012").region('us-east-2')
-      .addOns(new blueprints.CloudWatchInsights())
+      .addOns(addOn)
       .buildAsync(app,  'cloudwatch-insights-specific-eks-version');
 
     const template = Template.fromStack(blueprint);
 
     template.hasResource("AWS::EKS::Addon", {
       Properties: {
-        "AddonVersion": Match.exact("v1.7.0-eksbuild.1")
+        "AddonVersion": Match.exact(addOn.provideDefaultAutoVersion(version))
       }
     });
   });
