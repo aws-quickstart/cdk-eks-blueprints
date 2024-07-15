@@ -483,10 +483,10 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
     enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
     enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam),
     enableWindowsPrefixDelegation: JSON.stringify(props?.enableWindowsPrefixDelegation),
-    warmWindowsPrefixTarget: JSON.stringify(props?.warmWindowsPrefixTarget),
-    warmWindowsIPTarget: JSON.stringify(props?.warmWindowsIPTarget),
-    minimumWindowsIPTarget: JSON.stringify(props?.minimumWindowsIPTarget),
-    branchENICooldown: JSON.stringify(props?.branchENICooldown)
+    warmWindowsPrefixTarget: props?.warmWindowsPrefixTarget,
+    warmWindowsIPTarget: props?.warmWindowsIPTarget,
+    minimumWindowsIPTarget: props?.minimumWindowsIPTarget,
+    branchENICooldown: props?.branchENICooldown
   };
 
   // clean up all undefined
