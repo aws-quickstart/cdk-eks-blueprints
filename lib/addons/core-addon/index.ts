@@ -177,7 +177,7 @@ export class CoreAddOn implements ClusterAddOn {
     }
 
     async provideVersion(clusterInfo: ClusterInfo, versionMap?: Map<KubernetesVersion, string>) : Promise<string> {
-        const client = new sdk.EKSClient(clusterInfo.cluster.stack.region);
+        const client = new sdk.EKSClient({ region: clusterInfo.cluster.stack.region });
         const command = new sdk.DescribeAddonVersionsCommand({
             addonName: this.coreAddOnProps.addOnName,
             kubernetesVersion: clusterInfo.version.version

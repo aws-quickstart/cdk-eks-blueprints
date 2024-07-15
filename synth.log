@@ -1,0 +1,1324 @@
+
+> @aws-quickstart/eks-blueprints@1.15.1 examples
+> cdk --app "npx ts-node examples/examples.ts" synth mng-blueprint
+
+[32m[1mDEBUG[22m[39m[0m[0m Core add-on vpc-cni is at version auto
+[32m[1mDEBUG[22m[39m[0m[0m Core add-on vpc-cni has autoselected version v1.18.1-eksbuild.3
+Description: Blueprints tracking (qs-1s1r465hk)
+Resources:
+  kmskey22164B3914:
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Statement:
+          - Action: kms:*
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::929819487611:root
+            Resource: "*"
+        Version: "2012-10-17"
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: mng-blueprint/kms-key-22/Resource
+  mngblueprintvpcAFFCE2E4:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/Resource
+  mngblueprintvpcPublicSubnet1Subnet3B9CA50E:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.0.0/19
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet1
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/Subnet
+  mngblueprintvpcPublicSubnet1RouteTableBAC7B420:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet1
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/RouteTable
+  mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/RouteTableAssociation
+  mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: mngblueprintvpcIGWFDEDCEEB
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+    DependsOn:
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/DefaultRoute
+  mngblueprintvpcPublicSubnet1EIP70EEF434:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet1
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/EIP
+  mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - mngblueprintvpcPublicSubnet1EIP70EEF434
+          - AllocationId
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet1
+    DependsOn:
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet1/NATGateway
+  mngblueprintvpcPublicSubnet2SubnetDCC62763:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.32.0/19
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet2
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/Subnet
+  mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet2
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/RouteTable
+  mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet2SubnetDCC62763
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/RouteTableAssociation
+  mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: mngblueprintvpcIGWFDEDCEEB
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+    DependsOn:
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/DefaultRoute
+  mngblueprintvpcPublicSubnet2EIP4C853131:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet2
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/EIP
+  mngblueprintvpcPublicSubnet2NATGatewayB7040860:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - mngblueprintvpcPublicSubnet2EIP4C853131
+          - AllocationId
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet2SubnetDCC62763
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet2
+    DependsOn:
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet2/NATGateway
+  mngblueprintvpcPublicSubnet3Subnet879E4358:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1c
+      CidrBlock: 10.0.64.0/19
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet3
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/Subnet
+  mngblueprintvpcPublicSubnet3RouteTable5AF92D27:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet3
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/RouteTable
+  mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet3Subnet879E4358
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/RouteTableAssociation
+  mngblueprintvpcPublicSubnet3DefaultRoute3C86018A:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: mngblueprintvpcIGWFDEDCEEB
+      RouteTableId:
+        Ref: mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+    DependsOn:
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/DefaultRoute
+  mngblueprintvpcPublicSubnet3EIPBE09C507:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet3
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/EIP
+  mngblueprintvpcPublicSubnet3NATGateway57634EA2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - mngblueprintvpcPublicSubnet3EIPBE09C507
+          - AllocationId
+      SubnetId:
+        Ref: mngblueprintvpcPublicSubnet3Subnet879E4358
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PublicSubnet3
+    DependsOn:
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PublicSubnet3/NATGateway
+  mngblueprintvpcPrivateSubnet1Subnet8FBF6026:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.96.0/19
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1/Subnet
+  mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1/RouteTable
+  mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      SubnetId:
+        Ref: mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1/RouteTableAssociation
+  mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet1/DefaultRoute
+  mngblueprintvpcPrivateSubnet2Subnet1EEF3552:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.128.0/19
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2/Subnet
+  mngblueprintvpcPrivateSubnet2RouteTable9D070088:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2/RouteTable
+  mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      SubnetId:
+        Ref: mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2/RouteTableAssociation
+  mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet2RouteTable9D070088
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet2/DefaultRoute
+  mngblueprintvpcPrivateSubnet3Subnet6857C7C0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1c
+      CidrBlock: 10.0.160.0/19
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3/Subnet
+  mngblueprintvpcPrivateSubnet3RouteTable113F3CA1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: kubernetes.io/role/internal-elb
+          Value: "1"
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3/RouteTable
+  mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      SubnetId:
+        Ref: mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3/RouteTableAssociation
+  mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      RouteTableId:
+        Ref: mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/PrivateSubnet3/DefaultRoute
+  mngblueprintvpcIGWFDEDCEEB:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: mng-blueprint/mng-blueprint-vpc
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/IGW
+  mngblueprintvpcVPCGWCF88211A:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId:
+        Ref: mngblueprintvpcIGWFDEDCEEB
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-vpc/VPCGW
+  mngblueprintkmskeyE270FA5F:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Key for EKS Cluster 'mng-blueprint'
+      KeyPolicy:
+        Statement:
+          - Action: kms:*
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::929819487611:root
+            Resource: "*"
+        Version: "2012-10-17"
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-kms-key/Resource
+  mngblueprintAccessRole7219A567:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::929819487611:root
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint-AccessRole/Resource
+  kubectllayer30FE27BA32:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      Content:
+        S3Bucket: cdk-hnb659fds-assets-929819487611-us-east-1
+        S3Key: bfbdea4d45250c8162c204fe0687cb775e24d61c895ad89e4ca6e9a7fc90b0f0.zip
+      Description: /opt/kubectl/kubectl 1.30; /opt/helm/helm 3.15
+      LicenseInfo: Apache-2.0
+    Metadata:
+      aws:cdk:path: mng-blueprint/kubectllayer30/Resource
+      aws:asset:path: asset.bfbdea4d45250c8162c204fe0687cb775e24d61c895ad89e4ca6e9a7fc90b0f0.zip
+      aws:asset:is-bundled: false
+      aws:asset:property: Content
+  mngblueprintKubectlHandlerRole6BB60002:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - Fn::If:
+            - mngblueprintHasEcrPublicA03D3153
+            - Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - :iam::aws:policy/AmazonElasticContainerRegistryPublicReadOnly
+            - Ref: AWS::NoValue
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/KubectlHandlerRole/Resource
+  mngblueprintKubectlHandlerRoleDefaultPolicy92A4675E:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: eks:DescribeCluster
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - mngblueprint5790702D
+                - Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - mngblueprintCreationRole9AEFA538
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: mngblueprintKubectlHandlerRoleDefaultPolicy92A4675E
+      Roles:
+        - Ref: mngblueprintKubectlHandlerRole6BB60002
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/KubectlHandlerRole/DefaultPolicy/Resource
+  mngblueprintRole4F7A82C3:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: eks.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEKSClusterPolicy
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Role/Resource
+  mngblueprintControlPlaneSecurityGroupBF0AE3DB:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EKS Control Plane Security Group
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: mngblueprintvpcAFFCE2E4
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/ControlPlaneSecurityGroup/Resource
+  mngblueprintCreationRole9AEFA538:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454
+                  - Outputs.mngblueprintawscdkawseksClusterResourceProviderOnEventHandlerServiceRoleBD2C7D44Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454
+                  - Outputs.mngblueprintawscdkawseksClusterResourceProviderIsCompleteHandlerServiceRole287ED8C5Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - mngblueprintKubectlHandlerRole6BB60002
+                  - Arn
+        Version: "2012-10-17"
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Resource/CreationRole/Resource
+  mngblueprintCreationRoleDefaultPolicyA08D3612:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: iam:PassRole
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - mngblueprintRole4F7A82C3
+                - Arn
+          - Action:
+              - eks:CreateCluster
+              - eks:DescribeCluster
+              - eks:DescribeUpdate
+              - eks:DeleteCluster
+              - eks:UpdateClusterVersion
+              - eks:UpdateClusterConfig
+              - eks:CreateFargateProfile
+              - eks:TagResource
+              - eks:UntagResource
+            Effect: Allow
+            Resource:
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :eks:us-east-1:929819487611:cluster/mng-blueprint
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :eks:us-east-1:929819487611:cluster/mng-blueprint/*
+          - Action:
+              - eks:DescribeFargateProfile
+              - eks:DeleteFargateProfile
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - :eks:us-east-1:929819487611:fargateprofile/mng-blueprint/*
+          - Action:
+              - iam:GetRole
+              - iam:listAttachedRolePolicies
+            Effect: Allow
+            Resource: "*"
+          - Action: iam:CreateServiceLinkedRole
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - ec2:DescribeInstances
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeRouteTables
+              - ec2:DescribeDhcpOptions
+              - ec2:DescribeVpcs
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:CreateGrant
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - mngblueprintkmskeyE270FA5F
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: mngblueprintCreationRoleDefaultPolicyA08D3612
+      Roles:
+        - Ref: mngblueprintCreationRole9AEFA538
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Resource/CreationRole/DefaultPolicy/Resource
+  mngblueprint5790702D:
+    Type: Custom::AWSCDK-EKS-Cluster
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454
+          - Outputs.mngblueprintawscdkawseksClusterResourceProviderframeworkonEvent01DF8FD9Arn
+      Config:
+        name: mng-blueprint
+        version: "1.30"
+        roleArn:
+          Fn::GetAtt:
+            - mngblueprintRole4F7A82C3
+            - Arn
+        encryptionConfig:
+          - provider:
+              keyArn:
+                Fn::GetAtt:
+                  - mngblueprintkmskeyE270FA5F
+                  - Arn
+            resources:
+              - secrets
+        kubernetesNetworkConfig:
+          ipFamily: ipv4
+        resourcesVpcConfig:
+          subnetIds:
+            - Ref: mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+            - Ref: mngblueprintvpcPublicSubnet2SubnetDCC62763
+            - Ref: mngblueprintvpcPublicSubnet3Subnet879E4358
+          securityGroupIds:
+            - Fn::GetAtt:
+                - mngblueprintControlPlaneSecurityGroupBF0AE3DB
+                - GroupId
+          endpointPublicAccess: true
+          endpointPrivateAccess: true
+        logging:
+          clusterLogging:
+            - enabled: true
+              types:
+                - api
+                - audit
+        accessConfig: {}
+      AssumeRoleArn:
+        Fn::GetAtt:
+          - mngblueprintCreationRole9AEFA538
+          - Arn
+      AttributesRevision: 3
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+      - mngblueprintCreationRoleDefaultPolicyA08D3612
+      - mngblueprintCreationRole9AEFA538
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Resource/Resource/Default
+  mngblueprintKubectlReadyBarrier53020045:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Value: aws:cdk:eks:kubectl-ready
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+      - mngblueprintCreationRoleDefaultPolicyA08D3612
+      - mngblueprintCreationRole9AEFA538
+      - mngblueprint5790702D
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/KubectlReadyBarrier
+  mngblueprintAwsAuthmanifestB110FE96:
+    Type: Custom::AWSCDK-EKS-KubernetesResource
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - awscdkawseksKubectlProviderNestedStackawscdkawseksKubectlProviderNestedStackResourceA7AEBA6B
+          - Outputs.mngblueprintawscdkawseksKubectlProviderframeworkonEvent5C90A428Arn
+      Manifest:
+        Fn::Join:
+          - ""
+          - - '[{"apiVersion":"v1","kind":"ConfigMap","metadata":{"name":"aws-auth","namespace":"kube-system","labels":{"aws.cdk.eks/prune-c8a1f4a86dbe8fce75ca82e60e9f40014c654f1cfd":""}},"data":{"mapRoles":"[{\"rolearn\":\"'
+            - Fn::GetAtt:
+                - mngblueprintAccessRole7219A567
+                - Arn
+            - \",\"username\":\"
+            - Fn::GetAtt:
+                - mngblueprintAccessRole7219A567
+                - Arn
+            - \",\"groups\":[\"system:masters\"]},{\"rolearn\":\"
+            - Fn::GetAtt:
+                - mngblueprintNodegroupeksblueprintsmngngNodeGroupRoleD65EB009
+                - Arn
+            - \",\"username\":\"system:node:{{EC2PrivateDNSName}}\",\"groups\":[\"system:bootstrappers\",\"system:nodes\"]}]","mapUsers":"[]","mapAccounts":"[]"}}]
+      ClusterName:
+        Ref: mngblueprint5790702D
+      RoleArn:
+        Fn::GetAtt:
+          - mngblueprintCreationRole9AEFA538
+          - Arn
+      PruneLabel: aws.cdk.eks/prune-c8a1f4a86dbe8fce75ca82e60e9f40014c654f1cfd
+      Overwrite: true
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+      - mngblueprintKubectlReadyBarrier53020045
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/AwsAuth/manifest/Resource/Default
+  mngblueprintNodegroupeksblueprintsmngngNodeGroupRoleD65EB009:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEKS_CNI_Policy
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Nodegroupeks-blueprints-mng-ng/NodeGroupRole/Resource
+  mngblueprintNodegroupeksblueprintsmngng47D72D50:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      AmiType: AL2_x86_64
+      ClusterName:
+        Ref: mngblueprint5790702D
+      ForceUpdateEnabled: true
+      InstanceTypes:
+        - m5.large
+      NodeRole:
+        Fn::GetAtt:
+          - mngblueprintNodegroupeksblueprintsmngngNodeGroupRoleD65EB009
+          - Arn
+      NodegroupName: eks-blueprints-mng
+      ScalingConfig:
+        DesiredSize: 1
+        MaxSize: 2
+        MinSize: 1
+      Subnets:
+        - Ref: mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+        - Ref: mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+        - Ref: mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+    DependsOn:
+      - mngblueprintvpcIGWFDEDCEEB
+      - mngblueprintvpcPrivateSubnet1DefaultRouteAE80D4AC
+      - mngblueprintvpcPrivateSubnet1RouteTableDA9EAD86
+      - mngblueprintvpcPrivateSubnet1RouteTableAssociationA13549EF
+      - mngblueprintvpcPrivateSubnet1Subnet8FBF6026
+      - mngblueprintvpcPrivateSubnet2DefaultRoute22C9A874
+      - mngblueprintvpcPrivateSubnet2RouteTable9D070088
+      - mngblueprintvpcPrivateSubnet2RouteTableAssociation4D6A8965
+      - mngblueprintvpcPrivateSubnet2Subnet1EEF3552
+      - mngblueprintvpcPrivateSubnet3DefaultRoute9A7D5EA9
+      - mngblueprintvpcPrivateSubnet3RouteTable113F3CA1
+      - mngblueprintvpcPrivateSubnet3RouteTableAssociation5F44E07C
+      - mngblueprintvpcPrivateSubnet3Subnet6857C7C0
+      - mngblueprintvpcPublicSubnet1DefaultRoute0FCA2101
+      - mngblueprintvpcPublicSubnet1EIP70EEF434
+      - mngblueprintvpcPublicSubnet1NATGatewayDC4ABA48
+      - mngblueprintvpcPublicSubnet1RouteTableBAC7B420
+      - mngblueprintvpcPublicSubnet1RouteTableAssociation978A664F
+      - mngblueprintvpcPublicSubnet1Subnet3B9CA50E
+      - mngblueprintvpcPublicSubnet2DefaultRoute0DE950E4
+      - mngblueprintvpcPublicSubnet2EIP4C853131
+      - mngblueprintvpcPublicSubnet2NATGatewayB7040860
+      - mngblueprintvpcPublicSubnet2RouteTable1F4EC1F8
+      - mngblueprintvpcPublicSubnet2RouteTableAssociation8409B980
+      - mngblueprintvpcPublicSubnet2SubnetDCC62763
+      - mngblueprintvpcPublicSubnet3DefaultRoute3C86018A
+      - mngblueprintvpcPublicSubnet3EIPBE09C507
+      - mngblueprintvpcPublicSubnet3NATGateway57634EA2
+      - mngblueprintvpcPublicSubnet3RouteTable5AF92D27
+      - mngblueprintvpcPublicSubnet3RouteTableAssociation770CC9D7
+      - mngblueprintvpcPublicSubnet3Subnet879E4358
+      - mngblueprintvpcAFFCE2E4
+      - mngblueprintvpcVPCGWCF88211A
+    Metadata:
+      aws:cdk:path: mng-blueprint/mng-blueprint/Nodegroupeks-blueprints-mng-ng/Resource
+  awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Join:
+          - ""
+          - - https://s3.us-east-1.
+            - Ref: AWS::URLSuffix
+            - /cdk-hnb659fds-assets-929819487611-us-east-1/23e6f7a957f649fca83fe0b6bc5a0e9ed52ce4e19e6684cde834e8a5b3101042.json
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: mng-blueprint/@aws-cdk--aws-eks.ClusterResourceProvider.NestedStack/@aws-cdk--aws-eks.ClusterResourceProvider.NestedStackResource
+      aws:asset:path: mngblueprintawscdkawseksClusterResourceProvider517BEEF7.nested.template.json
+      aws:asset:property: TemplateURL
+  awscdkawseksKubectlProviderNestedStackawscdkawseksKubectlProviderNestedStackResourceA7AEBA6B:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        referencetomngblueprintkubectllayer30A61BF605Ref:
+          Ref: kubectllayer30FE27BA32
+        referencetomngblueprintKubectlHandlerRole1F1F1949Arn:
+          Fn::GetAtt:
+            - mngblueprintKubectlHandlerRole6BB60002
+            - Arn
+      TemplateURL:
+        Fn::Join:
+          - ""
+          - - https://s3.us-east-1.
+            - Ref: AWS::URLSuffix
+            - /cdk-hnb659fds-assets-929819487611-us-east-1/d3ad50b8b2ddb664815e7dbf57a9a7bbe5cdda8c594d958d229772ecfc01ba5c.json
+    DependsOn:
+      - mngblueprintKubectlHandlerRoleDefaultPolicy92A4675E
+      - mngblueprintKubectlHandlerRole6BB60002
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: mng-blueprint/@aws-cdk--aws-eks.KubectlProvider.NestedStack/@aws-cdk--aws-eks.KubectlProvider.NestedStackResource
+      aws:asset:path: mngblueprintawscdkawseksKubectlProviderE6DFC808.nested.template.json
+      aws:asset:property: TemplateURL
+  vpccniaddOn:
+    Type: AWS::EKS::Addon
+    Properties:
+      AddonName: vpc-cni
+      AddonVersion: v1.18.1-eksbuild.3
+      ClusterName:
+        Ref: mngblueprint5790702D
+      ConfigurationValues: '{"init":{"env":{}},"env":{}}'
+      ResolveConflicts: OVERWRITE
+    Metadata:
+      aws:cdk:path: mng-blueprint/vpc-cni-addOn
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/1WR3U7DMAyFn4V7N5QViVtKhSY0fqoN7Ra5qTdC22SKnU1V1XdHaWGDq3NyYjmf44Uabm7vVHaFJ0503SStqdSwEdQN4Ik/hqZjNayoh2JnV9SPQHqhhu1Bx2BbFlCGqjV6EypLErOLW7sg9I5VS5f8kuXMThsU4+y5OJrHpzLKK8oShU7YQ+nNEYUujZ+skLd0LphJfk65COrPjqzAhnTwRvqld+EwMfwNRjDYqWHtZr5JS9caPTWc3QicfSAzCas8CnCmHoJuSB6QCVrsqhpVsbPP2JPfkuc4DzWshqINLOQhP3Ee5BNWoZqoiV/Qmh2xwKuraf8L9++Q17Wz4whrYhe8Jphe3wjujd1DEVhcd76L9H984Wxtfv/1LcghzIuJSx0hVenV/c+2r2f+pI3wSRMq0tImxyxVq9lvs3QabATralJffH1cpOom9vhiYxIfrJiO1HrWb335PJlOAgAA
+    Metadata:
+      aws:cdk:path: mng-blueprint/CDKMetadata/Default
+Conditions:
+  mngblueprintHasEcrPublicA03D3153:
+    Fn::Equals:
+      - Ref: AWS::Partition
+      - aws
+Outputs:
+  mngblueprintClusterName68B6B69F:
+    Value:
+      Ref: mngblueprint5790702D
+  mngblueprintConfigCommand045F6075:
+    Value:
+      Fn::Join:
+        - ""
+        - - "aws eks update-kubeconfig --name "
+          - Ref: mngblueprint5790702D
+          - " --region us-east-1 --role-arn "
+          - Fn::GetAtt:
+              - mngblueprintAccessRole7219A567
+              - Arn
+  mngblueprintGetTokenCommand099DE74F:
+    Value:
+      Fn::Join:
+        - ""
+        - - "aws eks get-token --cluster-name "
+          - Ref: mngblueprint5790702D
+          - " --region us-east-1 --role-arn "
+          - Fn::GetAtt:
+              - mngblueprintAccessRole7219A567
+              - Arn
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+
