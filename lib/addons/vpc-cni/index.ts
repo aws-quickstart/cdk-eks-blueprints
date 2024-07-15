@@ -307,26 +307,26 @@ export interface VpcCniAddOnProps {
    * Specifies the number of free IPv4(/28) prefixes that the ipamd daemon
    * should attempt to keep available for pod assignment on the node.
    */
-  warmWindowsPrefixTarget?: boolean;
+  warmWindowsPrefixTarget?: number;
 
   /**
    * `warm-ip-target` value in amazon-vpc-cni config map. Format integer.
    * Specifies the number of free IP addresses that the ipamd daemon
    * should attempt to keep available for pod assignment on Windows nodes.
    */
-  warmWindowsIPTarget?: boolean;
+  warmWindowsIPTarget?: number;
 
   /**
    * `minimum-ip-target` value in amazon-vpc-cni config map. Format integer.
    * Specifies the number of total IP addresses that the ipamd
    * daemon should attempt to allocate for pod assignment on a Window nodes.
    */
-  minimumWindowsIPTarget?: boolean;
+  minimumWindowsIPTarget?: number;
 
   /**
    * `branch-eni-cooldown` value in amazon-vpc-cni config map. Format integer.
    */
-  branchENICooldown?: boolean;
+  branchENICooldown?: number;
 
   /**
    * Version of the add-on to use. Must match the version of the cluster where it
