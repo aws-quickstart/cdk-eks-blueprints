@@ -3,7 +3,6 @@ import * as blueprints from '../lib';
 import {CloudWatchInsightsAddOnProps, Values} from "../lib";
 import {Match, Template} from "aws-cdk-lib/assertions";
 import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
-import { add } from 'lodash';
 
 const customAgentConfig: Values = {
   "agent": {
