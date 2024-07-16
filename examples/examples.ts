@@ -42,6 +42,7 @@ builder()
     .clusterProvider(new bp.MngClusterProvider({
         ...publicCluster
     }))
+    .addOns(new bp.addons.VpcCniAddOn())
     .enableControlPlaneLogTypes(bp.ControlPlaneLogType.API, bp.ControlPlaneLogType.AUDIT)
     .build(app, "mng-blueprint");
 
