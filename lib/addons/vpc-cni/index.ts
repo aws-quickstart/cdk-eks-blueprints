@@ -402,7 +402,7 @@ export class VpcCniAddOn extends CoreAddOn {
 }
 
   /**
-   * Iterates over all Values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
+   * Iterates over all values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
    */
 function ConvertPropertiesToString(helmValues: Values): void {
   Object.keys(helmValues).forEach(key => {
