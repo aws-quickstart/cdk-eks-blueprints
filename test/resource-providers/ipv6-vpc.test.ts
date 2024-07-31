@@ -1,7 +1,6 @@
 import { App } from "aws-cdk-lib";
 import * as blueprints from "../../lib";
 import {
-    EksBlueprintConstruct,
     GlobalResources,
 } from "../../lib";
 import {IpFamily} from "aws-cdk-lib/aws-eks";
@@ -21,8 +20,8 @@ describe("CreateIpv6VpcProvider", () => {
             .region("us-east-1")
             .version("auto")
             .build(app, "east-test-1");
-        const eksBlueprintConstruct = <EksBlueprintConstruct>stack.node.tryFindChild("east-test-1");
-        const vpc = <Vpc>eksBlueprintConstruct.node.tryFindChild('east-test-1-vpc');
+
+        const vpc = <Vpc>stack.node.tryFindChild('east-test-1-vpc');
         expect(vpc.vpcIpv6CidrBlocks);
     });
 
@@ -92,8 +91,7 @@ describe("CreateIpv6VpcProvider", () => {
             .region("us-east-1")
             .version("auto")
             .build(app, "east-test-1");
-        const eksBlueprintConstruct = <EksBlueprintConstruct>stack.node.tryFindChild("east-test-1");
-        const vpc = <Vpc>eksBlueprintConstruct.node.tryFindChild('east-test-1-vpc');
+        const vpc = <Vpc>stack.node.tryFindChild('east-test-1-vpc');
         expect(vpc.vpcIpv6CidrBlocks);
     });
 });

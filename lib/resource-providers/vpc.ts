@@ -17,14 +17,13 @@ interface VpcProps {
 /**
  * VPC resource provider 
  */
-export class VpcProvider extends Ipv6VpcProvider {
+export class VpcProvider implements ResourceProvider<ec2.IVpc> {
     readonly vpcId?: string;
     readonly primaryCidr?: string;
     readonly secondaryCidr?: string;
     readonly secondarySubnetCidrs?: string[];
 
     constructor(vpcId?: string, private vpcProps?: VpcProps) {
-        super(vpcId);
         this.vpcId = vpcId;
         this.primaryCidr = vpcProps?.primaryCidr;
         this.secondaryCidr = vpcProps?.secondaryCidr;
@@ -36,10 +35,11 @@ export class VpcProvider extends Ipv6VpcProvider {
         const ipFamily = context.blueprintProps.ipFamily;
 
         if (ipFamily == eks.IpFamily.IP_V6) {
-            return super.provide(context);
+            const ipv6VpcProvider:Ipv6VpcProvider = new Ipv6VpcProvider(this.vpcId);
+            return ipv6VpcProvider.provide(context);
         }
 
-        let vpc = this.getVPCFromId(context, id);
+        let vpc = getVPCFromId(context, id, this.vpcId);
         if (vpc == null) {
             // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
             // If VPC CIDR range is not provided, uses `10.0.0.0/16` as the range and creates public and private subnets per Availability Zone.
@@ -91,6 +91,26 @@ export class VpcProvider extends Ipv6VpcProvider {
             }
         }
     }
+}
+
+
+
+/*
+** This function will give return vpc based on the ResourceContext and vpcId passed to the cluster.
+ */
+export function getVPCFromId(context: ResourceContext, nodeId: string, vpcId?: string) {
+    let vpc = undefined;
+    if (vpcId) {
+        if (vpcId === "default") {
+            console.log(`looking up completely default VPC`);
+            vpc = ec2.Vpc.fromLookup(context.scope, nodeId + "-vpc", { isDefault: true });
+        } else {
+            console.log(`looking up non-default ${vpcId} VPC`);
+            vpc = ec2.Vpc.fromLookup(context.scope, nodeId + "-vpc", { vpcId: vpcId });
+            console.log(vpc);
+        }
+    }
+    return vpc;
 }
 
 export class DirectVpcProvider implements ResourceProvider<ec2.IVpc> {

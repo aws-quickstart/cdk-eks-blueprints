@@ -2,6 +2,7 @@ import {Fn} from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import {IpProtocol, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { ResourceContext, ResourceProvider } from "../spi";
+import {getVPCFromId} from "./vpc";
 
 /**
  * IPV6 VPC resource provider
@@ -15,7 +16,7 @@ export class Ipv6VpcProvider implements ResourceProvider<ec2.IVpc> {
 
     provide(context: ResourceContext): ec2.IVpc {
         const id = context.scope.node.id;
-        let vpc = this.getVPCFromId(context, id);
+        let vpc = getVPCFromId(context, id, this.vpcId);
         if (vpc == null) {
             // It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
             // Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
@@ -67,22 +68,4 @@ export class Ipv6VpcProvider implements ResourceProvider<ec2.IVpc> {
         cfnSubnet.assignIpv6AddressOnCreation = true;
     }
 
-    /*
-    ** This function will give return vpc based on the ResourceContext passed to the cluster.
-     */
-    getVPCFromId(context: ResourceContext, nodeId: string) {
-        let vpc = undefined;
-        const vpcId = this.vpcId;
-        if (vpcId) {
-            if (vpcId === "default") {
-                console.log(`looking up completely default VPC`);
-                vpc = ec2.Vpc.fromLookup(context.scope, nodeId + "-vpc", { isDefault: true });
-            } else {
-                console.log(`looking up non-default ${vpcId} VPC`);
-                vpc = ec2.Vpc.fromLookup(context.scope, nodeId + "-vpc", { vpcId: vpcId });
-                console.log(vpc);
-            }
-        }
-        return vpc;
-    }
 }

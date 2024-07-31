@@ -82,18 +82,15 @@ export class EksBlueprintProps {
     readonly enableGitOpsMode?: spi.GitOpsMode;
 
     /**
-<<<<<<< HEAD
      * When set to true, will not use extra nesting for blueprint resources and attach them directly to the stack.
      */
     readonly compatibilityMode?: boolean;
 
     /**
-     * Adding ipFamily to support IPv6 clusters. By default it uses IPv4 as the value.
-=======
-     *
->>>>>>> cfbe78ce (IPV6 EKS cluster code.)
+     * ipFamily to support IPv6 clusters. By default, it uses IPv4 as the value.
      */
     readonly ipFamily?: eks.IpFamily;
+
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -148,6 +145,14 @@ export class BlueprintConstructBuilder {
 
     public version(version: "auto" | KubernetesVersion): this {
         this.props = { ...this.props, ...{ version: version } };
+        return this;
+    }
+
+    /**
+     * Adding ipFamily method to support IPv6 clusters. By default, it uses IPv4 as the value.
+     */
+    public ipFamily(ipFamily:  eks.IpFamily = eks.IpFamily.IP_V4): this {
+        this.props = { ...this.props, ...{ ipFamily: ipFamily } };
         return this;
     }
 

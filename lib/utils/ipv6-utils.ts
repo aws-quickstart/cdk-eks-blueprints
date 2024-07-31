@@ -6,7 +6,7 @@
  */
 import {PolicyDocument} from "aws-cdk-lib/aws-iam";
 
-export function getEKSNodeIpv6PolicyDocument(){
+export function getEKSNodeIpv6PolicyDocument(): PolicyDocument {
     return PolicyDocument.fromJson({
         "Version": "2012-10-17",
         "Statement": [
