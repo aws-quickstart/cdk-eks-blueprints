@@ -401,19 +401,19 @@ export class VpcCniAddOn extends CoreAddOn {
   }
 }
 
-  /**
-   * Iterates over all values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
-   */
+/**
+ * Iterates over all values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
+ */
 function ConvertPropertiesToString(helmValues: Values): void {
   Object.keys(helmValues).forEach(key => {
     if (helmValues[key] === undefined) {
-      delete helmValues[key]
+      delete helmValues[key];
     }
     else if (typeof helmValues[key] === 'object'){
       ConvertPropertiesToString(helmValues[key]);
     }
     else if (typeof helmValues[key] !== 'string'){
-      helmValues[key] = JSON.stringify(helmValues[key])
+      helmValues[key] = JSON.stringify(helmValues[key]);
     }
   });
 }
