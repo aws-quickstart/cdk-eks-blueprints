@@ -15,3 +15,4 @@ export * from './string-utils';
 export * from './usage-utils';
 export * from './vpc-utils';
 export * from './yaml-utils';
+export * from './ipv6-utils';

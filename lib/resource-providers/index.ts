@@ -7,3 +7,5 @@ export * from './vpc';
 export * from './efs';
 export * from './s3';
 export * from './amp';
+export * from './ipv6-iam';
+export * from './ipv6-vpc';
