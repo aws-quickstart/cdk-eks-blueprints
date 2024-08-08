@@ -432,19 +432,16 @@ export class VpcCniAddOn extends CoreAddOn {
   }
 }
 
-/**
- * Iterates over all values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
- */
-function ConvertPropertiesToString(helmValues: Values): void {
+  /**
+   * Iterates over all Values including nested child objects and removes undefined entries
+   */
+function RemoveUndefined(helmValues: Values): void {
   Object.keys(helmValues).forEach(key => {
     if (helmValues[key] === undefined) {
       delete helmValues[key];
     }
     else if (typeof helmValues[key] === 'object'){
-      ConvertPropertiesToString(helmValues[key]);
-    }
-    else if (typeof helmValues[key] !== 'string'){
-      helmValues[key] = JSON.stringify(helmValues[key]);
+      RemoveUndefined(helmValues[key]);
     }
   });
 }
@@ -457,56 +454,56 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   const result: Values = {
     init: {
       env: {
-        DISABLE_TCP_EARLY_DEMUX: props?.disableTcpEarlyDemux,
-        ENABLE_V6_EGRESS: props?.enableV6Egress,
+        DISABLE_TCP_EARLY_DEMUX: JSON.stringify(props?.disableTcpEarlyDemux), // format: boolean, type: string
+        ENABLE_V6_EGRESS: JSON.stringify(props?.enableV6Egress), // format: boolean, type: string
       }
     },
     env: {
-      AWS_EC2_ENDPOINT: props?.awsEc2Endpoint,
-      ADDITIONAL_ENI_TAGS: props?.additionalEniTags,
-      ANNOTATE_POD_IP: props?.annotatePodIp,
-      AWS_EXTERNAL_SERVICE_CIDR: props?.awsExternalServiceCidrs,
-      AWS_MANAGE_ENIS_NON_SCHEDULABLE: props?.awsManageEnisNonSchedulable,
-      AWS_VPC_CNI_NODE_PORT_SUPPORT: props?.awsVpcCniNodePortSupport,
-      AWS_VPC_ENI_MTU: props?.awsVpcEniMtu,
-      AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: props?.awsVpcK8sCniCustomNetworkCfg,
-      AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS: props?.awsVpcK8sExcludeSnatCidrs,
-      ENI_CONFIG_LABEL_DEF: props?.eniConfigLabelDef,
-      ENI_CONFIG_ANNOTATION_DEF: props?.eniConfigAnnotationDef,
-      AWS_VPC_K8S_CNI_EXTERNALSNAT: props?.awsVpcK8sCniExternalSnat,
-      AWS_VPC_K8S_CNI_LOGLEVEL: props?.awsVpcK8sCniLogLevel,
-      AWS_VPC_K8S_CNI_LOG_FILE: props?.awsVpcK8sCniLogFile,
-      AWS_VPC_K8S_CNI_RANDOMIZESNAT: props?.awsVpcK8sCniRandomizeSnat,
-      AWS_VPC_K8S_CNI_VETHPREFIX: props?.awsVpcK8sCniVethPrefix,
-      AWS_VPC_K8S_PLUGIN_LOG_FILE: props?.awsVpcK8sPluginLogFile,
-      AWS_VPC_K8S_PLUGIN_LOG_LEVEL: props?.awsVpcK8sPluginLogLevel,
-      CLUSTER_ENDPOINT: props?.clusterEndpoint,
-      DISABLE_LEAKED_ENI_CLEANUP: props?.disableLeakedEniCleanup,
-      DISABLE_INTROSPECTION: props?.disableIntrospection,
-      DISABLE_METRICS: props?.disableMetrics,
-      DISABLE_NETWORK_RESOURCE_PROVISIONING: props?.disablenetworkResourceProvisioning,
-      ENABLE_BANDWIDTH_PLUGIN: props?.enableBandwidthPlugin,
-      ENABLE_NFTABLES: props?.enableNftables,
-      ENABLE_POD_ENI: props?.enablePodEni,
-      ENABLE_PREFIX_DELEGATION: props?.enablePrefixDelegation,
-      INTROSPECTION_BIND_ADDRESS: props?.introspectionBindAddress,
-      MAX_ENI: props?.maxEni,
-      MINIMUM_IP_TARGET: props?.minimumIpTarget,
-      POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode,
-      WARM_ENI_TARGET: props?.warmEniTarget,
-      WARM_IP_TARGET: props?.warmIpTarget,
-      WARM_PREFIX_TARGET: props?.warmPrefixTarget,
+      AWS_EC2_ENDPOINT: props?.awsEc2Endpoint, // type: string
+      ADDITIONAL_ENI_TAGS: props?.additionalEniTags, // type: string
+      ANNOTATE_POD_IP: JSON.stringify(props?.annotatePodIp), // format: boolean, type: string
+      AWS_EXTERNAL_SERVICE_CIDR: props?.awsExternalServiceCidrs, // type: string
+      AWS_MANAGE_ENIS_NON_SCHEDULABLE: JSON.stringify(props?.awsManageEnisNonSchedulable), // format: boolean, type: string
+      AWS_VPC_CNI_NODE_PORT_SUPPORT: JSON.stringify(props?.awsVpcCniNodePortSupport), // format: boolean, type: string
+      AWS_VPC_ENI_MTU: JSON.stringify(props?.awsVpcEniMtu), // format: integer, type: string
+      AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG: JSON.stringify(props?.awsVpcK8sCniCustomNetworkCfg), // format: boolean, type: string
+      AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS: props?.awsVpcK8sExcludeSnatCidrs, // type: string
+      ENI_CONFIG_LABEL_DEF: props?.eniConfigLabelDef, // type: string
+      ENI_CONFIG_ANNOTATION_DEF: props?.eniConfigAnnotationDef, // type: string
+      AWS_VPC_K8S_CNI_EXTERNALSNAT: JSON.stringify(props?.awsVpcK8sCniExternalSnat), // format: boolean, type: string
+      AWS_VPC_K8S_CNI_LOGLEVEL: props?.awsVpcK8sCniLogLevel, // type: string
+      AWS_VPC_K8S_CNI_LOG_FILE: props?.awsVpcK8sCniLogFile, // type: string
+      AWS_VPC_K8S_CNI_RANDOMIZESNAT: props?.awsVpcK8sCniRandomizeSnat, // type: string
+      AWS_VPC_K8S_CNI_VETHPREFIX: props?.awsVpcK8sCniVethPrefix, // type: string
+      AWS_VPC_K8S_PLUGIN_LOG_FILE: props?.awsVpcK8sPluginLogFile, // type: string
+      AWS_VPC_K8S_PLUGIN_LOG_LEVEL: props?.awsVpcK8sPluginLogLevel, // type: string
+      CLUSTER_ENDPOINT: props?.clusterEndpoint, // type: string
+      DISABLE_LEAKED_ENI_CLEANUP: JSON.stringify(props?.disableLeakedEniCleanup), // format: boolean, type: string
+      DISABLE_INTROSPECTION: JSON.stringify(props?.disableIntrospection), // format: boolean, type: string
+      DISABLE_METRICS: JSON.stringify(props?.disableMetrics), // format: boolean, type: string
+      DISABLE_NETWORK_RESOURCE_PROVISIONING: JSON.stringify(props?.disablenetworkResourceProvisioning), // format: boolean, type: string
+      ENABLE_BANDWIDTH_PLUGIN: JSON.stringify(props?.enableBandwidthPlugin), // format: boolean, type: string
+      ENABLE_NFTABLES: JSON.stringify(props?.enableNftables), // format: boolean, type: string
+      ENABLE_POD_ENI: JSON.stringify(props?.enablePodEni), // format: boolean, type: string
+      ENABLE_PREFIX_DELEGATION: JSON.stringify(props?.enablePrefixDelegation), // format: boolean, type: string
+      INTROSPECTION_BIND_ADDRESS: props?.introspectionBindAddress, // type: string
+      MAX_ENI: JSON.stringify(props?.maxEni), // format: integer, type: string
+      MINIMUM_IP_TARGET: JSON.stringify(props?.minimumIpTarget), // format: integer, type: string
+      POD_SECURITY_GROUP_ENFORCING_MODE: props?.podSecurityGroupEnforcingMode, // type: string
+      WARM_ENI_TARGET: JSON.stringify(props?.warmEniTarget), // format: integer, type: string
+      WARM_IP_TARGET: JSON.stringify(props?.warmIpTarget), // format: integer, type: string
+      WARM_PREFIX_TARGET: JSON.stringify(props?.warmPrefixTarget), // format: integer, type: string
     },
-    enableNetworkPolicy: props?.enableNetworkPolicy,
-    enableWindowsIpam: props?.enableWindowsIpam,
-    enableWindowsPrefixDelegation: props?.enableWindowsPrefixDelegation,
-    warmWindowsPrefixTarget: props?.warmWindowsPrefixTarget,
-    warmWindowsIPTarget: props?.warmWindowsIPTarget,
-    minimumWindowsIPTarget: props?.minimumWindowsIPTarget,
-    branchENICooldown: props?.branchENICooldown,
+    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy), // format: boolean, type: string
+    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam), // format: boolean, type: string
+    enableWindowsPrefixDelegation: JSON.stringify(props?.enableWindowsPrefixDelegation), // format: boolean, type: string
+    warmWindowsPrefixTarget: props?.warmWindowsPrefixTarget, // type: integer
+    warmWindowsIPTarget: props?.warmWindowsIPTarget, // type: integer
+    minimumWindowsIPTarget: props?.minimumWindowsIPTarget, // type: integer
+    branchENICooldown: props?.branchENICooldown, // type: integer
   };
 
-  ConvertPropertiesToString(result);
+  RemoveUndefined(result);
 
   return result;
 }
