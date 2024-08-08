@@ -401,6 +401,23 @@ export class VpcCniAddOn extends CoreAddOn {
   }
 }
 
+/**
+ * Iterates over all values including nested child objects, removes undefined entries and stringifies the remaining if they are not already strings
+ */
+function ConvertPropertiesToString(helmValues: Values): void {
+  Object.keys(helmValues).forEach(key => {
+    if (helmValues[key] === undefined) {
+      delete helmValues[key];
+    }
+    else if (typeof helmValues[key] === 'object'){
+      ConvertPropertiesToString(helmValues[key]);
+    }
+    else if (typeof helmValues[key] !== 'string'){
+      helmValues[key] = JSON.stringify(helmValues[key]);
+    }
+  });
+}
+
 function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
   if (props === null) {
     return {};
@@ -449,19 +466,11 @@ function populateVpcCniConfigurationValues(props?: VpcCniAddOnProps): Values {
       WARM_IP_TARGET: props?.warmIpTarget,
       WARM_PREFIX_TARGET: props?.warmPrefixTarget,
     },
-    enableNetworkPolicy: JSON.stringify(props?.enableNetworkPolicy),
-    enableWindowsIpam: JSON.stringify(props?.enableWindowsIpam)
+    enableNetworkPolicy: props?.enableNetworkPolicy,
+    enableWindowsIpam: props?.enableWindowsIpam
   };
 
-  // clean up all undefined
-  const values = result.env;
-  Object.keys(values).forEach(key => values[key] === undefined ? delete values[key] : {});
-  Object.keys(values).forEach(key => values[key] = typeof values[key] !== 'string' ? JSON.stringify(values[key]) : values[key]);
-
-  // clean up all undefined on Init env
-  const initValues = result.init.env;
-  Object.keys(initValues).forEach(key => initValues[key] === undefined ? delete initValues[key] : {});
-  Object.keys(initValues).forEach(key => initValues[key] = typeof initValues[key] !== 'string' ? JSON.stringify(initValues[key]) : initValues[key]);
+  ConvertPropertiesToString(result);
 
   return result;
 }
