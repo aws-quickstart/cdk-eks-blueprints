@@ -432,9 +432,9 @@ export class VpcCniAddOn extends CoreAddOn {
   }
 }
 
-  /**
-   * Iterates over all Values including nested child objects and removes undefined entries
-   */
+/**
+ * Iterates over all Values including nested child objects and removes undefined entries
+ */
 function RemoveUndefined(helmValues: Values): void {
   Object.keys(helmValues).forEach(key => {
     if (helmValues[key] === undefined) {
