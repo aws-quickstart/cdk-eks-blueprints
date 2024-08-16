@@ -84,7 +84,7 @@ export interface IngressNginxAddOnProps extends HelmAddOnUserProps {
 
     /**
      * Specifies the class of the ingress controller. Used to differentiate between multiple ingress controllers.
-     * @default 'nginx'
+     * @default 'ingress-nginx'
      */
     ingressClassName?: string;
 
