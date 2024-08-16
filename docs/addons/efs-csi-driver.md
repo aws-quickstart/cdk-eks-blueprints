@@ -62,4 +62,6 @@ Applies the EFS CSI Driver add-on to an Amazon EKS cluster.
 
 If you run into this error: `Output: Could not start amazon-efs-mount-watchdog, unrecognized init system "aws-efs-csi-dri" b'mount.nfs4: access denied by server while mounting 127.0.0.1:/'`
 
-Take a look at this issue: <https://github.com/aws-quickstart/cdk-eks-blueprints/issues/1052>, which will lead you to this workshop, which shows you how to set up KMS keys for EFS and EBS: <https://catalog.us-east-1.prod.workshops.aws/workshops/90c9d1eb-71a1-4e0e-b850-dba04ae92887/en-US/security/065-data-encryption/1-stack-setup>.
+Take a look at this workshop which shows you how to set up KMS keys for EFS and EBS: <https://catalog.us-east-1.prod.workshops.aws/workshops/90c9d1eb-71a1-4e0e-b850-dba04ae92887/en-US/security/065-data-encryption/1-stack-setup>.
+
+Similarly, if you face a mounting issue, take a look at this thread regarding EFS mounting issues: <https://repost.aws/knowledge-center/eks-troubleshoot-efs-volume-mount-issues>.
