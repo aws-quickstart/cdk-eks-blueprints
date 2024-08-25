@@ -7,3 +7,4 @@ export * from './vpc';
 export * from './efs';
 export * from './s3';
 export * from './amp';
+export * from './rds';
