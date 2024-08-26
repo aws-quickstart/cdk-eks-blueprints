@@ -70,9 +70,9 @@ cdk init app --language typescript
 cdk bootstrap aws://<AWS_ACCOUNT_ID>/<AWS_REGION>
 ```
 
-### Usage
+### Usage for IPv4 cluster
 
-Run the following command to install the `eks-blueprints` dependency in your project.
+Run the following command to install the `eks-blueprints` dependency in your project. By default, blueprints creates IPv4 cluster.
 
 ```sh
 npm i @aws-quickstart/eks-blueprints
@@ -109,18 +109,71 @@ const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .addOns(...addOns)
-    .build(app, 'eks-blueprint');
+    .build(app, 'eks-blueprint-ipv4');
 // do something with stack or drop this variable
+```
+
+
+### Usage for IPv6 cluster
+
+Run the following command to install the `eks-blueprints` dependency in your project. This example creates Ipv6 cluster.
+
+#### Note: ipFamily has been introduced to support ipv6 cluster.
+
+At time of creation, if VPC is not provided to EKS blueprints. It will automatically divide the provided VPC CIDR range, and create public and private subnets per Availability Zone.
+Network routing for the public subnets will be configured to allow outbound access directly via an Internet Gateway.
+Network routing for the private subnets will be configured to allow outbound access via a one NAT Gateway to reduce the cost.
+IPv6 does not require NAT for pod to pod communication. By default, we are creating one NAT for cluster communications outside endpoints if any.
+
+```typescript
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const app = new cdk.App();
+
+// AddOns for the cluster. For ipv6 cluster, we haven't tested with all the addons except for the below addons.
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new blueprints.addons.VpcCniAddOn(),
+    new blueprints.addons.KarpenterAddOn(),
+    new blueprints.addons.SecretsStoreAddOn()
+];
+
+const account = 'XXXXXXXXXXXXX';
+const region = 'us-east-2';
+const ipFamily = IpFamily.IP_V6; //IpFamily.IP_V6 isquavelent to "ipv6"
+
+const stack = blueprints.EksBlueprint.builder()
+    .account(account)
+    .region(region)
+    .ipFamily(ipFamily)
+    .addOns(...addOns)
+    .build(app, 'eks-blueprint-ipv6');
+
 ```
 
 Note: if the account/region combination used in the code example above is different from the initial combination used with `cdk bootstrap`, you will need to perform `cdk bootstrap` again to avoid error.
 
 Please reference [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) usage doc for detail.
 
-Deploy the stack using the following command
+List the stacks using the following command
 
 ```sh
-cdk deploy
+cdk list 
+```
+Example output for `cdk list`:
+```sh
+eks-blueprint-ipv4
+eks-blueprint-ipv6
+```
+
+Deploy the stack using the following command
+```sh
+cdk deploy <stack-name>
+```
+Example to deploy IPv6 cluster:
+```sh
+cdk deploy eks-blueprint-ipv6
 ```
 
 This will provision the following:
