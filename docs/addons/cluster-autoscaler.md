@@ -31,11 +31,12 @@ const blueprint = blueprints.EksBlueprint.builder()
 5. Supports [standard helm configuration options](./index.md#standard-helm-add-on-configuration-options).
 
 The add-on automatically sets the following Helm Chart [values](https://github.com/kubernetes/autoscaler/tree/master/charts/cluster-autoscaler#values), and it is **highly recommended** not to pass these values in (as it will result in a failed deployment):
-- cloudProvider
-- autoDiscovery.clusterName
-- awsRegion
-- rbac.serviceAccount.create
-- rbac.serviceAccount.name
+
+- `cloudProvider`
+- `autoDiscovery.clusterName`
+- `awsRegion`
+- `rbac.serviceAccount.create`
+- `rbac.serviceAccount.name`
 
 ## Testing the scaling functionality
 
