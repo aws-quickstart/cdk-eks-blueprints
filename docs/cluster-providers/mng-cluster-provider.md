@@ -2,7 +2,7 @@
 
 The `MngClusterProvider` allows you to provision an EKS cluster which leverages [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs) for compute capacity. MNGs automate the provisioning and lifecycle management of nodes (Amazon EC2 instances) for Amazon EKS Kubernetes clusters.
 
-## Usage 
+## Usage
 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
@@ -15,7 +15,7 @@ const app = new cdk.App();
 const props: bp.MngClusterProviderProps = {
     minSize: 1,
     maxSize: 10,
-    desiredSize: 4,    
+    desiredSize: 4,
     instanceTypes: [new ec2.InstanceType('m5.large')],
     amiType: eks.NodegroupAmiType.AL2023_X86_64_STANDARD,
     nodeGroupCapacityType: eks.CapacityType.ON_DEMAND,
@@ -28,7 +28,7 @@ new bp.EksBlueprint(app, { id: 'blueprint-1', addOns:[], teams: [], clusterProvi
 
 ## Configuration
 
-The `MngClusterProvider` supports the following configuration options. 
+The `MngClusterProvider` supports the following configuration options.
 
 | Prop                  | Description |
 |-----------------------|-------------|
@@ -45,18 +45,20 @@ The `MngClusterProvider` supports the following configuration options.
 | nodeGroupCapacityType | The capacity type for the node group (on demand or spot).
 | vpcSubnets            | The subnets for the cluster.
 | privateCluster        | If `true` Kubernetes API server is private.
+| isolatedCluster       | If `true` EKS Cluster is configured to deploy in an isolated subnet.
 | tags                  | Tags to propagate to Cluster.
-| nodeGroupTags         | Tags to propagate to Node Group. 
+| nodeGroupTags         | Tags to propagate to Node Group.
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 
 Configuration can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 
 - `eks.default.min-size`
-- `eks.default.max-size` 
+- `eks.default.max-size`
 - `eks.default.desired-size`
-- `eks.default.instance-type` 
+- `eks.default.instance-type`
 - `eks.default.private-cluster`
+- `eks.default.isolated-cluster`
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `MngClusterProviderProps` to each cluster blueprint.
 
@@ -92,7 +94,7 @@ Note that two attributes in this configuration are relevant for Spot: `nodeGroup
 
 ## Creating Clusters with custom AMI for the node group
 
-To create clusters using custom AMI for the worker nodes, set the `customAmi` to your custom image and provide your `userData` for node bootstrapping. 
+To create clusters using custom AMI for the worker nodes, set the `customAmi` to your custom image and provide your `userData` for node bootstrapping.
 
 ```typescript
 const userData = UserData.forLinux();

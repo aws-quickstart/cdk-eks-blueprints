@@ -1,6 +1,6 @@
 # Generic Cluster Provider
 
-The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity. 
+The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity.
 
 Today it is not possible for an Amazon EKS Cluster to propagate tags to EC2 instance worker nodes directly when you create an EKS cluster. You can create a launch template with custom tags on `managedNodeGroups` with `GenericClusterProvider` as shown in `mng2-launchtemplate`. This will allow you to propagate custom tags to your EC2 instance worker nodes.
 
@@ -15,7 +15,7 @@ Full list of configuration options:
 - [Autoscaling Group](../api/interfaces/clusters.AutoscalingNodeGroup.html)
 - [Fargate Cluster](../api/interfaces/clusters.FargateClusterProviderProps.html)
 
-## Usage 
+## Usage
 
 ```typescript
 const windowsUserData = ec2.UserData.forWindows();
@@ -49,7 +49,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             amiType: NodegroupAmiType.AL2_X86_64,
             instanceTypes: [new InstanceType('m5.2xlarge')],
             desiredSize: 2,
-            maxSize: 3, 
+            maxSize: 3,
             nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
             launchTemplate: {
                 // You can pass Custom Tags to Launch Templates which gets propagated to worker nodes.
@@ -92,7 +92,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             amiType: NodegroupAmiType.AL2_X86_64,
             instanceTypes: [new ec2.InstanceType('m5.4xlarge')],
             desiredSize: 0,
-            minSize: 0, 
+            minSize: 0,
             nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
             launchTemplate: {
                 blockDevices: [
@@ -123,7 +123,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
     fargateProfiles: {
         "fp1": {
             fargateProfileName: "fp1",
-            selectors:  [{ namespace: "serverless1" }] 
+            selectors:  [{ namespace: "serverless1" }]
         }
     }
 });
@@ -134,7 +134,7 @@ EksBlueprint.builder()
 ```
 
 
-The Cluster configuration and node group configuration exposes a number of options that require to supply an actual CDK resource. 
+The Cluster configuration and node group configuration exposes a number of options that require to supply an actual CDK resource.
 For example cluster allows passing `mastersRole`, `securityGroup`, etc. to the cluster, while managed node group allow specifying `nodeRole`.
 
 All of such cases can be solved with [Resource Providers](../resource-providers/index.md#using-resource-providers-with-cdk-constructs).
@@ -157,7 +157,7 @@ const clusterProvider = new blueprints.GenericClusterProvider({
             id: "mng1",
             nodeRole: blueprints.getResource(context => {
                 const role = new iam.Role(context.scope, 'NodeRole', { assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com")});
-                ... add policies such as AmazonEKSWorkerNodePolicy and AmazonEC2ContainerRegistryReadOnly 
+                ... add policies such as AmazonEKSWorkerNodePolicy and AmazonEC2ContainerRegistryReadOnly
                 return role;
             })
         }
@@ -173,11 +173,11 @@ EksBlueprint.builder()
     .build(app, blueprintID);
 ```
 
-    
+
 
 ## Configuration
 
-The `GenericClusterProvider` supports the following configuration options. 
+The `GenericClusterProvider` supports the following configuration options.
 
 | Prop                  | Description |
 |-----------------------|-------------|
@@ -197,10 +197,11 @@ There should be public and private subnets for EKS cluster to work. For more inf
 Default configuration for managed and autoscaling node groups can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 
 - `eks.default.min-size`
-- `eks.default.max-size` 
+- `eks.default.max-size`
 - `eks.default.desired-size`
-- `eks.default.instance-type` 
+- `eks.default.instance-type`
 - `eks.default.private-cluster`
+- `eks.default.isolated-cluster`
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass individual `GenericProviderClusterProps` to each cluster blueprint.
 

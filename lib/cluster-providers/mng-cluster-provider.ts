@@ -2,7 +2,7 @@ import { aws_autoscaling as asg, aws_eks as eks } from "aws-cdk-lib";
 // Cluster
 import { ClusterInfo } from "..";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
-// Constants 
+// Constants
 import { ManagedNodeGroup } from "./types";
 
 
@@ -27,6 +27,12 @@ export interface MngClusterProviderProps extends Partial<eks.CommonClusterOption
      * @default false
      */
     privateCluster?: boolean;
+
+    /**
+     * Is the EKS Cluster in isolated subnets?
+     * @default false
+     */
+    isolatedCluster?: boolean,
 
     /**
      * Tags for the Cluster.
@@ -62,9 +68,9 @@ export class MngClusterProvider extends GenericClusterProvider {
 
 /**
  * Validates that cluster is backed by EC2 either through a managed node group or through a self-managed autoscaling group.
- * @param clusterInfo 
+ * @param clusterInfo
  * @param source Used for error message to identify the source of the check
- * @returns 
+ * @returns
  */
 //TODO: move to clusterInfo
 export function assertEC2NodeGroup(clusterInfo: ClusterInfo, source: string): eks.Nodegroup[] | asg.AutoScalingGroup[] {

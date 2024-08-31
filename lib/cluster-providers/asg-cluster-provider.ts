@@ -6,7 +6,7 @@ import { AutoscalingNodeGroup } from "./types";
  * Configuration options for the cluster provider.
  */
 export interface AsgClusterProviderProps extends Partial<eks.CommonClusterOptions>, AutoscalingNodeGroup {
-    
+
     /**
      * The name for the cluster.
      */
@@ -18,6 +18,12 @@ export interface AsgClusterProviderProps extends Partial<eks.CommonClusterOption
      * @default false
      */
     privateCluster?: boolean;
+
+    /**
+     * Is the EKS Cluster in isolated subnets?
+     * @default false
+     */
+    isolatedCluster?: boolean,
 
     /**
      * Tags for the cluster
