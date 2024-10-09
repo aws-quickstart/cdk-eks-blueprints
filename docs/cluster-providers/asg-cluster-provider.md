@@ -2,7 +2,7 @@
 
 The `AsgClusterProvider` allows you to provision an EKS cluster which leverages [EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html)(ASGs) for compute capacity. An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management.
 
-## Usage 
+## Usage
 
 ```typescript
 const props: AsgClusterProviderProps = {
@@ -20,7 +20,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 
 ## Configuration
 
-`AsgClusterProvider` supports the following configuration options. 
+`AsgClusterProvider` supports the following configuration options.
 
 | Prop              | Description |
 |-------------------|-------------|
@@ -33,7 +33,7 @@ new blueprints.EksBlueprint(scope, { id: 'blueprint', [], [], clusterProvider })
 | machineImageType  | Machine Image Type for the Autoscaling Group.
 | updatePolicy      | Update policy for the Autoscaling Group.
 | vpcSubnets        | The subnets for the cluster.
-| privateCluster    | If `true` Kubernetes API server is private. 
+| privateCluster    | If `true` Kubernetes API server is private.
 | tags              | Tags to propagate to Cluster.
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
@@ -41,10 +41,11 @@ There should be public and private subnets for EKS cluster to work. For more inf
 Configuration can also be supplied via context variables (specify in cdk.json, cdk.context.json, ~/.cdk.json or pass with -c command line option):
 
 - `eks.default.min-size`
-- `eks.default.max-size` 
+- `eks.default.max-size`
 - `eks.default.desired-size`
-- `eks.default.instance-type` 
+- `eks.default.instance-type`
 - `eks.default.private-cluster`
+- `eks.default.isolated-cluster`
 
 Configuration of the EC2 parameters through context parameters makes sense if you would like to apply default configuration to multiple clusters without the need to explicitly pass `AsgClusterProviderProps` to each cluster blueprint.
 
@@ -67,4 +68,3 @@ const props: AsgClusterProviderProps = {
 const clusterProvider = new blueprints.AsgClusterProvider(props);
 new blueprints.EksBlueprint(scope, { id: 'blueprint', teams, addOns, clusterProvider });
 ```
-

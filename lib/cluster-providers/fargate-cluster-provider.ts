@@ -33,6 +33,12 @@ export interface FargateClusterProviderProps extends Partial<eks.CommonClusterOp
     privateCluster?: boolean;
 
     /**
+     * Is the EKS Cluster in isolated subnets?
+     * @default false
+     */
+    isolatedCluster?: boolean,
+
+    /**
      * Tags for the cluster
      */
     tags?: {
@@ -57,5 +63,5 @@ export class FargateClusterProvider extends GenericClusterProvider {
      */
     internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
         return new eks.FargateCluster(scope, id, clusterOptions);
-    }    
+    }
 }

@@ -27,3 +27,5 @@ export const MAX_SIZE_KEY = "eks.default.max-size";
 export const DESIRED_SIZE_KEY = "eks.default.desired-size";
 
 export const PRIVATE_CLUSTER = "eks.default.private-cluster";
+
+export const ISOLATED_CLUSTER = "eks.default.isolated-cluster";
