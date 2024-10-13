@@ -2,7 +2,7 @@
 
 The Open Policy Agent (OPA, pronounced “oh-pa”) is an open source, general-purpose policy engine that unifies policy enforcement across the stack. OPA provides a high-level declarative language that lets you specify policy as code and simple APIs to offload policy decision-making from your software. You can use OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, and more. OPA uses a policy language known as Rego which is a query language which was purpose built to support structured document models such as JSON. To learn more about Rego check out this [link](https://www.openpolicyagent.org/docs/latest/policy-language/).
 
-OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. The Kubernetes API Server is configured to query OPA for admission control decisions when objects (e.g., Pods, Services, etc.) are created, updated, or deleted. The API Server sends the entire Kubernetes object in the webhook request to OPA. OPA evaluates the policies it has loaded using the admission review as input. Gatekeeper also provides audit functionality as well. The diagram below shows the flow between a user making a request to the Kube-API server and how AdmissionReview and AdmissionRequests are made through OPA Gatekeeper. 
+OPA Gatekeeper is an open-source project that provides a first-class integration between OPA and Kubernetes. What Gatekeeper adds is an extensible parameterized policy library that includes native Kubernetes CRD's for instantiating and extending the OPA policy library. The Kubernetes API Server is configured to query OPA for admission control decisions when objects (e.g., Pods, Services, etc.) are created, updated, or deleted. The API Server sends the entire Kubernetes object in the webhook request to OPA. OPA evaluates the policies it has loaded using the admission review as input. Gatekeeper also provides audit functionality as well. The diagram below shows the flow between a user making a request to the Kube-API server and how AdmissionReview and AdmissionRequests are made through OPA Gatekeeper.
 
 ![opa](https://d33wubrfki0l68.cloudfront.net/a5ed0c27ff2dda6abb18b9bc960f2ad4120d937a/a5939/docs/latest/images/kubernetes-admission-flow.png))
 
@@ -36,7 +36,7 @@ const region = <AWS_REGION>;
 const version = "auto";
 
 const blueprint = blueprints.EksBlueprint.builder()
-  .account(account) 
+  .account(account)
   .region(region)
   .version(version)
   .addOns( new blueprints.addons.OpaGatekeeperAddOn() )
@@ -58,7 +58,8 @@ gatekeeper-controller-manager-5894545cc9-b86zm   1/1     Running   0          1d
 gatekeeper-controller-manager-5894545cc9-bntdt   1/1     Running   0          1d
 gatekeeper-controller-manager-5894545cc9-tb7fz   1/1     Running   0          1d
 ```
-You will notice the `gatekeeper-audit-7c5998d4c-b5n7j` pod that is created when we deploy the `OpaGatekeeperAddOn`. The audit functionality enables periodic evaluations of replicated resources against the Constraints enforced in the cluster to detect pre-existing misconfigurations. Gatekeeper stores audit results as violations listed in the status field of the relevant Constraint. The `gatekeeper-controller-manager` is simply there to manage the `OpaGatekeeperAddOn`. 
+
+You will notice the `gatekeeper-audit-7c5998d4c-b5n7j` pod that is created when we deploy the `OpaGatekeeperAddOn`. The audit functionality enables periodic evaluations of replicated resources against the Constraints enforced in the cluster to detect pre-existing misconfigurations. Gatekeeper stores audit results as violations listed in the status field of the relevant Constraint. The `gatekeeper-controller-manager` is simply there to manage the `OpaGatekeeperAddOn`.
 
 ## Example with OPA Gatekeeper
 
@@ -86,7 +87,7 @@ k8srequiredlabels   45s
 You will notice that if you create a new namespace without any labels that the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
 
 ```bash
-k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml           
+k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml
 ```
 
 If we then try and create a namespace by running `kubectl create ns test` (notice that we are not adding any labels) you will get the following error message:
@@ -99,4 +100,4 @@ For more information on OPA Gatekeeper please refer to the links below:
 
 - https://github.com/open-policy-agent
 - https://open-policy-agent.github.io/gatekeeper/website/docs/
-- https://github.com/open-policy-agent/gatekeeper-library 
+- https://github.com/open-policy-agent/gatekeeper-library
