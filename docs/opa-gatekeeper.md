@@ -46,7 +46,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 To validate that OPA Gatekeeper is running within your cluster run the following command:
 
 ```bash
-k get po -n gatekeeper-system
+kubectl get pod -n gatekeeper-system
 ```
 
 You should see the following output:
