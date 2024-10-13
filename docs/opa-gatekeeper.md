@@ -87,7 +87,7 @@ k8srequiredlabels   45s
 You will notice that if you create a new namespace without any labels that the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
 
 ```bash
-k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml
 ```
 
 If we then try and create a namespace by running `kubectl create ns test` (notice that we are not adding any labels) you will get the following error message:
