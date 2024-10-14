@@ -79,7 +79,7 @@ describe('Unit test for CloudWatch Addon', () => {
   test("Stack is defined when using a specified version of EKS and \"auto\" version", async () => {
     const app = new cdk.App();
     
-    const addOn = new blueprints.CloudWatchInsights();
+    const addOn = new blueprints.CloudWatchInsights({});
     const version = KubernetesVersion.V1_29;
     const blueprint = await blueprints.EksBlueprint.builder()
       .version(version)

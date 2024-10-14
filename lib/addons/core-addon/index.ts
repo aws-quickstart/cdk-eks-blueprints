@@ -218,8 +218,8 @@ export class CoreAddOn implements ClusterAddOn {
 
     provideDefaultAutoVersion(version: KubernetesVersion) : string {
         const versionMap = this.coreAddOnProps.versionMap;
-        if (versionMap) {
-            return versionMap.get(version) ?? versionMap.values().next().value;
+        if (versionMap && versionMap.size > 0) {
+            return versionMap.get(version) ?? versionMap.values().next().value!;
         }
         throw new Error(`No default version found for add-on ${this.coreAddOnProps.addOnName}`);
     }

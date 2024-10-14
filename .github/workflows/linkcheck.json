@@ -25,6 +25,7 @@
       { "pattern": "http://console-eks.yourdomain.com" },
       { "pattern": "https://p191.p3.n0.cdn.getcloudapp.com"},
       { "pattern": "https://rafay.co/"},
-      { "pattern": "https://grafana-operator.github.io/grafana-operator/docs/installation/helm"}
+      { "pattern": "https://grafana-operator.github.io/grafana-operator/docs/installation/helm"},
+      { "pattern": "https://hackerone.com/newrelic"}
     ]
 }
