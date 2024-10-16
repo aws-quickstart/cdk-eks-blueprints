@@ -44,7 +44,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 To validate that OPA Gatekeeper is running within your cluster run the following command:
 
 ```bash
-k get po -n gatekeeper-system
+kubectl get pod -n gatekeeper-system
 ```
 
 You should see the following output:
@@ -56,6 +56,7 @@ gatekeeper-controller-manager-5894545cc9-b86zm   1/1     Running   0          1d
 gatekeeper-controller-manager-5894545cc9-bntdt   1/1     Running   0          1d
 gatekeeper-controller-manager-5894545cc9-tb7fz   1/1     Running   0          1d
 ```
+
 You will notice the `gatekeeper-audit-7c5998d4c-b5n7j` pod that is created when we deploy the `OpaGatekeeperAddOn`. The audit functionality enables periodic evaluations of replicated resources against the Constraints enforced in the cluster to detect pre-existing misconfigurations. Gatekeeper stores audit results as violations listed in the status field of the relevant Constraint. The `gatekeeper-controller-manager` is simply there to manage the `OpaGatekeeperAddOn`. 
 
 ## Example with OPA Gatekeeper
@@ -81,10 +82,10 @@ NAME                AGE
 k8srequiredlabels   45s
 ```
 
-You will notice that if you create a new namespace without any labels, the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below: 
+You will notice that if you create a new namespace without any labels, the request will go through and that is because we now need to create the individual `Constraint CRD` as defined by the `Constraint Template` that we created above. Let's create the individal `Constraint CRD` using the command below:
 
 ```bash
-k apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml           
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml
 ```
 
 If we then try and create a namespace by running `kubectl create ns test` (notice that we are not adding any labels) you will get the following error message:
