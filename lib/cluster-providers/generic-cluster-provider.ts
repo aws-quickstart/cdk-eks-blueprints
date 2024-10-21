@@ -1,12 +1,11 @@
 
-import { KubectlV23Layer } from "@aws-cdk/lambda-layer-kubectl-v23";
-import { KubectlV24Layer } from "@aws-cdk/lambda-layer-kubectl-v24";
 import { KubectlV25Layer } from "@aws-cdk/lambda-layer-kubectl-v25";
 import { KubectlV26Layer } from "@aws-cdk/lambda-layer-kubectl-v26";
 import { KubectlV27Layer } from "@aws-cdk/lambda-layer-kubectl-v27";
 import { KubectlV28Layer } from "@aws-cdk/lambda-layer-kubectl-v28";
 import { KubectlV29Layer } from "@aws-cdk/lambda-layer-kubectl-v29";
 import { KubectlV30Layer } from "@aws-cdk/lambda-layer-kubectl-v30";
+import { KubectlV31Layer } from "@aws-cdk/lambda-layer-kubectl-v31";
 
 import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
@@ -34,10 +33,6 @@ export function clusterBuilder() {
  */
 export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVersion): ILayerVersion | undefined {
     switch(version.version) {
-        case "1.23":
-            return new KubectlV23Layer(scope, "kubectllayer23");
-        case "1.24":
-            return new KubectlV24Layer(scope, "kubectllayer24");
         case "1.25":
             return new KubectlV25Layer(scope, "kubectllayer25");
         case "1.26":
@@ -50,13 +45,15 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
             return new KubectlV29Layer(scope, "kubectllayer29");
         case "1.30":
             return new KubectlV30Layer(scope, "kubectllayer30");
+        case "1.31":
+            return new KubectlV31Layer(scope, "kubectllayer30");
 
     }
 
     const minor = version.version.split('.')[1];
 
-    if(minor && parseInt(minor, 10) > 30) {
-        return new KubectlV30Layer(scope, "kubectllayer30"); // for all versions above 1.30 use 1.30 kubectl (unless explicitly supported in CDK)
+    if(minor && parseInt(minor, 10) > 31) {
+        return new KubectlV30Layer(scope, "kubectllayer31"); // for all versions above 1.30 use 1.30 kubectl (unless explicitly supported in CDK)
     }
     return undefined;
 }
