@@ -3,6 +3,7 @@ import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { supportsALL } from "../../utils";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
+    [KubernetesVersion.V1_31, "1.31.0-eksbuild.5"],
     [KubernetesVersion.V1_30, "v1.30.0-eksbuild.3"],
     [KubernetesVersion.V1_29, "v1.29.0-eksbuild.1"],
     [KubernetesVersion.V1_28, "v1.28.2-eksbuild.2"],
