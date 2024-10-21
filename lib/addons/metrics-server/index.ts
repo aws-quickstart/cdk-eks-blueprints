@@ -21,7 +21,7 @@ export interface MetricsServerAddOnProps extends HelmAddOnUserProps {
 const defaultProps: HelmAddOnProps & MetricsServerAddOnProps = {
     chart: 'metrics-server',
     repository: 'https://kubernetes-sigs.github.io/metrics-server',
-    version: '3.12.1',
+    version: '3.12.2',
     release: 'blueprints-addon-metrics-server',
     name: 'metrics-server',
     namespace: 'kube-system',
