@@ -322,7 +322,7 @@ export default class BlueprintConstruct {
 
 export function getClusterProvider(managedNodeGroups: ManagedNodeGroup[]){
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_29,
+        version: KubernetesVersion.V1_30,
         tags: {
             "Name": "blueprints-example-cluster",
             "Type": "generic-cluster"
