@@ -101,10 +101,9 @@ export class KedaAddOn extends HelmAddOn {
     } else {
       //Let Keda Create Service account for you. This is controlled by flag helmOptions.createServiceAccount (refer line no:118)
       const chart = this.addHelmChart(clusterInfo, values);
+      chart.node.addDependency(namespace);
       return Promise.resolve(chart);
     }
-
-
   }
 }
 

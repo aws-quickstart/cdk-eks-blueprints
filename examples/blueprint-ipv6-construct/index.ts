@@ -36,7 +36,7 @@ export default class BlueprintIPV6Construct extends BlueprintConstruct {
 
         const addOns: Array<blueprints.ClusterAddOn> = [
             new blueprints.addons.KarpenterAddOn({
-                version: "v0.34.5",
+                version: "v0.37.5",
                 nodePoolSpec: this.nodePoolSpec,
                 ec2NodeClassSpec: this.nodeClassSpec,
                 interruptionHandling: true,

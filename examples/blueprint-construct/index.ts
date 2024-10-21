@@ -166,7 +166,7 @@ export default class BlueprintConstruct {
                 serviceName: blueprints.AckServiceName.S3
             }),
             new blueprints.addons.KarpenterAddOn({
-                version: "v0.33.2",
+                version: "v0.37.5",
                 nodePoolSpec: this.nodePoolSpec,
                 ec2NodeClassSpec: this.nodeClassSpec,
                 interruptionHandling: true,
