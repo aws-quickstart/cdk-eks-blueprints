@@ -12,7 +12,7 @@ For more information on the driver, please review the [user guide](https://docs.
 
 ## Prerequisites
 
-- The EFS file system itself must be created in AWS separately as the driver uses the EFS for storage, but it does not create it. You can create an EFS file system using the `CreateEfsFileSystemProvider`, e.g.: `.resourceProvider("efs-file-system", new CreateEfsFileSystemProvider('efs-file-system'))`
+- The EFS file system itself must be created in AWS separately as the driver uses the EFS for storage, but it does not create it. You can create an EFS file system using the `CreateEfsFileSystemProvider`, e.g.: `.resourceProvider("efs-file-system", new CreateEfsFileSystemProvider({name: 'efs-file-system'}))`
 
 ## Usage
 
