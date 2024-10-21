@@ -21,7 +21,7 @@ const defaultProps: HelmAddOnProps & KubeRayAddOnProps = {
   name: "kuberay-operator",
   chart: "kuberay-operator",
   namespace: "default",
-  version: "1.1.1",
+  version: "1.2.2",
   release: "kuberay-operator",
   repository: "https://ray-project.github.io/kuberay-helm",
   values: {},
