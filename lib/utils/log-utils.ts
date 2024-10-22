@@ -7,7 +7,8 @@ export const userLog = new Logger({
     stylePrettyLogs: true,
     name: "user",
     hideLogPositionForProduction: true,
-    prettyLogTemplate: "{{logLevelName}} "
+    prettyLogTemplate: "{{logLevelName}} ",
+    minLevel: 2 // info
 });
 
 /**
@@ -17,5 +18,5 @@ export const logger = new Logger({
     stylePrettyLogs: true,
     type: "pretty",
     name: "main",
-    minLevel: 4 // info 
+    minLevel: 3 // info 
 });

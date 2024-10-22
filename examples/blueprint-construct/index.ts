@@ -46,8 +46,6 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel = 3; // info
-        userLog.settings.minLevel = 2; // debug
 
         this.teams = [
             new team.TeamTroi,
