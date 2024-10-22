@@ -300,8 +300,8 @@ const RELEASE = 'blueprints-addon-karpenter';
  */
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
-    namespace: KARPENTER,
-    version: '0.37.5',
+    namespace: "kube-system",
+    version: '1.0.6',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -360,7 +360,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const amiFamily = this.options.ec2NodeClassSpec?.amiFamily;
         const amiSelector = this.options.ec2NodeClassSpec?.amiSelector || {};
         const amiSelectorTerms = this.options.ec2NodeClassSpec?.amiSelectorTerms;
-        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || null;
+        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || undefined;
         const userData = this.options.ec2NodeClassSpec?.userData || "";
         const instanceProf = this.options.ec2NodeClassSpec?.instanceProfile;
         const tags = this.options.ec2NodeClassSpec?.tags || {};
@@ -631,7 +631,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     }
 
                     // Instance Store Policy added for v0.34.0 and up
-                    if (semver.gte(version, '0.34.0')){
+                    if (semver.gte(version, '0.34.0') && instanceStorePolicy){
                         ec2Node = merge(ec2Node, { spec: { instanceStorePolicy: instanceStorePolicy }});
                     }
                 } else {
