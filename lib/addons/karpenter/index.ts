@@ -16,6 +16,7 @@ import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam'
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
+        [KubernetesVersion.V1_31.version, '0.37.5'],
         [KubernetesVersion.V1_30.version, '0.37.5'],
         [KubernetesVersion.V1_29.version, '0.34.0'],
         [KubernetesVersion.V1_28.version, '0.31.0'],
@@ -300,7 +301,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: KARPENTER,
-    version: 'v0.37.5',
+    version: '0.37.5',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
