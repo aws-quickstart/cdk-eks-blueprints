@@ -150,7 +150,7 @@ export class VeleroAddOn extends HelmAddOn {
      * @param namespace
      * @returns the namespace created or existed.
      */
-    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace: string, create: boolean): {name: string, manifest?: KubernetesManifest} {
+    protected createNamespaceIfNeeded(clusterInfo: ClusterInfo, defaultName: string, namespace: string, create: boolean): {name: string, manifest?: Construct} {
         // Create Namespace if namespace is not explicied defined.
         if (namespace){
             // Create Namespace if the "create" option is true
