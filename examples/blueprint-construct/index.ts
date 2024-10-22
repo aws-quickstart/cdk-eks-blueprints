@@ -5,7 +5,6 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import {
