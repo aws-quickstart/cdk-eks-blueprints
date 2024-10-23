@@ -1,4 +1,4 @@
-import { KubernetesManifest, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { ServiceAccount } from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
