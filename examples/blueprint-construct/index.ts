@@ -5,7 +5,6 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 import {
@@ -46,8 +45,6 @@ export default class BlueprintConstruct {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel = 3; // info
-        userLog.settings.minLevel = 2; // debug
 
         this.teams = [
             new team.TeamTroi,
@@ -166,10 +163,10 @@ export default class BlueprintConstruct {
                 serviceName: blueprints.AckServiceName.S3
             }),
             new blueprints.addons.KarpenterAddOn({
-                version: "v0.37.5",
                 nodePoolSpec: this.nodePoolSpec,
                 ec2NodeClassSpec: this.nodeClassSpec,
                 interruptionHandling: true,
+                installCRDs: false
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
@@ -322,7 +319,7 @@ export default class BlueprintConstruct {
 
 export function getClusterProvider(managedNodeGroups: ManagedNodeGroup[]){
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_29,
+        version: KubernetesVersion.V1_30,
         tags: {
             "Name": "blueprints-example-cluster",
             "Type": "generic-cluster"

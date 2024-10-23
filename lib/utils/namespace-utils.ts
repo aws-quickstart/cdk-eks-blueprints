@@ -12,6 +12,9 @@ import { Values } from "../spi";
   * @returns KubernetesManifest
   */
 export function createNamespace(name: string, cluster: eks.ICluster, overwrite?: boolean, prune?: boolean, annotations?: Values, labels? : Values) {
+    if(name === "kube-system") {
+        return cluster.clusterSecurityGroup; // a construct that is populated for the cluster l
+    }
     return new KubernetesManifest(cluster.stack, `${name}-namespace-struct`, {
         cluster: cluster,
         manifest: [{
