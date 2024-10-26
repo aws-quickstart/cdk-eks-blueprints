@@ -17,7 +17,7 @@ export interface S3CSIDriverAddOnProps extends HelmAddOnUserProps {
     /**
      * ARN of the S3 bucket to be used by the driver
      */
-    s3BucketArn: string;
+    s3BucketName: string;
     /**
      * Create Namespace with the provided one (will not if namespace is kube-system)
      */
@@ -34,7 +34,8 @@ const defaultProps: HelmAddOnUserProps & S3CSIDriverAddOnProps = {
     release: S3_CSI_DRIVER_RELEASE,
     version: 'v1.9.0',
     repository: 'https://github.com/awslabs/mountpoint-s3-csi-driver',
-    s3BucketArn: ''
+    createNamespace: false,
+    s3BucketName: ''
 };
 
 @supportsALL
@@ -57,7 +58,7 @@ export class S3CSIDriverAddOn extends HelmAddOn {
 
         const s3BucketPolicy = new iam.Policy(cluster, S3_DRIVER_POLICY, {
             statements:
-                getS3DriverPolicyStatements(this.options.s3BucketArn)
+                getS3DriverPolicyStatements(this.options.s3BucketName)
         });
         serviceAccount.role.attachInlinePolicy(s3BucketPolicy);
         
