@@ -37,7 +37,9 @@ export const AwsLoadbalancerControllerIamPolicy = (partition: string) => {
                     "elasticloadbalancing:DescribeTargetGroups",
                     "elasticloadbalancing:DescribeTargetGroupAttributes",
                     "elasticloadbalancing:DescribeTargetHealth",
-                    "elasticloadbalancing:DescribeTags"
+                    "elasticloadbalancing:DescribeTags",
+                    "elasticloadbalancing:DescribeTrustStores",
+                    "elasticloadbalancing:DescribeListenerAttributes"
                 ],
                 "Resource": "*"
             },
@@ -186,7 +188,8 @@ export const AwsLoadbalancerControllerIamPolicy = (partition: string) => {
                     "elasticloadbalancing:DeleteLoadBalancer",
                     "elasticloadbalancing:ModifyTargetGroup",
                     "elasticloadbalancing:ModifyTargetGroupAttributes",
-                    "elasticloadbalancing:DeleteTargetGroup"
+                    "elasticloadbalancing:DeleteTargetGroup",
+                    "elasticloadbalancing:ModifyListenerAttributes"
                 ],
                 "Resource": "*",
                 "Condition": {
