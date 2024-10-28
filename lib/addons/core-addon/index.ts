@@ -7,6 +7,7 @@ import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
 import { RemovalPolicy } from "aws-cdk-lib";
+import cluster from "cluster";
 
 export class CoreAddOnProps {
     /**
@@ -87,7 +88,7 @@ export class CoreAddOn implements ClusterAddOn {
         let version: string = this.coreAddOnProps.version;
 
         if (this.coreAddOnProps.version === "auto") {
-            version = await this.provideVersion(clusterInfo);
+            version = await this.provideVersion(clusterInfo.version, clusterInfo.cluster.stack.region);
         }
 
         let addOnProps = {
@@ -176,11 +177,11 @@ export class CoreAddOn implements ClusterAddOn {
         return result;
     }
 
-    async provideVersion(clusterInfo: ClusterInfo) : Promise<string> {
-        const client = new sdk.EKSClient({ region: clusterInfo.cluster.stack.region });
+    async provideVersion(clusterVersion: KubernetesVersion, region: string) : Promise<string> {
+        const client = new sdk.EKSClient({ region });
         const command = new sdk.DescribeAddonVersionsCommand({
             addonName: this.coreAddOnProps.addOnName,
-            kubernetesVersion: clusterInfo.version.version
+            kubernetesVersion: clusterVersion.version
         });
 
         try {
@@ -210,7 +211,7 @@ export class CoreAddOn implements ClusterAddOn {
             logger.warn(`Failed to retrieve add-on versions from EKS for add-on ${this.coreAddOnProps.addOnName}.`);
             logger.warn("Possible reasons for failures - Unauthorized or Authentication failure or Network failure on the terminal.");
             logger.warn(" Falling back to default version.");
-            let version: string = this.provideDefaultAutoVersion(clusterInfo.version);
+            let version: string = this.provideDefaultAutoVersion(clusterVersion);
             userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected version ${version}`);
             return version;
         }
