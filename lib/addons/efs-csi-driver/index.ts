@@ -4,7 +4,7 @@ import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { getEfsDriverPolicyStatements } from "./iam-policy";
 import { registries }  from "../../utils/registry-utils";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { setPath, supportsALL} from "../../utils";
+import { createNamespace, setPath, supportsALL} from "../../utils";
 import * as kms from "aws-cdk-lib/aws-kms";
 
 
@@ -31,18 +31,24 @@ export interface EfsCsiDriverProps extends HelmAddOnUserProps {
      */
     kmsKeys?: kms.Key[];
 
+    /**
+     * Create Namespace with the provided one (will not if namespace is kube-system)
+     */
+    createNamespace?: boolean
+
 }
 
 /**
  * Defaults options for the add-on
  */
 const defaultProps: EfsCsiDriverProps = {
-    version: '3.0.6',
+    version: '3.0.8',
     namespace: "kube-system",
     repository: "https://kubernetes-sigs.github.io/aws-efs-csi-driver/",
     name: EFS_CSI_DRIVER,
     chart: EFS_CSI_DRIVER,
-    replicaCount: 2
+    replicaCount: 2,
+    createNamespace: false
 };
 
 @supportsALL
@@ -62,10 +68,16 @@ export class EfsCsiDriverAddOn extends HelmAddOn {
             name: EFS_CSI_CONTROLLER_SA,
             namespace: this.options.namespace,
         });
+
         getEfsDriverPolicyStatements(this.options?.kmsKeys).forEach((statement) => {
             serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
         });
 
+                // Create namespace
+        if (this.options.createNamespace) {
+            const ns = createNamespace(this.options.namespace!, cluster, true);
+            serviceAccount.node.addDependency(ns);
+        }
 
         // Lookup appropriate image repo
         const repo = registries.get(clusterInfo.cluster.stack.region) + EFS_REGISTRY_SUFFIX;

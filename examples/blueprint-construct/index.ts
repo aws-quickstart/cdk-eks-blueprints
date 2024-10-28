@@ -5,9 +5,14 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
-import { logger, userLog } from '../../lib/utils';
 import * as team from '../teams';
 import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
+import {
+    CreateEfsFileSystemProvider,
+    CreateRoleProvider,
+    CreateS3BucketProvider,
+    GenericClusterProvider, ManagedNodeGroup
+} from "../../lib";
 
 const burnhamManifestDir = './examples/teams/team-burnham/';
 const rikerManifestDir = './examples/teams/team-riker/';
@@ -22,45 +27,56 @@ export interface BlueprintConstructProps {
 }
 
 export default class BlueprintConstruct {
+    teams: Array<blueprints.Team>;
+    nodeRole: CreateRoleProvider;
+    ampWorkspaceName: string;
+    ampWorkspace: CfnWorkspace;
+    apacheAirflowS3Bucket: CreateS3BucketProvider;
+    apacheAirflowEfs: CreateEfsFileSystemProvider;
+    addOns: Array<blueprints.ClusterAddOn>;
+    clusterProvider: GenericClusterProvider;
+    dataTeam: blueprints.EmrEksTeamProps;
+    batchTeam: blueprints.BatchEksTeamProps;
+    nodeClassSpec: blueprints.Ec2NodeClassSpec;
+    nodePoolSpec: blueprints.NodePoolSpec;
+
+
     constructor(scope: Construct, props: cdk.StackProps) {
 
         blueprints.HelmAddOn.validateHelmVersions = true;
         blueprints.HelmAddOn.failOnVersionValidation = false;
-        logger.settings.minLevel = 3; // info
-        userLog.settings.minLevel = 2; // debug
 
-        const teams: Array<blueprints.Team> = [
+        this.teams = [
             new team.TeamTroi,
             new team.TeamRiker(scope, teamManifestDirList[1]),
             new team.TeamBurnham(scope, teamManifestDirList[0]),
             new team.TeamPlatform(process.env.CDK_DEFAULT_ACCOUNT!)
         ];
 
-        const nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new iam.ServicePrincipal("ec2.amazonaws.com"),
-        [
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
-            iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
-        ]);
+        this.nodeRole = new blueprints.CreateRoleProvider("blueprint-node-role", new iam.ServicePrincipal("ec2.amazonaws.com"),
+            [
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKSWorkerNodePolicy"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEC2ContainerRegistryReadOnly"),
+                iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
+            ]);
 
-        const ampWorkspaceName = "blueprints-amp-workspace";
-        const ampWorkspace: CfnWorkspace = blueprints.getNamedResource(ampWorkspaceName);
+        this.ampWorkspaceName = "blueprints-amp-workspace";
+        this.ampWorkspace = blueprints.getNamedResource(this.ampWorkspaceName);
 
-        const apacheAirflowS3Bucket = new blueprints.CreateS3BucketProvider({
+        this.apacheAirflowS3Bucket = new blueprints.CreateS3BucketProvider({
             id: 'apache-airflow-s3-bucket-id',
             s3BucketProps: { removalPolicy: cdk.RemovalPolicy.DESTROY }
         });
-        const apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
+        this.apacheAirflowEfs = new blueprints.CreateEfsFileSystemProvider({
             name: 'blueprints-apache-airflow-efs',
         });
-
-        const nodeClassSpec: blueprints.Ec2NodeClassSpec = {
+        this.nodeClassSpec = {
             amiFamily: "AL2",
             subnetSelectorTerms: [{ tags: { "Name": `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` }}],
             securityGroupSelectorTerms: [{ tags: { "aws:eks:cluster-name": `${blueprintID}` }}],
         };
         
-        const nodePoolSpec: blueprints.NodePoolSpec = {
+        this.nodePoolSpec = {
             labels: {
                 type: "karpenter-test"
             },
@@ -85,7 +101,7 @@ export default class BlueprintConstruct {
             }
         };
 
-        const addOns: Array<blueprints.ClusterAddOn> = [
+        this.addOns = [
             new blueprints.KubeRayAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
@@ -98,7 +114,7 @@ export default class BlueprintConstruct {
                 version: 'auto'
             }),
             new blueprints.addons.AmpAddOn({
-                ampPrometheusEndpoint: ampWorkspace.attrPrometheusEndpoint,
+                ampPrometheusEndpoint: this.ampWorkspace.attrPrometheusEndpoint,
                 namespace: 'adot'
             }),
             new blueprints.addons.XrayAdotAddOn({
@@ -147,10 +163,10 @@ export default class BlueprintConstruct {
                 serviceName: blueprints.AckServiceName.S3
             }),
             new blueprints.addons.KarpenterAddOn({
-                version: "v0.33.2",
-                nodePoolSpec: nodePoolSpec,
-                ec2NodeClassSpec: nodeClassSpec,
+                nodePoolSpec: this.nodePoolSpec,
+                ec2NodeClassSpec: this.nodeClassSpec,
                 interruptionHandling: true,
+                installCRDs: false
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
             new blueprints.addons.KubeviousAddOn(),
@@ -247,22 +263,12 @@ export default class BlueprintConstruct {
             hostedZoneResources: [ blueprints.GlobalResources.HostedZone ]
         });
 
-        const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_29,
-            tags: {
-                "Name": "blueprints-example-cluster",
-                "Type": "generic-cluster"
-            },
-            mastersRole: blueprints.getResource(context => {
-                return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
-            }),
-            managedNodeGroups: [
-                addGenericNodeGroup(),
-                addCustomNodeGroup(),
-                addWindowsNodeGroup(), //  commented out to check the impact on e2e
-                addGpuNodeGroup()
-            ]
-        });
+        this.clusterProvider = getClusterProvider([
+            addGenericNodeGroup(),
+            addCustomNodeGroup(),
+            addWindowsNodeGroup(), //  commented out to check the impact on e2e
+            addGpuNodeGroup()
+        ]);
 
         const executionRolePolicyStatement:iam. PolicyStatement [] = [
             new iam.PolicyStatement({
@@ -281,7 +287,7 @@ export default class BlueprintConstruct {
             }),
           ];
 
-        const dataTeam: blueprints.EmrEksTeamProps = {
+        this.dataTeam = {
               name:'dataTeam',
               virtualClusterName: 'batchJob',
               virtualClusterNamespace: 'batchjob',
@@ -294,7 +300,7 @@ export default class BlueprintConstruct {
               ]
           };
 
-        const batchTeam: blueprints.BatchEksTeamProps = {
+        this.batchTeam = {
             name: 'batch-a',
             namespace: 'aws-batch',
             envName: 'batch-a-comp-env',
@@ -308,27 +314,24 @@ export default class BlueprintConstruct {
             },
             jobQueueName: 'team-a-job-queue',
         };
-
-        blueprints.EksBlueprint.builder()
-            .addOns(...addOns)
-            .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, {
-                primaryCidr: "10.2.0.0/16",
-                secondaryCidr: "100.64.0.0/16",
-                secondarySubnetCidrs: ["100.64.0.0/24","100.64.1.0/24","100.64.2.0/24"]
-            }))
-            .resourceProvider("node-role", nodeRole)
-            .resourceProvider('apache-airflow-s3-bucket-provider', apacheAirflowS3Bucket)
-            .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
-            .clusterProvider(clusterProvider)
-            .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
-            .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
-            .build(scope, blueprintID, props);
-
     }
 }
 
-function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
+export function getClusterProvider(managedNodeGroups: ManagedNodeGroup[]){
+    return new blueprints.GenericClusterProvider({
+        version: KubernetesVersion.V1_30,
+        tags: {
+            "Name": "blueprints-example-cluster",
+            "Type": "generic-cluster"
+        },
+        mastersRole: blueprints.getResource(context => {
+            return new iam.Role(context.scope, 'AdminRole', { assumedBy: new iam.AccountRootPrincipal() });
+        }),
+        managedNodeGroups: managedNodeGroups
+    });
+}
+
+export function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng1",
@@ -351,7 +354,7 @@ function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
+export function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
 
     const userData = ec2.UserData.forLinux();
     userData.addCommands(`/etc/eks/bootstrap.sh ${blueprintID}`);
@@ -385,7 +388,7 @@ function addCustomNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
+export function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng3-windowsami",
@@ -404,7 +407,7 @@ function addWindowsNodeGroup(): blueprints.ManagedNodeGroup {
     };
 }
 
-function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
+export function addGpuNodeGroup(): blueprints.ManagedNodeGroup {
 
     return {
         id: "mng-linux-gpu",

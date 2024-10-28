@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
-import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion, IpFamily } from 'aws-cdk-lib/aws-eks';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -16,7 +16,8 @@ import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam'
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
-        [KubernetesVersion.V1_30.version, '0.37.0'],
+        [KubernetesVersion.V1_31.version, '0.37.5'],
+        [KubernetesVersion.V1_30.version, '0.37.5'],
         [KubernetesVersion.V1_29.version, '0.34.0'],
         [KubernetesVersion.V1_28.version, '0.31.0'],
         [KubernetesVersion.V1_27.version, '0.28.0'],
@@ -299,8 +300,8 @@ const RELEASE = 'blueprints-addon-karpenter';
  */
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
-    namespace: KARPENTER,
-    version: 'v0.34.1',
+    namespace: "kube-system",
+    version: '1.0.6',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
@@ -359,7 +360,7 @@ export class KarpenterAddOn extends HelmAddOn {
         const amiFamily = this.options.ec2NodeClassSpec?.amiFamily;
         const amiSelector = this.options.ec2NodeClassSpec?.amiSelector || {};
         const amiSelectorTerms = this.options.ec2NodeClassSpec?.amiSelectorTerms;
-        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || null;
+        const instanceStorePolicy = this.options.ec2NodeClassSpec?.instanceStorePolicy || undefined;
         const userData = this.options.ec2NodeClassSpec?.userData || "";
         const instanceProf = this.options.ec2NodeClassSpec?.instanceProfile;
         const tags = this.options.ec2NodeClassSpec?.tags || {};
@@ -369,6 +370,9 @@ export class KarpenterAddOn extends HelmAddOn {
             httpPutResponseHopLimit: 2,
             httpTokens: "required"
         };
+        if (cluster.ipFamily == IpFamily.IP_V6) {
+            metadataOptions.httpProtocolIPv6 = "enabled";
+        }
         const blockDeviceMappings = this.options.ec2NodeClassSpec?.blockDeviceMappings || [];
         const detailedMonitoring = this.options.ec2NodeClassSpec?.detailedMonitoring || false;
 
@@ -627,7 +631,7 @@ export class KarpenterAddOn extends HelmAddOn {
                     }
 
                     // Instance Store Policy added for v0.34.0 and up
-                    if (semver.gte(version, '0.34.0')){
+                    if (semver.gte(version, '0.34.0') && instanceStorePolicy){
                         ec2Node = merge(ec2Node, { spec: { instanceStorePolicy: instanceStorePolicy }});
                     }
                 } else {
@@ -771,6 +775,13 @@ export class KarpenterAddOn extends HelmAddOn {
             ],
             //roleName: `KarpenterNodeRole-${name}` // let role name to be generated as unique
         });
+
+        // Attach ipv6 related policies based on cluster IPFamily
+        if (cluster.ipFamily === IpFamily.IP_V6){
+            const nodeIpv6Policy = new iam.Policy(cluster, 'karpenter-node-Ipv6-Policy', {
+                document: utils.getEKSNodeIpv6PolicyDocument() });
+            karpenterNodeRole.attachInlinePolicy(nodeIpv6Policy);
+        }
 
         // Set up Instance Profile
         const instanceProfileName = md5.Md5.hashStr(stackName+region);

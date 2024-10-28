@@ -49,6 +49,11 @@ export interface KedaAddOnProps extends HelmAddOnUserProps {
      */
     irsaRoles?: string[];
 
+    /**
+     * If set to true the namespace will be created. Default is true, since namespace is set to keda. 
+     * Set to false if installing to kube-system or other existing namespace. 
+     */
+    createNamespace?: boolean,
 }
 
 /**
@@ -58,13 +63,14 @@ const defaultProps: HelmAddOnProps & KedaAddOnProps = {
   name: "blueprints-keda-addon",
   chart: "keda",
   namespace:"keda",
-  version: "2.14.2",
+  version: "2.15.2",
   release: "keda",
   repository:  "https://kedacore.github.io/charts",
   values: {},
   kedaOperatorName: "keda-operator",
   kedaServiceAccountName: "keda-operator",
-  irsaRoles: []
+  irsaRoles: [],
+  createNamespace: true
 };
 
 /**
@@ -85,26 +91,26 @@ export class KedaAddOn extends HelmAddOn {
     let values: Values = populateValues(this.options);
     values = merge(values, this.props.values ?? {});
 
-    const namespace = createNamespace(this.options.namespace! , cluster);
+    let namespace: Construct | undefined = undefined;
+    
+    if(this.options.createNamespace) {
+        namespace = createNamespace(this.options.namespace! , cluster);
+    }
+    const chart = this.addHelmChart(clusterInfo, values);
 
     if (this.options.irsaRoles!.length > 0) {
       //Create Service Account with IRSA
       const opts = { name: this.options.kedaOperatorName, namespace: this.options.namespace };
       const sa = cluster.addServiceAccount(this.options.kedaServiceAccountName!, opts);
-      setRoles(sa,this.options.irsaRoles!);
-      sa.node.addDependency(namespace);
-
-      const chart = this.addHelmChart(clusterInfo, values);
+      setRoles(sa, this.options.irsaRoles!);
+      if(namespace) {
+        sa.node.addDependency(namespace);
+      }
       chart.node.addDependency(sa);
-      return Promise.resolve(chart);
-
-    } else {
-      //Let Keda Create Service account for you. This is controlled by flag helmOptions.createServiceAccount (refer line no:118)
-      const chart = this.addHelmChart(clusterInfo, values);
-      return Promise.resolve(chart);
+    } else if(namespace) {
+      chart.node.addDependency(namespace);
     }
-
-
+    return Promise.resolve(chart);
   }
 }
 

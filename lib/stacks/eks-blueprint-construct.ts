@@ -12,8 +12,9 @@ import { IKey } from "aws-cdk-lib/aws-kms";
 import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
+import * as eks from "aws-cdk-lib/aws-eks";
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = KubernetesVersion.V1_29;
+export const DEFAULT_VERSION = KubernetesVersion.V1_30;
 
 /**
  *  Exporting control plane log type so that customers don't have to import CDK EKS module for blueprint configuration.
@@ -84,6 +85,12 @@ export class EksBlueprintProps {
      * When set to true, will not use extra nesting for blueprint resources and attach them directly to the stack.
      */
     readonly compatibilityMode?: boolean;
+
+    /**
+     * ipFamily to support IPv6 clusters. By default, it uses IPv4 as the value.
+     */
+    readonly ipFamily?: eks.IpFamily;
+
 }
 
 export class BlueprintPropsConstraints implements constraints.ConstraintsType<EksBlueprintProps> {
@@ -138,6 +145,14 @@ export class BlueprintConstructBuilder {
 
     public version(version: "auto" | KubernetesVersion): this {
         this.props = { ...this.props, ...{ version: version } };
+        return this;
+    }
+
+    /**
+     * Adding ipFamily method to support IPv6 clusters. By default, it uses IPv4 as the value.
+     */
+    public ipFamily(ipFamily:  eks.IpFamily = eks.IpFamily.IP_V4): this {
+        this.props = { ...this.props, ...{ ipFamily: ipFamily } };
         return this;
     }
 
@@ -240,7 +255,7 @@ export class EksBlueprintConstruct extends Construct {
             version
         });
 
-        this.clusterInfo = clusterProvider.createCluster(scope, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes);
+        this.clusterInfo = clusterProvider.createCluster(scope, vpcResource!, kmsKeyResource, version, blueprintProps.enableControlPlaneLogTypes, blueprintProps.ipFamily);
         this.clusterInfo.setResourceContext(resourceContext);
 
         if (blueprintProps.enableGitOpsMode == spi.GitOpsMode.APPLICATION) {

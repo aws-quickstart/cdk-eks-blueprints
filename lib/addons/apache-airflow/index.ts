@@ -74,7 +74,7 @@ const AIRFLOWPVC = 'efs-apache-airflow-pvc';
     name: AIRFLOW,
     namespace: AIRFLOW,
     chart: AIRFLOW,
-    version: "1.14.0",
+    version: "1.15.0",
     release: RELEASE,
     repository:  "https://airflow.apache.org",
     enableAlb: false,
@@ -204,7 +204,7 @@ function setUpLoadBalancer(clusterInfo: ClusterInfo, values: Values, albAddOnChe
 /**
  * Helper function to set up Logging with S3 Bucket
 */
-function setUpLogging(clusterInfo: ClusterInfo, values: Values, ns: KubernetesManifest, namespace: string, bucket: IBucket): Values {
+function setUpLogging(clusterInfo: ClusterInfo, values: Values, ns: Construct, namespace: string, bucket: IBucket): Values {
     
     // Assert check to ensure you provide an S3 Bucket
     assert(bucket, "Please provide the name of S3 bucket for Logging.");
@@ -275,7 +275,7 @@ function setUpLogging(clusterInfo: ClusterInfo, values: Values, ns: KubernetesMa
 /**
  * 
  */
-function setUpEFS(clusterInfo: ClusterInfo, values: Values, ns: KubernetesManifest, namespace: string, efsResourceName: string): [Values, KubernetesManifest] {
+function setUpEFS(clusterInfo: ClusterInfo, values: Values, ns: Construct, namespace: string, efsResourceName: string): [Values, KubernetesManifest] {
     // Check 
     const efsAddOnCheck = clusterInfo.getScheduledAddOn(EfsCsiDriverAddOn.name);
     assert(efsAddOnCheck, `Missing a dependency: ${EfsCsiDriverAddOn.name}. Please add it to your list of addons.`); 
