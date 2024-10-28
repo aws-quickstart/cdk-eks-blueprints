@@ -80,7 +80,7 @@ describe('Unit test for CloudWatch Addon', () => {
     const app = new cdk.App();
     
     const addOn = new blueprints.CloudWatchInsights({});
-    const version = KubernetesVersion.V1_29;
+    const version = KubernetesVersion.V1_30;
     const blueprint = await blueprints.EksBlueprint.builder()
       .version(version)
       .account("123456789012").region('us-east-2')
@@ -89,9 +89,11 @@ describe('Unit test for CloudWatch Addon', () => {
 
     const template = Template.fromStack(blueprint);
 
+    const inferredVersion = await addOn.provideVersion(version, 'us-west-2');
+
     template.hasResource("AWS::EKS::Addon", {
       Properties: {
-        "AddonVersion": Match.exact(addOn.provideDefaultAutoVersion(version))
+        "AddonVersion": Match.exact(inferredVersion)
       }
     });
   });
