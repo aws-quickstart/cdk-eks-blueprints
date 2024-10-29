@@ -67,5 +67,5 @@ spec:
 
 ## References
 
-- [Amazon S3 CSI Driver Documentation](https://github.com/kubernetes-sigs/aws-s3-csi-driver)
+- [Amazon S3 CSI Driver Source](https://github.com/awslabs/mountpoint-s3-csi-driver)
 - [Amazon EKS S3 CSI Driver Documentation](https://docs.aws.amazon.com/eks/latest/userguide/s3-csi.html)
