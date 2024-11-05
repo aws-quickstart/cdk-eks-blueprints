@@ -1,9 +1,9 @@
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
-import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { supportsALL } from "../../utils";
+import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
-    [KubernetesVersion.V1_31, "1.31.0-eksbuild.5"],
+    [KubernetesVersion.V1_31, "v1.31.0-eksbuild.5"],
     [KubernetesVersion.V1_30, "v1.30.0-eksbuild.3"],
     [KubernetesVersion.V1_29, "v1.29.0-eksbuild.1"],
     [KubernetesVersion.V1_28, "v1.28.2-eksbuild.2"],
