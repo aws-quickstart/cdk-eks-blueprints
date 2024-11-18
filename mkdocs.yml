@@ -83,6 +83,7 @@ nav:
     - Pixie: 'addons/pixie.md'
     - Prometheus Node Exporter: 'addons/prometheus-node-exporter.md'
     - Rafay: 'addons/rafay.md'
+    - S3 CSI Driver: 'addons/s3-csi-driver.md'
     - Secrets Store: 'addons/secrets-store.md'
     - Snyk: 'https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon'
     - SSM Agent: 'addons/ssm-agent.md'
