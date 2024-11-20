@@ -6,6 +6,7 @@ import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
 import { supportsALL } from "../../utils";
+import { Duration } from "aws-cdk-lib";
 
 /**
  * Configuration options for the add-on.
@@ -119,7 +120,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
             ...image,
             vpcId: clusterInfo.cluster.vpc.vpcId,
             ...this.options.values,
-        }, undefined, false);
+        }, undefined, true, Duration.minutes(15));
 
         awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
         // return the Promise Construct for any teams that may depend on this
