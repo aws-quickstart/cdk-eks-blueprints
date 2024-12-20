@@ -74,7 +74,7 @@
         "semver": "^7.6.0"
     },
     "peerDependencies": {
-        "aws-cdk-lib": "2.162.1",
-        "aws-cdk": "2.162.1"
+        "aws-cdk-lib": "2.173.2",
+        "aws-cdk": "2.173.2"
     }
 }

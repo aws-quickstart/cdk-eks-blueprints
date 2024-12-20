@@ -1,6 +1,6 @@
 # gMaestro add-on for Amazon EKS Blueprints
 
-This add-on deploys the [gMaestro Agent](https://app.granulate.io/gMaestroSignup) on Amazon EKS using the [eks-blueprints](https://github.com/aws-quickstart/cdk-eks-blueprints) [CDK](https://aws.amazon.com/cdk/) construct.
+This add-on deploys the [gMaestro Agent](https://app.granulate.io/) on Amazon EKS using the [eks-blueprints](https://github.com/aws-quickstart/cdk-eks-blueprints) [CDK](https://aws.amazon.com/cdk/) construct.
 
 gMaestro is a Kubernetes cost optimization solution that helps companies reduce spending on un-utilized resources by up to 60%. With gMaestro, you gain full visibility into K8s clusters, seamlessly interact with HPA scaling policies, and achieve your cost-performance goals by applying custom rightsizing recommendations based on actual usage in production.
 
@@ -9,8 +9,8 @@ This add-on will deploy gMaestro agent on a namespace of your choice and create 
 
 ## Prerequisites
 Before using gMaestro, you need to:
-1. [Sign up](https://app.granulate.io/gMaestroSignup) to the gMaestro platform
-2. Download a config YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/deploy) on the left-hand menu, fill in the required fields and click on "Generate Config File" as shown bellow:
+1. [Sign up](https://app.granulate.io/) to the gMaestro platform
+2. Download a config YAML file - After signing up to gMaestro, navigate to the [Deploy](https://app.granulate.io/) on the left-hand menu, fill in the required fields and click on "Generate Config File" as shown bellow:
 
 ![GmaestroGenerateConfigFile](./../assets/images/gmaestro-generate-config-file.png)
 

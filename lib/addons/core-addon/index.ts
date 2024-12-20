@@ -7,7 +7,7 @@ import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
 import { RemovalPolicy } from "aws-cdk-lib";
-import cluster from "cluster";
+
 
 export class CoreAddOnProps {
     /**

@@ -84,7 +84,7 @@ blueprints.EksBlueprint.builder()
 | `deploy.postgresql.enable`  | Deploy and use postgres database             | false                            |
 | `deploy.postgresql.dsn`  | DSN of your existing postgres database for paralus to use             | ""                            |
 | `deploy.fluentbit.enable`       | Deploy and use fluentbit for auditlogs with database storage    | ""                            |
-| `paralus.initialize.adminEmail`       | Admin email to access paralus    | "<admin@paralus.local>"                            |
+| `paralus.initialize.adminEmail`       | Admin email to access paralus    | `admin@paralus.local`                            |
 | `paralus.initialize.org`             | Organization name using paralus    | "ParalusOrg"                     |
 | `auditLogs.storage`               | Default storage of auditlogs               | "database"                     |
 | `fqdn.domain`               | Root domain               | "paralus.local"                     |

@@ -8,12 +8,12 @@ import { getAdotCollectorPolicyDocument } from "./iam-policy";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
-    // 1.31 not supported for adot as of 10/20/2024
-    [KubernetesVersion.V1_30, "v0.102.1-eksbuild.1"],
-    [KubernetesVersion.V1_29, "v0.102.1-eksbuild.1"],
-    [KubernetesVersion.V1_28, "v0.102.1-eksbuild.1"],
-    [KubernetesVersion.V1_27, "v0.102.1-eksbuild.1"],
-    [KubernetesVersion.V1_26, "v0.102.1-eksbuild.1"],
+  // 1.31 not supported for adot as of 10/20/2024
+  [KubernetesVersion.V1_30, "v0.109.0-eksbuild.2"],
+  [KubernetesVersion.V1_29, "v0.109.0-eksbuild.2"],
+  [KubernetesVersion.V1_28, "v0.109.0-eksbuild.2"],
+  [KubernetesVersion.V1_27, "v0.109.0-eksbuild.2"],
+  [KubernetesVersion.V1_26, "v0.109.0-eksbuild.2"],
 ]);
 
 /**
