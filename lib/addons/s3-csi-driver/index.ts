@@ -7,6 +7,7 @@ import { getS3DriverPolicyStatements } from "./iam-policy";
 
 const S3_CSI_DRIVER_SA = 's3-csi-driver-sa';
 const S3_CSI_DRIVER = "aws-mountpoint-s3-csi-driver";
+
 const S3_CSI_DRIVER_RELEASE = 's3-csi-driver-release';
 const S3_DRIVER_POLICY = 's3-csi-driver-policy';
 
@@ -35,7 +36,7 @@ const defaultProps: HelmAddOnUserProps & S3CSIDriverAddOnProps = {
   version: "v1.11.0",
   repository: "https://awslabs.github.io/mountpoint-s3-csi-driver",
   createNamespace: false,
-  s3BucketName: "",
+  s3BucketName: ""
 };
 
 @supportsALL
