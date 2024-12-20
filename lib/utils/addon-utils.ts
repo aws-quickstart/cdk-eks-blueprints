@@ -35,7 +35,10 @@ export function dependable(...addOns: string[]) {
 
       addOns.forEach( (addOn) => {
         const dep = clusterInfo.getScheduledAddOn(addOn);
-        assert(dep, `Missing a dependency for ${addOn} for ${stack}`); 
+       
+        let targetString = target?.constructor?.toString().split("\n")[0] ?? "unknown";
+
+        assert(dep, `Missing a dependency for ${addOn} for ${stack} and target ${targetString}`);
         dependencies.push(dep!);
       });
 
