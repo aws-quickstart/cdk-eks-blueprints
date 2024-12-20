@@ -107,7 +107,6 @@ export function getVPCFromId(context: ResourceContext, nodeId: string, vpcId?: s
         } else {
             console.log(`looking up non-default ${vpcId} VPC`);
             vpc = ec2.Vpc.fromLookup(context.scope, nodeId + "-vpc", { vpcId: vpcId });
-            console.log(vpc);
         }
     }
     return vpc;
