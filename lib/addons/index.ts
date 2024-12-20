@@ -57,6 +57,7 @@ export * from './neuron';
 export * from './nginx';
 export * from './opa-gatekeeper';
 export * from './prometheus-node-exporter';
+export * from './s3-csi-driver';
 export * from './secrets-store';
 export * from './secrets-store/csi-driver-provider-aws-secrets';
 export * from './secrets-store/secret-provider';
