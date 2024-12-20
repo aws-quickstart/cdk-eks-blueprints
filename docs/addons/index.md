@@ -79,7 +79,7 @@ The framework currently supports the following add-ons.
 | [`VeleroAddOn`](./velero.md)                                           | Adds [Velero](https://velero.io/) to the EKS Cluster.                                                                                  | ✅ | ✅ |
 | [`XrayAddOn`](./xray.md)                                                  | Adds XRay Daemon to the EKS Cluster.                                                                                                   | NA | NA
 | [`XrayAdotAddOn`](./xray-adot-addon.md)                                   | Deploys ADOT Collector for Xray to receive traces from your workloads.                                                                 | ✅ | ✅ |
-| [`GmaestroAddOn`](./gmaestro.md) | Adds [gMaestro](https://app.granulate.io/gMaestroSignup) cost optimization solution for EKS cluster.                                                                         |
+| ~~[`GmaestroAddOn`](./gmaestro.md)~~ | Deprecated due to EOL. Adds [gMaestro](https://app.granulate.io) cost optimization solution for EKS cluster.                                                                         |
 | [`EksPodIdentityAgentAddOn`](./eks-pod-identity-agent.md)       | [Setting up the EKS Pod Identity Agent](https://docs.aws.amazon.com/en_ca/eks/latest/userguide/pod-id-agent-setup.html)                  | ✅ | ✅ |
 
 
