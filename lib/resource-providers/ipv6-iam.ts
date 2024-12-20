@@ -1,7 +1,7 @@
 import * as spi from "../spi";
 import * as iam from "aws-cdk-lib/aws-iam";
 import {IManagedPolicy} from "aws-cdk-lib/aws-iam";
-import {getEKSNodeIpv6PolicyDocument} from '../../lib/utils/ipv6-utils';
+import {getEKSNodeIpv6PolicyDocument} from '../utils/ipv6-utils';
 
 /**
  * Resource provider that creates a new role with ipv6 permissions.

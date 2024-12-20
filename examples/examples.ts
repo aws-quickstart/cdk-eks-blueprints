@@ -35,7 +35,7 @@ const publicCluster = {
 };
 
 builder()
-    .clusterProvider(new bp.FargateClusterProvider(publicCluster))
+    .clusterProvider(new bp.FargateClusterProvider({...publicCluster}))
     .build(app, "fargate-blueprint");
 
 builder()
