@@ -132,6 +132,20 @@ export default class BlueprintConstruct {
 
     this.addOns = [
       // pre-reqs / core addons
+      new addons.VpcCniAddOn({
+        customNetworkingConfig: {
+          subnets: [
+            blueprints.getNamedResource("secondary-cidr-subnet-0"),
+            blueprints.getNamedResource("secondary-cidr-subnet-1"),
+            blueprints.getNamedResource("secondary-cidr-subnet-2"),
+          ],
+        },
+        awsVpcK8sCniCustomNetworkCfg: true,
+        eniConfigLabelDef: "topology.kubernetes.io/zone",
+        serviceAccountPolicies: [
+          iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"),
+        ],
+      }),
       new addons.AwsLoadBalancerControllerAddOn(),
       new addons.CertManagerAddOn(),
       new addons.AdotCollectorAddOn({
@@ -264,20 +278,6 @@ export default class BlueprintConstruct {
       new addons.UpboundCrossplaneAddOn({
         skipVersionValidation: true,
         clusterAccessRole: blueprints.getNamedResource("node-role"),
-      }),
-      new addons.VpcCniAddOn({
-        customNetworkingConfig: {
-          subnets: [
-            blueprints.getNamedResource("secondary-cidr-subnet-0"),
-            blueprints.getNamedResource("secondary-cidr-subnet-1"),
-            blueprints.getNamedResource("secondary-cidr-subnet-2"),
-          ],
-        },
-        awsVpcK8sCniCustomNetworkCfg: true,
-        eniConfigLabelDef: "topology.kubernetes.io/zone",
-        serviceAccountPolicies: [
-          iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonEKS_CNI_Policy"),
-        ],
       }),
       new addons.XrayAddOn(),
       new addons.XrayAdotAddOn({

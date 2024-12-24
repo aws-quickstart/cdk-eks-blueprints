@@ -5,7 +5,9 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { supportsALL } from "../../utils";
+import { dependable, supportsALL } from "../../utils";
+import { Duration } from "aws-cdk-lib";
+import { VpcCniAddOn } from "../vpc-cni";
 
 /**
  * Configuration options for the add-on.
@@ -76,53 +78,65 @@ function lookupImage(registry?: string, region?: string): Values {
     return { image: { repository: registry + "amazon/aws-load-balancer-controller" } };
 }
 
-@Reflect.metadata("ordered", true)
 @supportsALL
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
+  readonly options: AwsLoadBalancerControllerProps;
 
-    readonly options: AwsLoadBalancerControllerProps;
+  constructor(props?: AwsLoadBalancerControllerProps) {
+    super({ ...(defaultProps as any), ...props });
+    this.options = this.props as AwsLoadBalancerControllerProps;
+  }
 
-    constructor(props?: AwsLoadBalancerControllerProps) {
-        super({ ...defaultProps as any, ...props });
-        this.options = this.props as AwsLoadBalancerControllerProps;
-    }
+  @dependable(VpcCniAddOn.name)
+  deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+    const cluster = clusterInfo.cluster;
+    const serviceAccount = cluster.addServiceAccount(
+      "aws-load-balancer-controller",
+      {
+        name: AWS_LOAD_BALANCER_CONTROLLER,
+        namespace: this.options.namespace,
+      }
+    );
 
-    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        const cluster = clusterInfo.cluster;
-        const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
-            name: AWS_LOAD_BALANCER_CONTROLLER,
-            namespace: this.options.namespace,
-        });
+    AwsLoadbalancerControllerIamPolicy(
+      cluster.stack.partition
+    ).Statement.forEach((statement) => {
+      serviceAccount.addToPrincipalPolicy(
+        iam.PolicyStatement.fromJson(statement)
+      );
+    });
 
-        AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
-            serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
-        });
+    const registry = registries.get(cluster.stack.region);
 
-        const registry = registries.get(cluster.stack.region);
+    const image = lookupImage(registry, cluster.stack.region);
 
-        const image = lookupImage(registry, cluster.stack.region);
+    const awsLoadBalancerControllerChart = this.addHelmChart(
+      clusterInfo,
+      {
+        clusterName: cluster.clusterName,
+        serviceAccount: {
+          create: false,
+          name: serviceAccount.serviceAccountName,
+        },
+        // must disable waf features for aws-cn partition
+        enableShield: this.options.enableShield,
+        enableWaf: this.options.enableWaf,
+        enableWafv2: this.options.enableWafv2,
+        createIngressClassResource: this.options.createIngressClassResource,
+        ingressClass: this.options.ingressClass,
+        enableServiceMutatorWebhook: this.options.enableServiceMutatorWebhook,
+        region: clusterInfo.cluster.stack.region,
+        ...image,
+        vpcId: clusterInfo.cluster.vpc.vpcId,
+        ...this.options.values,
+      },
+      undefined,
+      true,
+      Duration.minutes(15)
+    );
 
-        const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
-            clusterName: cluster.clusterName,
-            serviceAccount: {
-                create: false,
-                name: serviceAccount.serviceAccountName,
-            },
-            // must disable waf features for aws-cn partition
-            enableShield: this.options.enableShield,
-            enableWaf: this.options.enableWaf,
-            enableWafv2: this.options.enableWafv2,
-            createIngressClassResource: this.options.createIngressClassResource,
-            ingressClass: this.options.ingressClass,
-            enableServiceMutatorWebhook: this.options.enableServiceMutatorWebhook,
-            region: clusterInfo.cluster.stack.region,
-            ...image,
-            vpcId: clusterInfo.cluster.vpc.vpcId,
-            ...this.options.values,
-        }, undefined, false);
-
-        awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
-        // return the Promise Construct for any teams that may depend on this
-        return Promise.resolve(awsLoadBalancerControllerChart);
-    }
+    awsLoadBalancerControllerChart.node.addDependency(serviceAccount);
+    // return the Promise Construct for any teams that may depend on this
+    return Promise.resolve(awsLoadBalancerControllerChart);
+  }
 }
