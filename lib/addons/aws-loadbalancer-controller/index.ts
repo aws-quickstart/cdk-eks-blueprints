@@ -5,14 +5,9 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-<<<<<<< HEAD
-import { dependable, supportsALL } from "../../utils";
-import { Duration } from "aws-cdk-lib";
-import { VpcCniAddOn } from "../vpc-cni";
-=======
 import { supportsALL } from "../../utils";
 import { Duration } from "aws-cdk-lib";
->>>>>>> main
+
 
 /**
  * Configuration options for the add-on.
@@ -92,7 +87,6 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         this.options = this.props as AwsLoadBalancerControllerProps;
     }
 
-    @dependable(VpcCniAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const serviceAccount = cluster.addServiceAccount(

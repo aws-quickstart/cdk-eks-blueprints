@@ -6,7 +6,7 @@
       },
       "ghcr.io/devcontainers/features/aws-cli:1": {},
       "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
-        "version": "2.173.2"
+        "version": "2.173.4"
       }
     },
     "postCreateCommand": ".devcontainer/postCreateCommand.sh",
