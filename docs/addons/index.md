@@ -4,6 +4,76 @@ The `eks-blueprints` framework leverages a modular approach to managing [Add-ons
 
 Within the context of the `eks-blueprints` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources.
 
+Here's an improved version of the public documentation abstract with enhanced readability:
+
+## Add-on Dependencies and Ordering in EKS Blueprints
+
+Add-ons in EKS Blueprints rely on CDK/CloudFormation constructs for provisioning. By default, these constructs don't guarantee a specific order unless explicitly defined using the [CDK dependency mechanism](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib-readme.html#dependencies).
+
+**Default Behavior**
+- Add-ons without explicit dependencies are provisioned concurrently in an arbitrary order.
+- The order in which you add add-ons to the blueprint may not matter if there are no explicit dependencies between them.
+
+Lack of explicit dependencies can lead to:
+- Race conditions
+- Non-deterministic behavior
+- Difficult-to-troubleshoot problems
+
+For example, if an add-on requires the AWS LoadBalancer Controller to be in place, but there's no explicit dependency, the dependent add-on might start installing before the ALB controller is fully provisioned.
+
+### Built-in Dependencies
+
+Many add-ons in EKS Blueprints have pre-defined dependencies. For example, `Istio*` add-ons depend on `IstioBase`, `AmpAddOn` depends on `AdotCollectorAddOn`, etc.
+
+These dependencies are implemented using the `@dependable` decorator applied to the `deploy` method of the dependent add-on:
+
+```typescript
+export class AmpAddOn implements ClusterAddOn {
+    @dependable(AdotCollectorAddOn.name)
+    deploy(clusterInfo: ClusterInfo): Promise<Construct> {
+        // Implementation
+    }
+}
+```
+
+### Custom Ordering
+
+For cases where the framework doesn't capture all necessary dependencies, you have two options:
+
+1. Subclass an add-on and override the `deploy` method to declare additional dependencies.
+2. Use the EKS Blueprints framework's mechanism to create dependencies at the project level.
+
+**Creating Dependencies at the Project Level**
+
+To ensure one add-on is installed before another:
+
+1. Ensure the prerequisite add-on is added to the blueprint ahead of the dependent add-ons.
+2. Mark the prerequisite add-on as "strictly ordered" using:
+
+```typescript
+Reflect.defineMetadata("ordered", true, blueprints.addons.PrerequisiteAddOn);
+```
+
+This ensures that all add-ons declared after the marked add-on will only be provisioned after it's successfully deployed.
+
+### Example
+
+```typescript
+// Enable detailed logging
+blueprints.utils.logger.settings.minLevel = 1;
+
+// Mark AwsLoadBalancerControllerAddOn as requiring strict ordering
+Reflect.defineMetadata("ordered", true, blueprints.addons.AwsLoadBalancerControllerAddOn);
+
+blueprints.EksBlueprint.builder()
+    .addOns(new VpcCniAddon) // add all add-ons that do NOT need to depend on ALB before the ALB add-on
+    .addOns(new AwsLoadBalancerControllerAddOn())
+    .addOns(new MyAddOn()) // Automatically depends on AwsLoadBalancerControllerAddOn
+    .build(...);
+```
+
+Note: You can mark multiple add-ons as `ordered` if needed.
+
 ## Supported Add-ons
 
 The framework currently supports the following add-ons.
