@@ -1,0 +1,3365 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../teams/bedrock-team/">
+      
+      
+        <link rel="next" href="../addons/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Pipelines - Amazon EKS Blueprints Quick Start</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pipelines" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Amazon EKS Blueprints Quick Start" class="md-header__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Amazon EKS Blueprints Quick Start
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pipelines
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Amazon EKS Blueprints Quick Start" class="md-nav__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Amazon EKS Blueprints Quick Start
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-Cluster Management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Core Concepts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Teams
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/teams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/emr-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/aws-batch-on-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/bedrock-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Pipelines
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Pipelines
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defining-your-blueprint-to-use-with-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining your blueprint to use with pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-github-as-codepipeline-repository-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using GitHub as CodePipeline repository source.
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-aws-codestar-connection-as-codepipeline-repository-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using AWS CodeStar connection as CodePipeline repository source.
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating stages
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-waves" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Waves
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-build-time-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Build Time Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monorepo-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monorepo support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-the-pipeline-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build the pipeline stack
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying Pipelines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    AddOns
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            AddOns
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ack-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ACK
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/amp-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/app-mesh/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS App Mesh
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/apache-airflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apache Airflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-batch-on-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch for EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/argo-cd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-for-fluent-bit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS For Fluent Bit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-load-balancer-controller/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Load Balancer Controller
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-node-termination-handler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Node Termination Handler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-privateca-issuer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Private CA Issuer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/backstage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backstage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/calico/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/calico-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cert-manager/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cloudwatch-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-cloudwatch-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cluster-autoscaler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cluster Autoscaler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/container-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Container Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/coredns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CoreDns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/datadog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Datadog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dynatrace
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ebs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EBS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/efs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/external-dns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External DNS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/external-secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/emr-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/fluxcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FluxCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/gmaestro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Gmaestro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/gpu-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NVIDIA GPU Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/grafana-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Grafana Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/instana-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IBM Instana
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ingress-nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-control-plane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Control Plane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio CNI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-ingress-gateway/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Ingress Gateway
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/jupyterhub/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JupyterHub
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/karpenter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Karpenter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kasten-k10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kasten
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/keda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/keptn-sandbox/keptn-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keptn
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/knative-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Knative
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/komodorio/komodor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Komodor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/konveyor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Konveyor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kube-proxy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube Proxy
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubecost/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubecost
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubeflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kuberay-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeRay Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ingress-nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubeshark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeshark
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubevious/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubevious
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kube-state-metrics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube State Metrics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/metrics-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metrics Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/newrelic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    New Relic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/neuron-device-plugin-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Device
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/neuron-monitor-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Monitor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/paralus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paralus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/pixie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pixie
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/prometheus-node-exporter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prometheus Node Exporter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/rafay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rafay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/s3-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/secrets-store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Snyk
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ssm-agent/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SSM Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/upbound-universal-crossplane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upbound Universal Crossplane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/velero/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Velero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/vpc-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vpc Cni
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/xray/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/xray-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Internal
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Internal
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/ci/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeBuild CI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/input-validations-framework-readme/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input Validation Framework
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/readme-internal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Readme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Cluster Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Cluster Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/generic-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Generic Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/asg-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ASG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/mng-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MNG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/fargate-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fargate Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/import-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Import Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Resource Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resource Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/amp-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP Resource Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/certificate-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/efs-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/hosted-zone-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hosted Zone Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/iam-role-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IAM Role Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/kms-key-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KMS Key Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/s3-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 Bucket Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/vpc-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VPC Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Builders
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/bedrock-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/graviton-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Graviton Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/gpu-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GPU Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/observability-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/windows-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensibility/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Extensibility
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defining-your-blueprint-to-use-with-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining your blueprint to use with pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-github-as-codepipeline-repository-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using GitHub as CodePipeline repository source.
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-aws-codestar-connection-as-codepipeline-repository-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using AWS CodeStar connection as CodePipeline repository source.
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating stages
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-waves" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Waves
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-build-time-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Build Time Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monorepo-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monorepo support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-the-pipeline-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build the pipeline stack
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying Pipelines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="pipelines">Pipelines<a class="headerlink" href="#pipelines" title="Permanent link">&para;</a></h1>
+<p>While it is convenient to leverage the CDK command line tool to deploy your first cluster, we recommend setting up automated pipelines that will be responsible for deploying and updating your EKS infrastructure.</p>
+<p>To accomplish this, the EKS Blueprints - Reference Solution leverages the <a href="https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html"><code>Pipelines</code></a> CDK module. This module makes it trivial to create Continuous Delivery (CD) pipelines via CodePipeline that are responsible for deploying and updating your infrastructure.</p>
+<p>Additionally, the EKS Blueprints - Reference Solution leverages the GitHub integration that the <code>Pipelines</code> CDK module provides in order to integrate our pipelines with GitHub. The end result is that any new configuration pushed to a GitHub repository containing our CDK will be automatically deployed.</p>
+<h2 id="defining-your-blueprint-to-use-with-pipeline">Defining your blueprint to use with pipeline<a class="headerlink" href="#defining-your-blueprint-to-use-with-pipeline" title="Permanent link">&para;</a></h2>
+<p>Pipeline support requires enabling a setting for <em>modern</em> stack synthesis. This setting should be enabled for blueprints that leverage CDKv1 explicitly, for CDKv2 it is enabled by default.</p>
+<p>Creation of a pipeline starts with defining the blueprint that will be deployed across the pipeline stages.</p>
+<p>The framework allows defining a blueprint builder without instantiating the stack.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">blueprints</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aws-quickstart/eks-blueprints&#39;</span>
+<span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">team</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;path/to/teams&#39;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">account</span><span class="p">(</span><span class="nx">account</span><span class="p">)</span><span class="w"> </span><span class="c1">// the supplied default will fail, but build and synth will pass</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">region</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span>
+<span class="w">        </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">AwsLoadBalancerControllerAddOn</span><span class="p">,</span>
+<span class="w">        </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">ExternalDnsAddOn</span><span class="p">,</span>
+<span class="w">        </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">NginxAddOn</span><span class="p">,</span>
+<span class="w">        </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">MetricsServerAddOn</span><span class="p">,</span>
+<span class="w">        </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">ClusterAutoScalerAddOn</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">teams</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">team</span><span class="p">.</span><span class="nx">TeamRikerSetup</span><span class="p">);</span>
+</code></pre></div>
+<p>The difference between the above code and a normal way of instantiating the stack is lack of <code>.build()</code> at the end of the blueprint definition.
+This code will produce a blueprint builder that can be instantiated inside the pipeline stages.</p>
+<h2 id="creating-a-pipeline">Creating a pipeline<a class="headerlink" href="#creating-a-pipeline" title="Permanent link">&para;</a></h2>
+<p>We can create a new <code>CodePipeline</code> resource via the following.</p>
+<h3 id="using-github-as-codepipeline-repository-source">Using GitHub as CodePipeline repository source.<a class="headerlink" href="#using-github-as-codepipeline-repository-source" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">blueprints</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aws-quickstart/eks-blueprints&#39;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">...;</span><span class="w"> </span><span class="c1">// configure your blueprint builder</span>
+
+<span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;eks-blueprints-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;aws-samples&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">repoUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;cdk-eks-blueprints-patterns&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">credentialsSecretName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;github-token&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">targetRevision</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;main&#39;</span><span class="w"> </span><span class="c1">// optional, default is &quot;main&quot;,</span>
+<span class="w">    </span><span class="p">})</span>
+</code></pre></div>
+<p>If you IaC code is located under a specific folder, for example <code>PROJECT_ROOT/infra/blueprints</code> you can specify that directory with the repository (applies to GitHub. CodeCommit and CodeStar repos). </p>
+<div class="highlight"><pre><span></span><code> blueprints.CodePipelineStack.builder()
+    .name(&quot;eks-blueprints-pipeline&quot;)
+    .repository({
+        owner: &quot;aws-samples&quot;,
+        repoUrl: &#39;cdk-eks-blueprints-patterns&#39;,
+        credentialsSecretName: &#39;github-token&#39;,
+        path: &quot;./infra/blueprints&quot; // optional, default is &#39;./&#39;
+    })```
+
+Note: the above code depends on the AWS secret `github-token` defined in the target account/region. The secret may be defined in one main region, and replicated to all target regions.
+
+### Using AWS CodeCommit as CodePipeline repository source.
+
+```typescript
+import * as blueprints from &#39;@aws-quickstart/eks-blueprints&#39;
+
+const blueprint = blueprints.EksBlueprint.builder()
+    ...; // configure your blueprint builder
+
+ blueprints.CodePipelineStack.builder()
+    .name(&quot;eks-blueprints-pipeline&quot;)
+    .repository({
+        codeCommitRepoName: &#39;cdk-eks-blueprints-patterns&#39;, // should be in the same region with pipeline-stack
+        targetRevision: &#39;master&#39; // optional, default is &quot;master&quot;
+    })
+</code></pre></div>
+<h3 id="using-aws-codestar-connection-as-codepipeline-repository-source">Using AWS CodeStar connection as CodePipeline repository source.<a class="headerlink" href="#using-aws-codestar-connection-as-codepipeline-repository-source" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">blueprints</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aws-quickstart/eks-blueprints&#39;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">...;</span><span class="w"> </span><span class="c1">// configure your blueprint builder</span>
+
+<span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;eks-blueprints-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">codeBuildPolicies</span><span class="p">(</span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">DEFAULT_BUILD_POLICIES</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s1">&#39;aws-samples&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">repoUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;blueprints-repo-codestar&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// repository name </span>
+<span class="w">        </span><span class="nx">codeStarConnectionArn</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;fill-in-codestar-arn&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// CodeStar connection ARN</span>
+<span class="w">        </span><span class="nx">targetRevision</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;main&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// optional, default is &quot;main&quot;</span>
+<span class="w">    </span><span class="p">})</span>
+</code></pre></div>
+<h2 id="creating-stages">Creating stages<a class="headerlink" href="#creating-stages" title="Permanent link">&para;</a></h2>
+<p>Once our pipeline is created, we need to define <code>stages</code> for the pipeline. To do so, we can leverage <code>blueprints.StackStage</code> convenience class and builder support for it. Let's continue leveraging the pipeline builder defined in the previous step.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">...;</span><span class="w"> </span><span class="c1">// configure your blueprint builder</span>
+
+<span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;blueprints-eks-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s2">&quot;aws-samples&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="c1">//  your repo info</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;us-west-1-managed-blueprints-test&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// clone the blueprint to customize for the stage. You can add more add-ons, teams here.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;us-east-2-managed-blueprints-prod&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-east-2&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// clone the blueprint to customize for the stage. You can add more add-ons, team, here.</span>
+<span class="w">        </span><span class="nx">stageProps</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">manualApprovals</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">})</span>
+</code></pre></div>
+<p>Consider adding <code>ArgoCDAddOn</code> with your specific workload bootstrap repository to automatically bootstrap workloads in the provisioned clusters.
+See <a href="../addons/argo-cd/#Bootstrapping">Bootstrapping</a> for more details.</p>
+<h2 id="adding-waves">Adding Waves<a class="headerlink" href="#adding-waves" title="Permanent link">&para;</a></h2>
+<p>In many case, when enterprises configure their SDLC environments, such as dev/test/staging/prod, each environment may contain more than a single cluster.
+It is convenient to provision and maintain (update/upgrade) such clusters in parallel within the limits of the environment. Such environments may be represented as waves of the pipeline. The wave concept is not limited to just a logical environment. It may represent any grouping of clusters that should be executed in parallel. An important advantage of running stages in parallel is the time gain associated with it. Each stage may potentially take tens of minutes (e.g. initial provisioning, upgrade, etc.) and as the number of clusters increase, the overall pipeline run may become very lengthy and won't provide enough agility for the enterprise. Running parallel stages within a wave provides roughly the time performance equivalent to a single stage.</p>
+<p>Pipeline functionality provides wave support to express waves with blueprints. You can mix individual stages and waves together. An individual stage can be viewed as a wave with a single stage.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;eks-blueprints-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s2">&quot;aws-samples&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="c1">//...</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;us-west-1-managed-blueprints&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">wave</span><span class="p">(</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// adding two clusters for dev env</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;dev&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stages</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;dev-west-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">).</span><span class="nx">account</span><span class="p">(</span><span class="nx">DEV_ACCOUNT</span><span class="p">)},</span><span class="w"> </span><span class="c1">// requires trust relationship with the code pipeline role</span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;dev-east-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-east-2&#39;</span><span class="p">).</span><span class="nx">account</span><span class="p">(</span><span class="nx">DEV_ACCOUNT</span><span class="p">)},</span><span class="w"> </span><span class="c1">// See https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping</span>
+
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">wave</span><span class="p">(</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;prod&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stages</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;prod-west-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">)},</span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;prod-east-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-east-2&#39;</span><span class="p">)},</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">})</span>
+</code></pre></div>
+<h2 id="handling-build-time-access">Handling Build Time Access<a class="headerlink" href="#handling-build-time-access" title="Permanent link">&para;</a></h2>
+<p>CodePipeline leverages CodeBuild to build artifacts. During build time, add-ons may require various look-ups. For example, the add-on or stack may look up VPC, subnets, certificates, hosted zones as well as secrets. </p>
+<p>By default, such look-ups at build time are restricted by the CodeBuild role created by the pipeline dynamically. That means that builds that require look-ups will fail with access denied exception. </p>
+<p>Customers can configure the IAM policies used by the CodeBuild as part of the pipeline execution. The framework provides a convenience default build policies <code>blueprints.DEFAULT_BUILD_POLICIES</code> that enable look-ups (including secret look-ups).</p>
+<p>Example with default policies:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;blueprints-pipeline-with-build-roles&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s1">&#39;aws-samples&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">codeBuildPolicies</span><span class="p">(</span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">DEFAULT_BUILD_POLICIES</span><span class="p">)</span>
+</code></pre></div>
+<p>Example with customer supplied policies:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PolicyStatement</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;aws-cdk-lib/aws-iam&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;blueprints-pipeline-inaction&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s1">&#39;your-owner&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">codeBuildPolicies</span><span class="p">([</span><span class="w"> </span>
+<span class="w">                </span><span class="ow">new</span><span class="w"> </span><span class="nx">PolicyStatement</span><span class="p">({</span>
+<span class="w">                    </span><span class="nx">resources</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">mySecretArn</span><span class="p">],</span>
+<span class="w">                    </span><span class="nx">actions</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w">    </span>
+<span class="w">                        </span><span class="s2">&quot;secretsmanager:GetSecretValue&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="s2">&quot;secretsmanager:DescribeSecret&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="p">]</span>
+<span class="w">                </span><span class="p">})</span>
+<span class="w">            </span><span class="p">])</span>
+<span class="w">            </span><span class="p">.</span><span class="nx">build</span><span class="p">(...)</span>
+</code></pre></div>
+<h2 id="monorepo-support">Monorepo support<a class="headerlink" href="#monorepo-support" title="Permanent link">&para;</a></h2>
+<p>In some cases, customers choose to have their blueprints defined in subdirectories on a monorepo project. In this scenario, the root of the project is not the root of the CDK pipeline. A single monorepo can also support multiple subprojects each containing its own pipeline. </p>
+<p>To support this case, customers can specify the relative path of the subdirectory containing the blueprints. </p>
+<p>Example pipeline with inline explanation:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">// define your blueprint</span>
+
+<span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">application</span><span class="p">(</span><span class="s2">&quot;npx ts-node bin/main.ts&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// optionally set application to point to the launch file. In this case bin/main.ts is located in the path set in the repo configuration  - examples/monorepo/bin/main.ts. Useful when multiple apps are defined. </span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;blueprints-eks-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s2">&quot;aws-quickstart&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">codeBuildPolicies</span><span class="p">(</span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">DEFAULT_BUILD_POLICIES</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">repoUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;cdk-eks-blueprints&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">credentialsSecretName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;github-token&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">targetRevision</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bug/broken-monorepo-pipelines&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;examples/monorepo&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// set the path relative to the root of the monrepo</span>
+<span class="w">        </span><span class="nx">trigger</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprints.GitHubTrigger.POLL</span><span class="w"> </span><span class="c1">// optionally set trigger, by default it will create a webhook.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;us-west-2-sandbox&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-2&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pipeline&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">env</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">region</span><span class="p">,</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="p">}});</span>
+</code></pre></div>
+<h2 id="build-the-pipeline-stack">Build the pipeline stack<a class="headerlink" href="#build-the-pipeline-stack" title="Permanent link">&para;</a></h2>
+<p>Now that we have defined the blueprint builder, the pipeline with repository and stages we just need to invoke the build() step to create the stack.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">...;</span><span class="w"> </span><span class="c1">// configure your blueprint builder</span>
+
+<span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;eks-blueprints-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(</span><span class="s2">&quot;aws-samples&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// owner of your repo</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="c1">//  your repo info</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;dev&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-1&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// clone the blueprint to customize for the stage. You can add more add-ons, teams here.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-east-2&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// clone the blueprint to customize for the stage. You can add more add-ons, team, here.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">stage</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">stackBuilder</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprint.clone</span><span class="p">(</span><span class="s1">&#39;us-west-2&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// clone the blueprint to customize for the stage. You can add more add-ons, team, here.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;blueprints-pipeline-stack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">props</span><span class="p">);</span><span class="w"> </span><span class="c1">// will produce the self-mutating pipeline in the target region and start provisioning the defined blueprints.</span>
+</code></pre></div>
+<h2 id="deploying-pipelines">Deploying Pipelines<a class="headerlink" href="#deploying-pipelines" title="Permanent link">&para;</a></h2>
+<p>In order to deploy pipelines, each environment (account and region) where pipeline will either be running and each environment to which it will be deploying should be bootstrapped based on CodePipeline <a href="https://docs.aws.amazon.com/cdk/api/v1/docs/pipelines-readme.html#cdk-environment-bootstrapping">documentation</a>.</p>
+<p>Examples of bootstrapping (from the original documentation):</p>
+<p>To bootstrap an environment for provisioning the pipeline:</p>
+<p><div class="highlight"><pre><span></span><code>$<span class="w"> </span>env<span class="w"> </span><span class="nv">CDK_NEW_BOOTSTRAP</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>npx<span class="w"> </span>cdk<span class="w"> </span>bootstrap<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">[</span>--profile<span class="w"> </span>admin-profile-1<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cloudformation-execution-policies<span class="w"> </span>arn:aws:iam::aws:policy/AdministratorAccess<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>aws://111111111111/us-east-1
+</code></pre></div>
+To bootstrap a different environment for deploying CDK applications into using a pipeline in account 111111111111:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>env<span class="w"> </span><span class="nv">CDK_NEW_BOOTSTRAP</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>npx<span class="w"> </span>cdk<span class="w"> </span>bootstrap<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">[</span>--profile<span class="w"> </span>admin-profile-2<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cloudformation-execution-policies<span class="w"> </span>arn:aws:iam::aws:policy/AdministratorAccess<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--trust<span class="w"> </span><span class="m">11111111111</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>aws://222222222222/us-east-2
+</code></pre></div>
+<p>If you only want to trust an account to do lookups (e.g, when your CDK application has a Vpc.fromLookup() call), use the option --trust-for-lookup:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>env<span class="w"> </span><span class="nv">CDK_NEW_BOOTSTRAP</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>npx<span class="w"> </span>cdk<span class="w"> </span>bootstrap<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">[</span>--profile<span class="w"> </span>admin-profile-2<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cloudformation-execution-policies<span class="w"> </span>arn:aws:iam::aws:policy/AdministratorAccess<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--trust-for-lookup<span class="w"> </span><span class="m">11111111111</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>aws://222222222222/us-east-2
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><strong>Problem</strong>
+Blueprints Build can fail with AccessDenied exception during build phase. Typical error messages:</p>
+<div class="highlight"><pre><span></span><code>Error: AccessDeniedException: User: arn:aws:sts::&lt;account&gt;:assumed-role/blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1/AWSCodeBuild-e95830ee-07f6-46f5-aaee-90e269c7eb5f is not authorized to perform:
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>current credentials could not be used to assume &#39;arn:aws:iam::&lt;account&gt;:role/cdk-hnb659fds-lookup-role-,account&gt;-eu-west-3&#39;, but are for the right account. Proceeding anyway.
+</code></pre></div>
+<hr />
+<div class="highlight"><pre><span></span><code>Error: you are not authorized to perform this operation.
+</code></pre></div>
+<p>This can happen for a few reasons, but most typical is  related to the stack requiring elevated permissions at build time. Such permissions may be required to perform lookups, such as look up fo VPC, Hosted Zone, Certificate (if imported) and those are handled during stack synthesis.</p>
+<p><strong>Resolution</strong></p>
+<p>You can take advantage of supplying the require IAM policies to the pipeline to avoid this error. See <a href="#handling-build-time-access">this</a> for more details.</p>
+<p>To address this issue "manually" (without the change to the pipeline), you can locate the role leveraged for Code Build and provide ***required permissions. Depending on the scope of the build role, the easiest resolution is to add <code>AdministratorAccess</code> permission to the build role which typically looks similar to this <code>blueprints-pipeline-stack-blueprintsekspipelinePipelineBuildSynt-1NPFJRH6H7TB1</code> provided your pipeline stack was named <code>blueprints-pipeline-stack</code>.
+If adding administrative access to the role solves the issue, you can then consider tightening the role scope to just the required permissions, such as access to specific resources needed for the build.</p>
+<p><strong>Problem</strong></p>
+<p>Failure to create webhook for GitHub sources. When user does not admin rights to a repository or in a more narrow case does not have required permissions to create a webhook, the pipeline fails with an error message similar to this:</p>
+<div class="highlight"><pre><span></span><code>Webhook could not be registered with GitHub. Error cause: Not found [StatusCode: 404, Body: {&quot;message&quot;:&quot;Not Found&quot;,&quot;documentation_url&quot;:&quot;https://docs.github.com/rest/repos/webhooks#create-a-repository-webhook&quot;}]
+</code></pre></div>
+<p><strong>Resolution</strong></p>
+<ol>
+<li>Option one: configure proper permissions to create webhook against the target repo.</li>
+<li>Option two: modify the trigger to use POLL instead of webhook. </li>
+</ol>
+<p>For option two here is the example configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">blueprints</span><span class="p">.</span><span class="nx">CodePipelineStack</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">name</span><span class="p">(</span><span class="s2">&quot;blueprints-eks-pipeline&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">owner</span><span class="p">(...)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">repository</span><span class="p">({</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="w">        </span><span class="nx">trigger</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprints.GitHubTrigger.POLL</span><span class="w"> </span><span class="c1">// optionally set trigger to POLL, by default it will create a webhook.</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">...</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["tabs"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+    
+  </body>
+</html>

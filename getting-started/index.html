@@ -1,0 +1,3294 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../cluster-management/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Getting Started - Amazon EKS Blueprints Quick Start</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Amazon EKS Blueprints Quick Start" class="md-header__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Amazon EKS Blueprints Quick Start
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Getting Started
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Amazon EKS Blueprints Quick Start" class="md-nav__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Amazon EKS Blueprints Quick Start
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#project-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-your-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configure Your Project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-eks-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy EKS Clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cluster Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-workloads-with-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy workloads with ArgoCD
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy workloads with ArgoCD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-argocd-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install ArgoCD CLI
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exposing-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exposing ArgoCD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging-into-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Into ArgoCD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-workloads-to-your-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy workloads to your cluster
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validate deployments.
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-Cluster Management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Core Concepts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Teams
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/teams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/emr-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/aws-batch-on-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams/bedrock-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipelines/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipelines
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    AddOns
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            AddOns
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ack-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ACK
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/amp-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/app-mesh/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS App Mesh
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/apache-airflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apache Airflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-batch-on-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch for EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/argo-cd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-for-fluent-bit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS For Fluent Bit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-load-balancer-controller/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Load Balancer Controller
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-node-termination-handler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Node Termination Handler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-privateca-issuer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Private CA Issuer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/backstage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backstage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/calico/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/calico-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cert-manager/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cloudwatch-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/aws-cloudwatch-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/cluster-autoscaler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cluster Autoscaler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/container-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Container Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/coredns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CoreDns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/datadog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Datadog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dynatrace
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ebs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EBS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/efs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/external-dns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External DNS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/external-secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/emr-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/fluxcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FluxCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/gmaestro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Gmaestro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/gpu-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NVIDIA GPU Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/grafana-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Grafana Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/instana-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IBM Instana
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ingress-nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-control-plane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Control Plane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio CNI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/istio-ingress-gateway/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Ingress Gateway
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/jupyterhub/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JupyterHub
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/karpenter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Karpenter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kasten-k10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kasten
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/keda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/keptn-sandbox/keptn-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keptn
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/knative-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Knative
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/komodorio/komodor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Komodor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/konveyor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Konveyor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kube-proxy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube Proxy
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubecost/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubecost
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubeflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kuberay-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeRay Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ingress-nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubeshark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeshark
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kubevious/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubevious
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/kube-state-metrics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube State Metrics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/metrics-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metrics Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/newrelic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    New Relic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/neuron-device-plugin-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Device
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/neuron-monitor-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Monitor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/paralus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paralus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/pixie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pixie
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/prometheus-node-exporter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prometheus Node Exporter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/rafay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rafay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/s3-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/secrets-store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Snyk
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/ssm-agent/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SSM Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/upbound-universal-crossplane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upbound Universal Crossplane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/velero/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Velero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/vpc-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vpc Cni
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/xray/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../addons/xray-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Internal
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Internal
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/ci/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeBuild CI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/input-validations-framework-readme/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input Validation Framework
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internal/readme-internal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Readme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Cluster Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Cluster Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/generic-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Generic Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/asg-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ASG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/mng-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MNG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/fargate-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fargate Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-providers/import-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Import Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Resource Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resource Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/amp-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP Resource Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/certificate-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/efs-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/hosted-zone-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hosted Zone Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/iam-role-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IAM Role Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/kms-key-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KMS Key Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/s3-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 Bucket Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-providers/vpc-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VPC Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Builders
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/bedrock-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/graviton-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Graviton Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/gpu-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GPU Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/observability-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../builders/windows-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensibility/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Extensibility
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#project-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-your-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configure Your Project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-eks-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy EKS Clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cluster Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-workloads-with-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy workloads with ArgoCD
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy workloads with ArgoCD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-argocd-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install ArgoCD CLI
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exposing-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exposing ArgoCD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging-into-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Into ArgoCD
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-workloads-to-your-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy workloads to your cluster
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validate deployments.
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<p>This getting started guide will walk you through setting up a new CDK project which leverages the <code>eks-blueprints</code> NPM module to deploy a simple Blueprints. </p>
+<h2 id="project-setup">Project Setup<a class="headerlink" href="#project-setup" title="Permanent link">&para;</a></h2>
+<p>Before proceeding, make sure <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">AWS CLI</a> is installed on your machine.</p>
+<p>To use the <code>eks-blueprints</code> module, you must have <a href="https://nodejs.org/en/">Node.js</a> and <a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">npm</a> installed. We will also use <code>make</code> to simplify build and other common actions. You can do it using the following instructions:</p>
+<div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Mac</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>make
+brew<span class="w"> </span>install<span class="w"> </span>node
+</code></pre></div>
+</div>
+<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">Ubuntu</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>make
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>nodejs
+</code></pre></div>
+</div>
+</div>
+<p>Create a directory that represents you project (e.g. <code>my-blueprints</code>) and then create a new <code>typescript</code> CDK project in that directory.</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>n<span class="w"> </span><span class="c1"># may require sudo</span>
+n<span class="w"> </span>stable<span class="w"> </span><span class="c1"># may require sudo </span>
+npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>aws-cdk@2.173.4<span class="w"> </span><span class="c1"># may require sudo (Ubuntu) depending on configuration</span>
+cdk<span class="w"> </span>--version<span class="w"> </span><span class="c1"># must produce 2.173.4</span>
+mkdir<span class="w"> </span>my-blueprints
+<span class="nb">cd</span><span class="w"> </span>my-blueprints
+cdk<span class="w"> </span>init<span class="w"> </span>app<span class="w"> </span>--language<span class="w"> </span>typescript
+</code></pre></div>
+<h2 id="configure-your-project">Configure Your Project<a class="headerlink" href="#configure-your-project" title="Permanent link">&para;</a></h2>
+<p>Install the <code>eks-blueprints</code> NPM package (keep reading if you get an error or warning message):</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>@aws-quickstart/eks-blueprints
+</code></pre></div>
+<p>CDK version of the EKS Blueprints is pinned as <a href="https://docs.npmjs.com/cli/v10/configuring-npm/package-json#peerdependencies"><code>peerDependencies</code></a> to the version that we tested against to minimize the risk of incompatibilities and/or broken functionality. When running the install command, NPM will detect any mismatch in the version and issue an error. For example:</p>
+<div class="highlight"><pre><span></span><code>npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR! 
+npm ERR! While resolving: my-blueprint@0.1.0
+npm ERR! Found: aws-cdk-lib@2.133.0
+npm ERR! node_modules/aws-cdk-lib
+npm ERR!   aws-cdk-lib@&quot;2.133.0&quot; from the root project
+npm ERR! 
+npm ERR! Could not resolve dependency:
+npm ERR! peer bundled aws-cdk-lib@&quot;2.133.0&quot; from @aws-quickstart/eks-blueprints@1.14.0
+npm ERR! node_modules/@aws-quickstart/eks-blueprint
+</code></pre></div>
+<p>This message means that the version of CDK that the customer is using is different from the version of CDK used in EKS Blueprints. Locate the line <code>peer bundled</code> and check the expected version of the CDK. Make sure that in your <code>package.json</code> the version is set to the expected. In this example, <code>package.json</code> contained <code>"aws-cdk-lib": "2.133.0"</code>, while the expected version was <code>2.173.4</code>.</p>
+<p><strong>Note</strong>: after the initial installation, upgrading the version of CDK to an incompatible higher/lower version will produce a warning, but will succeed. For community support (submitting GitHub issues) please make sure you have a matching version configured.</p>
+<p>Example warning:</p>
+<div class="highlight"><pre><span></span><code>npm WARN 
+npm WARN Could not resolve dependency:
+npm WARN peer bundled aws-cdk-lib@&quot;2.133.0&quot; from @aws-quickstart/eks-blueprints@1.14.0
+</code></pre></div>
+<h2 id="deploy-eks-clusters">Deploy EKS Clusters<a class="headerlink" href="#deploy-eks-clusters" title="Permanent link">&para;</a></h2>
+<p>Replace the contents of <code>bin/&lt;your-main-file&gt;.ts</code> (where <code>your-main-file</code> by default is the name of the root project directory) with the following code. This code will deploy a new EKS Cluster and install a number of addons.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">cdk</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;aws-cdk-lib&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">blueprints</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aws-quickstart/eks-blueprints&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">cdk</span><span class="p">.</span><span class="nx">App</span><span class="p">();</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;XXXXXXXXXXXXX&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;us-east-2&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;auto&#39;</span><span class="p">;</span>
+
+<span class="nx">blueprints</span><span class="p">.</span><span class="nx">HelmAddOn</span><span class="p">.</span><span class="nx">validateHelmVersions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// optional if you would like to check for newer versions</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">addOns</span><span class="o">:</span><span class="w"> </span><span class="kt">Array</span><span class="o">&lt;</span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">ClusterAddOn</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">ArgoCDAddOn</span><span class="p">(),</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">MetricsServerAddOn</span><span class="p">(),</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">ClusterAutoScalerAddOn</span><span class="p">(),</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">AwsLoadBalancerControllerAddOn</span><span class="p">(),</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">VpcCniAddOn</span><span class="p">(),</span><span class="w"> </span><span class="c1">// support network policies ootb</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">CoreDnsAddOn</span><span class="p">(),</span>
+<span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">KubeProxyAddOn</span><span class="p">()</span>
+<span class="p">];</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">stack</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">account</span><span class="p">(</span><span class="nx">account</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">region</span><span class="p">(</span><span class="nx">region</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="nx">version</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(...</span><span class="nx">addOns</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">useDefaultSecretEncryption</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="c1">// set to false to turn secret encryption off (non-production/demo cases)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;eks-blueprint&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>Each combination of target account and region must be bootstrapped prior to deploying stacks. Bootstrapping is a process of creating IAM roles and lambda functions that can execute some of the common CDK constructs.</p>
+<p>For application of the EKS Blueprints Framework with <a href="https://aws.amazon.com/organizations/">AWS Organizations</a>, <a href="https://docs.aws.amazon.com/controltower/latest/userguide/aws-multi-account-landing-zone.html">Multi-account framework and Control Tower</a> consider a process to automatically or manually CDK-bootstrapping new (workload/environment) accounts when they are added to the organization. More info on account bootstrapping <a href="https://aws.amazon.com/blogs/mt/how-to-automate-the-creation-of-multiple-accounts-in-aws-control-tower/">here</a>.</p>
+<p><a href="https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html">Bootstrap</a> your environment with the following command. </p>
+<div class="highlight"><pre><span></span><code>cdk<span class="w"> </span>bootstrap<span class="w"> </span>aws://&lt;your-account-number&gt;/&lt;region-to-bootstrap&gt;
+</code></pre></div>
+<p>Note: if the account/region combination used in the code example above is different from the initial combination used with <code>cdk bootstrap</code>, you will need to perform <code>cdk bootstrap</code> again to avoid error.</p>
+<p>Please reference <a href="https://docs.aws.amazon.com/cdk/latest/guide/home.html">CDK</a> usage doc for detail.</p>
+<p>Setup the <code>AWS_REGION</code> environment variable and deploy the stack using the following command. This command will take roughly 20 minutes to complete.</p>
+<div class="highlight"><pre><span></span><code>export AWS_REGION=us-east-2 # Replace this with region of your choice.
+cdk deploy
+</code></pre></div>
+<p>Note: Your terminal needs access to an AWS environment along with the <code>AWS_REGION</code> environment variable setup. If you fail to do so, you will observe following errors logs in your <code>cdk deploy</code> command. The stack will still run fine but will fall back picking default versions for the addon from <code>versionMap</code> in the respective <code>CoreAddon</code> instead of making an EKS API call to retrieve the latest version for the core addon.</p>
+<div class="highlight"><pre><span></span><code> Error  Region is missing
+error stack:
+  • index.js    default
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:117
+  • index.js
+        /node_modules/@smithy/node-config-provider/dist-cjs/index.js:72
+  • index.js
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:79
+  • index.js    async coalesceProvider
+        /node_modules/@smithy/property-provider/dist-cjs/index.js:106
+  • index.js
+        async /node_modules/@smithy/property-provider/dist-cjs/index.js:117
+  • index.js    async region
+        /node_modules/@smithy/config-resolver/dist-cjs/index.js:142
+  • httpAuthSchemeProvider.js   async Object.defaultEKSHttpAuthSchemeParametersProvider [as httpAuthSchemeParametersProvider]
+        /node_modules/@aws-sdk/client-eks/dist-cjs/auth/httpAuthSchemeProvider.js:9
+  • index.js
+        async /node_modules/@smithy/core/dist-cjs/index.js:61
+  • index.js
+        async /node_modules/@aws-sdk/middleware-logger/dist-cjs/index.js:33
+  • index.ts    async VpcCniAddOn.provideVersion
+        /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:187
+2024-04-29 19:33:48.638 WARN    /node_modules/@aws-quickstart/eks-blueprints/lib/addons/core-addon/index.ts:209 main    Failed to retrieve add-on versions from EKS for add-on vpc-cni. Falling back to default version.
+</code></pre></div>
+<p>Congratulations! You have deployed your first EKS cluster with <code>eks-blueprints</code>. The above code will provision the following:</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> A new Well-Architected VPC with both Public and Private subnets.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> A new Well-Architected EKS cluster in the region and account you specify.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://docs.nginx.com/nginx-ingress-controller/technical-specifications/">Nginx</a> into your cluster to serve as a reverse proxy for your workloads. </li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://argoproj.github.io/argo-cd/">ArgoCD</a> into your cluster to support GitOps deployments. </li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://github.com/kubernetes-sigs/metrics-server">Metrics Server</a> into your cluster to support metrics collection.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> AWS and Kubernetes resources needed to support <a href="https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html">Cluster Autoscaler</a>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> AWS and Kubernetes resources needed to forward logs and metrics to <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html">Container Insights</a>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> AWS and Kubernetes resources needed to support <a href="https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html">AWS Load Balancer Controller</a>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://docs.aws.amazon.com/eks/latest/userguide/managing-vpc-cni.html">Amazon VPC CNI add-on (VpcCni)</a> into your cluster to support native VPC networking for Amazon EKS.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://docs.aws.amazon.com/eks/latest/userguide/managing-coredns.html">CoreDNS Amazon EKS add-on (CoreDns)</a> into your cluster. CoreDns is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <a href="https://docs.aws.amazon.com/eks/latest/userguide/managing-kube-proxy.html"> kube-proxy Amazon EKS add-on (KubeProxy)</a> into your cluster to maintains network rules on each Amazon EC2 node</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> AWS and Kubernetes resources needed to support <a href="https://aws.amazon.com/xray/">AWS X-Ray</a>.</li>
+</ul>
+<h2 id="cluster-access">Cluster Access<a class="headerlink" href="#cluster-access" title="Permanent link">&para;</a></h2>
+<p>Once the deploy completes, you will see output in your terminal window similar to the following:</p>
+<div class="highlight"><pre><span></span><code>Outputs:
+east-test-1.easttest1ClusterName8D8E5E5E<span class="w"> </span><span class="o">=</span><span class="w"> </span>east-test-1
+east-test-1.easttest1ConfigCommand25ABB520<span class="w"> </span><span class="o">=</span><span class="w"> </span>aws<span class="w"> </span>eks<span class="w"> </span>update-kubeconfig<span class="w"> </span>--name<span class="w"> </span>east-test-1<span class="w"> </span>--region<span class="w"> </span>us-east-1<span class="w"> </span>--role-arn<span class="w"> </span>&lt;ROLE_ARN&gt;
+east-test-1.easttest1GetTokenCommand337FE3DD<span class="w"> </span><span class="o">=</span><span class="w"> </span>aws<span class="w"> </span>eks<span class="w"> </span>get-token<span class="w"> </span>--cluster-name<span class="w"> </span>east-test-1<span class="w"> </span>--region<span class="w"> </span>us-east-1<span class="w"> </span>--role-arn<span class="w"> </span>&lt;ROLE_ARN&gt;
+
+Stack<span class="w"> </span>ARN:
+arn:aws:cloudformation:us-east-1:115717706081:stack/east-test-1/e1b9e6a0-d5f6-11eb-8498-0a374cd00e27
+</code></pre></div>
+<p>To update your Kubernetes config for you new cluster, copy and run the <code>east-test-1.easttest1ConfigCommand25ABB520</code> command (the second command) in your terminal. </p>
+<div class="highlight"><pre><span></span><code>aws eks update-kubeconfig --name east-test-1 --region us-east-1 --role-arn &lt;ROLE_ARN&gt;
+</code></pre></div>
+<p>Validate that you now have <code>kubectl</code> access to your cluster via the following:</p>
+<div class="highlight"><pre><span></span><code>kubectl get namespace
+</code></pre></div>
+<p>You should see output that lists all namespaces in your cluster. </p>
+<h2 id="deploy-workloads-with-argocd">Deploy workloads with ArgoCD<a class="headerlink" href="#deploy-workloads-with-argocd" title="Permanent link">&para;</a></h2>
+<p>Next, let's walk you through how to deploy workloads to your cluster with ArgoCD. This approach leverages the <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/#app-of-apps-pattern">App of Apps</a> pattern to deploy multiple workloads across multiple namespaces. The sample app of apps repository that we use in this getting started guide can be found <a href="https://github.com/aws-samples/eks-blueprints-workloads">here</a>.</p>
+<p>You can leverage <a href="../addons/argo-cd/#bootstrapping">Automatic Bootstrapping</a> for automatic onboarding of workloads. This feature may be leveraged even when workload repositories are not ready yet, as it creates a placeholder for future workloads and decouples workload onboarding for the infrastructure provisioning pipeline. The next steps, described in this guide apply for cases when customer prefer to bootstrap their workloads manually through ArgoCD UI console.</p>
+<h3 id="install-argocd-cli">Install ArgoCD CLI<a class="headerlink" href="#install-argocd-cli" title="Permanent link">&para;</a></h3>
+<p>These steps are needed for manual workload onboarding. For automatic bootstrapping please refer to the <a href="../addons/argo-cd/#bootstrapping">Automatic Bootstrapping</a>.</p>
+<p>Follow the instructions found <a href="https://argo-cd.readthedocs.io/en/stable/cli_installation/">here</a> as it will include instructions for your specific OS. You can test that the ArgoCD CLI was installed correctly using the following:</p>
+<div class="highlight"><pre><span></span><code>argocd version --short --client
+</code></pre></div>
+<p>You should see output similar to the following:</p>
+<div class="highlight"><pre><span></span><code>argocd: v2.0.1+33eaf11.dirty
+</code></pre></div>
+<h3 id="exposing-argocd">Exposing ArgoCD<a class="headerlink" href="#exposing-argocd" title="Permanent link">&para;</a></h3>
+<p>To access ArgoCD running in your Kubernetes cluster, we can leverage <a href="https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/">Kubernetes Port Forwarding</a>. To do so, first capture the ArgoCD service name in an environment variable.</p>
+<div class="highlight"><pre><span></span><code>export ARGO_SERVER=$(kubectl get svc -n argocd -l app.kubernetes.io/name=argocd-server -o name) 
+</code></pre></div>
+<p>Next, in a new terminal tab, expose the service locally.</p>
+<div class="highlight"><pre><span></span><code>kubectl port-forward $ARGO_SERVER -n argocd 8080:443
+</code></pre></div>
+<p>Open your browser to http://localhost:8080 and you should see the ArgoCD login screen.</p>
+<p><img alt="ArgoCD" src="../assets/images/argo-cd.png" /></p>
+<h3 id="logging-into-argocd">Logging Into ArgoCD<a class="headerlink" href="#logging-into-argocd" title="Permanent link">&para;</a></h3>
+<p>ArgoCD will create an <code>admin</code> user and password on a fresh install. To get the ArgoCD admin password, run the following.</p>
+<div class="highlight"><pre><span></span><code>export ARGO_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=&quot;{.data.password}&quot; | base64 -d)
+</code></pre></div>
+<p>While still port-forwarding, login via the following.</p>
+<div class="highlight"><pre><span></span><code>argocd login localhost:8080 --username admin --password $ARGO_PASSWORD
+</code></pre></div>
+<p>You can also login to the ArgoCD UI with generated password and the username <code>admin</code>. </p>
+<div class="highlight"><pre><span></span><code>echo $ARGO_PASSWORD
+</code></pre></div>
+<h3 id="deploy-workloads-to-your-cluster">Deploy workloads to your cluster<a class="headerlink" href="#deploy-workloads-to-your-cluster" title="Permanent link">&para;</a></h3>
+<p>Create a project in Argo by running the following command</p>
+<div class="highlight"><pre><span></span><code>argocd proj create sample \
+    -d https://kubernetes.default.svc,argocd \
+    -s https://github.com/aws-samples/eks-blueprints-workloads.git
+</code></pre></div>
+<p>Create the application within Argo by running the following command</p>
+<div class="highlight"><pre><span></span><code>argocd app create dev-apps \
+    --dest-namespace argocd  \
+    --dest-server https://kubernetes.default.svc  \
+    --repo https://github.com/aws-samples/eks-blueprints-workloads.git \
+    --path &quot;envs/dev&quot;
+</code></pre></div>
+<p>Sync the apps by running the following command</p>
+<div class="highlight"><pre><span></span><code>argocd app sync dev-apps 
+</code></pre></div>
+<h3 id="validate-deployments">Validate deployments.<a class="headerlink" href="#validate-deployments" title="Permanent link">&para;</a></h3>
+<p>To validate your deployments, leverage <code>kubectl port-forwarding</code> to access the <code>guestbook-ui</code> service for <code>team-riker</code>.</p>
+<div class="highlight"><pre><span></span><code>kubectl port-forward svc/guestbook-ui -n team-riker 4040:80
+</code></pre></div>
+<p>Open up <code>localhost:4040</code> in your browser and you should see the application.</p>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>For information on onboarding teams to your clusters, see <a href="../teams/teams/"><code>Team</code> documentation</a>. </p>
+<p>For information on deploying Continuous Delivery pipelines for your infrastructure, see <a href="../pipelines/"><code>Pipelines</code> documentation</a>.</p>
+<p>For information on supported add-ons, see <a href="../addons/"><code>Add-on</code> documentation</a></p>
+<p>For information on Onboarding and managing workloads in your clusters, see <a href="https://github.com/aws-samples/eks-blueprints-workloads"><code>Workload</code> documentation</a>. </p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["tabs"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+    
+  </body>
+</html>

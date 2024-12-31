@@ -1,0 +1,3443 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../kuberay-operator/">
+      
+      
+        <link rel="next" href="../kubeshark/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Ingress Nginx - Amazon EKS Blueprints Quick Start</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f8fc17f.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ingress-nginx-add-on" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Amazon EKS Blueprints Quick Start" class="md-header__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Amazon EKS Blueprints Quick Start
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Ingress Nginx
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Amazon EKS Blueprints Quick Start" class="md-nav__button md-logo" aria-label="Amazon EKS Blueprints Quick Start" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Amazon EKS Blueprints Quick Start
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aws-quickstart/cdk-eks-blueprints" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aws-quickstart/cdk-eks-blueprints
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-Cluster Management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../core-concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Core Concepts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Teams
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../teams/teams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Teams
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../teams/emr-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../teams/aws-batch-on-eks-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch on EKS Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../teams/bedrock-team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipelines/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipelines
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    AddOns
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            AddOns
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ack-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ACK
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../amp-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../app-mesh/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS App Mesh
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apache-airflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apache Airflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-batch-on-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Batch for EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../argo-cd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ArgoCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-for-fluent-bit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS For Fluent Bit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-load-balancer-controller/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Load Balancer Controller
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-node-termination-handler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Node Termination Handler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-privateca-issuer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Private CA Issuer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backstage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backstage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calico/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calico-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Calico Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cert-manager/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Manager
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloudwatch-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-cloudwatch-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CloudWatch Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-autoscaler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cluster Autoscaler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../container-insights/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Container Insights
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coredns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CoreDns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datadog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Datadog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/dynatrace-oss/dynatrace-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dynatrace
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ebs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EBS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efs-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external-dns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External DNS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external-secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External Secrets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../emr-eks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EMR on EKS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fluxcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FluxCD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gmaestro/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Gmaestro
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpu-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NVIDIA GPU Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../grafana-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Grafana Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../instana-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IBM Instana
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-integration-and-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      DNS Integration and Routing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls-termination-and-certificates" class="md-nav__link">
+    <span class="md-ellipsis">
+      TLS Termination and Certificates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-multiple-ingress-controllers-with-ingressclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Multiple Ingress Controllers with IngressClasses
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Multiple Ingress Controllers with IngressClasses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-on-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add-on Configuration Example**
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benefits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences-between-ingress-nginx-controller-and-nginx-inc-ingress-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Differences between Ingress Nginx Controller and NGINX Inc. Ingress Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functionality
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../istio-base/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Base
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../istio-control-plane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Control Plane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../istio-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio CNI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../istio-ingress-gateway/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Istio Ingress Gateway
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyterhub/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JupyterHub
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../karpenter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Karpenter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kasten-k10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kasten
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../keda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/keptn-sandbox/keptn-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keptn
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../knative-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Knative
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/komodorio/komodor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Komodor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../konveyor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Konveyor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kube-proxy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube Proxy
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubecost/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubecost
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kuberay-operator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KubeRay Operator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Ingress Nginx
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-integration-and-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      DNS Integration and Routing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls-termination-and-certificates" class="md-nav__link">
+    <span class="md-ellipsis">
+      TLS Termination and Certificates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-multiple-ingress-controllers-with-ingressclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Multiple Ingress Controllers with IngressClasses
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Multiple Ingress Controllers with IngressClasses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-on-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add-on Configuration Example**
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benefits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences-between-ingress-nginx-controller-and-nginx-inc-ingress-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Differences between Ingress Nginx Controller and NGINX Inc. Ingress Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functionality
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeshark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubeshark
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubevious/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubevious
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kube-state-metrics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kube State Metrics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metrics Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../newrelic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    New Relic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nginx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuron-device-plugin-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Device
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuron-monitor-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Neuron Monitor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../opa-gatekeeper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OPA Gatekeeper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paralus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paralus
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pixie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pixie
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prometheus-node-exporter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prometheus Node Exporter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rafay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rafay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../s3-csi-driver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 CSI Driver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secrets-store/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secrets Store
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/snyk-partners/snyk-monitor-eks-blueprints-addon" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Snyk
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ssm-agent/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SSM Agent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../upbound-universal-crossplane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upbound Universal Crossplane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../velero/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Velero
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vpc-cni/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vpc Cni
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xray/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xray-adot-addon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS XRay ADOT
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Internal
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Internal
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internal/ci/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeBuild CI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internal/input-validations-framework-readme/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input Validation Framework
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internal/readme-internal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Readme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Cluster Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Cluster Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/generic-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Generic Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/asg-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ASG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/mng-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MNG Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/fargate-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fargate Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster-providers/import-cluster-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Import Cluster Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Resource Providers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resource Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/amp-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AMP Resource Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/certificate-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Certificate Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/efs-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EFS Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/hosted-zone-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hosted Zone Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/iam-role-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IAM Role Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/kms-key-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KMS Key Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/s3-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 Bucket Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resource-providers/vpc-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VPC Resource Providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Builders
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Builders
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/bedrock-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bedrock Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/graviton-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Graviton Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/gpu-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GPU Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/observability-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../builders/windows-builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Windows Builder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensibility/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Extensibility
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-integration-and-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      DNS Integration and Routing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls-termination-and-certificates" class="md-nav__link">
+    <span class="md-ellipsis">
+      TLS Termination and Certificates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-multiple-ingress-controllers-with-ingressclasses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Multiple Ingress Controllers with IngressClasses
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Multiple Ingress Controllers with IngressClasses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-on-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add-on Configuration Example**
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benefits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences-between-ingress-nginx-controller-and-nginx-inc-ingress-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      Differences between Ingress Nginx Controller and NGINX Inc. Ingress Controller
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functionality
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="ingress-nginx-add-on">Ingress NGINX Add-on<a class="headerlink" href="#ingress-nginx-add-on" title="Permanent link">&para;</a></h1>
+<p>This add-on installs <a href="https://kubernetes.github.io/ingress-nginx">Ingress Nginx Controller</a> on Amazon EKS. Ingress Nginx controller uses NGINX as a reverse proxy and load balancer.</p>
+<p>Other than handling Kubernetes ingress objects, this ingress controller can facilitate multi-tenancy and segregation of workload ingresses based on host name (host-based routing) and/or URL Path (path-based routing).</p>
+<p><strong><em>IMPORTANT</em></strong>:
+This add-on depends on <a href="../aws-load-balancer-controller/">AWS Load Balancer Controller</a> Add-on in order to enable NLB support.</p>
+<p><strong><em>AWS Load Balancer Controller add-on must be present in add-on array</em></strong> and <strong><em>must be in add-on array before the NGINX ingress controller add-on</em></strong> for it to work, as shown in below example. Otherwise will run into error <code>Assertion failed: Missing a dependency for AwsLoadBalancerControllerAddOn</code>.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="s1">&#39;source-map-support/register&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">cdk</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;aws-cdk-lib&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">blueprints</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aws-quickstart/eks-blueprints&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">cdk</span><span class="p">.</span><span class="nx">App</span><span class="p">();</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">externalDnsHostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">awsLbControllerAddOn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">AwsLoadBalancerControllerAddOn</span><span class="p">();</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">IngressNginxAddOn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">IngressNginxAddOn</span><span class="p">({</span><span class="w"> </span><span class="nx">externalDnsHostname</span><span class="w"> </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">addOns</span><span class="o">:</span><span class="w"> </span><span class="kt">Array</span><span class="o">&lt;</span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">ClusterAddOn</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="nx">awsLbControllerAddOn</span><span class="p">,</span><span class="w"> </span><span class="nx">IngressNginxAddOn</span><span class="w"> </span><span class="p">];</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">blueprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(...</span><span class="nx">addOns</span><span class="p">)</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-stack-name&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>To validate that the installation is successful, run the following command:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>po<span class="w"> </span>-n<span class="w"> </span>kube-system
+NAME<span class="w">                                                              </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
+k8s-ingress-ingress-nginx-controller-75886597f6-n9qnn<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>119m<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>4d10h
+</code></pre></div>
+<p>Note that the ingress controller is deployed in the <code>kube-system</code> namespace.</p>
+<p>Once deployed, it allows applications to create ingress objects and use host-based routing with external DNS support, if the External DNS Add-on is installed.</p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p><code>backendProtocol</code>: Indication for AWS Load Balancer controller with respect to the protocol supported on the load balancer. TCP by default.</p>
+</li>
+<li>
+<p><code>crossZoneEnabled</code>: Whether to create a cross-zone load balancer with the service that backs NGINX.</p>
+</li>
+<li>
+<p><code>internetFacing</code>: Whether the created load balancer is internet-facing. Defaults to <code>true</code> if not specified. An internal load balancer is provisioned if set to <code>false</code>.</p>
+</li>
+<li>
+<p><code>targetType:</code>ip<code>or</code>instance mode<code>. Defaults to</code>ip`, which requires VPC-CNI and has better performance by eliminating a hop through kube-proxy. Instance mode leverages traditional NodePort mode on the instances.</p>
+</li>
+<li>
+<p><code>externaDnsHostname</code>: Used in conjunction with the external DNS add-on to handle automatic registration of the service with Route 53.</p>
+</li>
+<li>
+<p><code>ingressClassName</code>: Class of the ingress controller (default: nginx).</p>
+</li>
+<li>
+<p><code>controllerClass</code>: Class used for handling ingress in a cluster.</p>
+</li>
+<li>
+<p><code>electionId</code>: Identifier for leader election.</p>
+</li>
+<li>
+<p><code>isDefaultClass</code>: Sets the ingress controller as the default for handling ingress resources (default: false).</p>
+</li>
+<li>
+<p><code>certificateResourceName</code>: Name of the certificate resource provider.</p>
+</li>
+<li>
+<p><code>certificateResourceARN</code>: ARN of the AWS Certificate Manager certificate for HTTPS.</p>
+</li>
+<li>
+<p><code>sslPort</code>: Protocol for the load balancer SSL port (default: https).</p>
+</li>
+<li>
+<p><code>httpTargetPort</code>: Protocol for the load balancer HTTP target port (default: http).</p>
+</li>
+<li>
+<p><code>httpsTargetPort</code>: Protocol for the load balancer HTTPS target port (default: https).</p>
+</li>
+<li>
+<p><code>forceSSLRedirect</code>: Forces SSL redirection (default: true).</p>
+</li>
+<li>
+<p><code>loadBalancerType</code>: Type of the load balancer (default: external).</p>
+</li>
+<li>
+<p><code>idleTimeout</code>: Idle timeout for the load balancer (default: 3600).</p>
+</li>
+<li>
+<p><code>values</code>: Arbitrary values to pass to the chart as per <a href="https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/">https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/</a></p>
+</li>
+</ul>
+<h2 id="dns-integration-and-routing">DNS Integration and Routing<a class="headerlink" href="#dns-integration-and-routing" title="Permanent link">&para;</a></h2>
+<p>If the <a href="../external-dns/">External DNS Add-on</a> is installed, it is possible to configure the Ingress Nginx with an external NLB load balancer and leverage wild-card DNS domains (and public certificate) to route external traffic to individual workloads.</p>
+<p>The following example provides support for AWS Load Balancer Controller, External DNS, and Ingress Nginx add-ons to enable such routing:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">// Register hosted zone1 under the name of MyHostedZone1</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">resourceProvider</span><span class="p">(</span><span class="s2">&quot;MyHostedZone1&quot;</span><span class="p">,</span><span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">DelegatingHostedZoneProvider</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">parentDomain</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;myglobal-domain.com&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">subdomain</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;dev.myglobal-domain.com&#39;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">parentAccountId</span><span class="o">:</span><span class="w"> </span><span class="kt">parentDnsAccountId</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">delegatingRoleName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;DomainOperatorRole&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">wildcardSubdomain</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span>
+<span class="w">    </span><span class="p">}))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">ExternalDnsAddOn</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">hostedZoneProviders</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;MyHostedZone1&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">IngressNginxAddOn</span><span class="p">({</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">internetFacing</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">backendProtocol</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;tcp&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">externalDnsHostname</span><span class="o">:</span><span class="w"> </span><span class="kt">subdomain</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nx">crossZoneEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="w"> </span>
+<span class="w">    </span><span class="p">}))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(...);</span>
+</code></pre></div>
+<p>Assuming the subdomain in the above example is <code>dev.my-domain.com</code> and wildcard is enabled for the external DNS add-on, customers can now create ingress objects for host-based routing. Let's define an ingress object for <code>team-riker</code> that is currently deploying the guestbook application with no ingress:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.k8s.io/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ingress</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">kubernetes.io/ingress.class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingress-riker</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-riker</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">riker.dev.my-domain.com</span>
+<span class="w">    </span><span class="nt">http</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">backend</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">service</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guestbook-ui</span>
+<span class="w">            </span><span class="nt">port</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
+<span class="w">        </span><span class="nt">pathType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Prefix</span>
+</code></pre></div>
+<p>A similar ingress may be defined for <code>team-troi</code>, routing to the workloads deployed by that team:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.k8s.io/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ingress</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">kubernetes.io/ingress.class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingress-troi</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-troi</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">troi.dev.my-domain.com</span>
+<span class="w">    </span><span class="nt">http</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">paths</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">backend</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">service</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guestbook-ui</span>
+<span class="w">            </span><span class="nt">port</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
+<span class="w">        </span><span class="nt">pathType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Prefix</span>
+</code></pre></div>
+<p>After the above ingresses are applied (ideally through a GitOps engine), you can now navigate to the specified hosts respectively:</p>
+<p><code>http://riker.dev.my-domain.com</code>
+<code>http://troi.dev.my-domain.com</code></p>
+<h2 id="tls-termination-and-certificates">TLS Termination and Certificates<a class="headerlink" href="#tls-termination-and-certificates" title="Permanent link">&para;</a></h2>
+<p>You can configure the Ingress Nginx add-on to terminate TLS at the load balancer and supply an ACM certificate through the platform blueprint.</p>
+<p>A certificate can be registered using a named <a href="../../resource-providers/">resource provider</a>.</p>
+<p>For convenience, the framework provides a couple of common certificate providers:</p>
+<p><strong>Import Certificate</strong></p>
+<p>This case is used when a certificate is already created and you just need to reference it with the blueprint stack:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">myCertArn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">;</span>
+<span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">resourceProvider</span><span class="p">(</span><span class="nx">GlobalResources</span><span class="p">.</span><span class="nx">Certificate</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ImportCertificateProvider</span><span class="p">(</span><span class="nx">myCertArn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cert1-id&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">IngressNginxAddOn</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">certificateResourceName</span><span class="o">:</span><span class="w"> </span><span class="kt">GlobalResources.Certificate</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">externalDnsHostname</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;my.domain.com&#39;</span>
+<span class="w">    </span><span class="p">}))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">teams</span><span class="p">(...)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stack-with-cert-provider&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Create Certificate</strong></p>
+<p>This approach is used when a certificate should be created with the blueprint stack. In this case, the new certificate requires DNS validation, which can be accomplished automatically if the corresponding Route 53 hosted zone is provisioned (either along with the stack or separately) and registered as a resource provider.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">blueprints</span><span class="p">.</span><span class="nx">EksBlueprint</span><span class="p">.</span><span class="nx">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">resourceProvider</span><span class="p">(</span><span class="nx">GlobalResources</span><span class="p">.</span><span class="nx">HostedZone</span><span class="w"> </span><span class="p">,</span><span class="ow">new</span><span class="w"> </span><span class="nx">ImportHostedZoneProvider</span><span class="p">(</span><span class="s1">&#39;hosted-zone-id1&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my.domain.com&#39;</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">resourceProvider</span><span class="p">(</span><span class="nx">GlobalResources</span><span class="p">.</span><span class="nx">Certificate</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CreateCertificateProvider</span><span class="p">(</span><span class="s1">&#39;domain-wildcard-cert&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;*.my.domain.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">GlobalResources</span><span class="p">.</span><span class="nx">HostedZone</span><span class="p">))</span><span class="w"> </span><span class="c1">// referencing hosted zone for automatic DNS validation</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">AwsLoadBalancerControllerAddOn</span><span class="p">())</span>
+<span class="w">    </span><span class="c1">// Use hosted zone for External DNS</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">ExternalDnsAddOn</span><span class="p">({</span><span class="w"> </span><span class="nx">hostedZoneResources</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">GlobalResources</span><span class="p">.</span><span class="nx">HostedZone</span><span class="p">]</span><span class="w"> </span><span class="p">}))</span>
+<span class="w">    </span><span class="c1">// Use certificate registered before with IngressNginxAddOn</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">addOns</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">IngressNginxAddOn</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">certificateResourceName</span><span class="o">:</span><span class="w"> </span><span class="kt">GlobalResources.Certificate</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">externalDnsHostname</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;my.domain.com&#39;</span>
+<span class="w">    </span><span class="p">}))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">teams</span><span class="p">(...)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">version</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">build</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stack-with-resource-providers&#39;</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="managing-multiple-ingress-controllers-with-ingressclasses">Managing Multiple Ingress Controllers with IngressClasses<a class="headerlink" href="#managing-multiple-ingress-controllers-with-ingressclasses" title="Permanent link">&para;</a></h2>
+<p>The IngressNginxAddOn leverages the Ingress Nginx Controller, which supports using IngressClasses to avoid conflicts. Here's how you can set up and use IngressClasses to manage multiple Ingress controllers effectively.</p>
+<p><strong>Using IngressClasses with IngressNginxAddOn</strong>
+To deploy multiple instances of the Ingress Nginx controller, grant them control over different IngressClasses and select the appropriate IngressClass using the ingressClassName field in your Ingress resources. The IngressNginxAddOn simplifies this setup by allowing you to define these parameters directly.</p>
+<h3 id="add-on-configuration-example">Add-on Configuration Example**<a class="headerlink" href="#add-on-configuration-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">IngressNginxAddOn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">blueprints</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">IngressNginxAddOn</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">crossZoneEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">internetFacing</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">targetType</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ip&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">externalDnsHostname</span><span class="o">:</span><span class="w"> </span><span class="kt">myDomainName</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">certificateResourceName</span><span class="o">:</span><span class="w"> </span><span class="kt">blueprints.GlobalResources.Certificate</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">ingressClassName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;internal-nginx&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">controllerClass</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;k8s.io/internal-ingress-nginx&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">electionId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ingress-controller-leader-internal&#39;</span>
+<span class="p">});</span>
+</code></pre></div>
+<p><strong>Helm Chart Values</strong>
+The add-on configuration sets up the necessary values for the Helm chart:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">values</span><span class="o">:</span><span class="w"> </span><span class="kt">Values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">controller</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">service</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">annotations</span><span class="o">:</span><span class="w"> </span><span class="kt">presetAnnotations</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nx">ingressClassResource</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">props.ingressClassName</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">enabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">default</span><span class="o">:</span><span class="w"> </span><span class="kt">props.isDefaultClass</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">controllerValue</span><span class="o">:</span><span class="w"> </span><span class="kt">props.controllerClass</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;k8s.io/ingress-nginx&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nx">electionID</span><span class="o">:</span><span class="w"> </span><span class="kt">props.electionId</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;ingress-controller-leader&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<h2 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Service Annotations: Customize the Kubernetes Service resource exposing the Ingress Nginx controller for better control over AWS integrations.</li>
+<li>Ingress Class Resource: Manage multiple Ingress configurations by specifying different ingress classes, ensuring proper routing and avoiding conflicts.</li>
+<li>Election ID: Ensure high availability and reliability by using a unique election ID for each controller instance, avoiding conflicts between multiple instances.</li>
+</ul>
+<h2 id="differences-between-ingress-nginx-controller-and-nginx-inc-ingress-controller">Differences between Ingress Nginx Controller and NGINX Inc. Ingress Controller<a class="headerlink" href="#differences-between-ingress-nginx-controller-and-nginx-inc-ingress-controller" title="Permanent link">&para;</a></h2>
+<p>The Ingress-Nginx Controller and the NGINX Inc(F5). Ingress Controller both use NGINX, but they have different implementations and configurations:</p>
+<ol>
+<li>Repository Source:</li>
+</ol>
+<p>Ingress Nginx: Available at <a href="https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/">kubernetes/ingress-nginx</a>.</p>
+<p>NGINX Inc.(F5): Available at <a href="https://github.com/nginxinc/kubernetes-ingress">nginxinc/kubernetes-ingress</a>.</p>
+<ol>
+<li>Configuration and Features:</li>
+</ol>
+<p>Ingress Nginx: Maintained by: Kubernetes community with extensive community support and documentation.</p>
+<p>NGINX Inc.(F5): Maintained by: NGINX Inc. (part of F5 Networks), potentially with enterprise features and different configurations.</p>
+<ol>
+<li>Annotations and Settings:</li>
+</ol>
+<p>Ingress Nginx: May have different annotations and settings specific to Kubernetes community practices.</p>
+<p>NGINX Inc.(F5): May offer additional enterprise-grade features and require different annotations.</p>
+<ol>
+<li>Support and Updates:</li>
+</ol>
+<p>Ingress Nginx: Community-supported with regular updates and improvements based on community contributions.</p>
+<p>NGINX Inc.(F5): Commercial support available from NGINX Inc, with a focus on security and enterprise features.</p>
+<h2 id="functionality">Functionality<a class="headerlink" href="#functionality" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Installs Ingress Nginx controller</li>
+<li>Provides convenience options to integrate with AWS Load Balancer Controller to leverage NLB for the load balancer</li>
+<li>Provides convenience options to integrate with External DNS add-on for integration with Amazon Route 53</li>
+<li>Allows configuring TLS termination at the load balancer provisioned with the add-on</li>
+<li>Supports <a href="../#standard-helm-add-on-configuration-options">standard helm configuration options</a></li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["tabs"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+    
+  </body>
+</html>
