@@ -15,7 +15,8 @@ export interface BlueprintConstructProps {
 export default class BlueprintIPv4Construct extends BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
         super(scope, props);
-
+        blueprints.utils.logger.settings.minLevel = 1;
+        Reflect.defineMetadata("ordered", true, blueprints.addons.AwsLoadBalancerControllerAddOn);
         blueprints.EksBlueprint.builder()
             .addOns(...this.addOns)
             .resourceProvider(blueprints.GlobalResources.Vpc, new blueprints.VpcProvider(undefined, {

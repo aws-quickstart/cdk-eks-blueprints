@@ -8,6 +8,7 @@ import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
 import { supportsALL } from "../../utils";
 import { Duration } from "aws-cdk-lib";
 
+
 /**
  * Configuration options for the add-on.
  */
@@ -58,7 +59,7 @@ const defaultProps: AwsLoadBalancerControllerProps = {
     chart: AWS_LOAD_BALANCER_CONTROLLER,
     repository: 'https://aws.github.io/eks-charts',
     release: AWS_LOAD_BALANCER_CONTROLLER,
-    version: '1.9.2',
+    version: '1.11.0',
     enableShield: false,
     enableWaf: false,
     enableWafv2: false,
@@ -77,31 +78,37 @@ function lookupImage(registry?: string, region?: string): Values {
     return { image: { repository: registry + "amazon/aws-load-balancer-controller" } };
 }
 
-@Reflect.metadata("ordered", true)
 @supportsALL
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
-
     readonly options: AwsLoadBalancerControllerProps;
 
     constructor(props?: AwsLoadBalancerControllerProps) {
-        super({ ...defaultProps as any, ...props });
+        super({ ...(defaultProps as any), ...props });
         this.options = this.props as AwsLoadBalancerControllerProps;
     }
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
-        const serviceAccount = cluster.addServiceAccount('aws-load-balancer-controller', {
-            name: AWS_LOAD_BALANCER_CONTROLLER,
-            namespace: this.options.namespace,
-        });
+        const serviceAccount = cluster.addServiceAccount(
+            "aws-load-balancer-controller",
+            {
+                name: AWS_LOAD_BALANCER_CONTROLLER,
+                namespace: this.options.namespace,
+            }
+        );
 
-        AwsLoadbalancerControllerIamPolicy(cluster.stack.partition).Statement.forEach((statement) => {
-            serviceAccount.addToPrincipalPolicy(iam.PolicyStatement.fromJson(statement));
+        AwsLoadbalancerControllerIamPolicy(
+            cluster.stack.partition
+        ).Statement.forEach((statement) => {
+            serviceAccount.addToPrincipalPolicy(
+                iam.PolicyStatement.fromJson(statement)
+            );
         });
 
         const registry = registries.get(cluster.stack.region);
 
         const image = lookupImage(registry, cluster.stack.region);
+
 
         const awsLoadBalancerControllerChart = this.addHelmChart(clusterInfo, {
             clusterName: cluster.clusterName,
