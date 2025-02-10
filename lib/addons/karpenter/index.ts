@@ -302,7 +302,7 @@ const RELEASE = 'blueprints-addon-karpenter';
 const defaultProps: HelmAddOnProps = {
     name: KARPENTER,
     namespace: "kube-system",
-    version: '1.0.6',
+    version: '1.1.2',
     chart: KARPENTER,
     release: KARPENTER,
     repository: 'oci://public.ecr.aws/karpenter/karpenter',
