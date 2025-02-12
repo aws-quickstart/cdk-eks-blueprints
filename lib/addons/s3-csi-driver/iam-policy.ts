@@ -1,9 +1,9 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 
-export function getS3DriverPolicyStatements(s3BucketNames: string[]): iam.PolicyStatement[] {
+export function getS3DriverPolicyStatements(bucketNames: string[]): iam.PolicyStatement[] {
     // new IAM policy to grand access to S3 bucket
     // https://github.com/awslabs/mountpoint-s3/blob/main/doc/CONFIGURATION.md#iam-permissions
-    const s3BucketArns = s3BucketNames.map((name) => `arn:aws:s3:::${name}`);
+    const s3BucketArns = bucketNames.map((name) => `arn:aws:s3:::${name}`);
     return [
         new iam.PolicyStatement({
             sid: 'S3MountpointFullBucketAccess',
