@@ -271,7 +271,7 @@ export default class BlueprintConstruct {
       new addons.OpaGatekeeperAddOn(),
       new addons.PrometheusNodeExporterAddOn(),
       new addons.S3CSIDriverAddOn({
-        s3BucketName: "s3-csi-driver-for-blueprints-xbucket",
+        bucketNames: ["s3-csi-driver-for-blueprints-xbucket"],
       }),
       new addons.SecretsStoreAddOn(),
       new addons.SSMAgentAddOn(),
