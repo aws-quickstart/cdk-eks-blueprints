@@ -41,7 +41,7 @@ export class HelmAddonPropsConstraints implements utils.ConstraintsType<HelmAddO
 
     /**
     * version can be no less than 1 character long, and no greater than 1024 characters long.
-    * allows passing extra custom parameters in the version field that will be used for installation (valid for OCI repos).
+    * The constraint passing extra custom parameters in the version field that will be used for installation (valid for OCI repos).
     */
     version = new utils.StringConstraint(1, 1024);
 }
