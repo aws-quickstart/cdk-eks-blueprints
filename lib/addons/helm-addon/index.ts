@@ -40,10 +40,10 @@ export class HelmAddonPropsConstraints implements utils.ConstraintsType<HelmAddO
     repository = new utils.UrlStringConstraint(0, 4096);
 
     /**
-    * version can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
-    * https://helm.sh/docs/chart_template_guide/getting_started/#:~:text=TIP%3A%20The%20name%3A%20field%20is,are%20limited%20to%2053%20characters
+    * version can be no less than 1 character long, and no greater than 1024 characters long.
+    * The constraint passing extra custom parameters in the version field that will be used for installation (valid for OCI repos).
     */
-    version = new utils.StringConstraint(1, 63);
+    version = new utils.StringConstraint(1, 1024);
 }
 
 export abstract class HelmAddOn implements spi.ClusterAddOn {
