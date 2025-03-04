@@ -38,13 +38,25 @@ builder()
     .clusterProvider(new bp.FargateClusterProvider({...publicCluster}))
     .build(app, "fargate-blueprint");
 
-builder()
+const mng = builder()
     .clusterProvider(new bp.MngClusterProvider({
-        ...publicCluster
+        ...publicCluster, 
+
+        launchTemplate: {
+            requireImdsv2: true, 
+            tags: {
+                "cost-center": "2122",
+                "old-cost-center": "2322",
+                "new-cost-center": "2422",
+                "upgrade-cost-center": "444"
+            }
+        },
+        
     }))
     .addOns(new bp.addons.VpcCniAddOn())
     .enableControlPlaneLogTypes(bp.ControlPlaneLogType.API, bp.ControlPlaneLogType.AUDIT)
     .build(app, "mng-blueprint");
+
 
 builder()
     .clusterProvider(new bp.MngClusterProvider(publicCluster))
