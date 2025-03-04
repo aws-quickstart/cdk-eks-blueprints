@@ -38,6 +38,9 @@ builder()
     .clusterProvider(new bp.FargateClusterProvider({...publicCluster}))
     .build(app, "fargate-blueprint");
 
+/**
+ * Example managed node group cluster with launch template tags that propagate all the way to the EC2 instances.
+ */
 const mng = builder()
     .clusterProvider(new bp.MngClusterProvider({
         ...publicCluster, 
@@ -45,7 +48,7 @@ const mng = builder()
         launchTemplate: {
             requireImdsv2: true, 
             tags: {
-                "cost-center": "2122",
+                "cost-center": "2122", 
                 "old-cost-center": "2322",
                 "new-cost-center": "2422",
                 "upgrade-cost-center": "444"
