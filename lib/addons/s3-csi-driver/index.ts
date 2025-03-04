@@ -22,11 +22,11 @@ export interface S3CSIDriverAddOnProps extends HelmAddOnUserProps {
     /**
      * The ARNs of KMS Keys to be used by the driver.  Required if you are using Customer Managed Keys for S3
      */
-    kmsArns?: string[]
+    kmsArns?: string[];
     /**
      * Create Namespace with the provided one (will not if namespace is kube-system)
      */
-    createNamespace?: boolean
+    createNamespace?: boolean;
 }
 
 /**
