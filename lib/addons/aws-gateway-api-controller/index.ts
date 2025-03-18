@@ -13,9 +13,10 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 const AWS_GATEWAY_API_CONTROLLER_SA = 'gateway-api-controller';
 
+// https://www.gateway-api-controller.eks.aws.dev/latest/guides/environment/#environment-variables
 export interface AwsGatewayApiControllerAddOnProps extends HelmAddOnUserProps {
     /**
-     * Helm values for the service account configuration.
+     * Service account configuration. Service Account creation is handled for user.
      */
     serviceAccount?: {
         create: boolean;
@@ -23,24 +24,64 @@ export interface AwsGatewayApiControllerAddOnProps extends HelmAddOnUserProps {
     };
 
     /**
-     * Helm values for logging configuration.
-     * @default info
-     * info | debug
+     * A unique name to identify a cluster
+     * @default Inferred from IMDS metadata
      */
-    log?: {
-        level: string;
-    };
+    clusterName?: string;
 
     /**
-     * When set as a non-empty value, creates a service network with that name. 
-     * The created service network will be also associated with cluster VPC.
-     * @default ""
-     * 
+     * VPC ID of the cluster when running controller outside the cluster
+     * @default Inferred from IMDS metadata
      */
-    defaultServiceNetwork: string;
+    clusterVpcId?: string;
 
-    // TODO: Add other AWS Gateway API Controller Configuration
-    // https://www.gateway-api-controller.eks.aws.dev/latest/guides/environment/
+    /**
+     * AWS Account ID when running controller outside the cluster
+     * @default Inferred from IMDS metadata
+     */
+    awsAccountId?: string;
+
+    /**
+     * AWS Region for VPC Lattice Service endpoint
+     * @default Inferred from IMDS metadata
+     */
+    region?: string;
+
+    /**
+     * Log level configuration
+     * @default "info"
+     */
+    logLevel?: 'info' | 'debug';
+
+    /**
+     * Default service network name
+     * @default ""
+     */
+    defaultServiceNetwork?: string;
+
+    /**
+     * Enable single service network mode
+     * @default "false"
+     */
+    enableServiceNetworkOverride?: boolean;
+
+    /**
+     * Enable webhook listener for pod readiness gate injection
+     * @default "false"
+     */
+    webhookEnabled?: boolean;
+
+    /**
+     * Disable AWS Resource Groups Tagging API
+     * @default "false"
+     */
+    disableTaggingServiceApi?: boolean;
+
+    /**
+     * Maximum number of concurrent reconcile loops per route type
+     * @default 1
+     */
+    routeMaxConcurrentReconciles?: number;
 }
 
 const defaultProps: AwsGatewayApiControllerAddOnProps = {
@@ -50,7 +91,11 @@ const defaultProps: AwsGatewayApiControllerAddOnProps = {
     version: 'v1.1.0',
     repository: 'oci://public.ecr.aws/aws-application-networking-k8s/aws-gateway-controller-chart',
     values: {},
-    defaultServiceNetwork: ''
+    defaultServiceNetwork: '',
+    enableServiceNetworkOverride: false,
+    webhookEnabled: false,
+    disableTaggingServiceApi: false,
+    routeMaxConcurrentReconciles: 1,
 };
 
 export class AwsGatewayApiControllerAddOn extends HelmAddOn {
@@ -194,12 +239,47 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
             create: false,
             name: serviceAccount.serviceAccountName
         };
-        values.log = {
-            level: 'info'
-        };
+
+        if (this.options.clusterName) {
+            values.clusterName = this.options.clusterName;
+        }
+
+        if (this.options.clusterVpcId) {
+            values.clusterVpcId = this.options.clusterVpcId;
+        }
+
+        if (this.options.awsAccountId) {
+            values.awsAccountId = this.options.awsAccountId;
+        }
+
+        if (this.options.region) {
+            values.region = this.options.region;
+        }
+
+        if (this.options.logLevel) {
+            values.logLevel = this.options.logLevel;
+        }
+
         if (this.options.defaultServiceNetwork) {
             values.defaultServiceNetwork = this.options.defaultServiceNetwork;
         }
+
+        if (this.options.enableServiceNetworkOverride) {
+            values.enableServiceNetworkOverride = this.options.enableServiceNetworkOverride;
+        }
+
+        if (this.options.webhookEnabled) {
+            values.webhookEnabled = this.options.webhookEnabled;
+        }
+
+        if (this.options.disableTaggingServiceApi) {
+            values.disableTaggingServiceApi = this.options.disableTaggingServiceApi;
+        }
+
+        if (this.options.routeMaxConcurrentReconciles) {
+            values.routeMaxConcurrentReconciles = this.options.routeMaxConcurrentReconciles;
+        }
+
         return values;
     }
 

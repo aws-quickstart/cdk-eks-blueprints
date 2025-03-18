@@ -33,4 +33,4 @@ export class GatewayApiCrdsStack extends cdk.NestedStack {
             throw error;
         }
     }
-}
+};
