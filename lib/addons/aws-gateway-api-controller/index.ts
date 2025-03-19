@@ -108,7 +108,7 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
 
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         // Step 1: Configure Security Groups for VPC Lattice 
-        const sgCustomResource = this.configureSecurityGroup(clusterInfo);
+        this.configureSecurityGroup(clusterInfo);
 
         // Step 2: Create namespace
         const namespace = this.createNamespace(clusterInfo);

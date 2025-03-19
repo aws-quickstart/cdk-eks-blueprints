@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 
-const SIG_GATEWAY_API_FILE_PATH = 'standard-install.yaml'
+const SIG_GATEWAY_API_FILE_PATH = 'standard-install.yaml';
 
 export class GatewayApiCrdsStack extends cdk.NestedStack {
     public readonly manifestIds: string[] = [];
@@ -33,4 +33,4 @@ export class GatewayApiCrdsStack extends cdk.NestedStack {
             throw error;
         }
     }
-};
+}
