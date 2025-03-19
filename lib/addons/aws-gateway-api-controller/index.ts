@@ -134,8 +134,6 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
         serviceAccount.node.addDependency(namespace);
         awsGatewayApiController.node.addDependency(serviceAccount);
         gatewayClass.node.addDependency(crdsStack);
-        sgCustomResource.node.addDependency(awsGatewayApiController);
-        sgCustomResource.node.addDependency(gatewayClass);
 
         return Promise.resolve(awsGatewayApiController);
     }
