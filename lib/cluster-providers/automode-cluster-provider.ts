@@ -26,7 +26,7 @@ export interface AutomodeClusterProviderProps extends Partial<CommonClusterOptio
 export class AutomodeClusterProvider extends GenericClusterProvider {
 
     constructor(props?: AutomodeClusterProviderProps) {
-        super({...defaultOptions, ...props as Omit<AutomodeClusterProviderProps, "nodePools" | "nodeRole">, ...{
+        super({...defaultOptions, ...props, ...{
               automodeComputeConfig: props as Omit<AutomodeClusterProviderProps, "id" | "tags">,
               defaultCapacityType: eksv2.DefaultCapacityType.AUTOMODE
             }

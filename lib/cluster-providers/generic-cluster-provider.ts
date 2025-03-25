@@ -89,7 +89,7 @@ export interface GenericClusterProviderProps extends Partial<eks.ClusterOptions>
     /**
      * EKS Automode compute config
      */
-    automodeComputeConfig?: eksv2.ComputeConfig;
+    compute?: eksv2.ComputeConfig;
 
     /**
      * Fargate profiles
@@ -202,7 +202,7 @@ export class ClusterBuilder {
     private privateCluster = false;
     private managedNodeGroups: ManagedNodeGroup[] = [];
     private autoscalingNodeGroups: AutoscalingNodeGroup[] = [];
-    private automodeComputeConfig: eksv2.ComputeConfig;
+    private compute: eksv2.ComputeConfig;
     private fargateProfiles: {
         [key: string]: eks.FargateProfileOptions;
     } = {};
@@ -226,8 +226,8 @@ export class ClusterBuilder {
         return this;
     }
 
-    automodeConfig(config: eksv2.ComputeConfig): this {
-        this.automodeComputeConfig = config;
+    computeConfig(config: eksv2.ComputeConfig): this {
+        this.compute = config;
         return this;
     }
 
@@ -247,7 +247,7 @@ export class ClusterBuilder {
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups,
             autoscalingNodeGroups: this.autoscalingNodeGroups,
-            automodeComputeConfig: this.automodeComputeConfig,
+            compute: this.compute,
             fargateProfiles: this.fargateProfiles
         });
     }
@@ -265,7 +265,7 @@ export class GenericClusterProvider implements ClusterProvider {
         const computeTypesEnabled = [
             props.managedNodeGroups && props.managedNodeGroups.length > 0,
             props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0,
-            props.automodeComputeConfig !== undefined
+            props.compute != undefined
         ].filter(Boolean).length;
 
         // Assert that only one compute type is enabled
@@ -361,6 +361,9 @@ export class GenericClusterProvider implements ClusterProvider {
      */
     protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): ClusterType {
         if(clusterOptions.defaultCapacityType == eksv2.DefaultCapacityType.AUTOMODE) {
+
+            const {defaultCapacity, ...remainingOpts} = clusterOptions ?? {}
+            clusterOptions = remainingOpts
             return new eksv2.Cluster(scope, id, clusterOptions)
         }
         return new eks.Cluster(scope, id, clusterOptions);
@@ -482,8 +485,8 @@ export class GenericClusterProvider implements ClusterProvider {
             utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
         if (props.autoscalingNodeGroups != undefined)
             utils.validateConstraints(new AutoscalingNodeGroupConstraints, "AutoscalingNodeGroups", ...props.autoscalingNodeGroups);
-        if (props.automodeComputeConfig != undefined)
-            utils.validateConstraints(new ComputeConfigConstraints, "ComputeConfigConstraints", props.automodeComputeConfig)
+        if (props.compute != undefined)
+            utils.validateConstraints(new ComputeConfigConstraints, "ComputeConfigConstraints", props.compute)
         if (props.fargateProfiles as any != undefined)
             utils.validateConstraints(new FargateProfileConstraints, "FargateProfiles", ...Object.values(props.fargateProfiles as any));
     }
