@@ -20,9 +20,13 @@ export interface S3CSIDriverAddOnProps extends HelmAddOnUserProps {
      */
     bucketNames: string[];
     /**
+     * The ARNs of KMS Keys to be used by the driver.  Required if you are using Customer Managed Keys for S3
+     */
+    kmsArns?: string[];
+    /**
      * Create Namespace with the provided one (will not if namespace is kube-system)
      */
-    createNamespace?: boolean
+    createNamespace?: boolean;
 }
 
 /**
@@ -36,7 +40,8 @@ const defaultProps: HelmAddOnUserProps & S3CSIDriverAddOnProps = {
   version: "v1.11.0",
   repository: "https://awslabs.github.io/mountpoint-s3-csi-driver",
   createNamespace: false,
-  bucketNames: []
+  bucketNames: [],
+  kmsArns: []
 };
 
 @supportsALL
@@ -59,7 +64,7 @@ export class S3CSIDriverAddOn extends HelmAddOn {
 
         const s3BucketPolicy = new iam.Policy(cluster, S3_DRIVER_POLICY, {
             statements:
-                getS3DriverPolicyStatements(this.options.bucketNames)
+                getS3DriverPolicyStatements(this.options.bucketNames, this.options.kmsArns ?? [])
         });
         serviceAccount.role.attachInlinePolicy(s3BucketPolicy);
         
