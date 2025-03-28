@@ -1,9 +1,8 @@
-import { CommonClusterOptions } from "aws-cdk-lib/aws-eks";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 import * as eksv2 from "@aws-cdk/aws-eks-v2-alpha"
 import { IRole } from "aws-cdk-lib/aws-iam";
 
-export interface AutomodeClusterProviderProps extends Partial<CommonClusterOptions>{
+export interface AutomodeClusterProviderProps extends Partial<eksv2.ClusterCommonOptions>{
 
   id?: string,
 

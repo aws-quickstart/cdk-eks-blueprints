@@ -345,11 +345,13 @@ export class GenericClusterProvider implements ClusterProvider {
             autoscalingGroups.push(autoscalingGroup);
         });
 
+        const autoMode = clusterOptions.defaultCapacityType != undefined && (clusterOptions.defaultCapacityType as eksv2.DefaultCapacityType) == eksv2.DefaultCapacityType.AUTOMODE
+
         const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
         const fargateConstructs: eks.FargateProfile[] = [];
         fargateProfiles?.forEach(([key, options]) => fargateConstructs.push(this.addFargateProfile(cluster as eks.Cluster, key, options)));
 
-        return new ClusterInfo(cluster as eks.Cluster, version, nodeGroups, autoscalingGroups, fargateConstructs);
+        return new ClusterInfo(cluster as eks.Cluster, version, nodeGroups, autoscalingGroups, autoMode, cluster as eksv2.Cluster, fargateConstructs);
     }
 
     /**
@@ -362,8 +364,9 @@ export class GenericClusterProvider implements ClusterProvider {
     protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): ClusterType {
         if(clusterOptions.defaultCapacityType == eksv2.DefaultCapacityType.AUTOMODE) {
 
-            const {defaultCapacity, ...remainingOpts} = clusterOptions ?? {}
+            const {defaultCapacity, kubectlLayer, ...remainingOpts} = clusterOptions ?? {}
             clusterOptions = remainingOpts
+            clusterOptions.kubectlProviderOptions = {kubectlLayer}
             return new eksv2.Cluster(scope, id, clusterOptions)
         }
         return new eks.Cluster(scope, id, clusterOptions);

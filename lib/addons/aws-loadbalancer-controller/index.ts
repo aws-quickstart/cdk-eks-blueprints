@@ -5,8 +5,8 @@ import { ClusterInfo, Values } from "../../spi";
 import { registries } from "../../utils/registry-utils";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { AwsLoadbalancerControllerIamPolicy } from "./iam-policy";
-import { supportsALL } from "../../utils";
 import { Duration } from "aws-cdk-lib";
+import * as utils from "../../utils";
 
 
 /**
@@ -78,7 +78,7 @@ function lookupImage(registry?: string, region?: string): Values {
     return { image: { repository: registry + "amazon/aws-load-balancer-controller" } };
 }
 
-@supportsALL
+@utils.supportsALL
 export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
     readonly options: AwsLoadBalancerControllerProps;
 
@@ -87,6 +87,7 @@ export class AwsLoadBalancerControllerAddOn extends HelmAddOn {
         this.options = this.props as AwsLoadBalancerControllerProps;
     }
 
+    @utils.autoMode()
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         const cluster = clusterInfo.cluster;
         const serviceAccount = cluster.addServiceAccount(
