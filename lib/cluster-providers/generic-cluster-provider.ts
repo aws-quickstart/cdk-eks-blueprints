@@ -263,13 +263,18 @@ export class GenericClusterProvider implements ClusterProvider {
         }
         const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_30;
 
-        const privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
-        const isolatedCluster = this.props.isolatedCluster ?? utils.valueFromContext(scope, constants.ISOLATED_CLUSTER, false);
+        let privateCluster = this.props.privateCluster ?? utils.valueFromContext(scope, constants.PRIVATE_CLUSTER, false);
+        privateCluster = privateCluster ? privateCluster === 'true' : false;
+        let isolatedCluster = this.props.isolatedCluster ?? utils.valueFromContext(scope, constants.ISOLATED_CLUSTER, false);
+        isolatedCluster = isolatedCluster ? isolatedCluster === 'true' : false;
+
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
         const vpcSubnets = this.props.vpcSubnets ?? (isolatedCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]: privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
         const mastersRole = this.props.mastersRole ?? new Role(scope, `${clusterName}-AccessRole`, {
             assumedBy: new AccountRootPrincipal()
         });
+
+        
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
         const tags = this.props.tags;
@@ -289,7 +294,7 @@ export class GenericClusterProvider implements ClusterProvider {
             defaultCapacity: 0 // we want to manage capacity ourselves
         };
 
-        const isolatedOptions: Partial<eks.ClusterProps> = isolatedCluster ? {
+        const isolatedOptions: Partial<eks.ClusterProps> = isolatedCluster  ? {
           placeClusterHandlerInVpc: true,
           clusterHandlerEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },
           kubectlEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },

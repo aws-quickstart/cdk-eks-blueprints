@@ -791,6 +791,7 @@ export class KarpenterAddOn extends HelmAddOn {
             instanceProfileName: `KarpenterNodeInstanceProfile-${instanceProfileName}`,
             path: '/'
         });
+        karpenterInstanceProfile.node.addDependency(karpenterNodeRole);
 
         const clusterId = Names.uniqueId(cluster);
 
