@@ -16,7 +16,7 @@ import { KarpenterControllerPolicy, KarpenterControllerPolicyBeta } from './iam'
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
-        [KubernetesVersion.V1_32.version, '0.37.5'],
+        [KubernetesVersion.V1_32.version, '1.2.0'],
         [KubernetesVersion.V1_31.version, '0.37.5'],
         [KubernetesVersion.V1_30.version, '0.37.5'],
         [KubernetesVersion.V1_29.version, '0.34.0'],
