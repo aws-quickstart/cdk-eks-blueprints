@@ -1,80 +1,81 @@
 {
-    "name": "@aws-quickstart/eks-blueprints",
-    "version": "1.16.3",
-    "license": "Apache-2.0",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "homepage": "https://aws-quickstart.github.io/cdk-eks-blueprints/",
-    "repository": {
-        "url": "https://github.com/aws-quickstart/cdk-eks-blueprints.git",
-        "type": "git"
-    },
-    "scripts": {
-        "build": "rm -rf dist && tsc",
-        "watch": "tsc -w",
-        "test": "jest --verbose false --detectOpenHandles",
-        "cdk": "cdk",
-        "examples": "cdk --app \"npx ts-node examples/examples.ts\"",
-        "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
-    },
-    "devDependencies": {
-        "@types/dot-object": "^2.1.6",
-        "@types/jest": "^29.5.11",
-        "@types/js-yaml": "^4.0.9",
-        "@types/node": "^22.7.5",
-        "@types/semver": "^7.5.6",
-        "@types/uuid": "^10.0.0",
-        "@typescript-eslint/eslint-plugin": "^7.14.1",
-        "@typescript-eslint/parser": "^7.14.1",
-        "copyfiles": "^2.4.1",
-        "eslint": "^8.56.0",
-        "jest": "^29.7.0",
-        "json-schema-to-typescript": "^15.0.2",
-        "lint": "^1.1.2",
-        "ts-jest": "^29.1.1",
-        "ts-node": "^10.9.2",
-        "typedoc": "^0.26.2",
-        "typescript": "^5.5.2"
-    },
-    "dependencies": {
-        "@aws-cdk/lambda-layer-kubectl-v27": "^2.1.0",
-        "@aws-cdk/lambda-layer-kubectl-v28": "^2.2.0",
-        "@aws-cdk/lambda-layer-kubectl-v29": "^2.1.0",
-        "@aws-cdk/lambda-layer-kubectl-v30": "^2.0.0",
-        "@aws-cdk/lambda-layer-kubectl-v31": "^2.0.0",
-        "@aws-sdk/client-eks": "^3.529.1",
-        "@aws-sdk/client-secrets-manager": "^3.529.1",
-        "@types/assert": "^1.5.10",
-        "@types/bcrypt": "^5.0.2",
-        "@types/lodash.clonedeep": "^4.5.9",
-        "@types/uuid": "^10.0.0",
-        "bcrypt": "^5.1.1",
-        "constructs": "^10.3.0",
-        "dot-object": "^2.1.4",
-        "js-yaml": "4.1.0",
-        "lodash": "4.17.21",
-        "reflect-metadata": "^0.2.1",
-        "semver": "^7.6.0",
-        "simple-base": "^1.0.0",
-        "sync-request": "6.1.0",
-        "ts-deepmerge": "^7.0.0",
-        "ts-md5": "^1.3.1",
-        "tslog": "^4.9.2",
-        "uuid": "^10.0.0",
-        "yaml": "^2.4.1",
-        "zod": "^3.22.4"
-    },
-    "optionalDependencies": {
-        "@aws-cdk/lambda-layer-kubectl-v23": "^2.0.8",
-        "@aws-cdk/lambda-layer-kubectl-v24": "^2.0.242",
-        "@aws-cdk/lambda-layer-kubectl-v25": "^2.0.4",
-        "@aws-cdk/lambda-layer-kubectl-v26": "^2.1.0"
-    },
-    "overrides": {
-        "semver": "^7.6.0"
-    },
-    "peerDependencies": {
-        "aws-cdk-lib": "2.173.4",
-        "aws-cdk": "2.173.4"
-    }
+  "name": "@aws-quickstart/eks-blueprints",
+  "version": "1.16.3",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "homepage": "https://aws-quickstart.github.io/cdk-eks-blueprints/",
+  "repository": {
+    "url": "https://github.com/aws-quickstart/cdk-eks-blueprints.git",
+    "type": "git"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "watch": "tsc -w",
+    "test": "jest --verbose false --detectOpenHandles",
+    "cdk": "cdk",
+    "examples": "cdk --app \"npx ts-node examples/examples.ts\"",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "devDependencies": {
+    "@types/dot-object": "^2.1.6",
+    "@types/jest": "^29.5.11",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.7.5",
+    "@types/semver": "^7.5.6",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "json-schema-to-typescript": "^15.0.2",
+    "lint": "^1.1.2",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.28.1",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@aws-cdk/lambda-layer-kubectl-v30": "^2.0.0",
+    "@aws-cdk/lambda-layer-kubectl-v31": "^2.0.0",
+    "@aws-cdk/lambda-layer-kubectl-v32": "^2.0.0",
+    "@aws-sdk/client-eks": "^3.529.1",
+    "@aws-sdk/client-secrets-manager": "^3.529.1",
+    "@types/assert": "^1.5.10",
+    "@types/bcrypt": "^5.0.2",
+    "@types/lodash.clonedeep": "^4.5.9",
+    "@types/uuid": "^10.0.0",
+    "bcrypt": "^5.1.1",
+    "constructs": "^10.3.0",
+    "dot-object": "^2.1.4",
+    "js-yaml": "4.1.0",
+    "lodash": "4.17.21",
+    "reflect-metadata": "^0.2.1",
+    "semver": "^7.6.0",
+    "simple-base": "^1.0.0",
+    "sync-request": "6.1.0",
+    "ts-deepmerge": "^7.0.0",
+    "ts-md5": "^1.3.1",
+    "tslog": "^4.9.2",
+    "uuid": "^10.0.0",
+    "yaml": "^2.4.1",
+    "zod": "^3.22.4"
+  },
+  "optionalDependencies": {
+    "@aws-cdk/lambda-layer-kubectl-v23": "^2.0.8",
+    "@aws-cdk/lambda-layer-kubectl-v24": "^2.0.242",
+    "@aws-cdk/lambda-layer-kubectl-v25": "^2.0.4",
+    "@aws-cdk/lambda-layer-kubectl-v26": "^2.1.0",
+    "@aws-cdk/lambda-layer-kubectl-v27": "^2.1.0",
+    "@aws-cdk/lambda-layer-kubectl-v28": "^2.2.0",
+    "@aws-cdk/lambda-layer-kubectl-v29": "^2.1.1"
+  },
+  "overrides": {
+    "semver": "^7.6.0"
+  },
+  "peerDependencies": {
+    "aws-cdk": "2.1007.0",
+    "aws-cdk-lib": "2.187.0"
+  }
 }

@@ -263,3 +263,5 @@ export const KarpenterControllerPolicyBeta = (cluster: Cluster, partition: strin
         ]
     };
 };
+
+export const KarpenterControllerPolicyV1 = KarpenterControllerPolicyBeta;

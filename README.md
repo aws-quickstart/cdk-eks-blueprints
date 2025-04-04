@@ -48,14 +48,14 @@ aws --version
 Install CDK matching the current version of the Blueprints QuickStart (which can be found in package.json).
 
 ```bash
-npm install -g aws-cdk@2.173.4
+npm install -g aws-cdk@2.1007.0
 ```
 
 Verify the installation.
 
 ```bash
 cdk --version
-# must output 2.173.4
+# must output 2.1007.0
 ```
 
 Create a new CDK project. We use `typescript` for this example.
