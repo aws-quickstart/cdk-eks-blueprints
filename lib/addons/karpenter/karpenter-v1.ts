@@ -276,6 +276,7 @@ export class KarpenterV1AddOn extends HelmAddOn {
                 }
 
                 const nodeManifest = cluster.addManifest("default-node-template", ec2Node);
+                nodeManifest.node.addDependency(karpenterChart);
                 poolManifest.node.addDependency(nodeManifest);
             }
         }
