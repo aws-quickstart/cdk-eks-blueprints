@@ -43,8 +43,8 @@ export default class BlueprintConstruct {
   clusterProvider: GenericClusterProvider;
   dataTeam: blueprints.EmrEksTeamProps;
   batchTeam: blueprints.BatchEksTeamProps;
-  nodeClassSpec: blueprints.Ec2NodeClassSpec;
-  nodePoolSpec: blueprints.NodePoolSpec;
+  nodeClassSpec: blueprints.Ec2NodeClassV1Spec;
+  nodePoolSpec: blueprints.NodePoolV1Spec;
 
   constructor(scope: Construct, props: cdk.StackProps) {
     blueprints.HelmAddOn.validateHelmVersions = true;
@@ -82,7 +82,10 @@ export default class BlueprintConstruct {
       name: "blueprints-apache-airflow-efs",
     });
     this.nodeClassSpec = {
-      amiFamily: "AL2",
+      amiFamily: "Bottlerocket",
+      amiSelectorTerms: [
+        { alias: "bottlerocket@v1.34.0" },
+      ],
       subnetSelectorTerms: [
         { tags: { Name: `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` } },
       ],
@@ -92,42 +95,21 @@ export default class BlueprintConstruct {
     };
 
     this.nodePoolSpec = {
-      labels: {
-        type: "karpenter-test",
-      },
-      annotations: {
-        "eks-blueprints/owner": "young",
-      },
-      taints: [
-        {
-          key: "workload",
-          value: "test",
-          effect: "NoSchedule",
-        },
-      ],
+      labels: {type: "karpenter-test"},
+      annotations: {"eks-blueprints/owner": "young"},
+      //taints: [{key: "workload", value: "test", effect: "NoSchedule"}],
       requirements: [
-        {
-          key: "node.kubernetes.io/instance-type",
-          operator: "In",
-          values: ["m5.2xlarge"],
-        },
+        {key: "node.kubernetes.io/instance-type", operator: "In", values: ["m5.2xlarge"]},
         {
           key: "topology.kubernetes.io/zone",
           operator: "In",
           values: [`${props?.env?.region}a`, `${props?.env?.region}b`],
         },
-        {
-          key: "kubernetes.io/arch",
-          operator: "In",
-          values: ["amd64", "arm64"],
-        },
-        { key: "karpenter.sh/capacity-type", operator: "In", values: ["spot"] },
+        {key: "kubernetes.io/arch", operator: "In", values: ["amd64", "arm64"]},
+        {key: "karpenter.sh/capacity-type", operator: "In", values: ["spot"]},
       ],
-      disruption: {
-        consolidationPolicy: "WhenEmpty",
-        consolidateAfter: "30s",
-        expireAfter: "20m",
-      },
+      expireAfter: "20m",
+      disruption: {consolidationPolicy: "WhenEmpty", consolidateAfter: "30s"},
     };
 
     this.addOns = [
@@ -163,11 +145,10 @@ export default class BlueprintConstruct {
           ),
         ],
       }),
-      new addons.KarpenterAddOn({
+      new addons.KarpenterV1AddOn({
         nodePoolSpec: this.nodePoolSpec,
         ec2NodeClassSpec: this.nodeClassSpec,
-        interruptionHandling: true,
-        installCRDs: false,
+        interruptionHandling: true
       }),
 
       // other addons
@@ -192,7 +173,6 @@ export default class BlueprintConstruct {
       new addons.ArgoCDAddOn(),
       new addons.AwsBatchAddOn(),
       new addons.AWSPrivateCAIssuerAddon(),
-      new addons.AwsNodeTerminationHandlerAddOn(),
       new addons.CalicoOperatorAddOn(),
       new addons.CloudWatchLogsAddon({
         logGroupPrefix: "/aws/eks/blueprints-construct-dev",
@@ -344,7 +324,7 @@ export default class BlueprintConstruct {
 
 export function getClusterProvider(managedNodeGroups: ManagedNodeGroup[]) {
   return new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_30,
+    version: KubernetesVersion.V1_31,
     tags: {
       Name: "blueprints-example-cluster",
       Type: "generic-cluster",
@@ -363,8 +343,8 @@ export function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
     id: "mng1",
     amiType: NodegroupAmiType.AL2_X86_64,
     instanceTypes: [new ec2.InstanceType("m5.4xlarge")],
-    desiredSize: 2,
-    maxSize: 3,
+    desiredSize: 1,
+    maxSize: 1,
     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
     launchTemplate: {

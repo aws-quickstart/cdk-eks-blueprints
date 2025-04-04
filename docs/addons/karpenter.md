@@ -2,6 +2,11 @@
 
 Karpenter add-on is based on the [Karpenter](https://github.com/kubernetes-sigs/karpenter) open source node provisioning project. For this add-on, it will utilize the [AWS provider](https://github.com/aws/karpenter-provider-aws), to ensure a more efficient and cost-effective way to manage workloads by launching just the right compute resources to handle a cluster's application on your EKS cluster.
 
+At present the blueprints framework provides two versions of Karpenter add-on:
+
+1. KarpenterV1AddOn. Stable version based on  `v1` version of CRDs that are expected to be backwards compatible moving forward. Use this version for new clusters moving forward. 
+2. KarpenterAddOn. This version supports both `alpha` and `beta` versions of CRDs and is provided for legacy support and migration purposes. This add-on is deprecated and will not be getting new features. 
+
 Karpenter works by:
 
 * Watching for pods that the Kubernetes scheduler has marked as unschedulable,
@@ -19,6 +24,54 @@ Karpenter works by:
 3. [Amazon EKS cluster with supported Kubernetes version](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html). Karpenter provides minimum supported Karpenter versions for each Kubernetes version in form of a matrix [here](https://karpenter.sh/docs/upgrading/compatibility/#compatibility-matrix).
 
 ## Usage
+
+Blueprints release 1.17.x and above introduced a new Karpenter stable add-on based on `v1` version of CRDs. 
+This addon simplifies Karpenter usage and is expected to provide backwards compatibility moving forward. 
+
+```typescript
+
+import * as blueprints from '@aws-quickstart/eks-blueprints';
+
+const nodeClassSpec: blueprints.Ec2NodeClassV1Spec; = {
+  amiFamily: "Bottlerocket", // AL2 is another popular option
+  amiSelectorTerms: [
+    { alias: "bottlerocket@v1.34.0" }, // alias allows to specify ami family and version. @latest also supported
+  ],
+  subnetSelectorTerms: [
+    { tags: { Name: `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` } },
+  ],
+  securityGroupSelectorTerms: [
+    { tags: { "aws:eks:cluster-name": `${blueprintID}` } },
+  ],
+};
+
+const nodePoolSpec: blueprints.NodePoolV1Spec = {
+  labels: {type: "karpenter-test"},
+  annotations: {"eks-blueprints/owner": "young"},
+  //taints: [{key: "workload", value: "test", effect: "NoSchedule"}],
+  requirements: [
+    {key: "node.kubernetes.io/instance-type", operator: "In", values: ["m5.2xlarge"]},
+    {
+      key: "topology.kubernetes.io/zone",
+      operator: "In",
+      values: [`${props?.env?.region}a`, `${props?.env?.region}b`],
+    },
+    {key: "kubernetes.io/arch", operator: "In", values: ["amd64", "arm64"]},
+    {key: "karpenter.sh/capacity-type", operator: "In", values: ["spot"]},
+  ],
+  expireAfter: "20m",
+  disruption: {consolidationPolicy: "WhenEmpty", consolidateAfter: "30s"},
+};
+
+const karpenterAddOn =  new addons.KarpenterV1AddOn({
+    nodePoolSpec,
+    ec2NodeClassSpec: nodeClassSpec,
+    interruptionHandling: true
+  });
+```
+
+
+## Usage Pre-Stable Releases (KarpenterAddOn legacy)
 
 ```typescript
 import 'source-map-support/register';
