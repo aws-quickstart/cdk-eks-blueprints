@@ -9,6 +9,7 @@ import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
 import { FluxBucket } from './bucket';
 import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
+import { Duration } from "aws-cdk-lib";
 
 /**
  * Options for a FluxCD GitRepository
@@ -220,7 +221,7 @@ export class FluxCDAddOn extends HelmAddOn {
         const cluster = clusterInfo.cluster;
         let values: Values = this.options.values ?? {};
         values = merge(values, this.props.values ?? {});
-        const chart = this.addHelmChart(clusterInfo, values);
+        const chart = this.addHelmChart(clusterInfo, values, false, true, Duration.minutes(15));
 
         if( this.options.createNamespace == true){
             // Let CDK Create the Namespace
