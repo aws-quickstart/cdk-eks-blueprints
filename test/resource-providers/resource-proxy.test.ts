@@ -128,6 +128,7 @@ describe("ResourceProxy",() => {
                 id: "mng1",
                 launchTemplate: {
                     requireImdsv2: true,
+                    httpPutResponseHopLimit: 2,
                 },
             }],
         });

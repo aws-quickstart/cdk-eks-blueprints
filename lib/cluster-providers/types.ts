@@ -36,6 +36,15 @@ export interface LaunchTemplateProps {
      * Security group to assign to instances created with the launch template.
      */
     securityGroup?: ec2.ISecurityGroup;
+
+    /**
+     * The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
+     *
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-launchtemplate-launchtemplatedata-metadataoptions.html#cfn-ec2-launchtemplate-launchtemplatedata-metadataoptions-httpputresponsehoplimit
+     *
+     * @default 1
+     */
+    readonly httpPutResponseHopLimit?: number;
 }
 
 
@@ -44,7 +53,7 @@ export interface ManagedNodeGroup extends Omit<eks.NodegroupOptions, "launchTemp
     /**
      * Id of this node group. Expected to be unique in cluster scope.
      */
-    id: string, 
+    id: string,
 
     /**
      * Min size of the node group
@@ -113,7 +122,7 @@ export interface AutoscalingNodeGroup extends Omit<AutoScalingGroupCapacityOptio
     /**
      * Id of this node group. Expected to be unique in cluster scope.
      */
-    id: string, 
+    id: string,
 
     /**
      * Min size of the node group
