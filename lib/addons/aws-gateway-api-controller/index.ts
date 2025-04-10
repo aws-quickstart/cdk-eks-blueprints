@@ -5,11 +5,10 @@ import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { getVpcLatticeControllerPolicy } from "./iam-policy";
-import { GatewayApiCrdsAddOn } from "../gateway-api-crds/gateway-api-crds";
+import { GatewayApiCrdsAddOn } from "../gateway-api-crds";
 import { Stack } from "aws-cdk-lib";
 import * as customResources from 'aws-cdk-lib/custom-resources';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { dependable } from "../../utils";
 
 
 const AWS_GATEWAY_API_CONTROLLER_SA = 'gateway-api-controller';
@@ -71,11 +70,10 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
     readonly options: AwsGatewayApiControllerAddOnProps;
 
     constructor(props?: AwsGatewayApiControllerAddOnProps) {
-        super({ ...(defaultProps as any), ...props });
+        super({ ...(defaultProps as any), ...props});
         this.options = this.props as AwsGatewayApiControllerAddOnProps;
     }
 
-    @dependable(GatewayApiCrdsAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         // Step 1: Configure Security Groups for VPC Lattice 
         this.configureSecurityGroup(clusterInfo);
