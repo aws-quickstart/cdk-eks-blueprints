@@ -5,48 +5,17 @@ import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import { ServiceAccount } from "aws-cdk-lib/aws-eks";
 import { getVpcLatticeControllerPolicy } from "./iam-policy";
-import { GatewayApiCrdsStack } from "./sig-gateway-api";
+import { GatewayApiCrdsAddOn } from "../gateway-api-crds/gateway-api-crds";
 import { Stack } from "aws-cdk-lib";
 import * as customResources from 'aws-cdk-lib/custom-resources';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { dependable } from "../../utils";
 
 
 const AWS_GATEWAY_API_CONTROLLER_SA = 'gateway-api-controller';
 
 // https://www.gateway-api-controller.eks.aws.dev/latest/guides/environment/#environment-variables
 export interface AwsGatewayApiControllerAddOnProps extends HelmAddOnUserProps {
-    /**
-     * Service account configuration. Service Account creation is handled for user.
-     */
-    serviceAccount?: {
-        create: boolean;
-        name: string;
-    };
-
-    /**
-     * A unique name to identify a cluster
-     * @default Inferred from IMDS metadata
-     */
-    clusterName?: string;
-
-    /**
-     * VPC ID of the cluster when running controller outside the cluster
-     * @default Inferred from IMDS metadata
-     */
-    clusterVpcId?: string;
-
-    /**
-     * AWS Account ID when running controller outside the cluster
-     * @default Inferred from IMDS metadata
-     */
-    awsAccountId?: string;
-
-    /**
-     * AWS Region for VPC Lattice Service endpoint
-     * @default Inferred from IMDS metadata
-     */
-    region?: string;
-
     /**
      * Log level configuration
      * @default "info"
@@ -106,6 +75,7 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
         this.options = this.props as AwsGatewayApiControllerAddOnProps;
     }
 
+    @dependable(GatewayApiCrdsAddOn.name)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         // Step 1: Configure Security Groups for VPC Lattice 
         this.configureSecurityGroup(clusterInfo);
@@ -116,24 +86,16 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
         // Step 3: Set up IAM permissions
         const serviceAccount = this.setupIamPermissions(clusterInfo);
 
-        // Step 4: Deploy the controller
+        // Step 4: Create GatewayClass that uses the official K8s Gateway API
+        this.createGatewayClass(clusterInfo);
+
+        // Step 5: Deploy the controller
         const chartValues = this.populateValues(serviceAccount);
         const awsGatewayApiController = this.addHelmChart(clusterInfo, chartValues);
-
-        // Step 5: Create SIG-Network official K8s Gateway API
-        const crdsStack = new GatewayApiCrdsStack(
-            clusterInfo.cluster.stack,
-            'sig-gateway-api-crds',
-            clusterInfo.cluster
-        );
-
-        // Step 6: Create GatewayClass that uses the official K8s Gateway API
-        const gatewayClass = this.createGatewayClass(clusterInfo);
 
         // Set up dependencies:
         serviceAccount.node.addDependency(namespace);
         awsGatewayApiController.node.addDependency(serviceAccount);
-        gatewayClass.node.addDependency(crdsStack);
 
         return Promise.resolve(awsGatewayApiController);
     }
@@ -237,22 +199,6 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
             create: false,
             name: serviceAccount.serviceAccountName
         };
-
-        if (this.options.clusterName) {
-            values.clusterName = this.options.clusterName;
-        }
-
-        if (this.options.clusterVpcId) {
-            values.clusterVpcId = this.options.clusterVpcId;
-        }
-
-        if (this.options.awsAccountId) {
-            values.awsAccountId = this.options.awsAccountId;
-        }
-
-        if (this.options.region) {
-            values.region = this.options.region;
-        }
 
         if (this.options.logLevel) {
             values.logLevel = this.options.logLevel;
