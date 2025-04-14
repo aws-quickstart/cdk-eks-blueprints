@@ -41,7 +41,7 @@ builder()
 /**
  * Example managed node group cluster with launch template tags that propagate all the way to the EC2 instances.
  */
-const mng = builder()
+builder()
     .clusterProvider(new bp.MngClusterProvider({
         ...publicCluster, 
 
