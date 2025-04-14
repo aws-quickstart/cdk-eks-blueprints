@@ -47,6 +47,7 @@ builder()
 
         launchTemplate: {
             requireImdsv2: true, 
+            httpPutResponseHopLimit: 2,
             tags: {
                 "cost-center": "2122", 
                 "old-cost-center": "2322",
