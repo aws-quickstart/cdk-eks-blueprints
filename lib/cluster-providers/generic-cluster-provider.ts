@@ -11,6 +11,7 @@ import { Tags } from "aws-cdk-lib";
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as eks from "aws-cdk-lib/aws-eks";
+import * as eksv2 from "@aws-cdk/aws-eks-v2-alpha"
 import { AccountRootPrincipal, ManagedPolicy, Role } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import { ILayerVersion } from "aws-cdk-lib/aws-lambda";
@@ -20,6 +21,8 @@ import * as utils from "../utils";
 import * as constants from './constants';
 import { AutoscalingNodeGroup, ManagedNodeGroup } from "./types";
 import assert = require('assert');
+
+type ClusterType = eks.Cluster | eksv2.Cluster
 
 export function clusterBuilder() {
     return new ClusterBuilder();
@@ -82,6 +85,11 @@ export interface GenericClusterProviderProps extends Partial<eks.ClusterOptions>
      * Array of autoscaling node groups.
      */
     autoscalingNodeGroups?: AutoscalingNodeGroup[];
+
+    /**
+     * EKS Automode compute config
+     */
+    compute?: eksv2.ComputeConfig;
 
     /**
      * Fargate profiles
@@ -159,6 +167,9 @@ export class AutoscalingNodeGroupConstraints implements utils.ConstraintsType<Au
     desiredSize = new utils.NumberConstraint(0, 5000);
 }
 
+export class ComputeConfigConstraints implements utils.ConstraintsType<eksv2.ComputeConfig> {
+    nodePools= new utils.ArrayConstraint(1, 2)
+}
 export class FargateProfileConstraints implements utils.ConstraintsType<eks.FargateProfileOptions> {
     /**
     * fargateProfileNames can be no less than 1 character long, and no greater than 63 characters long due to DNS system limitations.
@@ -191,6 +202,7 @@ export class ClusterBuilder {
     private privateCluster = false;
     private managedNodeGroups: ManagedNodeGroup[] = [];
     private autoscalingNodeGroups: AutoscalingNodeGroup[] = [];
+    private compute: eksv2.ComputeConfig;
     private fargateProfiles: {
         [key: string]: eks.FargateProfileOptions;
     } = {};
@@ -214,6 +226,11 @@ export class ClusterBuilder {
         return this;
     }
 
+    computeConfig(config: eksv2.ComputeConfig): this {
+        this.compute = config;
+        return this;
+    }
+
     fargateProfile(name: string, options: eks.FargateProfileOptions): this {
         this.fargateProfiles[name] = options;
         return this;
@@ -230,6 +247,7 @@ export class ClusterBuilder {
             privateCluster: this.privateCluster,
             managedNodeGroups: this.managedNodeGroups,
             autoscalingNodeGroups: this.autoscalingNodeGroups,
+            compute: this.compute,
             fargateProfiles: this.fargateProfiles
         });
     }
@@ -244,21 +262,29 @@ export class GenericClusterProvider implements ClusterProvider {
 
         this.validateInput(props);
 
-        assert(!(props.managedNodeGroups && props.managedNodeGroups.length > 0
-            && props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0),
-            "Mixing managed and autoscaling node groups is not supported. Please file a request on GitHub to add this support if needed.");
+        const computeTypesEnabled = [
+            props.managedNodeGroups && props.managedNodeGroups.length > 0,
+            props.autoscalingNodeGroups && props.autoscalingNodeGroups.length > 0,
+            props.compute != undefined
+        ].filter(Boolean).length;
+
+        // Assert that only one compute type is enabled
+        assert(
+            computeTypesEnabled <= 1,
+            'Only one compute type can be enabled: managed node groups, autoscaling node groups, or automode configuration.  Mixing these is not supported. Please file a request on GitHub to add this support if needed.'
+        );
     }
 
     /**
      * @override
      */
-    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey?: IKey, kubernetesVersion?: eks.KubernetesVersion, clusterLogging?: eks.ClusterLoggingTypes[], ipFamily?: eks.IpFamily) : ClusterInfo {
+    createCluster(scope: Construct, vpc: ec2.IVpc, secretsEncryptionKey?: IKey, kubernetesVersion?: eks.KubernetesVersion, clusterLogging?: eks.ClusterLoggingTypes[], ipFamily?: eks.IpFamily): ClusterInfo {
         const id = scope.node.id;
 
         // Props for the cluster.
         const clusterName = this.props.clusterName ?? id;
         const outputClusterName = true;
-        if(!kubernetesVersion && !this.props.version) {
+        if (!kubernetesVersion && !this.props.version) {
             throw new Error("Version was not specified by cluster builder or in cluster provider props, must be specified in one of these");
         }
         const version: eks.KubernetesVersion = kubernetesVersion || this.props.version || eks.KubernetesVersion.V1_30;
@@ -269,12 +295,11 @@ export class GenericClusterProvider implements ClusterProvider {
         isolatedCluster = isolatedCluster ? isolatedCluster === 'true' : false;
 
         const endpointAccess = (privateCluster === true) ? eks.EndpointAccess.PRIVATE : eks.EndpointAccess.PUBLIC_AND_PRIVATE;
-        const vpcSubnets = this.props.vpcSubnets ?? (isolatedCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]: privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
+        const vpcSubnets = this.props.vpcSubnets ?? (isolatedCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_ISOLATED }] : privateCluster === true ? [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }] : undefined);
         const mastersRole = this.props.mastersRole ?? new Role(scope, `${clusterName}-AccessRole`, {
             assumedBy: new AccountRootPrincipal()
         });
 
-        
 
         const kubectlLayer = this.getKubectlLayer(scope, version);
         const tags = this.props.tags;
@@ -291,16 +316,17 @@ export class GenericClusterProvider implements ClusterProvider {
             kubectlLayer,
             tags,
             mastersRole,
-            defaultCapacity: 0 // we want to manage capacity ourselves
+            defaultCapacity: 0, // we want to manage capacity ourselves
+            defaultCapacityType: eks.DefaultCapacityType.NODEGROUP
         };
 
-        const isolatedOptions: Partial<eks.ClusterProps> = isolatedCluster  ? {
-          placeClusterHandlerInVpc: true,
-          clusterHandlerEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },
-          kubectlEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },
-        }: {};
+        const isolatedOptions: Partial<eks.ClusterProps> = isolatedCluster ? {
+            placeClusterHandlerInVpc: true,
+            clusterHandlerEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },
+            kubectlEnvironment: { AWS_STS_REGIONAL_ENDPOINTS: "regional" },
+        } : {};
 
-        const clusterOptions = { ...defaultOptions, ...isolatedOptions, ...this.props, version , ipFamily };
+        const clusterOptions = { ...defaultOptions, ...isolatedOptions, ...this.props, version, ipFamily };
 
         // Create an EKS Cluster
         const cluster = this.internalCreateCluster(scope, id, clusterOptions);
@@ -309,21 +335,23 @@ export class GenericClusterProvider implements ClusterProvider {
         const nodeGroups: eks.Nodegroup[] = [];
 
         this.props.managedNodeGroups?.forEach(n => {
-            const nodeGroup = this.addManagedNodeGroup(cluster, n);
+            const nodeGroup = this.addManagedNodeGroup(cluster as eks.Cluster, n);
             nodeGroups.push(nodeGroup);
         });
 
         const autoscalingGroups: autoscaling.AutoScalingGroup[] = [];
         this.props.autoscalingNodeGroups?.forEach(n => {
-            const autoscalingGroup = this.addAutoScalingGroup(cluster, n);
+            const autoscalingGroup = this.addAutoScalingGroup(cluster as eks.Cluster, n);
             autoscalingGroups.push(autoscalingGroup);
         });
 
-        const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
-        const fargateConstructs : eks.FargateProfile[] = [];
-        fargateProfiles?.forEach(([key, options]) => fargateConstructs.push(this.addFargateProfile(cluster, key, options)));
+        const autoMode = clusterOptions.defaultCapacityType != undefined && (clusterOptions.defaultCapacityType as eksv2.DefaultCapacityType) == eksv2.DefaultCapacityType.AUTOMODE
 
-        return new ClusterInfo(cluster, version, nodeGroups, autoscalingGroups, fargateConstructs);
+        const fargateProfiles = Object.entries(this.props.fargateProfiles ?? {});
+        const fargateConstructs: eks.FargateProfile[] = [];
+        fargateProfiles?.forEach(([key, options]) => fargateConstructs.push(this.addFargateProfile(cluster as eks.Cluster, key, options)));
+
+        return new ClusterInfo(cluster as eks.Cluster, version, nodeGroups, autoscalingGroups, autoMode, cluster as eksv2.Cluster, fargateConstructs);
     }
 
     /**
@@ -333,7 +361,14 @@ export class GenericClusterProvider implements ClusterProvider {
      * @param clusterOptions
      * @returns
      */
-    protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): eks.Cluster {
+    protected internalCreateCluster(scope: Construct, id: string, clusterOptions: any): ClusterType {
+        if(clusterOptions.defaultCapacityType == eksv2.DefaultCapacityType.AUTOMODE) {
+
+            const {defaultCapacity, kubectlLayer, ...remainingOpts} = clusterOptions ?? {}
+            clusterOptions = remainingOpts
+            clusterOptions.kubectlProviderOptions = {kubectlLayer}
+            return new eksv2.Cluster(scope, id, clusterOptions)
+        }
         return new eks.Cluster(scope, id, clusterOptions);
     }
 
@@ -343,8 +378,8 @@ export class GenericClusterProvider implements ClusterProvider {
      * @param version
      * @returns
      */
-    protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion) : ILayerVersion | undefined {
-       return selectKubectlLayer(scope, version);
+    protected getKubectlLayer(scope: Construct, version: eks.KubernetesVersion): ILayerVersion | undefined {
+        return selectKubectlLayer(scope, version);
     }
 
     /**
@@ -430,7 +465,7 @@ export class GenericClusterProvider implements ClusterProvider {
                 version: lt.latestVersionNumber,
             });
             const tags = Object.entries(nodeGroup.launchTemplate.tags ?? {});
-            tags.forEach(([key, options]) => Tags.of(lt).add(key,options));
+            tags.forEach(([key, options]) => Tags.of(lt).add(key, options));
             if (nodeGroup.launchTemplate?.machineImage) {
                 delete nodegroupOptions.amiType;
                 delete nodegroupOptions.releaseVersion;
@@ -440,7 +475,7 @@ export class GenericClusterProvider implements ClusterProvider {
 
         const result = cluster.addNodegroupCapacity(nodeGroup.id + "-ng", nodegroupOptions);
 
-        if(nodeGroup.enableSsmPermissions) {
+        if (nodeGroup.enableSsmPermissions) {
             result.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
         }
 
@@ -454,6 +489,8 @@ export class GenericClusterProvider implements ClusterProvider {
             utils.validateConstraints(new ManagedNodeGroupConstraints, "ManagedNodeGroup", ...props.managedNodeGroups);
         if (props.autoscalingNodeGroups != undefined)
             utils.validateConstraints(new AutoscalingNodeGroupConstraints, "AutoscalingNodeGroups", ...props.autoscalingNodeGroups);
+        if (props.compute != undefined)
+            utils.validateConstraints(new ComputeConfigConstraints, "ComputeConfigConstraints", props.compute)
         if (props.fargateProfiles as any != undefined)
             utils.validateConstraints(new FargateProfileConstraints, "FargateProfiles", ...Object.values(props.fargateProfiles as any));
     }

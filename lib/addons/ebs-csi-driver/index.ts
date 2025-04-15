@@ -3,7 +3,7 @@ import * as kms from "aws-cdk-lib/aws-kms";
 import { ClusterInfo } from "../../spi";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
-import { supportsALL } from "../../utils";
+import * as utils from "../../utils";
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 import { Construct } from "constructs";
 import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
@@ -50,7 +50,7 @@ const defaultProps: CoreAddOnProps & EbsCsiDriverAddOnProps = {
 /**
  * Implementation of EBS CSI Driver EKS add-on
  */
-@supportsALL
+@utils.supportsALL
 export class EbsCsiDriverAddOn extends CoreAddOn {
   readonly ebsProps: EbsCsiDriverAddOnProps;
 
@@ -76,6 +76,7 @@ export class EbsCsiDriverAddOn extends CoreAddOn {
     );
   }
 
+  @utils.autoMode()
   async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const baseDeployment = await super.deploy(clusterInfo);
 

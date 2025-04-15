@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
-import {supportsALL } from "../../utils";
+import * as utils from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { CfnAddon, FargateCluster } from "aws-cdk-lib/aws-eks";
 import { RemovalPolicy } from "aws-cdk-lib";
@@ -30,7 +30,7 @@ const defaultProps = {
 /**
  * Implementation of CoreDns EKS add-on.
  */
-@supportsALL
+@utils.supportsALL
 export class CoreDnsAddOn extends CoreAddOn {
 
     constructor(version?: string, props?: CoreDnsAddOnProps) {
@@ -41,6 +41,7 @@ export class CoreDnsAddOn extends CoreAddOn {
         });
     }
 
+    @utils.autoMode()
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
 
         const addonPromise: Promise<Construct> = super.deploy(clusterInfo);

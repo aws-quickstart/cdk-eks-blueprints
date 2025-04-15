@@ -89,3 +89,22 @@ export function conflictsWith(...addOns: string[]) {
     return descriptor;
   };
 }
+
+export function autoMode() {
+  return function(target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function( ...args: any[]) {
+      // const dependencies: (Promise<Construct> | undefined)[] = [];
+      const clusterInfo: ClusterInfo = args[0];
+      const stack = clusterInfo.cluster.stack.stackName;
+      if (clusterInfo.autoMode){ // what to do if other nodegroups attached too?
+        throw new Error(`Deploying ${stack} failed. This add-on is already available on the cluster with EKS Auto Mode`) 
+      }
+      return originalMethod.apply(this, args);
+    };
+
+        return descriptor;
+    };
+
+}
