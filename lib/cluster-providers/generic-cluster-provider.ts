@@ -458,6 +458,7 @@ export class GenericClusterProvider implements ClusterProvider {
                 securityGroup: nodeGroup.launchTemplate.securityGroup,
                 userData: nodeGroup.launchTemplate?.userData,
                 requireImdsv2: nodeGroup.launchTemplate?.requireImdsv2,
+                httpPutResponseHopLimit: nodeGroup.launchTemplate?.httpPutResponseHopLimit,
             });
             utils.setPath(nodegroupOptions, "launchTemplateSpec", {
                 id: lt.launchTemplateId!,

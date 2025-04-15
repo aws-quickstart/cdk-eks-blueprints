@@ -9,6 +9,7 @@ import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provi
 import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
+  [KubernetesVersion.V1_32, "v1.19.2-eksbuild.1"],
   [KubernetesVersion.V1_31, "v1.19.0-eksbuild.1"],
   [KubernetesVersion.V1_30, "v1.19.0-eksbuild.1"],
   [KubernetesVersion.V1_29, "v1.19.0-eksbuild.1"],

@@ -41,12 +41,13 @@ builder()
 /**
  * Example managed node group cluster with launch template tags that propagate all the way to the EC2 instances.
  */
-const mng = builder()
+builder()
     .clusterProvider(new bp.MngClusterProvider({
         ...publicCluster, 
 
         launchTemplate: {
             requireImdsv2: true, 
+            httpPutResponseHopLimit: 2,
             tags: {
                 "cost-center": "2122", 
                 "old-cost-center": "2322",
