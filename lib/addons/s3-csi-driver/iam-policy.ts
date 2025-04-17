@@ -1,10 +1,12 @@
 import * as iam from 'aws-cdk-lib/aws-iam';
 
-export function getS3DriverPolicyStatements(bucketNames: string[]): iam.PolicyStatement[] {
-    // new IAM policy to grand access to S3 bucket
-    // https://github.com/awslabs/mountpoint-s3/blob/main/doc/CONFIGURATION.md#iam-permissions
+/**
+ * IAM policy to grant access to S3 buckets and, optionally, KMS keys
+ * https://github.com/awslabs/mountpoint-s3/blob/main/doc/CONFIGURATION.md#iam-permissions
+ */
+export function getS3DriverPolicyStatements(bucketNames: string[], kmsArns: string[]): iam.PolicyStatement[] {
     const arns = bucketNames.map((name) => `arn:aws:s3:::${name}`);
-    return [
+    const bucketPolicy = [
         new iam.PolicyStatement({
             sid: 'S3MountpointFullBucketAccess',
             actions: [
@@ -21,5 +23,17 @@ export function getS3DriverPolicyStatements(bucketNames: string[]): iam.PolicySt
                 "s3:DeleteObject"
             ],
             resources: arns.map((arn) => `${arn}/*`)
-        })];
+        }),
+    ];
+    const kmsPolicy = kmsArns.length > 0 ? [
+        new iam.PolicyStatement({
+            sid: "S3MountpointKmsAccess",
+            actions: [
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
+            ],
+            resources: kmsArns
+        })] : [];
+
+    return [...bucketPolicy, ...kmsPolicy];
 }
