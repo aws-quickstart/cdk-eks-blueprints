@@ -68,6 +68,7 @@ export * from './vpc-cni';
 export * from './xray';
 export * from './xray-adot-addon';
 export * from './aws-gateway-api-controller';
+export * from './gateway-api-crds';
 
 export class Constants {
     public static readonly BLUEPRINTS_ADDON = "blueprints-addon";

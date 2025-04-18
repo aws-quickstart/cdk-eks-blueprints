@@ -9,6 +9,7 @@ import { GatewayApiCrdsAddOn } from "../gateway-api-crds";
 import { Stack } from "aws-cdk-lib";
 import * as customResources from 'aws-cdk-lib/custom-resources';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { dependable } from "../../utils";
 
 
 const AWS_GATEWAY_API_CONTROLLER_SA = 'gateway-api-controller';
@@ -74,6 +75,7 @@ export class AwsGatewayApiControllerAddOn extends HelmAddOn {
         this.options = this.props as AwsGatewayApiControllerAddOnProps;
     }
 
+    @dependable('gateway-api-crds')
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         // Step 1: Configure Security Groups for VPC Lattice 
         this.configureSecurityGroup(clusterInfo);

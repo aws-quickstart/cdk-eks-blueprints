@@ -10,28 +10,26 @@ The AWS Gateway API Controller watches for Gateway API resources (Gateway, HTTPR
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
-const addOns = 
-    new blueprints.addons.AwsGatewayApiControllerAddOn();
+const addOns = [
+    new blueprints.addons.GatewayApiCrdsAddOn(),
+    new blueprints.addons.AwsGatewayApiControllerAddOn(),
+];
 
 const blueprint = blueprints.EksBlueprint.builder()
-    .addOns(addOn)
+    .addOns(...addOns)
     .build();
 ```
 
 ## Configuration Options
 
-| Environment Variable               | Type   | Default                         | Description |
-|-------------------------------------|--------|---------------------------------|-------------|
-| `clusterName`                      | string | Inferred from IMDS metadata    | A unique name to identify a cluster. Used in AWS resource tags. Required except for EKS cluster. Needs to be specified if IMDS is not available. |
-| `clusterVpcId`                     | string | Inferred from IMDS metadata    | Specifies the VPC of the cluster when running outside Kubernetes. Needs to be specified if IMDS is not available. |
-| `awsAccountId`                     | string | Inferred from IMDS metadata    | Specifies the AWS account when running outside Kubernetes. Needs to be specified if IMDS is not available. |
-| `region`                           | string | Inferred from IMDS metadata    | Specifies the AWS Region of VPC Lattice Service endpoint when running outside Kubernetes. Needs to be specified if IMDS is not available. |
-| `logLevel`                         | string | `"info"`                        | When set to `"debug"`, emits debug level logs. |
-| `defaultServiceNetwork`            | string | `""`                            | When set as a non-empty value, creates a service network with that name and associates it with the cluster VPC. |
-| `enableServiceNetworkOverride`     | string | `""`                            | When set to `"true"`, the controller runs in "single service network" mode, overriding all gateways to point to the default service network. Useful for small setups and conformance tests. |
-| `webhookEnabled`                   | string | `""`                            | When set to `"true"`, starts the webhook listener responsible for pod readiness gate injection. Disabled by default for deploy.yaml but enabled by default for Helm install. |
-| `disableTaggingServiceApi`         | string | `""`                            | When set to `"true"`, the controller will not use the AWS Resource Groups Tagging API. Necessary for private clusters. When enabled, the controller uses VPC Lattice APIs for tag lookups, which are less performant. The Helm chart sets this to `"false"` by default. |
-| `routeMaxConcurrentReconciles`     | int    | `1`                             | Maximum number of concurrently running reconcile loops per route type (HTTP, GRPC, TLS). |
+| Environment Variable               | Type   | Default     | Description |
+|-----------------------------------|--------|-------------|-------------|
+| `logLevel`                         | string | `"info"`    | When set as "debug", the AWS Gateway API Controller will emit debug level logs. |
+| `defaultServiceNetwork`           | string | `""`        | When set as a non-empty value, creates a service network with that name. The created service network will be also associated with cluster VPC. |
+| `enableServiceNetworkOverride`    | string | `"false"`   | When set as "true", the controller will run in "single service network" mode that will override all gateways to point to default service network, instead of searching for service network with the same name. Can be used for small setups and conformance tests.|
+| `webhookEnabled`                  | string | `"false"`   | When set as "true", the controller will start the webhook listener responsible for pod readiness gate injection (see pod-readiness-gates.md). This is disabled by default for deploy.yaml because the controller will not start successfully without the TLS certificate for the webhook in place. While this can be fixed by running scripts/gen-webhook-cert.sh, it requires manual action. The webhook is enabled by default for the Helm install as the Helm install will also generate the necessary certificate. |
+| `disableTaggingServiceApi`        | string | `"false"`   | When set as "true", the controller will not use the AWS Resource Groups Tagging API. The Resource Groups Tagging API is only available on the public internet and customers using private clusters will need to enable this feature. When enabled, the controller will use VPC Lattice APIs to lookup tags which are not as performant and requires more API calls. The Helm chart sets this value to "false" by default. |
+| `routeMaxConcurrentReconciles`    | int    | `1`         | Maximum number of concurrently running reconcile loops per route type (HTTP, GRPC, TLS). |
 
 
 ## IAM Permissions
@@ -92,7 +90,8 @@ The add-on creates an IAM role with the following permissions:
 ## Functionality
 
 The add-on:
-- Installs the AWS Gateway API Controller using Helm
+- Installs the AWS Gateway API Controller using Helm 
+    - Note: Depends on GatewayApiCrdsAddOn
 - Creates necessary IAM roles and service accounts
 - Configures VPC Lattice service networking
 - Enables Gateway API resources (Gateway, HTTPRoute)
