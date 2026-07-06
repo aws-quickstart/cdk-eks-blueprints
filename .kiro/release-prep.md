@@ -50,7 +50,17 @@ Add notes/decisions as we go.
   - `ts-deepmerge`: `^7.0.0` (NOT 8.x). Imported in 33 files.
   - `uuid`: `^11.1.0` (NOT 14.x).
   - `zod`: `^3.22.4` (NOT 4.x).
-  Verified fix: `make build` EXIT 0 and `npx cdk list` EXIT 0 (was crashing on ts-md5).
+  - `js-yaml`: `^4.2.0` (NOT 5.x). js-yaml 5 `load("")` THROWS `YAMLException: expected a document,
+    but the input is empty` (v4 returned undefined), breaking `loadMultiResourceYaml` (splits on `---`,
+    first segment is empty) -> `test/utils/yaml-utils.test.ts` failed. Also `@types/js-yaml` is `^4.0.9`.
+  Verified: `make build` EXIT 0, `npx cdk list` EXIT 0, yaml-utils test passes.
+
+## Running tests without hanging
+`make run-test` / bare `jest` HANGS: the npm `test` script uses `--detectOpenHandles` and the
+`yaml-utils` suite makes a real network call (`loadExternalYaml` -> sync-request to githubusercontent).
+Use forceExit (and optionally target a test), e.g.:
+`CI=true npx jest <path> -t "<name>" --forceExit --runInBand`   (`timeout` is not available on macOS.)
+
   Strategic decision (option 1): hold for 1.19.0; tracked separately for an ESM-migration /
   dependency-modernization effort (evaluate ESM migration once CDK/ts-node ESM support is solid;
   meanwhile consider replacing `uuid`->`crypto.randomUUID()` and `ts-md5`->`crypto.createHash('md5')`
