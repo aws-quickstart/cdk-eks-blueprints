@@ -20,7 +20,7 @@ const defaultProps: HelmAddOnProps = {
     namespace: 'gatekeeper-system',
     chart: 'gatekeeper',
     repository: "https://open-policy-agent.github.io/gatekeeper/charts",
-    version: '3.21.1'
+    version: '3.22.2'
 };
 
 @supportsALL

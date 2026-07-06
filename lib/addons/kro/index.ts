@@ -4,7 +4,7 @@ import { merge } from "ts-deepmerge";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
 import * as utils from "../../utils";
 
-const KRO_VERSION="0.9.1";
+const KRO_VERSION="0.9.2";
 
 export interface KroAddOnProps extends HelmAddOnUserProps {
   /**
