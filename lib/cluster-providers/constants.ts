@@ -12,9 +12,11 @@ export const DEFAULT_INSTANCE_TYPE = ec2.InstanceType.of(ec2.InstanceClass.M5, e
 export const DEFAULT_AMI = eks.NodegroupAmiType.AL2023_X86_64_STANDARD;
 
 /**
- * Default min size of MNG
+ * Default min size of MNG. Defaults to 2 so that HA workloads that require
+ * spreading across nodes (e.g. Karpenter's 2 controller replicas with hostname
+ * topology spread) can schedule out of the box. desiredSize defaults to minSize.
  */
-export const DEFAULT_NG_MINSIZE = 1;
+export const DEFAULT_NG_MINSIZE = 2;
 
 /**
  * Default max size for MNG
