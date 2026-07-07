@@ -1913,8 +1913,11 @@ spec:
         endpoint: "{{remoteWriteEndpoint}}"
         auth:
           authenticator: sigv4auth
-      debug:
-        verbosity: normal
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 1500
+        spike_limit_mib: 512
     extensions:
       sigv4auth:
         region: "{{awsRegion}}"
@@ -1929,7 +1932,8 @@ spec:
       pipelines:
         metrics:
           receivers: [prometheus]
-          exporters: [debug, prometheusremotewrite]
+          processors: [memory_limiter]
+          exporters: [prometheusremotewrite]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
