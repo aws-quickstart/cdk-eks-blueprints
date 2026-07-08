@@ -7,7 +7,7 @@ The `MngClusterProvider` allows you to provision an EKS cluster which leverages 
 ```typescript
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 import * as bp from '@aws-quickstart/eks-blueprints';
 
 const app = new cdk.App();

@@ -49,7 +49,7 @@ describe('Unit test for CloudWatch Addon', () => {
 
     const blueprint = await blueprints.EksBlueprint.builder()
       .account("123456789012").region('us-east-2')
-      .version(KubernetesVersion.V1_29)
+      .version(KubernetesVersion.V1_35)
       .addOns(new blueprints.CloudWatchInsights())
       .buildAsync(app, 'cloudwatch');
 

@@ -1,33 +1,19 @@
 import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 import * as blueprints from '../lib';
 import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 
-test("Kubeproxy Addon deploying correct default version of Addon for 1.28", async () => {
+test("Kubeproxy Addon deploying correct default version of Addon for 1.35", async () => {
     const app = new cdk.App();
 
-    await blueprints.EksBlueprint.builder()
+    const stack = await blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_28)
+        .version(KubernetesVersion.V1_35)
         .addOns(new blueprints.KubeProxyAddOn("auto"))
         .buildAsync(app, "KubeProxy-stack-001");
-});
 
-test("Kubeproxy Addon deploying correct default version of Addon for 1.27", async () => {
-    const app = new cdk.App();
-
-    await blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_27)
-        .addOns(new blueprints.KubeProxyAddOn("auto"))
-        .buildAsync(app, "KubeProxy-stack-002");
-});
-
-test("Kubeproxy Addon deploying correct default version of Addon for 1.26", async () => {
-    const app = new cdk.App();
-
-    await blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_26)
-        .addOns(new blueprints.KubeProxyAddOn("auto"))
-        .buildAsync(app, "KubeProxy-stack-003");
+    Template.fromStack(stack).hasResourceProperties("AWS::EKS::Addon", {
+        AddonName: "kube-proxy",
+        AddonVersion: "v1.35.0-eksbuild.2",
+    });
 });

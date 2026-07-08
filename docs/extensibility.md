@@ -63,7 +63,7 @@ Add-ons that don't leverage helm but require to install arbitrary Kubernetes man
 Deployment of arbitrary kubernetes manifests can leverage the following construct:
 
 ```typescript
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks-v2";
 import * as blueprints from "@aws-quickstart/eks-blueprints";
 
 export class MyNonHelmAddOn implements blueprints.ClusterAddOn {
@@ -272,12 +272,12 @@ Customers can override the kubectl layer used by cluster providers for specific 
 ```typescript
 import { KubectlV34Layer } from '@aws-cdk/lambda-layer-kubectl-v34';
 import { ILayerVersion } from 'aws-cdk-lib/aws-lambda';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 /**
  * Custom cluster provider with specific kubectl layer
- * Works with AutomodeClusterProvider, GenericClusterProvider, or GenericClusterProviderV2
+ * Works with AutomodeClusterProvider, GenericClusterProvider, and other cluster providers
  */
 class CustomClusterProvider extends blueprints.AutomodeClusterProvider {
     protected getKubectlLayer(scope: Construct, version: KubernetesVersion): ILayerVersion {

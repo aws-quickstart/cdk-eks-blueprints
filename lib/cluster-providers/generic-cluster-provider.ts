@@ -262,7 +262,7 @@ export class GenericClusterProvider implements ClusterProvider {
         if (kubectlLayer) {
             kubectlProviderOptions = { ...this.props.kubectlProviderOptions, kubectlLayer };
         } else {
-            utils.logger.warn("No kubectlLayer could be resolved for version " + version.version + ". Kubectl-based operations (manifests, helm charts) will not work.");
+            utils.logger.warn("No kubectlLayer could be resolved for version " + version.version + ". In this version of EKS Blueprints, 1.29 is the lowest supported version for which the kubectl provider is automatically resolved. Kubectl-based operations (manifests, helm charts) will not work. Provide a kubectlLayer explicitly via kubectlProviderOptions to use an older version.");
             if (this.props.kubectlProviderOptions) {
                 utils.logger.warn("kubectlProviderOptions were specified but will be ignored without a kubectlLayer.");
             }

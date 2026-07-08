@@ -131,7 +131,7 @@ IPv6 does not require NAT for pod to pod communication. By default, we are creat
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
-import { IpFamily } from 'aws-cdk-lib/aws-eks';
+import { IpFamily } from 'aws-cdk-lib/aws-eks-v2';
 
 const app = new cdk.App();
 

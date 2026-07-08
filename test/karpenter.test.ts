@@ -81,7 +81,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 "version": "v0.20.1"
             }))
@@ -100,7 +100,7 @@ describe('Unit tests for Karpenter addon', () => {
         const warningLog = jest.spyOn(global.console, 'warn');
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: 'v0.30.2'
             }))
@@ -109,7 +109,7 @@ describe('Unit tests for Karpenter addon', () => {
         blueprint.build(app, 'stack-with-non-supporting-kubernetes-version');
         expect(warningLog).toHaveBeenCalled();
         expect(warningLog).toHaveBeenCalledTimes(2);
-        expect(warningLog).toHaveBeenCalledWith('Please use minimum Karpenter version for this Kubernetes Version: 0.31.0, otherwise you will run into compatibility issues.');
+        expect(warningLog).toHaveBeenCalledWith('Please use minimum Karpenter version for this Kubernetes Version: 1.9.0, otherwise you will run into compatibility issues.');
     });
 
     test("Stack creation fails due to providing Detailed Monitoring in non-supported Karpenter version", () => {
@@ -149,7 +149,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.33.0",
                 nodePoolSpec: {
@@ -178,7 +178,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.34.1",
                 nodePoolSpec: {
@@ -223,7 +223,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_25)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.28.0",
                 nodePoolSpec: {
@@ -244,7 +244,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_25)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.34.1",
                 nodePoolSpec: {
@@ -341,7 +341,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         const stack = await blueprint
-        .version(KubernetesVersion.V1_27)
+        .version(KubernetesVersion.V1_35)
         .account("123567891")
         .region("us-west-1")
         .addOns(new blueprints.KarpenterAddOn({
@@ -389,7 +389,7 @@ describe('Unit tests for Karpenter addon', () => {
         };
 
         const stack = await blueprint
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .account("123567891")
             .region("us-west-1")
             .addOns(
@@ -435,7 +435,7 @@ describe('Unit tests for Karpenter addon', () => {
 
         const blueprint = blueprints.EksBlueprint.builder();
         const stack = blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.V1_28)
+            .version(KubernetesVersion.V1_35)
             .addOns(new blueprints.KarpenterAddOn({
                 version: "v0.32.0",
                 installCRDs: true,
@@ -484,7 +484,7 @@ describe('Unit tests for Karpenter addon', () => {
         
         
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.of('1.28'))
+            .version(KubernetesVersion.of('1.33'))
             .addOns(new blueprints.KarpenterAddOn({
                 version: 'v0.30.2'
             }))
@@ -508,7 +508,7 @@ describe('Unit tests for Karpenter addon', () => {
         const blueprint = blueprints.EksBlueprint.builder();
 
         blueprint.account("123567891").region('us-west-1')
-            .version(KubernetesVersion.of('1.28'))
+            .version(KubernetesVersion.of('1.33'))
             .withBlueprintProps({ipFamily: IpFamily.IP_V6})
             .addOns(new blueprints.KarpenterAddOn({
                 version: 'v0.31.0'

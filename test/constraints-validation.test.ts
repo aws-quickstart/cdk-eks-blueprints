@@ -75,7 +75,7 @@ type DataError = [Executable, ZodError];
 
 function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, desiredSize?: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         autoscalingNodeGroups: [
             {
                 id: id,
@@ -88,7 +88,7 @@ function createAutoScalingGroup(id: string, minSize?: number, maxSize?: number, 
 
 function createManyAutoScalingGroup(length: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         autoscalingNodeGroups: loop(new Array<blueprints.AutoscalingNodeGroup>(length).fill({ id: "" }))
     });
 }
@@ -102,7 +102,7 @@ function loop(array: Array<blueprints.AutoscalingNodeGroup>): blueprints.Autosca
 
 function singleErrorInArray(id: string, errorNumberVariable?: number) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         autoscalingNodeGroups: [
             {
                 id: id + 1
@@ -123,7 +123,7 @@ function singleErrorInArray(id: string, errorNumberVariable?: number) {
 
 function createFargateProfile(fargateProfileName: string) {
     return new blueprints.GenericClusterProvider({
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         fargateProfiles: {
             "fp1": {
                 fargateProfileName: fargateProfileName,
