@@ -71,4 +71,4 @@ const blueprint = blueprints.EksBlueprint.builder()
 
 ## Support
 
-If you have questions about gMaestro, catch us [on Slack](https://join.slack.com/t/granulatecommunity/shared_invite/zt-1dde7x9ki-QHl3pX54peYP91SR5kAcRA)!
+The gMaestro add-on has been deprecated due to end of life.
