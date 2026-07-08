@@ -101,6 +101,11 @@ nav:
     - CodeBuild CI: 'internal/ci.md'
     - Input Validation Framework: 'internal/input-validations-framework-readme.md'
     - Readme: 'internal/readme-internal.md'
+  - Capabilities:
+    - Overview: 'capabilities/index.md'
+    - ArgoCD Capability: 'capabilities/argocd-capability.md'
+    - ACK Capability: 'capabilities/ack-capability.md'
+    - kro Capability: 'capabilities/kro-capability.md'
   - Cluster Providers:
     - Overview: 'cluster-providers/index.md'
     - Generic Cluster Provider: 'cluster-providers/generic-cluster-provider.md'

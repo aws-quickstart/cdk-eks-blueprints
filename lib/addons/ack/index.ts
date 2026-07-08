@@ -3,9 +3,10 @@ import { Construct, IConstruct } from 'constructs';
 import { merge } from "ts-deepmerge";
 import { ClusterInfo, Values } from "../../spi";
 import "reflect-metadata";
-import { createNamespace, setPath, supportsX86 } from "../../utils";
+import { conflictsWithCapabilities, createNamespace, setPath, supportsX86 } from "../../utils";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { AckServiceName, serviceMappings } from './serviceMappings';
+import { CapabilityType } from '../../spi';
 
 export * from "./serviceMappings";
 
@@ -70,6 +71,7 @@ export class AckAddOn extends HelmAddOn {
   }
 
 
+  @conflictsWithCapabilities(CapabilityType.ACK)
   deploy(clusterInfo: ClusterInfo): Promise<Construct> {
     const cluster = clusterInfo.cluster;
     const context = clusterInfo.getResourceContext();

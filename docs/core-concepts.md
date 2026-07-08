@@ -8,6 +8,7 @@ This document provides a high level overview of the Core Concepts that are embed
 | [Cluster](#cluster) | A Well-Architected EKS Cluster. |
 | [Resource Provider](#resource-provider) | Resource providers are abstractions that supply external AWS resources to the cluster (e.g. hosted zones, VPCs, etc.) |
 | [Add-on](#add-on) |  Allow you to configure, deploy, and update the operational software, or add-ons, that provide key functionality to support your Kubernetes applications. |
+| [Capabilities](#capability) | AWS-managed cluster features that replace self-managed add-ons for tools like ACK, ArgoCD, and kro. |
 | [Team](#team) | A logical grouping of IAM identities that have access to a Kubernetes namespace(s). |
 | [Pipeline](#pipeline) | Continuous Delivery pipelines for deploying `clusters` and `add-ons`. |
 | [Application](#application) | An application that runs within an EKS Cluster. |
@@ -33,6 +34,25 @@ A `resource` is a CDK construct that implements `IResource` interface from `aws-
 `ResourceProviders` enable customers to supply resources for add-ons, teams and/or post-deployment steps. Resources may be imported (e.g., if created outside of the platform) or created with the blueprint. 
 
 See our [`Resource Providers`](resource-providers/index.md) documentation page for detailed information.
+
+## Capability
+
+`Capabilities` are [fully managed EKS cluster features](https://docs.aws.amazon.com/eks/latest/userguide/capabilities.html) that eliminate the need to install, maintain, and scale foundational cluster services on worker nodes. Each capability is an AWS resource managed by EKS, covering installation, upgrades, scaling, and security patching.
+
+The framework supports three capabilities: `ACK` (AWS Controllers for Kubernetes), `ArgoCD` (GitOps continuous deployment), and `kro` (Kubernetes Resource Orchestrator). Capabilities are configured via the `.capabilities()` builder method using a typed object where each key can only appear once:
+
+```typescript
+blueprints.EksBlueprint.builder()
+  .capabilities({
+    ack: new blueprints.capabilities.AckCapability(),
+    argocd: new blueprints.capabilities.ArgoCapability({ idcInstanceArn: "..." }),
+    kro: new blueprints.capabilities.KroCapability(),
+  })
+```
+
+Capabilities and their corresponding add-ons are mutually exclusive — the framework will throw a conflict error if both are configured on the same cluster.
+
+See our [`Capabilities`](./capabilities/index.md) documentation page for detailed information.
 
 ## Add-on
 
