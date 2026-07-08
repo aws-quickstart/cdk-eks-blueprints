@@ -4,6 +4,9 @@ export * as addons from './addons';
 export * from './builders';
 export * as builders from './builders';
 
+export * from './capabilities';
+export * as capabilities from './capabilities';
+
 export * from './stacks';
 export * as stacks from './stacks';
 

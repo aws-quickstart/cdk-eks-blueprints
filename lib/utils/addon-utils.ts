@@ -76,7 +76,6 @@ export function conflictsWith(...addOns: string[]) {
     const originalMethod = descriptor.value;
 
     descriptor.value = function( ...args: any[]) {
-      // const dependencies: (Promise<Construct> | undefined)[] = [];
       const clusterInfo: ClusterInfo = args[0];
       const stack = clusterInfo.cluster.stack.stackName;
 
@@ -191,6 +190,28 @@ export function mustRunOnAutoMode() {
   };
 
 
+}
+
+export function conflictsWithCapabilities(...capabilities: string[]) {
+  return function (target: object, key: string | symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function( ...args: any[]) {
+      const clusterInfo: ClusterInfo = args[0];
+      const stack = clusterInfo.cluster.stack.stackName;
+
+      capabilities.forEach( (capability) => {
+        const dep = clusterInfo.getCapability(capability);
+        if (dep){
+          throw new Error(`Deploying ${stack} failed due to conflicting EKS Capability: ${capability}.`);
+        }
+      });
+
+      return originalMethod.apply(this, args);
+    };
+
+    return descriptor;
+  };
 }
 
 /**

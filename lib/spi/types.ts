@@ -9,6 +9,27 @@ import { EksBlueprintProps } from '../stacks';
 import { logger } from "../utils/log-utils";
 import * as constraints from '../utils/constraints-utils';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
+import * as customresources from "aws-cdk-lib/custom-resources";
+
+/**
+ * Supported EKS capability types
+ */
+export enum CapabilityType {
+  ARGOCD = "argocd",
+  ACK = "ack",
+  KRO = "kro"
+}
+
+export enum ArgoCDSsoRole {
+  ADMIN = "ADMIN",
+  EDITOR = "EDITOR",
+  VIEWER = "VIEWER"
+}
+
+export enum SsoIdentityType {
+  SSO_USER = "SSO_USER",
+  SSO_GROUP = "SSO_GROUP"
+}
 
 /**
  * Data type defining helm repositories for GitOps bootstrapping.
@@ -190,6 +211,7 @@ export class ClusterInfo {
     private readonly provisionedAddOns: Map<string, Construct>;
     private readonly scheduledAddOns: Map<string, Promise<Construct>>;
     private readonly orderedAddOns: string[];
+    private readonly capabilities: Map<string, Construct>;
     private resourceContext: ResourceContext;
     private addonContext: Map<string, Values>;
 
@@ -203,6 +225,7 @@ export class ClusterInfo {
         this.provisionedAddOns = new Map<string, Construct>();
         this.scheduledAddOns = new Map<string, Promise<Construct>>();
         this.orderedAddOns = [];
+        this.capabilities = new Map<string, Construct>();
         this.addonContext = new Map<string, Values>();
     }
 
@@ -340,6 +363,32 @@ export class ClusterInfo {
     public getAddOnContexts(): Map<string, Values> {
         return this.addonContext;
     }
+
+    /**
+     * Add a capability to the cluster
+     * @param name capability name
+     * @param capability capability instance
+     */
+    public addCapability(name: string, capability: Construct) {
+        this.capabilities.set(name, capability);
+    }
+
+    /**
+     * Get a capability by name
+     * @param name capability name
+     * @returns capability instance or undefined
+     */
+    public getCapability(name: string): Construct| undefined {
+        return this.capabilities.get(name);
+    }
+
+    /**
+     * Get all capabilities
+     * @returns Map of all capabilities
+     */
+    public getAllCapabilities(): Map<string, Construct> {
+        return this.capabilities;
+    }
 }
 
 /**
@@ -381,6 +430,50 @@ export class MultiConstruct<T extends cdk.IResource, R extends IConstruct> imple
 
   applyRemovalPolicy(policy: cdk.RemovalPolicy): void {
     this.primaryResource.applyRemovalPolicy(policy);
+  }
+}
+
+export interface AccessPolicyAssociationProps {
+  accessPolicies: eks.IAccessPolicy[];
+  roleArn: string;
+  clusterName: string;
+}
+
+export class AssociateAccessPolicy extends Construct {
+  constructor(scope: Construct, id: string, props: AccessPolicyAssociationProps) {
+    super(scope, id);
+
+    props.accessPolicies.forEach((policy, index) => {
+      new customresources.AwsCustomResource(this, `policy-${index}`, {
+        onCreate: {
+          service: 'EKS',
+          action: 'associateAccessPolicy',
+          parameters: {
+            clusterName: props.clusterName,
+            principalArn: props.roleArn,
+            policyArn: policy.policy,
+            accessScope: {
+              type: policy.accessScope.type,
+              ...(policy.accessScope.namespaces && { namespaces: policy.accessScope.namespaces }),
+            },
+          },
+          physicalResourceId: customresources.PhysicalResourceId.of(`${id}-${index}`),
+        },
+        onDelete: {
+          service: 'EKS',
+          action: 'disassociateAccessPolicy',
+          parameters: {
+            clusterName: props.clusterName,
+            principalArn: props.roleArn,
+            policyArn: policy.policy,
+          },
+          ignoreErrorCodesMatching: 'ResourceNotFoundException',
+        },
+        policy: customresources.AwsCustomResourcePolicy.fromSdkCalls({
+          resources: customresources.AwsCustomResourcePolicy.ANY_RESOURCE,
+        }),
+      });
+    });
   }
 }
 
