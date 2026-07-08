@@ -36,6 +36,14 @@ export interface EfsCsiDriverProps extends HelmAddOnUserProps {
      */
     createNamespace?: boolean
 
+    /**
+     * Override the driver container image tag. By default the Helm chart's appVersion is used
+     * (currently the latest published driver image). Set this to pin a newer patched image tag
+     * as soon as upstream publishes one (e.g. to remediate OS-package/openssl CVEs), without
+     * waiting for a chart/blueprints release.
+     */
+    imageTag?: string
+
 }
 
 /**
@@ -111,6 +119,11 @@ function populateValues(helmOptions: EfsCsiDriverProps, clusterName: string,
     setPath(values, "node.serviceAccount.name",  serviceAccountName);
     setPath(values, "replicaCount",  helmOptions.replicaCount);
     setPath(values, "image.repository",  repository);
+    // Optional override of the driver image tag (chart appVersion is used when unset). Lets
+    // customers pin a patched image to remediate OS-package/openssl CVEs ahead of a chart bump.
+    if (helmOptions.imageTag) {
+        setPath(values, "image.tag", helmOptions.imageTag);
+    }
 
     return values;
 }

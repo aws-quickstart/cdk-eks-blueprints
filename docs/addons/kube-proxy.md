@@ -30,6 +30,9 @@ const blueprint = blueprints.EksBlueprint.builder()
 ## Configuration Options
 
    - `version`: Optionally pass in the kube-proxy plugin version compatible with kubernetes-cluster version as shown below
+
+> **Tip:** When left at the default `"auto"`, the version resolves to the **EKS default** build for your cluster's Kubernetes version. To globally resolve `"auto"` to the **latest** available build instead (for newer security patches), set `"eks-blueprints:core-addon-version-selection": "latest"` in your `cdk.json` context. See [Managed Add-on Version Selection](./index.md#managed-add-on-version-selection-auto).
+
 ```bash
 # Assuming cluster version is 1.27, below command shows versions of the Kube-proxy add-on available for the specified cluster's version.
 aws eks describe-addon-versions \

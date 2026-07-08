@@ -4,7 +4,7 @@ import { AutoModeAddon, ClusterInfo, Values } from "../../spi";
 import { Construct, IConstruct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
 import { KubernetesVersion, IdentityType } from "aws-cdk-lib/aws-eks";
-import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
+import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog, valueFromContext } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
 import { RemovalPolicy } from "aws-cdk-lib";
 
@@ -57,6 +57,15 @@ export class CoreAddOnProps {
 const DEFAULT_NAMESPACE = "kube-system";
 
 /**
+ * CDK context key controlling how EKS managed add-ons using version "auto" are resolved:
+ *  - "default" (the EKS-recommended default version for the target K8s version) — the default.
+ *  - "latest"  (the newest available version for the target K8s version).
+ * Set globally in cdk.json, e.g. { "context": { "eks-blueprints:core-addon-version-selection": "latest" } }.
+ * Only affects add-ons left at version "auto"; add-ons pinned to an explicit version are unaffected.
+ */
+export const CORE_ADDON_VERSION_SELECTION_KEY = "eks-blueprints:core-addon-version-selection";
+
+/**
  * Implementation of EKS Managed add-ons.
  */
 export class CoreAddOn implements ClusterAddOn, AutoModeAddon{
@@ -96,7 +105,12 @@ export class CoreAddOn implements ClusterAddOn, AutoModeAddon{
         let version: string = this.coreAddOnProps.version;
 
         if (this.coreAddOnProps.version === "auto") {
-            version = await this.provideVersion(clusterInfo.version, clusterInfo.cluster.stack.region);
+            // Resolve the global version-selection policy. Missing context, null, or any value
+            // other than "latest" falls back to "default" (backward-compatible). Coerced to a
+            // normalized string so non-string / mixed-case context values are handled safely.
+            const rawSelection = valueFromContext(clusterInfo.cluster, CORE_ADDON_VERSION_SELECTION_KEY, "default");
+            const versionSelection = `${rawSelection ?? "default"}`.trim().toLowerCase();
+            version = await this.provideVersion(clusterInfo.version, clusterInfo.cluster.stack.region, versionSelection);
         }
 
         let addOnProps: any = {
@@ -185,7 +199,7 @@ export class CoreAddOn implements ClusterAddOn, AutoModeAddon{
         return result;
     }
 
-    async provideVersion(clusterVersion: KubernetesVersion, region: string) : Promise<string> {
+    async provideVersion(clusterVersion: KubernetesVersion, region: string, versionSelection: string = "default") : Promise<string> {
         const client = new sdk.EKSClient({ region });
         const command = new sdk.DescribeAddonVersionsCommand({
             addonName: this.coreAddOnProps.addOnName,
@@ -196,6 +210,18 @@ export class CoreAddOn implements ClusterAddOn, AutoModeAddon{
             const response = await client.send(command);
             if (response.addons && response.addons.length > 0)
             {
+                // "latest": pick the newest available version for the target K8s version.
+                // DescribeAddonVersions returns versions newest-first.
+                if (versionSelection === "latest") {
+                    const latest: string | undefined = response.addons[0].addonVersions?.[0]?.addonVersion;
+                    if (!latest) {
+                        throw new Error(`No versions found for add-on ${this.coreAddOnProps.addOnName}`);
+                    }
+                    userLog.debug(`Core add-on ${this.coreAddOnProps.addOnName} has autoselected latest version ${latest}`);
+                    return latest;
+                }
+
+                // "default" (behavior when unset): pick the EKS-recommended default version.
                 const defaultVersions = response.addons?.flatMap(addon =>
                     addon.addonVersions?.filter(version =>
                       version.compatibilities?.some(compatibility => compatibility.defaultVersion === true)

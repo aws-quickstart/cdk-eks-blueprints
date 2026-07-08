@@ -2,6 +2,7 @@
     "app": "npx ts-node bin/main.ts",
     "context": {
         "@aws-cdk/core:defaultCrossStackReferences": "strong",
+        "eks-blueprints:core-addon-version-selection": "latest",
         "eks.default.vpc": null,
         "eks.default.min-size": 2,
         "eks.default.max-size": 3,
