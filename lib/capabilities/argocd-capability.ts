@@ -1,7 +1,7 @@
 import { Capability, CapabilityProps } from "./capability";
 import { ArgoCDSsoRole, CapabilityType, ClusterInfo, SsoIdentityType } from "../spi";
 import { CfnCapability } from "aws-cdk-lib/aws-eks";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { IVpcEndpoint } from "aws-cdk-lib/aws-ec2";
 import { CfnOutput } from "aws-cdk-lib";
 
