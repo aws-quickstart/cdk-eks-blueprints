@@ -63,7 +63,7 @@ Additional options for customers who may need to supply their own private Helm r
 
 ## Support
 
-If you have any questions about Kubecost, get in touch with the team [on Slack](https://docs.kubecost.com/troubleshooting/creating-a-support-ticket).
+If you have any questions about Kubecost, get in touch with the team [on Slack](https://www.ibm.com/docs/en/kubecost/self-hosted/2.x?topic=install-creating-kubecost-support-ticket).
 
 ## License
 
