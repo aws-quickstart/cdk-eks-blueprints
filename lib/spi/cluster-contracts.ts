@@ -2,7 +2,7 @@ import { ClusterInfo } from '.';
 import { Construct } from "constructs";
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import {IKey} from "aws-cdk-lib/aws-kms";
-import { ClusterLoggingTypes, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { ClusterLoggingTypes, KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 
 
 

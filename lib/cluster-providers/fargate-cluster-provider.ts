@@ -1,12 +1,12 @@
 import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { defaultOptions, GenericClusterProvider } from './generic-cluster-provider';
 
 /**
  * Configuration options for the cluster provider.
  */
-export interface FargateClusterProviderProps extends Partial<eks.CommonClusterOptions> {
+export interface FargateClusterProviderProps extends Partial<eks.ClusterCommonOptions> {
 
     /**
     * The name for the cluster.

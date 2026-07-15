@@ -1,5 +1,5 @@
 import { ClusterAddOn, ClusterInfo } from '../../spi';
-import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks-v2';
 import { conflictsWith, mustRunOnAutoMode, supportsALL } from '../../utils';
 
 

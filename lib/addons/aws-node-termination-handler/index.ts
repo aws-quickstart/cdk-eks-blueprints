@@ -1,6 +1,6 @@
 import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
 import { QueueHook } from 'aws-cdk-lib/aws-autoscaling-hooktargets';
-import { ICluster, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ICluster, ServiceAccount } from 'aws-cdk-lib/aws-eks-v2';
 import { EventPattern, Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';

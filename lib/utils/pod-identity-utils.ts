@@ -1,4 +1,5 @@
-import { CfnPodIdentityAssociation, ICluster } from "aws-cdk-lib/aws-eks";
+import { ICluster } from "aws-cdk-lib/aws-eks-v2";
+import { CfnPodIdentityAssociation } from "aws-cdk-lib/aws-eks";
 import * as iam from "aws-cdk-lib/aws-iam";
 
 /**

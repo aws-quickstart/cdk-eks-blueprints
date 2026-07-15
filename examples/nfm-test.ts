@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
-import { KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks-v2';
 import { CfnWorkspace } from 'aws-cdk-lib/aws-aps';
 
 const app = new cdk.App();

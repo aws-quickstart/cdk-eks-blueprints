@@ -1,9 +1,9 @@
 import { BlueprintBuilder } from '../stacks';
 import * as addons from '../addons';
 import * as clusterproviders from '../cluster-providers';
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { NodegroupAmiType } from 'aws-cdk-lib/aws-eks-v2';
 import { merge } from "ts-deepmerge";
 import { ValuesSchema } from '../addons/gpu-operator/values';
 
@@ -61,7 +61,7 @@ export interface GpuOptions {
  * for EKS cluster
  */
 const defaultOptions: GpuOptions = {
-    kubernetesVersion: eks.KubernetesVersion.of("1.28"),
+    kubernetesVersion: eks.KubernetesVersion.V1_35,
     instanceClass: ec2.InstanceClass.G5,
     instanceSize: ec2.InstanceSize.XLARGE,
     desiredNodeSize: 2,
@@ -127,7 +127,7 @@ function addGpuNodeGroup(options: GpuOptions): clusterproviders.ManagedNodeGroup
 
     return {
         id: "mng-linux-gpu-01",
-        amiType: NodegroupAmiType.AL2_X86_64_GPU,
+        amiType: NodegroupAmiType.AL2023_ARM_64_NVIDIA,
         instanceTypes: [new ec2.InstanceType(`${options.instanceClass}.${options.instanceSize}`)],
         desiredSize: options.desiredNodeSize, 
         minSize: options.minNodeSize, 

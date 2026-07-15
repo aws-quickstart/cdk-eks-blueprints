@@ -1,7 +1,7 @@
 import * as bp from "../lib";
 import * as cdk from "aws-cdk-lib";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
-import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
+import {KubernetesVersion} from "aws-cdk-lib/aws-eks-v2";
 import {Construct} from "constructs";
 import {logger} from "../lib/utils";
 import { Vpc } from "aws-cdk-lib/aws-ec2";

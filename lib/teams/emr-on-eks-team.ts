@@ -1,4 +1,4 @@
-import { ICluster } from "aws-cdk-lib/aws-eks";
+import { ICluster } from "aws-cdk-lib/aws-eks-v2";
 import { FederatedPrincipal, IManagedPolicy, ManagedPolicy, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
 import { Aws, CfnJson, CfnOutput, CfnTag } from "aws-cdk-lib";
 import * as nsutils from '../utils/namespace-utils';

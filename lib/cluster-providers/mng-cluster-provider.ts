@@ -1,4 +1,4 @@
-import { aws_autoscaling as asg, aws_eks as eks } from "aws-cdk-lib";
+import { aws_autoscaling as asg, aws_eks_v2 as eks } from "aws-cdk-lib";
 // Cluster
 import { ClusterInfo } from "..";
 import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
@@ -9,7 +9,7 @@ import { ManagedNodeGroup } from "./types";
 /**
  * Configuration options for the cluster provider.
  */
-export interface MngClusterProviderProps extends Partial<eks.CommonClusterOptions>, Omit<ManagedNodeGroup, "id"> {
+export interface MngClusterProviderProps extends Partial<eks.ClusterCommonOptions>, Omit<ManagedNodeGroup, "id"> {
     /**
     * The name for the cluster.
     * @deprecated use #clusterName

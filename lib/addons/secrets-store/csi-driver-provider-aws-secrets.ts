@@ -1,4 +1,4 @@
-import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks-v2';
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { IStringParameter } from 'aws-cdk-lib/aws-ssm';
 import { CfnOutput } from 'aws-cdk-lib';

@@ -3,7 +3,7 @@ import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { loadExternalYaml } from "../../utils/yaml-utils";
 import { createNamespace, dependable } from "../../utils";
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks-v2";
 import { NeuronMonitorManifest } from "./neuron-monitor-customization";
 
 const PLUGIN_URL = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml";

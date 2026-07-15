@@ -1,4 +1,4 @@
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import { cloneDeepWith } from 'lodash';
 import {Construct} from "constructs";
 import * as nutil from 'node:util/types';

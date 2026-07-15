@@ -1,4 +1,5 @@
-import { CfnCapability, CfnCapabilityProps, IAccessPolicy } from "aws-cdk-lib/aws-eks";
+import { CfnCapability, CfnCapabilityProps } from "aws-cdk-lib/aws-eks";
+import { IAccessPolicy } from "aws-cdk-lib/aws-eks-v2";
 import { ClusterInfo, ClusterCapability, CapabilityType, AssociateAccessPolicy } from "../spi";
 import { CfnTag } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";

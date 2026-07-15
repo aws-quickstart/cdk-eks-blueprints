@@ -1,6 +1,6 @@
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
-import { AutoScalingGroupCapacityOptions } from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
+import { AutoScalingGroupCapacityOptions } from "aws-cdk-lib/aws-eks-v2";
 import { NodePoolV1Spec } from "../addons";
 import { IRole } from "aws-cdk-lib/aws-iam";
 

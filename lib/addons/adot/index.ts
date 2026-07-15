@@ -1,11 +1,10 @@
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest, KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import { Construct, IConstruct } from 'constructs';
 import { ClusterInfo } from "../../spi";
 import { createNamespace, dependable, loadYaml, readYamlDocument, supportsALL } from "../../utils";
 import { CertManagerAddOn } from "../cert-manager";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getAdotCollectorPolicyDocument } from "./iam-policy";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
   [KubernetesVersion.V1_35, "v0.151.0-eksbuild.1"],

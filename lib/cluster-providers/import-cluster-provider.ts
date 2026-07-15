@@ -1,7 +1,7 @@
 import { ClusterInfo, ClusterProvider } from "../spi";
 import { selectKubectlLayer } from "./generic-cluster-provider";
 import { IVpc } from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { IKey } from "aws-cdk-lib/aws-kms";
 import * as sdk from "@aws-sdk/client-eks";
@@ -15,17 +15,23 @@ import { isToken, uniqueId } from "../utils/id-utils";
 /**
  * Properties object for the ImportClusterProvider.
  */
-export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, "vpc"> {
-    
+export interface ImportClusterProviderProps extends Omit<eks.ClusterAttributes, "vpc" | "kubectlProviderOptions"> {
+
     /**
-     * Used for the CDK construct id for the imported cluster. Useful when passing tokens for cluster name. 
+     * Used for the CDK construct id for the imported cluster. Useful when passing tokens for cluster name.
      */
     id?: string;
 
     /**
-     * This property is needed as it drives selection of certain add-on versions as well as kubectl layer. 
+     * This property is needed as it drives selection of certain add-on versions as well as kubectl layer.
      */
     version: eks.KubernetesVersion;
+
+    /**
+     * Options for the kubectl provider. The kubectlLayer is automatically resolved
+     * from the cluster version if not explicitly provided.
+     */
+    kubectlProviderOptions?: Partial<eks.KubectlProviderOptions>;
 }
 
 /**
@@ -48,12 +54,17 @@ export class ImportClusterProvider implements ClusterProvider {
      * @returns 
      */
     createCluster(scope: Construct, vpc: IVpc, _secretsEncryptionKey?: IKey | undefined): ClusterInfo {
-        const props = { ...this.props, vpc };
+        const kubectlLayer = this.props.kubectlProviderOptions?.kubectlLayer ?? selectKubectlLayer(scope, this.props.version)!;
+        const kubectlProviderOptions: eks.KubectlProviderOptions = {
+            ...this.props.kubectlProviderOptions,
+            kubectlLayer,
+        };
 
-        if(! props.kubectlLayer) {
-            props.kubectlLayer = selectKubectlLayer(scope, props.version);
-        }
-        const existingCluster = eks.Cluster.fromClusterAttributes(scope, `imported-cluster-${this.id}`, props);
+        const existingCluster = eks.Cluster.fromClusterAttributes(scope, `imported-cluster-${this.id}`, {
+            ...this.props,
+            vpc,
+            kubectlProviderOptions,
+        });
         return new ClusterInfo(existingCluster, this.props.version);
     }
 
@@ -87,8 +98,10 @@ export class ImportClusterProvider implements ClusterProvider {
             clusterEndpoint: sdkCluster.endpoint,
             openIdConnectProvider: getResource(context =>
                 new LookupOpenIdConnectProvider(sdkCluster.identity!.oidc!.issuer!).provide(context)),
+            kubectlProviderOptions: {
+              role: kubectlRole
+            },
             clusterCertificateAuthorityData: sdkCluster.certificateAuthority?.data,
-            kubectlRoleArn: kubectlRole.roleArn,
             clusterSecurityGroupId: sdkCluster.resourcesVpcConfig?.clusterSecurityGroupId,
             securityGroupIds: sdkCluster.resourcesVpcConfig?.securityGroupIds
         });

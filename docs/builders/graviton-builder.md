@@ -23,7 +23,7 @@ import * as blueprints from "@aws-quickstart/eks-blueprints";
 import { GravitonBuilder } from "@aws-quickstart/eks-blueprints";
 import { CfnWorkspace } from "aws-cdk-lib/aws-aps";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { Construct } from "constructs";
 
 export default class GravitonConstruct {

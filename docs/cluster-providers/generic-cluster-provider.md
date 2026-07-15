@@ -1,6 +1,8 @@
 # Generic Cluster Provider
 
-The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), or one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute cpacity.
+The `GenericClusterProvider` allows you to provision an EKS cluster which leverages one or more [EKS managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html)(MNGs), one or more autoscaling groups[EC2 Auto Scaling groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html), or [EKS Auto Mode](https://docs.aws.amazon.com/eks/latest/userguide/automode.html) for its compute capacity. Users can also configure multiple Fargate profiles along with the EC2 based compute capacity.
+
+> **Note:** `GenericClusterProvider` is built on the AWS CDK EKS v2 module (`aws-cdk-lib/aws-eks-v2`), which uses native CloudFormation constructs to provision the EKS cluster. This reduces the number of custom resources and nested stacks and lets you apply standard CloudFormation guardrails for resource usage and tagging. The previously separate `GenericClusterProviderV2` has been merged into this provider — use `GenericClusterProvider` for all use cases, including EKS Auto Mode.
 
 Today it is not possible for an Amazon EKS Cluster to propagate tags to EC2 instance worker nodes directly when you create an EKS cluster. You can create a launch template with custom tags on `managedNodeGroups` with `GenericClusterProvider` as shown in `mng2-launchtemplate`. This will allow you to propagate custom tags to your EC2 instance worker nodes.
 
@@ -133,6 +135,30 @@ EksBlueprint.builder()
     .build(app, blueprintID);
 ```
 
+### EKS Auto Mode
+
+To provision the cluster with [EKS Auto Mode](https://docs.aws.amazon.com/eks/latest/userguide/automode.html) instead of node groups, supply the `compute` property. This is mutually exclusive with `managedNodeGroups` and `autoscalingNodeGroups`.
+
+```typescript
+const clusterProvider = new blueprints.GenericClusterProvider({
+    version: KubernetesVersion.V1_31,
+    tags: {
+        "Name": "blueprints-example-cluster",
+        "Type": "generic-cluster"
+    },
+    compute: {
+        nodePools: ["system", "general-purpose"],
+        nodeRole: blueprints.getResource(context => {
+            return iam.Role.fromRoleName(context.scope, "node-role", "AmazonEKSNodeRole");
+        })
+    }
+});
+
+EksBlueprint.builder()
+    .clusterProvider(clusterProvider)
+    .build(app, blueprintID);
+```
+
 
 The Cluster configuration and node group configuration exposes a number of options that require to supply an actual CDK resource.
 For example cluster allows passing `mastersRole`, `securityGroup`, etc. to the cluster, while managed node group allow specifying `nodeRole`.
@@ -184,12 +210,16 @@ The `GenericClusterProvider` supports the following configuration options.
 | clusterName           | The name for the cluster.
 | managedNodeGroups     | Zero or more managed node groups.
 | autoscalingNodeGroups | Zero or more autoscaling node groups (mutually exclusive with managed node groups).
+| compute               | Configuration for EKS Auto Mode (mutually exclusive with managed and autoscaling node groups).
 | fargateProfiles       | Zero or more Fargate profiles.
 | version               | Kubernetes version for the control plane. Required in cluster props or blueprint props.
 | vpc                   | VPC for the cluster.
 | vpcSubnets            | The subnets for control plane ENIs (subnet selection).
 | privateCluster        | If `true` Kubernetes API server is private.
+| kubectlProviderOptions | Options for the kubectl provider (e.g. `role`, `kubectlLayer`). The `kubectlLayer` is resolved automatically from the cluster version if not supplied.
 | tags                  | Tags to propagate to Cluster.
+
+The compute types are mutually exclusive: a cluster can use managed node groups, autoscaling node groups, or EKS Auto Mode (`compute`), but not a combination of them.
 
 There should be public and private subnets for EKS cluster to work. For more information see [Cluster VPC Considerations](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html).
 

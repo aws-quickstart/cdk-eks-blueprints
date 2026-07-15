@@ -6,8 +6,7 @@ The framework currently provides support for the following Cluster Providers:
 
 | Cluster Provider  | Description                                                                       |
 |-------------------|-----------------------------------------------------------------------------------|
-| [`GenericClusterProvider`](./generic-cluster-provider.md) | Provisions an EKS cluster with one or more managed or Auto Scaling groups as well as Fargate Profiles.
-| [`GenericClusterProviderV2`](./generic-cluster-provider-v2.md) | Provisions an EKS cluster with one or more managed node groups, Auto Scaling groups, Fargate Profiles, or uses EKS Auto Mode.
+| [`GenericClusterProvider`](./generic-cluster-provider.md) | Provisions an EKS cluster with one or more managed node groups, Auto Scaling groups, Fargate Profiles, or uses EKS Auto Mode.
 | [`AsgClusterProvider`](./asg-cluster-provider.md) | Provisions an EKS cluster with an Auto Scaling group used for compute capacity.
 | [`MngClusterProvider`](./mng-cluster-provider.md) | Provisions an EKS cluster with a Managed Node group for compute capacity.
 | [`FargateClusterProvider`](./fargate-cluster-provider.md) | Provisions an EKS cluster which leverages AWS Fargate to run Kubernetes pods.
@@ -16,7 +15,9 @@ The framework currently provides support for the following Cluster Providers:
 
 By default, the framework will leverage the `MngClusterProvider` which creates a single managed node group.
 
-If you would like to add more node groups to a single cluster, you can leverage `GenericClusterProvider`, which allows multiple managed node groups or autoscaling (self-managed) node groups along with Fargate profiles.
+If you would like to add more node groups to a single cluster, you can leverage `GenericClusterProvider`, which allows multiple managed node groups or autoscaling (self-managed) node groups along with Fargate profiles, or EKS Auto Mode.
+
+> **Note:** All cluster providers are built on the AWS CDK EKS v2 module (`aws-cdk-lib/aws-eks-v2`), which uses native CloudFormation constructs to provision the cluster. This reduces the number of custom resources and nested stacks and lets you apply standard CloudFormation guardrails for resource usage and tagging. The previously separate `GenericClusterProviderV2` has been merged into `GenericClusterProvider`; use `GenericClusterProvider` for all use cases including EKS Auto Mode.
 
 The version property that sets the Kubernetes Version for the Control Plane is required to be set either in the Cluster Provider, or in the Blueprint Properties.  In either spot, it can be set to a `KubernetesVersion` or `"auto"`.  If set to auto, the cluster version will be set to the latest Kubernetes Version. Auto versioning is not recommended in production clusters, as clusters will be updated as new Kubernetes versions release.
 
@@ -29,7 +30,7 @@ To override the kubectl layer, extend any cluster provider and implement the `ge
 ```typescript
 import { KubectlV34Layer } from '@aws-cdk/lambda-layer-kubectl-v34';
 import { ILayerVersion } from 'aws-cdk-lib/aws-lambda';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 class CustomClusterProvider extends blueprints.AutomodeClusterProvider {

@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { supportsALL } from "../../utils";
-import * as eksv2 from 'aws-cdk-lib/aws-eks-v2';
 
 /** 
  * Properties for UsageTracking
@@ -27,13 +26,8 @@ export class UsageTrackingAddOn implements ClusterAddOn {
     if (this.props.tags.length == 0) {
       return;
     }
-    let stack;
+    const stack = clusterInfo.cluster.stack;
 
-    if (clusterInfo.clusterv2 instanceof eksv2.Cluster) {
-      stack = clusterInfo.clusterv2.stack;
-    } else {
-      stack = clusterInfo.cluster.stack;
-    }
     const tracking = new TaggedUsageTracking(stack.templateOptions.description || '');
     tracking.addTags(this.props.tags);
 

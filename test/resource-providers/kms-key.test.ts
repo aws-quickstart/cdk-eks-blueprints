@@ -25,18 +25,16 @@ describe("KmsKeyProvider", () => {
       },
       DeletionPolicy: "Retain",
     });
-    template.hasResource("Custom::AWSCDK-EKS-Cluster", {
+    template.hasResource("AWS::EKS::Cluster", {
       Properties: {
-        Config: {
-          encryptionConfig: [
-            {
-              provider: {
-                keyArn: Match.anyValue(),
-              },
-              resources: ["secrets"],
+        EncryptionConfig: [
+          {
+            Provider: {
+              KeyArn: Match.anyValue(),
             },
-          ],
-        },
+            Resources: ["secrets"],
+          },
+        ],
       },
     });
   });
@@ -58,18 +56,16 @@ describe("KmsKeyProvider", () => {
     const template = Template.fromStack(stack);
 
     // Then
-    template.hasResource("Custom::AWSCDK-EKS-Cluster", {
+    template.hasResource("AWS::EKS::Cluster", {
       Properties: {
-        Config: {
-          encryptionConfig: [
-            {
-              provider: {
-                keyArn: Match.anyValue(),
-              },
-              resources: ["secrets"],
+        EncryptionConfig: [
+          {
+            Provider: {
+              KeyArn: Match.anyValue(),
             },
-          ],
-        },
+            Resources: ["secrets"],
+          },
+        ],
       },
     });
   });
@@ -98,18 +94,16 @@ describe("KmsKeyProvider", () => {
       },
       DeletionPolicy: "Retain",
     });
-    template.hasResource("Custom::AWSCDK-EKS-Cluster", {
+    template.hasResource("AWS::EKS::Cluster", {
       Properties: {
-        Config: {
-          encryptionConfig: [
-            {
-              provider: {
-                keyArn: Match.anyValue(),
-              },
-              resources: ["secrets"],
+        EncryptionConfig: [
+          {
+            Provider: {
+              KeyArn: Match.anyValue(),
             },
-          ],
-        },
+            Resources: ["secrets"],
+          },
+        ],
       },
     });
   });
@@ -129,18 +123,16 @@ describe("KmsKeyProvider", () => {
     const template = Template.fromStack(stack);
 
     // Then EKS cluster config has no encryption
-    template.resourcePropertiesCountIs("Custom::AWSCDK-EKS-Cluster", {
-        Config: {
-            encryptionConfig: [
-            {
-                provider: {
-                    keyArn: Match.anyValue(),
-                },
-                resources: ["secrets"],
+    template.resourcePropertiesCountIs("AWS::EKS::Cluster", {
+        EncryptionConfig: [
+          {
+            Provider: {
+              KeyArn: Match.anyValue(),
             },
-            ],
-        },
-    }, 
+            Resources: ["secrets"],
+          },
+        ],
+    },
     0);
   });
 });

@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { HelmChart, ServiceAccount } from "aws-cdk-lib/aws-eks-v2";
 import { Stack } from 'aws-cdk-lib';
 import * as bcrypt from "bcrypt";
 import { Construct } from "constructs";

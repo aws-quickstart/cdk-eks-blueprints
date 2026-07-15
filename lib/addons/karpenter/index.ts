@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { CfnOutput, Duration, Names } from 'aws-cdk-lib';
-import { Cluster, KubernetesVersion, IpFamily } from 'aws-cdk-lib/aws-eks';
+import { Cluster, KubernetesVersion, IpFamily, AccessEntryType } from 'aws-cdk-lib/aws-eks-v2';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -21,6 +21,7 @@ export * from './karpenter-v1';
 
 class versionMap {
     private static readonly versionMap: Map<string, string> = new Map([
+        [KubernetesVersion.V1_35.version, "1.9.0"],
         [KubernetesVersion.V1_34.version, "1.6.0"],
         [KubernetesVersion.V1_33.version, '1.5.0'],
         [KubernetesVersion.V1_32.version, '1.2.0'],
@@ -31,8 +32,8 @@ class versionMap {
         [KubernetesVersion.V1_27.version, '0.28.0'],
         [KubernetesVersion.V1_26.version, '0.28.0'],
         [KubernetesVersion.V1_25.version, '0.25.0'],
-        [KubernetesVersion.V1_24.version, '0.21.0'],
-        [KubernetesVersion.V1_23.version, '0.21.0'],
+        [KubernetesVersion.of("1.24").version, '0.21.0'],
+        [KubernetesVersion.of("1.23").version, '0.21.0'],
     ]);
     public static has(version: KubernetesVersion) {
       return this.versionMap.has(version.version);
@@ -606,9 +607,8 @@ export class KarpenterAddOn extends HelmAddOn {
         });
 
         // Map Node Role to aws-auth
-        cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
-            groups: ['system:bootstrappers', 'system:nodes'],
-            username: 'system:node:{{EC2PrivateDNSName}}'
+        cluster.grantAccess("KarpenterNodeRoleAccess", karpenterNodeRole.roleArn, [], {
+            accessEntryType: AccessEntryType.EC2_LINUX
         });
 
         return [karpenterNodeRole, karpenterInstanceProfile];

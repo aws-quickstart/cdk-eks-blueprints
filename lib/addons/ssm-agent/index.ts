@@ -1,4 +1,4 @@
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks-v2";
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { assertEC2NodeGroup } from "../../cluster-providers";
 import { ClusterAddOn, ClusterInfo } from "../../spi";

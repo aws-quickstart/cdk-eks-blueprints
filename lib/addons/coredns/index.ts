@@ -2,9 +2,10 @@ import { Construct } from "constructs";
 import { ClusterInfo } from "../../spi";
 import * as utils from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
-import { CfnAddon, FargateCluster } from "aws-cdk-lib/aws-eks";
+import { CfnAddon } from "aws-cdk-lib/aws-eks";
+import { FargateCluster } from "aws-cdk-lib/aws-eks-v2";
 import { RemovalPolicy } from "aws-cdk-lib";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
     [KubernetesVersion.V1_35, "v1.13.2-eksbuild.3"],

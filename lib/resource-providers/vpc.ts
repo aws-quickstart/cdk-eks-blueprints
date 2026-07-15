@@ -2,7 +2,7 @@ import { Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { ISubnet, PrivateSubnet } from 'aws-cdk-lib/aws-ec2';
 import { MultiConstruct, ResourceContext, ResourceProvider } from "../spi";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import {Ipv6VpcProvider} from "./ipv6-vpc";
 
 /**

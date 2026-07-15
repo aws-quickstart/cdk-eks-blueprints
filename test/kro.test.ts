@@ -21,6 +21,27 @@ describe('Unit tests for KRO addon', () => {
         });
     });
 
+    test("Helm chart is deployed with correct default version", () => {
+        const app = new cdk.App();
+
+        const stack = blueprints.EksBlueprint.builder()
+            .account('123456789').region('us-west-1')
+            .version("auto")
+            .addOns(new blueprints.KroAddOn())
+            .build(app, 'kro-version');
+
+        const template = Template.fromStack(stack);
+        const helmCharts = template.findResources("Custom::AWSCDK-EKS-HelmChart");
+        const kroChart = Object.values(helmCharts).find(r => {
+            const chart = r.Properties?.Chart;
+            return (typeof chart === 'string' ? chart : JSON.parse(chart)) === 'kro';
+        });
+        expect(kroChart).toBeDefined();
+        const version = kroChart!.Properties?.Version;
+        const versionStr = typeof version === 'string' ? version : JSON.parse(version);
+        expect(versionStr).toEqual('0.9.1');
+    });
+
     test("Stack creation succeeds with custom version", () => {
         const app = new cdk.App();
 

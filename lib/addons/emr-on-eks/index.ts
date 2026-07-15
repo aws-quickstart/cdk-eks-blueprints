@@ -1,7 +1,7 @@
 import assert = require("assert");
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Stack } from "aws-cdk-lib";
-import { Cluster } from "aws-cdk-lib/aws-eks";
+import { Cluster, AccessPolicy, AccessScopeType, AccessPolicyArn } from "aws-cdk-lib/aws-eks-v2";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { supportsALL } from "../../utils";
@@ -30,13 +30,10 @@ export class EmrEksAddOn implements ClusterAddOn {
     );
     
     //Add the service role to the AwsAuth
-    cluster.awsAuth.addRoleMapping(
-      emrEksServiceRole,
-      {
-        username: 'emr-containers',
-        groups: ['']
-      }
-    );
+    cluster.grantAccess('EMRServiceRoleAccess', emrEksServiceRole.roleArn, [new AccessPolicy({
+      accessScope: { type: AccessScopeType.CLUSTER },
+      policy: AccessPolicyArn.AMAZON_EKS_CLUSTER_ADMIN_POLICY
+    })]);
   
     return Promise.resolve(emrOnEksSlr);
   }

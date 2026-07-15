@@ -2,7 +2,7 @@
 import { Construct } from 'constructs';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { merge } from "ts-deepmerge";
-import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks-v2';
 import { HelmAddOn, HelmAddOnUserProps, HelmAddOnProps } from "../helm-addon";
 import { dependable, setPath, createNamespace, supportsX86 } from '../../utils';
 import { ClusterInfo, Values } from "../../spi";

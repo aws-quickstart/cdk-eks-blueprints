@@ -1,12 +1,10 @@
 import assert = require("assert");
 import { ClusterAddOn, ClusterInfo } from "../../spi";
 import { Stack } from "aws-cdk-lib";
-import { Cluster } from "aws-cdk-lib/aws-eks";
+import { AccessPolicy, AccessPolicyArn, AccessScopeType, Cluster } from "aws-cdk-lib/aws-eks-v2";
 import { CfnServiceLinkedRole, IRole, Role } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { supportsALL } from "../../utils";
-
-const BATCH = 'aws-batch';
 
 @supportsALL
 export class AwsBatchAddOn implements ClusterAddOn {
@@ -23,22 +21,16 @@ export class AwsBatchAddOn implements ClusterAddOn {
       });
     }    
 
-    //Init the service role as IRole because `addRoleMapping` method does not
-    //support the CfnServiceLinkedRole type
     const batchEksServiceRole: IRole = Role.fromRoleArn(
       cluster.stack,
       'ServiceRoleForBatch',
       `arn:aws:iam::${Stack.of(cluster.stack).account}:role/AWSServiceRoleForBatch`,
     );
     
-    //Add the service role to the AwsAuth
-    cluster.awsAuth.addRoleMapping(
-      batchEksServiceRole,
-      {
-        username: BATCH,
-        groups: ['']
-      }
-    );
+    cluster.grantAccess('BatchServiceRoleAccess', batchEksServiceRole.roleArn, [new AccessPolicy({
+      accessScope: { type: AccessScopeType.CLUSTER },
+      policy: AccessPolicyArn.AMAZON_EKS_CLUSTER_ADMIN_POLICY
+    })]);
   
     return Promise.resolve(batchEksServiceRole);
 

@@ -1,4 +1,4 @@
-import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks-v2';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from "constructs";

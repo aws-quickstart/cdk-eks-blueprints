@@ -2,9 +2,9 @@ import * as cdk from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { BlockDeviceVolume, EbsDeviceVolumeType } from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 import { SubnetType } from 'aws-cdk-lib/aws-ec2';
-import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { CapacityType, KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 import * as blueprints from '../lib';
 import { AsgClusterProvider, MngClusterProvider } from '../lib';
 import { logger } from '../lib/utils';
@@ -66,7 +66,7 @@ test("Generic cluster provider correctly registers managed node groups with inst
     const clusterProvider = blueprints.clusterBuilder()
     .withCommonOptions({
         serviceIpv4Cidr: "10.43.0.0/16",
-        version: KubernetesVersion.V1_28
+        version: KubernetesVersion.V1_35
     })
     .managedNodeGroup({
         id: "mng1",
@@ -108,7 +108,7 @@ test("Generic cluster provider correctly registers autoscaling node groups", () 
     const app = new cdk.App();
 
     const clusterProvider = blueprints.clusterBuilder()
-    .version(KubernetesVersion.V1_28)
+    .version(KubernetesVersion.V1_35)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,
@@ -154,7 +154,7 @@ test("Generic cluster provider correctly registers autoscaling node groups with 
     app.node.setContext("eks.default.instance-type", "m5.large");
 
     const clusterProvider = blueprints.clusterBuilder()
-    .version(eks.KubernetesVersion.V1_28)
+    .version(eks.KubernetesVersion.V1_35)
     .autoscalingGroup({
         id: "mng1",
         maxSize: 2,
@@ -182,7 +182,7 @@ test("Mng cluster provider correctly initializes managed node group", () => {
     const app = new cdk.App();
 
     const clusterProvider = new MngClusterProvider({
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         clusterName: "my-cluster",
         forceUpdate:true,
         labels: { "mylabel": "value" },
@@ -217,7 +217,7 @@ test("Asg cluster provider correctly initializes self-managed node group", () =>
 
     const clusterProvider = new AsgClusterProvider({
         id: "asg1",
-        version: KubernetesVersion.V1_25,
+        version: KubernetesVersion.V1_35,
         clusterName: "my-cluster",
         blockDevices: [
             {
@@ -268,15 +268,19 @@ test.each([
   });
 });
 
-test("Kubectl layer is correctly injected for EKS version 1.21 and below", () => {
+test("Kubectl layer warns that 1.29 is the lowest auto-resolved version for EKS versions below 1.29", () => {
     const app = new cdk.App();
+    const warnSpy = jest.spyOn(logger, 'warn');
 
-    const stackV122 = blueprints.EksBlueprint.builder()
+    blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_22).build(app, "stack-122");
-    
-    const template = Template.fromStack(stackV122);
-    template.resourceCountIs("AWS::Lambda::LayerVersion", 0);
+        .version(KubernetesVersion.of("1.22")).build(app, "stack-122");
+
+    expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("1.29 is the lowest supported version for which the kubectl provider is automatically resolved")
+    );
+
+    warnSpy.mockRestore();
 });
 
 test("Build fails if no version is set in builder or node group", () => {
@@ -311,16 +315,19 @@ test("Kubernetes Version gets set correctly in NodeGroup", () => {
 });
 
 test("Import cluster provider can use output values from other stacks as params", () => {
+    const app = new cdk.App();
     const importClusterProvider = new blueprints.ImportClusterProvider({
         clusterName: cdk.Fn.importValue('ClusterName'),
-        version: KubernetesVersion.V1_27,
+        version: KubernetesVersion.V1_35,
         clusterEndpoint: cdk.Fn.importValue('ClusterEndpoint'),
         openIdConnectProvider: blueprints.getResource((context) =>
           new blueprints.LookupOpenIdConnectProvider(
             'classified',
           ).provide(context),
         ),
-        kubectlRoleArn: cdk.Fn.importValue('KubectlRoleArn'),
+        kubectlProviderOptions: {
+          role: cdk.aws_iam.Role.fromRoleArn(new cdk.Stack(app, 'temp'), "role", cdk.Fn.importValue('KubectlRoleArn')),
+        },
         clusterSecurityGroupId: cdk.Fn.importValue('ClusterSecurityGroupId'),
       });
       expect(isToken(importClusterProvider.id)).toBeFalsy();

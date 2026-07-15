@@ -12,7 +12,7 @@ const stack = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .version("auto")
-    .clusterProvider(new blueprints.GenericClusterProviderV2({
+    .clusterProvider(new blueprints.GenericClusterProvider({
         defaultCapacityType: DefaultCapacityType.NODEGROUP,
         managedNodeGroups: [{
             id: "default",

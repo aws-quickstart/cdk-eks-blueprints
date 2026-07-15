@@ -8,7 +8,7 @@ import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { FluxGitRepository } from "./gitrepository";
 import { FluxKustomization } from "./kustomization";
 import { FluxBucket } from './bucket';
-import { KubernetesManifest } from 'aws-cdk-lib/aws-eks/lib/k8s-manifest';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks-v2';
 import { Duration } from "aws-cdk-lib";
 
 /**

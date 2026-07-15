@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { IpFamily } from 'aws-cdk-lib/aws-eks';
+import { IpFamily } from 'aws-cdk-lib/aws-eks-v2';
 import { Construct } from "constructs";
 import * as blueprints from '../../lib';
 import BlueprintConstruct, {
@@ -35,7 +35,7 @@ export default class BlueprintIPV6Construct extends BlueprintConstruct {
         ]);
 
         const addOns: Array<blueprints.ClusterAddOn> = [
-            new blueprints.addons.KarpenterAddOn({
+            new blueprints.addons.KarpenterV1AddOn({
                 version: "v0.37.5",
                 nodePoolSpec: this.nodePoolSpec,
                 ec2NodeClassSpec: this.nodeClassSpec,

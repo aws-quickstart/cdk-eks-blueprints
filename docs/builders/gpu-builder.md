@@ -29,7 +29,7 @@ The below usage helps you with a demonstration to use `GpuBuilder` to configure 
 ```typescript
 import * as blueprints from "@aws-quickstart/eks-blueprints";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { GpuBuilder, GpuOptions } from '../common/gpu-builder';

@@ -1,7 +1,7 @@
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import { SecurityGroup } from "aws-cdk-lib/aws-ec2";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Key } from "aws-cdk-lib/aws-kms";
 import * as nutil from 'node:util/types';
@@ -34,7 +34,7 @@ describe("ResourceProxy",() => {
         const app = new App();
         
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_35,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -48,7 +48,7 @@ describe("ResourceProxy",() => {
 
         const stack1 = builder.build(app, "resource-cluster");
         const template = Template.fromStack(stack1);
-        
+
         const stack2 = builder.build(new App(), "resource-cluster2");
         const template1 = Template.fromStack(stack2);
         // Then
@@ -65,7 +65,7 @@ describe("ResourceProxy",() => {
         
         const sgDescription = "My new security group";
         const clusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_35,
             mastersRole: blueprints.getResource(context => {
                 return Role.fromRoleName(context.scope, "mastersRole", "myrole");
             }),
@@ -123,7 +123,7 @@ describe("ResourceProxy",() => {
         const app = new App();
 
         const genericClusterProvider = new blueprints.GenericClusterProvider({
-            version: KubernetesVersion.V1_25,
+            version: KubernetesVersion.V1_35,
             managedNodeGroups: [{
                 id: "mng1",
                 launchTemplate: {

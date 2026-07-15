@@ -1,14 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import * as blueprints from '../lib';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 
 test("Cluster autoscaler correctly is using correct defaults if EKS version is not defined in the version map", () => {
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_28)
+        .version(KubernetesVersion.of("1.36"))
         .addOns(new blueprints.ClusterAutoScalerAddOn())
         .build(app, "ca-stack-127");
 
@@ -16,18 +16,18 @@ test("Cluster autoscaler correctly is using correct defaults if EKS version is n
 
     template.hasResource("Custom::AWSCDK-EKS-HelmChart", {
         Properties: {
-            Version: "9.34.0",
+            Version: "9.53.0",
         },
     });
 });
 
 
-test("Cluster autoscaler correctly is using correct version for 1.26", () => {
+test("Cluster autoscaler correctly is using correct version for 1.35", () => {
     const app = new cdk.App();
 
     const stack = blueprints.EksBlueprint.builder()
         .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.V1_27)
+        .version(KubernetesVersion.V1_35)
         .addOns(new blueprints.ClusterAutoScalerAddOn())
         .build(app, "ca-stack-126");
 
@@ -35,26 +35,9 @@ test("Cluster autoscaler correctly is using correct version for 1.26", () => {
 
     template.hasResource("Custom::AWSCDK-EKS-HelmChart", {
         Properties: {
-            Version: "9.33.0",
+            Version: "9.53.0",
         },
     });
 });
 
 
-test("Cluster autoscaler correctly is using correct version for 1.26 specified as string", () => {
-    const app = new cdk.App();
-
-    const stack = blueprints.EksBlueprint.builder()
-        .account('123456789').region('us-west-2')
-        .version(KubernetesVersion.of("1.26"))
-        .addOns(new blueprints.ClusterAutoScalerAddOn())
-        .build(app, "ca-stack-127");
-
-    const template = Template.fromStack(stack);
-
-    template.hasResource("Custom::AWSCDK-EKS-HelmChart", {
-        Properties: {
-            Version: "9.29.0",
-        },
-    });
-});

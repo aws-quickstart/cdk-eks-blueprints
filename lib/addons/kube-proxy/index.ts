@@ -1,4 +1,4 @@
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import * as utils from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { ClusterInfo } from "../../spi/types";

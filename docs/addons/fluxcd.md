@@ -219,7 +219,7 @@ const blueprint = blueprints.EksBlueprint.builder()
 ```typescript
 import 'source-map-support/register';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { Construct } from 'constructs';
 import { dependable } from '@aws-quickstart/eks-blueprints/dist/utils';
 

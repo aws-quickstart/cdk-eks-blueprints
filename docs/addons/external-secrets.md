@@ -26,7 +26,7 @@ ExternalSecrets from all namespaces.
 Below example is for integration with AWS Secrets Manager:
 
 ```typescript
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 
 const cluster = blueprint.getClusterInfo().cluster;
 
@@ -61,7 +61,7 @@ const clusterSecretStore = new eks.KubernetesManifest(scope, "ClusterSecretStore
 Below example is for integration with AWS Systems Manager Parameter Store:
 
 ```typescript
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 
 const cluster = blueprint.getClusterInfo().cluster;
 
@@ -99,7 +99,7 @@ Create an [ExternalSecret](https://external-secrets.io/v0.5.9/api-externalsecret
 and inject secret data
 
 ```typescript
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 
 const cluster = blueprint.getClusterInfo().cluster;
 const keyfiles = new eks.KubernetesManifest(scope, "ExternalSecret", {

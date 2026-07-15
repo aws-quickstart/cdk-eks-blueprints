@@ -4,9 +4,9 @@ import { ClusterInfo } from "../../spi";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { getEbsDriverPolicyDocument } from "./iam-policy";
 import * as utils from "../../utils";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import { Construct } from "constructs";
-import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest, KubernetesPatch } from "aws-cdk-lib/aws-eks-v2";
 
 /* VersioMap showing the default version for 4 supported Kubernetes versions */
 const versionMap: Map<KubernetesVersion, string> = new Map([

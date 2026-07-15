@@ -62,7 +62,7 @@ import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { cloudWatchDeploymentMode } from '@aws-quickstart/eks-blueprints';
 import { ObservabilityBuilder } from '@aws-quickstart/eks-blueprints';
 import * as cdk from "aws-cdk-lib";
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 
 export default class ExistingEksMixedobservabilityConstruct {
     async buildAsync(scope: cdk.App, id: string) {
@@ -129,7 +129,7 @@ For `ObservabilityBuilder` with `AutomodeClusterProvider`, set the parameter `is
 ```typescript
 import { Construct } from 'constructs';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { ObservabilityBuilder, ObservabilityBuilderProps } from '@aws-quickstart/eks-blueprints';
 
 export default class SingleNewEksAutoModeConstruct {

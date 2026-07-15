@@ -1,7 +1,7 @@
 import { Duration, Names, CfnOutput } from "aws-cdk-lib";
 import { Rule } from "aws-cdk-lib/aws-events";
 import { SqsQueue } from "aws-cdk-lib/aws-events-targets";
-import { Cluster, IpFamily } from "aws-cdk-lib/aws-eks";
+import { Cluster, IpFamily, AccessEntryType } from "aws-cdk-lib/aws-eks-v2";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import { Construct } from "constructs";
@@ -13,7 +13,6 @@ import * as assert from "assert";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
 import { KarpenterControllerPolicyV1 } from "./iam";
 import { Ec2NodeClassV1Spec, NodePoolV1Spec, KARPENTER, RELEASE } from "./types";
-import { Cluster as Clusterv2, AccessEntryType } from 'aws-cdk-lib/aws-eks-v2';
 import * as md5 from "ts-md5";
 
 const defaultProps: HelmAddOnProps = {
@@ -99,7 +98,7 @@ export class KarpenterV1AddOn extends HelmAddOn {
     @utils.conflictsWithAutoMode(utils.AutoModeConflictType.ALREADY_INSTALLED)
     deploy(clusterInfo: ClusterInfo): Promise<Construct> {
         assert(
-            clusterInfo.cluster instanceof Cluster || clusterInfo.clusterv2 instanceof Clusterv2,
+            clusterInfo.cluster instanceof Cluster,
             "KarpenterAddOn cannot be used with imported clusters as it requires changes to the cluster authentication."
         );
         assert(
@@ -159,7 +158,7 @@ export class KarpenterV1AddOn extends HelmAddOn {
         const detailedMonitoring = this.options.ec2NodeClassSpec?.detailedMonitoring || false;
 
         // Set up the node role and instance profile
-        const [karpenterNodeRole] = this.setUpNodeRole(cluster, stackName, region, clusterInfo.clusterv2 as Clusterv2);
+        const [karpenterNodeRole] = this.setUpNodeRole(cluster, stackName, region);
 
         // Create the controller policy
         let karpenterPolicyDocument;
@@ -357,8 +356,7 @@ export class KarpenterV1AddOn extends HelmAddOn {
     private setUpNodeRole(
         cluster: Cluster,
         stackName: string,
-        region: string,
-        clusterv2?: Clusterv2,
+        region: string
     ): [iam.Role, iam.CfnInstanceProfile] {
         // Set up Node Role
         const karpenterNodeRole = new iam.Role(cluster, "karpenter-node-role", {
@@ -408,17 +406,9 @@ export class KarpenterV1AddOn extends HelmAddOn {
             exportName: clusterId + "KarpenterInstanceProfileName",
         });
 
-        if (cluster instanceof Cluster) {
-            // Map Node Role to aws-auth
-            cluster.awsAuth.addRoleMapping(karpenterNodeRole, {
-                groups: ["system:bootstrappers", "system:nodes"],
-                username: "system:node:{{EC2PrivateDNSName}}",
-            });
-        } else if (clusterv2) {
-            clusterv2.grantAccess("KarpenterNodeRoleAccess", karpenterNodeRole.roleArn, [], {
-                accessEntryType: AccessEntryType.EC2_LINUX
-            });
-        }
+        cluster.grantAccess("KarpenterNodeRoleAccess", karpenterNodeRole.roleArn, [], {
+            accessEntryType: AccessEntryType.EC2_LINUX
+        });
 
         return [karpenterNodeRole, karpenterInstanceProfile];
     }

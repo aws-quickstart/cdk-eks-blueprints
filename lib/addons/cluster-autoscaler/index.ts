@@ -1,5 +1,5 @@
 import { CfnJson, Tags } from "aws-cdk-lib";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { assertEC2NodeGroup } from "../../cluster-providers";
@@ -51,13 +51,13 @@ const versionMap: Map<string, string> = new Map([
     [KubernetesVersion.V1_27.version, "9.33.0"],
     [KubernetesVersion.V1_26.version, "9.29.0"],
     [KubernetesVersion.V1_25.version, "9.29.0"],
-    [KubernetesVersion.V1_24.version, "9.25.0"],
-    [KubernetesVersion.V1_23.version, "9.21.0"],
-    [KubernetesVersion.V1_22.version, "9.13.1"],
-    [KubernetesVersion.V1_21.version, "9.13.1"],
-    [KubernetesVersion.V1_20.version, "9.9.2"],
-    [KubernetesVersion.V1_19.version, "9.4.0"],
-    [KubernetesVersion.V1_18.version, "9.4.0"],
+    [KubernetesVersion.of("1.24").version, "9.25.0"],
+    [KubernetesVersion.of("1.23").version, "9.21.0"],
+    [KubernetesVersion.of("1.22").version, "9.13.1"],
+    [KubernetesVersion.of("1.21").version, "9.13.1"],
+    [KubernetesVersion.of("1.20").version, "9.9.2"],
+    [KubernetesVersion.of("1.19").version, "9.4.0"],
+    [KubernetesVersion.of("1.18").version, "9.4.0"],
 ]);
 
 @supportsALL

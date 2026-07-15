@@ -4,7 +4,7 @@ import {ClusterInfo, Values} from "../../spi";
 import {conflictsWith, createNamespace as makeNamespace, supportsALL} from "../../utils";
 import {CoreAddOn, CoreAddOnProps} from "../core-addon";
 import {ebsCollectorPolicy} from "./iam-policy";
-import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
+import {KubernetesVersion} from "aws-cdk-lib/aws-eks-v2";
 
 // Can be easily retrieved from the aws cli with:
 // aws eks describe-addon-versions --kubernetes-version <kubernetes-version> --addon-name amazon-cloudwatch-observability \

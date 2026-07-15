@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { IVpc, ISubnet } from 'aws-cdk-lib/aws-ec2';
-import { ClusterLoggingTypes as ControlPlaneLogType, KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { ClusterLoggingTypes as ControlPlaneLogType, KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 import { Construct } from 'constructs';
 import { MngClusterProvider } from '../cluster-providers/mng-cluster-provider';
 import { VpcProvider } from '../resource-providers/vpc';
@@ -12,10 +12,10 @@ import { IKey } from "aws-cdk-lib/aws-kms";
 import {CreateKmsKeyProvider} from "../resource-providers/kms-key";
 import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = KubernetesVersion.V1_34;
+export const DEFAULT_VERSION = KubernetesVersion.V1_35;
 
 /**
  *  Exporting control plane log type so that customers don't have to import CDK EKS module for blueprint configuration.

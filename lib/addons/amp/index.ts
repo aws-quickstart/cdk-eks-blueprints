@@ -4,7 +4,7 @@ import { AdotCollectorAddOn } from "../adot";
 import { Construct } from 'constructs';
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
 import { CfnRuleGroupsNamespace } from "aws-cdk-lib/aws-aps";
-import { ICluster } from "aws-cdk-lib/aws-eks";
+import { ICluster } from "aws-cdk-lib/aws-eks-v2";
 
 /**
  * This AMP add-on installs an ADOT Collector for Amazon Managed Service for Prometheus 

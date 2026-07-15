@@ -6,7 +6,7 @@ import { loadYaml, readYamlDocument } from "../../utils/yaml-utils";
 
 import { Construct } from 'constructs';
 import * as batch from 'aws-cdk-lib/aws-batch';
-import * as eks from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks-v2';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { AutoScalingGroup } from "aws-cdk-lib/aws-autoscaling";
 import * as iam from "aws-cdk-lib/aws-iam";

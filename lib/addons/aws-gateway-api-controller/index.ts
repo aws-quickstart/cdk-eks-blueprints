@@ -3,7 +3,7 @@
 import { Construct } from "constructs";
 import { ClusterInfo, Values } from "../../spi";
 import { HelmAddOn, HelmAddOnUserProps } from "../helm-addon";
-import { ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { ServiceAccount } from "aws-cdk-lib/aws-eks-v2";
 import { getVpcLatticeControllerPolicy } from "./iam-policy";
 import { GatewayApiCrdsAddOn } from "../gateway-api-crds";
 import { Stack } from "aws-cdk-lib";

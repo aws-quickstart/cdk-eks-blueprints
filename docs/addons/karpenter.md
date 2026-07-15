@@ -78,7 +78,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 import { EbsDeviceVolumeType } from 'aws-cdk-lib/aws-ec2';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 
 const app = new cdk.App();
 const blueprintID = "my-stack-name"

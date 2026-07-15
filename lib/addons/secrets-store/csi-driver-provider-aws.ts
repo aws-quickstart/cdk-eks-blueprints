@@ -1,7 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import { ClusterInfo, Values } from "../../spi";
 import { loadExternalYaml } from "../../utils/yaml-utils";
-import { KubernetesManifest } from "aws-cdk-lib/aws-eks";
+import { KubernetesManifest } from "aws-cdk-lib/aws-eks-v2";
 import { SecretsStoreAddOnProps } from ".";
 import { merge } from "ts-deepmerge";
 import { HelmAddOn } from "../helm-addon";

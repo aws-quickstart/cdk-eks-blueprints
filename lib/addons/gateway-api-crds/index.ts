@@ -1,24 +1,39 @@
 // gateway-api-crds-stack.ts
 import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ICluster } from 'aws-cdk-lib/aws-eks';
+import { ICluster } from 'aws-cdk-lib/aws-eks-v2';
 import { loadExternalYaml } from '../../utils';
 import { ClusterInfo, NestedStackBuilder } from '../../spi';
 import { NestedStackAddOn, NestedStackAddOnProps } from '../nested-stack';
 
-export const GatewayCrdChannels = {
-    STANDARD: 'https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml',
-    EXPERIMENTAL: 'https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml',
-};
+export const GATEWAY_API_CRD_DEFAULT_VERSION = 'v1.5.0';
+
+export enum GatewayCrdChannel {
+    STANDARD = 'standard-install.yaml',
+    EXPERIMENTAL = 'experimental-install.yaml',
+}
+
+function gatewayApiCrdUrl(version: string, channel: GatewayCrdChannel): string {
+    return `https://github.com/kubernetes-sigs/gateway-api/releases/download/${version}/${channel}`;
+}
 
 export interface GatewayApiCrdsAddOnProps extends NestedStackProps {
+    /**
+     * The Gateway API CRD version to install (e.g. 'v1.5.0').
+     * @default 'v1.5.0'
+     */
+    version?: string;
+    /**
+     * Which channel to install: standard or experimental.
+     * @default GatewayCrdChannel.STANDARD
+     */
+    channel?: GatewayCrdChannel;
+    /**
+     * Override the full URL to the CRD YAML. Takes precedence over version/channel.
+     */
     gatewayApiCrdsUrl?: string;
     cluster?: ICluster;
 }
-
-const defaultProps: GatewayApiCrdsAddOnProps = {
-    gatewayApiCrdsUrl: GatewayCrdChannels.STANDARD
-};
 
 export class GatewayApiCrdsStack extends NestedStack {
     public readonly manifestIds: string[] = [];
@@ -31,10 +46,13 @@ export class GatewayApiCrdsStack extends NestedStack {
         }
 
         const cluster = props.cluster;
-        const url = props?.gatewayApiCrdsUrl ?? defaultProps.gatewayApiCrdsUrl;
+        const url = props?.gatewayApiCrdsUrl ?? gatewayApiCrdUrl(
+            props?.version ?? GATEWAY_API_CRD_DEFAULT_VERSION,
+            props?.channel ?? GatewayCrdChannel.STANDARD
+        );
 
         try {
-            const yamlDocuments = loadExternalYaml(url!)
+            const yamlDocuments = loadExternalYaml(url)
                 .filter((manifest: Record<string, any>) => manifest && manifest.metadata && manifest.metadata.name);
 
             yamlDocuments.forEach((manifest: Record<string, any>) => {

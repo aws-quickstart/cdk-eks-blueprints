@@ -24,7 +24,7 @@ The below usage demonstrates how to use `AutomodeBuilder` to set up EKS Auto Mod
 import * as blueprints from "@aws-quickstart/eks-blueprints";
 import { AutomodeBuilder } from "@aws-quickstart/eks-blueprints";
 import { CfnWorkspace } from "aws-cdk-lib/aws-aps";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { Construct } from "constructs";
 
 export default class AutomodeConstruct {

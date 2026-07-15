@@ -113,7 +113,6 @@ nav:
     - MNG Cluster Provider: 'cluster-providers/mng-cluster-provider.md'
     - Fargate Cluster Provider: 'cluster-providers/fargate-cluster-provider.md'
     - Import Cluster Provider: 'cluster-providers/import-cluster-provider.md'
-    - Generic Cluster Provider V2: 'cluster-providers/generic-cluster-provider-v2.md'
     - Auto Mode Cluster Provider: 'cluster-providers/automode-cluster-provider.md'
   - Resource Providers:
     - Overview: 'resource-providers/index.md'

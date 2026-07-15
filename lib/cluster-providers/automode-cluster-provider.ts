@@ -1,4 +1,4 @@
-import { defaultOptionsv2, GenericClusterProviderV2 } from "./generic-cluster-provider-v2";
+import { defaultOptions, GenericClusterProvider } from "./generic-cluster-provider";
 import * as eks from "aws-cdk-lib/aws-eks-v2";
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { AutoModeNodeClassSpec, AutoModeNodePoolSpec } from "./types";
@@ -34,11 +34,12 @@ export interface AutomodeClusterProviderProps extends Partial<eks.ClusterCommonO
 
 }
 
-export class AutomodeClusterProvider extends GenericClusterProviderV2 {
+export class AutomodeClusterProvider extends GenericClusterProvider {
 
     constructor(props?: AutomodeClusterProviderProps) {
-        super({...defaultOptionsv2, ...props, ...{
+        super({...defaultOptions, ...props, ...{
               compute: props as Pick<AutomodeClusterProviderProps, "nodePools" | "nodeRole" |"extraNodePools" | "extraNodeClasses">,
+              defaultCapacityType: eks.DefaultCapacityType.AUTOMODE
             }
         });
     }

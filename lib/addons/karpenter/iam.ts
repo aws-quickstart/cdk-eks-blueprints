@@ -1,5 +1,5 @@
 import { CfnJson } from "aws-cdk-lib";
-import { Cluster } from "aws-cdk-lib/aws-eks";
+import { Cluster } from "aws-cdk-lib/aws-eks-v2";
 
 // IAM Policy for Alpha CRD Karpenter addons
 export const KarpenterControllerPolicy = {

@@ -1,12 +1,12 @@
 import { ISecurityGroup, ISubnet } from "aws-cdk-lib/aws-ec2";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { ClusterInfo, Values } from "../../spi";
 import { loadYaml, readYamlDocument, supportsALL, conflictsWithAutoMode, AutoModeConflictType} from "../../utils";
 import { CoreAddOn, CoreAddOnProps } from "../core-addon";
 import { KubectlProvider, ManifestDeployment } from "../helm-addon/kubectl-provider";
-import { KubernetesVersion } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion } from "aws-cdk-lib/aws-eks-v2";
 
 const versionMap: Map<KubernetesVersion, string> = new Map([
   [KubernetesVersion.V1_35, "v1.21.1-eksbuild.1"],

@@ -1,4 +1,4 @@
-import { ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import { ServiceAccount } from 'aws-cdk-lib/aws-eks-v2';
 import { ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { merge } from "ts-deepmerge";

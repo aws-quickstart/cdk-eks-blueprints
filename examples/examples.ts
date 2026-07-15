@@ -3,7 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as bp from '../lib';
 import * as bcrypt from 'bcrypt';
-import { KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion, NodegroupAmiType } from 'aws-cdk-lib/aws-eks-v2';
 import { IngressNginxAddOn, AwsLoadBalancerControllerAddOn } from '../lib/addons';
 
 

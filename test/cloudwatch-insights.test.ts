@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '../lib';
 import {CloudWatchInsightsAddOnProps, Values} from "../lib";
 import {Match, Template} from "aws-cdk-lib/assertions";
-import {KubernetesVersion} from "aws-cdk-lib/aws-eks";
+import {KubernetesVersion} from "aws-cdk-lib/aws-eks-v2";
 
 const customAgentConfig: Values = {
   "agent": {
@@ -49,7 +49,7 @@ describe('Unit test for CloudWatch Addon', () => {
 
     const blueprint = await blueprints.EksBlueprint.builder()
       .account("123456789012").region('us-east-2')
-      .version(KubernetesVersion.V1_29)
+      .version(KubernetesVersion.V1_35)
       .addOns(new blueprints.CloudWatchInsights())
       .buildAsync(app, 'cloudwatch');
 

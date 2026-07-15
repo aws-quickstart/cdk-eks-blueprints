@@ -7,7 +7,7 @@ import {
     SecretProviderClass,
     SecretsStoreAddOn
 } from "../lib";
-import {ServiceAccount} from "aws-cdk-lib/aws-eks";
+import {ServiceAccount} from "aws-cdk-lib/aws-eks-v2";
 
 class TestSecretAddon implements ClusterAddOn {
     public deploy(clusterInfo: ClusterInfo): void {

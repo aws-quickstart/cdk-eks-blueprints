@@ -2,7 +2,7 @@ import { CapabilityProps, Capability } from "./capability";
 import * as cdk from "aws-cdk-lib";
 import { CapabilityType, ClusterInfo } from "../spi";
 import { CfnCapability } from "aws-cdk-lib/aws-eks";
-import * as eks from "aws-cdk-lib/aws-eks";
+import * as eks from "aws-cdk-lib/aws-eks-v2";
 import * as iam from "aws-cdk-lib/aws-iam";
 
 /**

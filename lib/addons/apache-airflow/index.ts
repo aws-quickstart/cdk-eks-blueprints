@@ -3,7 +3,7 @@ import * as assert from "assert";
 
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
-import { KubernetesManifest } from 'aws-cdk-lib/aws-eks';
+import { KubernetesManifest } from 'aws-cdk-lib/aws-eks-v2';
 import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 
 import { HelmAddOnUserProps } from "../helm-addon";

@@ -1,9 +1,10 @@
-import { CfnAddon, CfnPodIdentityAssociation, FargateCluster, ServiceAccount } from "aws-cdk-lib/aws-eks";
+import { CfnAddon, CfnPodIdentityAssociation } from "aws-cdk-lib/aws-eks";
+import { FargateCluster, ServiceAccount } from "aws-cdk-lib/aws-eks-v2";
 import { ClusterAddOn } from "../..";
 import { AutoModeAddon, ClusterInfo, Values } from "../../spi";
 import { Construct, IConstruct } from "constructs";
 import { IManagedPolicy, ManagedPolicy, PolicyDocument } from "aws-cdk-lib/aws-iam";
-import { KubernetesVersion, IdentityType } from "aws-cdk-lib/aws-eks";
+import { KubernetesVersion, IdentityType } from "aws-cdk-lib/aws-eks-v2";
 import { createServiceAccountWithPolicy, deployBeforeCapacity, logger, userLog,  } from "../../utils";
 import * as sdk from "@aws-sdk/client-eks";
 import { RemovalPolicy } from "aws-cdk-lib";

@@ -4,7 +4,7 @@ import * as blueprints from '../lib';
 import { Construct } from 'constructs';
 import { ILayerVersion } from 'aws-cdk-lib/aws-lambda';
 import { KubectlV34Layer } from '@aws-cdk/lambda-layer-kubectl-v34';
-import { KubernetesVersion } from 'aws-cdk-lib/aws-eks';
+import { KubernetesVersion } from 'aws-cdk-lib/aws-eks-v2';
 
 
 class CustomAutomodeClusterProvider extends blueprints.AutomodeClusterProvider {

@@ -27,7 +27,7 @@ npm i @instana/aws-eks-blueprint-addon
 ```
 
 ## Instana Agent Configuration
-Go to your Instana installation (Instana User Interface), click ... More > Agents > Installing Instana Agents and select 'Kubernetes' platform to get the Instana Agent Key, Instana Service Endpoint, Instana Service port. These steps are also described [here](https://www.ibm.com/docs/en/instana-observability/218?topic=instana-endpoints-keys) or in the screenshot below.
+Go to your Instana installation (Instana User Interface), click ... More > Agents > Installing Instana Agents and select 'Kubernetes' platform to get the Instana Agent Key, Instana Service Endpoint, Instana Service port. These steps are also described [here](https://www.ibm.com/docs/en/instana-observability?topic=planning-preparing-endpoints-keys) or in the screenshot below.
 
 ![Instana Agent Configuration](../assets/images/instana-agent.png)
 
