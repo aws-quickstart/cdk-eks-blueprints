@@ -49,7 +49,7 @@ export function selectKubectlLayer(scope: Construct, version: eks.KubernetesVers
         case "1.35":
             return new KubectlV35Layer(scope, "kubectllayer35");
         case "1.36":
-            return new KubectlV36Layer(scope, "kubectllayer36")
+            return new KubectlV36Layer(scope, "kubectllayer36");
 
     }
 
