@@ -18,7 +18,7 @@ By default, the framework will leverage the `MngClusterProvider` which creates a
 
 If you would like to add more node groups to a single cluster, you can leverage `GenericClusterProvider`, which allows multiple managed node groups or autoscaling (self-managed) node groups along with Fargate profiles.
 
-The version property that sets the Kubernetes Version for the Control Plane is required to be set either in the Cluster Provider, or in the Blueprint Properties.  In either spot, it can be set to a `KubernetesVersion` or `"auto"`.  If set to auto, the cluster version will be set to the latest Kubernetes Version. Auto versioning is not recommended in production clusters, as clusters will be updated as new Kubernetes versions release.
+The version property that sets the Kubernetes Version for the Control Plane is required to be set either in the Cluster Provider, or in the Blueprint Properties.  In either spot, it can be set to a `KubernetesVersion` or `"auto"`.  If set to `auto`, the cluster version is set to the framework default (`DEFAULT_VERSION`) — the latest Kubernetes version validated by EKS Blueprints (not necessarily the newest version EKS offers). Relying on `auto` is not recommended for production clusters, as the default may advance across Blueprints releases; pin an explicit `KubernetesVersion` for deterministic upgrades.
 
 ## Customizing kubectl Layers
 

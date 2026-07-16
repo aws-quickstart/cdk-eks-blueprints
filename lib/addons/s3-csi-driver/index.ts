@@ -27,6 +27,14 @@ export interface S3CSIDriverAddOnProps extends HelmAddOnUserProps {
      * Create Namespace with the provided one (will not if namespace is kube-system)
      */
     createNamespace?: boolean;
+
+    /**
+     * Override the driver container image tag. By default the Helm chart's appVersion is used
+     * (currently the latest published driver image). Set this to pin a newer patched image tag
+     * as soon as upstream publishes one (e.g. to remediate OS-package/openssl CVEs), without
+     * waiting for a chart/blueprints release.
+     */
+    imageTag?: string;
 }
 
 /**
@@ -37,7 +45,7 @@ const defaultProps: HelmAddOnUserProps & S3CSIDriverAddOnProps = {
   name: S3_CSI_DRIVER,
   namespace: "kube-system",
   release: S3_CSI_DRIVER_RELEASE,
-  version: "2.4.1",
+  version: "2.7.0",
   repository: "https://awslabs.github.io/mountpoint-s3-csi-driver",
   createNamespace: false,
   bucketNames: [],
@@ -89,5 +97,10 @@ function populateValues(helmOptions: S3CSIDriverAddOnProps): any {
     setPath(values, 'node.serviceAccount.create', true);
     setPath(values, 'controller.serviceAccount.create', true);
     setPath(values, 'node.tolerateAllTaints', true);
+    // Optional override of the driver image tag (chart appVersion is used when unset). Lets
+    // customers pin a patched image to remediate OS-package/openssl CVEs ahead of a chart bump.
+    if (helmOptions.imageTag) {
+        setPath(values, 'image.tag', helmOptions.imageTag);
+    }
     return values;
 }

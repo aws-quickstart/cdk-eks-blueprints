@@ -115,6 +115,8 @@ export default class BlueprintConstruct {
     this.addOns = [
       // pre-reqs / core addons
       new addons.VpcCniAddOn({
+        enablePrefixDelegation: true,
+        warmPrefixTarget: 1,
         customNetworkingConfig: {
           subnets: [
             blueprints.getNamedResource("secondary-cidr-subnet-0"),
@@ -325,7 +327,7 @@ export default class BlueprintConstruct {
 
 export function getClusterProvider(managedNodeGroups: ManagedNodeGroup[]) {
   return new blueprints.GenericClusterProvider({
-    version: KubernetesVersion.V1_34,
+    version: KubernetesVersion.V1_35,
     tags: {
       Name: "blueprints-example-cluster",
       Type: "generic-cluster",
@@ -343,9 +345,10 @@ export function addGenericNodeGroup(): blueprints.ManagedNodeGroup {
   return {
     id: "mng1",
     amiType: NodegroupAmiType.AL2023_X86_64_STANDARD,
-    instanceTypes: [new ec2.InstanceType("m5.4xlarge")],
-    desiredSize: 1,
-    maxSize: 1,
+    instanceTypes: [new ec2.InstanceType("m5.2xlarge")],
+    minSize: 2,
+    desiredSize: 2,
+    maxSize: 3,
     nodeRole: blueprints.getNamedResource("node-role") as iam.Role,
     nodeGroupSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
     launchTemplate: {

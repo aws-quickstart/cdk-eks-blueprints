@@ -4,6 +4,33 @@ The `eks-blueprints` framework leverages a modular approach to managing [Add-ons
 
 Within the context of the `eks-blueprints` framework, an add-on is abstracted as `ClusterAddOn` interface, and the implementation of the add-on interface can do whatever is necessary to support the desired add-on functionality. This can include applying manifests to a Kubernetes cluster or calling AWS APIs to provision new resources.
 
+## Managed Add-on Version Selection (`auto`)
+
+EKS managed add-ons (e.g. `KubeProxyAddOn`, `CoreDnsAddOn`, `VpcCniAddOn`, `EbsCsiDriverAddOn`, `AwsNetworkFlowMonitorAddOn`) accept a `version`. When left at the default value `"auto"`, the framework resolves the version for you by calling the EKS `DescribeAddonVersions` API for your cluster's Kubernetes version.
+
+By default, `"auto"` selects the **EKS default** version — the one AWS marks as `defaultVersion` for the target Kubernetes version. The EKS default is intentionally a conservative, broadly-validated build and is often **not** the newest available version.
+
+To pick up the latest security patches sooner, you can globally switch `"auto"` resolution to select the **latest** available version instead, by setting the following key in your `cdk.json` context:
+
+```json
+{
+  "context": {
+    "eks-blueprints:core-addon-version-selection": "latest"
+  }
+}
+```
+
+| Value | Behavior |
+|-------|----------|
+| `default` (or unset) | Use the EKS-recommended default version (backward-compatible behavior). |
+| `latest` | Use the newest available version for the target Kubernetes version. |
+
+Notes:
+
+- This setting only affects managed add-ons left at `version: "auto"`. Add-ons pinned to an explicit version string are unaffected.
+- `latest` trades some additional soak/validation time for newer patches; the EKS default lags the latest by design. Choose `latest` for a security-currency-first posture.
+- For full determinism you can always pin a specific version per add-on, e.g. `new blueprints.addons.KubeProxyAddOn("v1.34.6-eksbuild.13")`.
+
 Here's an improved version of the public documentation abstract with enhanced readability:
 
 ## Add-on Dependencies and Ordering in EKS Blueprints

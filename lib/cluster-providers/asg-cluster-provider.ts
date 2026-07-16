@@ -5,7 +5,7 @@ import { AutoscalingNodeGroup } from "./types";
 /**
  * Configuration options for the cluster provider.
  */
-export interface AsgClusterProviderProps extends Partial<eks.CommonClusterOptions>, AutoscalingNodeGroup {
+export interface AsgClusterProviderProps extends Partial<eks.CommonClusterOptions>, Omit<AutoscalingNodeGroup, "deletionProtection"> {
 
     /**
      * The name for the cluster.

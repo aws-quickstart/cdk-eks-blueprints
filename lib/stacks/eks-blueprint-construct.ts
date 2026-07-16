@@ -15,7 +15,7 @@ import { ArgoGitOpsFactory } from "../addons/argocd/argo-gitops-factory";
 import * as eks from "aws-cdk-lib/aws-eks";
 
 /* Default K8s version of EKS Blueprints */
-export const DEFAULT_VERSION = KubernetesVersion.V1_34;
+export const DEFAULT_VERSION = KubernetesVersion.V1_35;
 
 /**
  *  Exporting control plane log type so that customers don't have to import CDK EKS module for blueprint configuration.

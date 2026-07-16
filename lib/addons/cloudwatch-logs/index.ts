@@ -8,6 +8,15 @@ import { createNamespace } from "../../utils/namespace-utils";
 import { getCloudWatchLogsPolicyDocument } from "./iam-policy";
 
 /**
+ * Default aws-for-fluent-bit image tag. The eks-charts `aws-for-fluent-bit` chart appVersion
+ * lags the published image tags (chart 0.2.0 ships 3.2.1), so we override `image.tag` to pick
+ * up OS-package/openssl CVE fixes (e.g. ALAS2023-2026-1853). Pinned to the latest published
+ * mainline tag; override via the `imageTag` prop (or `values.image.tag`) to use another line
+ * such as the `stable` LTS release.
+ */
+const DEFAULT_FLUENT_BIT_IMAGE_TAG = "3.4.5";
+
+/**
  * Configuration options for the FluentBit add-on.
  */
 export interface CloudWatchLogsAddonProps extends HelmAddOnUserProps {
@@ -30,6 +39,13 @@ export interface CloudWatchLogsAddonProps extends HelmAddOnUserProps {
      * CloudWatch Log retention days
      */
     logRetentionDays?: number;
+
+    /**
+     * aws-for-fluent-bit container image tag to deploy. Overrides the Helm chart's default
+     * (lagging) appVersion. Defaults to the latest published mainline tag. Set this to pin a
+     * specific patched build or a different release line (e.g. the `stable` LTS tag).
+     */
+    imageTag?: string;
 }
 /**
  * Default props for the add-on.
@@ -45,6 +61,7 @@ const defaultProps: CloudWatchLogsAddonProps = {
     serviceAccountName: 'aws-fluent-bit-for-cw-sa',
     logGroupPrefix: '/aws/eks/blueprints-construct-dev', 
     logRetentionDays: 90,
+    imageTag: DEFAULT_FLUENT_BIT_IMAGE_TAG,
     values: {}
 };
 
@@ -100,6 +117,10 @@ export class CloudWatchLogsAddon extends HelmAddOn {
  */
 function populateValues(clusterInfo: ClusterInfo, helmOptions: CloudWatchLogsAddonProps): Values {
     const values = helmOptions.values ?? {};
+    // Pin the aws-for-fluent-bit image tag (the eks-charts chart appVersion lags published tags,
+    // leaving OS/openssl CVEs unpatched). Configurable via the `imageTag` prop; a user-provided
+    // values.image.tag still wins via the merge in deploy().
+    setPath(values, "image.tag", helmOptions.imageTag);
     setPath(values, "serviceAccount.name", helmOptions.serviceAccountName);
     setPath(values, "serviceAccount.create", false);
     setPath(values, "cloudWatch.enabled", false);
