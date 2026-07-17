@@ -33,8 +33,20 @@ export const KarpenterControllerPolicy = {
     ]
 };
 
-// IAM Policy for Beta CRD Karpenter addons
-export const KarpenterControllerPolicyBeta = (cluster: Cluster, partition: string, region: string) => {
+/**
+ * Builds the full (combined) scoped Karpenter controller policy document.
+ *
+ * This scoped policy is shared by the legacy v1beta1-generation addon and the stable-v1 addon
+ * (`KarpenterV1AddOn`): the controller IAM permissions did not materially change between the
+ * v1beta1 and stable-v1 CRD generations, so a single definition serves both.
+ *
+ * The document embeds the cluster name repeatedly in its tag-scoped conditions, so for clusters with
+ * long names a single combined managed policy can exceed the IAM managed-policy size quota
+ * (6,144 chars). To stay under the limit, callers can attach it as several scoped managed policies
+ * via {@link KarpenterControllerPolicyV1Groups}, mirroring upstream Karpenter
+ * (aws/karpenter-provider-aws#8690).
+ */
+const buildScopedKarpenterControllerPolicyDocument = (cluster: Cluster, partition: string, region: string) => {
     const condition1 = new CfnJson(cluster.stack, 'condition-owned-request-tag', {
         value: {
             [`aws:RequestTag/kubernetes.io/cluster/${cluster.clusterName}`]: "owned"
@@ -176,11 +188,14 @@ export const KarpenterControllerPolicyBeta = (cluster: Cluster, partition: strin
                 "Resource": "*",
                 "Action": [
                     "ec2:DescribeAvailabilityZones",
+                    "ec2:DescribeCapacityReservations",
                     "ec2:DescribeImages",
                     "ec2:DescribeInstances",
+                    "ec2:DescribeInstanceStatus",
                     "ec2:DescribeInstanceTypeOfferings",
                     "ec2:DescribeInstanceTypes",
                     "ec2:DescribeLaunchTemplates",
+                    "ec2:DescribePlacementGroups",
                     "ec2:DescribeSecurityGroups",
                     "ec2:DescribeSpotPriceHistory",
                     "ec2:DescribeSubnets"
@@ -262,9 +277,91 @@ export const KarpenterControllerPolicyBeta = (cluster: Cluster, partition: strin
                 "Effect": "Allow",
                 "Resource": `${cluster.clusterArn}`,
                 "Action": "eks:DescribeCluster"
-            }    
+            },
+            {
+                "Sid": "AllowZonalShiftStatusReadOnly",
+                "Effect": "Allow",
+                "Resource": "*",
+                "Action": [
+                    "arc-zonal-shift:GetManagedResource"
+                ],
+                "Condition": {
+                    "StringEquals": {
+                        "arc-zonal-shift:ResourceIdentifier": `${cluster.clusterArn}`
+                    }
+                }
+            }
         ]
     };
 };
 
+/**
+ * Sids that make up each named controller policy, mirroring the policy split upstream Karpenter uses
+ * (aws/karpenter-provider-aws#8690). The interruption-queue permissions are not listed here; the
+ * addon adds them separately as their own policy, and only when interruption handling is enabled.
+ */
+const KARPENTER_CONTROLLER_POLICY_SIDS = {
+    nodeLifecycle: [
+        "AllowScopedEC2InstanceActions",
+        "AllowScopedEC2InstanceActionsWithTags",
+        "AllowScopedResourceCreationTagging",
+        "AllowScopedResourceTagging",
+        "AllowScopedDeletion",
+    ],
+    iamIntegration: [
+        "AllowScopedInstanceProfileCreationActions",
+        "AllowScopedInstanceProfileTagActions",
+        "AllowScopedInstanceProfileActions",
+        "AllowInstanceProfileReadActions",
+    ],
+    eksIntegration: [
+        "AllowAPIServerEndpointDiscovery",
+    ],
+    resourceDiscovery: [
+        "AllowRegionalReadActions",
+        "AllowSSMReadActions",
+        "AllowPricingReadActions",
+    ],
+    zonalShift: [
+        "AllowZonalShiftStatusReadOnly",
+    ],
+} as const;
+
+/** Names of the scoped Karpenter controller policies (mirrors upstream's policy names). */
+export type KarpenterControllerPolicyName = keyof typeof KARPENTER_CONTROLLER_POLICY_SIDS;
+
+/**
+ * Scoped Karpenter controller policy as a single combined document. Introduced for the v1beta1 CRD
+ * generation (hence the historical `Beta` name) and still used by the legacy `KarpenterAddOn`.
+ */
+export const KarpenterControllerPolicyBeta = (cluster: Cluster, partition: string, region: string) =>
+    buildScopedKarpenterControllerPolicyDocument(cluster, partition, region);
+
+/**
+ * The same scoped controller policy, split into separate named documents — `nodeLifecycle`,
+ * `iamIntegration`, `eksIntegration`, `resourceDiscovery`, and `zonalShift` — each meant to be
+ * attached as its own managed policy. This keeps every managed policy under the IAM managed-policy
+ * size quota even for clusters with long names (the cluster name is embedded repeatedly in the
+ * tag-scoped conditions), mirroring upstream Karpenter (aws/karpenter-provider-aws#8690).
+ */
+export const KarpenterControllerPolicyV1Groups = (cluster: Cluster, partition: string, region: string): Record<KarpenterControllerPolicyName, object> => {
+    const statements = buildScopedKarpenterControllerPolicyDocument(cluster, partition, region).Statement as any[];
+    const documentFor = (sids: readonly string[]) => ({
+        "Version": "2012-10-17",
+        "Statement": statements.filter((statement) => sids.includes(statement.Sid)),
+    });
+    return {
+        nodeLifecycle: documentFor(KARPENTER_CONTROLLER_POLICY_SIDS.nodeLifecycle),
+        iamIntegration: documentFor(KARPENTER_CONTROLLER_POLICY_SIDS.iamIntegration),
+        eksIntegration: documentFor(KARPENTER_CONTROLLER_POLICY_SIDS.eksIntegration),
+        resourceDiscovery: documentFor(KARPENTER_CONTROLLER_POLICY_SIDS.resourceDiscovery),
+        zonalShift: documentFor(KARPENTER_CONTROLLER_POLICY_SIDS.zonalShift),
+    };
+};
+
+/**
+ * Alias retained for backward compatibility. The controller IAM permissions are shared between the
+ * v1beta1 and stable-v1 CRD generations. Prefer {@link KarpenterControllerPolicyV1Groups} for the
+ * stable-v1 addon so the permissions are attached as multiple size-bounded managed policies.
+ */
 export const KarpenterControllerPolicyV1 = KarpenterControllerPolicyBeta;

@@ -11,7 +11,7 @@ import { ClusterInfo } from "../../spi";
 import * as semver from "semver";
 import * as assert from "assert";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from "../helm-addon";
-import { KarpenterControllerPolicyV1 } from "./iam";
+import { KarpenterControllerPolicyV1Groups } from "./iam";
 import { Ec2NodeClassV1Spec, NodePoolV1Spec, KARPENTER, RELEASE } from "./types";
 import { Cluster as Clusterv2, AccessEntryType } from 'aws-cdk-lib/aws-eks-v2';
 import * as md5 from "ts-md5";
@@ -161,14 +161,16 @@ export class KarpenterV1AddOn extends HelmAddOn {
         // Set up the node role and instance profile
         const [karpenterNodeRole] = this.setUpNodeRole(cluster, stackName, region, clusterInfo.clusterv2 as Clusterv2);
 
-        // Create the controller policy
-        let karpenterPolicyDocument;
+        // Create the controller policies. Mirroring upstream Karpenter (aws/karpenter-provider-aws#8690),
+        // the controller permissions are attached as several small, purpose-named managed policies
+        // instead of one combined policy. The cluster name is embedded repeatedly in the tag-scoped
+        // conditions, so a single managed policy can exceed the IAM managed-policy size quota
+        // (6,144 chars) for clusters with long names; splitting keeps each policy under the limit.
+        const controllerPolicyDocuments = KarpenterControllerPolicyV1Groups(cluster, partition, region);
 
-        karpenterPolicyDocument = iam.PolicyDocument.fromJson(
-            KarpenterControllerPolicyV1(cluster, partition, region)
-        );
-
-        karpenterPolicyDocument.addStatements(
+        // iam:PassRole for the node role belongs with the IAM-integration policy.
+        const iamIntegrationDocument = iam.PolicyDocument.fromJson(controllerPolicyDocuments.iamIntegration);
+        iamIntegrationDocument.addStatements(
             new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
                 actions: ["iam:PassRole"],
@@ -176,11 +178,38 @@ export class KarpenterV1AddOn extends HelmAddOn {
             })
         );
 
-        // Support for Native spot interruption
+        const nodeLifecyclePolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-node-lifecycle-policy`, {
+            document: iam.PolicyDocument.fromJson(controllerPolicyDocuments.nodeLifecycle),
+        });
+        const iamIntegrationPolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-iam-integration-policy`, {
+            document: iamIntegrationDocument,
+        });
+        const eksIntegrationPolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-eks-integration-policy`, {
+            document: iam.PolicyDocument.fromJson(controllerPolicyDocuments.eksIntegration),
+        });
+        const resourceDiscoveryPolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-resource-discovery-policy`, {
+            document: iam.PolicyDocument.fromJson(controllerPolicyDocuments.resourceDiscovery),
+        });
+        const zonalShiftPolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-zonal-shift-policy`, {
+            document: iam.PolicyDocument.fromJson(controllerPolicyDocuments.zonalShift),
+        });
+
+        const controllerManagedPolicies: iam.IManagedPolicy[] = [
+            nodeLifecyclePolicy,
+            iamIntegrationPolicy,
+            eksIntegrationPolicy,
+            resourceDiscoveryPolicy,
+            zonalShiftPolicy,
+        ];
+
+        // Support for Native spot interruption: attach the interruption-queue permissions as their
+        // own managed policy (mirrors upstream's InterruptionPolicy), only when enabled.
         if (interruption) {
-            // Add policy to the node role to allow access to the Interruption Queue
             const interruptionQueueStatement = this.createInterruptionQueue(cluster, stackName);
-            karpenterPolicyDocument.addStatements(interruptionQueueStatement);
+            const interruptionPolicy = new iam.ManagedPolicy(cluster, `${RELEASE}-interruption-policy`, {
+                document: new iam.PolicyDocument({ statements: [interruptionQueueStatement] }),
+            });
+            controllerManagedPolicies.push(interruptionPolicy);
         }
 
         // Create Namespace
@@ -189,19 +218,22 @@ export class KarpenterV1AddOn extends HelmAddOn {
         let sa: any;
         let saAnnotation: any;
         if (podIdentity) {
-            sa = utils.podIdentityAssociation(
+            sa = utils.podIdentityAssociationWithPolicies(
                 cluster,
                 RELEASE,
                 this.options.namespace!,
-                karpenterPolicyDocument
+                ...controllerManagedPolicies
             );
             saAnnotation = {};
         } else {
-            sa = utils.createServiceAccount(
+            // identityType left as default (IRSA); the controller permissions are supplied as the
+            // named managed policies above.
+            sa = utils.createServiceAccountWithPolicy(
                 cluster,
                 RELEASE,
                 this.options.namespace!,
-                karpenterPolicyDocument
+                undefined,
+                ...controllerManagedPolicies
             );
             saAnnotation = { "eks.amazonaws.com/role-arn": sa.role.roleArn };
         }

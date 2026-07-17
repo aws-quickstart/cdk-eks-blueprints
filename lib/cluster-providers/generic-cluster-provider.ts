@@ -358,9 +358,12 @@ export class GenericClusterProvider implements ClusterProvider {
         const machineImageType = nodeGroup.machineImageType ?? eks.MachineImageType.AMAZON_LINUX_2;
         const instanceTypeContext = utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
         const instanceType = nodeGroup.instanceType ?? (typeof instanceTypeContext === 'string' ? new ec2.InstanceType(instanceTypeContext) : instanceTypeContext);
-        const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
-        const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+        // Clamp the defaulted min/desired sizes so they never exceed an explicitly smaller maxSize
+        // (e.g. a node group that only sets maxSize: 1). Explicitly-provided minSize/desiredSize are
+        // respected as-is, so genuine user misconfigurations still surface.
+        const minSize = nodeGroup.minSize ?? Math.min(utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE), maxSize);
+        const desiredSize = nodeGroup.desiredSize ?? Math.min(utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize), maxSize);
         const updatePolicy = nodeGroup.updatePolicy ?? autoscaling.UpdatePolicy.rollingUpdate();
 
         // Create an autoscaling group
@@ -398,9 +401,12 @@ export class GenericClusterProvider implements ClusterProvider {
         const instanceTypeContext = utils.valueFromContext(cluster, constants.INSTANCE_TYPE_KEY, constants.DEFAULT_INSTANCE_TYPE);
         const instanceTypes = nodeGroup.instanceTypes ?? ([typeof instanceTypeContext === 'string' ? new ec2.InstanceType(instanceTypeContext) : instanceTypeContext]);
         const amiType = nodeGroup.amiType ?? constants.DEFAULT_AMI;
-        const minSize = nodeGroup.minSize ?? utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE);
         const maxSize = nodeGroup.maxSize ?? utils.valueFromContext(cluster, constants.MAX_SIZE_KEY, constants.DEFAULT_NG_MAXSIZE);
-        const desiredSize = nodeGroup.desiredSize ?? utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize);
+        // Clamp the defaulted min/desired sizes so they never exceed an explicitly smaller maxSize
+        // (e.g. a node group that only sets maxSize: 1). Explicitly-provided minSize/desiredSize are
+        // respected as-is, so genuine user misconfigurations still surface.
+        const minSize = nodeGroup.minSize ?? Math.min(utils.valueFromContext(cluster, constants.MIN_SIZE_KEY, constants.DEFAULT_NG_MINSIZE), maxSize);
+        const desiredSize = nodeGroup.desiredSize ?? Math.min(utils.valueFromContext(cluster, constants.DESIRED_SIZE_KEY, minSize), maxSize);
 
         // Create a managed node group.
         const nodegroupOptions: utils.Writeable<eks.NodegroupOptions> = {
