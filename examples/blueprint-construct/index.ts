@@ -84,7 +84,11 @@ export default class BlueprintConstruct {
     this.nodeClassSpec = {
       amiFamily: "Bottlerocket",
       amiSelectorTerms: [
-        { alias: "bottlerocket@v1.34.0" },
+        // Use the `@latest` alias so the AMI resolves to the newest Bottlerocket build for the
+        // cluster's Kubernetes version. A pinned version (e.g. bottlerocket@v1.34.0) refers to a
+        // Bottlerocket OS release, not the K8s version, and can fail to resolve ("failed to discover
+        // any AMIs for alias") — which also breaks as the default cluster version advances.
+        { alias: "bottlerocket@latest" },
       ],
       subnetSelectorTerms: [
         { tags: { Name: `${blueprintID}/${blueprintID}-vpc/PrivateSubnet*` } },
