@@ -1,0 +1,503 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>VpcCniAddOnProps | @aws-quickstart/eks-blueprints</title><meta name="description" content="Documentation for @aws-quickstart/eks-blueprints"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">@aws-quickstart/eks-blueprints</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">VpcCniAddOnProps</a></li></ul>
+<h1>Interface VpcCniAddOnProps</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>User provided option for the Helm Chart</p>
+</div></section>
+<div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">VpcCniAddOnProps</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#additionalenitags">additionalEniTags</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#annotatepodip">annotatePodIp</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsec2endpoint">awsEc2Endpoint</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsexternalservicecidrs">awsExternalServiceCidrs</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsmanageenisnonschedulable">awsManageEnisNonSchedulable</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpccninodeportsupport">awsVpcCniNodePortSupport</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpcenimtu">awsVpcEniMtu</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scnicustomnetworkcfg">awsVpcK8sCniCustomNetworkCfg</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scniexternalsnat">awsVpcK8sCniExternalSnat</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scnilogfile">awsVpcK8sCniLogFile</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scniloglevel">awsVpcK8sCniLogLevel</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scnirandomizesnat">awsVpcK8sCniRandomizeSnat</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8scnivethprefix">awsVpcK8sCniVethPrefix</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8sexcludesnatcidrs">awsVpcK8sExcludeSnatCidrs</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8spluginlogfile">awsVpcK8sPluginLogFile</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#awsvpck8spluginloglevel">awsVpcK8sPluginLogLevel</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#branchenicooldown">branchENICooldown</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#clusterendpoint">clusterEndpoint</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#customnetworkingconfig">customNetworkingConfig</a><span class="tsd-signature-symbol">?:</span> <a href="CustomNetworkingConfig.html" class="tsd-signature-type tsd-kind-interface">CustomNetworkingConfig</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#disableintrospection">disableIntrospection</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#disableleakedenicleanup">disableLeakedEniCleanup</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#disablemetrics">disableMetrics</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#disablenetworkresourceprovisioning">disablenetworkResourceProvisioning</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#disabletcpearlydemux">disableTcpEarlyDemux</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablebandwidthplugin">enableBandwidthPlugin</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablenetworkpolicy">enableNetworkPolicy</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablenftables">enableNftables</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablepodeni">enablePodEni</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enableprefixdelegation">enablePrefixDelegation</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablev6egress">enableV6Egress</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablewindowsipam">enableWindowsIpam</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#enablewindowsprefixdelegation">enableWindowsPrefixDelegation</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#eniconfigannotationdef">eniConfigAnnotationDef</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#eniconfiglabeldef">eniConfigLabelDef</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#introspectionbindaddress">introspectionBindAddress</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#maxeni">maxEni</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#minimumiptarget">minimumIpTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#minimumwindowsiptarget">minimumWindowsIPTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#podsecuritygroupenforcingmode">podSecurityGroupEnforcingMode</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#serviceaccountpolicies">serviceAccountPolicies</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IManagedPolicy</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#version">version</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#warmenitarget">warmEniTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#warmiptarget">warmIpTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#warmprefixtarget">warmPrefixTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#warmwindowsiptarget">warmWindowsIPTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#warmwindowsprefixtarget">warmWindowsPrefixTarget</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L27">lib/addons/vpc-cni/index.ts:27</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h5 class="tsd-index-heading uppercase">Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#additionalenitags" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>additional<wbr/>Eni<wbr/>Tags?</span></a>
+<a href="#annotatepodip" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>annotate<wbr/>Pod<wbr/>Ip?</span></a>
+<a href="#awsec2endpoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Ec2<wbr/>Endpoint?</span></a>
+<a href="#awsexternalservicecidrs" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>External<wbr/>Service<wbr/>Cidrs?</span></a>
+<a href="#awsmanageenisnonschedulable" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Manage<wbr/>Enis<wbr/>Non<wbr/>Schedulable?</span></a>
+<a href="#awsvpccninodeportsupport" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>Cni<wbr/>Node<wbr/>Port<wbr/>Support?</span></a>
+<a href="#awsvpcenimtu" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>Eni<wbr/>Mtu?</span></a>
+<a href="#awsvpck8scnicustomnetworkcfg" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Custom<wbr/>Network<wbr/>Cfg?</span></a>
+<a href="#awsvpck8scniexternalsnat" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>External<wbr/>Snat?</span></a>
+<a href="#awsvpck8scnilogfile" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>File?</span></a>
+<a href="#awsvpck8scniloglevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>Level?</span></a>
+<a href="#awsvpck8scnirandomizesnat" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Randomize<wbr/>Snat?</span></a>
+<a href="#awsvpck8scnivethprefix" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Veth<wbr/>Prefix?</span></a>
+<a href="#awsvpck8sexcludesnatcidrs" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Exclude<wbr/>Snat<wbr/>Cidrs?</span></a>
+<a href="#awsvpck8spluginlogfile" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>File?</span></a>
+<a href="#awsvpck8spluginloglevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>Level?</span></a>
+<a href="#branchenicooldown" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>branch<wbr/>ENI<wbr/>Cooldown?</span></a>
+<a href="#clusterendpoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Endpoint?</span></a>
+<a href="#customnetworkingconfig" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>custom<wbr/>Networking<wbr/>Config?</span></a>
+<a href="#disableintrospection" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Introspection?</span></a>
+<a href="#disableleakedenicleanup" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Leaked<wbr/>Eni<wbr/>Cleanup?</span></a>
+<a href="#disablemetrics" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Metrics?</span></a>
+<a href="#disablenetworkresourceprovisioning" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disablenetwork<wbr/>Resource<wbr/>Provisioning?</span></a>
+<a href="#disabletcpearlydemux" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Tcp<wbr/>Early<wbr/>Demux?</span></a>
+<a href="#enablebandwidthplugin" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Bandwidth<wbr/>Plugin?</span></a>
+<a href="#enablenetworkpolicy" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Network<wbr/>Policy?</span></a>
+<a href="#enablenftables" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Nftables?</span></a>
+<a href="#enablepodeni" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Pod<wbr/>Eni?</span></a>
+<a href="#enableprefixdelegation" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Prefix<wbr/>Delegation?</span></a>
+<a href="#enablev6egress" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>V6<wbr/>Egress?</span></a>
+<a href="#enablewindowsipam" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Windows<wbr/>Ipam?</span></a>
+<a href="#enablewindowsprefixdelegation" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Windows<wbr/>Prefix<wbr/>Delegation?</span></a>
+<a href="#eniconfigannotationdef" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>eni<wbr/>Config<wbr/>Annotation<wbr/>Def?</span></a>
+<a href="#eniconfiglabeldef" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>eni<wbr/>Config<wbr/>Label<wbr/>Def?</span></a>
+<a href="#introspectionbindaddress" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>introspection<wbr/>Bind<wbr/>Address?</span></a>
+<a href="#maxeni" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>max<wbr/>Eni?</span></a>
+<a href="#minimumiptarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>minimum<wbr/>Ip<wbr/>Target?</span></a>
+<a href="#minimumwindowsiptarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>minimum<wbr/>Windows<wbr/>IP<wbr/>Target?</span></a>
+<a href="#podsecuritygroupenforcingmode" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>pod<wbr/>Security<wbr/>Group<wbr/>Enforcing<wbr/>Mode?</span></a>
+<a href="#serviceaccountpolicies" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>service<wbr/>Account<wbr/>Policies?</span></a>
+<a href="#version" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>version?</span></a>
+<a href="#warmenitarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Eni<wbr/>Target?</span></a>
+<a href="#warmiptarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Ip<wbr/>Target?</span></a>
+<a href="#warmprefixtarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Prefix<wbr/>Target?</span></a>
+<a href="#warmwindowsiptarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Windows<wbr/>IP<wbr/>Target?</span></a>
+<a href="#warmwindowsprefixtarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Windows<wbr/>Prefix<wbr/>Target?</span></a>
+</div></section></div></details></section></section>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="additionalenitags"><code class="tsd-tag">Optional</code><span>additional<wbr/>Eni<wbr/>Tags</span><a href="#additionalenitags" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">additionalEniTags</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ADDITIONAL_ENI_TAGS</code> Environment Variable. Type: String.
+Metadata applied to ENI helps you categorize and organize your
+resources for billing or other purposes.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L34">lib/addons/vpc-cni/index.ts:34</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="annotatepodip"><code class="tsd-tag">Optional</code><span>annotate<wbr/>Pod<wbr/>Ip</span><a href="#annotatepodip" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">annotatePodIp</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ANNOTATE_POD_IP</code> Environment Variable. Type: Boolean.
+Setting ANNOTATE_POD_IP to true will allow IPAMD to add an annotation
+<a href="http://vpc.amazonaws.com/pod-ips">vpc.amazonaws.com/pod-ips</a> to the pod with pod IP.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L41">lib/addons/vpc-cni/index.ts:41</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsec2endpoint"><code class="tsd-tag">Optional</code><span>aws<wbr/>Ec2<wbr/>Endpoint</span><a href="#awsec2endpoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsEc2Endpoint</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_EC2_ENDPOINT</code> Environment Variable. Type: string.
+Specifies the EC2 endpoint to use. This is useful if you
+are using a custom endpoint for EC2.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L48">lib/addons/vpc-cni/index.ts:48</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsexternalservicecidrs"><code class="tsd-tag">Optional</code><span>aws<wbr/>External<wbr/>Service<wbr/>Cidrs</span><a href="#awsexternalservicecidrs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsExternalServiceCidrs</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_EXTERNAL_SERVICE_CIDRS</code> Environment Variable. Type: string.
+Specify a comma-separated list of IPv4 CIDRs that must be routed
+via main routing table. This is required for secondary ENIs to reach
+endpoints outside of VPC that are backed by a service.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L56">lib/addons/vpc-cni/index.ts:56</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsmanageenisnonschedulable"><code class="tsd-tag">Optional</code><span>aws<wbr/>Manage<wbr/>Enis<wbr/>Non<wbr/>Schedulable</span><a href="#awsmanageenisnonschedulable" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsManageEnisNonSchedulable</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_MANAGE_ENIS_NON_SCHEDULABLE</code> Environment Variable. Type: Boolean.
+Specifies whether IPAMD should allocate or deallocate ENIs on a non-schedulable
+node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L63">lib/addons/vpc-cni/index.ts:63</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpccninodeportsupport"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>Cni<wbr/>Node<wbr/>Port<wbr/>Support</span><a href="#awsvpccninodeportsupport" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcCniNodePortSupport</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_CNI_NODE_PORT_SUPPORT</code> Environment Variable. Type: Boolean.
+Specifies whether NodePort services are enabled on a worker node's primary
+network interface.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L70">lib/addons/vpc-cni/index.ts:70</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpcenimtu"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>Eni<wbr/>Mtu</span><a href="#awsvpcenimtu" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcEniMtu</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_ENI_MTU</code> Environment Variable. Type: Integer.
+Used to configure the MTU size for attached ENIs. The valid range is
+from 576 to 9001.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L77">lib/addons/vpc-cni/index.ts:77</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scnicustomnetworkcfg"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Custom<wbr/>Network<wbr/>Cfg</span><a href="#awsvpck8scnicustomnetworkcfg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniCustomNetworkCfg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG</code> Environment Variable. Type: Boolean.
+Specifies that your pods may use subnets and security groups that are
+independent of your worker node's VPC configuration.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L84">lib/addons/vpc-cni/index.ts:84</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scniexternalsnat"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>External<wbr/>Snat</span><a href="#awsvpck8scniexternalsnat" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniExternalSnat</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_EXTERNALSNAT</code> Environment Variable. Type: Boolean.
+Specifies whether an external NAT gateway should be used to provide SNAT
+of secondary ENI IP addresses.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L124">lib/addons/vpc-cni/index.ts:124</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scnilogfile"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>File</span><a href="#awsvpck8scnilogfile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniLogFile</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_LOG_FILE</code> Environment Variable. Type: String.
+Specifies where to write the logging output of ipamd. Either to stdout
+or to override the default file (i.e., /var/log/aws-routed-eni/ipamd.log).</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L110">lib/addons/vpc-cni/index.ts:110</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scniloglevel"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>Level</span><a href="#awsvpck8scniloglevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniLogLevel</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_LOGLEVEL</code> Environment Variable. Type: String.
+Specifies the loglevel for ipamd and cni-metric-helper.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L103">lib/addons/vpc-cni/index.ts:103</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scnirandomizesnat"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Randomize<wbr/>Snat</span><a href="#awsvpck8scnirandomizesnat" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniRandomizeSnat</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_RANDOMIZESNAT</code> Environment Variable. Type: String.
+Specifies whether the SNAT iptables rule should randomize the outgoing
+ports for connections.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L117">lib/addons/vpc-cni/index.ts:117</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8scnivethprefix"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Veth<wbr/>Prefix</span><a href="#awsvpck8scnivethprefix" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sCniVethPrefix</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_VETHPREFIX</code> Environment Variable. Type: String.
+Specifies the veth prefix used to generate the host-side veth device name
+for the CNI.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L91">lib/addons/vpc-cni/index.ts:91</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8sexcludesnatcidrs"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Exclude<wbr/>Snat<wbr/>Cidrs</span><a href="#awsvpck8sexcludesnatcidrs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sExcludeSnatCidrs</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_CNI_EXCLUDE_SNAT_CIDRS</code> Environment Variable. Type: String.
+Specify a comma-separated list of IPv4 CIDRs to exclude from SNAT.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L97">lib/addons/vpc-cni/index.ts:97</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8spluginlogfile"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>File</span><a href="#awsvpck8spluginlogfile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sPluginLogFile</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_PLUGIN_LOG_FILE</code> Environment Variable. Type: String.
+Specifies where to write the logging output for aws-cni plugin.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L130">lib/addons/vpc-cni/index.ts:130</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="awsvpck8spluginloglevel"><code class="tsd-tag">Optional</code><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>Level</span><a href="#awsvpck8spluginloglevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">awsVpcK8sPluginLogLevel</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>AWS_VPC_K8S_PLUGIN_LOG_LEVEL</code> Environment Variable. Type: String.
+Specifies the loglevel for aws-cni plugin.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L136">lib/addons/vpc-cni/index.ts:136</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="branchenicooldown"><code class="tsd-tag">Optional</code><span>branch<wbr/>ENI<wbr/>Cooldown</span><a href="#branchenicooldown" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">branchENICooldown</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>branch-eni-cooldown</code> value in amazon-vpc-cni config map. Format integer.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L334">lib/addons/vpc-cni/index.ts:334</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="clusterendpoint"><code class="tsd-tag">Optional</code><span>cluster<wbr/>Endpoint</span><a href="#clusterendpoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">clusterEndpoint</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>CLUSTER_ENDPOINT</code> Environment Variable. Type: String.
+Specifies the cluster endpoint to use for connecting to
+the api-server without relying on kube-proxy.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L143">lib/addons/vpc-cni/index.ts:143</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="customnetworkingconfig"><code class="tsd-tag">Optional</code><span>custom<wbr/>Networking<wbr/>Config</span><a href="#customnetworkingconfig" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">customNetworkingConfig</span><span class="tsd-signature-symbol">?:</span> <a href="CustomNetworkingConfig.html" class="tsd-signature-type tsd-kind-interface">CustomNetworkingConfig</a></div>
+<div class="tsd-comment tsd-typography"><p>CustomNetworkingConfig holding Secondary Subnet IDs for creating <code>ENIConfig</code></p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L148">lib/addons/vpc-cni/index.ts:148</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="disableintrospection"><code class="tsd-tag">Optional</code><span>disable<wbr/>Introspection</span><a href="#disableintrospection" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">disableIntrospection</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>DISABLE_INTROSPECTION</code> Environment Variable. Type: Boolean.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L158">lib/addons/vpc-cni/index.ts:158</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="disableleakedenicleanup"><code class="tsd-tag">Optional</code><span>disable<wbr/>Leaked<wbr/>Eni<wbr/>Cleanup</span><a href="#disableleakedenicleanup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">disableLeakedEniCleanup</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>DISABLE_LEAKED_ENI_CLEANUP</code> Environment Variable. Type: Boolean.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L153">lib/addons/vpc-cni/index.ts:153</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="disablemetrics"><code class="tsd-tag">Optional</code><span>disable<wbr/>Metrics</span><a href="#disablemetrics" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">disableMetrics</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>DISABLE_METRICS</code> Environment Variable. Type: Boolean.
+Specifies whether the prometheus metrics endpoint is disabled or not for
+ipamd. By default metrics are published on :61678/metrics.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L165">lib/addons/vpc-cni/index.ts:165</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="disablenetworkresourceprovisioning"><code class="tsd-tag">Optional</code><span>disablenetwork<wbr/>Resource<wbr/>Provisioning</span><a href="#disablenetworkresourceprovisioning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">disablenetworkResourceProvisioning</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>DISABLE_NETWORK_RESOURCE_PROVISIONING</code> Environment Variable. Type: Boolean.
+Setting DISABLE_NETWORK_RESOURCE_PROVISIONING to true will make IPAMD
+depend only on IMDS to get attached ENIs and IPs/prefixes.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L172">lib/addons/vpc-cni/index.ts:172</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="disabletcpearlydemux"><code class="tsd-tag">Optional</code><span>disable<wbr/>Tcp<wbr/>Early<wbr/>Demux</span><a href="#disabletcpearlydemux" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">disableTcpEarlyDemux</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>DISABLE_TCP_EARLY_DEMUX</code> Environment Variable. Type: Boolean.
+If ENABLE_POD_ENI is set to true, for the kubelet to connect via TCP
+to pods that are using per pod security groups, DISABLE_TCP_EARLY_DEMUX
+should be set to true for amazon-k8s-cni-init the container under initcontainers.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L180">lib/addons/vpc-cni/index.ts:180</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablebandwidthplugin"><code class="tsd-tag">Optional</code><span>enable<wbr/>Bandwidth<wbr/>Plugin</span><a href="#enablebandwidthplugin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableBandwidthPlugin</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENABLE_BANDWIDTH_PLUGIN</code> Environment Variable. Type: Boolean.
+Setting ENABLE_BANDWIDTH_PLUGIN to true will update 10-aws.conflist to
+include upstream bandwidth plugin as a chained plugin.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L187">lib/addons/vpc-cni/index.ts:187</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablenetworkpolicy"><code class="tsd-tag">Optional</code><span>enable<wbr/>Network<wbr/>Policy</span><a href="#enablenetworkpolicy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableNetworkPolicy</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Enable kubernetes network policy in the VPC CNI introduced in vpc-cni 1.14
+More informaton on official AWS documentation: <a href="https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html">https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html</a></p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L297">lib/addons/vpc-cni/index.ts:297</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablenftables"><code class="tsd-tag">Optional</code><span>enable<wbr/>Nftables</span><a href="#enablenftables" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableNftables</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENABLE_NFTABLES</code> Environment Variable. Type: Boolean.
+VPC CNI uses iptables-legacy by default. Setting ENABLE_NFTABLES
+to true will update VPC CNI to use iptables-nft</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L194">lib/addons/vpc-cni/index.ts:194</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablepodeni"><code class="tsd-tag">Optional</code><span>enable<wbr/>Pod<wbr/>Eni</span><a href="#enablepodeni" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enablePodEni</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENABLE_POD_ENI</code> Environment Variable. Type: Boolean.
+Setting ENABLE_POD_ENI to true will allow IPAMD to add the
+<a href="http://vpc.amazonaws.com/has-trunk-attached">vpc.amazonaws.com/has-trunk-attached</a> label to the node if the instance
+has the capacity to attach an additional ENI.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L202">lib/addons/vpc-cni/index.ts:202</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enableprefixdelegation"><code class="tsd-tag">Optional</code><span>enable<wbr/>Prefix<wbr/>Delegation</span><a href="#enableprefixdelegation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enablePrefixDelegation</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENABLE_PREFIX_DELEGATION</code> Environment Variable. Type: Boolean.
+To enable prefix delegation on nitro instances. Setting
+ENABLE_PREFIX_DELEGATION to true will start allocating a prefix (/28 for IPv4 and /80 for IPv6) instead of a secondary IP in the ENIs subnet.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L209">lib/addons/vpc-cni/index.ts:209</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablev6egress"><code class="tsd-tag">Optional</code><span>enable<wbr/>V6<wbr/>Egress</span><a href="#enablev6egress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableV6Egress</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENABLE_V6_EGRESS</code> Environment Variable. Type: Boolean.
+Specifies whether PODs in an IPv4 cluster support IPv6 egress.
+If env is set to true, range fd00::ac:00/118 is reserved for IPv6 egress.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L216">lib/addons/vpc-cni/index.ts:216</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablewindowsipam"><code class="tsd-tag">Optional</code><span>enable<wbr/>Windows<wbr/>Ipam</span><a href="#enablewindowsipam" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableWindowsIpam</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Enable windows support for your cluster</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L303">lib/addons/vpc-cni/index.ts:303</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="enablewindowsprefixdelegation"><code class="tsd-tag">Optional</code><span>enable<wbr/>Windows<wbr/>Prefix<wbr/>Delegation</span><a href="#enablewindowsprefixdelegation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">enableWindowsPrefixDelegation</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Enable prefix delegation for Windows nodes</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L308">lib/addons/vpc-cni/index.ts:308</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="eniconfigannotationdef"><code class="tsd-tag">Optional</code><span>eni<wbr/>Config<wbr/>Annotation<wbr/>Def</span><a href="#eniconfigannotationdef" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">eniConfigAnnotationDef</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENI_CONFIG_ANNOTATION_DEF</code> Environment Variable. Type: String.
+Specifies node annotation key name. This should be used when
+AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L230">lib/addons/vpc-cni/index.ts:230</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="eniconfiglabeldef"><code class="tsd-tag">Optional</code><span>eni<wbr/>Config<wbr/>Label<wbr/>Def</span><a href="#eniconfiglabeldef" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">eniConfigLabelDef</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>ENI_CONFIG_LABEL_DEF</code> Environment Variable. Type: String.
+Specifies node label key name. This should be used when
+AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L223">lib/addons/vpc-cni/index.ts:223</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="introspectionbindaddress"><code class="tsd-tag">Optional</code><span>introspection<wbr/>Bind<wbr/>Address</span><a href="#introspectionbindaddress" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">introspectionBindAddress</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>INTROSPECTION_BIND_ADDRESS</code> Environment Variable. Type: String.
+Specifies the bind address for the introspection endpoint.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L236">lib/addons/vpc-cni/index.ts:236</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="maxeni"><code class="tsd-tag">Optional</code><span>max<wbr/>Eni</span><a href="#maxeni" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">maxEni</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>MAX_ENI</code> Environment Variable. Format integer.
+Specifies the maximum number of ENIs that will be attached to the node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L242">lib/addons/vpc-cni/index.ts:242</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="minimumiptarget"><code class="tsd-tag">Optional</code><span>minimum<wbr/>Ip<wbr/>Target</span><a href="#minimumiptarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">minimumIpTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>MINIMUM_IP_TARGET</code> Environment Variable. Format integer.
+Specifies the number of total IP addresses that the ipamd
+daemon should attempt to allocate for pod assignment on the node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L249">lib/addons/vpc-cni/index.ts:249</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="minimumwindowsiptarget"><code class="tsd-tag">Optional</code><span>minimum<wbr/>Windows<wbr/>IP<wbr/>Target</span><a href="#minimumwindowsiptarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">minimumWindowsIPTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>minimum-ip-target</code> value in amazon-vpc-cni config map. Format integer.
+Specifies the number of total IP addresses that the ipamd
+daemon should attempt to allocate for pod assignment on a Windows nodes.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L329">lib/addons/vpc-cni/index.ts:329</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="podsecuritygroupenforcingmode"><code class="tsd-tag">Optional</code><span>pod<wbr/>Security<wbr/>Group<wbr/>Enforcing<wbr/>Mode</span><a href="#podsecuritygroupenforcingmode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">podSecurityGroupEnforcingMode</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p><code>POD_SECURITY_GROUP_ENFORCING_MODE</code> Environment Variable. Type: String.
+Once ENABLE_POD_ENI is set to true, this value controls how the traffic
+of pods with the security group behaves.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L256">lib/addons/vpc-cni/index.ts:256</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="serviceaccountpolicies"><code class="tsd-tag">Optional</code><span>service<wbr/>Account<wbr/>Policies</span><a href="#serviceaccountpolicies" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">serviceAccountPolicies</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IManagedPolicy</span><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>If specified, an IRSA account will be created for the VPC-CNI add-on with the IRSA role
+having the specified managed policies. When specified, the node role for the cluster provider can be configured
+without the CNI policy.</p>
+<p>For IPv4 the required managed policy is AmazonEKS_CNI_Policy.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-example">
+<h4 class="tsd-anchor-link" id="example">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-11">serviceAccountPolicies</span><span class="hl-1">: [</span><span class="hl-6">ManagedPolicy</span><span class="hl-1">.</span><span class="hl-0">fromAwsManagedPolicyName</span><span class="hl-1">(</span><span class="hl-4">&quot;AmazonEKS_CNI_Policy&quot;</span><span class="hl-1">)]</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L290">lib/addons/vpc-cni/index.ts:290</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="version"><code class="tsd-tag">Optional</code><span>version</span><a href="#version" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">version</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Version of the add-on to use. Must match the version of the cluster where it
+will be deployed.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L341">lib/addons/vpc-cni/index.ts:341</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="warmenitarget"><code class="tsd-tag">Optional</code><span>warm<wbr/>Eni<wbr/>Target</span><a href="#warmenitarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">warmEniTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>WARM_ENI_TARGET</code> Environment Variable. Format integer.
+Specifies the number of free elastic network interfaces (and all of their
+available IP addresses) that the ipamd daemon should attempt to keep
+available for pod assignment on the node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L264">lib/addons/vpc-cni/index.ts:264</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="warmiptarget"><code class="tsd-tag">Optional</code><span>warm<wbr/>Ip<wbr/>Target</span><a href="#warmiptarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">warmIpTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>WARM_IP_TARGET</code> Environment Variable. Format integer.
+Specifies the number of free IP addresses that the ipamd daemon
+should attempt to keep available for pod assignment on the node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L271">lib/addons/vpc-cni/index.ts:271</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="warmprefixtarget"><code class="tsd-tag">Optional</code><span>warm<wbr/>Prefix<wbr/>Target</span><a href="#warmprefixtarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">warmPrefixTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>WARM_PREFIX_TARGET</code> Environment Variable. Format integer.
+Specifies the number of free IPv4(/28) prefixes that the ipamd daemon
+should attempt to keep available for pod assignment on the node.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L278">lib/addons/vpc-cni/index.ts:278</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="warmwindowsiptarget"><code class="tsd-tag">Optional</code><span>warm<wbr/>Windows<wbr/>IP<wbr/>Target</span><a href="#warmwindowsiptarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">warmWindowsIPTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>warm-ip-target</code> value in amazon-vpc-cni config map. Format integer.
+Specifies the number of free IP addresses that the ipamd daemon
+should attempt to keep available for pod assignment on Windows nodes.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L322">lib/addons/vpc-cni/index.ts:322</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="warmwindowsprefixtarget"><code class="tsd-tag">Optional</code><span>warm<wbr/>Windows<wbr/>Prefix<wbr/>Target</span><a href="#warmwindowsprefixtarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">warmWindowsPrefixTarget</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p><code>warm-prefix-target</code> value in amazon-vpc-cni config map. Format integer.
+Specifies the number of free IPv4(/28) prefixes that the ipamd daemon
+should attempt to keep available for pod assignment on Windows nodes.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/addons/vpc-cni/index.ts#L315">lib/addons/vpc-cni/index.ts:315</a></li></ul></aside></section></section></details></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
+<div><a href="#additionalenitags"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>additional<wbr/>Eni<wbr/>Tags</span></a><a href="#annotatepodip"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>annotate<wbr/>Pod<wbr/>Ip</span></a><a href="#awsec2endpoint"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Ec2<wbr/>Endpoint</span></a><a href="#awsexternalservicecidrs"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>External<wbr/>Service<wbr/>Cidrs</span></a><a href="#awsmanageenisnonschedulable"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Manage<wbr/>Enis<wbr/>Non<wbr/>Schedulable</span></a><a href="#awsvpccninodeportsupport"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>Cni<wbr/>Node<wbr/>Port<wbr/>Support</span></a><a href="#awsvpcenimtu"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>Eni<wbr/>Mtu</span></a><a href="#awsvpck8scnicustomnetworkcfg"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Custom<wbr/>Network<wbr/>Cfg</span></a><a href="#awsvpck8scniexternalsnat"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>External<wbr/>Snat</span></a><a href="#awsvpck8scnilogfile"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>File</span></a><a href="#awsvpck8scniloglevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Log<wbr/>Level</span></a><a href="#awsvpck8scnirandomizesnat"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Randomize<wbr/>Snat</span></a><a href="#awsvpck8scnivethprefix"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Cni<wbr/>Veth<wbr/>Prefix</span></a><a href="#awsvpck8sexcludesnatcidrs"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Exclude<wbr/>Snat<wbr/>Cidrs</span></a><a href="#awsvpck8spluginlogfile"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>File</span></a><a href="#awsvpck8spluginloglevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>aws<wbr/>Vpc<wbr/>K8s<wbr/>Plugin<wbr/>Log<wbr/>Level</span></a><a href="#branchenicooldown"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>branch<wbr/>ENI<wbr/>Cooldown</span></a><a href="#clusterendpoint"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Endpoint</span></a><a href="#customnetworkingconfig"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>custom<wbr/>Networking<wbr/>Config</span></a><a href="#disableintrospection"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Introspection</span></a><a href="#disableleakedenicleanup"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Leaked<wbr/>Eni<wbr/>Cleanup</span></a><a href="#disablemetrics"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Metrics</span></a><a href="#disablenetworkresourceprovisioning"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disablenetwork<wbr/>Resource<wbr/>Provisioning</span></a><a href="#disabletcpearlydemux"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>disable<wbr/>Tcp<wbr/>Early<wbr/>Demux</span></a><a href="#enablebandwidthplugin"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Bandwidth<wbr/>Plugin</span></a><a href="#enablenetworkpolicy"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Network<wbr/>Policy</span></a><a href="#enablenftables"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Nftables</span></a><a href="#enablepodeni"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Pod<wbr/>Eni</span></a><a href="#enableprefixdelegation"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Prefix<wbr/>Delegation</span></a><a href="#enablev6egress"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>V6<wbr/>Egress</span></a><a href="#enablewindowsipam"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Windows<wbr/>Ipam</span></a><a href="#enablewindowsprefixdelegation"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>enable<wbr/>Windows<wbr/>Prefix<wbr/>Delegation</span></a><a href="#eniconfigannotationdef"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>eni<wbr/>Config<wbr/>Annotation<wbr/>Def</span></a><a href="#eniconfiglabeldef"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>eni<wbr/>Config<wbr/>Label<wbr/>Def</span></a><a href="#introspectionbindaddress"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>introspection<wbr/>Bind<wbr/>Address</span></a><a href="#maxeni"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>max<wbr/>Eni</span></a><a href="#minimumiptarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>minimum<wbr/>Ip<wbr/>Target</span></a><a href="#minimumwindowsiptarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>minimum<wbr/>Windows<wbr/>IP<wbr/>Target</span></a><a href="#podsecuritygroupenforcingmode"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>pod<wbr/>Security<wbr/>Group<wbr/>Enforcing<wbr/>Mode</span></a><a href="#serviceaccountpolicies"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>service<wbr/>Account<wbr/>Policies</span></a><a href="#version"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>version</span></a><a href="#warmenitarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Eni<wbr/>Target</span></a><a href="#warmiptarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Ip<wbr/>Target</span></a><a href="#warmprefixtarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Prefix<wbr/>Target</span></a><a href="#warmwindowsiptarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Windows<wbr/>IP<wbr/>Target</span></a><a href="#warmwindowsprefixtarget"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>warm<wbr/>Windows<wbr/>Prefix<wbr/>Target</span></a></div></details></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">@aws-quickstart/eks-blueprints</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

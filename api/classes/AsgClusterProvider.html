@@ -1,0 +1,207 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>AsgClusterProvider | @aws-quickstart/eks-blueprints</title><meta name="description" content="Documentation for @aws-quickstart/eks-blueprints"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">@aws-quickstart/eks-blueprints</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">AsgClusterProvider</a></li></ul>
+<h1>Class AsgClusterProvider</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>AsgClusterProvider provisions an EKS cluster with an autoscaling group for self-managed capacity.</p>
+</div></section>
+<section class="tsd-panel tsd-hierarchy" data-refl="4557">
+<h4>Hierarchy (<a href="../hierarchy.html#AsgClusterProvider">View Summary</a>)</h4>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><a href="GenericClusterProvider.html" class="tsd-signature-type tsd-kind-class">GenericClusterProvider</a>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">AsgClusterProvider</span></li></ul></li></ul></section><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/asg-cluster-provider.ts#L40">lib/cluster-providers/asg-cluster-provider.ts:40</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h5 class="tsd-index-heading uppercase">Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="constructors">Constructors<a href="#constructors" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#props" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>props</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="methods">Methods<a href="#methods" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#addautoscalinggroup" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Auto<wbr/>Scaling<wbr/>Group</span></a>
+<a href="#addfargateprofile" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Fargate<wbr/>Profile</span></a>
+<a href="#addmanagednodegroup" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Managed<wbr/>Node<wbr/>Group</span></a>
+<a href="#createcluster" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Cluster</span></a>
+<a href="#getkubectllayer" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Kubectl<wbr/>Layer</span></a>
+<a href="#internalcreatecluster" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>internal<wbr/>Create<wbr/>Cluster</span></a>
+</div></section></div></details></section></section>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="constructors-1">Constructors<a href="#constructors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="constructor"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="constructorasgclusterprovider"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">AsgClusterProvider</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">props</span><span class="tsd-signature-symbol">?:</span> <a href="../interfaces/AsgClusterProviderProps.html" class="tsd-signature-type tsd-kind-interface">AsgClusterProviderProps</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">AsgClusterProvider</a><a href="#constructorasgclusterprovider" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">props</span>: <a href="../interfaces/AsgClusterProviderProps.html" class="tsd-signature-type tsd-kind-interface">AsgClusterProviderProps</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">AsgClusterProvider</a></h4><aside class="tsd-sources">
+<p>Overrides <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#constructor">constructor</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/asg-cluster-provider.ts#L42">lib/cluster-providers/asg-cluster-provider.ts:42</a></li></ul></aside></div></li></ul></section></section></details>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="props"><code class="tsd-tag">Readonly</code><span>props</span><a href="#props" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">props</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/GenericClusterProviderProps.html" class="tsd-signature-type tsd-kind-interface">GenericClusterProviderProps</a></div><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#props">props</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L246">lib/cluster-providers/generic-cluster-provider.ts:246</a></li></ul></aside></section></section></details>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="addautoscalinggroup"><span>add<wbr/>Auto<wbr/>Scaling<wbr/>Group</span><a href="#addautoscalinggroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="addautoscalinggroup-1"><span class="tsd-kind-call-signature">addAutoScalingGroup</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">cluster</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Cluster</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">nodeGroup</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/AutoscalingNodeGroup.html" class="tsd-signature-type tsd-kind-interface">AutoscalingNodeGroup</a><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AutoScalingGroup</span><a href="#addautoscalinggroup-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Adds an autoscaling group to the cluster.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">cluster</span>: <span class="tsd-signature-type">Cluster</span></span></li>
+<li><span><span class="tsd-kind-parameter">nodeGroup</span>: <a href="../interfaces/AutoscalingNodeGroup.html" class="tsd-signature-type tsd-kind-interface">AutoscalingNodeGroup</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AutoScalingGroup</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#addautoscalinggroup">addAutoScalingGroup</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L357">lib/cluster-providers/generic-cluster-provider.ts:357</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="addfargateprofile"><span>add<wbr/>Fargate<wbr/>Profile</span><a href="#addfargateprofile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="addfargateprofile-1"><span class="tsd-kind-call-signature">addFargateProfile</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">cluster</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Cluster</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">profileOptions</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">FargateProfileOptions</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">FargateProfile</span><a href="#addfargateprofile-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Adds a fargate profile to the cluster</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">cluster</span>: <span class="tsd-signature-type">Cluster</span></span></li>
+<li><span><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">profileOptions</span>: <span class="tsd-signature-type">FargateProfileOptions</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">FargateProfile</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#addfargateprofile">addFargateProfile</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L388">lib/cluster-providers/generic-cluster-provider.ts:388</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="addmanagednodegroup"><span>add<wbr/>Managed<wbr/>Node<wbr/>Group</span><a href="#addmanagednodegroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="addmanagednodegroup-1"><span class="tsd-kind-call-signature">addManagedNodeGroup</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">cluster</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Cluster</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">nodeGroup</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/ManagedNodeGroup.html" class="tsd-signature-type tsd-kind-interface">ManagedNodeGroup</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Nodegroup</span><a href="#addmanagednodegroup-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Adds a managed node group to the cluster.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">cluster</span>: <span class="tsd-signature-type">Cluster</span></span></li>
+<li><span><span class="tsd-kind-parameter">nodeGroup</span>: <a href="../interfaces/ManagedNodeGroup.html" class="tsd-signature-type tsd-kind-interface">ManagedNodeGroup</a></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Nodegroup</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#addmanagednodegroup">addManagedNodeGroup</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L398">lib/cluster-providers/generic-cluster-provider.ts:398</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="createcluster"><span>create<wbr/>Cluster</span><a href="#createcluster" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="createcluster-1"><span class="tsd-kind-call-signature">createCluster</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">scope</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Construct</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">vpc</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">IVpc</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">secretsEncryptionKey</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IKey</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">kubernetesVersion</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">KubernetesVersion</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">clusterLogging</span><span class="tsd-signature-symbol">?:</span> <a href="../enums/ControlPlaneLogType.html" class="tsd-signature-type tsd-kind-enum">ControlPlaneLogType</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">ipFamily</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IpFamily</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <a href="ClusterInfo.html" class="tsd-signature-type tsd-kind-class">ClusterInfo</a><a href="#createcluster-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">scope</span>: <span class="tsd-signature-type">Construct</span></span></li>
+<li><span><span class="tsd-kind-parameter">vpc</span>: <span class="tsd-signature-type">IVpc</span></span></li>
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">secretsEncryptionKey</span>: <span class="tsd-signature-type">IKey</span></span></li>
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">kubernetesVersion</span>: <span class="tsd-signature-type">KubernetesVersion</span></span></li>
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">clusterLogging</span>: <a href="../enums/ControlPlaneLogType.html" class="tsd-signature-type tsd-kind-enum">ControlPlaneLogType</a><span class="tsd-signature-symbol">[]</span></span></li>
+<li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">ipFamily</span>: <span class="tsd-signature-type">IpFamily</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="ClusterInfo.html" class="tsd-signature-type tsd-kind-class">ClusterInfo</a></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#createcluster">createCluster</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L258">lib/cluster-providers/generic-cluster-provider.ts:258</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="getkubectllayer"><code class="tsd-tag">Protected</code><span>get<wbr/>Kubectl<wbr/>Layer</span><a href="#getkubectllayer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="getkubectllayer-1"><span class="tsd-kind-call-signature">getKubectlLayer</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">scope</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Construct</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">version</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">KubernetesVersion</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ILayerVersion</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">undefined</span><a href="#getkubectllayer-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Can be overridden to provide a custom kubectl layer.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">scope</span>: <span class="tsd-signature-type">Construct</span></span></li>
+<li><span><span class="tsd-kind-parameter">version</span>: <span class="tsd-signature-type">KubernetesVersion</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ILayerVersion</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">undefined</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#getkubectllayer">getKubectlLayer</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L347">lib/cluster-providers/generic-cluster-provider.ts:347</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited">
+<h3 class="tsd-anchor-link" id="internalcreatecluster"><code class="tsd-tag">Protected</code><span>internal<wbr/>Create<wbr/>Cluster</span><a href="#internalcreatecluster" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-is-inherited">
+<div class="tsd-signature tsd-anchor-link" id="internalcreatecluster-1"><span class="tsd-kind-call-signature">internalCreateCluster</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">scope</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Construct</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">clusterOptions</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Cluster</span><a href="#internalcreatecluster-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Template method that may be overridden by subclasses to create a specific cluster flavor (e.g. FargateCluster vs eks.Cluster)</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li><span><span class="tsd-kind-parameter">scope</span>: <span class="tsd-signature-type">Construct</span></span></li>
+<li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span></li>
+<li><span><span class="tsd-kind-parameter">clusterOptions</span>: <span class="tsd-signature-type">any</span></span></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Cluster</span></h4><aside class="tsd-sources">
+<p>Inherited from <a href="GenericClusterProvider.html">GenericClusterProvider</a>.<a href="GenericClusterProvider.html#internalcreatecluster">internalCreateCluster</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider.ts#L337">lib/cluster-providers/generic-cluster-provider.ts:337</a></li></ul></aside></div></li></ul></section></section></details></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
+<div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
+<div><a href="#props" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>props</span></a></div></details>
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
+<div><a href="#addautoscalinggroup" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Auto<wbr/>Scaling<wbr/>Group</span></a><a href="#addfargateprofile" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Fargate<wbr/>Profile</span></a><a href="#addmanagednodegroup" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Managed<wbr/>Node<wbr/>Group</span></a><a href="#createcluster" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Cluster</span></a><a href="#getkubectllayer" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Kubectl<wbr/>Layer</span></a><a href="#internalcreatecluster" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>internal<wbr/>Create<wbr/>Cluster</span></a></div></details></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">@aws-quickstart/eks-blueprints</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

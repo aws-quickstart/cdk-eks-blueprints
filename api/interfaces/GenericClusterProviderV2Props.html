@@ -1,0 +1,529 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>GenericClusterProviderV2Props | @aws-quickstart/eks-blueprints</title><meta name="description" content="Documentation for @aws-quickstart/eks-blueprints"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">@aws-quickstart/eks-blueprints</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">GenericClusterProviderV2Props</a></li></ul>
+<h1>Interface GenericClusterProviderV2Props</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Properties for the generic cluster provider, containing definitions of managed node groups,
+auto-scaling groups, fargate profiles.</p>
+</div></section>
+<div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">GenericClusterProviderV2Props</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#albcontroller">albController</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">AlbControllerOptions</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#autoscalingnodegroups">autoscalingNodeGroups</a><span class="tsd-signature-symbol">?:</span> <a href="AutoscalingNodeGroup.html" class="tsd-signature-type tsd-kind-interface">AutoscalingNodeGroup</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#bootstrapclustercreatoradminpermissions">bootstrapClusterCreatorAdminPermissions</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#bootstrapselfmanagedaddons">bootstrapSelfManagedAddons</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#clusterlogging">clusterLogging</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">ClusterLoggingTypes</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#clustername">clusterName</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#compute">compute</a><span class="tsd-signature-symbol">?:</span> <a href="ComputeConfig.html" class="tsd-signature-type tsd-kind-interface">ComputeConfig</a><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#corednscomputetype">coreDnsComputeType</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">CoreDnsComputeType</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#defaultcapacity">defaultCapacity</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#defaultcapacityinstance">defaultCapacityInstance</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">InstanceType</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#defaultcapacitytype">defaultCapacityType</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">DefaultCapacityType</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#endpointaccess">endpointAccess</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">EndpointAccess</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#fargateprofiles">fargateProfiles</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-signature-symbol">[</span><span class="tsd-kind-index-signature">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]:</span> <span class="tsd-signature-type">FargateProfileOptions</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#ipfamily">ipFamily</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IpFamily</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#isolatedcluster">isolatedCluster</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#kubectlprovideroptions">kubectlProviderOptions</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">KubectlProviderOptions</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#managednodegroups">managedNodeGroups</a><span class="tsd-signature-symbol">?:</span> <a href="ManagedNodeGroup.html" class="tsd-signature-type tsd-kind-interface">ManagedNodeGroup</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#mastersrole">mastersRole</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IRole</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#outputconfigcommand">outputConfigCommand</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#privatecluster">privateCluster</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#prune">prune</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#remotenodenetworks">remoteNodeNetworks</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemoteNodeNetwork</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#remotepodnetworks">remotePodNetworks</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemotePodNetwork</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#removalpolicy">removalPolicy</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemovalPolicy</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#role">role</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IRole</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#secretsencryptionkey">secretsEncryptionKey</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IKeyRef</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#securitygroup">securityGroup</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">ISecurityGroup</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#serviceipv4cidr">serviceIpv4Cidr</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#tags">tags</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-signature-symbol">[</span><span class="tsd-kind-index-signature">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#version">version</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">KubernetesVersion</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#vpc">vpc</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IVpc</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#vpcsubnets">vpcSubnets</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">SubnetSelection</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div>
+<section class="tsd-panel tsd-hierarchy" data-refl="4809">
+<h4>Hierarchy</h4>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">eks.ClusterProps</span><span class="tsd-signature-symbol">&gt;</span>
+<ul class="tsd-hierarchy">
+<li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">GenericClusterProviderV2Props</span></li></ul></li></ul></section><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L45">lib/cluster-providers/generic-cluster-provider-v2.ts:45</a></li></ul></aside>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h5 class="tsd-index-heading uppercase">Index</h5></summary>
+<div class="tsd-accordion-details">
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-index-list"><a href="#albcontroller" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>alb<wbr/>Controller?</span></a>
+<a href="#autoscalingnodegroups" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>autoscaling<wbr/>Node<wbr/>Groups?</span></a>
+<a href="#bootstrapclustercreatoradminpermissions" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>bootstrap<wbr/>Cluster<wbr/>Creator<wbr/>Admin<wbr/>Permissions?</span></a>
+<a href="#bootstrapselfmanagedaddons" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>bootstrap<wbr/>Self<wbr/>Managed<wbr/>Addons?</span></a>
+<a href="#clusterlogging" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Logging?</span></a>
+<a href="#clustername" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Name?</span></a>
+<a href="#compute" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>compute?</span></a>
+<a href="#corednscomputetype" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>core<wbr/>Dns<wbr/>Compute<wbr/>Type?</span></a>
+<a href="#defaultcapacity" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity?</span></a>
+<a href="#defaultcapacityinstance" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity<wbr/>Instance?</span></a>
+<a href="#defaultcapacitytype" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity<wbr/>Type?</span></a>
+<a href="#endpointaccess" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>endpoint<wbr/>Access?</span></a>
+<a href="#fargateprofiles" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fargate<wbr/>Profiles?</span></a>
+<a href="#ipfamily" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ip<wbr/>Family?</span></a>
+<a href="#isolatedcluster" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>isolated<wbr/>Cluster?</span></a>
+<a href="#kubectlprovideroptions" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kubectl<wbr/>Provider<wbr/>Options?</span></a>
+<a href="#managednodegroups" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>managed<wbr/>Node<wbr/>Groups?</span></a>
+<a href="#mastersrole" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>masters<wbr/>Role?</span></a>
+<a href="#outputconfigcommand" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>output<wbr/>Config<wbr/>Command?</span></a>
+<a href="#privatecluster" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>private<wbr/>Cluster?</span></a>
+<a href="#prune" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>prune?</span></a>
+<a href="#remotenodenetworks" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remote<wbr/>Node<wbr/>Networks?</span></a>
+<a href="#remotepodnetworks" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remote<wbr/>Pod<wbr/>Networks?</span></a>
+<a href="#removalpolicy" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>removal<wbr/>Policy?</span></a>
+<a href="#role" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>role?</span></a>
+<a href="#secretsencryptionkey" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>secrets<wbr/>Encryption<wbr/>Key?</span></a>
+<a href="#securitygroup" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>security<wbr/>Group?</span></a>
+<a href="#serviceipv4cidr" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>service<wbr/>Ipv4<wbr/>Cidr?</span></a>
+<a href="#tags" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>tags?</span></a>
+<a href="#version" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>version?</span></a>
+<a href="#vpc" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>vpc?</span></a>
+<a href="#vpcsubnets" class="tsd-index-link tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>vpc<wbr/>Subnets?</span></a>
+</div></section></div></details></section></section>
+<details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
+<section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="albcontroller"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>alb<wbr/>Controller</span><a href="#albcontroller" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">albController</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">AlbControllerOptions</span></div>
+<div class="tsd-comment tsd-typography"><p>Install the AWS Load Balancer Controller onto the cluster.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-see">
+<h4 class="tsd-anchor-link" id="see">See<a href="#see" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><a href="https://kubernetes-sigs.github.io/aws-load-balancer-controller">https://kubernetes-sigs.github.io/aws-load-balancer-controller</a></p>
+</div>
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default">Default<a href="#default" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">The</span><span class="hl-1"> </span><span class="hl-6">controller</span><span class="hl-1"> </span><span class="hl-6">is</span><span class="hl-1"> </span><span class="hl-6">not</span><span class="hl-1"> </span><span class="hl-6">installed</span><span class="hl-1">.</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.albController</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:347</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="autoscalingnodegroups"><code class="tsd-tag">Optional</code><span>autoscaling<wbr/>Node<wbr/>Groups</span><a href="#autoscalingnodegroups" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">autoscalingNodeGroups</span><span class="tsd-signature-symbol">?:</span> <a href="AutoscalingNodeGroup.html" class="tsd-signature-type tsd-kind-interface">AutoscalingNodeGroup</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>Array of autoscaling node groups.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L65">lib/cluster-providers/generic-cluster-provider-v2.ts:65</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="bootstrapclustercreatoradminpermissions"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>bootstrap<wbr/>Cluster<wbr/>Creator<wbr/>Admin<wbr/>Permissions</span><a href="#bootstrapclustercreatoradminpermissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">bootstrapClusterCreatorAdminPermissions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Whether or not IAM principal of the cluster creator was set as a cluster admin access entry
+during cluster creation time.</p>
+<p>Changing this value after the cluster has been created will result in the cluster being replaced.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-1">Default<a href="#default-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-2">true</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.bootstrapClusterCreatorAdminPermissions</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:548</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="bootstrapselfmanagedaddons"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>bootstrap<wbr/>Self<wbr/>Managed<wbr/>Addons</span><a href="#bootstrapselfmanagedaddons" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">bootstrapSelfManagedAddons</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>If you set this value to False when creating a cluster, the default networking add-ons will not be installed.
+The default networking addons include vpc-cni, coredns, and kube-proxy.
+Use this option when you plan to install third-party alternative add-ons or self-manage the default networking add-ons.</p>
+<p>Changing this value after the cluster has been created will result in the cluster being replaced.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-2">Default<a href="#default-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-2">true</span><span class="hl-1"> </span><span class="hl-5">if</span><span class="hl-1"> </span><span class="hl-6">the</span><span class="hl-1"> </span><span class="hl-6">mode</span><span class="hl-1"> </span><span class="hl-6">is</span><span class="hl-1"> </span><span class="hl-6">not</span><span class="hl-1"> </span><span class="hl-7">EKS</span><span class="hl-1"> </span><span class="hl-6">Auto</span><span class="hl-1"> </span><span class="hl-6">Mode</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.bootstrapSelfManagedAddons</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:558</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="clusterlogging"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>cluster<wbr/>Logging</span><a href="#clusterlogging" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">clusterLogging</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">ClusterLoggingTypes</span><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>The cluster log types which you want to enable.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-3">Default<a href="#default-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">none</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.clusterLogging</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:353</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="clustername"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>cluster<wbr/>Name</span><a href="#clustername" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">clusterName</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Name for the cluster.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-4">Default<a href="#default-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">Automatically</span><span class="hl-1"> </span><span class="hl-6">generated</span><span class="hl-1"> </span><span class="hl-6">name</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.clusterName</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:272</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="compute"><code class="tsd-tag">Optional</code><span>compute</span><a href="#compute" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">compute</span><span class="tsd-signature-symbol">?:</span> <a href="ComputeConfig.html" class="tsd-signature-type tsd-kind-interface">ComputeConfig</a></div>
+<div class="tsd-comment tsd-typography"><p>EKS Automode compute config</p>
+</div><aside class="tsd-sources">
+<p>Overrides Partial.compute</p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L70">lib/cluster-providers/generic-cluster-provider-v2.ts:70</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="corednscomputetype"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>core<wbr/>Dns<wbr/>Compute<wbr/>Type</span><a href="#corednscomputetype" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">coreDnsComputeType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">CoreDnsComputeType</span></div>
+<div class="tsd-comment tsd-typography"><p>Controls the &quot;<a href="http://eks.amazonaws.com/compute-type">eks.amazonaws.com/compute-type</a>&quot; annotation in the CoreDNS
+configuration on your cluster to determine which compute type to use
+for CoreDNS.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-5">Default<a href="#default-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>CoreDnsComputeType.EC2 (for <code>FargateCluster</code> the default is FARGATE)</p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.coreDnsComputeType</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:299</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="defaultcapacity"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>default<wbr/>Capacity</span><a href="#defaultcapacity" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">defaultCapacity</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>Number of instances to allocate as an initial capacity for this cluster.
+Instance type can be configured through <code>defaultCapacityInstanceType</code>,
+which defaults to <code>m5.large</code>.</p>
+<p>Use <code>cluster.addAutoScalingGroupCapacity</code> to add additional customized capacity. Set this
+to <code>0</code> is you wish to avoid the initial capacity allocation.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-6">Default<a href="#default-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">2</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.defaultCapacity</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:526</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="defaultcapacityinstance"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>default<wbr/>Capacity<wbr/>Instance</span><a href="#defaultcapacityinstance" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">defaultCapacityInstance</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">InstanceType</span></div>
+<div class="tsd-comment tsd-typography"><p>The instance type to use for the default capacity. This will only be taken
+into account if <code>defaultCapacity</code> is &gt; 0.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-7">Default<a href="#default-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-6">m5</span><span class="hl-1">.</span><span class="hl-6">large</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.defaultCapacityInstance</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:533</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="defaultcapacitytype"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>default<wbr/>Capacity<wbr/>Type</span><a href="#defaultcapacitytype" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">defaultCapacityType</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">DefaultCapacityType</span></div>
+<div class="tsd-comment tsd-typography"><p>The default capacity type for the cluster.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-8">Default<a href="#default-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-7">AUTOMODE</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.defaultCapacityType</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:539</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="endpointaccess"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>endpoint<wbr/>Access</span><a href="#endpointaccess" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">endpointAccess</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">EndpointAccess</span></div>
+<div class="tsd-comment tsd-typography"><p>Configure access to the Kubernetes API server endpoint..</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-see">
+<h4 class="tsd-anchor-link" id="see-1">See<a href="#see-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><a href="https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html">https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html</a></p>
+</div>
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-9">Default<a href="#default-9" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-6">EndpointAccess</span><span class="hl-1">.</span><span class="hl-7">PUBLIC_AND_PRIVATE</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.endpointAccess</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:307</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="fargateprofiles"><code class="tsd-tag">Optional</code><span>fargate<wbr/>Profiles</span><a href="#fargateprofiles" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">fargateProfiles</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-signature-symbol">[</span><span class="tsd-kind-index-signature">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]:</span> <span class="tsd-signature-type">FargateProfileOptions</span> <span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-comment tsd-typography"><p>Fargate profiles</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L75">lib/cluster-providers/generic-cluster-provider-v2.ts:75</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="ipfamily"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>ip<wbr/>Family</span><a href="#ipfamily" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">ipFamily</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IpFamily</span></div>
+<div class="tsd-comment tsd-typography"><p>Specify which IP family is used to assign Kubernetes pod and service IP addresses.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-10">Default<a href="#default-10" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-6">IpFamily</span><span class="hl-1">.</span><span class="hl-7">IP_V4</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-tag-see">
+<h4 class="tsd-anchor-link" id="see-2">See<a href="#see-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><a href="https://docs.aws.amazon.com/eks/latest/APIReference/API_KubernetesNetworkConfigRequest.html#AmazonEKS-Type-KubernetesNetworkConfigRequest-ipFamily">https://docs.aws.amazon.com/eks/latest/APIReference/API_KubernetesNetworkConfigRequest.html#AmazonEKS-Type-KubernetesNetworkConfigRequest-ipFamily</a></p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.ipFamily</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:331</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="isolatedcluster"><code class="tsd-tag">Optional</code><span>isolated<wbr/>Cluster</span><a href="#isolatedcluster" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">isolatedCluster</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Whether cluster has internet access.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L50">lib/cluster-providers/generic-cluster-provider-v2.ts:50</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="kubectlprovideroptions"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>kubectl<wbr/>Provider<wbr/>Options</span><a href="#kubectlprovideroptions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">kubectlProviderOptions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">KubectlProviderOptions</span></div>
+<div class="tsd-comment tsd-typography"><p>Options for creating the kubectl provider - a lambda function that executes <code>kubectl</code> and <code>helm</code>
+against the cluster. If defined, <code>kubectlLayer</code> is a required property.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-11">Default<a href="#default-11" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">kubectl</span><span class="hl-1"> </span><span class="hl-6">provider</span><span class="hl-1"> </span><span class="hl-6">will</span><span class="hl-1"> </span><span class="hl-6">not</span><span class="hl-1"> </span><span class="hl-6">be</span><span class="hl-1"> </span><span class="hl-6">created</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.kubectlProviderOptions</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:368</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="managednodegroups"><code class="tsd-tag">Optional</code><span>managed<wbr/>Node<wbr/>Groups</span><a href="#managednodegroups" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">managedNodeGroups</span><span class="tsd-signature-symbol">?:</span> <a href="ManagedNodeGroup.html" class="tsd-signature-type tsd-kind-interface">ManagedNodeGroup</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>Array of managed node groups.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L60">lib/cluster-providers/generic-cluster-provider-v2.ts:60</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="mastersrole"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>masters<wbr/>Role</span><a href="#mastersrole" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">mastersRole</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IRole</span></div>
+<div class="tsd-comment tsd-typography"><p>An IAM role that will be added to the <code>system:masters</code> Kubernetes RBAC
+group.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-see">
+<h4 class="tsd-anchor-link" id="see-3">See<a href="#see-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#default-roles-and-role-bindings">https://kubernetes.io/docs/reference/access-authn-authz/rbac/#default-roles-and-role-bindings</a></p>
+</div>
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-12">Default<a href="#default-12" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">no</span><span class="hl-1"> </span><span class="hl-6">masters</span><span class="hl-1"> </span><span class="hl-6">role</span><span class="hl-1">.</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.mastersRole</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:291</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="outputconfigcommand"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>output<wbr/>Config<wbr/>Command</span><a href="#outputconfigcommand" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">outputConfigCommand</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Determines whether a CloudFormation output with the <code>aws eks update-kubeconfig</code> command will be synthesized. This command will include
+the cluster name and, if applicable, the ARN of the masters IAM role.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-13">Default<a href="#default-13" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-2">true</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.outputConfigCommand</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:566</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="privatecluster"><code class="tsd-tag">Optional</code><span>private<wbr/>Cluster</span><a href="#privatecluster" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">privateCluster</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Whether API server is private.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L55">lib/cluster-providers/generic-cluster-provider-v2.ts:55</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="prune"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>prune</span><a href="#prune" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">prune</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>Indicates whether Kubernetes resources added through <code>addManifest()</code> can be
+automatically pruned. When this is enabled (default), prune labels will be
+allocated and injected to each resource. These labels will then be used
+when issuing the <code>kubectl apply</code> operation with the <code>--prune</code> switch.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-14">Default<a href="#default-14" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-2">true</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.prune</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:316</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="remotenodenetworks"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>remote<wbr/>Node<wbr/>Networks</span><a href="#remotenodenetworks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">remoteNodeNetworks</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemoteNodeNetwork</span><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>IPv4 CIDR blocks defining the expected address range of hybrid nodes
+that will join the cluster.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-15">Default<a href="#default-15" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">none</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.remoteNodeNetworks</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:374</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="remotepodnetworks"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>remote<wbr/>Pod<wbr/>Networks</span><a href="#remotepodnetworks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">remotePodNetworks</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemotePodNetwork</span><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>IPv4 CIDR blocks for Pods running Kubernetes webhooks on hybrid nodes.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-16">Default<a href="#default-16" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">none</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.remotePodNetworks</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:379</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="removalpolicy"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>removal<wbr/>Policy</span><a href="#removalpolicy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">removalPolicy</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">RemovalPolicy</span></div>
+<div class="tsd-comment tsd-typography"><p>The removal policy applied to all CloudFormation resources created by this construct
+when they are no longer managed by CloudFormation.</p>
+<p>This can happen in one of three situations:</p>
+<ul>
+<li>The resource is removed from the template, so CloudFormation stops managing it;</li>
+<li>A change to the resource is made that requires it to be replaced, so CloudFormation stops managing it;</li>
+<li>The stack is deleted, so CloudFormation stops managing all resources in it.</li>
+</ul>
+<p>This affects the EKS cluster itself, associated IAM roles, node groups, security groups, VPC
+and any other CloudFormation resources managed by this construct.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-17">Default<a href="#default-17" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">Resources</span><span class="hl-1"> </span><span class="hl-6">will</span><span class="hl-1"> </span><span class="hl-6">be</span><span class="hl-1"> </span><span class="hl-6">deleted</span><span class="hl-1">.</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.removalPolicy</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:394</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="role"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>role</span><a href="#role" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">role</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IRole</span></div>
+<div class="tsd-comment tsd-typography"><p>Role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-18">Default<a href="#default-18" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-7">A</span><span class="hl-1"> </span><span class="hl-6">role</span><span class="hl-1"> </span><span class="hl-6">is</span><span class="hl-1"> </span><span class="hl-6">automatically</span><span class="hl-1"> </span><span class="hl-6">created</span><span class="hl-1"> </span><span class="hl-6">for</span><span class="hl-1"> </span><span class="hl-6">you</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.role</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:266</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="secretsencryptionkey"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>secrets<wbr/>Encryption<wbr/>Key</span><a href="#secretsencryptionkey" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">secretsEncryptionKey</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IKeyRef</span></div>
+<div class="tsd-comment tsd-typography"><p>KMS secret for envelope encryption for Kubernetes secrets.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-19">Default<a href="#default-19" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">By</span><span class="hl-1"> </span><span class="hl-5">default</span><span class="hl-1">, </span><span class="hl-6">Kubernetes</span><span class="hl-1"> </span><span class="hl-6">stores</span><span class="hl-1"> </span><span class="hl-6">all</span><span class="hl-1"> </span><span class="hl-6">secret</span><span class="hl-1"> </span><span class="hl-6">object</span><span class="hl-1"> </span><span class="hl-6">data</span><span class="hl-1"> </span><span class="hl-6">within</span><span class="hl-1"> </span><span class="hl-6">etcd</span><span class="hl-1"> </span><span class="hl-6">and</span><br/><span class="hl-1">           </span><span class="hl-6">all</span><span class="hl-1"> </span><span class="hl-6">etcd</span><span class="hl-1"> </span><span class="hl-6">volumes</span><span class="hl-1"> </span><span class="hl-6">used</span><span class="hl-1"> </span><span class="hl-6">by</span><span class="hl-1"> </span><span class="hl-6">Amazon</span><span class="hl-1"> </span><span class="hl-7">EKS</span><span class="hl-1"> </span><span class="hl-6">are</span><span class="hl-1"> </span><span class="hl-6">encrypted</span><span class="hl-1"> </span><span class="hl-6">at</span><span class="hl-1"> </span><span class="hl-6">the</span><span class="hl-1"> </span><span class="hl-6">disk</span><span class="hl-1">-</span><span class="hl-6">level</span><br/><span class="hl-1">           </span><span class="hl-2">using</span><span class="hl-1"> </span><span class="hl-7">AWS</span><span class="hl-1">-Managed encryption keys.</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.secretsEncryptionKey</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:324</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="securitygroup"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>security<wbr/>Group</span><a href="#securitygroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">securityGroup</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">ISecurityGroup</span></div>
+<div class="tsd-comment tsd-typography"><p>Security Group to use for Control Plane ENIs</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-20">Default<a href="#default-20" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-7">A</span><span class="hl-1"> </span><span class="hl-6">security</span><span class="hl-1"> </span><span class="hl-6">group</span><span class="hl-1"> </span><span class="hl-6">is</span><span class="hl-1"> </span><span class="hl-6">automatically</span><span class="hl-1"> </span><span class="hl-6">created</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.securityGroup</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:278</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="serviceipv4cidr"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>service<wbr/>Ipv4<wbr/>Cidr</span><a href="#serviceipv4cidr" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">serviceIpv4Cidr</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>The CIDR block to assign Kubernetes service IP addresses from.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-21">Default<a href="#default-21" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">Kubernetes</span><span class="hl-1"> </span><span class="hl-6">assigns</span><span class="hl-1"> </span><span class="hl-6">addresses</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-6">either</span><span class="hl-1"> </span><span class="hl-6">the</span><br/><span class="hl-1">           </span><span class="hl-9">10.100</span><span class="hl-1">.</span><span class="hl-9">0.0</span><span class="hl-1">/</span><span class="hl-9">16</span><span class="hl-1"> </span><span class="hl-6">or</span><span class="hl-1"> </span><span class="hl-9">172.20</span><span class="hl-1">.</span><span class="hl-9">0.0</span><span class="hl-1">/</span><span class="hl-9">16</span><span class="hl-1"> </span><span class="hl-7">CIDR</span><span class="hl-1"> </span><span class="hl-6">blocks</span>
+</code><button type="button">Copy</button></pre>
+
+</div>
+<div class="tsd-tag-see">
+<h4 class="tsd-anchor-link" id="see-4">See<a href="#see-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p><a href="https://docs.aws.amazon.com/eks/latest/APIReference/API_KubernetesNetworkConfigRequest.html#AmazonEKS-Type-KubernetesNetworkConfigRequest-serviceIpv4Cidr">https://docs.aws.amazon.com/eks/latest/APIReference/API_KubernetesNetworkConfigRequest.html#AmazonEKS-Type-KubernetesNetworkConfigRequest-serviceIpv4Cidr</a></p>
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.serviceIpv4Cidr</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:339</li></ul></aside></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="tags"><code class="tsd-tag">Optional</code><span>tags</span><a href="#tags" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">tags</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-signature-symbol">[</span><span class="tsd-kind-index-signature">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-comment tsd-typography"><p>Tags for the cluster</p>
+</div><aside class="tsd-sources">
+<p>Overrides Partial.tags</p>
+<ul>
+<li>Defined in <a href="https://github.com/awslabs/cdk-eks-blueprints/blob/a6f3c57fdeeb4bcf92b95406c3ba42dc9b5042a9/lib/cluster-providers/generic-cluster-provider-v2.ts#L82">lib/cluster-providers/generic-cluster-provider-v2.ts:82</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="version"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>version</span><a href="#version" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">version</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">KubernetesVersion</span></div>
+<div class="tsd-comment tsd-typography"><p>The Kubernetes version to run in the cluster</p>
+</div><aside class="tsd-sources">
+<p>Inherited from Partial.version</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:282</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="vpc"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>vpc</span><a href="#vpc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">vpc</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">IVpc</span></div>
+<div class="tsd-comment tsd-typography"><p>The VPC in which to create the Cluster.</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-22">Default<a href="#default-22" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>a VPC with default configuration will be created and can be accessed through <code>cluster.vpc</code>.</li>
+</ul>
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.vpc</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:250</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external">
+<h3 class="tsd-anchor-link" id="vpcsubnets"><code class="tsd-tag">Optional</code> <code class="tsd-tag">Readonly</code><span>vpc<wbr/>Subnets</span><a href="#vpcsubnets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">vpcSubnets</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">SubnetSelection</span><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>Where to place EKS Control Plane ENIs</p>
+<p>For example, to only select private subnets, supply the following:</p>
+<p><code>vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }]</code></p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-default">
+<h4 class="tsd-anchor-link" id="default-23">Default<a href="#default-23" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-1">- </span><span class="hl-6">All</span><span class="hl-1"> </span><span class="hl-6">public</span><span class="hl-1"> </span><span class="hl-6">and</span><span class="hl-1"> </span><span class="hl-6">private</span><span class="hl-1"> </span><span class="hl-6">subnets</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources">
+<p>Inherited from Partial.vpcSubnets</p>
+<ul>
+<li>Defined in node_modules/aws-cdk-lib/aws-eks-v2/lib/cluster.d.ts:260</li></ul></aside></section></section></details></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
+<div><a href="#albcontroller" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>alb<wbr/>Controller</span></a><a href="#autoscalingnodegroups"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>autoscaling<wbr/>Node<wbr/>Groups</span></a><a href="#bootstrapclustercreatoradminpermissions" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>bootstrap<wbr/>Cluster<wbr/>Creator<wbr/>Admin<wbr/>Permissions</span></a><a href="#bootstrapselfmanagedaddons" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>bootstrap<wbr/>Self<wbr/>Managed<wbr/>Addons</span></a><a href="#clusterlogging" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Logging</span></a><a href="#clustername" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>cluster<wbr/>Name</span></a><a href="#compute"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>compute</span></a><a href="#corednscomputetype" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>core<wbr/>Dns<wbr/>Compute<wbr/>Type</span></a><a href="#defaultcapacity" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity</span></a><a href="#defaultcapacityinstance" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity<wbr/>Instance</span></a><a href="#defaultcapacitytype" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Capacity<wbr/>Type</span></a><a href="#endpointaccess" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>endpoint<wbr/>Access</span></a><a href="#fargateprofiles"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fargate<wbr/>Profiles</span></a><a href="#ipfamily" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>ip<wbr/>Family</span></a><a href="#isolatedcluster"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>isolated<wbr/>Cluster</span></a><a href="#kubectlprovideroptions" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kubectl<wbr/>Provider<wbr/>Options</span></a><a href="#managednodegroups"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>managed<wbr/>Node<wbr/>Groups</span></a><a href="#mastersrole" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>masters<wbr/>Role</span></a><a href="#outputconfigcommand" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>output<wbr/>Config<wbr/>Command</span></a><a href="#privatecluster"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>private<wbr/>Cluster</span></a><a href="#prune" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>prune</span></a><a href="#remotenodenetworks" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remote<wbr/>Node<wbr/>Networks</span></a><a href="#remotepodnetworks" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remote<wbr/>Pod<wbr/>Networks</span></a><a href="#removalpolicy" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>removal<wbr/>Policy</span></a><a href="#role" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>role</span></a><a href="#secretsencryptionkey" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>secrets<wbr/>Encryption<wbr/>Key</span></a><a href="#securitygroup" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>security<wbr/>Group</span></a><a href="#serviceipv4cidr" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>service<wbr/>Ipv4<wbr/>Cidr</span></a><a href="#tags"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>tags</span></a><a href="#version" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>version</span></a><a href="#vpc" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>vpc</span></a><a href="#vpcsubnets" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>vpc<wbr/>Subnets</span></a></div></details></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">@aws-quickstart/eks-blueprints</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>
