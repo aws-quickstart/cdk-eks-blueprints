@@ -4,7 +4,7 @@ This document provides a high level overview of the Core Concepts that are embed
 
 | Concept       | Description                                                           |     
 |---------------|-----------------------------------------------------------------------|
-| [Blueprint](#blueprint) | A `blueprint` combines `clusters`, `add-ons`, and `teams` into a cohesive object that can deployed as a whole |                              
+| [Blueprint](#blueprint) | A `blueprint` combines `clusters`, `add-ons`, and `teams` into a cohesive object that can be deployed as a whole |                              
 | [Cluster](#cluster) | A Well-Architected EKS Cluster. |
 | [Resource Provider](#resource-provider) | Resource providers are abstractions that supply external AWS resources to the cluster (e.g. hosted zones, VPCs, etc.) |
 | [Add-on](#add-on) |  Allow you to configure, deploy, and update the operational software, or add-ons, that provide key functionality to support your Kubernetes applications. |
