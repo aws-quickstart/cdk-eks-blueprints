@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as spi from '../spi';
 import * as utils from '../utils';
 import {BlueprintConstructBuilder, EksBlueprintConstruct, EksBlueprintProps} from "./eks-blueprint-construct";
+import { MigrationBuilder, EksMigrationOptions } from '../migration';
 
 /**
  * Blueprint builder implements a builder pattern that improves readability (no bloated constructors)
@@ -22,6 +23,35 @@ export class BlueprintBuilder extends BlueprintConstructBuilder implements spi.A
     public build(scope: Construct, id: string, stackProps?: cdk.StackProps): EksBlueprint {
         return new EksBlueprint(scope, { ...this.props, ...{ id } },
             { ...{ env: this.env }, ...stackProps });
+    }
+
+    /**
+     * Wraps this builder in a migration construct that transitions the stack
+     * from EKS V1 (custom resources) to EKS V2 (native CloudFormation resources)
+     * across multiple deploys.
+     *
+     * Usage:
+     * ```typescript
+     * blueprints.EksBlueprint.builder()
+     *   .clusterProvider(new blueprints.GenericClusterProvider({ ... }))
+     *   .addOns(...)
+     *   .teams(...)
+     *   .migrate()  // <-- add this line
+     *   .build(app, 'my-cluster');
+     * ```
+     *
+     * Then advance phases via CDK context:
+     * ```bash
+     * cdk deploy -c eks:migration:phase=ADD_RETAIN
+     * ```
+     *
+     * After migration completes, remove `.migrate()` and upgrade to V2-backed Blueprints.
+     *
+     * @param options Migration options (suffix, rollback settings)
+     * @returns MigrationBuilder that supports .build() with the same signature
+     */
+    public migrate(options?: EksMigrationOptions): MigrationBuilder {
+        return new MigrationBuilder(this, options);
     }
 
     /**

@@ -7,6 +7,9 @@ export * as builders from './builders';
 export * from './capabilities';
 export * as capabilities from './capabilities';
 
+export * from './migration';
+export * as migration from './migration';
+
 export * from './stacks';
 export * as stacks from './stacks';
 

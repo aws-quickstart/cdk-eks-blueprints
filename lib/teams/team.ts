@@ -1,5 +1,6 @@
 import { CfnOutput } from 'aws-cdk-lib';
 import { Cluster, KubernetesManifest, ServiceAccount } from 'aws-cdk-lib/aws-eks';
+import * as eks from 'aws-cdk-lib/aws-eks';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as eksv2 from 'aws-cdk-lib/aws-eks-v2';
 import { IRole } from "aws-cdk-lib/aws-iam";
@@ -146,10 +147,20 @@ export class ApplicationTeam implements Team {
             }
         }else if(clusterInfo.cluster instanceof Cluster){
             const eksCluster : Cluster = clusterInfo.cluster;
-            const awsAuth = eksCluster.awsAuth;
-          if (teamRole) {
-            awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
-          }
+            if (teamRole) {
+                if (eksCluster.authenticationMode && eksCluster.authenticationMode !== eks.AuthenticationMode.CONFIG_MAP) {
+                    // Use Access Entries when auth mode supports API
+                    eksCluster.grantAccess(props.name+'-access', teamRole.roleArn, [
+                        eks.AccessPolicy.fromAccessPolicyName('AmazonEKSAdminPolicy', {
+                            accessScopeType: eks.AccessScopeType.NAMESPACE,
+                            namespaces: [props.namespace!],
+                        }),
+                    ]);
+                } else {
+                    // Fall back to ConfigMap for legacy CONFIG_MAP mode
+                    eksCluster.awsAuth.addRoleMapping(teamRole, { groups: [props.namespace! + "-team-group"], username: props.name });
+                }
+            }
         }
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team role ', { value: teamRole ? teamRole.roleArn : "none" });
 
@@ -178,11 +189,19 @@ export class ApplicationTeam implements Team {
                 })]);
             }
         }else if (clusterInfo.cluster instanceof Cluster){
-
-
             if (adminRole) {
                 const eksCluster: Cluster = clusterInfo.cluster;
-                eksCluster.awsAuth.addMastersRole(adminRole, this.teamProps.name);
+                if (eksCluster.authenticationMode && eksCluster.authenticationMode !== eks.AuthenticationMode.CONFIG_MAP) {
+                    // Use Access Entries when auth mode supports API
+                    eksCluster.grantAccess(props.name+'-access', adminRole.roleArn, [
+                        eks.AccessPolicy.fromAccessPolicyName('AmazonEKSClusterAdminPolicy', {
+                            accessScopeType: eks.AccessScopeType.CLUSTER,
+                        }),
+                    ]);
+                } else {
+                    // Fall back to ConfigMap for legacy CONFIG_MAP mode
+                    eksCluster.awsAuth.addMastersRole(adminRole, this.teamProps.name);
+                }
             }
         }
         new CfnOutput(clusterInfo.cluster.stack, props.name + ' team admin ', { value: adminRole ? adminRole.roleArn : "none" });
